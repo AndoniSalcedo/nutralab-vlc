@@ -37,6 +37,7 @@ export default function DashboardShell({ children }) {
           <Menu
             width={220}
             position="bottom-end"
+            p={0}
             withinPortal
             transitionProps={{ transition: 'pop-top-right' }}
             opened={opened}
@@ -48,7 +49,14 @@ export default function DashboardShell({ children }) {
                 className={`${classes.user} ${opened ? classes.userActive : ''}`}
               >
                 <Group gap={2}>
-                  <Avatar radius="xl" size={42} />
+                  <Avatar 
+                    src={undefined}
+                    alt={"Avatar"}
+                    radius="xl" 
+                    size={42} />
+                    <Text fw={500} size="sm" lh={1} mr={2}>
+                  
+                  </Text>
                   <IconChevronDown size={16} stroke={1.5} />
                 </Group>
               </UnstyledButton>
