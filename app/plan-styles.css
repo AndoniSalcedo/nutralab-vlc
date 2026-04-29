@@ -1,0 +1,19 @@
+
+/* ── Markdown Plan Styles ── */
+.plan-md { font-size: 14px; line-height: 1.7; color: var(--fg2); }
+.plan-md h1 { font-size: 20px; font-weight: 800; color: var(--fg); margin: 0 0 4px; letter-spacing: -0.5px; background: linear-gradient(135deg, #fff 40%, var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.plan-md h2 { font-size: 13px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--accent-border); }
+.plan-md h3 { font-size: 13px; font-weight: 600; color: var(--fg); margin: 14px 0 6px; }
+.plan-md p { margin: 6px 0; color: var(--fg2); }
+.plan-md strong { color: var(--fg); font-weight: 600; }
+.plan-md em { color: var(--accent2); font-style: normal; font-weight: 500; }
+.plan-md hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.plan-md ul, .plan-md ol { padding-left: 20px; margin: 6px 0; }
+.plan-md li { margin: 4px 0; color: var(--fg2); }
+.plan-md li::marker { color: var(--accent); }
+.plan-md table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+.plan-md th { background: var(--bg3); color: var(--accent); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 8px 12px; border: 1px solid var(--border2); text-align: left; }
+.plan-md td { padding: 8px 12px; border: 1px solid var(--border); color: var(--fg2); }
+.plan-md tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+.plan-md blockquote { border-left: 3px solid var(--accent); padding: 8px 14px; margin: 10px 0; background: var(--accent-bg); border-radius: 0 8px 8px 0; color: var(--fg2); font-size: 13px; }
+.plan-md code { background: var(--bg3); border: 1px solid var(--border2); border-radius: 4px; padding: 1px 6px; font-size: 12px; color: var(--accent2); font-family: 'SF Mono', monospace; }
