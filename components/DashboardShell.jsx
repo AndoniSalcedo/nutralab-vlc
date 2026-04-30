@@ -28,6 +28,7 @@ import Logo from './Logo';
 export default function DashboardShell({ children }) {
   const [opened, setOpened] = useState(false);
   const router = useRouter();
+  const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL
 
   return (
     <div className={classes.header}>
@@ -49,13 +50,13 @@ export default function DashboardShell({ children }) {
                 className={`${classes.user} ${opened ? classes.userActive : ''}`}
               >
                 <Group gap={2}>
-                  <Avatar 
+                  <Avatar
                     src={undefined}
                     alt={"Avatar"}
-                    radius="xl" 
+                    radius="xl"
                     size={42} />
-                    <Text fw={500} size="sm" lh={1} mr={2}>
-                  
+                  <Text fw={500} size="sm" lh={1} mr={2}>
+
                   </Text>
                   <IconChevronDown size={16} stroke={1.5} />
                 </Group>
@@ -76,7 +77,7 @@ export default function DashboardShell({ children }) {
               <Menu.Item
                 leftSection={<IconUserStar size={16} stroke={1.5} />}
                 onClick={() => {
-                  window.location.href = 'https://nutralab-frontend.vercel.app/admin/nutritionists';
+                  window.location.href = `${frontendUrl}/admin/nutritionists`;
                   setOpened(false);
                 }}
               >
@@ -86,7 +87,7 @@ export default function DashboardShell({ children }) {
               <Menu.Item
                 leftSection={<IconUserCog size={16} stroke={1.5} />}
                 onClick={() => {
-                  window.location.href = 'https://nutralab-frontend.vercel.app/users';
+                  window.location.href = `${frontendUrl}/users`;
                   setOpened(false);
                 }}
               >
@@ -96,7 +97,7 @@ export default function DashboardShell({ children }) {
               <Menu.Item
                 leftSection={<IconReceipt size={16} stroke={1.5} />}
                 onClick={() => {
-                  window.location.href = 'https://nutralab-frontend.vercel.app/recipes';
+                  window.location.href = `${frontendUrl}/recipes`;
                   setOpened(false);
                 }}
               >
@@ -106,7 +107,7 @@ export default function DashboardShell({ children }) {
               <Menu.Item
                 leftSection={<IconBook size={16} stroke={1.5} />}
                 onClick={() => {
-                  window.location.href = 'https://nutralab-frontend.vercel.app/catalogs';
+                  window.location.href = `${frontendUrl}/catalogs`;
                   setOpened(false);
                 }}
               >
@@ -117,7 +118,7 @@ export default function DashboardShell({ children }) {
               <Menu.Item
                 leftSection={<IconSettings size={16} stroke={1.5} />}
                 onClick={() => {
-                  window.location.href = 'https://nutralab-frontend.vercel.app/settings';
+                  window.location.href = `${frontendUrl}/settings`;
                   setOpened(false);
                 }}
               >
