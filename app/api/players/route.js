@@ -6,7 +6,7 @@ function toNumber(value) {
   return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-export async function POST(request: Request) {
+export async function POST(request) {
   const url = new URL(request.url);
   const deleting = url.searchParams.get('delete') === '1';
   const form = await request.formData();

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { env } from '@/lib/env';
 import { buildSessionValue, COOKIE_NAME } from '@/lib/auth';
 
-export async function POST(request: Request) {
+export async function POST(request) {
   const form = await request.formData();
   const username = String(form.get('username') || '');
   const password = String(form.get('password') || '');
