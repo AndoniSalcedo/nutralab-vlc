@@ -3,24 +3,18 @@
 import { useMemo, useState } from 'react';
 import { Card, Text, Group, Select, NumberInput, Grid, ThemeIcon, Stack, Title, Badge, Paper } from '@mantine/core';
 import { IconFlame, IconMeat, IconWheat, IconDroplet, IconScale } from '@tabler/icons-react';
-
-const foods = [
-  { name: 'Pasta cocida', kcal: 157, cho: 30.9, pro: 5.8, fat: 0.9 },
-  { name: 'Arroz cocido', kcal: 129, cho: 28.2, pro: 2.7, fat: 0.3 },
-  { name: 'Pechuga de pollo cocinada', kcal: 165, cho: 0, pro: 31, fat: 3.6 },
-  { name: 'Pan blanco', kcal: 265, cho: 49, pro: 9, fat: 3.2 },
-  { name: 'Plátano', kcal: 89, cho: 23, pro: 1.1, fat: 0.3 },
-  { name: 'Yogur griego natural', kcal: 97, cho: 3.9, pro: 9, fat: 5 },
-  { name: 'Bebida isotónica', kcal: 24, cho: 6, pro: 0, fat: 0 },
-  { name: 'Gel energético', kcal: 120, cho: 30, pro: 0, fat: 0 },
-  { name: 'Whey protein', kcal: 400, cho: 8, pro: 78, fat: 7 },
-];
+import foods from '@/data/foods';
 
 export default function FoodCalculator() {
-  const [foodName, setFoodName] = useState(foods[0].name);
+  const foodOptions = useMemo(
+    () => foods.map((food, index) => ({ value: String(index), label: food.name })),
+    []
+  );
+
+  const [foodId, setFoodId] = useState('0');
   const [grams, setGrams] = useState(100);
 
-  const food = foods.find((f) => f.name === foodName) || foods[0];
+  const food = foods[Number(foodId)] || foods[0];
   
   const result = useMemo(() => {
     const g = Number(grams || 0) / 100;
@@ -49,11 +43,13 @@ export default function FoodCalculator() {
           <Grid.Col span={{ base: 12, sm: 8 }}>
             <Select
               label="Alimento"
-              placeholder="Elige un alimento"
-              data={foods.map(f => ({ value: f.name, label: f.name }))}
-              value={foodName}
-              onChange={setFoodName}
+              placeholder="Escribe para buscar un alimento o plato"
+              data={foodOptions}
+              value={foodId}
+              onChange={(value) => setFoodId(value || '0')}
               searchable
+              limit={50}
+              nothingFoundMessage="No hay alimentos con ese nombre"
               radius="md"
               size="md"
             />
