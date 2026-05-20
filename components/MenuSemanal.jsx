@@ -1,25 +1,75 @@
 'use client';
-import { useState, useRef } from 'react';
 
-const DIAS_ORDEN = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+import { useState } from 'react';
+import { 
+  Paper, 
+  Stack, 
+  Group, 
+  Title, 
+  Text, 
+  Button, 
+  FileButton, 
+  TextInput, 
+  Alert, 
+  Badge, 
+  SimpleGrid, 
+  Box, 
+  Divider 
+} from '@mantine/core';
+import { IconCalendar, IconUpload, IconToolsKitchen, IconFlame, IconInfoCircle } from '@tabler/icons-react';
+import NothingFound from '@/components/NothingFound/NothingFound';
+
+const DIAS_ORDEN = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
 function TarjetaDia({ dia }) {
   return (
-    <div className='card stack' style={{ minWidth: 0 }}>
-      <h4 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>{dia.dia}</h4>
-      <div>
-        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: '#f59e0b', marginBottom: 4 }}>COMIDA</div>
-        {dia.comida.primero && <p style={{ margin: '2px 0', fontSize: 13 }}>1º {dia.comida.primero}</p>}
-        {dia.comida.segundo && <p style={{ margin: '2px 0', fontSize: 13 }}>2º {dia.comida.segundo}</p>}
-        {dia.comida.postre && <p style={{ margin: '2px 0', fontSize: 12, color: 'var(--muted)' }}>🍎 {dia.comida.postre}</p>}
-      </div>
-      <div style={{ borderTop: '1px solid var(--border)', paddingTop: 8 }}>
-        <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: '#6366f1', marginBottom: 4 }}>CENA</div>
-        {dia.cena.primero && <p style={{ margin: '2px 0', fontSize: 13 }}>1º {dia.cena.primero}</p>}
-        {dia.cena.segundo && <p style={{ margin: '2px 0', fontSize: 13 }}>2º {dia.cena.segundo}</p>}
-        {dia.cena.postre && <p style={{ margin: '2px 0', fontSize: 12, color: 'var(--muted)' }}>🍎 {dia.cena.postre}</p>}
-      </div>
-    </div>
+    <Paper radius="md" p="md" withBorder shadow="xs" bg="white" style={{ minWidth: 0 }}>
+      <Stack gap="xs">
+        <Title order={4} size="h5" fw={800} c="dark.7">
+          {dia.dia}
+        </Title>
+        
+        <Box>
+          <Badge size="xs" color="orange" variant="light" mb={4} leftSection={<IconToolsKitchen size={10} />}>
+            COMIDA
+          </Badge>
+          <Stack gap={2}>
+            {dia.comida.primero ? (
+              <Text size="sm" fw={500} c="dark.6">1º {dia.comida.primero}</Text>
+            ) : (
+              <Text size="sm" c="dimmed" fs="italic">Sin primero</Text>
+            )}
+            {dia.comida.segundo && (
+              <Text size="sm" fw={500} c="dark.6">2º {dia.comida.segundo}</Text>
+            )}
+            {dia.comida.postre && (
+              <Text size="xs" c="dimmed">🍎 {dia.comida.postre}</Text>
+            )}
+          </Stack>
+        </Box>
+        
+        <Divider style={{ borderStyle: 'dashed' }} />
+        
+        <Box>
+          <Badge size="xs" color="indigo" variant="light" mb={4} leftSection={<IconFlame size={10} />}>
+            CENA
+          </Badge>
+          <Stack gap={2}>
+            {dia.cena.primero ? (
+              <Text size="sm" fw={500} c="dark.6">1º {dia.cena.primero}</Text>
+            ) : (
+              <Text size="sm" c="dimmed" fs="italic">Sin primero</Text>
+            )}
+            {dia.cena.segundo && (
+              <Text size="sm" fw={500} c="dark.6">2º {dia.cena.segundo}</Text>
+            )}
+            {dia.cena.postre && (
+              <Text size="xs" c="dimmed">🍎 {dia.cena.postre}</Text>
+            )}
+          </Stack>
+        </Box>
+      </Stack>
+    </Paper>
   );
 }
 
@@ -34,75 +84,128 @@ export default function MenuSemanal({ menusIniciales }) {
     lunes.setDate(hoy.getDate() - hoy.getDay() + 1);
     return lunes.toISOString().split('T')[0];
   });
-  const fileRef = useRef(null);
 
-  async function handleUpload(e) {
-    const file = e.target.files?.[0];
+  async function handleUploadFile(file) {
     if (!file) return;
-    setUploading(true); setError('');
+    setUploading(true); 
+    setError('');
+    
     try {
       const fd = new FormData();
       fd.append('file', file);
       fd.append('semana', semana);
+      
       const res = await fetch('/api/menu-semanal', { method: 'POST', body: fd });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) throw new Error(data.error || 'Error al subir el archivo');
+      
       setMenus(prev => {
         const filtered = prev.filter(m => m.semana !== data.menu.semana);
-        return [data.menu, ...filtered].sort((a,b) => b.semana.localeCompare(a.semana));
+        return [data.menu, ...filtered].sort((a, b) => b.semana.localeCompare(a.semana));
       });
       setSelected(data.menu);
-    } catch (e) { setError(e.message); }
-    finally { setUploading(false); if (fileRef.current) fileRef.current.value = ''; }
+    } catch (e) { 
+      setError(e.message); 
+    } finally { 
+      setUploading(false); 
+    }
   }
 
-  const diasOrdenados = selected ? [...selected.dias].sort((a,b) => DIAS_ORDEN.indexOf(a.dia) - DIAS_ORDEN.indexOf(b.dia)) : [];
+  const diasOrdenados = selected ? [...selected.dias].sort((a, b) => DIAS_ORDEN.indexOf(a.dia) - DIAS_ORDEN.indexOf(b.dia)) : [];
 
   return (
-    <div className='stack'>
-      <div className='card stack'>
-        <div className='between' style={{ flexWrap: 'wrap', gap: 12 }}>
-          <div>
-            <h3 style={{ margin: 0 }}>Subir menú semanal</h3>
-            <p className='muted small'>Foto o PDF del menú del comedor · La IA extrae automáticamente los platos</p>
-          </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+    <Stack gap="lg">
+      
+      {/* Tarjeta de Carga */}
+      <Paper radius="md" p="md" withBorder shadow="xs" bg="white">
+        <Stack gap="md">
+          <Group justify="space-between" align="center" style={{ flexWrap: 'wrap', gap: 12 }}>
             <div>
-              <label className='muted small' style={{ display: 'block', marginBottom: 2 }}>Semana del:</label>
-              <input type='date' value={semana} onChange={e => setSemana(e.target.value)}
-                style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--fg)', fontSize: 13 }} />
+              <Title order={4} c="dark.8">Subir menú semanal</Title>
+              <Text size="xs" c="dimmed">
+                Foto o PDF del menú del comedor · La IA extrae automáticamente los platos de cada día
+              </Text>
             </div>
-            <label style={{ padding: '8px 16px', borderRadius: 6, background: uploading ? 'var(--border)' : 'var(--fg)', color: uploading ? 'var(--muted)' : 'var(--bg)', fontSize: 13, fontWeight: 600, cursor: uploading ? 'not-allowed' : 'pointer', alignSelf: 'flex-end' }}>
-              {uploading ? 'Procesando...' : 'Subir foto / PDF'}
-              <input ref={fileRef} type='file' accept='image/*,.pdf' onChange={handleUpload} style={{ display: 'none' }} disabled={uploading} />
-            </label>
-          </div>
-        </div>
-        {error && <div style={{ padding: 10, background: '#fee2e2', borderRadius: 6, color: '#991b1b', fontSize: 13 }}>{error}</div>}
-        {uploading && <div style={{ padding: 10, background: '#dbeafe', borderRadius: 6, color: '#1e40af', fontSize: 13 }}>La IA está leyendo el menú... puede tardar unos segundos.</div>}
-      </div>
+            
+            <Group align="flex-end" gap="xs" style={{ flexWrap: 'wrap' }}>
+              <TextInput
+                label="Semana del:"
+                type="date"
+                value={semana}
+                onChange={(e) => setSemana(e.target.value)}
+                leftSection={<IconCalendar size={16} />}
+                size="sm"
+                radius="md"
+              />
+              <FileButton onChange={handleUploadFile} accept="image/*,.pdf" disabled={uploading}>
+                {(props) => (
+                  <Button 
+                    {...props} 
+                    loading={uploading} 
+                    leftSection={<IconUpload size={16} />}
+                    color="blue" 
+                    radius="xl"
+                    size="xs"
+                  >
+                    Subir foto / PDF
+                  </Button>
+                )}
+              </FileButton>
+            </Group>
+          </Group>
 
+          {error && (
+            <Alert color="red" icon={<IconInfoCircle size={16} />} radius="md">
+              {error}
+            </Alert>
+          )}
+
+          {uploading && (
+            <Alert color="blue" icon={<IconInfoCircle size={16} />} radius="md" title="IA Procesando">
+              La Inteligencia Artificial está leyendo e indexando el menú. Este proceso puede tardar unos segundos...
+            </Alert>
+          )}
+        </Stack>
+      </Paper>
+
+      {/* Selector de semanas guardadas */}
       {menus.length > 1 && (
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Group gap="xs" style={{ flexWrap: 'wrap' }}>
           {menus.map(m => (
-            <button key={m.semana} onClick={() => setSelected(m)}
-              style={{ padding: '6px 14px', borderRadius: 99, border: '1px solid ' + (selected?.semana === m.semana ? 'var(--fg)' : 'var(--border)'), background: selected?.semana === m.semana ? 'var(--fg)' : 'transparent', color: selected?.semana === m.semana ? 'var(--bg)' : 'var(--fg)', fontSize: 13, cursor: 'pointer', fontWeight: selected?.semana === m.semana ? 600 : 400 }}>
+            <Button
+              key={m.semana}
+              onClick={() => setSelected(m)}
+              variant={selected?.semana === m.semana ? 'filled' : 'light'}
+              color="blue"
+              radius="xl"
+              size="xs"
+            >
               Semana {m.semana}
-            </button>
+            </Button>
           ))}
-        </div>
+        </Group>
       )}
 
+      {/* Grid de días */}
       {selected ? (
-        <div>
-          <p className='muted small' style={{ marginBottom: 12 }}>Semana del {selected.semana} · {selected.dias.length} días</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
-            {diasOrdenados.map(dia => <TarjetaDia key={dia.dia} dia={dia} />)}
-          </div>
-        </div>
+        <Stack gap="xs">
+          <Text size="xs" c="dimmed" fw={600}>
+            Menú de la semana del {selected.semana} · {selected.dias.length} días estructurados
+          </Text>
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 4, lg: 7 }} spacing="md">
+            {diasOrdenados.map(dia => (
+              <TarjetaDia key={dia.dia} dia={dia} />
+            ))}
+          </SimpleGrid>
+        </Stack>
       ) : (
-        <div className='card'><p className='muted'>No hay menús. Sube la foto o PDF del menú de esta semana.</p></div>
+        <NothingFound
+          withPaper
+          icon={IconToolsKitchen}
+          title="Sin menús"
+          description="No hay menús registrados. Sube la foto o PDF del menú de esta semana para empezar."
+        />
       )}
-    </div>
+    </Stack>
   );
 }

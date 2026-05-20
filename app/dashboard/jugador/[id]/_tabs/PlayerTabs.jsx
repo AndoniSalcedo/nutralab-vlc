@@ -1,0 +1,91 @@
+'use client';
+
+import { Tabs, rem } from '@mantine/core';
+import { IconBrain, IconChartBar, IconUser } from '@tabler/icons-react';
+import { useRouter } from 'next/navigation';
+import MetricasTab from './MetricasTab';
+import NutricionTab from './NutricionTab';
+import ResumenTab from './ResumenTab';
+
+const DEFAULT_SUBTABS = {
+  resumen: 'ficha',
+  metricas: 'mediciones',
+  nutricion: 'plan',
+};
+
+const VALID_TABS = Object.keys(DEFAULT_SUBTABS);
+const VALID_SUBTABS = {
+  resumen: ['ficha', 'objetivos', 'herramientas'],
+  metricas: ['mediciones', 'analiticas'],
+  nutricion: ['plan', 'hidratacion', 'suplementacion', 'protocolos'],
+};
+
+export default function PlayerTabs({
+  jugador,
+  analiticas = [],
+  evoluciones = [],
+  activeTab: activeTabProp = 'resumen',
+  activeSubtab: activeSubtabProp,
+  readOnly = false,
+}) {
+  const router = useRouter();
+
+  const activeTab = VALID_TABS.includes(activeTabProp) ? activeTabProp : 'resumen';
+  const activeSubtab = VALID_SUBTABS[activeTab].includes(activeSubtabProp)
+    ? activeSubtabProp
+    : DEFAULT_SUBTABS[activeTab];
+
+  function navigate(nextTab, nextSubtab = DEFAULT_SUBTABS[nextTab]) {
+    router.replace(`/dashboard/jugador/${jugador.id}/${nextTab}/${nextSubtab}`, { scroll: false });
+  }
+
+  return (
+    <Tabs
+      value={activeTab}
+      onChange={(value) => value && navigate(value)}
+      variant="outline"
+      radius="md"
+      color="blue"
+      keepMounted={false}
+      styles={{
+        list: { backgroundColor: 'transparent', borderBottomColor: 'var(--mantine-color-gray-3)' },
+        tab: { fontSize: rem(14), fontWeight: 600, padding: `${rem(10)} ${rem(16)}` },
+      }}
+    >
+      <Tabs.List grow mb="md">
+        <Tabs.Tab value="resumen" leftSection={<IconUser size={18} />}>Resumen</Tabs.Tab>
+        <Tabs.Tab value="metricas" leftSection={<IconChartBar size={18} />}>Métricas</Tabs.Tab>
+        <Tabs.Tab value="nutricion" leftSection={<IconBrain size={18} />}>Nutrición</Tabs.Tab>
+      </Tabs.List>
+
+      <Tabs.Panel value="resumen">
+        <ResumenTab
+          jugador={jugador}
+          activeSubtab={activeTab === 'resumen' ? activeSubtab : DEFAULT_SUBTABS.resumen}
+          onSubtabChange={(value) => navigate('resumen', value)}
+          readOnly={readOnly}
+        />
+      </Tabs.Panel>
+
+      <Tabs.Panel value="metricas">
+        <MetricasTab
+          jugador={jugador}
+          analiticas={analiticas}
+          evoluciones={evoluciones}
+          activeSubtab={activeTab === 'metricas' ? activeSubtab : DEFAULT_SUBTABS.metricas}
+          onSubtabChange={(value) => navigate('metricas', value)}
+          readOnly={readOnly}
+        />
+      </Tabs.Panel>
+
+      <Tabs.Panel value="nutricion">
+        <NutricionTab
+          jugador={jugador}
+          activeSubtab={activeTab === 'nutricion' ? activeSubtab : DEFAULT_SUBTABS.nutricion}
+          onSubtabChange={(value) => navigate('nutricion', value)}
+          readOnly={readOnly}
+        />
+      </Tabs.Panel>
+    </Tabs>
+  );
+}

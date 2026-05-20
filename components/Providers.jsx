@@ -29,9 +29,12 @@ const theme = createTheme({
   primaryColor: 'nutralabColor',
 });
 
+import { Notifications } from '@mantine/notifications';
+
 export default function Providers({ children }) {
   return (
     <MantineProvider theme={theme} defaultColorScheme="light">
+      <Notifications />
       {children}
     </MantineProvider>
   );

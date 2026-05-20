@@ -3,6 +3,9 @@
 import { Anchor, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon } from '@mantine/core';
 import { IconCalendarEvent, IconFlame, IconUsers, IconUserPlus, IconChevronRight, IconPencil, IconChartPie } from '@tabler/icons-react';
 import DashboardActions from '@/components/DashboardActions';
+import TeamEvolutionChart from '@/components/TeamEvolutionChart';
+import ExcelImporter from '@/components/ExcelImporter';
+import NothingFound from '@/components/NothingFound/NothingFound';
 
 function initials(name = '') {
   return name.trim().split(/\s+/).slice(0, 2).map((s) => s[0]?.toUpperCase() || '').join('');
@@ -26,7 +29,7 @@ function BentoCard({ title, icon: Icon, color = 'blue', children }) {
   );
 }
 
-export default function DashboardContent({ players = [] }) {
+export default function DashboardContent({ players = [], teamEvolutions = [] }) {
   const totalPlayers = players.length;
   const avgKcal = players.length ? Math.round(players.reduce((a, p) => a + Number(p.kcal_objetivo || 0), 0) / players.length) : 0;
 
@@ -76,8 +79,14 @@ export default function DashboardContent({ players = [] }) {
         </BentoCard>
       </SimpleGrid>
 
-      {/* 3. LISTADO DE JUGADORES (TABLA) */}
-      <Box>
+      {/* 3. GRÁFICO EVOLUTIVO DEL EQUIPO */}
+      {teamEvolutions.length > 0 && (
+        <TeamEvolutionChart teamEvolutions={teamEvolutions} />
+      )}
+
+      {/* 4. LISTADO DE JUGADORES (TABLA) */}
+      <Box mt="md">
+        <Title order={4} mb="md">Plantilla</Title>
         {players.length > 0 ? (
           <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
             <ScrollArea>
@@ -174,13 +183,12 @@ export default function DashboardContent({ players = [] }) {
             </ScrollArea>
           </Paper>
         ) : (
-          <Box mt="xl" py="xl" ta="center">
-            <ThemeIcon size={64} radius="xl" variant="light" color="gray" mb="md">
-              <IconUserPlus size={32} />
-            </ThemeIcon>
-            <Text fw={600} size="lg" mb={4}>Sin jugadores</Text>
-            <Text size="sm" c="dimmed">Importa un Excel o añade un jugador manualmente para empezar.</Text>
-          </Box>
+          <NothingFound
+            withPaper
+            icon={IconUserPlus}
+            title="Sin jugadores"
+            description="Importa un Excel o añade un jugador manualmente para empezar."
+          />
         )}
       </Box>
     </Stack>

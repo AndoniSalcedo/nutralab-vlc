@@ -1,15 +1,27 @@
 'use client';
 
 import { useRef, useState } from 'react';
-
 import { Dropzone } from '@mantine/dropzone';
-import { IconCloudUpload, IconDownload, IconX } from '@tabler/icons-react';
-import { Group, Text, Button, useMantineTheme, Box } from '@mantine/core';
+import { IconCloudUpload, IconDownload, IconX, IconCheck, IconAlertTriangle } from '@tabler/icons-react';
+import { 
+  Group, 
+  Text, 
+  Button, 
+  useMantineTheme, 
+  Box, 
+  Stack, 
+  Paper, 
+  Title, 
+  Table, 
+  Checkbox, 
+  Badge, 
+  Alert, 
+  ScrollArea 
+} from '@mantine/core';
 
 export default function AnthroImporter() {
   const openRef = useRef(null);
   const theme = useMantineTheme();
-  const inputRef = useRef(null);
   const [estado, setEstado] = useState('idle');
   const [jugadores, setJugadores] = useState([]);
   const [seleccionados, setSeleccionados] = useState(new Set());
@@ -45,7 +57,15 @@ export default function AnthroImporter() {
   }
 
   function toggleSeleccion(nombre) {
-    setSeleccionados(prev => { const next = new Set(prev); next.has(nombre) ? next.delete(nombre) : next.add(nombre); return next; });
+    setSeleccionados(prev => { 
+      const next = new Set(prev); 
+      if (next.has(nombre)) {
+        next.delete(nombre);
+      } else {
+        next.add(nombre);
+      }
+      return next; 
+    });
   }
 
   function toggleTodos() {
@@ -66,166 +86,224 @@ export default function AnthroImporter() {
       if (!res.ok) throw new Error(data.error);
       setResultados(data.resultados);
       setEstado('done');
-    } catch (err) { setError(err.message); setEstado('error'); }
+    } catch (err) { 
+      setError(err.message); 
+      setEstado('error'); 
+    }
   }
 
   function resetear() {
-    setEstado('idle'); setJugadores([]); setSeleccionados(new Set()); setResultados([]); setError(''); setArchivo(null);
+    setEstado('idle'); 
+    setJugadores([]); 
+    setSeleccionados(new Set()); 
+    setResultados([]); 
+    setError(''); 
+    setArchivo(null);
   }
 
-  const fmt = (v, dec = 1) => v != null ? v.toFixed(dec) : '—';
+  const fmt = (v, dec = 1) => v != null ? Number(v).toFixed(dec) : '—';
 
   return (
-    <div className="card stack">
-      <div className="between">
-        <div>
-          <h3 style={{ margin: 0 }}>Importar antropometrías</h3>
-          <p className="muted small">Excel del club - Última medición por jugador</p>
-        </div>
-        {estado !== 'idle' && <button className="button secondary" onClick={resetear}>Nuevo archivo</button>}
-      </div>
-      {estado === 'idle' && (
-        <Box pos="relative" mt="xs">
-          <Dropzone
-            openRef={openRef}
-            onDrop={handleDrop}
-            accept={EXCEL_TYPES}
-            maxSize={30 * 1024 ** 2}
-            radius="md"
-            activateOnClick={false}
-            style={{
-              border: '2px dashed var(--mantine-color-gray-4)',
-              backgroundColor: 'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6))',
-              padding: '40px',
-              textAlign: 'center',
-              cursor: 'pointer',
-              transition: 'border-color 150ms ease, background-color 150ms ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--mantine-color-blue-4)';
-              e.currentTarget.style.backgroundColor = 'light-dark(var(--mantine-color-blue-0), var(--mantine-color-dark-5))';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--mantine-color-gray-4)';
-              e.currentTarget.style.backgroundColor = 'light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6))';
-            }}
-          >
-            <div style={{ pointerEvents: 'none' }}>
-              <Group justify="center">
-                <Dropzone.Accept>
-                  <IconDownload size={50} color={theme.colors.blue[6]} stroke={1.5} />
-                </Dropzone.Accept>
-                <Dropzone.Reject>
-                  <IconX size={50} color={theme.colors.red[6]} stroke={1.5} />
-                </Dropzone.Reject>
-                <Dropzone.Idle>
-                  <IconCloudUpload size={50} stroke={1.5} color="var(--mantine-color-dimmed)" />
-                </Dropzone.Idle>
-              </Group>
-
-              <Text ta="center" fw={700} fz="lg" mt="xl">
-                <Dropzone.Accept>¡Suelta el archivo aquí!</Dropzone.Accept>
-                <Dropzone.Reject>Solo Excel</Dropzone.Reject>
-                <Dropzone.Idle>Subir antropometría (.xls / .xlsx)</Dropzone.Idle>
-              </Text>
-
-              <Text ta="center" size="sm" c="dimmed" mt={7}>
-                Arrastra y suelta el archivo o haz clic para seleccionarlo.
-              </Text>
-            </div>
-
-            <Button
-              size="md"
-              radius="xl"
-              style={{ pointerEvents: 'all', marginTop: '20px' }}
-              onClick={() => openRef.current?.()}
-              variant="light"
-            >
-              Seleccionar archivo
+    <Paper radius="md" p="md" withBorder shadow="sm" bg="white">
+      <Stack gap="md">
+        <Group justify="space-between" align="center">
+          <div>
+            <Title order={4} c="dark.8">Importar antropometrías</Title>
+            <Text size="xs" c="dimmed">Excel del club - Última medición por jugador</Text>
+          </div>
+          {estado !== 'idle' && (
+            <Button variant="light" color="gray" size="xs" radius="xl" onClick={resetear}>
+              Nuevo archivo
             </Button>
-          </Dropzone>
-        </Box>
-      )}
-      {estado === 'cargando' && <div style={{ textAlign:'center',padding:'32px 0' }}><p className="muted">Procesando Excel...</p></div>}
-      {estado === 'error' && <div style={{ padding:12,background:'#fee2e2',borderRadius:8,color:'#991b1b' }}>{error}</div>}
-      {estado === 'preview' && jugadores.length > 0 && (
-        <>
-          <div className="between">
-            <p className="muted small">{jugadores.length} jugadores detectados - {seleccionados.size} seleccionados</p>
-            <button className="button secondary" onClick={toggleTodos} style={{ padding:'4px 12px',fontSize:13 }}>
-              {seleccionados.size === jugadores.length ? 'Deseleccionar todos' : 'Seleccionar todos'}
-            </button>
-          </div>
-          <div style={{ overflowX:'auto' }}>
-            <table style={{ width:'100%',borderCollapse:'collapse',fontSize:13 }}>
-              <thead><tr style={{ borderBottom:'1px solid var(--border)' }}>
-                <th style={{ padding:'8px 6px',width:32 }}></th>
-                <th style={{ padding:'8px 6px',textAlign:'left' }}>Jugador</th>
-                <th style={{ padding:'8px 6px',textAlign:'center' }}>Fecha</th>
-                <th style={{ padding:'8px 6px',textAlign:'center' }}>Altura</th>
-                <th style={{ padding:'8px 6px',textAlign:'center' }}>Peso</th>
-                <th style={{ padding:'8px 6px',textAlign:'center' }}>% Grasa</th>
-                <th style={{ padding:'8px 6px',textAlign:'center' }}>Masa magra</th>
-                <th style={{ padding:'8px 6px',textAlign:'center' }}>S6 pliegues</th>
-                <th style={{ padding:'8px 6px',textAlign:'center' }}>Somatotipo</th>
-              </tr></thead>
-              <tbody>{jugadores.map(j => {
-                const sel = seleccionados.has(j._nombre_completo);
-                return (
-                  <tr key={j._nombre_completo} onClick={() => toggleSeleccion(j._nombre_completo)}
-                    style={{ borderBottom:'1px solid var(--border)',background:sel?'var(--bg2)':'transparent',cursor:'pointer',opacity:sel?1:0.45 }}>
-                    <td style={{ padding:'8px 6px',textAlign:'center' }}>
-                      <input type="checkbox" checked={sel} onChange={() => toggleSeleccion(j._nombre_completo)} onClick={e=>e.stopPropagation()} />
-                    </td>
-                    <td style={{ padding:'8px 6px',fontWeight:500 }}>{j._nombre_completo}</td>
-                    <td style={{ padding:'8px 6px',textAlign:'center',color:'var(--muted)' }}>{j.fecha_ultima_medicion ?? '-'}</td>
-                    <td style={{ padding:'8px 6px',textAlign:'center' }}>{j.altura_cm ? j.altura_cm+' cm' : '-'}</td>
-                    <td style={{ padding:'8px 6px',textAlign:'center' }}>{j.peso_kg ? fmt(j.peso_kg)+' kg' : '-'}</td>
-                    <td style={{ padding:'8px 6px',textAlign:'center' }}>
-                      <span style={{ padding:'2px 8px',borderRadius:99,fontSize:12,
-                        background:(j.porcentaje_grasa_faulkner??0)>14?'#fee2e2':(j.porcentaje_grasa_faulkner??0)>11?'#fef9c3':'#dcfce7',
-                        color:(j.porcentaje_grasa_faulkner??0)>14?'#991b1b':(j.porcentaje_grasa_faulkner??0)>11?'#854d0e':'#166534' }}>
-                        {fmt(j.porcentaje_grasa_faulkner)}%
-                      </span>
-                    </td>
-                    <td style={{ padding:'8px 6px',textAlign:'center' }}>{j.masa_magra_kg ? fmt(j.masa_magra_kg)+' kg' : '-'}</td>
-                    <td style={{ padding:'8px 6px',textAlign:'center' }}>{fmt(j.suma_6_pliegues)} mm</td>
-                    <td style={{ padding:'8px 6px',textAlign:'center',color:'var(--muted)',fontSize:12 }}>
-                      {j.endomorfia!=null?fmt(j.endomorfia)+'-'+fmt(j.mesomorfia)+'-'+fmt(j.ectomorfia):'-'}
-                    </td>
-                  </tr>);
-              })}</tbody>
-            </table>
-          </div>
-          <div className="flex" style={{ justifyContent:'flex-end',gap:8,paddingTop:8 }}>
-            <button className="button" onClick={handleImportar} disabled={seleccionados.size===0}>
-              Importar {seleccionados.size} jugador{seleccionados.size!==1?'es':''}
-            </button>
-          </div>
-        </>
-      )}
-      {estado === 'importando' && <div style={{ textAlign:'center',padding:'32px 0' }}><p className="muted">Actualizando en Supabase...</p></div>}
-      {estado === 'done' && (
-        <div className="stack" style={{ gap:8 }}>
-          <p style={{ fontWeight:500,color:'#166534' }}>Importacion completada - {resultados.filter(r=>!r.error).length} jugadores actualizados</p>
-          <table style={{ width:'100%',borderCollapse:'collapse',fontSize:13 }}>
-            <thead><tr style={{ borderBottom:'1px solid var(--border)' }}>
-              <th style={{ padding:'6px 8px',textAlign:'left' }}>Jugador</th>
-              <th style={{ padding:'6px 8px',textAlign:'center' }}>Accion</th>
-              <th style={{ padding:'6px 8px',textAlign:'left' }}>Estado</th>
-            </tr></thead>
-            <tbody>{resultados.map((r,i) => (
-              <tr key={i} style={{ borderBottom:'1px solid var(--border)' }}>
-                <td style={{ padding:'6px 8px' }}>{r.nombre}</td>
-                <td style={{ padding:'6px 8px',textAlign:'center' }}>
-                  <span style={{ padding:'2px 8px',borderRadius:99,fontSize:12,background:r.accion==='creado'?'#dbeafe':'#dcfce7',color:r.accion==='creado'?'#1e40af':'#166534' }}>{r.accion}</span>
-                </td>
-                <td style={{ padding:'6px 8px',color:r.error?'#991b1b':'#166534',fontSize:12 }}>{r.error??'OK'}</td>
-              </tr>
-            ))}</tbody>
-          </table>
-        </div>
-      )}
-    </div>
+          )}
+        </Group>
+
+        {estado === 'idle' && (
+          <Box pos="relative">
+            <Dropzone
+              openRef={openRef}
+              onDrop={handleDrop}
+              accept={EXCEL_TYPES}
+              maxSize={30 * 1024 ** 2}
+              radius="md"
+              activateOnClick={false}
+              style={{
+                border: '2px dashed var(--mantine-color-gray-4)',
+                backgroundColor: 'var(--mantine-color-gray-0)',
+                padding: '40px',
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'border-color 150ms ease, background-color 150ms ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--mantine-color-blue-4)';
+                e.currentTarget.style.backgroundColor = 'var(--mantine-color-blue-0)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--mantine-color-gray-4)';
+                e.currentTarget.style.backgroundColor = 'var(--mantine-color-gray-0)';
+              }}
+            >
+              <div style={{ pointerEvents: 'none' }}>
+                <Group justify="center">
+                  <Dropzone.Accept>
+                    <IconDownload size={50} color={theme.colors.blue[6]} stroke={1.5} />
+                  </Dropzone.Accept>
+                  <Dropzone.Reject>
+                    <IconX size={50} color={theme.colors.red[6]} stroke={1.5} />
+                  </Dropzone.Reject>
+                  <Dropzone.Idle>
+                    <IconCloudUpload size={50} stroke={1.5} color="var(--mantine-color-dimmed)" />
+                  </Dropzone.Idle>
+                </Group>
+
+                <Text ta="center" fw={700} fz="lg" mt="xl">
+                  <Dropzone.Accept>¡Suelta el archivo aquí!</Dropzone.Accept>
+                  <Dropzone.Reject>Solo Excel</Dropzone.Reject>
+                  <Dropzone.Idle>Subir antropometría (.xls / .xlsx)</Dropzone.Idle>
+                </Text>
+
+                <Text ta="center" size="sm" c="dimmed" mt={7}>
+                  Arrastra y suelta el archivo o haz clic para seleccionarlo.
+                </Text>
+              </div>
+
+              <Button
+                size="xs"
+                radius="xl"
+                style={{ pointerEvents: 'all', marginTop: '20px' }}
+                onClick={() => openRef.current?.()}
+                variant="light"
+              >
+                Seleccionar archivo
+              </Button>
+            </Dropzone>
+          </Box>
+        )}
+
+        {estado === 'cargando' && (
+          <Box py="xl" ta="center">
+            <Text c="dimmed" size="sm">Procesando Excel...</Text>
+          </Box>
+        )}
+
+        {estado === 'error' && (
+          <Alert color="red" icon={<IconAlertTriangle size={16} />} radius="md">
+            {error}
+          </Alert>
+        )}
+
+        {estado === 'preview' && jugadores.length > 0 && (
+          <Stack gap="md">
+            <Group justify="space-between">
+              <Text size="xs" c="dimmed" fw={600}>
+                {jugadores.length} jugadores detectados — {seleccionados.size} seleccionados
+              </Text>
+              <Button variant="light" color="blue" size="xs" radius="xl" onClick={toggleTodos}>
+                {seleccionados.size === jugadores.length ? 'Deseleccionar todos' : 'Seleccionar todos'}
+              </Button>
+            </Group>
+
+            <ScrollArea>
+              <Table striped highlightOnHover verticalSpacing="xs">
+                <Table.Thead bg="gray.0">
+                  <Table.Tr>
+                    <Table.Th style={{ width: 40 }}></Table.Th>
+                    <Table.Th>Jugador</Table.Th>
+                    <Table.Th ta="center">Fecha</Table.Th>
+                    <Table.Th ta="center">Altura</Table.Th>
+                    <Table.Th ta="center">Peso</Table.Th>
+                    <Table.Th ta="center">% Grasa</Table.Th>
+                    <Table.Th ta="center">Masa magra</Table.Th>
+                    <Table.Th ta="center">S6 pliegues</Table.Th>
+                    <Table.Th ta="center">Somatotipo</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {jugadores.map((j) => {
+                    const sel = seleccionados.has(j._nombre_completo);
+                    return (
+                      <Table.Tr 
+                        key={j._nombre_completo} 
+                        onClick={() => toggleSeleccion(j._nombre_completo)}
+                        style={{ cursor: 'pointer', opacity: sel ? 1 : 0.5 }}
+                      >
+                        <Table.Td onClick={(e) => e.stopPropagation()}>
+                          <Checkbox checked={sel} onChange={() => toggleSeleccion(j._nombre_completo)} />
+                        </Table.Td>
+                        <Table.Td fw={600}>{j._nombre_completo}</Table.Td>
+                        <Table.Td ta="center" c="dimmed">{j.fecha_ultima_medicion ?? '-'}</Table.Td>
+                        <Table.Td ta="center">{j.altura_cm ? `${j.altura_cm} cm` : '-'}</Table.Td>
+                        <Table.Td ta="center">{j.peso_kg ? `${fmt(j.peso_kg)} kg` : '-'}</Table.Td>
+                        <Table.Td ta="center">
+                          <Badge 
+                            color={(j.porcentaje_grasa_faulkner ?? 0) > 14 ? 'red' : (j.porcentaje_grasa_faulkner ?? 0) > 11 ? 'yellow' : 'green'} 
+                            variant="light"
+                          >
+                            {fmt(j.porcentaje_grasa_faulkner)}%
+                          </Badge>
+                        </Table.Td>
+                        <Table.Td ta="center">{j.masa_magra_kg ? `${fmt(j.leanMass || j.masa_magra_kg)} kg` : '-'}</Table.Td>
+                        <Table.Td ta="center">{fmt(j.suma_6_pliegues)} mm</Table.Td>
+                        <Table.Td ta="center" c="dimmed">
+                          {j.endomorfia != null ? `${fmt(j.endomorfia)}-${fmt(j.mesomorfia)}-${fmt(j.ectomorfia)}` : '-'}
+                        </Table.Td>
+                      </Table.Tr>
+                    );
+                  })}
+                </Table.Tbody>
+              </Table>
+            </ScrollArea>
+
+            <Group justify="flex-end">
+              <Button onClick={handleImportar} disabled={seleccionados.size === 0} color="blue" size="xs" radius="xl">
+                Importar {seleccionados.size} jugador{seleccionados.size !== 1 ? 'es' : ''}
+              </Button>
+            </Group>
+          </Stack>
+        )}
+
+        {estado === 'importando' && (
+          <Box py="xl" ta="center">
+            <Text c="dimmed" size="sm">Actualizando datos en Supabase...</Text>
+          </Box>
+        )}
+
+        {estado === 'done' && (
+          <Stack gap="md">
+            <Alert color="green" icon={<IconCheck size={16} />} title="Importación completada">
+              {resultados.filter(r => !r.error).length} jugadores han sido actualizados con éxito.
+            </Alert>
+
+            <ScrollArea>
+              <Table highlightOnHover verticalSpacing="xs">
+                <Table.Thead bg="gray.0">
+                  <Table.Tr>
+                    <Table.Th>Jugador</Table.Th>
+                    <Table.Th ta="center">Acción</Table.Th>
+                    <Table.Th>Estado / Error</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {resultados.map((r, i) => (
+                    <Table.Tr key={i}>
+                      <Table.Td fw={500}>{r.nombre}</Table.Td>
+                      <Table.Td ta="center">
+                        <Badge color={r.accion === 'creado' ? 'blue' : 'green'} variant="light">
+                          {r.accion}
+                        </Badge>
+                      </Table.Td>
+                      <Table.Td c={r.error ? 'red.6' : 'green.6'} fw={500}>
+                        {r.error ?? 'Correcto (OK)'}
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </ScrollArea>
+          </Stack>
+        )}
+      </Stack>
+    </Paper>
   );
 }

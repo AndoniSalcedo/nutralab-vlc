@@ -1,27 +1,48 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import DashboardContent from '@/components/DashboardContent';
+import { getUser } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function Dashboard() {
   const supabase = getSupabaseAdmin();
-  let players = [];
-  let error = null;
+  const user = await getUser();
+  
+  // Jugador flow
+  if (user?.role === 'jugador') {
+    const { data: jugador } = await supabase.from('jugadores').select('*').eq('id', user.id).single();
+    
+    if (!jugador) {
+      return <p>Error: No se encontró tu perfil de jugador.</p>;
+    }
 
-  try {
-    const { data, error: sbError } = await supabase
-      .from('jugadores')
-      .select('id,nombre,apellidos,posicion,kcal_objetivo,peso_kg,porcentaje_grasa,masa_magra_kg')
-      .order('nombre');
-
-    if (sbError) throw sbError;
-    players = data || [];
-  } catch (err) {
-    console.error('Error fetching players:', err);
-    error = err;
-    players = [];
+    redirect(`/dashboard/jugador/${jugador.id}`);
   }
 
-  return <DashboardContent players={players} />;
+  // Admin flow
+  let players = [];
+  let teamEvolutions = [];
+  try {
+    const [resJugadores, resEvoluciones] = await Promise.all([
+      supabase
+        .from('jugadores')
+        .select('id,nombre,apellidos,posicion,kcal_objetivo,peso_kg,porcentaje_grasa,masa_magra_kg')
+        .order('nombre'),
+      supabase
+        .from('evoluciones')
+        .select('fecha,peso_kg,porcentaje_grasa,masa_magra_kg')
+    ]);
+
+    if (resJugadores.error) throw resJugadores.error;
+    if (resEvoluciones.error) throw resEvoluciones.error;
+    
+    players = resJugadores.data || [];
+    teamEvolutions = resEvoluciones.data || [];
+  } catch (err) {
+    console.error('Error fetching players/evolutions:', err);
+  }
+
+  return <DashboardContent players={players} teamEvolutions={teamEvolutions} />;
 }

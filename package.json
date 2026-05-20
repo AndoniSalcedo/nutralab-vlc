@@ -6,17 +6,25 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:migrate": "node scripts/db-migrate.js",
+    "db:migrate:status": "node scripts/db-migrate.js --status",
+    "db:teams": "node scripts/db-migrate.js --schema=teams"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
-    "@mantine/core": "^7.15.3",
-    "@mantine/dropzone": "^7.15.3",
-    "@mantine/hooks": "^7.15.3",
+    "@mantine/core": "^8.3.18",
+    "@mantine/dates": "^8.3.18",
+    "@mantine/dropzone": "^8.3.18",
+    "@mantine/hooks": "^8.3.18",
+    "@mantine/notifications": "^8.3.18",
     "@supabase/supabase-js": "^2.49.8",
     "@tabler/icons-react": "^3.31.0",
+    "dayjs": "^1.11.20",
+    "jsonwebtoken": "^9.0.3",
     "marked": "^12.0.0",
     "next": "14.2.25",
+    "postcss-simple-vars": "^7.0.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "recharts": "^2.12.7",
@@ -24,7 +32,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "pg": "^8.21.0",
     "postcss": "^8.4.49",
-    "postcss-preset-mantine": "^1.17.0"
+    "postcss-preset-mantine": "^1.18.0"
   }
 }

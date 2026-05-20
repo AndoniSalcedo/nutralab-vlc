@@ -13,7 +13,16 @@ Base real para desplegar en Vercel con Supabase.
 ## Antes de desplegar
 1. Copia `.env.example` a `.env.local`
 2. Rellena las variables de Supabase
-3. Comprueba que tu tabla `jugadores` tiene estas columnas:
+3. Aplica las migraciones de base de datos. Por defecto usan el schema `teams`:
+   ```bash
+   npm run db:migrate
+   ```
+   También puedes ver el estado con:
+   ```bash
+   npm run db:migrate:status
+   ```
+   Para que `supabase-js` pueda consultar ese schema, debes poner `SUPABASE_SCHEMA=teams` y exponer `teams` en Supabase: Project Settings -> API -> Exposed schemas. `SUPABASE_DB_URL` solo lo usa el runner de migraciones para conectar a Postgres; no expone el schema a la API REST de Supabase.
+4. Comprueba que tu tabla `jugadores` tiene estas columnas:
    - nombre, apellidos, posicion
    - altura_cm, peso_kg, porcentaje_grasa, masa_magra_kg
    - factor_actividad
@@ -25,6 +34,23 @@ Base real para desplegar en Vercel con Supabase.
 npm install
 npm run dev
 ```
+
+## Migraciones de Supabase
+Las migraciones viven en `supabase/migrations` y son SQL versionado compatible con el flujo nativo de Supabase.
+
+Comandos útiles:
+```bash
+npm run db:migrate
+npm run db:migrate:status
+npm run db:teams
+```
+
+Para añadir un cambio de base de datos, crea un archivo nuevo con formato:
+```txt
+supabase/migrations/YYYYMMDDHHMMSS_nombre_del_cambio.sql
+```
+
+El runner guarda el historial en `teams.schema_migrations`, ejecuta solo las pendientes y recarga la caché de PostgREST con `notify pgrst, 'reload schema';`.
 
 ## Despliegue en Vercel
 - Sube esta carpeta a un repositorio privado de GitHub

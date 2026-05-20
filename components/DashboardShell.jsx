@@ -25,10 +25,16 @@ import classes from './DashboardShell.module.css';
 import Logo from './Logo';
 
 
-export default function DashboardShell({ children }) {
+export default function DashboardShell({ children, user }) {
   const [opened, setOpened] = useState(false);
   const router = useRouter();
-  const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL
+  const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL;
+
+  const initials = (name) => {
+    if (!name) return '';
+    const parts = name.split(' ');
+    return parts.slice(0, 2).map((n) => n[0]).join('').toUpperCase();
+  };
 
   return (
     <div className={classes.header}>
@@ -52,11 +58,13 @@ export default function DashboardShell({ children }) {
                 <Group gap={2}>
                   <Avatar
                     src={undefined}
-                    alt={"Avatar"}
+                    alt={user?.name || "Avatar"}
                     radius="xl"
-                    size={42} />
+                    size={42} >
+                    {initials(user?.name || user?.username)}
+                  </Avatar>
                   <Text fw={500} size="sm" lh={1} mr={2}>
-
+                    {user?.name || user?.username || ""}
                   </Text>
                   <IconChevronDown size={16} stroke={1.5} />
                 </Group>
