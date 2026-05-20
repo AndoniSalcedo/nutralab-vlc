@@ -198,7 +198,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
   return (
     <Stack gap="lg">
-      <Paper radius="lg" p="lg" withBorder shadow="sm">
+      <Paper p="md" bg="white" shadow="xs" radius="lg" withBorder>
         <Stack gap="md">
           <Group justify="space-between" align="flex-start">
             <Box>

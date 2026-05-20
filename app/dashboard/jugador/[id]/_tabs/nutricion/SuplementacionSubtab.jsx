@@ -57,7 +57,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
 
   return (
     <Stack gap="lg">
-      <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
+      <Paper p="md" bg="white" shadow="xs" radius="lg" withBorder>
         <Group justify="space-between" align="flex-start" wrap="wrap">
           <Group gap="xs">
             <ThemeIcon color="grape" variant="light" radius="xl" size="lg">
