@@ -38,7 +38,7 @@ export default function DashboardShell({ children, user }) {
 
   return (
     <div className={classes.header}>
-      <Container size="lg">
+      <Container size="lg" px={{ base: 'xs', sm: 'md' }}>
         <Group justify="space-between">
           <Logo />
           <Menu
@@ -150,10 +150,9 @@ export default function DashboardShell({ children, user }) {
 
       <form id="logout-form" method="post" action="/api/logout" />
 
-      <Container size="xl" pt="md" pb="md">
+      <Container size="xl" px={{ base: 'xs', sm: 'md' }} pt={{ base: 'xs', sm: 'md' }} pb="md">
         {children}
       </Container>
     </div>
   );
 }
-

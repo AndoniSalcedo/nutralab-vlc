@@ -2,7 +2,6 @@
 
 import { useMemo, useRef, useState } from 'react';
 import {
-  Alert,
   Badge,
   Box,
   Button,
@@ -17,7 +16,8 @@ import {
   ThemeIcon,
   Title,
 } from '@mantine/core';
-import { IconAlertCircle, IconCalendar, IconFileAnalytics, IconFileText, IconPlus, IconReportMedical, IconUpload } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
+import { IconCalendar, IconFileAnalytics, IconFileText, IconPlus, IconReportMedical, IconUpload } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
 import NothingFound from '@/components/NothingFound/NothingFound';
 
@@ -78,7 +78,6 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
   const [currentId, setCurrentId] = useState(analiticasIniciales?.[0]?.id ? String(analiticasIniciales[0].id) : null);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
   const [fecha, setFecha] = useState('');
   const fileRef = useRef(null);
 
@@ -93,21 +92,28 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
 
   function startUpload() {
     setUploadOpen(true);
-    setError('');
     setFecha('');
   }
 
   function cancelUpload() {
     setUploadOpen(false);
-    setError('');
   }
 
   async function handleUpload(e) {
     if (readOnly) return;
     const file = e.target.files?.[0];
     if (!file) return;
+    const notificationId = 'analitica-upload';
     setUploading(true);
-    setError('');
+    notifications.show({
+      id: notificationId,
+      color: 'blue',
+      title: 'Procesando analítica',
+      message: 'Extrayendo parámetros con IA. Puede tardar unos segundos.',
+      loading: true,
+      autoClose: false,
+      withCloseButton: false,
+    });
     try {
       const fd = new FormData();
       fd.append('file', file);
@@ -119,8 +125,25 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
       setAnaliticas((prev) => [data.analitica, ...prev]);
       setCurrentId(String(data.analitica.id));
       setUploadOpen(false);
+      notifications.update({
+        id: notificationId,
+        color: 'green',
+        title: 'Analítica subida',
+        message: 'La analítica se ha procesado correctamente.',
+        loading: false,
+        autoClose: 4000,
+        withCloseButton: true,
+      });
     } catch (e) {
-      setError(e.message);
+      notifications.update({
+        id: notificationId,
+        color: 'red',
+        title: 'No se pudo subir la analítica',
+        message: e.message,
+        loading: false,
+        autoClose: 6000,
+        withCloseButton: true,
+      });
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = '';
@@ -128,15 +151,20 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
   }
 
   return (
-    <Stack gap="lg">
-      <Paper p="md" bg="white" shadow="xs" radius="lg" withBorder>
+    <Stack gap={0}>
+      <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Stack gap="sm">
-          <Group justify="space-between" align="center">
+          <Group justify="space-between" align="flex-start" wrap="wrap">
             <Group gap="xs">
               <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
                 <IconReportMedical size={20} />
               </ThemeIcon>
-              <Title order={3} fw={800} c="dark.4">Analíticas</Title>
+              <Stack gap={2}>
+                <Title order={3} fw={800} c="dark.4">Analíticas</Title>
+                <Text size="sm" c="dimmed">
+                  Documentos clínicos destacados.
+                </Text>
+              </Stack>
             </Group>
 
             {!readOnly && (
@@ -167,12 +195,6 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
         </Stack>
       </Paper>
 
-      {error && !uploadOpen && (
-        <Alert color="red" icon={<IconAlertCircle size={16} />}>
-          {error}
-        </Alert>
-      )}
-
       <Modal
         opened={uploadOpen && !readOnly}
         onClose={cancelUpload}
@@ -180,12 +202,6 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
         size="lg"
       >
         <Stack gap="md">
-          {error && (
-            <Alert color="red" icon={<IconAlertCircle size={16} />}>
-              {error}
-            </Alert>
-          )}
-
           <Group gap="xs" align="flex-end">
             <TextInput
               label="Fecha extracción"
@@ -199,16 +215,10 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
             </Button>
             <input ref={fileRef} type="file" accept=".pdf" onChange={handleUpload} style={{ display: 'none' }} />
           </Group>
-
-          {uploading && (
-            <Alert color="blue" icon={<IconFileText size={16} />}>
-              Extrayendo parámetros con IA... puede tardar unos segundos.
-            </Alert>
-          )}
         </Stack>
       </Modal>
 
-      <Box p="md">
+      <Box py={{ base: 'sm', sm: 'md' }}>
         {sorted.length === 0 ? (
           <Box mt="xl">
             <NothingFound
@@ -220,32 +230,32 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
             />
           </Box>
         ) : selected ? (
-          <Stack gap="lg">
-          <SimpleGrid cols={{ base: 1, sm: 3 }}>
-            <Paper p="sm" radius="md" withBorder shadow="xs" style={{ borderLeft: '4px solid var(--mantine-color-blue-filled)' }}>
-              <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Parámetros</Text>
-              <Text fw={800} size="xl">{parametros.length}</Text>
-            </Paper>
-            <Paper p="sm" radius="md" withBorder shadow="xs" style={{ borderLeft: `4px solid ${totalFuera > 0 ? 'var(--mantine-color-red-filled)' : 'var(--mantine-color-green-filled)'}` }}>
-              <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Fuera de rango</Text>
-              <Text fw={800} size="xl" c={totalFuera > 0 ? 'red' : 'green'}>{totalFuera}</Text>
-            </Paper>
-            <Paper p="sm" radius="md" withBorder shadow="xs" style={{ borderLeft: '4px solid var(--mantine-color-gray-5)' }}>
-              <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Fecha</Text>
-              <Group gap="xs" pt={4}>
-                <IconCalendar size={16} color="var(--mantine-color-gray-5)" />
-                <Text fw={800} size="md">{fechaLabel(selected.fecha_extraccion)}</Text>
-              </Group>
-            </Paper>
-          </SimpleGrid>
+          <Stack gap={0}>
+            <SimpleGrid cols={{ base: 1, sm: 3 }} spacing={{ base: 'md', sm: 'md' }} mb={{ base: 'md', sm: 'xl' }}>
+              <Paper p="sm" radius="md" withBorder shadow="xs" style={{ borderLeft: '4px solid var(--mantine-color-blue-filled)' }}>
+                <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Parámetros</Text>
+                <Text fw={800} size="xl">{parametros.length}</Text>
+              </Paper>
+              <Paper p="sm" radius="md" withBorder shadow="xs" style={{ borderLeft: `4px solid ${totalFuera > 0 ? 'var(--mantine-color-red-filled)' : 'var(--mantine-color-green-filled)'}` }}>
+                <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Fuera de rango</Text>
+                <Text fw={800} size="xl" c={totalFuera > 0 ? 'red' : 'green'}>{totalFuera}</Text>
+              </Paper>
+              <Paper p="sm" radius="md" withBorder shadow="xs" style={{ borderLeft: '4px solid var(--mantine-color-gray-5)' }}>
+                <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Fecha</Text>
+                <Group gap="xs" pt={4}>
+                  <IconCalendar size={16} color="var(--mantine-color-gray-5)" />
+                  <Text fw={800} size="md">{fechaLabel(selected.fecha_extraccion)}</Text>
+                </Group>
+              </Paper>
+            </SimpleGrid>
 
-          {Object.entries(grupos).map(([grupo, params]) => params.length > 0 && (
-            <BentoCard key={grupo} title={grupo} icon={IconFileText} color="blue">
-              <Stack gap={0}>
-                {params.map((p) => <Semaforo key={p.nombre} p={p} />)}
-              </Stack>
-            </BentoCard>
-          ))}
+            {Object.entries(grupos).map(([grupo, params]) => params.length > 0 && (
+              <BentoCard key={grupo} title={grupo} icon={IconFileText} color="blue" mb={{ base: 'md', sm: 'xl' }}>
+                <Stack gap={0}>
+                  {params.map((p) => <Semaforo key={p.nombre} p={p} />)}
+                </Stack>
+              </BentoCard>
+            ))}
           </Stack>
         ) : (
           <Box mt="xl">

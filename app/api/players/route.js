@@ -14,7 +14,16 @@ export async function POST(request) {
   const supabase = getSupabaseAdmin();
 
   if (deleting && id) {
+    const { data: jugador } = await supabase
+      .from('jugadores')
+      .select('auth_user_id')
+      .eq('id', id)
+      .single();
+
     await supabase.from('jugadores').delete().eq('id', id);
+    if (jugador?.auth_user_id) {
+      await supabase.auth.admin.deleteUser(jugador.auth_user_id);
+    }
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

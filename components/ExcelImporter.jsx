@@ -3,7 +3,8 @@
 import { useState, useRef } from 'react';
 import * as XLSX from 'xlsx';
 import { Dropzone } from '@mantine/dropzone';
-import { IconCloudUpload, IconDownload, IconX, IconCheck, IconAlertTriangle } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
+import { IconCloudUpload, IconDownload, IconX } from '@tabler/icons-react';
 import { 
   Group, 
   Text, 
@@ -14,16 +15,13 @@ import {
   Stack, 
   Title, 
   Table, 
-  ScrollArea, 
-  Alert 
+  ScrollArea
 } from '@mantine/core';
 
 export default function ExcelImporter() {
   const [rows, setRows] = useState([]);
   const [allRows, setAllRows] = useState([]);
   const [importing, setImporting] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(null);
   const theme = useMantineTheme();
   const openRef = useRef(null);
 
@@ -35,8 +33,6 @@ export default function ExcelImporter() {
   function handleDrop(files) {
     const file = files[0];
     if (!file) return;
-    setSuccess(false);
-    setError(null);
     const reader = new FileReader();
     reader.onload = (e) => {
       const data = e.target?.result;
@@ -52,7 +48,6 @@ export default function ExcelImporter() {
 
   async function handleImport() {
     setImporting(true);
-    setError(null);
     try {
       const res = await fetch('/api/import-mediciones', {
         method: 'POST',
@@ -61,11 +56,19 @@ export default function ExcelImporter() {
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || 'Error al importar');
-      setSuccess(true);
+      notifications.show({
+        color: 'green',
+        title: 'Importación completada',
+        message: 'Mediciones de plantilla importadas correctamente.',
+      });
       setRows([]);
       setAllRows([]);
     } catch (err) {
-      setError(err.message);
+      notifications.show({
+        color: 'red',
+        title: 'Error al importar',
+        message: err.message,
+      });
     } finally {
       setImporting(false);
     }
@@ -142,18 +145,6 @@ export default function ExcelImporter() {
             </Button>
           </Dropzone>
         </Box>
-
-        {error && (
-          <Alert color="red" icon={<IconAlertTriangle size={16} />} radius="md">
-            {error}
-          </Alert>
-        )}
-
-        {success && (
-          <Alert color="green" icon={<IconCheck size={16} />} radius="md" title="Éxito">
-            ¡Mediciones de plantilla importadas correctamente!
-          </Alert>
-        )}
 
         {rows.length > 0 && (
           <Stack gap="sm">

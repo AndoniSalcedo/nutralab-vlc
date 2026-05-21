@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import {
-  Badge,
   Box,
   Button,
   Group,
@@ -14,26 +13,40 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { IconCheck, IconEdit } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
+import { IconEdit } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
 
 export function CampoEditable({ label, campo, valor, jugadorId, tipo = 'textarea', opciones, readOnly = false }) {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(valor || '');
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
 
   async function save() {
     setSaving(true);
-    await fetch('/api/update-player', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: jugadorId, field: campo, value: val }),
-    });
-    setSaving(false);
-    setSaved(true);
-    setEditing(false);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      const res = await fetch('/api/update-player', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: jugadorId, field: campo, value: val }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'No se pudo guardar el campo');
+      setEditing(false);
+      notifications.show({
+        color: 'green',
+        title: 'Campo guardado',
+        message: `${label} se ha actualizado correctamente.`,
+      });
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'No se pudo guardar',
+        message: e.message,
+      });
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -58,7 +71,6 @@ export function CampoEditable({ label, campo, valor, jugadorId, tipo = 'textarea
 
           {!readOnly && (
             <Group gap={6}>
-              {saved && <IconCheck size={16} color="green" />}
               {!editing ? (
                 <Button variant="subtle" size="xs" radius="xl" onClick={() => setEditing(true)}>
                   Editar
@@ -85,15 +97,26 @@ export function EditableSection({ title, defaultValue, onSave, readOnly = false 
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(defaultValue);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
 
   async function handleSave() {
     setSaving(true);
-    await onSave(value);
-    setSaving(false);
-    setSaved(true);
-    setEditing(false);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await onSave(value);
+      setEditing(false);
+      notifications.show({
+        color: 'green',
+        title: 'Sección guardada',
+        message: `${title} se ha actualizado correctamente.`,
+      });
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'No se pudo guardar',
+        message: e.message,
+      });
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -102,7 +125,6 @@ export function EditableSection({ title, defaultValue, onSave, readOnly = false 
         <Group justify="space-between">
           <Title order={4}>{title}</Title>
           <Group gap="xs">
-            {saved && <Badge color="green" variant="light">Guardado</Badge>}
             {!readOnly && (
               !editing ? (
                 <Button variant="light" size="xs" radius="xl" onClick={() => setEditing(true)} leftSection={<IconEdit size={14} />}>

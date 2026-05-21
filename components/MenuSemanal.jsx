@@ -10,13 +10,13 @@ import {
   Button, 
   FileButton, 
   TextInput, 
-  Alert, 
   Badge, 
   SimpleGrid, 
   Box, 
   Divider 
 } from '@mantine/core';
-import { IconCalendar, IconUpload, IconToolsKitchen, IconFlame, IconInfoCircle } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
+import { IconCalendar, IconUpload, IconToolsKitchen, IconFlame } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
 
 const DIAS_ORDEN = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
@@ -77,7 +77,6 @@ export default function MenuSemanal({ menusIniciales }) {
   const [menus, setMenus] = useState(menusIniciales);
   const [selected, setSelected] = useState(menusIniciales[0] || null);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
   const [semana, setSemana] = useState(() => {
     const hoy = new Date();
     const lunes = new Date(hoy);
@@ -88,7 +87,16 @@ export default function MenuSemanal({ menusIniciales }) {
   async function handleUploadFile(file) {
     if (!file) return;
     setUploading(true); 
-    setError('');
+    const notificationId = 'menu-semanal-upload';
+    notifications.show({
+      id: notificationId,
+      color: 'blue',
+      title: 'IA procesando',
+      message: 'La IA está leyendo e indexando el menú.',
+      loading: true,
+      autoClose: false,
+      withCloseButton: false,
+    });
     
     try {
       const fd = new FormData();
@@ -104,8 +112,25 @@ export default function MenuSemanal({ menusIniciales }) {
         return [data.menu, ...filtered].sort((a, b) => b.semana.localeCompare(a.semana));
       });
       setSelected(data.menu);
+      notifications.update({
+        id: notificationId,
+        color: 'green',
+        title: 'Menú actualizado',
+        message: 'El menú semanal se ha procesado correctamente.',
+        loading: false,
+        autoClose: 4000,
+        withCloseButton: true,
+      });
     } catch (e) { 
-      setError(e.message); 
+      notifications.update({
+        id: notificationId,
+        color: 'red',
+        title: 'Error al subir menú',
+        message: e.message,
+        loading: false,
+        autoClose: 5000,
+        withCloseButton: true,
+      });
     } finally { 
       setUploading(false); 
     }
@@ -154,17 +179,6 @@ export default function MenuSemanal({ menusIniciales }) {
             </Group>
           </Group>
 
-          {error && (
-            <Alert color="red" icon={<IconInfoCircle size={16} />} radius="md">
-              {error}
-            </Alert>
-          )}
-
-          {uploading && (
-            <Alert color="blue" icon={<IconInfoCircle size={16} />} radius="md" title="IA Procesando">
-              La Inteligencia Artificial está leyendo e indexando el menú. Este proceso puede tardar unos segundos...
-            </Alert>
-          )}
         </Stack>
       </Paper>
 

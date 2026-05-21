@@ -1,13 +1,13 @@
 'use client';
 
-import { Badge, Group, Paper, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core';
+import { Badge, Box, Group, Paper, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { IconActivityHeartbeat, IconDroplet, IconMoon, IconRun, IconTrophy } from '@tabler/icons-react';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/Bento/BentoItem';
 
 function HydrationTarget({ title, value, helper, color, icon: Icon }) {
   return (
-    <Paper p="md" radius="lg" withBorder shadow="sm" style={{ borderTop: `4px solid var(--mantine-color-${color}-filled)` }}>
+    <Paper p={{ base: 'sm', sm: 'md' }} radius="lg" withBorder shadow="sm" style={{ borderTop: `4px solid var(--mantine-color-${color}-filled)` }}>
       <Group justify="space-between" align="flex-start" wrap="nowrap">
         <Stack gap={4}>
           <Text size="xs" c="dimmed" tt="uppercase" fw={700}>{title}</Text>
@@ -56,8 +56,8 @@ export default function HidratacionSubtab({ jugador, readOnly = false }) {
   ].join('\n');
 
   return (
-    <Stack gap="lg">
-      <Paper p="md" bg="white" shadow="xs" radius="lg" withBorder>
+    <Stack gap={0}>
+      <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Group justify="space-between" align="flex-start" wrap="wrap">
           <Group gap="xs">
             <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
@@ -66,7 +66,7 @@ export default function HidratacionSubtab({ jugador, readOnly = false }) {
             <Stack gap={2}>
               <Title order={3} fw={800} c="dark.4">Hidratación</Title>
               <Text size="sm" c="dimmed">
-                Objetivos diarios ajustados por peso y demanda de sesión.
+                Objetivos diarios de hidratación.
               </Text>
             </Stack>
           </Group>
@@ -78,30 +78,34 @@ export default function HidratacionSubtab({ jugador, readOnly = false }) {
         </Group>
       </Paper>
 
-      <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
-        <HydrationTarget title="Descanso" value={descanso} helper="Día sin carga competitiva" color="blue" icon={IconMoon} />
-        <HydrationTarget title="Entreno" value={entreno} helper={`Base + ${aguaEntreno || 0} ml por sesión`} color="orange" icon={IconRun} />
-        <HydrationTarget title="Partido" value={partido} helper={`Base + ${aguaPartido || 0} ml por partido`} color="red" icon={IconTrophy} />
-      </SimpleGrid>
+      <Box py={{ base: 'sm', sm: 'md' }}>
+        <Stack gap={0}>
+          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing={{ base: 'md', sm: 'md' }} mb={{ base: 'md', sm: 'xl' }}>
+            <HydrationTarget title="Descanso" value={descanso} helper="Día sin carga competitiva" color="blue" icon={IconMoon} />
+            <HydrationTarget title="Entreno" value={entreno} helper={`Base + ${aguaEntreno || 0} ml por sesión`} color="orange" icon={IconRun} />
+            <HydrationTarget title="Partido" value={partido} helper={`Base + ${aguaPartido || 0} ml por partido`} color="red" icon={IconTrophy} />
+          </SimpleGrid>
 
-      <BentoCard title="Timing recomendado" icon={IconActivityHeartbeat} color="cyan">
-        <SimpleGrid cols={{ base: 1, md: 5 }} spacing="sm">
-          {[
-            ['Al despertar', '500 ml'],
-            ['Pre-entreno', '500 ml + electrolitos'],
-            ['Durante', '150-200 ml / 15 min'],
-            ['Post', '150% pérdida'],
-            ['Comidas', '300 ml'],
-          ].map(([label, value]) => (
-            <Paper key={label} p="sm" radius="md" bg="gray.0" withBorder>
-              <Text size="xs" c="dimmed" fw={700} tt="uppercase">{label}</Text>
-              <Text size="sm" fw={700} c="dark.4">{value}</Text>
-            </Paper>
-          ))}
-        </SimpleGrid>
-      </BentoCard>
+          <BentoCard title="Timing recomendado" icon={IconActivityHeartbeat} color="cyan" mb={{ base: 'md', sm: 'xl' }}>
+            <SimpleGrid cols={{ base: 1, md: 5 }} spacing={{ base: 'md', sm: 'sm' }}>
+              {[
+                ['Al despertar', '500 ml'],
+                ['Pre-entreno', '500 ml + electrolitos'],
+                ['Durante', '150-200 ml / 15 min'],
+                ['Post', '150% pérdida'],
+                ['Comidas', '300 ml'],
+              ].map(([label, value]) => (
+                <Paper key={label} p="sm" radius="md" bg="gray.0" withBorder>
+                  <Text size="xs" c="dimmed" fw={700} tt="uppercase">{label}</Text>
+                  <Text size="sm" fw={700} c="dark.4">{value}</Text>
+                </Paper>
+              ))}
+            </SimpleGrid>
+          </BentoCard>
 
-      <EditableSection title="Notas y ajustes de hidratación" defaultValue={jugador.notas_hidratacion || hidDef} onSave={(v) => saveField('notas_hidratacion', v)} readOnly={readOnly} />
+          <EditableSection title="Notas y ajustes de hidratación" defaultValue={jugador.notas_hidratacion || hidDef} onSave={(v) => saveField('notas_hidratacion', v)} readOnly={readOnly} />
+        </Stack>
+      </Box>
     </Stack>
   );
 }

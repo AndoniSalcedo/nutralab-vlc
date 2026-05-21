@@ -28,7 +28,7 @@ export default async function Dashboard() {
     const [resJugadores, resEvoluciones] = await Promise.all([
       supabase
         .from('jugadores')
-        .select('id,nombre,apellidos,posicion,kcal_objetivo,peso_kg,porcentaje_grasa,masa_magra_kg')
+        .select('id,nombre,apellidos,posicion,kcal_objetivo,peso_kg,porcentaje_grasa,masa_magra_kg,factor_actividad,auth_user_id,auth_email,credentials_created_at')
         .order('nombre'),
       supabase
         .from('evoluciones')

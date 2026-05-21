@@ -1,15 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Container, Paper, Title, Text, TextInput, PasswordInput, Button, Stack, Center, Box, ThemeIcon, Alert, Anchor } from '@mantine/core';
-import { IconLock, IconMail, IconShieldCheck, IconAlertCircle } from '@tabler/icons-react';
+import { Container, Paper, Title, Text, TextInput, PasswordInput, Button, Stack, Center, Box, ThemeIcon, Anchor } from '@mantine/core';
+import { IconLock, IconMail, IconShieldCheck } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const router = useRouter();
 
   const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:5173';
@@ -17,7 +17,6 @@ export default function LoginPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
       const res = await fetch('/api/login', {
@@ -34,7 +33,11 @@ export default function LoginPage() {
 
       router.push('/dashboard');
     } catch (err) {
-      setError(err.message);
+      notifications.show({
+        color: 'red',
+        title: 'No se pudo iniciar sesión',
+        message: err.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -66,12 +69,6 @@ export default function LoginPage() {
         <Paper withBorder shadow="lg" p={32} radius="lg" bg="white">
           <form onSubmit={handleSubmit}>
             <Stack gap="md">
-              {error && (
-                <Alert color="red" icon={<IconAlertCircle size={16} />} radius="md">
-                  {error}
-                </Alert>
-              )}
-
               <TextInput
                 label="Email"
                 name="email"
@@ -93,7 +90,7 @@ export default function LoginPage() {
                 leftSection={<IconLock size={16} />}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                size="md"
+                size="xs"
                 radius="md"
               />
               <Button

@@ -2,7 +2,8 @@
 
 import { useRef, useState } from 'react';
 import { Dropzone } from '@mantine/dropzone';
-import { IconCloudUpload, IconDownload, IconX, IconCheck, IconAlertTriangle } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
+import { IconCloudUpload, IconDownload, IconX } from '@tabler/icons-react';
 import { 
   Group, 
   Text, 
@@ -14,8 +15,7 @@ import {
   Title, 
   Table, 
   Checkbox, 
-  Badge, 
-  Alert, 
+  Badge,
   ScrollArea 
 } from '@mantine/core';
 
@@ -26,7 +26,6 @@ export default function AnthroImporter() {
   const [jugadores, setJugadores] = useState([]);
   const [seleccionados, setSeleccionados] = useState(new Set());
   const [resultados, setResultados] = useState([]);
-  const [error, setError] = useState('');
   const [archivo, setArchivo] = useState(null);
 
   const EXCEL_TYPES = [
@@ -39,7 +38,6 @@ export default function AnthroImporter() {
     if (!file) return;
     setArchivo(file);
     setEstado('cargando');
-    setError('');
     const fd = new FormData();
     fd.append('file', file);
     fd.append('modo', 'preview');
@@ -51,7 +49,11 @@ export default function AnthroImporter() {
       setSeleccionados(new Set(data.jugadores.map((j) => j._nombre_completo)));
       setEstado('preview');
     } catch (err) {
-      setError(err.message);
+      notifications.show({
+        color: 'red',
+        title: 'Error procesando antropometría',
+        message: err.message,
+      });
       setEstado('error');
     }
   }
@@ -85,9 +87,18 @@ export default function AnthroImporter() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setResultados(data.resultados);
+      notifications.show({
+        color: 'green',
+        title: 'Importación completada',
+        message: `${data.resultados.filter((r) => !r.error).length} jugadores actualizados correctamente.`,
+      });
       setEstado('done');
     } catch (err) { 
-      setError(err.message); 
+      notifications.show({
+        color: 'red',
+        title: 'Error importando antropometría',
+        message: err.message,
+      });
       setEstado('error'); 
     }
   }
@@ -97,7 +108,6 @@ export default function AnthroImporter() {
     setJugadores([]); 
     setSeleccionados(new Set()); 
     setResultados([]); 
-    setError(''); 
     setArchivo(null);
   }
 
@@ -187,12 +197,6 @@ export default function AnthroImporter() {
           </Box>
         )}
 
-        {estado === 'error' && (
-          <Alert color="red" icon={<IconAlertTriangle size={16} />} radius="md">
-            {error}
-          </Alert>
-        )}
-
         {estado === 'preview' && jugadores.length > 0 && (
           <Stack gap="md">
             <Group justify="space-between">
@@ -271,10 +275,6 @@ export default function AnthroImporter() {
 
         {estado === 'done' && (
           <Stack gap="md">
-            <Alert color="green" icon={<IconCheck size={16} />} title="Importación completada">
-              {resultados.filter(r => !r.error).length} jugadores han sido actualizados con éxito.
-            </Alert>
-
             <ScrollArea>
               <Table highlightOnHover verticalSpacing="xs">
                 <Table.Thead bg="gray.0">

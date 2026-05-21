@@ -14,7 +14,13 @@
   }
 
   @media (max-width:36em) {
-    display: none;
+    padding: var(--mantine-spacing-xs);
+  }
+
+  @media (max-width:36em) {
+    :global(.mantine-Text-root) {
+      display: none;
+    }
   }
 }
 

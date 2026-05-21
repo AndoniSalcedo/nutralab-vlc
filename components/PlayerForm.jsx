@@ -14,16 +14,15 @@ import {
   Title, 
   Text, 
   Box,
-  Divider,
-  Alert
+  Divider
 } from '@mantine/core';
-import { IconUser, IconScale, IconActivity, IconInfoCircle, IconCheck } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
+import { IconUser, IconScale, IconActivity, IconCheck } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 
 export default function PlayerForm({ initial }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   // Form states
   const [nombre, setNombre] = useState(initial?.nombre ?? '');
@@ -52,7 +51,6 @@ export default function PlayerForm({ initial }) {
   async function handleSubmit(e, isDelete = false) {
     if (e) e.preventDefault();
     setLoading(true);
-    setError('');
 
     try {
       const formData = new FormData();
@@ -93,11 +91,20 @@ export default function PlayerForm({ initial }) {
         if (!res.ok) throw new Error('Error al guardar jugador');
       }
 
+      notifications.show({
+        color: 'green',
+        title: isDelete ? 'Jugador eliminado' : 'Jugador guardado',
+        message: isDelete ? 'El jugador se ha eliminado correctamente.' : 'Los datos del jugador se han guardado correctamente.',
+      });
       router.refresh();
       // Cerrar modales (NextJS redirigirá o refrescará y el modal se cerrará al recargar)
       window.location.reload(); 
     } catch (err) {
-      setError(err.message);
+      notifications.show({
+        color: 'red',
+        title: 'No se pudo guardar',
+        message: err.message,
+      });
       setLoading(false);
     }
   }
@@ -111,12 +118,6 @@ export default function PlayerForm({ initial }) {
             Este formulario recalcula automáticamente el plan base del jugador utilizando la ecuación de Cunningham.
           </Text>
         </div>
-
-        {error && (
-          <Alert color="red" icon={<IconInfoCircle size={16} />} radius="md">
-            {error}
-          </Alert>
-        )}
 
         <form onSubmit={(e) => handleSubmit(e, false)}>
           <Stack gap="lg">

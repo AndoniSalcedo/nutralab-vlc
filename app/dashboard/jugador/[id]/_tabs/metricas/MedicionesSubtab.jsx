@@ -11,7 +11,6 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import {
-  Alert,
   Badge,
   Box,
   Button,
@@ -28,6 +27,7 @@ import {
   ThemeIcon,
   Title,
 } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { IconCalendarStats, IconChartLine, IconCheck, IconEdit, IconPlus, IconRuler2 } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
 import NothingFound from '@/components/NothingFound/NothingFound';
@@ -76,8 +76,6 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   const [currentId, setCurrentId] = useState(evolucionesIniciales.length ? String(evolucionesIniciales[evolucionesIniciales.length - 1].id) : null);
   const [modalMode, setModalMode] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState('');
   const [metrica, setMetrica] = useState('peso_kg');
   const [form, setForm] = useState(emptyForm);
 
@@ -94,21 +92,16 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   function startNew() {
     setModalMode('new');
     setForm(emptyForm());
-    setError('');
-    setSaved(false);
   }
 
   function startEdit() {
     if (!selected) return;
     setModalMode('edit');
     setForm(formFromMedicion(selected));
-    setError('');
-    setSaved(false);
   }
 
   function cancelForm() {
     setModalMode(null);
-    setError('');
   }
 
   function diff(key) {
@@ -123,7 +116,6 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   async function handleSave() {
     if (readOnly) return;
     setSaving(true);
-    setError('');
     try {
       const res = await fetch('/api/evoluciones', {
         method: 'POST',
@@ -146,26 +138,37 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
       });
       setCurrentId(String(data.evolucion.id));
       setModalMode(null);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      notifications.show({
+        color: 'green',
+        title: 'Medición guardada',
+        message: 'La medición se ha guardado correctamente.',
+      });
     } catch (e) {
-      setError(e.message);
+      notifications.show({
+        color: 'red',
+        title: 'No se pudo guardar la medición',
+        message: e.message,
+      });
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <Stack gap="lg">
-      <Paper p="md" bg="white" shadow="xs" radius="lg" withBorder>
+    <Stack gap={0}>
+      <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="wrap">
             <Group gap="xs">
               <ThemeIcon color="cyan" variant="light" radius="xl" size="lg">
                 <IconRuler2 size={20} />
               </ThemeIcon>
-              <Title order={3} fw={800} c="dark.4">Composición</Title>
-              {saved && <Badge color="green" variant="light" leftSection={<IconCheck size={12} />}>Guardado</Badge>}
+              <Stack gap={2}>
+                <Title order={3} fw={800} c="dark.4">Composición</Title>
+                <Text size="sm" c="dimmed">
+                  Historial de medidas y evolución del jugador.
+                </Text>
+              </Stack>
             </Group>
 
             {!readOnly && (
@@ -206,8 +209,6 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         size="lg"
       >
         <Stack gap="md">
-          {error && <Alert color="red">{error}</Alert>}
-
           <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
             <TextInput label="Fecha" type="date" value={form.fecha} onChange={(e) => setForm((f) => ({ ...f, fecha: e.target.value }))} />
             <TextInput label="Peso (kg)" type="number" value={form.peso_kg} onChange={(e) => setForm((f) => ({ ...f, peso_kg: e.target.value }))} />
@@ -229,7 +230,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         </Stack>
       </Modal>
 
-      <Box p="md">
+      <Box py={{ base: 'sm', sm: 'md' }}>
         {sortedAsc.length === 0 ? (
           <Box mt="xl">
             <NothingFound
@@ -241,8 +242,8 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
             />
           </Box>
         ) : selected ? (
-          <Stack gap="lg">
-            <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+          <Stack gap={0}>
+            <SimpleGrid cols={{ base: 1, sm: 3 }} spacing={{ base: 'md', sm: 'md' }} mb={{ base: 'md', sm: 'xl' }}>
             {[
               { label: 'Peso actual', key: 'peso_kg', unit: 'kg' },
               { label: '% Grasa actual', key: 'porcentaje_grasa', unit: '%' },
@@ -261,7 +262,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
             })}
           </SimpleGrid>
 
-          <BentoCard title="Gráfico de evolución" icon={IconChartLine} color="blue">
+          <BentoCard title="Gráfico de evolución" icon={IconChartLine} color="blue" mb={{ base: 'md', sm: 'xl' }}>
             <Stack gap="md">
               <Group gap="xs">
                 {METRICAS.map((m) => (

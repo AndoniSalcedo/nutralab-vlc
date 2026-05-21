@@ -1,0 +1,67 @@
+'use client';
+
+import { useState } from 'react';
+import { Button, Group, Modal, PasswordInput, Stack } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { IconLock } from '@tabler/icons-react';
+
+export default function PlayerPasswordButton({ compact = false }) {
+  const [opened, setOpened] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  async function savePassword() {
+    if (password.length < 8) {
+      notifications.show({ color: 'red', title: 'Contraseña inválida', message: 'La contraseña debe tener al menos 8 caracteres' });
+      return;
+    }
+    if (password !== confirm) {
+      notifications.show({ color: 'red', title: 'Contraseña inválida', message: 'Las contraseñas no coinciden' });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const res = await fetch('/api/player-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error actualizando contraseña');
+      notifications.show({ color: 'green', title: 'Contraseña actualizada', message: 'Tu contraseña se ha cambiado correctamente.' });
+      setPassword('');
+      setConfirm('');
+      setOpened(false);
+    } catch (e) {
+      notifications.show({ color: 'red', title: 'No se pudo actualizar', message: e.message });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <>
+      <Button size="xs" radius="xl" variant="light" color="gray" leftSection={<IconLock size={14} />} onClick={() => setOpened(true)}>
+        {compact ? 'Clave' : 'Cambiar contraseña'}
+      </Button>
+
+      <Modal opened={opened} onClose={() => setOpened(false)} title="Cambiar contraseña" size="sm">
+        <Stack gap="md">
+          <PasswordInput label="Nueva contraseña" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <PasswordInput label="Repetir contraseña" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+
+          <Group justify="flex-end">
+            <Button size="xs" radius="xl" variant="subtle" color="gray" onClick={() => setOpened(false)} disabled={saving}>
+              Cerrar
+            </Button>
+            <Button size="xs" radius="xl" onClick={savePassword} loading={saving}>
+              Guardar contraseña
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+    </>
+  );
+}

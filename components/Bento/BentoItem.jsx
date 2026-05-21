@@ -4,14 +4,14 @@ export function BentoCard({ title, icon: Icon, color = 'blue', children, ...prop
   return (
     <Paper
       radius="lg"
-      p="md"
+      p={{ base: 'sm', sm: 'md' }}
       shadow="sm"
       withBorder
       h="100%"
       className="bento-card-hover"
       {...props}
     >
-      <Group mb="md" gap="xs">
+      <Group mb={{ base: 'sm', sm: 'md' }} gap="xs">
         <ThemeIcon color={color} variant="light" radius="md" size="md">
           <Icon size={16} stroke={1.5} />
         </ThemeIcon>

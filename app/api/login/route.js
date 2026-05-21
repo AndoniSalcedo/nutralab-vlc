@@ -7,20 +7,25 @@ import { getSupabaseAdmin } from '@/lib/supabase-server';
 export async function POST(request) {
   try {
     const { email, password } = await request.json();
+    const cleanEmail = String(email || '').trim().toLowerCase();
 
-    if (!email || !password) {
+    if (!cleanEmail || !password) {
       return NextResponse.json({ error: 'Email y contraseña son obligatorios' }, { status: 400 });
     }
 
-    // Autenticar con Supabase Auth (anon key para el flujo de login del jugador)
-    const supabaseAuth = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+    // Este endpoint corre en servidor, así que usamos la service key para no depender
+    // de la publishable/anon key del cliente.
+    const supabaseAuth = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
     const { data: authData, error: authError } = await supabaseAuth.auth.signInWithPassword({
-      email,
+      email: cleanEmail,
       password,
     });
 
     if (authError || !authData?.user) {
+      console.error('Player login auth error:', authError?.message);
       return NextResponse.json({ error: 'Email o contraseña incorrectos' }, { status: 401 });
     }
 

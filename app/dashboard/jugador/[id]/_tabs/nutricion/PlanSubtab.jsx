@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { marked } from 'marked';
 import {
-  Alert,
   Badge,
   Box,
   Button,
@@ -18,7 +17,8 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { IconAlertCircle, IconBrain, IconCheck, IconEdit, IconFileAi, IconPlus, IconSparkles } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
+import { IconBrain, IconCheck, IconEdit, IconFileAi, IconPlus, IconSparkles } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
 
 const CONTEXTOS = [
@@ -47,8 +47,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [contenido, setContenido] = useState('');
   const [loadingList, setLoadingList] = useState(true);
   const [actionType, setActionType] = useState(null);
-  const [error, setError] = useState('');
-  const [saved, setSaved] = useState(false);
   const isDocumentMode = mode === 'create' || mode === 'edit';
   const loadingAction = Boolean(actionType);
 
@@ -67,7 +65,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     let active = true;
     async function loadPlanes() {
       setLoadingList(true);
-      setError('');
       try {
         const res = await fetch(`/api/ai-plan?jugador_id=${jugador.id}`);
         const data = await res.json();
@@ -78,7 +75,13 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         setCurrentId(list.length ? String(list[0].id) : null);
         setMode('view');
       } catch (e) {
-        if (active) setError(e.message);
+        if (active) {
+          notifications.show({
+            color: 'red',
+            title: 'No se pudieron cargar los planes',
+            message: e.message,
+          });
+        }
       } finally {
         if (active) setLoadingList(false);
       }
@@ -96,8 +99,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setContexto('semana_normal');
     setContextoAdicional('');
     setContenido('');
-    setSaved(false);
-    setError('');
   }
 
   function startEdit() {
@@ -107,18 +108,24 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setContexto(currentPlan.contexto || 'semana_normal');
     setContextoAdicional(currentPlan.contexto_adicional || '');
     setContenido(currentPlan.contenido || '');
-    setSaved(false);
-    setError('');
   }
 
   function cancelForm() {
     setMode('view');
-    setError('');
   }
 
   async function generateDraft() {
+    const notificationId = 'ai-plan-generate';
     setActionType('generate');
-    setError('');
+    notifications.show({
+      id: notificationId,
+      color: 'blue',
+      title: 'Generando plan IA',
+      message: `Generando plan inteligente para ${jugador.nombre}. Esto puede tardar unos segundos.`,
+      loading: true,
+      autoClose: false,
+      withCloseButton: false,
+    });
     try {
       const res = await fetch('/api/ai-plan', {
         method: 'POST',
@@ -128,16 +135,42 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error al generar el borrador');
       setContenido(data.contenido || '');
+      notifications.update({
+        id: notificationId,
+        color: 'green',
+        title: 'Borrador generado',
+        message: 'Ya puedes revisar y editar el plan antes de guardarlo.',
+        loading: false,
+        autoClose: 4000,
+        withCloseButton: true,
+      });
     } catch (e) {
-      setError(e.message);
+      notifications.update({
+        id: notificationId,
+        color: 'red',
+        title: 'No se pudo generar el borrador',
+        message: e.message,
+        loading: false,
+        autoClose: 6000,
+        withCloseButton: true,
+      });
     } finally {
       setActionType(null);
     }
   }
 
   async function saveCreate() {
+    const notificationId = 'ai-plan-save';
     setActionType('save');
-    setError('');
+    notifications.show({
+      id: notificationId,
+      color: 'blue',
+      title: 'Guardando plan',
+      message: 'Guardando cambios del plan IA.',
+      loading: true,
+      autoClose: false,
+      withCloseButton: false,
+    });
     try {
       const res = await fetch('/api/ai-plan', {
         method: 'POST',
@@ -149,10 +182,25 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       setPlanes((prev) => [data.plan, ...prev]);
       setCurrentId(String(data.plan.id));
       setMode('view');
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      notifications.update({
+        id: notificationId,
+        color: 'green',
+        title: 'Plan guardado',
+        message: 'El nuevo plan IA se ha guardado correctamente.',
+        loading: false,
+        autoClose: 4000,
+        withCloseButton: true,
+      });
     } catch (e) {
-      setError(e.message);
+      notifications.update({
+        id: notificationId,
+        color: 'red',
+        title: 'No se pudo guardar el plan',
+        message: e.message,
+        loading: false,
+        autoClose: 6000,
+        withCloseButton: true,
+      });
     } finally {
       setActionType(null);
     }
@@ -160,8 +208,17 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
   async function saveEdit() {
     if (!currentPlan) return;
+    const notificationId = 'ai-plan-save';
     setActionType('save');
-    setError('');
+    notifications.show({
+      id: notificationId,
+      color: 'blue',
+      title: 'Guardando plan',
+      message: 'Guardando cambios del plan IA.',
+      loading: true,
+      autoClose: false,
+      withCloseButton: false,
+    });
     try {
       const res = await fetch('/api/ai-plan', {
         method: 'PATCH',
@@ -179,10 +236,25 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       setPlanes((prev) => [data.plan, ...prev.filter((plan) => plan.id !== data.plan.id)]);
       setCurrentId(String(data.plan.id));
       setMode('view');
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      notifications.update({
+        id: notificationId,
+        color: 'green',
+        title: 'Plan guardado',
+        message: 'Los cambios del plan IA se han guardado correctamente.',
+        loading: false,
+        autoClose: 4000,
+        withCloseButton: true,
+      });
     } catch (e) {
-      setError(e.message);
+      notifications.update({
+        id: notificationId,
+        color: 'red',
+        title: 'No se pudo guardar el plan',
+        message: e.message,
+        loading: false,
+        autoClose: 6000,
+        withCloseButton: true,
+      });
     } finally {
       setActionType(null);
     }
@@ -197,14 +269,19 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   ].filter(Boolean);
 
   return (
-    <Stack gap="lg">
-      <Paper p="md" bg="white" shadow="xs" radius="lg" withBorder>
+    <Stack gap={0}>
+      <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Stack gap="md">
           <Group justify="space-between" align="flex-start">
             <Box>
               <Group gap="xs">
                 <IconBrain size={22} color="var(--mantine-color-blue-filled)" />
-                <Title order={3}>Plan nutricional personalizado</Title>
+                <Stack gap={2}>
+                  <Title order={3} fw={800} c="dark.4">Planes IA</Title>
+                  <Text size="sm" c="dimmed">
+                    Planes personales nutricionales.
+                  </Text>
+                </Stack>
               </Group>
             </Box>
             {!readOnly && (
@@ -255,20 +332,14 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         </Stack>
       </Paper>
 
-      {error && (
-        <Alert color="red" icon={<IconAlertCircle size={16} />}>
-          {error}
-        </Alert>
-      )}
-
-      <Box p="md">
+      <Box py={{ base: 'sm', sm: 'md' }}>
         {loadingList ? (
-          <Paper p="xl" radius="lg" withBorder shadow="sm" style={{ textAlign: 'center' }}>
+          <Paper p={{ base: 'md', sm: 'xl' }} radius="lg" withBorder shadow="sm" style={{ textAlign: 'center' }}>
             <Loader size="lg" />
           </Paper>
         ) : isDocumentMode ? (
-          <Paper p="lg" radius="lg" withBorder shadow="sm">
-            <Stack gap="lg">
+          <Paper p={{ base: 'sm', sm: 'lg' }} radius="lg" withBorder shadow="sm">
+            <Stack gap={{ base: 'md', sm: 'xl' }}>
               <Group justify="space-between" align="flex-start" wrap="wrap">
                 <Box>
                   <Title order={3}>{mode === 'create' ? 'Nuevo plan IA' : 'Editar plan IA'}</Title>
@@ -329,14 +400,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                 rows={2}
               />
 
-              {actionType && (
-                <Alert color="blue" icon={<IconSparkles size={16} />}>
-                  {actionType === 'generate'
-                    ? `Generando plan inteligente para ${jugador.nombre}. Esto puede tardar hasta 15-20 segundos.`
-                    : 'Guardando cambios del plan...'}
-                </Alert>
-              )}
-
               <Textarea
                 label="Documento del plan"
                 description="Puedes editar el Markdown completo antes de guardarlo."
@@ -368,7 +431,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
             />
           </Box>
         ) : planHtml ? (
-          <Paper p="xl" radius="lg" withBorder shadow="sm">
+          <Paper p={{ base: 'sm', sm: 'xl' }} radius="lg" withBorder shadow="sm">
             <Box className="plan-md" dangerouslySetInnerHTML={{ __html: planHtml }} />
           </Paper>
         ) : (
