@@ -202,7 +202,7 @@ export default function DashboardContent({ players = [], teamEvolutions = [] }) 
               </Box>
             </Group>
 
-            <DashboardActions />
+            <DashboardActions players={playersState} />
           </Group>
 
           <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xs">

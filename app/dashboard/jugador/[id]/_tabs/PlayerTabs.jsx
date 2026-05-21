@@ -8,14 +8,14 @@ import NutricionTab from './NutricionTab';
 import ResumenTab from './ResumenTab';
 
 const DEFAULT_SUBTABS = {
-  resumen: 'ficha',
+  general: 'perfil',
   metricas: 'mediciones',
   nutricion: 'plan',
 };
 
 const VALID_TABS = Object.keys(DEFAULT_SUBTABS);
 const VALID_SUBTABS = {
-  resumen: ['ficha', 'objetivos'],
+  general: ['perfil', 'mensajes'],
   metricas: ['mediciones', 'analiticas'],
   nutricion: ['plan', 'hidratacion', 'suplementacion', 'protocolos'],
 };
@@ -24,15 +24,20 @@ export default function PlayerTabs({
   jugador,
   analiticas = [],
   evoluciones = [],
-  activeTab: activeTabProp = 'resumen',
+  messages = [],
+  activeTab: activeTabProp = 'general',
   activeSubtab: activeSubtabProp,
   readOnly = false,
 }) {
   const router = useRouter();
 
-  const activeTab = VALID_TABS.includes(activeTabProp) ? activeTabProp : 'resumen';
-  const activeSubtab = VALID_SUBTABS[activeTab].includes(activeSubtabProp)
-    ? activeSubtabProp
+  const normalizedTab = activeTabProp === 'resumen' ? 'general' : activeTabProp;
+  const normalizedSubtab = activeSubtabProp === 'ficha' || activeSubtabProp === 'objetivos'
+    ? 'perfil'
+    : activeSubtabProp;
+  const activeTab = VALID_TABS.includes(normalizedTab) ? normalizedTab : 'general';
+  const activeSubtab = VALID_SUBTABS[activeTab].includes(normalizedSubtab)
+    ? normalizedSubtab
     : DEFAULT_SUBTABS[activeTab];
 
   function navigate(nextTab, nextSubtab = DEFAULT_SUBTABS[nextTab]) {
@@ -61,17 +66,18 @@ export default function PlayerTabs({
       }}
     >
       <Tabs.List grow>
-        <Tabs.Tab value="resumen" leftSection={<IconInfoCircle size={18} />} style={activeTabStyle('resumen')}>Resumen</Tabs.Tab>
+        <Tabs.Tab value="general" leftSection={<IconInfoCircle size={18} />} style={activeTabStyle('general')}>General</Tabs.Tab>
         <Tabs.Tab value="metricas" leftSection={<IconChartBar size={18} />} style={activeTabStyle('metricas')}>Métricas</Tabs.Tab>
         <Tabs.Tab value="nutricion" leftSection={<IconSalad size={18} />} style={activeTabStyle('nutricion')}>Nutrición</Tabs.Tab>
       </Tabs.List>
 
       <Box>
-        <Tabs.Panel value="resumen">
+        <Tabs.Panel value="general">
           <ResumenTab
             jugador={jugador}
-            activeSubtab={activeTab === 'resumen' ? activeSubtab : DEFAULT_SUBTABS.resumen}
-            onSubtabChange={(value) => navigate('resumen', value)}
+            messages={messages}
+            activeSubtab={activeTab === 'general' ? activeSubtab : DEFAULT_SUBTABS.general}
+            onSubtabChange={(value) => navigate('general', value)}
             readOnly={readOnly}
           />
         </Tabs.Panel>

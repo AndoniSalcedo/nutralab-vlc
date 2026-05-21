@@ -1,12 +1,12 @@
 'use client';
 
 import { Box, Paper, SegmentedControl, Stack } from '@mantine/core';
-import { IconClipboardList, IconUser } from '@tabler/icons-react';
+import { IconMail, IconUser } from '@tabler/icons-react';
 import { tabLabel } from './tab-label';
-import FichaSubtab from './resumen/FichaSubtab';
-import ObjetivosSubtab from './resumen/ObjetivosSubtab';
+import MensajesTab from './MensajesTab';
+import PerfilSubtab from './resumen/PerfilSubtab';
 
-export default function ResumenTab({ jugador, activeSubtab, onSubtabChange, readOnly = false }) {
+export default function ResumenTab({ jugador, messages = [], activeSubtab, onSubtabChange, readOnly = false }) {
   return (
     <Stack gap={0}>
       <Paper
@@ -33,8 +33,8 @@ export default function ResumenTab({ jugador, activeSubtab, onSubtabChange, read
           size="sm"
           bg="gray.1"
           data={[
-            { value: 'ficha', label: tabLabel(IconUser, 'Ficha') },
-            { value: 'objetivos', label: tabLabel(IconClipboardList, 'Objetivos') },
+            { value: 'perfil', label: tabLabel(IconUser, 'Perfil') },
+            { value: 'mensajes', label: tabLabel(IconMail, 'Mensajes') },
           ]}
           styles={{
             root: { border: 'none', width: '100%' },
@@ -44,8 +44,8 @@ export default function ResumenTab({ jugador, activeSubtab, onSubtabChange, read
       </Paper>
 
       <Box mt={0}>
-        {activeSubtab === 'ficha' && <FichaSubtab jugador={jugador} />}
-        {activeSubtab === 'objetivos' && <ObjetivosSubtab jugador={jugador} readOnly={readOnly} />}
+        {activeSubtab === 'perfil' && <PerfilSubtab jugador={jugador} readOnly={readOnly} />}
+        {activeSubtab === 'mensajes' && <MensajesTab jugador={jugador} messages={messages} readOnly={readOnly} />}
       </Box>
     </Stack>
   );

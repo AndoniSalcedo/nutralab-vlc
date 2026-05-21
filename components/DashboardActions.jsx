@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Group, Modal } from '@mantine/core';
-import { IconPlus, IconCalculator, IconFileSpreadsheet, IconBodyScan } from '@tabler/icons-react';
+import { Button, Group, Modal, Tabs } from '@mantine/core';
+import { IconPlus, IconFileSpreadsheet, IconBodyScan, IconMail } from '@tabler/icons-react';
 import PlayerForm from './PlayerForm';
-import FoodCalculator from './FoodCalculator';
 import ExcelImporter from './ExcelImporter';
 import AnthroImporter from './AnthroImporter';
+import MessageComposer from './MessageComposer';
 
-export default function DashboardActions() {
+export default function DashboardActions({ players = [] }) {
   const [openedModal, setOpenedModal] = useState(null);
 
   const closeModal = () => setOpenedModal(null);
@@ -20,31 +20,21 @@ export default function DashboardActions() {
           radius="xl"
           size="xs"
           variant="light"
-          color="gray"
-          leftSection={<IconCalculator size={14} />}
-          onClick={() => setOpenedModal('calculator')}
-        >
-          Calculadora
-        </Button>
-        <Button
-          radius="xl"
-          size="xs"
-          variant="light"
           color="teal"
           leftSection={<IconFileSpreadsheet size={14} />}
-          onClick={() => setOpenedModal('excel')}
+          onClick={() => setOpenedModal('import')}
         >
-          Importar Excel
+          Importar datos
         </Button>
         <Button
           radius="xl"
           size="xs"
           variant="light"
-          color="orange"
-          leftSection={<IconBodyScan size={14} />}
-          onClick={() => setOpenedModal('anthro')}
+          color="blue"
+          leftSection={<IconMail size={14} />}
+          onClick={() => setOpenedModal('message')}
         >
-          Antropometría
+          Mensaje
         </Button>
         <Button
           radius="xl"
@@ -62,16 +52,29 @@ export default function DashboardActions() {
         <PlayerForm initial={null} />
       </Modal>
 
-      <Modal opened={openedModal === 'excel'} onClose={closeModal} title="Importar desde Excel" size="xl">
-        <ExcelImporter />
+      <Modal opened={openedModal === 'import'} onClose={closeModal} title="Importar datos" size="xl">
+        <Tabs defaultValue="players" variant="outline" radius="md" color="dark" keepMounted={false}>
+          <Tabs.List grow mb="md">
+            <Tabs.Tab value="players" leftSection={<IconFileSpreadsheet size={16} />}>
+              Jugadores
+            </Tabs.Tab>
+            <Tabs.Tab value="anthro" leftSection={<IconBodyScan size={16} />}>
+              Antropometría
+            </Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="players">
+            <ExcelImporter />
+          </Tabs.Panel>
+
+          <Tabs.Panel value="anthro">
+            <AnthroImporter />
+          </Tabs.Panel>
+        </Tabs>
       </Modal>
 
-      <Modal opened={openedModal === 'anthro'} onClose={closeModal} title="Importar Antropometría" size="xl">
-        <AnthroImporter />
-      </Modal>
-
-      <Modal opened={openedModal === 'calculator'} onClose={closeModal} title="Calculadora Rápida" size="lg">
-        <FoodCalculator />
+      <Modal opened={openedModal === 'message'} onClose={closeModal} title="Enviar mensaje" size="lg">
+        <MessageComposer players={players} onSent={closeModal} />
       </Modal>
     </>
   );

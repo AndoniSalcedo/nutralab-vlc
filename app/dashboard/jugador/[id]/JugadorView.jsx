@@ -4,7 +4,7 @@ import JugadorHeader from '@/components/JugadorHeader';
 import { Anchor, Stack, Text } from '@mantine/core';
 import PlayerTabs from './_tabs/PlayerTabs';
 
-export default async function JugadorView({ id, activeTab = 'resumen', activeSubtab }) {
+export default async function JugadorView({ id, activeTab = 'general', activeSubtab }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
   const isPlayer = user?.role === 'jugador';
@@ -12,17 +12,24 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
   let jugador = null;
   let analiticas = [];
   let evoluciones = [];
+  let messages = [];
 
   try {
-    const [resJugador, resAnaliticas, resEvoluciones] = await Promise.all([
+    const [resJugador, resAnaliticas, resEvoluciones, resMessages] = await Promise.all([
       supabase.from('jugadores').select('*').eq('id', id).single(),
       supabase.from('analiticas').select('*').eq('jugador_id', id).order('fecha_extraccion', { ascending: false }),
       supabase.from('evoluciones').select('*').eq('jugador_id', id).order('fecha', { ascending: true }),
+      supabase
+        .from('mensajes')
+        .select('id,jugador_id,titulo,contenido,created_by_name,created_at')
+        .or(`jugador_id.is.null,jugador_id.eq.${id}`)
+        .order('created_at', { ascending: false }),
     ]);
 
     jugador = resJugador.data;
     analiticas = resAnaliticas.data || [];
     evoluciones = resEvoluciones.data || [];
+    messages = resMessages.data || [];
   } catch (err) {
     console.error('Error fetching jugador details:', err);
   }
@@ -52,6 +59,7 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
         jugador={jugador}
         analiticas={analiticas}
         evoluciones={evoluciones}
+        messages={messages}
         activeTab={activeTab}
         activeSubtab={activeSubtab}
         readOnly={isPlayer}

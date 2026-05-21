@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { 
+  ActionIcon,
+  Anchor,
   Paper, 
   Stack, 
   Group, 
@@ -13,61 +15,87 @@ import {
   Badge, 
   SimpleGrid, 
   Box, 
-  Divider 
+  Divider,
+  Select,
+  ThemeIcon,
+  Tooltip,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconCalendar, IconUpload, IconToolsKitchen, IconFlame } from '@tabler/icons-react';
+import {
+  IconArrowLeft,
+  IconCalendar,
+  IconChefHat,
+  IconClock,
+  IconFlame,
+  IconToolsKitchen,
+  IconUpload,
+  IconUtensils,
+} from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
 
 const DIAS_ORDEN = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
+function formatWeek(value) {
+  if (!value) return 'Sin semana';
+  return new Intl.DateTimeFormat('es-ES', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(`${value}T00:00:00`));
+}
+
+function DishLine({ label, value }) {
+  return (
+    <Group gap={6} align="flex-start" wrap="nowrap">
+      <Text size="xs" c="dimmed" fw={800} style={{ flex: '0 0 24px' }}>
+        {label}
+      </Text>
+      <Text size="sm" fw={550} c="dark.4" style={{ overflowWrap: 'anywhere' }}>
+        {value || 'Sin registrar'}
+      </Text>
+    </Group>
+  );
+}
+
 function TarjetaDia({ dia }) {
   return (
-    <Paper radius="md" p="md" withBorder shadow="xs" bg="white" style={{ minWidth: 0 }}>
-      <Stack gap="xs">
-        <Title order={4} size="h5" fw={800} c="dark.7">
-          {dia.dia}
-        </Title>
-        
-        <Box>
-          <Badge size="xs" color="orange" variant="light" mb={4} leftSection={<IconToolsKitchen size={10} />}>
-            COMIDA
+    <Paper
+      radius="lg"
+      p={{ base: 'sm', sm: 'md' }}
+      withBorder
+      shadow="sm"
+      bg="white"
+      style={{ minWidth: 0, height: '100%' }}
+    >
+      <Stack gap="sm" h="100%">
+        <Group justify="space-between" align="center" wrap="nowrap">
+          <Title order={4} size="h5" fw={850} c="#24291f" lh={1.1}>
+            {dia.dia}
+          </Title>
+          <ThemeIcon color="gray" variant="light" radius="xl" size={30}>
+            <IconClock size={15} />
+          </ThemeIcon>
+        </Group>
+
+        <Stack gap={6}>
+          <Badge size="xs" color="orange" variant="light" radius="sm" leftSection={<IconToolsKitchen size={11} />}>
+            Comida
           </Badge>
-          <Stack gap={2}>
-            {dia.comida.primero ? (
-              <Text size="sm" fw={500} c="dark.6">1º {dia.comida.primero}</Text>
-            ) : (
-              <Text size="sm" c="dimmed" fs="italic">Sin primero</Text>
-            )}
-            {dia.comida.segundo && (
-              <Text size="sm" fw={500} c="dark.6">2º {dia.comida.segundo}</Text>
-            )}
-            {dia.comida.postre && (
-              <Text size="xs" c="dimmed">🍎 {dia.comida.postre}</Text>
-            )}
-          </Stack>
-        </Box>
-        
+          <DishLine label="1º" value={dia.comida?.primero} />
+          <DishLine label="2º" value={dia.comida?.segundo} />
+          {dia.comida?.postre && <DishLine label="P" value={dia.comida.postre} />}
+        </Stack>
+
         <Divider style={{ borderStyle: 'dashed' }} />
-        
-        <Box>
-          <Badge size="xs" color="indigo" variant="light" mb={4} leftSection={<IconFlame size={10} />}>
-            CENA
+
+        <Stack gap={6}>
+          <Badge size="xs" color="blue" variant="light" radius="sm" leftSection={<IconFlame size={11} />}>
+            Cena
           </Badge>
-          <Stack gap={2}>
-            {dia.cena.primero ? (
-              <Text size="sm" fw={500} c="dark.6">1º {dia.cena.primero}</Text>
-            ) : (
-              <Text size="sm" c="dimmed" fs="italic">Sin primero</Text>
-            )}
-            {dia.cena.segundo && (
-              <Text size="sm" fw={500} c="dark.6">2º {dia.cena.segundo}</Text>
-            )}
-            {dia.cena.postre && (
-              <Text size="xs" c="dimmed">🍎 {dia.cena.postre}</Text>
-            )}
-          </Stack>
-        </Box>
+          <DishLine label="1º" value={dia.cena?.primero} />
+          <DishLine label="2º" value={dia.cena?.segundo} />
+          {dia.cena?.postre && <DishLine label="P" value={dia.cena.postre} />}
+        </Stack>
       </Stack>
     </Paper>
   );
@@ -137,75 +165,111 @@ export default function MenuSemanal({ menusIniciales }) {
   }
 
   const diasOrdenados = selected ? [...selected.dias].sort((a, b) => DIAS_ORDEN.indexOf(a.dia) - DIAS_ORDEN.indexOf(b.dia)) : [];
+  const weekOptions = menus.map((menu) => ({
+    value: menu.semana,
+    label: `Semana del ${formatWeek(menu.semana)}`,
+  }));
 
   return (
     <Stack gap="lg">
-      
-      {/* Tarjeta de Carga */}
-      <Paper radius="md" p="md" withBorder shadow="xs" bg="white">
-        <Stack gap="md">
-          <Group justify="space-between" align="center" style={{ flexWrap: 'wrap', gap: 12 }}>
-            <div>
-              <Title order={4} c="dark.8">Subir menú semanal</Title>
-              <Text size="xs" c="dimmed">
-                Foto o PDF del menú del comedor · La IA extrae automáticamente los platos de cada día
-              </Text>
-            </div>
-            
-            <Group align="flex-end" gap="xs" style={{ flexWrap: 'wrap' }}>
+      <Paper
+        p={{ base: 'sm', sm: 'md' }}
+        shadow="sm"
+        radius="xl"
+        withBorder
+        style={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
+          zIndex: 10,
+          position: 'relative',
+        }}
+      >
+        <Stack gap="sm">
+          <Group justify="space-between" align="center" wrap="wrap" gap="md">
+            <Group gap="sm" wrap="nowrap">
+              <Tooltip label="Volver al panel" withArrow>
+                <ActionIcon component={Anchor} href="/dashboard" variant="light" color="gray" radius="xl" size={42}>
+                  <IconArrowLeft size={20} />
+                </ActionIcon>
+              </Tooltip>
+              <ThemeIcon color="teal" variant="light" radius="xl" size={42}>
+                <IconChefHat size={21} />
+              </ThemeIcon>
+              <Box>
+                <Title order={3} fw={850} c="#24291f" lh={1.1}>
+                  Menú Ciudad Deportiva
+                </Title>
+                <Text size="xs" c="dimmed" mt={2}>
+                  Comedor del primer equipo, comida y cena.
+                </Text>
+              </Box>
+            </Group>
+
+            <Group align="flex-end" gap="xs" wrap="wrap">
               <TextInput
-                label="Semana del:"
+                label="Semana"
                 type="date"
                 value={semana}
                 onChange={(e) => setSemana(e.target.value)}
                 leftSection={<IconCalendar size={16} />}
                 size="sm"
-                radius="md"
+                radius="xl"
+                variant="filled"
               />
               <FileButton onChange={handleUploadFile} accept="image/*,.pdf" disabled={uploading}>
                 {(props) => (
-                  <Button 
-                    {...props} 
-                    loading={uploading} 
+                  <Button
+                    {...props}
+                    loading={uploading}
                     leftSection={<IconUpload size={16} />}
-                    color="blue" 
+                    color="blue"
                     radius="xl"
-                    size="xs"
+                    size="sm"
                   >
-                    Subir foto / PDF
+                    Subir menú
                   </Button>
                 )}
               </FileButton>
             </Group>
           </Group>
 
+          <Paper p={6} radius="xl" shadow="xs" withBorder bg="white" w="100%">
+            <Group gap={8} w="100%" wrap="wrap" align="center">
+              <Select
+                placeholder="Selecciona una semana"
+                leftSection={<IconCalendar size={16} style={{ opacity: 0.7 }} />}
+                data={weekOptions}
+                value={selected?.semana || null}
+                onChange={(value) => {
+                  const next = menus.find((menu) => menu.semana === value);
+                  if (next) setSelected(next);
+                }}
+                disabled={menus.length === 0}
+                variant="filled"
+                radius="xl"
+                size="sm"
+                allowDeselect={false}
+                style={{ flex: 1, minWidth: 240 }}
+              />
+              <Badge variant="light" color="gray" radius="sm" size="lg" leftSection={<IconUtensils size={13} />}>
+                {selected ? `${selected.dias.length} días` : 'Sin menú'}
+              </Badge>
+            </Group>
+          </Paper>
         </Stack>
       </Paper>
 
-      {/* Selector de semanas guardadas */}
-      {menus.length > 1 && (
-        <Group gap="xs" style={{ flexWrap: 'wrap' }}>
-          {menus.map(m => (
-            <Button
-              key={m.semana}
-              onClick={() => setSelected(m)}
-              variant={selected?.semana === m.semana ? 'filled' : 'light'}
-              color="blue"
-              radius="xl"
-              size="xs"
-            >
-              Semana {m.semana}
-            </Button>
-          ))}
-        </Group>
-      )}
-
-      {/* Grid de días */}
       {selected ? (
-        <Stack gap="xs">
-          <Text size="xs" c="dimmed" fw={600}>
-            Menú de la semana del {selected.semana} · {selected.dias.length} días estructurados
-          </Text>
+        <Stack gap="sm">
+          <Group justify="space-between" align="center" wrap="wrap" gap="xs">
+            <Box>
+              <Title order={4} fw={800} c="dark.4">
+                Semana del {formatWeek(selected.semana)}
+              </Title>
+              <Text size="xs" c="dimmed">
+                Platos extraídos y estructurados para planificación nutricional.
+              </Text>
+            </Box>
+          </Group>
           <SimpleGrid cols={{ base: 1, sm: 2, md: 4, lg: 7 }} spacing="md">
             {diasOrdenados.map(dia => (
               <TarjetaDia key={dia.dia} dia={dia} />

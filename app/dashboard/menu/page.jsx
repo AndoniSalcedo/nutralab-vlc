@@ -1,6 +1,5 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import MenuSemanal from '@/components/MenuSemanal';
-import { Anchor, Group, Stack, Text, Title } from '@mantine/core';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,15 +22,6 @@ export default async function MenuPage() {
   }
 
   return (
-    <Stack gap="lg">
-      <Group justify="space-between" align="flex-start">
-        <div>
-          <Anchor href="/dashboard" size="xs" c="dimmed">← Panel</Anchor>
-          <Title order={2} mt={4}>Menú Ciudad Deportiva</Title>
-          <Text c="dimmed" size="sm">Comedor del primer equipo · Comida y cena</Text>
-        </div>
-      </Group>
-      <MenuSemanal menusIniciales={menus || []} />
-    </Stack>
+    <MenuSemanal menusIniciales={menus || []} />
   );
 }
