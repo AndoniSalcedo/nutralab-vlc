@@ -1,8 +1,7 @@
 'use client';
 
 import { Box, Group, Paper, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core';
-import { IconChartBar, IconClipboardList, IconTargetArrow, IconUser } from '@tabler/icons-react';
-import { BentoCard } from '@/components/Bento/BentoItem';
+import { IconClipboardList, IconTargetArrow, IconUser } from '@tabler/icons-react';
 import { cunninghamPlan } from '@/lib/calculations';
 import { CampoEditable } from '../editable';
 import { latestEvolution } from '@/lib/player-metrics';
@@ -33,7 +32,6 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
   const pesoActual = metricValue(jugador, latest, 'peso_kg');
   const grasaActual = metricValue(jugador, latest, 'porcentaje_grasa');
   const masaMagraActual = metricValue(jugador, latest, 'masa_magra_kg');
-  const fechaUltimaMedicion = latest?.fecha || jugador.fecha_ultima_medicion;
   const weightKg = Number(pesoActual || 0);
   const calc = weightKg ? cunninghamPlan({
     weightKg,
@@ -45,7 +43,6 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
   const protein = jugador.proteina_objetivo_g || calc?.protein;
   const cho = jugador.cho_objetivo_g || calc?.cho;
   const fat = jugador.grasa_objetivo_g || calc?.fat;
-  const hasSomatotype = jugador.endomorfia || jugador.mesomorfia || jugador.ectomorfia;
 
   return (
     <Stack gap={0}>
@@ -64,7 +61,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
           <Box>
             <Title order={3} fw={800} c="dark.4">Perfil del jugador</Title>
             <Text size="sm" c="dimmed">
-              Datos físicos, objetivos y ajustes individuales.
+              Objetivos, preferencias y ajustes individuales.
             </Text>
           </Box>
         </Group>
@@ -72,15 +69,6 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
 
       <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         <Stack gap="md">
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
-            <StatCard label="Altura" value={jugador.altura_cm ? `${jugador.altura_cm} cm` : '-'} />
-            <StatCard label="Peso actual" value={pesoActual ? `${pesoActual} kg` : '-'} />
-            <StatCard label="% Grasa" value={grasaActual ? `${grasaActual}%` : '-'} />
-            <StatCard label="Masa magra" value={masaMagraActual ? `${masaMagraActual} kg` : '-'} />
-            <StatCard label="Última medición" value={fechaUltimaMedicion || '-'} order={3} />
-            <StatCard label="Posición" value={jugador.posicion || '-'} order={3} />
-          </SimpleGrid>
-
           <Paper p={{ base: 'md', sm: 'lg' }} bg="white" shadow="xs" radius="lg" withBorder>
             <Group gap="xs" mb="md">
               <ThemeIcon color="green" variant="light" radius="xl" size="lg">
@@ -89,7 +77,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
               <Box>
                 <Title order={3} fw={800} c="dark.4">Objetivos nutricionales</Title>
                 <Text size="sm" c="dimmed">
-                  Referencias calculadas o fijadas manualmente.
+                  Referencias calculadas con la última medición o fijadas manualmente.
                 </Text>
               </Box>
             </Group>
@@ -101,25 +89,6 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
               <StatCard label="Grasa" value={fat ? `${fat}g` : '-'} />
             </SimpleGrid>
           </Paper>
-
-          {hasSomatotype && (
-            <BentoCard title="Somatotipo" icon={IconChartBar} color="violet">
-              <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
-                <Stack gap={0}>
-                  <Text size="xs" c="dimmed">Endomorfia</Text>
-                  <Text fw={700}>{jugador.endomorfia}</Text>
-                </Stack>
-                <Stack gap={0}>
-                  <Text size="xs" c="dimmed">Mesomorfia</Text>
-                  <Text fw={700}>{jugador.mesomorfia}</Text>
-                </Stack>
-                <Stack gap={0}>
-                  <Text size="xs" c="dimmed">Ectomorfia</Text>
-                  <Text fw={700}>{jugador.ectomorfia}</Text>
-                </Stack>
-              </SimpleGrid>
-            </BentoCard>
-          )}
 
           <Paper p={{ base: 'md', sm: 'lg' }} bg="white" shadow="xs" radius="lg" withBorder>
             <Group gap="xs" mb="md">

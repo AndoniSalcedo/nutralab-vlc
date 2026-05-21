@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Badge, Box, Button, Collapse, Divider, Group, Paper, Stack, Text, ThemeIcon, Title } from '@mantine/core';
+import { Badge, Box, Button, Group, Modal, Paper, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconInbox, IconMail, IconPlus } from '@tabler/icons-react';
 import MessageComposer from '@/components/MessageComposer';
@@ -19,7 +19,7 @@ function formatDate(value) {
 }
 
 export default function MensajesTab({ jugador, messages = [], readOnly = false }) {
-  const [opened, { toggle, close }] = useDisclosure(false);
+  const [opened, { open, close }] = useDisclosure(false);
   const playerOption = useMemo(() => [jugador], [jugador]);
 
   return (
@@ -32,10 +32,10 @@ export default function MensajesTab({ jugador, messages = [], readOnly = false }
         shadow="xs"
         style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
       >
-        <Group justify="space-between" align="flex-start" gap="md">
-          <Group gap="sm">
-            <ThemeIcon color="blue" variant="light" radius="xl" size={42}>
-              <IconMail size={21} />
+        <Group justify="space-between" align="center" gap="sm" wrap="wrap">
+          <Group gap="xs">
+            <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
+              <IconMail size={20} />
             </ThemeIcon>
             <Box>
               <Title order={3} fw={800} c="dark.4">Mensajes</Title>
@@ -48,37 +48,36 @@ export default function MensajesTab({ jugador, messages = [], readOnly = false }
           {!readOnly && (
             <Button
               radius="xl"
-              variant={opened ? 'light' : 'filled'}
-              leftSection={<IconPlus size={16} />}
-              onClick={toggle}
+              size="xs"
+              color="blue"
+              variant="light"
+              leftSection={<IconPlus size={14} />}
+              onClick={open}
             >
-              Nuevo
+              Nuevo mensaje
             </Button>
           )}
         </Group>
-
-        {!readOnly && (
-          <Collapse in={opened}>
-            <Divider my="md" />
-            <MessageComposer
-              players={playerOption}
-              defaultRecipientIds={[jugador.id]}
-              forceRecipients
-              onSent={close}
-            />
-          </Collapse>
-        )}
       </Paper>
+
+      <Modal opened={opened && !readOnly} onClose={close} title="Nuevo mensaje" size="lg">
+        <MessageComposer
+          players={playerOption}
+          defaultRecipientIds={[jugador.id]}
+          forceRecipients
+          onSent={close}
+        />
+      </Modal>
 
       <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         {messages.length > 0 ? (
           <Stack gap="sm">
             {messages.map((message) => (
-              <Paper key={message.id} p={{ base: 'md', sm: 'lg' }} radius="lg" withBorder bg="white">
+              <Paper key={message.id} p={{ base: 'sm', sm: 'md' }} radius="lg" withBorder bg="white" shadow="xs">
                 <Group justify="space-between" align="flex-start" gap="sm" mb="xs">
                   <Box style={{ minWidth: 0 }}>
                     <Group gap="xs" wrap="nowrap">
-                      <Title order={4} fw={800} c="dark.4" style={{ overflowWrap: 'anywhere' }}>
+                      <Title order={4} size="h5" fw={800} c="dark.4" style={{ overflowWrap: 'anywhere' }}>
                         {message.titulo}
                       </Title>
                       {!message.jugador_id && (

@@ -24,7 +24,6 @@ export default async function Dashboard() {
 
   // Admin flow
   let players = [];
-  let teamEvolutions = [];
   try {
     const [resJugadores, resEvoluciones] = await Promise.all([
       supabase
@@ -43,10 +42,9 @@ export default async function Dashboard() {
     players = (resJugadores.data || []).map((player) => (
       withLatestMeasurement(player, evoluciones.filter((item) => String(item.jugador_id) === String(player.id)))
     ));
-    teamEvolutions = resEvoluciones.data || [];
   } catch (err) {
     console.error('Error fetching players/evolutions:', err);
   }
 
-  return <DashboardContent players={players} teamEvolutions={teamEvolutions} />;
+  return <DashboardContent players={players} />;
 }

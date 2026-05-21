@@ -3,9 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Anchor, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconCalendarEvent, IconDots, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil } from '@tabler/icons-react';
+import { IconAlertTriangle, IconCalendarEvent, IconChartLine, IconDots, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil } from '@tabler/icons-react';
 import DashboardActions from '@/components/DashboardActions';
-import TeamEvolutionChart from '@/components/TeamEvolutionChart';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import PlayerForm from '@/components/PlayerForm';
@@ -84,7 +83,7 @@ function getPlayerPlan(player) {
   return { kcal: calc.kcal, calculated: true };
 }
 
-export default function DashboardContent({ players = [], teamEvolutions = [] }) {
+export default function DashboardContent({ players = [] }) {
   const router = useRouter();
   const [playersState, setPlayersState] = useState(players);
   const [editingPlayer, setEditingPlayer] = useState(null);
@@ -122,8 +121,6 @@ export default function DashboardContent({ players = [], teamEvolutions = [] }) 
     const start = (page - 1) * PAGE_SIZE;
     return filteredPlayers.slice(start, start + PAGE_SIZE);
   }, [filteredPlayers, page]);
-  const kcalValues = playersWithPlan.map((player) => player.plan.kcal).filter(Boolean);
-  const avgKcal = kcalValues.length ? Math.round(kcalValues.reduce((a, kcal) => a + kcal, 0) / kcalValues.length) : 0;
 
   useEffect(() => {
     setPage(1);
@@ -214,11 +211,12 @@ export default function DashboardContent({ players = [], teamEvolutions = [] }) 
               description="Plantilla en seguimiento"
             />
             <DashboardStat
-              title="Kcal medio equipo"
-              icon={IconFlame}
-              color="orange"
-              value={avgKcal || '—'}
-              description="Promedio diario estimado"
+              title="Evolución equipo"
+              icon={IconChartLine}
+              color="blue"
+              value="Ver análisis →"
+              description="Tendencias y comparativas"
+              href="/dashboard/evolucion"
             />
             <DashboardStat
               title="Menú esta semana"
@@ -274,11 +272,6 @@ export default function DashboardContent({ players = [], teamEvolutions = [] }) 
           </Paper>
         </Stack>
       </Paper>
-
-      {/* 2. GRÁFICO EVOLUTIVO DEL EQUIPO */}
-      {teamEvolutions.length > 0 && (
-        <TeamEvolutionChart teamEvolutions={teamEvolutions} />
-      )}
 
       {/* 3. LISTADO DE JUGADORES (TABLA) */}
       <Box>

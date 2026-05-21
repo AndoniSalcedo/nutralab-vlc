@@ -75,10 +75,16 @@ export default function MessageComposer({
             onChange={setMode}
             fullWidth
             radius="xl"
+            size="sm"
+            bg="gray.1"
             data={[
               { value: 'all', label: 'Todos' },
               { value: 'selected', label: 'Jugadores concretos' },
             ]}
+            styles={{
+              root: { border: 'none', width: '100%' },
+              indicator: { boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
+            }}
           />
         )}
 
@@ -91,6 +97,8 @@ export default function MessageComposer({
             onChange={setRecipientIds}
             searchable
             clearable={!forceRecipients}
+            variant="filled"
+            radius="md"
             required
           />
         )}
@@ -100,6 +108,8 @@ export default function MessageComposer({
           placeholder="Ej: Recordatorio de hidratación"
           value={titulo}
           onChange={(event) => setTitulo(event.currentTarget.value)}
+          variant="filled"
+          radius="md"
           required
         />
 
@@ -110,11 +120,13 @@ export default function MessageComposer({
           autosize
           value={contenido}
           onChange={(event) => setContenido(event.currentTarget.value)}
+          variant="filled"
+          radius="md"
           required
         />
 
         <Group justify="flex-end">
-          <Button type="submit" loading={loading} leftSection={<IconSend size={16} />}>
+          <Button type="submit" loading={loading} size="xs" radius="xl" leftSection={<IconSend size={14} />}>
             Enviar mensaje
           </Button>
         </Group>
