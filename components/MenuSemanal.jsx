@@ -29,7 +29,6 @@ import {
   IconFlame,
   IconToolsKitchen,
   IconUpload,
-  IconUtensils,
 } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
 
@@ -250,7 +249,7 @@ export default function MenuSemanal({ menusIniciales }) {
                 allowDeselect={false}
                 style={{ flex: 1, minWidth: 240 }}
               />
-              <Badge variant="light" color="gray" radius="sm" size="lg" leftSection={<IconUtensils size={13} />}>
+              <Badge variant="light" color="gray" radius="sm" size="lg" leftSection={<IconToolsKitchen size={13} />}>
                 {selected ? `${selected.dias.length} días` : 'Sin menú'}
               </Badge>
             </Group>
