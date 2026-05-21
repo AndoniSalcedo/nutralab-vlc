@@ -75,6 +75,7 @@ export default function PlayerTabs({
         <Tabs.Panel value="general">
           <ResumenTab
             jugador={jugador}
+            evoluciones={evoluciones}
             messages={messages}
             activeSubtab={activeTab === 'general' ? activeSubtab : DEFAULT_SUBTABS.general}
             onSubtabChange={(value) => navigate('general', value)}

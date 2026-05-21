@@ -249,9 +249,6 @@ export default function MenuSemanal({ menusIniciales }) {
                 allowDeselect={false}
                 style={{ flex: 1, minWidth: 240 }}
               />
-              <Badge variant="light" color="gray" radius="sm" size="lg" leftSection={<IconToolsKitchen size={13} />}>
-                {selected ? `${selected.dias.length} días` : 'Sin menú'}
-              </Badge>
             </Group>
           </Paper>
         </Stack>

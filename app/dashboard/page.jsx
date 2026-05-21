@@ -1,6 +1,7 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import DashboardContent from '@/components/DashboardContent';
 import { getUser } from '@/lib/auth';
+import { withLatestMeasurement } from '@/lib/player-metrics';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -28,17 +29,20 @@ export default async function Dashboard() {
     const [resJugadores, resEvoluciones] = await Promise.all([
       supabase
         .from('jugadores')
-        .select('id,nombre,apellidos,posicion,kcal_objetivo,peso_kg,porcentaje_grasa,masa_magra_kg,factor_actividad,auth_user_id,auth_email,credentials_created_at')
+        .select('id,nombre,apellidos,posicion,kcal_objetivo,factor_actividad,auth_user_id,auth_email,credentials_created_at')
         .order('nombre'),
       supabase
         .from('evoluciones')
-        .select('fecha,peso_kg,porcentaje_grasa,masa_magra_kg')
+        .select('jugador_id,fecha,peso_kg,porcentaje_grasa,masa_magra_kg')
     ]);
 
     if (resJugadores.error) throw resJugadores.error;
     if (resEvoluciones.error) throw resEvoluciones.error;
     
-    players = resJugadores.data || [];
+    const evoluciones = resEvoluciones.data || [];
+    players = (resJugadores.data || []).map((player) => (
+      withLatestMeasurement(player, evoluciones.filter((item) => String(item.jugador_id) === String(player.id)))
+    ));
     teamEvolutions = resEvoluciones.data || [];
   } catch (err) {
     console.error('Error fetching players/evolutions:', err);

@@ -5,6 +5,7 @@ import { IconChartBar, IconClipboardList, IconTargetArrow, IconUser } from '@tab
 import { BentoCard } from '@/components/Bento/BentoItem';
 import { cunninghamPlan } from '@/lib/calculations';
 import { CampoEditable } from '../editable';
+import { latestEvolution } from '@/lib/player-metrics';
 
 const NUM_COMIDAS = [
   { value: '3', label: '3 comidas' },
@@ -23,12 +24,21 @@ function StatCard({ label, value, order = 2 }) {
   );
 }
 
-export default function PerfilSubtab({ jugador, readOnly = false }) {
-  const weightKg = Number(jugador.peso_kg || 0);
+function metricValue(jugador, latest, key) {
+  return latest?.[key] ?? jugador?.[key] ?? null;
+}
+
+export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = false }) {
+  const latest = latestEvolution(evoluciones);
+  const pesoActual = metricValue(jugador, latest, 'peso_kg');
+  const grasaActual = metricValue(jugador, latest, 'porcentaje_grasa');
+  const masaMagraActual = metricValue(jugador, latest, 'masa_magra_kg');
+  const fechaUltimaMedicion = latest?.fecha || jugador.fecha_ultima_medicion;
+  const weightKg = Number(pesoActual || 0);
   const calc = weightKg ? cunninghamPlan({
     weightKg,
-    bodyFatPct: jugador.porcentaje_grasa ? Number(jugador.porcentaje_grasa) : null,
-    leanMassKg: jugador.masa_magra_kg ? Number(jugador.masa_magra_kg) : null,
+    bodyFatPct: grasaActual ? Number(grasaActual) : null,
+    leanMassKg: masaMagraActual ? Number(masaMagraActual) : null,
     activityFactor: Number(jugador.factor_actividad || 1.6),
   }) : null;
   const kcal = jugador.kcal_objetivo || calc?.kcal;
@@ -64,10 +74,10 @@ export default function PerfilSubtab({ jugador, readOnly = false }) {
         <Stack gap="md">
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
             <StatCard label="Altura" value={jugador.altura_cm ? `${jugador.altura_cm} cm` : '-'} />
-            <StatCard label="Peso actual" value={jugador.peso_kg ? `${jugador.peso_kg} kg` : '-'} />
-            <StatCard label="% Grasa" value={jugador.porcentaje_grasa ? `${jugador.porcentaje_grasa}%` : '-'} />
-            <StatCard label="Masa magra" value={jugador.masa_magra_kg ? `${jugador.masa_magra_kg} kg` : '-'} />
-            <StatCard label="Última medición" value={jugador.fecha_ultima_medicion || '-'} order={3} />
+            <StatCard label="Peso actual" value={pesoActual ? `${pesoActual} kg` : '-'} />
+            <StatCard label="% Grasa" value={grasaActual ? `${grasaActual}%` : '-'} />
+            <StatCard label="Masa magra" value={masaMagraActual ? `${masaMagraActual} kg` : '-'} />
+            <StatCard label="Última medición" value={fechaUltimaMedicion || '-'} order={3} />
             <StatCard label="Posición" value={jugador.posicion || '-'} order={3} />
           </SimpleGrid>
 

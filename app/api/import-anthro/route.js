@@ -25,6 +25,55 @@ function getNombre(f) {
   return String(f['NOMBRE'] ?? f['Nombre'] ?? f['nombre'] ?? '').trim();
 }
 
+const MEASUREMENT_FIELDS = [
+  'altura_cm',
+  'peso_kg',
+  'porcentaje_grasa',
+  'masa_magra_kg',
+  'pliegue_biceps',
+  'pliegue_triceps',
+  'pliegue_subescapular',
+  'pliegue_cresta_iliaca',
+  'pliegue_supraeliaco',
+  'pliegue_abdominal',
+  'pliegue_pantorrilla',
+  'pliegue_muslo',
+  'suma_6_pliegues',
+  'suma_8_pliegues',
+  'porcentaje_grasa_faulkner',
+  'porcentaje_grasa_yuhasz',
+  'peso_oseo',
+  'peso_residual',
+  'peso_graso',
+  'peso_muscular',
+  'peso_magro',
+  'peso_deseable',
+  'endomorfia',
+  'mesomorfia',
+  'ectomorfia',
+  'perimetro_brazo_contraido',
+  'perimetro_pantorrilla',
+  'perimetro_muslo',
+];
+
+function splitJugadorAndMedicion(datos) {
+  const jugador = {
+    nombre: datos.nombre,
+    apellidos: datos.apellidos,
+    fecha_nacimiento: datos.fecha_nacimiento,
+  };
+  const medicion = {
+    fecha: datos.fecha_ultima_medicion || new Date().toISOString().split('T')[0],
+    notas: 'Importado desde antropometría',
+  };
+
+  for (const field of MEASUREMENT_FIELDS) {
+    medicion[field] = datos[field] ?? null;
+  }
+
+  return { jugador, medicion };
+}
+
 function extraerUltimaMedicion(filas) {
   const validas = filas.filter(f => {
     const nombre = getNombre(f);
@@ -109,13 +158,28 @@ export async function POST(req) {
     for (const j of jugadores) {
       if (!j || !sel.includes(j._nombre_completo)) continue;
       const { _nombre_completo, ...datos } = j;
+      const { jugador: jugadorPayload, medicion } = splitJugadorAndMedicion(datos);
       const { data: existente } = await supabase.from('jugadores').select('id').ilike('nombre', '%' + datos.nombre + '%').limit(1).single();
+      let jugadorId = existente?.id;
+
       if (existente) {
-        const { error } = await supabase.from('jugadores').update(datos).eq('id', existente.id);
+        const { error } = await supabase.from('jugadores').update(jugadorPayload).eq('id', existente.id);
         resultados.push({ nombre: _nombre_completo, accion: 'actualizado', error: error?.message });
       } else {
-        const { error } = await supabase.from('jugadores').insert({ ...datos, factor_actividad: 1.6 });
+        const { data: creado, error } = await supabase.from('jugadores').insert({ ...jugadorPayload, factor_actividad: 1.6 }).select('id').single();
+        jugadorId = creado?.id;
         resultados.push({ nombre: _nombre_completo, accion: 'creado', error: error?.message });
+      }
+
+      if (jugadorId) {
+        const { error } = await supabase
+          .from('evoluciones')
+          .upsert({ ...medicion, jugador_id: jugadorId }, { onConflict: 'jugador_id,fecha' });
+
+        if (error) {
+          const last = resultados[resultados.length - 1];
+          if (last && !last.error) last.error = error.message;
+        }
       }
     }
     return NextResponse.json({ ok: true, resultados });

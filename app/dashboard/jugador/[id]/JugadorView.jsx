@@ -1,5 +1,6 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
+import { withLatestMeasurement } from '@/lib/player-metrics';
 import JugadorHeader from '@/components/JugadorHeader';
 import { Anchor, Stack, Text } from '@mantine/core';
 import PlayerTabs from './_tabs/PlayerTabs';
@@ -26,9 +27,9 @@ export default async function JugadorView({ id, activeTab = 'general', activeSub
         .order('created_at', { ascending: false }),
     ]);
 
-    jugador = resJugador.data;
     analiticas = resAnaliticas.data || [];
     evoluciones = resEvoluciones.data || [];
+    jugador = withLatestMeasurement(resJugador.data, evoluciones);
     messages = resMessages.data || [];
   } catch (err) {
     console.error('Error fetching jugador details:', err);

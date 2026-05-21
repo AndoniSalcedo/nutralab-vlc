@@ -42,6 +42,7 @@ const METRICAS = [
 function emptyForm() {
   return {
     fecha: new Date().toISOString().split('T')[0],
+    altura_cm: '',
     peso_kg: '',
     porcentaje_grasa: '',
     masa_magra_kg: '',
@@ -53,6 +54,7 @@ function emptyForm() {
 function formFromMedicion(medicion) {
   return {
     fecha: medicion?.fecha || new Date().toISOString().split('T')[0],
+    altura_cm: medicion?.altura_cm ?? '',
     peso_kg: medicion?.peso_kg ?? '',
     porcentaje_grasa: medicion?.porcentaje_grasa ?? '',
     masa_magra_kg: medicion?.masa_magra_kg ?? '',
@@ -123,6 +125,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         body: JSON.stringify({
           jugador_id: jugadorId,
           ...form,
+          altura_cm: form.altura_cm ? Number(form.altura_cm) : null,
           peso_kg: form.peso_kg ? Number(form.peso_kg) : null,
           porcentaje_grasa: form.porcentaje_grasa ? Number(form.porcentaje_grasa) : null,
           masa_magra_kg: form.masa_magra_kg ? Number(form.masa_magra_kg) : null,
@@ -211,6 +214,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         <Stack gap="md">
           <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
             <TextInput label="Fecha" type="date" value={form.fecha} onChange={(e) => setForm((f) => ({ ...f, fecha: e.target.value }))} />
+            <TextInput label="Altura (cm)" type="number" value={form.altura_cm} onChange={(e) => setForm((f) => ({ ...f, altura_cm: e.target.value }))} />
             <TextInput label="Peso (kg)" type="number" value={form.peso_kg} onChange={(e) => setForm((f) => ({ ...f, peso_kg: e.target.value }))} />
             <TextInput label="% Grasa" type="number" value={form.porcentaje_grasa} onChange={(e) => setForm((f) => ({ ...f, porcentaje_grasa: e.target.value }))} />
             <TextInput label="Masa magra (kg)" type="number" value={form.masa_magra_kg} onChange={(e) => setForm((f) => ({ ...f, masa_magra_kg: e.target.value }))} />
@@ -291,6 +295,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
               <Table variant="simple" verticalSpacing="sm">
                 <Table.Tbody>
                   <Table.Tr><Table.Th>Fecha</Table.Th><Table.Td>{fechaLabel(selected.fecha)}</Table.Td></Table.Tr>
+                  <Table.Tr><Table.Th>Altura</Table.Th><Table.Td>{selected.altura_cm ?? '-'} cm</Table.Td></Table.Tr>
                   <Table.Tr><Table.Th>Peso</Table.Th><Table.Td>{selected.peso_kg ?? '-'} kg</Table.Td></Table.Tr>
                   <Table.Tr><Table.Th>% Grasa</Table.Th><Table.Td>{selected.porcentaje_grasa ?? '-'} %</Table.Td></Table.Tr>
                   <Table.Tr><Table.Th>Masa magra</Table.Th><Table.Td>{selected.masa_magra_kg ?? '-'} kg</Table.Td></Table.Tr>

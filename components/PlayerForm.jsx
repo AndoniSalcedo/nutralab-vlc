@@ -1,7 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { cunninghamPlan } from '@/lib/calculations';
+import { useState } from 'react';
 import { 
   TextInput, 
   Select, 
@@ -14,10 +13,9 @@ import {
   Title, 
   Text, 
   Box,
-  Divider
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconUser, IconScale, IconActivity, IconCheck } from '@tabler/icons-react';
+import { IconUser, IconActivity, IconCheck } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 
 export default function PlayerForm({ initial }) {
@@ -28,25 +26,10 @@ export default function PlayerForm({ initial }) {
   const [nombre, setNombre] = useState(initial?.nombre ?? '');
   const [apellidos, setApellidos] = useState(initial?.apellidos ?? '');
   const [posicion, setPosicion] = useState(initial?.posicion ?? '');
-  const [altura, setAltura] = useState(String(initial?.altura_cm ?? ''));
-  const [weight, setWeight] = useState(String(initial?.peso_kg ?? ''));
-  const [bodyFat, setBodyFat] = useState(String(initial?.porcentaje_grasa ?? ''));
-  const [leanMass, setLeanMass] = useState(String(initial?.masa_magra_kg ?? ''));
   const [activityFactor, setActivityFactor] = useState(String(initial?.factor_actividad ?? '1.6'));
   const [gustos, setGustos] = useState(initial?.gustos_preferencias ?? '');
   const [contexto, setContexto] = useState(initial?.contexto_clinico ?? '');
   const [objetivo, setObjetivo] = useState(initial?.objetivo ?? '');
-
-  const calc = useMemo(() => {
-    const weightNum = Number(weight || 0);
-    if (!weightNum) return null;
-    return cunninghamPlan({
-      weightKg: weightNum,
-      bodyFatPct: bodyFat ? Number(bodyFat) : null,
-      leanMassKg: leanMass ? Number(leanMass) : null,
-      activityFactor: Number(activityFactor || 1.6),
-    });
-  }, [weight, bodyFat, leanMass, activityFactor]);
 
   async function handleSubmit(e, isDelete = false) {
     if (e) e.preventDefault();
@@ -68,21 +51,10 @@ export default function PlayerForm({ initial }) {
         formData.append('nombre', nombre);
         formData.append('apellidos', apellidos);
         formData.append('posicion', posicion);
-        formData.append('altura_cm', altura);
-        formData.append('peso_kg', weight);
-        formData.append('porcentaje_grasa', bodyFat);
-        formData.append('masa_magra_kg', leanMass);
         formData.append('factor_actividad', activityFactor);
         formData.append('gustos_preferencias', gustos);
         formData.append('contexto_clinico', contexto);
         formData.append('objetivo', objetivo);
-
-        // Calculated values
-        formData.append('kcal_objetivo', String(calc?.kcal ?? ''));
-        formData.append('cho_objetivo_g', String(calc?.cho ?? ''));
-        formData.append('proteina_objetivo_g', String(calc?.protein ?? ''));
-        formData.append('grasa_objetivo_g', String(calc?.fat ?? ''));
-        formData.append('agua_objetivo_ml', String(calc?.hydrationMl ?? ''));
 
         const res = await fetch('/api/players', {
           method: 'POST',
@@ -115,7 +87,7 @@ export default function PlayerForm({ initial }) {
         <div>
           <Title order={3} c="dark.8">{initial ? 'Editar jugador' : 'Añadir jugador'}</Title>
           <Text size="sm" c="dimmed">
-            Este formulario recalcula automáticamente el plan base del jugador utilizando la ecuación de Cunningham.
+            Datos de identidad, rol y contexto nutricional. Las mediciones corporales se gestionan en la pestaña Métricas.
           </Text>
         </div>
 
@@ -147,46 +119,6 @@ export default function PlayerForm({ initial }) {
               />
             </SimpleGrid>
 
-            {/* Datos Físicos */}
-            <Title order={5} c="blue" mb={-10}>Datos Físicos e Índices</Title>
-            <SimpleGrid cols={{ base: 1, sm: 4 }} spacing="md">
-              <TextInput 
-                label="Altura (cm)"
-                type="number"
-                step="0.1"
-                placeholder="Ej. 182"
-                value={altura}
-                onChange={(e) => setAltura(e.target.value)}
-              />
-              <TextInput 
-                label="Peso (kg)"
-                type="number"
-                step="0.1"
-                placeholder="Ej. 75.5"
-                required
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-                leftSection={<IconScale size={16} />}
-              />
-              <TextInput 
-                label="% Grasa"
-                type="number"
-                step="0.1"
-                placeholder="Ej. 10.2"
-                value={bodyFat}
-                onChange={(e) => setBodyFat(e.target.value)}
-              />
-              <TextInput 
-                label="Masa Magra (kg)"
-                type="number"
-                step="0.1"
-                placeholder="Ej. 65"
-                value={leanMass}
-                onChange={(e) => setLeanMass(e.target.value)}
-              />
-            </SimpleGrid>
-
-            {/* Actividad */}
             <Select 
               label="Factor de Actividad Diario"
               value={activityFactor}
@@ -226,31 +158,6 @@ export default function PlayerForm({ initial }) {
                 onChange={(e) => setObjetivo(e.target.value)}
               />
             </SimpleGrid>
-
-            <Divider />
-
-            {/* KPI Resultados de Cunningham en vivo */}
-            <Box bg="blue.0" p="md" style={{ borderRadius: '12px' }}>
-              <Text fw={700} size="sm" c="blue.8" mb="xs">Cálculo Automático Cunningham (Base)</Text>
-              <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
-                <Box>
-                  <Text size="xs" c="dimmed">Kcal Objetivo</Text>
-                  <Text size="lg" fw={800} c="dark.7">{calc?.kcal ?? '—'} kcal</Text>
-                </Box>
-                <Box>
-                  <Text size="xs" c="dimmed">Macronutrientes (G / P / L)</Text>
-                  <Text size="md" fw={700} c="dark.7">
-                    {calc ? `${calc.cho}g / ${calc.protein}g / ${calc.fat}g` : '—'}
-                  </Text>
-                </Box>
-                <Box>
-                  <Text size="xs" c="dimmed">Agua Objetivo</Text>
-                  <Text size="lg" fw={800} c="dark.7">
-                    {calc ? `${(calc.hydrationMl / 1000).toFixed(2)} L` : '—'}
-                  </Text>
-                </Box>
-              </SimpleGrid>
-            </Box>
 
             {/* Botones de acción */}
             <Group justify="flex-end" mt="md">

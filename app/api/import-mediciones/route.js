@@ -28,6 +28,7 @@ export async function POST(req) {
         (j.apellidos || '').toLowerCase() === apellidos.toLowerCase()
       );
 
+      const altura_cm = row['Altura'] || row['Altura (cm)'] || row['altura_cm'] ? parseFloat(row['Altura'] || row['Altura (cm)'] || row['altura_cm']) : null;
       const peso_kg = row['Peso'] || row['Peso (kg)'] || row['peso_kg'] ? parseFloat(row['Peso'] || row['Peso (kg)'] || row['peso_kg']) : null;
       const porcentaje_grasa = row['% Grasa'] || row['Grasa'] || row['porcentaje_grasa'] ? parseFloat(row['% Grasa'] || row['Grasa'] || row['porcentaje_grasa']) : null;
       const masa_magra_kg = row['Masa Magra'] || row['Masa Magra (kg)'] || row['masa_magra_kg'] ? parseFloat(row['Masa Magra'] || row['Masa Magra (kg)'] || row['masa_magra_kg']) : null;
@@ -57,10 +58,7 @@ export async function POST(req) {
       if (!jugador) {
         const { data: newJugador, error: createError } = await supabase.from('jugadores').insert({
           nombre,
-          apellidos,
-          peso_kg,
-          porcentaje_grasa,
-          masa_magra_kg
+          apellidos
         }).select().single();
         
         if (createError) {
@@ -69,17 +67,9 @@ export async function POST(req) {
         }
         jugador = newJugador;
         jugadoresDb.push(jugador);
-      } else {
-        // Actualizar jugador con la medición más reciente (simplificado, actualizamos con la actual)
-        await supabase.from('jugadores').update({
-          peso_kg: peso_kg || jugador.peso_kg,
-          porcentaje_grasa: porcentaje_grasa || jugador.porcentaje_grasa,
-          masa_magra_kg: masa_magra_kg || jugador.masa_magra_kg
-        }).eq('id', jugador.id);
       }
 
-      // 2. Insertar o actualizar la evolución (upsert basado en jugador_id + fecha si existe unique, o simplemente insert)
-      // Primero verificamos si ya existe una medición para ese día
+      // 2. Insertar o actualizar la evolución. Las métricas corporales viven solo aquí.
       const { data: existEvol } = await supabase.from('evoluciones')
         .select('id')
         .eq('jugador_id', jugador.id)
@@ -89,6 +79,7 @@ export async function POST(req) {
       const evoPayload = {
         jugador_id: jugador.id,
         fecha,
+        altura_cm,
         peso_kg,
         porcentaje_grasa,
         masa_magra_kg,

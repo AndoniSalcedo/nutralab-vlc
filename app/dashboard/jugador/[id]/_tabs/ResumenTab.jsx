@@ -6,7 +6,7 @@ import { tabLabel } from './tab-label';
 import MensajesTab from './MensajesTab';
 import PerfilSubtab from './resumen/PerfilSubtab';
 
-export default function ResumenTab({ jugador, messages = [], activeSubtab, onSubtabChange, readOnly = false }) {
+export default function ResumenTab({ jugador, evoluciones = [], messages = [], activeSubtab, onSubtabChange, readOnly = false }) {
   return (
     <Stack gap={0}>
       <Paper
@@ -44,7 +44,7 @@ export default function ResumenTab({ jugador, messages = [], activeSubtab, onSub
       </Paper>
 
       <Box mt={0}>
-        {activeSubtab === 'perfil' && <PerfilSubtab jugador={jugador} readOnly={readOnly} />}
+        {activeSubtab === 'perfil' && <PerfilSubtab jugador={jugador} evoluciones={evoluciones} readOnly={readOnly} />}
         {activeSubtab === 'mensajes' && <MensajesTab jugador={jugador} messages={messages} readOnly={readOnly} />}
       </Box>
     </Stack>
