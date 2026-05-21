@@ -42,7 +42,7 @@ export default function ObjetivosSubtab({ jugador, readOnly = false }) {
         </Group>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }}>
+      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         <Stack gap={0}>
           <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing={{ base: 'md', sm: 'md' }} mb={{ base: 'md', sm: 'xl' }}>
             <Paper p={{ base: 'sm', sm: 'md' }} radius="lg" withBorder shadow="sm">

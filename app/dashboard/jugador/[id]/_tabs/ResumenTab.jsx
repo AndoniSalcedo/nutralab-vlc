@@ -35,8 +35,8 @@ export default function ResumenTab({ jugador, activeSubtab, onSubtabChange, read
           bg="gray.1"
           data={[
             { value: 'ficha', label: tabLabel(IconUser, 'Ficha') },
-            { value: 'objetivos', label: tabLabel(IconClipboardList, 'Objetivos') },
-            { value: 'herramientas', label: tabLabel(IconCalculator, 'Herramientas') },
+            { value: 'objetivos', label: tabLabel(IconClipboardList, 'Objetivos', 'Objs.') },
+            { value: 'herramientas', label: tabLabel(IconCalculator, 'Herramientas', 'Tools') },
           ]}
           styles={{
             root: { border: 'none', width: '100%' },

@@ -230,7 +230,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         </Stack>
       </Modal>
 
-      <Box py={{ base: 'sm', sm: 'md' }}>
+      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         {sortedAsc.length === 0 ? (
           <Box mt="xl">
             <NothingFound

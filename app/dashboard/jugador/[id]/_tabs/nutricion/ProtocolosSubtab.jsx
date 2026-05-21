@@ -56,7 +56,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
         </Group>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }}>
+      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         <Stack gap={0}>
           <SimpleGrid cols={{ base: 1, lg: 2 }} spacing={{ base: 'md', sm: 'md' }} align="stretch" mb={{ base: 'md', sm: 'xl' }}>
             <BentoCard title="Timeline prepartido" icon={IconFlag} color="dark">

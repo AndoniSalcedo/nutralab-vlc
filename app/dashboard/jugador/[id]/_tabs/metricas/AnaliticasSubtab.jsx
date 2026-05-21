@@ -218,7 +218,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
         </Stack>
       </Modal>
 
-      <Box py={{ base: 'sm', sm: 'md' }}>
+      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         {sorted.length === 0 ? (
           <Box mt="xl">
             <NothingFound

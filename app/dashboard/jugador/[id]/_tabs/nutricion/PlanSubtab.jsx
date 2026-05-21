@@ -332,7 +332,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         </Stack>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }}>
+      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         {loadingList ? (
           <Paper p={{ base: 'md', sm: 'xl' }} radius="lg" withBorder shadow="sm" style={{ textAlign: 'center' }}>
             <Loader size="lg" />

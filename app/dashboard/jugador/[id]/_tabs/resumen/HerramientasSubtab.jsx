@@ -22,7 +22,7 @@ export default function HerramientasSubtab({ jugador }) {
         </Group>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }}>
+      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing={{ base: 'md', sm: 'lg' }}>
           <HydrationCalculator jugador={jugador} />
           <FoodCalculator />

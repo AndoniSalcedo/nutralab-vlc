@@ -76,7 +76,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
         </Group>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }}>
+      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         <Stack gap={0}>
           <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing={{ base: 'md', sm: 'md' }} mb={{ base: 'md', sm: 'xl' }}>
             <SupplementCard
