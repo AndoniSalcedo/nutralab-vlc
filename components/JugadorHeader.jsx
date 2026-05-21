@@ -24,12 +24,12 @@ import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
 import FoodCalculator from './FoodCalculator';
 
-function BackButton() {
+function BackButton({ size = 42, iconSize = 24 }) {
   return (
     <Tooltip label="Volver al listado" position="right" withArrow>
       <Anchor href="/dashboard" style={{ textDecoration: 'none' }}>
-        <ActionIcon variant="subtle" color="gray" size="lg" radius="xl">
-          <IconChevronLeft size={24} />
+        <ActionIcon variant="light" color="gray" size={size} radius="xl">
+          <IconChevronLeft size={iconSize} />
         </ActionIcon>
       </Anchor>
     </Tooltip>
@@ -217,13 +217,19 @@ function JugadorHeaderMobile({ jugador, isAdmin, isPlayer, hasCredentials, onEdi
       shadow="xs"
       bg="white"
       mb="xs"
+      style={{ position: 'relative' }}
     >
-      <Stack gap="sm" align="center">
-        <Group justify="space-between" w="100%">
-          <Box>{isAdmin && <BackButton />}</Box>
-          <HeaderActions jugador={jugador} isAdmin={isAdmin} isPlayer={isPlayer} onEdit={onEdit} onOpenCalculator={onOpenCalculator} compact />
-        </Group>
+      {isAdmin && (
+        <Box style={{ position: 'absolute', top: 14, left: 14, zIndex: 2 }}>
+          <BackButton size={50} iconSize={28} />
+        </Box>
+      )}
 
+      <Box style={{ position: 'absolute', top: 10, right: 10, zIndex: 2 }}>
+        <HeaderActions jugador={jugador} isAdmin={isAdmin} isPlayer={isPlayer} onEdit={onEdit} onOpenCalculator={onOpenCalculator} compact />
+      </Box>
+
+      <Stack gap="xs" align="center">
         <PlayerIdentity
           jugador={jugador}
           isAdmin={isAdmin}

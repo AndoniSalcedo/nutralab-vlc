@@ -150,7 +150,7 @@ export default function DashboardShell({ children, user }) {
 
       <form id="logout-form" method="post" action="/api/logout" />
 
-      <Container size="xl" px={{ base: 'xs', sm: 'md' }} pt={{ base: 'xs', sm: 'md' }} pb="md">
+      <Container size="xl" px={{ base: 0, sm: 'md' }} pt={{ base: 'xs', sm: 'md' }} pb="md">
         {children}
       </Container>
     </div>
