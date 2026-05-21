@@ -30,15 +30,21 @@ export default function HydrationCalculator({ jugador }) {
   const aguaEntreno = Math.round(peso * 6); // ml extra
   const aguaPartido = Math.round(peso * 10); // ml extra
 
-  const TARGETS = {
+  const targets = {
     descanso: aguaBase,
     entreno: aguaBase + aguaEntreno,
     partido: aguaBase + aguaPartido
   };
 
-  const currentTarget = TARGETS[targetType];
+  const currentTarget = targets[targetType];
   const percentage = Math.min(100, Math.round((consumed / currentTarget) * 100));
   const isGoalReached = percentage >= 100;
+
+  const targetOptions = [
+    { value: 'descanso', label: `Descanso · ${targets.descanso} ml` },
+    { value: 'entreno', label: `Entreno · ${targets.entreno} ml` },
+    { value: 'partido', label: `Partido · ${targets.partido} ml` },
+  ];
 
   useEffect(() => {
     setIsClient(true);
@@ -95,11 +101,7 @@ export default function HydrationCalculator({ jugador }) {
         <SegmentedControl
           value={targetType}
           onChange={handleTargetChange}
-          data={[
-            { label: 'Descanso', value: 'descanso' },
-            { label: 'Entreno', value: 'entreno' },
-            { label: 'Partido', value: 'partido' },
-          ]}
+          data={targetOptions}
           fullWidth
           radius="md"
           color="blue"

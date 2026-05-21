@@ -15,7 +15,7 @@ const DEFAULT_SUBTABS = {
 
 const VALID_TABS = Object.keys(DEFAULT_SUBTABS);
 const VALID_SUBTABS = {
-  resumen: ['ficha', 'objetivos', 'herramientas'],
+  resumen: ['ficha', 'objetivos'],
   metricas: ['mediciones', 'analiticas'],
   nutricion: ['plan', 'hidratacion', 'suplementacion', 'protocolos'],
 };

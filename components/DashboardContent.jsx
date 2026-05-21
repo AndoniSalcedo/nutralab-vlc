@@ -1,35 +1,68 @@
 'use client';
 
-import { useState } from 'react';
-import { Anchor, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip } from '@mantine/core';
+import { useEffect, useMemo, useState } from 'react';
+import { Anchor, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconCalendarEvent, IconDotsVertical, IconFlame, IconTrash, IconUsers, IconUserPlus, IconPencil, IconChartPie } from '@tabler/icons-react';
+import { IconAlertTriangle, IconCalendarEvent, IconDots, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil } from '@tabler/icons-react';
 import DashboardActions from '@/components/DashboardActions';
 import TeamEvolutionChart from '@/components/TeamEvolutionChart';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import PlayerForm from '@/components/PlayerForm';
 import { cunninghamPlan } from '@/lib/calculations';
+import { useRouter } from 'next/navigation';
+
+const PAGE_SIZE = 8;
 
 function initials(name = '') {
   return name.trim().split(/\s+/).slice(0, 2).map((s) => s[0]?.toUpperCase() || '').join('');
 }
 
-function BentoCard({ title, icon: Icon, color = 'blue', children }) {
-  return (
-    <Paper radius="lg" p="md" shadow="sm" withBorder h="100%">
-      <Group mb="md" gap="xs">
-        <ThemeIcon color={color} variant="light" radius="md" size="md">
-          <Icon size={16} stroke={1.5} />
+function normalize(value) {
+  return String(value || '').toLowerCase().trim();
+}
+
+function DashboardStat({ title, icon: Icon, color = 'blue', value, description, href }) {
+  const content = (
+    <Box
+      px={{ base: 'sm', sm: 'md' }}
+      py="xs"
+      style={{
+        height: '100%',
+        minHeight: 62,
+        borderRadius: 14,
+        background: 'rgba(248,249,245,0.82)',
+        border: '1px solid rgba(222,226,230,0.9)',
+        transition: 'border-color 120ms ease, transform 120ms ease',
+      }}
+    >
+      <Group gap="sm" wrap="nowrap" align="center">
+        <ThemeIcon color={color} variant="light" radius="md" size={34} style={{ flex: '0 0 auto' }}>
+          <Icon size={18} stroke={1.6} />
         </ThemeIcon>
-        <Text fw={700} c="dimmed" size="xs" tt="uppercase" lts={0.5}>
-          {title}
-        </Text>
+        <Box style={{ minWidth: 0 }}>
+          <Text fw={750} c="dimmed" size="xs" tt="uppercase" lts={0.5} truncate>
+            {title}
+          </Text>
+          <Group gap={8} align="baseline" wrap="nowrap">
+            <Text fw={800} size="lg" c="#24291f" lh={1.1} truncate>
+              {value}
+            </Text>
+            <Text size="xs" c="dimmed" truncate visibleFrom="xs">
+              {description}
+            </Text>
+          </Group>
+        </Box>
       </Group>
-      <Stack gap="sm">
-        {children}
-      </Stack>
-    </Paper>
+    </Box>
+  );
+
+  if (!href) return content;
+
+  return (
+    <Anchor href={href} underline="never" c="inherit">
+      {content}
+    </Anchor>
   );
 }
 
@@ -52,13 +85,53 @@ function getPlayerPlan(player) {
 }
 
 export default function DashboardContent({ players = [], teamEvolutions = [] }) {
+  const router = useRouter();
   const [playersState, setPlayersState] = useState(players);
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [filters, setFilters] = useState({ name: '', email: '', position: '' });
+  const [page, setPage] = useState(1);
   const totalPlayers = playersState.length;
   const playersWithPlan = playersState.map((player) => ({ ...player, plan: getPlayerPlan(player) }));
+  const positionOptions = useMemo(() => {
+    const positions = Array.from(new Set(playersState.map((player) => player.posicion).filter(Boolean))).sort();
+    return [
+      { value: '', label: 'Todas' },
+      ...positions.map((position) => ({ value: position, label: position })),
+    ];
+  }, [playersState]);
+  const filteredPlayers = useMemo(() => {
+    const name = normalize(filters.name);
+    const email = normalize(filters.email);
+    const position = filters.position;
+
+    return playersWithPlan.filter((player) => {
+      const fullName = normalize(`${player.nombre || ''} ${player.apellidos || ''}`);
+      const playerEmail = normalize(player.auth_email);
+      const playerPosition = player.posicion || '';
+
+      return (
+        (!name || fullName.includes(name)) &&
+        (!email || playerEmail.includes(email)) &&
+        (!position || playerPosition === position)
+      );
+    });
+  }, [filters.email, filters.name, filters.position, playersWithPlan]);
+  const totalPages = Math.max(1, Math.ceil(filteredPlayers.length / PAGE_SIZE));
+  const paginatedPlayers = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return filteredPlayers.slice(start, start + PAGE_SIZE);
+  }, [filteredPlayers, page]);
   const kcalValues = playersWithPlan.map((player) => player.plan.kcal).filter(Boolean);
   const avgKcal = kcalValues.length ? Math.round(kcalValues.reduce((a, kcal) => a + kcal, 0) / kcalValues.length) : 0;
+
+  useEffect(() => {
+    setPage(1);
+  }, [filters.email, filters.name, filters.position]);
+
+  useEffect(() => {
+    setPage((current) => Math.min(current, totalPages));
+  }, [totalPages]);
 
   function updateCredentials(jugadorId, credentials) {
     setPlayersState((prev) => prev.map((player) => (
@@ -100,155 +173,219 @@ export default function DashboardContent({ players = [], teamEvolutions = [] }) 
 
   return (
     <Stack gap="lg">
-      {/* 1. HEADER FLOTANTE BENTO */}
+      {/* 1. RESUMEN / ACCIONES */}
       <Paper
-        p="md"
-        bg="white"
-        shadow="xs"
-        radius={24}
+        p={{ base: 'sm', sm: 'md' }}
+        shadow="sm"
+        radius="xl"
+        withBorder
         style={{
+          background:
+            'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
           zIndex: 10,
           position: 'relative'
         }}
-        mb="lg"
       >
-        <Group justify="space-between" align="center" wrap="wrap">
-          <Group gap="xs">
-            <ThemeIcon color="dark" variant="light" radius="xl" size="lg">
-              <IconUsers size={20} />
-            </ThemeIcon>
-            <Title order={3} fw={800} c="dark.4">
-              Gestión de equipos
-            </Title>
+        <Stack gap="sm">
+          <Group justify="space-between" align="center" wrap="wrap" gap="md">
+            <Group gap="sm">
+              <ThemeIcon color="dark" variant="light" radius="xl" size={42}>
+                <IconUsers size={21} />
+              </ThemeIcon>
+              <Box>
+                <Title order={3} fw={850} c="#24291f" lh={1.1}>
+                  Gestión de equipos
+                </Title>
+                <Text size="xs" c="dimmed" mt={2}>
+                  Control de plantilla, cálculos y cargas nutricionales.
+                </Text>
+              </Box>
+            </Group>
+
+            <DashboardActions />
           </Group>
 
-          <DashboardActions />
-        </Group>
+          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xs">
+            <DashboardStat
+              title="Jugadores activos"
+              icon={IconUsers}
+              color="blue"
+              value={totalPlayers}
+              description="Plantilla en seguimiento"
+            />
+            <DashboardStat
+              title="Kcal medio equipo"
+              icon={IconFlame}
+              color="orange"
+              value={avgKcal || '—'}
+              description="Promedio diario estimado"
+            />
+            <DashboardStat
+              title="Menú esta semana"
+              icon={IconCalendarEvent}
+              color="teal"
+              value="Ver menú →"
+              description="Sube foto o PDF del comedor"
+              href="/dashboard/menu"
+            />
+          </SimpleGrid>
+
+          <Paper p={6} radius="xl" shadow="xs" withBorder bg="white" w="100%">
+            <Group gap={8} w="100%" wrap="wrap" align="center">
+              <TextInput
+                placeholder="Buscar por nombre"
+                leftSection={<IconSearch size={16} style={{ opacity: 0.7 }} />}
+                variant="filled"
+                radius="xl"
+                size="sm"
+                value={filters.name}
+                onChange={(event) => {
+                  const { value } = event.currentTarget;
+                  setFilters((current) => ({ ...current, name: value }));
+                }}
+                style={{ flex: 2, minWidth: 190 }}
+              />
+              <TextInput
+                placeholder="Buscar por email"
+                leftSection={<IconMail size={16} style={{ opacity: 0.7 }} />}
+                variant="filled"
+                radius="xl"
+                size="sm"
+                value={filters.email}
+                onChange={(event) => {
+                  const { value } = event.currentTarget;
+                  setFilters((current) => ({ ...current, email: value }));
+                }}
+                style={{ flex: 2, minWidth: 190 }}
+              />
+              <Select
+                placeholder="Posición"
+                leftSection={<IconUsers size={16} style={{ opacity: 0.7 }} />}
+                data={positionOptions}
+                value={filters.position}
+                onChange={(value) => setFilters((current) => ({ ...current, position: value || '' }))}
+                variant="filled"
+                radius="xl"
+                size="sm"
+                allowDeselect={false}
+                style={{ flex: 1, minWidth: 150 }}
+              />
+            </Group>
+          </Paper>
+        </Stack>
       </Paper>
 
-      {/* 2. KPI CARDS */}
-      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
-        <BentoCard title="Jugadores activos" icon={IconUsers} color="blue">
-          <Text fw={700} size="xl">{totalPlayers}</Text>
-          <Text size="xs" c="dimmed">Plantilla en seguimiento</Text>
-        </BentoCard>
-        <BentoCard title="Kcal medio equipo" icon={IconFlame} color="orange">
-          <Text fw={700} size="xl">{avgKcal || '—'}</Text>
-          <Text size="xs" c="dimmed">Promedio diario estimado</Text>
-        </BentoCard>
-        <BentoCard title="Menú esta semana" icon={IconCalendarEvent} color="teal">
-          <Anchor href="/dashboard/menu" fw={600} style={{ width: 'fit-content' }}>
-            Ver menú →
-          </Anchor>
-          <Text size="xs" c="dimmed">Sube foto o PDF del comedor</Text>
-        </BentoCard>
-      </SimpleGrid>
-
-      {/* 3. GRÁFICO EVOLUTIVO DEL EQUIPO */}
+      {/* 2. GRÁFICO EVOLUTIVO DEL EQUIPO */}
       {teamEvolutions.length > 0 && (
         <TeamEvolutionChart teamEvolutions={teamEvolutions} />
       )}
 
-      {/* 4. LISTADO DE JUGADORES (TABLA) */}
-      <Box mt="md">
-        <Title order={4} mb="md">Plantilla</Title>
-        {playersState.length > 0 ? (
+      {/* 3. LISTADO DE JUGADORES (TABLA) */}
+      <Box>
+        {filteredPlayers.length > 0 ? (
           <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
             <ScrollArea>
               <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 800 }}>
                 <Table.Thead bg="gray.0">
                   <Table.Tr>
                     <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
-                    <Table.Th visibleFrom="xs">Métricas Base</Table.Th>
-                    <Table.Th visibleFrom="sm">Kcal Objetivo</Table.Th>
+                    <Table.Th visibleFrom="xs">Métricas</Table.Th>
+                    <Table.Th visibleFrom="sm">Plan</Table.Th>
                     <Table.Th>Posición</Table.Th>
                     <Table.Th w={70} />
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                  {playersWithPlan.map((player) => (
+                  {paginatedPlayers.map((player) => (
                     <Table.Tr
                       h={75}
                       key={player.id}
+                      onClick={() => router.push(`/dashboard/jugador/${player.id}`)}
                       style={{ cursor: 'pointer' }}
                     >
                       {/* COLUMNA 1: JUGADOR */}
                       <Table.Td style={{ paddingLeft: 24 }}>
-                        <Anchor href={`/dashboard/jugador/${player.id}`} underline="never" c="inherit">
-                          <Group gap="sm" wrap="nowrap">
-                            <Avatar size={42} radius="xl" color="initials">
-                              {initials(`${player.nombre} ${player.apellidos || ''}`)}
-                            </Avatar>
-                            <div>
-                              <Group gap={6} wrap="nowrap">
-                                <Text fz="sm" fw={600} c="dark.4">
-                                  {player.nombre} {player.apellidos}
-                                </Text>
-                                {!player.auth_user_id && (
-                                  <Tooltip label="El usuario no tiene credenciales para entrar" withArrow>
-                                    <ThemeIcon color="yellow" variant="light" radius="xl" size="sm">
-                                      <IconAlertTriangle size={14} />
-                                    </ThemeIcon>
-                                  </Tooltip>
-                                )}
-                              </Group>
-                            </div>
-                          </Group>
-                        </Anchor>
+                        <Group gap="sm" wrap="nowrap">
+                          <Avatar size={42} radius="xl" color="initials">
+                            {initials(`${player.nombre} ${player.apellidos || ''}`)}
+                          </Avatar>
+                          <Box style={{ minWidth: 0 }}>
+                            <Group gap={6} wrap="nowrap">
+                              <Text fz="sm" fw={600} c="dark.4" truncate>
+                                {player.nombre} {player.apellidos}
+                              </Text>
+                              {!player.auth_user_id && (
+                                <Tooltip label="El usuario no tiene credenciales para entrar" withArrow>
+                                  <ThemeIcon color="yellow" variant="light" radius="xl" size="sm" style={{ flex: '0 0 auto' }}>
+                                    <IconAlertTriangle size={14} />
+                                  </ThemeIcon>
+                                </Tooltip>
+                              )}
+                            </Group>
+                            <Text c="dimmed" fz="xs" style={{ lineHeight: 1 }} truncate>
+                              {player.auth_email || 'Sin credenciales de acceso'}
+                            </Text>
+                          </Box>
+                        </Group>
                       </Table.Td>
 
                       {/* COLUMNA 2: MÉTRICAS */}
                       <Table.Td visibleFrom="xs">
-                        <Anchor href={`/dashboard/jugador/${player.id}`} underline="never" c="inherit">
-                          <Group gap={6}>
-                            <IconChartPie size={14} style={{ opacity: 0.5 }} />
+                        {player.peso_kg || player.porcentaje_grasa ? (
+                          <>
                             <Text fz="sm" fw={500} c="dark.4">
                               {player.peso_kg ? `${player.peso_kg} kg` : '—'}
                               {player.porcentaje_grasa ? ` · ${player.porcentaje_grasa}% GC` : ''}
                             </Text>
-                          </Group>
-                        </Anchor>
+                            <Text fz="xs" c="dimmed">Composición</Text>
+                          </>
+                        ) : (
+                          <Text fz="sm" c="dimmed">—</Text>
+                        )}
                       </Table.Td>
 
                       {/* COLUMNA 3: KCAL OBJETIVO */}
                       <Table.Td visibleFrom="sm">
-                        <Anchor href={`/dashboard/jugador/${player.id}`} underline="never" c="inherit">
-                          {player.plan.kcal ? (
-                            <Group gap={6}>
-                              <IconFlame size={14} style={{ opacity: 0.5 }} color="var(--mantine-color-orange-6)" />
-                              <Text fz="sm" fw={500} c="dark.4">
+                        {player.plan.kcal ? (
+                          <Group gap={6} wrap="nowrap">
+                            <IconFlame size={14} style={{ opacity: 0.5 }} color="var(--mantine-color-orange-6)" />
+                            <Box>
+                              <Text fz="sm" fw={500} c="dark.4" lh={1.2}>
                                 {player.plan.kcal} kcal
-                                {player.plan.calculated ? ' · estimado' : ''}
                               </Text>
-                            </Group>
-                          ) : (
-                            <Text fz="sm" c="dimmed">—</Text>
-                          )}
-                        </Anchor>
+                              <Text fz="xs" c="dimmed">
+                                {player.plan.calculated ? 'Estimado' : 'Objetivo'}
+                              </Text>
+                            </Box>
+                          </Group>
+                        ) : (
+                          <Text fz="sm" c="dimmed">—</Text>
+                        )}
                       </Table.Td>
 
                       {/* COLUMNA 4: POSICIÓN */}
                       <Table.Td>
-                        <Anchor href={`/dashboard/jugador/${player.id}`} underline="never" c="inherit">
-                          <Badge variant="light" color="gray" radius="sm">
-                            {player.posicion || 'Sin posición'}
-                          </Badge>
-                        </Anchor>
+                        <Badge variant="light" color="gray" radius="sm">
+                          {player.posicion || 'Sin posición'}
+                        </Badge>
                       </Table.Td>
 
                       {/* COLUMNA 5: ACCIONES */}
                       <Table.Td>
                         <Group gap={4} justify="flex-end" wrap="nowrap">
-                          <Menu shadow="md" width={220} position="bottom-end">
+                          <Menu shadow="md" width={220} position="bottom-end" withArrow radius="md">
                             <Menu.Target>
-                              <ActionIcon variant="subtle" color="gray" radius="xl" loading={deletingId === player.id}>
-                                <IconDotsVertical size={18} stroke={1.5} />
+                              <ActionIcon
+                                variant="subtle"
+                                color="gray"
+                                radius="xl"
+                                loading={deletingId === player.id}
+                                onClick={(event) => event.stopPropagation()}
+                              >
+                                <IconDots size={18} stroke={1.5} />
                               </ActionIcon>
                             </Menu.Target>
-                            <Menu.Dropdown>
-                              <Menu.Item leftSection={<IconPencil size={14} />} component="a" href={`/dashboard/jugador/${player.id}`}>
-                                Ver ficha
-                              </Menu.Item>
+                            <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
                               <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => setEditingPlayer(player)}>
                                 Editar
                               </Menu.Item>
@@ -270,13 +407,22 @@ export default function DashboardContent({ players = [], teamEvolutions = [] }) 
                 </Table.Tbody>
               </Table>
             </ScrollArea>
+
+            <Group justify="center" p="md" bg="gray.0" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+              <Pagination
+                total={totalPages}
+                value={page}
+                onChange={setPage}
+                radius="xl"
+              />
+            </Group>
           </Paper>
         ) : (
           <NothingFound
             withPaper
             icon={IconUserPlus}
-            title="Sin jugadores"
-            description="Importa un Excel o añade un jugador manualmente para empezar."
+            title={playersState.length ? 'Sin resultados' : 'Sin jugadores'}
+            description={playersState.length ? 'No hay jugadores que coincidan con los filtros.' : 'Importa un Excel o añade un jugador manualmente para empezar.'}
           />
         )}
       </Box>

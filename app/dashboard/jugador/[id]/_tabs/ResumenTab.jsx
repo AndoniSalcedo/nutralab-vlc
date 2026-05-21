@@ -1,10 +1,9 @@
 'use client';
 
 import { Box, Paper, SegmentedControl, Stack } from '@mantine/core';
-import { IconCalculator, IconClipboardList, IconUser } from '@tabler/icons-react';
+import { IconClipboardList, IconUser } from '@tabler/icons-react';
 import { tabLabel } from './tab-label';
 import FichaSubtab from './resumen/FichaSubtab';
-import HerramientasSubtab from './resumen/HerramientasSubtab';
 import ObjetivosSubtab from './resumen/ObjetivosSubtab';
 
 export default function ResumenTab({ jugador, activeSubtab, onSubtabChange, readOnly = false }) {
@@ -35,8 +34,7 @@ export default function ResumenTab({ jugador, activeSubtab, onSubtabChange, read
           bg="gray.1"
           data={[
             { value: 'ficha', label: tabLabel(IconUser, 'Ficha') },
-            { value: 'objetivos', label: tabLabel(IconClipboardList, 'Objetivos', 'Objs.') },
-            { value: 'herramientas', label: tabLabel(IconCalculator, 'Herramientas', 'Tools') },
+            { value: 'objetivos', label: tabLabel(IconClipboardList, 'Objetivos') },
           ]}
           styles={{
             root: { border: 'none', width: '100%' },
@@ -48,7 +46,6 @@ export default function ResumenTab({ jugador, activeSubtab, onSubtabChange, read
       <Box mt={0}>
         {activeSubtab === 'ficha' && <FichaSubtab jugador={jugador} />}
         {activeSubtab === 'objetivos' && <ObjetivosSubtab jugador={jugador} readOnly={readOnly} />}
-        {activeSubtab === 'herramientas' && <HerramientasSubtab jugador={jugador} />}
       </Box>
     </Stack>
   );

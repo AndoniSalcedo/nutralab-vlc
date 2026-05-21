@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Group, Modal, PasswordInput, Stack } from '@mantine/core';
+import { Button, Group, Menu, Modal, PasswordInput, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconLock } from '@tabler/icons-react';
 
-export default function PlayerPasswordButton({ compact = false }) {
+export default function PlayerPasswordButton({ compact = false, menuItem = false }) {
   const [opened, setOpened] = useState(false);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -43,9 +43,15 @@ export default function PlayerPasswordButton({ compact = false }) {
 
   return (
     <>
-      <Button size="xs" radius="xl" variant="light" color="gray" leftSection={<IconLock size={14} />} onClick={() => setOpened(true)}>
-        {compact ? 'Clave' : 'Cambiar contraseña'}
-      </Button>
+      {menuItem ? (
+        <Menu.Item leftSection={<IconLock size={14} />} onClick={() => setOpened(true)}>
+          Cambiar contraseña
+        </Menu.Item>
+      ) : (
+        <Button size="xs" radius="xl" variant="light" color="gray" leftSection={<IconLock size={14} />} onClick={() => setOpened(true)}>
+          {compact ? 'Clave' : 'Cambiar contraseña'}
+        </Button>
+      )}
 
       <Modal opened={opened} onClose={() => setOpened(false)} title="Cambiar contraseña" size="sm">
         <Stack gap="md">
