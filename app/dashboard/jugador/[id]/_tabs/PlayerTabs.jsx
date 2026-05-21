@@ -39,6 +39,10 @@ export default function PlayerTabs({
     router.replace(`/dashboard/jugador/${jugador.id}/${nextTab}/${nextSubtab}`, { scroll: false });
   }
 
+  const activeTabStyle = (value) => ({
+    backgroundColor: activeTab === value ? 'var(--mantine-color-white)' : 'transparent',
+  });
+
   return (
     <Tabs
       value={activeTab}
@@ -49,13 +53,17 @@ export default function PlayerTabs({
       keepMounted={false}
       styles={{
         list: { backgroundColor: 'transparent', borderBottomColor: 'var(--mantine-color-gray-3)' },
-        tab: { fontSize: rem(15), fontWeight: 600, padding: `${rem(10)} ${rem(16)}` },
+        tab: {
+          fontSize: rem(15),
+          fontWeight: 600,
+          padding: `${rem(10)} ${rem(16)}`,
+        },
       }}
     >
       <Tabs.List grow>
-        <Tabs.Tab value="resumen" leftSection={<IconInfoCircle size={18} />}>Resumen</Tabs.Tab>
-        <Tabs.Tab value="metricas" leftSection={<IconChartBar size={18} />}>Métricas</Tabs.Tab>
-        <Tabs.Tab value="nutricion" leftSection={<IconSalad size={18} />}>Nutrición</Tabs.Tab>
+        <Tabs.Tab value="resumen" leftSection={<IconInfoCircle size={18} />} style={activeTabStyle('resumen')}>Resumen</Tabs.Tab>
+        <Tabs.Tab value="metricas" leftSection={<IconChartBar size={18} />} style={activeTabStyle('metricas')}>Métricas</Tabs.Tab>
+        <Tabs.Tab value="nutricion" leftSection={<IconSalad size={18} />} style={activeTabStyle('nutricion')}>Nutrición</Tabs.Tab>
       </Tabs.List>
 
       <Box>
