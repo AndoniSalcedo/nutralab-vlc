@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Anchor, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination } from '@mantine/core';
+import { Anchor, Button, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination, Textarea } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconCalendarEvent, IconChartLine, IconDots, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil } from '@tabler/icons-react';
+import { IconAlertTriangle, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconDownload, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil } from '@tabler/icons-react';
 import DashboardActions from '@/components/DashboardActions';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
@@ -21,12 +21,20 @@ function normalize(value) {
   return String(value || '').toLowerCase().trim();
 }
 
-function DashboardStat({ title, icon: Icon, color = 'blue', value, description, href }) {
+function DashboardStat({ title, icon: Icon, color = 'blue', value, description, href, onClick }) {
+  const isClickable = Boolean(href || onClick);
   const content = (
     <Box
+      component={onClick ? 'button' : 'div'}
+      type={onClick ? 'button' : undefined}
+      onClick={onClick}
       px={{ base: 'sm', sm: 'md' }}
       py="xs"
       style={{
+        width: '100%',
+        textAlign: 'left',
+        cursor: isClickable ? 'pointer' : 'default',
+        font: 'inherit',
         height: '100%',
         minHeight: 62,
         borderRadius: 14,
@@ -39,7 +47,7 @@ function DashboardStat({ title, icon: Icon, color = 'blue', value, description, 
         <ThemeIcon color={color} variant="light" radius="md" size={34} style={{ flex: '0 0 auto' }}>
           <Icon size={18} stroke={1.6} />
         </ThemeIcon>
-        <Box style={{ minWidth: 0 }}>
+        <Box style={{ minWidth: 0, flex: 1 }}>
           <Text fw={750} c="dimmed" size="xs" tt="uppercase" lts={0.5} truncate>
             {title}
           </Text>
@@ -52,6 +60,11 @@ function DashboardStat({ title, icon: Icon, color = 'blue', value, description, 
             </Text>
           </Group>
         </Box>
+        {isClickable && (
+          <ThemeIcon color={color} variant="subtle" radius="xl" size={28} style={{ flex: '0 0 auto' }}>
+            <IconArrowRight size={16} stroke={1.8} />
+          </ThemeIcon>
+        )}
       </Group>
     </Box>
   );
@@ -63,6 +76,36 @@ function DashboardStat({ title, icon: Icon, color = 'blue', value, description, 
       {content}
     </Anchor>
   );
+}
+
+function defaultReportForm() {
+  return {
+    title: 'Semana 10-17 Mayo',
+    subtitle: 'Plan nutricional · 3 partidos en 8 dias',
+    team: 'Valencia CF · Primer Equipo',
+    author: 'Carlos Ferrando · Nutralab',
+    handle: '@c.ferrando',
+    microcycle: [
+      'DOM 10 · 16:15. Athletic Club — San Mames (Bilbao). Atlantico, 18-21 °C, humedad alta.',
+      'JUE 14 · 19:00. Rayo Vallecano — Mestalla. Calor moderado y humedad costera, 24-27 °C tarde.',
+      'DOM 17 · 19:00. Real Sociedad — Reale Arena (Donostia). Atlantico templado-humedo, 17-21 °C.',
+    ].join('\n'),
+    rules: [
+      'Ningun dia en deficit calorico. Carga glucogenica continua, HC en cada ingesta principal.',
+      'Pescado azul 4-5 tomas minimo. Frutos rojos diarios. Curcuma cada cena.',
+      'Batido post-entreno y post-partido obligatorio: whey 30 g + colageno 15 g + Vit C 200 mg.',
+      'Caseina nocturna (requeson o cottage) en todo el grupo durante esta semana.',
+      'Hidratacion reforzada. Reposicion 1,5 L por kg perdido en las 4-6 h post.',
+      'Sueno 8 h. Cero alcohol. Cafeina solo el dia de partido (3 mg/kg a -45 min).',
+    ].join('\n'),
+    buffet: 'Desayuno y comidas usan exclusivamente las opciones del listado oficial de Paterna (huevos, pavo, jamon serrano, porridge, focaccia, pan blanco, frutos rojos, fruta entera, yogur de proteina, AOVE...). Las meriendas se hacen en casa: yogur de proteina + tortitas de arroz + fruta + frutos secos (15 g) y, solo MD-1, browniato disponible.',
+  };
+}
+
+function filenameFromResponse(response, fallback) {
+  const header = response.headers.get('Content-Disposition') || '';
+  const match = header.match(/filename="([^"]+)"/);
+  return match?.[1] || fallback;
 }
 
 function getPlayerPlan(player) {
@@ -88,6 +131,9 @@ export default function DashboardContent({ players = [] }) {
   const [playersState, setPlayersState] = useState(players);
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [reportModal, setReportModal] = useState({ opened: false, player: null });
+  const [reportForm, setReportForm] = useState(defaultReportForm);
+  const [generatingReport, setGeneratingReport] = useState(false);
   const [filters, setFilters] = useState({ name: '', email: '', position: '' });
   const [page, setPage] = useState(1);
   const totalPlayers = playersState.length;
@@ -168,6 +214,66 @@ export default function DashboardContent({ players = [] }) {
     }
   }
 
+  function openReportModal(player = null) {
+    setReportModal({ opened: true, player });
+  }
+
+  function closeReportModal() {
+    if (generatingReport) return;
+    setReportModal({ opened: false, player: null });
+  }
+
+  function updateReportField(field, value) {
+    setReportForm((current) => ({ ...current, [field]: value }));
+  }
+
+  async function generateReport() {
+    setGeneratingReport(true);
+    try {
+      const jugadorIds = reportModal.player ? [reportModal.player.id] : undefined;
+      const res = await fetch('/api/reports/weekly-squad', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ meta: reportForm, jugadorIds }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'No se pudo generar el informe');
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filenameFromResponse(
+        res,
+        reportModal.player ? `Informe_${reportModal.player.nombre || 'Jugador'}.pdf` : 'Informe_Plantilla.pdf'
+      );
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      notifications.show({
+        color: 'green',
+        title: 'Informe generado',
+        message: reportModal.player
+          ? `PDF individual de ${reportModal.player.nombre} listo para descargar.`
+          : 'PDF de plantilla listo para descargar.',
+      });
+      setReportModal({ opened: false, player: null });
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'No se pudo generar el informe',
+        message: e.message,
+      });
+    } finally {
+      setGeneratingReport(false);
+    }
+  }
+
   return (
     <Stack gap="lg">
       {/* 1. RESUMEN / ACCIONES */}
@@ -209,6 +315,7 @@ export default function DashboardContent({ players = [] }) {
               color="blue"
               value={totalPlayers}
               description="Plantilla en seguimiento"
+              onClick={() => openReportModal()}
             />
             <DashboardStat
               title="Evolución equipo"
@@ -382,6 +489,9 @@ export default function DashboardContent({ players = [] }) {
                               <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => setEditingPlayer(player)}>
                                 Editar
                               </Menu.Item>
+                              <Menu.Item leftSection={<IconFileTypePdf size={14} />} onClick={() => openReportModal(player)}>
+                                Generar informe
+                              </Menu.Item>
                               <PlayerCredentialsButton
                                 jugador={player}
                                 menuItem
@@ -422,6 +532,78 @@ export default function DashboardContent({ players = [] }) {
 
       <Modal opened={!!editingPlayer} onClose={() => setEditingPlayer(null)} title="Editar jugador" size="xl">
         {editingPlayer && <PlayerForm initial={editingPlayer} />}
+      </Modal>
+
+      <Modal
+        opened={reportModal.opened}
+        onClose={closeReportModal}
+        title={reportModal.player ? `Informe de ${reportModal.player.nombre}` : 'Informe semanal de plantilla'}
+        size="xl"
+      >
+        <Stack gap="md">
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+            <TextInput
+              label="Rango / titulo de semana"
+              value={reportForm.title}
+              onChange={(event) => updateReportField('title', event.currentTarget.value)}
+            />
+            <TextInput
+              label="Subtitulo"
+              value={reportForm.subtitle}
+              onChange={(event) => updateReportField('subtitle', event.currentTarget.value)}
+            />
+            <TextInput
+              label="Club / equipo"
+              value={reportForm.team}
+              onChange={(event) => updateReportField('team', event.currentTarget.value)}
+            />
+            <TextInput
+              label="Autor / firma"
+              value={reportForm.author}
+              onChange={(event) => updateReportField('author', event.currentTarget.value)}
+            />
+          </SimpleGrid>
+          <TextInput
+            label="Handle / contacto"
+            value={reportForm.handle}
+            onChange={(event) => updateReportField('handle', event.currentTarget.value)}
+          />
+          <Textarea
+            label="Microciclo / calendario"
+            minRows={4}
+            autosize
+            value={reportForm.microcycle}
+            onChange={(event) => updateReportField('microcycle', event.currentTarget.value)}
+          />
+          <Textarea
+            label="Reglas de la semana"
+            minRows={5}
+            autosize
+            value={reportForm.rules}
+            onChange={(event) => updateReportField('rules', event.currentTarget.value)}
+          />
+          <Textarea
+            label="Equipamiento del buffet"
+            minRows={3}
+            autosize
+            value={reportForm.buffet}
+            onChange={(event) => updateReportField('buffet', event.currentTarget.value)}
+          />
+          <Group justify="space-between" align="center" mt="xs">
+            <Text size="sm" c="dimmed">
+              {reportModal.player
+                ? 'Se generara un PDF individual en una sola pagina A4.'
+                : `Se generara un PDF con portada y ${totalPlayers} fichas individuales.`}
+            </Text>
+            <Button
+              leftSection={<IconDownload size={16} />}
+              loading={generatingReport}
+              onClick={generateReport}
+            >
+              Generar PDF
+            </Button>
+          </Group>
+        </Stack>
       </Modal>
     </Stack>
   );

@@ -625,9 +625,6 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
               onChange={setGuideSection}
             />
           </SimpleGrid>
-
-          <Divider />
-
           <EditableSection
             key={jugador.notas_suplementacion || protocolText}
             title="Notas libres de suplementación"
