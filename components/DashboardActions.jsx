@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { Button, Group, Modal, Tabs } from '@mantine/core';
-import { IconPlus, IconFileSpreadsheet, IconBodyScan, IconMail } from '@tabler/icons-react';
+import { IconPlus, IconFileSpreadsheet, IconBodyScan, IconMail, IconBottle } from '@tabler/icons-react';
 import PlayerForm from './PlayerForm';
 import ExcelImporter from './ExcelImporter';
 import AnthroImporter from './AnthroImporter';
 import MessageComposer from './MessageComposer';
+import SupplementCatalogManager from './SupplementCatalogManager';
 
 export default function DashboardActions({ players = [] }) {
   const [openedModal, setOpenedModal] = useState(null);
@@ -35,6 +36,16 @@ export default function DashboardActions({ players = [] }) {
           onClick={() => setOpenedModal('message')}
         >
           Mensaje
+        </Button>
+        <Button
+          radius="xl"
+          size="xs"
+          variant="light"
+          color="grape"
+          leftSection={<IconBottle size={14} />}
+          onClick={() => setOpenedModal('supplementation')}
+        >
+          Suplementación
         </Button>
         <Button
           radius="xl"
@@ -75,6 +86,10 @@ export default function DashboardActions({ players = [] }) {
 
       <Modal opened={openedModal === 'message'} onClose={closeModal} title="Enviar mensaje" size="lg">
         <MessageComposer players={players} onSent={closeModal} />
+      </Modal>
+
+      <Modal opened={openedModal === 'supplementation'} onClose={closeModal} title="Gestión de suplementación" size="xl">
+        <SupplementCatalogManager players={players} />
       </Modal>
     </>
   );

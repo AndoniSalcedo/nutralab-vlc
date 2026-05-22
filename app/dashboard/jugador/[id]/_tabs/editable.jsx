@@ -148,7 +148,7 @@ export function EditableSection({ title, defaultValue, onSave, readOnly = false 
           <Textarea
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            minRows={10}
+            rows={15}
             size="sm"
             styles={{ input: { lineHeight: 1.6 } }}
           />
