@@ -24,6 +24,7 @@ export default function PlayerTabs({
   jugador,
   analiticas = [],
   evoluciones = [],
+  registrosHidratacion = [],
   messages = [],
   menus = [],
   activeTab: activeTabProp = 'general',
@@ -97,6 +98,7 @@ export default function PlayerTabs({
             jugador={jugador}
             analiticas={analiticas}
             evoluciones={evoluciones}
+            registrosHidratacion={registrosHidratacion}
             activeSubtab={activeTab === 'metricas' ? activeSubtab : DEFAULT_SUBTABS.metricas}
             onSubtabChange={(value) => navigate('metricas', value)}
             readOnly={readOnly}

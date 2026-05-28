@@ -8,7 +8,7 @@ import MedicionesSubtab from './metricas/MedicionesSubtab';
 import HidratacionSubtab from './nutricion/HidratacionSubtab';
 import ProtocolosSubtab from './nutricion/ProtocolosSubtab';
 
-export default function MetricasTab({ jugador, analiticas, evoluciones, activeSubtab, onSubtabChange, readOnly = false }) {
+export default function MetricasTab({ jugador, analiticas, evoluciones, registrosHidratacion = [], activeSubtab, onSubtabChange, readOnly = false }) {
   const tabsData = readOnly ? [
     { value: 'mediciones', label: tabLabel(IconChartLine, 'Mediciones', 'Med.') },
     { value: 'hidratacion', label: tabLabel(IconDroplet, 'Hidratación', 'Hidra.') },
@@ -61,7 +61,7 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, activeSu
           <AnaliticasSubtab jugador={jugador} analiticas={analiticas} readOnly={readOnly} />
         )}
         {activeSubtab === 'hidratacion' && (
-          <HidratacionSubtab jugador={jugador} readOnly={readOnly} />
+          <HidratacionSubtab jugador={jugador} registrosHidratacion={registrosHidratacion} readOnly={readOnly} />
         )}
         {activeSubtab === 'protocolos' && (
           <ProtocolosSubtab jugador={jugador} readOnly={readOnly} />

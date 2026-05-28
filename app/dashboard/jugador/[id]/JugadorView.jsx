@@ -28,19 +28,22 @@ export default async function JugadorView({ id, activeTab = 'general', activeSub
   let evoluciones = [];
   let messages = [];
   let menus = [];
+  let registrosHidratacion = [];
 
   try {
-    const [resJugador, resAnaliticas, resEvoluciones, resMenus] = await Promise.all([
+    const [resJugador, resAnaliticas, resEvoluciones, resMenus, resHidratacion] = await Promise.all([
       supabase.from('jugadores').select('*').eq('id', id).single(),
       supabase.from('analiticas').select('*').eq('jugador_id', id).order('fecha_extraccion', { ascending: false }),
       supabase.from('evoluciones').select('*').eq('jugador_id', id).order('fecha', { ascending: true }),
       supabase.from('menu_semanal').select('*').order('semana', { ascending: false }).limit(10),
+      supabase.from('registros_hidratacion').select('*').eq('jugador_id', id).order('fecha', { ascending: true }),
     ]);
 
     analiticas = resAnaliticas.data || [];
     evoluciones = resEvoluciones.data || [];
     jugador = withLatestMeasurement(resJugador.data, evoluciones);
     menus = resMenus.data || [];
+    registrosHidratacion = resHidratacion.data || [];
 
     if (jugador?.equipo_id) {
       const resMessages = await supabase
@@ -80,6 +83,7 @@ export default async function JugadorView({ id, activeTab = 'general', activeSub
         jugador={jugador}
         analiticas={analiticas}
         evoluciones={evoluciones}
+        registrosHidratacion={registrosHidratacion}
         messages={messages}
         menus={menus}
         activeTab={activeTab}

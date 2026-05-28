@@ -24,10 +24,11 @@ import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
 import FoodCalculator from './FoodCalculator';
 
-function BackButton({ size = 42, iconSize = 24 }) {
+function BackButton({ size = 42, iconSize = 24, equipoId }) {
+  const url = equipoId ? `/dashboard/equipo/${equipoId}` : '/dashboard';
   return (
     <Tooltip label="Volver al listado" position="right" withArrow>
-      <Anchor href="/dashboard" style={{ textDecoration: 'none' }}>
+      <Anchor href={url} style={{ textDecoration: 'none' }}>
         <ActionIcon variant="light" color="gray" size={size} radius="xl">
           <IconChevronLeft size={iconSize} />
         </ActionIcon>
@@ -198,7 +199,7 @@ function JugadorHeaderDesktop({ jugador, isAdmin, isPlayer, hasCredentials, onEd
     >
       <Group justify="space-between" align="center" wrap="wrap" gap="md">
         <Group gap="md">
-          {isAdmin && <BackButton />}
+          {isAdmin && <BackButton equipoId={jugador.equipo_id} />}
           <PlayerIdentity jugador={jugador} isAdmin={isAdmin} hasCredentials={hasCredentials} />
         </Group>
 
@@ -221,7 +222,7 @@ function JugadorHeaderMobile({ jugador, isAdmin, isPlayer, hasCredentials, onEdi
     >
       {isAdmin && (
         <Box style={{ position: 'absolute', top: 14, left: 14, zIndex: 2 }}>
-          <BackButton size={50} iconSize={28} />
+          <BackButton size={50} iconSize={28} equipoId={jugador.equipo_id} />
         </Box>
       )}
 
