@@ -35,7 +35,7 @@ export default function NutricionTab({ jugador, activeSubtab, onSubtabChange, re
           size="sm"
           bg="gray.1"
           data={[
-            { value: 'plan', label: tabLabel(IconBrain, 'Plan IA', 'Plan') },
+            { value: 'plan', label: tabLabel(IconBrain, 'Plan nutricional', 'Plan') },
             { value: 'hidratacion', label: tabLabel(IconDroplet, 'Hidratación', 'Hidra.') },
             { value: 'suplementacion', label: tabLabel(IconBottle, 'Suplementación', 'Supl.') },
             { value: 'protocolos', label: tabLabel(IconClipboardList, 'Protocolos', 'Prot.') },

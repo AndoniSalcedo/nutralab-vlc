@@ -35,8 +35,14 @@ export default function PlayerTabs({
   const normalizedSubtab = activeSubtabProp === 'ficha' || activeSubtabProp === 'objetivos'
     ? 'perfil'
     : activeSubtabProp;
+  const validSubtabs = {
+    general: ['perfil', 'mensajes'],
+    metricas: readOnly ? ['mediciones'] : ['mediciones', 'analiticas'],
+    nutricion: ['plan', 'hidratacion', 'suplementacion', 'protocolos'],
+  };
+
   const activeTab = VALID_TABS.includes(normalizedTab) ? normalizedTab : 'general';
-  const activeSubtab = VALID_SUBTABS[activeTab].includes(normalizedSubtab)
+  const activeSubtab = validSubtabs[activeTab].includes(normalizedSubtab)
     ? normalizedSubtab
     : DEFAULT_SUBTABS[activeTab];
 

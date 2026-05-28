@@ -120,7 +120,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     notifications.show({
       id: notificationId,
       color: 'blue',
-      title: 'Generando plan IA',
+      title: 'Generando plan nutricional',
       message: `Generando plan inteligente para ${jugador.nombre}. Esto puede tardar unos segundos.`,
       loading: true,
       autoClose: false,
@@ -166,7 +166,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       id: notificationId,
       color: 'blue',
       title: 'Guardando plan',
-      message: 'Guardando cambios del plan IA.',
+      message: 'Guardando cambios del plan nutricionals.',
       loading: true,
       autoClose: false,
       withCloseButton: false,
@@ -186,7 +186,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         id: notificationId,
         color: 'green',
         title: 'Plan guardado',
-        message: 'El nuevo plan IA se ha guardado correctamente.',
+        message: 'El nuevo plan nutricional se ha guardado correctamente.',
         loading: false,
         autoClose: 4000,
         withCloseButton: true,
@@ -214,7 +214,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       id: notificationId,
       color: 'blue',
       title: 'Guardando plan',
-      message: 'Guardando cambios del plan IA.',
+      message: 'Guardando cambios del plan nutricional.',
       loading: true,
       autoClose: false,
       withCloseButton: false,
@@ -240,7 +240,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         id: notificationId,
         color: 'green',
         title: 'Plan guardado',
-        message: 'Los cambios del plan IA se han guardado correctamente.',
+        message: 'Los cambios del plan nutricional se han guardado correctamente.',
         loading: false,
         autoClose: 4000,
         withCloseButton: true,
@@ -277,7 +277,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
               <Group gap="xs">
                 <IconBrain size={22} color="var(--mantine-color-blue-filled)" />
                 <Stack gap={2}>
-                  <Title order={3} fw={800} c="dark.4">Planes IA</Title>
+                  <Title order={3} fw={800} c="dark.4">Planes nutricionales</Title>
                   <Text size="sm" c="dimmed">
                     Planes personales nutricionales.
                   </Text>
@@ -303,32 +303,32 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                   {item}
                 </Badge>
               ))}
-              
+
             </Group>
           )}
 
 
-            <Select
-              placeholder={loadingList ? 'Cargando planes...' : 'Sin planes creados'}
-              data={planes.map((plan) => ({ value: String(plan.id), label: planLabel(plan) }))}
-              value={currentId}
-              onChange={(val) => {
-                if (!val) return;
-                setCurrentId(val);
-                setMode('view');
-              }}
-              allowDeselect={false}
-              searchable
-              variant="filled"
-              radius="md"
+          <Select
+            placeholder={loadingList ? 'Cargando planes...' : 'Sin planes creados'}
+            data={planes.map((plan) => ({ value: String(plan.id), label: planLabel(plan) }))}
+            value={currentId}
+            onChange={(val) => {
+              if (!val) return;
+              setCurrentId(val);
+              setMode('view');
+            }}
+            allowDeselect={false}
+            searchable
+            variant="filled"
+            radius="md"
 
-              leftSection={<IconFileAi size={16} />}
-              disabled={loadingList || planes.length === 0 || isDocumentMode}
+            leftSection={<IconFileAi size={16} />}
+            disabled={loadingList || planes.length === 0 || isDocumentMode}
 
 
-              rightSection={loadingList ? <Loader size={16} /> : null}
-              style={{ flex: 1, minWidth: 260 }}
-            />
+            rightSection={loadingList ? <Loader size={16} /> : null}
+            style={{ flex: 1, minWidth: 260 }}
+          />
         </Stack>
       </Paper>
 
@@ -342,7 +342,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
             <Stack gap={{ base: 'md', sm: 'xl' }}>
               <Group justify="space-between" align="flex-start" wrap="wrap">
                 <Box>
-                  <Title order={3}>{mode === 'create' ? 'Nuevo plan IA' : 'Editar plan IA'}</Title>
+                  <Title order={3}>{mode === 'create' ? 'Nuevo plan nutricional' : 'Editar plan nutricional'}</Title>
                   <Text size="sm" c="dimmed">
                     Trabaja el plan como documento. Genera el borrador, edita el contenido y guarda cuando esté listo.
                   </Text>
@@ -424,8 +424,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
           <Box mt="xl">
             <NothingFound
               icon={IconBrain}
-              title="Sin planes IA"
-              description="Todavía no hay planes IA creados para este jugador."
+              title="Sin planes nutricionales"
+              description="Todavía no hay planes nutricionales creados para este jugador."
               actionLabel={!readOnly ? 'Crear primer plan' : undefined}
               onAction={!readOnly ? startCreate : undefined}
             />

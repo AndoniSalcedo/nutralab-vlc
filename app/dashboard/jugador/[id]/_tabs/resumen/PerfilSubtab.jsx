@@ -61,12 +61,12 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
           <Box>
             <Title order={3} fw={800} c="dark.4">Perfil del jugador</Title>
             <Text size="sm" c="dimmed">
-              Objetivos, preferencias y ajustes individuales.
+              {readOnly ? 'Objetivos y ajustes individuales.' : 'Objetivos, preferencias y ajustes individuales.'}
             </Text>
           </Box>
         </Group>
       </Paper>
-
+ 
       <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         <Stack gap="md">
           <Paper p={{ base: 'md', sm: 'lg' }} bg="white" shadow="xs" radius="lg" withBorder>
@@ -81,7 +81,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
                 </Text>
               </Box>
             </Group>
-
+ 
             <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md">
               <StatCard label="Kcal objetivo" value={kcal ?? '-'} />
               <StatCard label="Proteína" value={protein ? `${protein}g` : '-'} />
@@ -89,30 +89,32 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
               <StatCard label="Grasa" value={fat ? `${fat}g` : '-'} />
             </SimpleGrid>
           </Paper>
-
-          <Paper p={{ base: 'md', sm: 'lg' }} bg="white" shadow="xs" radius="lg" withBorder>
-            <Group gap="xs" mb="md">
-              <ThemeIcon color="teal" variant="light" radius="xl" size="lg">
-                <IconClipboardList size={20} />
-              </ThemeIcon>
-              <Box>
-                <Title order={3} fw={800} c="dark.4">Preferencias y contexto</Title>
-                <Text size="sm" c="dimmed">
-                  Información que condiciona el plan nutricional.
-                </Text>
-              </Box>
-            </Group>
-
-            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-              <CampoEditable label="Número de comidas diarias" campo="num_comidas" valor={String(jugador.num_comidas || '5')} jugadorId={jugador.id} tipo="select" opciones={NUM_COMIDAS} readOnly={readOnly} />
-              <CampoEditable label="Objetivo nutricional" campo="objetivo" valor={jugador.objetivo || ''} jugadorId={jugador.id} tipo="text" readOnly={readOnly} />
-              <CampoEditable label="Gustos y preferencias" campo="gustos_preferencias" valor={jugador.gustos_preferencias || ''} jugadorId={jugador.id} readOnly={readOnly} />
-              <CampoEditable label="Aversiones" campo="aversiones" valor={jugador.aversiones || ''} jugadorId={jugador.id} readOnly={readOnly} />
-              <CampoEditable label="Intolerancias" campo="intolerancias" valor={jugador.intolerancias || ''} jugadorId={jugador.id} readOnly={readOnly} />
-              <CampoEditable label="Alergias" campo="alergias" valor={jugador.alergias || ''} jugadorId={jugador.id} readOnly={readOnly} />
-              <CampoEditable label="Contexto clínico" campo="contexto_clinico" valor={jugador.contexto_clinico || ''} jugadorId={jugador.id} readOnly={readOnly} />
-            </SimpleGrid>
-          </Paper>
+ 
+          {!readOnly && (
+            <Paper p={{ base: 'md', sm: 'lg' }} bg="white" shadow="xs" radius="lg" withBorder>
+              <Group gap="xs" mb="md">
+                <ThemeIcon color="teal" variant="light" radius="xl" size="lg">
+                  <IconClipboardList size={20} />
+                </ThemeIcon>
+                <Box>
+                  <Title order={3} fw={800} c="dark.4">Preferencias y contexto</Title>
+                  <Text size="sm" c="dimmed">
+                    Información que condiciona el plan nutricional.
+                  </Text>
+                </Box>
+              </Group>
+ 
+              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                <CampoEditable label="Número de comidas diarias" campo="num_comidas" valor={String(jugador.num_comidas || '5')} jugadorId={jugador.id} tipo="select" opciones={NUM_COMIDAS} readOnly={readOnly} />
+                <CampoEditable label="Objetivo nutricional" campo="objetivo" valor={jugador.objetivo || ''} jugadorId={jugador.id} tipo="text" readOnly={readOnly} />
+                <CampoEditable label="Gustos y preferencias" campo="gustos_preferencias" valor={jugador.gustos_preferencias || ''} jugadorId={jugador.id} readOnly={readOnly} />
+                <CampoEditable label="Aversiones" campo="aversiones" valor={jugador.aversiones || ''} jugadorId={jugador.id} readOnly={readOnly} />
+                <CampoEditable label="Intolerancias" campo="intolerancias" valor={jugador.intolerancias || ''} jugadorId={jugador.id} readOnly={readOnly} />
+                <CampoEditable label="Alergias" campo="alergias" valor={jugador.alergias || ''} jugadorId={jugador.id} readOnly={readOnly} />
+                <CampoEditable label="Contexto clínico" campo="contexto_clinico" valor={jugador.contexto_clinico || ''} jugadorId={jugador.id} readOnly={readOnly} />
+              </SimpleGrid>
+            </Paper>
+          )}
         </Stack>
       </Box>
     </Stack>

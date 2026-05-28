@@ -9,45 +9,47 @@ import MedicionesSubtab from './metricas/MedicionesSubtab';
 export default function MetricasTab({ jugador, analiticas, evoluciones, activeSubtab, onSubtabChange, readOnly = false }) {
   return (
     <Stack gap={0}>
-      <Paper
-        p="xs"
-        bg="white"
-        radius={0}
-        style={{
-          zIndex: 99,
-          position: 'sticky',
-          top: 0,
-          clipPath: 'inset(0 -100% 0 -100%)',
-          width: '100%',
-          borderBottom: 0,
-          borderLeft: '1px solid var(--mantine-color-gray-3)',
-          borderRight: '1px solid var(--mantine-color-gray-3)',
-          boxShadow: 'none',
-        }}
-      >
-        <SegmentedControl
-          value={activeSubtab}
-          onChange={onSubtabChange}
-          fullWidth
-          radius="xl"
-          size="sm"
-          bg="gray.1"
-          data={[
-            { value: 'mediciones', label: tabLabel(IconChartLine, 'Mediciones') },
-            { value: 'analiticas', label: tabLabel(IconReportAnalytics, 'Analíticas') },
-          ]}
-          styles={{
-            root: { border: 'none', width: '100%' },
-            indicator: { boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
+      {!readOnly && (
+        <Paper
+          p="xs"
+          bg="white"
+          radius={0}
+          style={{
+            zIndex: 99,
+            position: 'sticky',
+            top: 0,
+            clipPath: 'inset(0 -100% 0 -100%)',
+            width: '100%',
+            borderBottom: 0,
+            borderLeft: '1px solid var(--mantine-color-gray-3)',
+            borderRight: '1px solid var(--mantine-color-gray-3)',
+            boxShadow: 'none',
           }}
-        />
-      </Paper>
+        >
+          <SegmentedControl
+            value={activeSubtab}
+            onChange={onSubtabChange}
+            fullWidth
+            radius="xl"
+            size="sm"
+            bg="gray.1"
+            data={[
+              { value: 'mediciones', label: tabLabel(IconChartLine, 'Mediciones') },
+              { value: 'analiticas', label: tabLabel(IconReportAnalytics, 'Analíticas') },
+            ]}
+            styles={{
+              root: { border: 'none', width: '100%' },
+              indicator: { boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
+            }}
+          />
+        </Paper>
+      )}
 
       <Box mt={0}>
         {activeSubtab === 'mediciones' && (
           <MedicionesSubtab jugador={jugador} evoluciones={evoluciones} readOnly={readOnly} />
         )}
-        {activeSubtab === 'analiticas' && (
+        {activeSubtab === 'analiticas' && !readOnly && (
           <AnaliticasSubtab jugador={jugador} analiticas={analiticas} readOnly={readOnly} />
         )}
       </Box>
