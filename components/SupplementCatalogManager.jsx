@@ -26,7 +26,9 @@ import {
   IconCalendarStats,
   IconCirclePlus,
   IconInfoCircle,
+  IconPencil,
   IconPill,
+  IconSearch,
   IconTrash,
   IconUsers,
 } from '@tabler/icons-react';
@@ -62,6 +64,17 @@ export default function SupplementCatalogManager({ players = [] }) {
   const [selectedSupplementId, setSelectedSupplementId] = useState('');
   const [supplementForm, setSupplementForm] = useState(emptySupplementForm);
   const [listForm, setListForm] = useState(emptyListForm);
+  const [editingSupplementId, setEditingSupplementId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredSupplements = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return data.suplementos;
+    return data.suplementos.filter((supp) => 
+      (supp.nombre || '').toLowerCase().includes(query) ||
+      (supp.categoria || '').toLowerCase().includes(query)
+    );
+  }, [data.suplementos, searchQuery]);
 
   const supplementMap = useMemo(() => byId(data.suplementos), [data.suplementos]);
   const selectedList = data.listas.find((lista) => String(lista.id) === String(selectedListId)) || null;
@@ -123,6 +136,50 @@ export default function SupplementCatalogManager({ players = [] }) {
     if (result?.suplemento) {
       setSupplementForm(emptySupplementForm());
       setSelectedSupplementId(String(result.suplemento.id));
+    }
+  }
+
+  function handleSelectEditSupplement(supp) {
+    setEditingSupplementId(supp.id);
+    setSupplementForm({
+      nombre: supp.nombre || '',
+      categoria: supp.categoria || '',
+      pauta: supp.pauta || '',
+      timing: supp.timing || '',
+      descripcion: supp.descripcion || '',
+      notas: supp.notas || '',
+    });
+  }
+
+  function handleCancelEdit() {
+    setEditingSupplementId(null);
+    setSupplementForm(emptySupplementForm());
+  }
+
+  async function updateSupplement() {
+    if (!editingSupplementId) return;
+
+    const result = await postCatalog(
+      { action: 'update_supplement', id: Number(editingSupplementId), ...supplementForm },
+      'El suplemento se ha actualizado correctamente en el catálogo global.'
+    );
+    if (result?.suplemento) {
+      handleCancelEdit();
+    }
+  }
+
+  async function deleteSupplement(id, name) {
+    const ok = window.confirm(`¿Estás seguro de que deseas eliminar "${name}" del catálogo global? Se eliminará de todas las asignaciones.`);
+    if (!ok) return;
+
+    const result = await postCatalog(
+      { action: 'delete_supplement', id: Number(id) },
+      'El suplemento se ha eliminado del catálogo global.'
+    );
+    if (result) {
+      if (Number(editingSupplementId) === Number(id)) {
+        handleCancelEdit();
+      }
     }
   }
 
@@ -224,14 +281,20 @@ export default function SupplementCatalogManager({ players = [] }) {
                 label="Nombre"
                 placeholder="Ej. Pretemporada alta carga"
                 value={listForm.nombre}
-                onChange={(event) => setListForm((current) => ({ ...current, nombre: event.currentTarget.value }))}
+                onChange={(event) => {
+                  const val = event.currentTarget.value;
+                  setListForm((current) => ({ ...current, nombre: val }));
+                }}
               />
               <Textarea
                 label="Descripción"
                 placeholder="Opcional"
                 minRows={2}
                 value={listForm.descripcion}
-                onChange={(event) => setListForm((current) => ({ ...current, descripcion: event.currentTarget.value }))}
+                onChange={(event) => {
+                  const val = event.currentTarget.value;
+                  setListForm((current) => ({ ...current, descripcion: val }));
+                }}
               />
               <Group justify="flex-end">
                 <Button radius="xl" size="xs" onClick={createList} loading={saving}>
@@ -296,56 +359,157 @@ export default function SupplementCatalogManager({ players = [] }) {
         </Tabs.Panel>
 
         <Tabs.Panel value="supplements" pt="md">
-          <BentoCard title="Crear suplemento" icon={IconPill} color="teal">
-            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md" align="start">
+            {/* Left Column: Supplements List */}
+            <BentoCard title="Catálogo de suplementos" icon={IconPill} color="blue">
               <TextInput
-                label="Nombre"
-                placeholder="Ej. Zinc"
-                value={supplementForm.nombre}
-                onChange={(event) => setSupplementForm((current) => ({ ...current, nombre: event.currentTarget.value }))}
+                placeholder="Buscar por nombre o categoría..."
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.currentTarget.value)}
+                leftSection={<IconSearch size={16} />}
+                radius="md"
+                variant="filled"
               />
-              <TextInput
-                label="Categoría"
-                placeholder="Ej. Micronutrientes"
-                value={supplementForm.categoria}
-                onChange={(event) => setSupplementForm((current) => ({ ...current, categoria: event.currentTarget.value }))}
-              />
-              <TextInput
-                label="Dosis / pauta"
-                placeholder="Ej. 15 mg/día"
-                value={supplementForm.pauta}
-                onChange={(event) => setSupplementForm((current) => ({ ...current, pauta: event.currentTarget.value }))}
-              />
-              <TextInput
-                label="Timing"
-                placeholder="Ej. Con comida"
-                value={supplementForm.timing}
-                onChange={(event) => setSupplementForm((current) => ({ ...current, timing: event.currentTarget.value }))}
-              />
-              <Textarea
-                label="Descripción"
-                placeholder="Para qué se usa"
-                minRows={2}
-                value={supplementForm.descripcion}
-                onChange={(event) => setSupplementForm((current) => ({ ...current, descripcion: event.currentTarget.value }))}
-              />
-              <Textarea
-                label="Notas"
-                placeholder="Opcional"
-                minRows={2}
-                value={supplementForm.notas}
-                onChange={(event) => setSupplementForm((current) => ({ ...current, notas: event.currentTarget.value }))}
-              />
-            </SimpleGrid>
+              
+              {filteredSupplements.length ? (
+                <ScrollArea h={380}>
+                  <Stack gap="xs">
+                    {filteredSupplements.map((supp) => (
+                      <Paper
+                        key={supp.id}
+                        p="xs"
+                        radius="md"
+                        bg={editingSupplementId === supp.id ? 'blue.0' : 'gray.0'}
+                        style={{ border: editingSupplementId === supp.id ? '1px solid var(--mantine-color-blue-3)' : '1px solid var(--mantine-color-gray-3)' }}
+                        withBorder
+                      >
+                        <Group justify="space-between" wrap="nowrap" align="center">
+                          <Stack gap={0} style={{ minWidth: 0 }}>
+                            <Group gap={6} wrap="nowrap">
+                              <Text size="sm" fw={900} truncate>{supp.nombre}</Text>
+                              <Badge size="xs" radius="sm" variant="light" color={editingSupplementId === supp.id ? 'blue' : 'gray'}>
+                                {supp.categoria || 'Custom'}
+                              </Badge>
+                            </Group>
+                            <Text size="xs" fw={700} c="teal.7" truncate>{supp.pauta || 'Según pauta'}</Text>
+                            <Text size="xs" c="dimmed" truncate>{supp.timing || 'Timing individual'}</Text>
+                          </Stack>
+                          <Group gap={4} style={{ flexShrink: 0 }}>
+                            <ActionIcon
+                              color="blue"
+                              variant="subtle"
+                              radius="xl"
+                              onClick={() => handleSelectEditSupplement(supp)}
+                              aria-label={`Editar ${supp.nombre}`}
+                            >
+                              <IconPencil size={16} />
+                            </ActionIcon>
+                            <ActionIcon
+                              color="red"
+                              variant="subtle"
+                              radius="xl"
+                              onClick={() => deleteSupplement(supp.id, supp.nombre)}
+                              aria-label={`Eliminar ${supp.nombre}`}
+                            >
+                              <IconTrash size={16} />
+                            </ActionIcon>
+                          </Group>
+                        </Group>
+                      </Paper>
+                    ))}
+                  </Stack>
+                </ScrollArea>
+              ) : (
+                <Text size="sm" c="dimmed" py="md">No se encontraron suplementos en el catálogo.</Text>
+              )}
+            </BentoCard>
 
-            <Divider />
+            {/* Right Column: Create / Edit Form */}
+            <BentoCard 
+              title={editingSupplementId ? `Editar: ${supplementForm.nombre || 'Suplemento'}` : "Crear suplemento"} 
+              icon={editingSupplementId ? IconPencil : IconCirclePlus} 
+              color="teal"
+            >
+              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                <TextInput
+                  label="Nombre"
+                  placeholder="Ej. Zinc"
+                  value={supplementForm.nombre}
+                  onChange={(event) => {
+                    const val = event.currentTarget.value;
+                    setSupplementForm((current) => ({ ...current, nombre: val }));
+                  }}
+                  required
+                />
+                <TextInput
+                  label="Categoría"
+                  placeholder="Ej. Micronutrientes"
+                  value={supplementForm.categoria}
+                  onChange={(event) => {
+                    const val = event.currentTarget.value;
+                    setSupplementForm((current) => ({ ...current, categoria: val }));
+                  }}
+                />
+                <TextInput
+                  label="Dosis / pauta"
+                  placeholder="Ej. 15 mg/día"
+                  value={supplementForm.pauta}
+                  onChange={(event) => {
+                    const val = event.currentTarget.value;
+                    setSupplementForm((current) => ({ ...current, pauta: val }));
+                  }}
+                />
+                <TextInput
+                  label="Timing"
+                  placeholder="Ej. Con comida"
+                  value={supplementForm.timing}
+                  onChange={(event) => {
+                    const val = event.currentTarget.value;
+                    setSupplementForm((current) => ({ ...current, timing: val }));
+                  }}
+                />
+                <Textarea
+                  label="Descripción"
+                  placeholder="Para qué se usa"
+                  minRows={2}
+                  value={supplementForm.descripcion || ''}
+                  onChange={(event) => {
+                    const val = event.currentTarget.value;
+                    setSupplementForm((current) => ({ ...current, descripcion: val }));
+                  }}
+                />
+                <Textarea
+                  label="Notas"
+                  placeholder="Opcional"
+                  minRows={2}
+                  value={supplementForm.notas || ''}
+                  onChange={(event) => {
+                    const val = event.currentTarget.value;
+                    setSupplementForm((current) => ({ ...current, notas: val }));
+                  }}
+                />
+              </SimpleGrid>
 
-            <Group justify="flex-end">
-              <Button radius="xl" size="xs" leftSection={<IconCirclePlus size={15} />} onClick={createSupplement} loading={saving}>
-                Crear suplemento
-              </Button>
-            </Group>
-          </BentoCard>
+              <Divider my="sm" />
+
+              <Group justify="flex-end" gap="xs">
+                {editingSupplementId && (
+                  <Button radius="xl" size="xs" variant="outline" color="gray" onClick={handleCancelEdit}>
+                    Cancelar / Nuevo
+                  </Button>
+                )}
+                <Button
+                  radius="xl"
+                  size="xs"
+                  leftSection={editingSupplementId ? <IconPencil size={15} /> : <IconCirclePlus size={15} />}
+                  onClick={editingSupplementId ? updateSupplement : createSupplement}
+                  loading={saving}
+                >
+                  {editingSupplementId ? 'Guardar cambios' : 'Crear suplemento'}
+                </Button>
+              </Group>
+            </BentoCard>
+          </SimpleGrid>
         </Tabs.Panel>
       </Tabs>
     </Stack>

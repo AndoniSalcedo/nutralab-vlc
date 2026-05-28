@@ -14,9 +14,10 @@ export default async function JugadorView({ id, activeTab = 'general', activeSub
   let analiticas = [];
   let evoluciones = [];
   let messages = [];
+  let menus = [];
 
   try {
-    const [resJugador, resAnaliticas, resEvoluciones, resMessages] = await Promise.all([
+    const [resJugador, resAnaliticas, resEvoluciones, resMessages, resMenus] = await Promise.all([
       supabase.from('jugadores').select('*').eq('id', id).single(),
       supabase.from('analiticas').select('*').eq('jugador_id', id).order('fecha_extraccion', { ascending: false }),
       supabase.from('evoluciones').select('*').eq('jugador_id', id).order('fecha', { ascending: true }),
@@ -25,12 +26,14 @@ export default async function JugadorView({ id, activeTab = 'general', activeSub
         .select('id,jugador_id,titulo,contenido,created_by_name,created_at')
         .or(`jugador_id.is.null,jugador_id.eq.${id}`)
         .order('created_at', { ascending: false }),
+      supabase.from('menu_semanal').select('*').order('semana', { ascending: false }).limit(10),
     ]);
 
     analiticas = resAnaliticas.data || [];
     evoluciones = resEvoluciones.data || [];
     jugador = withLatestMeasurement(resJugador.data, evoluciones);
     messages = resMessages.data || [];
+    menus = resMenus.data || [];
   } catch (err) {
     console.error('Error fetching jugador details:', err);
   }
@@ -61,6 +64,7 @@ export default async function JugadorView({ id, activeTab = 'general', activeSub
         analiticas={analiticas}
         evoluciones={evoluciones}
         messages={messages}
+        menus={menus}
         activeTab={activeTab}
         activeSubtab={activeSubtab}
         readOnly={isPlayer}

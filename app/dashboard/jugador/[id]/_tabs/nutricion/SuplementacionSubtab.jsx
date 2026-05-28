@@ -508,20 +508,29 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
                   label="Dosis personalizada"
                   placeholder="Opcional, ej. 5 g/día"
                   value={extraForm.dose_override}
-                  onChange={(event) => setExtraForm((current) => ({ ...current, dose_override: event.currentTarget.value }))}
+                  onChange={(event) => {
+                    const val = event.currentTarget.value;
+                    setExtraForm((current) => ({ ...current, dose_override: val }));
+                  }}
                 />
                 <TextInput
                   label="Timing personalizado"
                   placeholder="Opcional, ej. post-entreno"
                   value={extraForm.timing_override}
-                  onChange={(event) => setExtraForm((current) => ({ ...current, timing_override: event.currentTarget.value }))}
+                  onChange={(event) => {
+                    const val = event.currentTarget.value;
+                    setExtraForm((current) => ({ ...current, timing_override: val }));
+                  }}
                 />
                 <Textarea
                   label="Nota personalizada"
                   placeholder="Opcional"
                   minRows={2}
                   value={extraForm.note_override}
-                  onChange={(event) => setExtraForm((current) => ({ ...current, note_override: event.currentTarget.value }))}
+                  onChange={(event) => {
+                    const val = event.currentTarget.value;
+                    setExtraForm((current) => ({ ...current, note_override: val }));
+                  }}
                 />
               </SimpleGrid>
 

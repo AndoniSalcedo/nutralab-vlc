@@ -16,8 +16,8 @@ const DEFAULT_SUBTABS = {
 const VALID_TABS = Object.keys(DEFAULT_SUBTABS);
 const VALID_SUBTABS = {
   general: ['perfil', 'mensajes'],
-  metricas: ['mediciones', 'analiticas'],
-  nutricion: ['plan', 'hidratacion', 'suplementacion', 'protocolos'],
+  metricas: ['mediciones', 'analiticas', 'hidratacion', 'protocolos'],
+  nutricion: ['plan', 'suplementacion', 'menu'],
 };
 
 export default function PlayerTabs({
@@ -25,6 +25,7 @@ export default function PlayerTabs({
   analiticas = [],
   evoluciones = [],
   messages = [],
+  menus = [],
   activeTab: activeTabProp = 'general',
   activeSubtab: activeSubtabProp,
   readOnly = false,
@@ -37,8 +38,10 @@ export default function PlayerTabs({
     : activeSubtabProp;
   const validSubtabs = {
     general: ['perfil', 'mensajes'],
-    metricas: readOnly ? ['mediciones'] : ['mediciones', 'analiticas'],
-    nutricion: ['plan', 'hidratacion', 'suplementacion', 'protocolos'],
+    metricas: readOnly 
+      ? ['mediciones', 'hidratacion', 'protocolos'] 
+      : ['mediciones', 'analiticas', 'hidratacion', 'protocolos'],
+    nutricion: ['plan', 'suplementacion', 'menu'],
   };
 
   const activeTab = VALID_TABS.includes(normalizedTab) ? normalizedTab : 'general';
@@ -103,6 +106,7 @@ export default function PlayerTabs({
         <Tabs.Panel value="nutricion">
           <NutricionTab
             jugador={jugador}
+            menus={menus}
             activeSubtab={activeTab === 'nutricion' ? activeSubtab : DEFAULT_SUBTABS.nutricion}
             onSubtabChange={(value) => navigate('nutricion', value)}
             readOnly={readOnly}

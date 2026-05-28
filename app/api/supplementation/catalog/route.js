@@ -100,6 +100,54 @@ export async function POST(request) {
     return NextResponse.json({ suplemento: data }, { status: 201 });
   }
 
+  if (action === 'update_supplement') {
+    const id = toPositiveNumber(body.id);
+    if (!id) {
+      return NextResponse.json({ error: 'ID de suplemento no válido' }, { status: 400 });
+    }
+
+    const nombre = cleanText(body.nombre);
+    if (!nombre) {
+      return NextResponse.json({ error: 'El nombre del suplemento es obligatorio' }, { status: 400 });
+    }
+
+    const payload = {
+      nombre,
+      categoria: cleanText(body.categoria) || 'Custom',
+      descripcion: cleanText(body.descripcion) || null,
+      pauta: cleanText(body.pauta) || 'Según producto.',
+      timing: cleanText(body.timing) || 'Según pauta',
+      dose_text: cleanText(body.dose_text || body.pauta) || 'Según producto',
+      notas: cleanText(body.notas) || null,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await supabase
+      .from('suplementos')
+      .update(payload)
+      .eq('id', id)
+      .select('*')
+      .single();
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ suplemento: data }, { status: 200 });
+  }
+
+  if (action === 'delete_supplement') {
+    const id = toPositiveNumber(body.id);
+    if (!id) {
+      return NextResponse.json({ error: 'ID de suplemento no válido' }, { status: 400 });
+    }
+
+    const { error } = await supabase
+      .from('suplementos')
+      .delete()
+      .eq('id', id);
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  }
+
   if (action === 'create_list') {
     const nombre = cleanText(body.nombre);
     if (!nombre) {

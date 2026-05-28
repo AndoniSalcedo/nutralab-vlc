@@ -1,14 +1,13 @@
 'use client';
 
 import { Box, Paper, SegmentedControl, Stack } from '@mantine/core';
-import { IconBottle, IconBrain, IconClipboardList, IconDroplet } from '@tabler/icons-react';
+import { IconBottle, IconBrain, IconChefHat } from '@tabler/icons-react';
 import { tabLabel } from './tab-label';
-import HidratacionSubtab from './nutricion/HidratacionSubtab';
 import PlanSubtab from './nutricion/PlanSubtab';
-import ProtocolosSubtab from './nutricion/ProtocolosSubtab';
 import SuplementacionSubtab from './nutricion/SuplementacionSubtab';
+import MenuSemanal from '@/components/MenuSemanal';
 
-export default function NutricionTab({ jugador, activeSubtab, onSubtabChange, readOnly = false }) {
+export default function NutricionTab({ jugador, menus = [], activeSubtab, onSubtabChange, readOnly = false }) {
   return (
     <Stack gap={0}>
       <Paper
@@ -36,9 +35,8 @@ export default function NutricionTab({ jugador, activeSubtab, onSubtabChange, re
           bg="gray.1"
           data={[
             { value: 'plan', label: tabLabel(IconBrain, 'Plan nutricional', 'Plan') },
-            { value: 'hidratacion', label: tabLabel(IconDroplet, 'Hidratación', 'Hidra.') },
             { value: 'suplementacion', label: tabLabel(IconBottle, 'Suplementación', 'Supl.') },
-            { value: 'protocolos', label: tabLabel(IconClipboardList, 'Protocolos', 'Prot.') },
+            { value: 'menu', label: tabLabel(IconChefHat, 'Menú comedor', 'Menú') },
           ]}
           styles={{
             root: { border: 'none', width: '100%' },
@@ -49,9 +47,8 @@ export default function NutricionTab({ jugador, activeSubtab, onSubtabChange, re
 
       <Box mt={0}>
         {activeSubtab === 'plan' && <PlanSubtab jugador={jugador} readOnly={readOnly} />}
-        {activeSubtab === 'hidratacion' && <HidratacionSubtab jugador={jugador} readOnly={readOnly} />}
         {activeSubtab === 'suplementacion' && <SuplementacionSubtab jugador={jugador} readOnly={readOnly} />}
-        {activeSubtab === 'protocolos' && <ProtocolosSubtab jugador={jugador} readOnly={readOnly} />}
+        {activeSubtab === 'menu' && <MenuSemanal menusIniciales={menus} isSubtab={true} readOnly={readOnly} />}
       </Box>
     </Stack>
   );
