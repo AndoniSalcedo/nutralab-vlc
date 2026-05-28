@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { forbidden, getOwnedPlayer, getOwnedTeam, getOwnerId } from '@/lib/team-access';
 
 function cleanText(value) {
   return String(value || '').trim();
@@ -35,9 +36,24 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Sin permisos' }, { status: 403 });
   }
 
+  let equipoId = null;
+  if (user.role === 'jugador') {
+    const { data: jugador } = await supabase
+      .from('jugadores')
+      .select('equipo_id')
+      .eq('id', jugadorId)
+      .maybeSingle();
+    equipoId = jugador?.equipo_id || null;
+  } else {
+    const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+    if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+    equipoId = ownedPlayer.equipo_id;
+  }
+
   const { data, error } = await supabase
     .from('mensajes')
     .select('id,jugador_id,titulo,contenido,created_by_name,created_at')
+    .eq('equipo_id', equipoId)
     .or(`jugador_id.is.null,jugador_id.eq.${jugadorId}`)
     .order('created_at', { ascending: false });
 
@@ -59,6 +75,7 @@ export async function POST(request) {
   const contenido = cleanText(body.contenido);
   const sendToAll = Boolean(body.sendToAll);
   const recipientIds = normalizeRecipientIds(body.recipientIds);
+  const teamId = cleanText(body.team_id);
 
   if (!titulo || !contenido) {
     return NextResponse.json({ error: 'Título y mensaje son obligatorios' }, { status: 400 });
@@ -75,11 +92,23 @@ export async function POST(request) {
     created_by_name: user.name || user.username || 'Nutricionista',
   };
 
-  const rows = sendToAll
-    ? [{ ...base, jugador_id: null }]
-    : recipientIds.map((jugadorId) => ({ ...base, jugador_id: jugadorId }));
-
   const supabase = getSupabaseAdmin();
+  const team = await getOwnedTeam(supabase, user, teamId);
+  if (!team) return forbidden('No tienes acceso a este equipo');
+
+  if (!sendToAll) {
+    for (const jugadorId of recipientIds) {
+      const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+      if (!ownedPlayer || String(ownedPlayer.equipo_id) !== String(team.id)) {
+        return forbidden('Hay jugadores fuera de este equipo');
+      }
+    }
+  }
+
+  const rows = sendToAll
+    ? [{ ...base, owner_id: getOwnerId(user), equipo_id: team.id, jugador_id: null }]
+    : recipientIds.map((jugadorId) => ({ ...base, owner_id: getOwnerId(user), equipo_id: team.id, jugador_id: jugadorId }));
+
   const { data, error } = await supabase
     .from('mensajes')
     .insert(rows)

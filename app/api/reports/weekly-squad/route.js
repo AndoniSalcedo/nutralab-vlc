@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { pdf } from '@react-pdf/renderer';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getOwnedTeam } from '@/lib/team-access';
 import { withLatestMeasurement } from '@/lib/player-metrics';
 import WeeklySquadReportDocument from '@/lib/reports/WeeklySquadReportDocument';
 
@@ -54,8 +55,12 @@ export async function POST(request) {
     const meta = defaultMeta(body?.meta);
     const jugadorIds = normalizeIds(body?.jugadorIds);
     const supabase = getSupabaseAdmin();
+    const team = await getOwnedTeam(supabase, user, body?.team_id);
+    if (!team) {
+      return NextResponse.json({ error: 'No tienes acceso a este equipo' }, { status: 403 });
+    }
 
-    let playersQuery = supabase.from('jugadores').select('*').order('nombre');
+    let playersQuery = supabase.from('jugadores').select('*').eq('equipo_id', team.id).order('nombre');
     if (jugadorIds.length) {
       playersQuery = playersQuery.in('id', jugadorIds);
     }
@@ -65,13 +70,26 @@ export async function POST(request) {
       supabase
         .from('evoluciones')
         .select('jugador_id,fecha,altura_cm,peso_kg,porcentaje_grasa,masa_magra_kg,suma_6_pliegues')
+        .in('jugador_id', jugadorIds.length ? jugadorIds : [-1])
         .order('fecha', { ascending: true }),
     ]);
 
     if (resJugadores.error) throw resJugadores.error;
     if (resEvoluciones.error) throw resEvoluciones.error;
 
-    const evoluciones = resEvoluciones.data || [];
+    let evoluciones = resEvoluciones.data || [];
+    if (!jugadorIds.length) {
+      const playerIds = (resJugadores.data || []).map((player) => player.id);
+      const res = playerIds.length
+        ? await supabase
+            .from('evoluciones')
+            .select('jugador_id,fecha,altura_cm,peso_kg,porcentaje_grasa,masa_magra_kg,suma_6_pliegues')
+            .in('jugador_id', playerIds)
+            .order('fecha', { ascending: true })
+        : { data: [] };
+      if (res.error) throw res.error;
+      evoluciones = res.data || [];
+    }
     const players = (resJugadores.data || []).map((player) => (
       withLatestMeasurement(
         player,

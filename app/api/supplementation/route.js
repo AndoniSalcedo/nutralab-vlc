@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getOwnedPlayer } from '@/lib/team-access';
 
 function toPositiveNumber(value) {
   const n = Number(value);
@@ -26,6 +27,14 @@ async function getAllowedJugadorId(request, user) {
 
   if (user?.role === 'jugador' && String(user.id) !== String(jugadorId)) {
     return { error: NextResponse.json({ error: 'Sin permisos' }, { status: 403 }) };
+  }
+
+  if (user?.role !== 'jugador') {
+    const supabase = getSupabaseAdmin();
+    const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+    if (!ownedPlayer) {
+      return { error: NextResponse.json({ error: 'Sin permisos' }, { status: 403 }) };
+    }
   }
 
   return { jugadorId };
@@ -83,6 +92,11 @@ export async function POST(request) {
 
   if (!jugadorId) {
     return NextResponse.json({ error: 'Falta jugador_id' }, { status: 400 });
+  }
+
+  const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+  if (!ownedPlayer) {
+    return NextResponse.json({ error: 'Sin permisos' }, { status: 403 });
   }
 
   if (action === 'set_list') {

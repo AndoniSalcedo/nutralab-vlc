@@ -56,7 +56,7 @@ function byId(items) {
   return new Map((items || []).map((item) => [Number(item.id), item]));
 }
 
-export default function SupplementCatalogManager({ players = [] }) {
+export default function SupplementCatalogManager({ players = [], team }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [data, setData] = useState({ suplementos: [], listas: [], items: [] });
@@ -228,7 +228,7 @@ export default function SupplementCatalogManager({ players = [] }) {
     if (!ok) return;
 
     await postCatalog(
-      { action: 'assign_all', lista_id: Number(selectedListId) },
+      { action: 'assign_all', lista_id: Number(selectedListId), team_id: team?.id },
       `Catálogo asignado a ${players.length} jugadores.`
     );
   }

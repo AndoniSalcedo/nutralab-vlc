@@ -18,7 +18,7 @@ import {
   ScrollArea
 } from '@mantine/core';
 
-export default function ExcelImporter() {
+export default function ExcelImporter({ team }) {
   const [rows, setRows] = useState([]);
   const [allRows, setAllRows] = useState([]);
   const [importing, setImporting] = useState(false);
@@ -52,7 +52,7 @@ export default function ExcelImporter() {
       const res = await fetch('/api/import-mediciones', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: allRows }),
+        body: JSON.stringify({ data: allRows, team_id: team?.id }),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || 'Error al importar');

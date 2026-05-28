@@ -107,6 +107,10 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
     setModalMode(null);
   }
 
+  function updateFormField(field, value) {
+    setForm((current) => ({ ...current, [field]: value }));
+  }
+
   function diff(key) {
     if (!first || !last || first === last) return null;
     const d = Number(last[key]) - Number(first[key]);
@@ -214,15 +218,15 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
       >
         <Stack gap="md">
           <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-            <TextInput label="Fecha" type="date" value={form.fecha} onChange={(e) => setForm((f) => ({ ...f, fecha: e.target.value }))} />
-            <TextInput label="Altura (cm)" type="number" value={form.altura_cm} onChange={(e) => setForm((f) => ({ ...f, altura_cm: e.target.value }))} />
-            <TextInput label="Peso (kg)" type="number" value={form.peso_kg} onChange={(e) => setForm((f) => ({ ...f, peso_kg: e.target.value }))} />
-            <TextInput label="% Grasa" type="number" value={form.porcentaje_grasa} onChange={(e) => setForm((f) => ({ ...f, porcentaje_grasa: e.target.value }))} />
-            <TextInput label="Masa magra (kg)" type="number" value={form.masa_magra_kg} onChange={(e) => setForm((f) => ({ ...f, masa_magra_kg: e.target.value }))} />
-            <TextInput label="Σ6 pliegues (mm)" type="number" value={form.suma_6_pliegues} onChange={(e) => setForm((f) => ({ ...f, suma_6_pliegues: e.target.value }))} />
+            <TextInput label="Fecha" type="date" value={form.fecha} onChange={(e) => updateFormField('fecha', e.target.value)} />
+            <TextInput label="Altura (cm)" type="number" value={form.altura_cm} onChange={(e) => updateFormField('altura_cm', e.target.value)} />
+            <TextInput label="Peso (kg)" type="number" value={form.peso_kg} onChange={(e) => updateFormField('peso_kg', e.target.value)} />
+            <TextInput label="% Grasa" type="number" value={form.porcentaje_grasa} onChange={(e) => updateFormField('porcentaje_grasa', e.target.value)} />
+            <TextInput label="Masa magra (kg)" type="number" value={form.masa_magra_kg} onChange={(e) => updateFormField('masa_magra_kg', e.target.value)} />
+            <TextInput label="Σ6 pliegues (mm)" type="number" value={form.suma_6_pliegues} onChange={(e) => updateFormField('suma_6_pliegues', e.target.value)} />
           </SimpleGrid>
 
-          <Textarea label="Notas" value={form.notas} onChange={(e) => setForm((f) => ({ ...f, notas: e.target.value }))} minRows={2} />
+          <Textarea label="Notas" value={form.notas} onChange={(e) => updateFormField('notas', e.target.value)} minRows={2} />
 
           <Group justify="flex-end">
             <Button size="xs" radius="xl" variant="subtle" color="gray" onClick={cancelForm} disabled={saving}>

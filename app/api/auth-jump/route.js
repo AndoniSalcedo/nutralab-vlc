@@ -18,6 +18,7 @@ export async function GET(request) {
     const sessionObj = {
       external_admin_id: decoded.id,
       name: decoded.name,
+      email: decoded.email,
       role: 'admin'
     };
 

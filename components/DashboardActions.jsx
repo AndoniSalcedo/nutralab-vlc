@@ -9,7 +9,7 @@ import AnthroImporter from './AnthroImporter';
 import MessageComposer from './MessageComposer';
 import SupplementCatalogManager from './SupplementCatalogManager';
 
-export default function DashboardActions({ players = [] }) {
+export default function DashboardActions({ players = [], team }) {
   const [openedModal, setOpenedModal] = useState(null);
 
   const closeModal = () => setOpenedModal(null);
@@ -60,7 +60,7 @@ export default function DashboardActions({ players = [] }) {
       </Group>
 
       <Modal opened={openedModal === 'new-player'} onClose={closeModal} title="Añadir jugador" size="xl">
-        <PlayerForm initial={null} />
+        <PlayerForm initial={null} team={team} />
       </Modal>
 
       <Modal opened={openedModal === 'import'} onClose={closeModal} title="Importar datos" size="xl">
@@ -75,21 +75,21 @@ export default function DashboardActions({ players = [] }) {
           </Tabs.List>
 
           <Tabs.Panel value="players">
-            <ExcelImporter />
+            <ExcelImporter team={team} />
           </Tabs.Panel>
 
           <Tabs.Panel value="anthro">
-            <AnthroImporter />
+            <AnthroImporter team={team} />
           </Tabs.Panel>
         </Tabs>
       </Modal>
 
       <Modal opened={openedModal === 'message'} onClose={closeModal} title="Enviar mensaje" size="lg">
-        <MessageComposer players={players} onSent={closeModal} />
+        <MessageComposer players={players} team={team} onSent={closeModal} />
       </Modal>
 
       <Modal opened={openedModal === 'supplementation'} onClose={closeModal} title="Gestión de suplementación" size="xl">
-        <SupplementCatalogManager players={players} />
+        <SupplementCatalogManager players={players} team={team} />
       </Modal>
     </>
   );

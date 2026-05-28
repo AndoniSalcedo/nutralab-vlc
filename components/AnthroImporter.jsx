@@ -19,7 +19,7 @@ import {
   ScrollArea 
 } from '@mantine/core';
 
-export default function AnthroImporter() {
+export default function AnthroImporter({ team }) {
   const openRef = useRef(null);
   const theme = useMantineTheme();
   const [estado, setEstado] = useState('idle');
@@ -41,6 +41,7 @@ export default function AnthroImporter() {
     const fd = new FormData();
     fd.append('file', file);
     fd.append('modo', 'preview');
+    if (team?.id) fd.append('team_id', team.id);
     try {
       const res = await fetch('/api/import-anthro', { method: 'POST', body: fd });
       const data = await res.json();
@@ -81,6 +82,7 @@ export default function AnthroImporter() {
     const fd = new FormData();
     fd.append('file', archivo);
     fd.append('modo', 'importar');
+    if (team?.id) fd.append('team_id', team.id);
     fd.append('seleccionados', JSON.stringify(Array.from(seleccionados)));
     try {
       const res = await fetch('/api/import-anthro', { method: 'POST', body: fd });

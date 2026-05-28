@@ -18,7 +18,7 @@ import { notifications } from '@mantine/notifications';
 import { IconUser, IconActivity, IconCheck } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 
-export default function PlayerForm({ initial }) {
+export default function PlayerForm({ initial, team }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -39,6 +39,9 @@ export default function PlayerForm({ initial }) {
       const formData = new FormData();
       if (initial?.id) {
         formData.append('id', initial.id);
+      }
+      if (team?.id || initial?.equipo_id) {
+        formData.append('team_id', team?.id || initial.equipo_id);
       }
 
       if (isDelete) {

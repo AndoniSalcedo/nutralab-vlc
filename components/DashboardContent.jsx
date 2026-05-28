@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Anchor, Button, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination, Textarea } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconDownload, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil } from '@tabler/icons-react';
+import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconDownload, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil } from '@tabler/icons-react';
 import DashboardActions from '@/components/DashboardActions';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
@@ -126,7 +126,7 @@ function getPlayerPlan(player) {
   return { kcal: calc.kcal, calculated: true };
 }
 
-export default function DashboardContent({ players = [] }) {
+export default function DashboardContent({ players = [], team }) {
   const router = useRouter();
   const [playersState, setPlayersState] = useState(players);
   const [editingPlayer, setEditingPlayer] = useState(null);
@@ -234,7 +234,7 @@ export default function DashboardContent({ players = [] }) {
       const res = await fetch('/api/reports/weekly-squad', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ meta: reportForm, jugadorIds }),
+        body: JSON.stringify({ meta: reportForm, jugadorIds, team_id: team?.id }),
       });
 
       if (!res.ok) {
@@ -292,20 +292,25 @@ export default function DashboardContent({ players = [] }) {
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="wrap" gap="md">
             <Group gap="sm">
+              <Tooltip label="Volver a equipos" withArrow>
+                <ActionIcon component={Anchor} href="/dashboard" variant="light" color="gray" radius="xl" size={42}>
+                  <IconArrowLeft size={20} />
+                </ActionIcon>
+              </Tooltip>
               <ThemeIcon color="dark" variant="light" radius="xl" size={42}>
                 <IconUsers size={21} />
               </ThemeIcon>
               <Box>
                 <Title order={3} fw={850} c="#24291f" lh={1.1}>
-                  Gestión de equipos
+                  {team?.nombre || 'Equipo'}
                 </Title>
                 <Text size="xs" c="dimmed" mt={2}>
-                  Control de plantilla, cálculos y cargas nutricionales.
+                  {team?.temporada ? `${team.temporada} · ` : ''}Control de plantilla, cálculos y cargas nutricionales.
                 </Text>
               </Box>
             </Group>
 
-            <DashboardActions players={playersState} />
+            <DashboardActions players={playersState} team={team} />
           </Group>
 
           <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xs">
@@ -323,7 +328,7 @@ export default function DashboardContent({ players = [] }) {
               color="blue"
               value="Ver análisis →"
               description="Tendencias y comparativas"
-              href="/dashboard/evolucion"
+              href={team?.id ? `/dashboard/equipo/${team.id}/evolucion` : '/dashboard/evolucion'}
             />
             <DashboardStat
               title="Menú esta semana"
@@ -531,7 +536,7 @@ export default function DashboardContent({ players = [] }) {
       </Box>
 
       <Modal opened={!!editingPlayer} onClose={() => setEditingPlayer(null)} title="Editar jugador" size="xl">
-        {editingPlayer && <PlayerForm initial={editingPlayer} />}
+        {editingPlayer && <PlayerForm initial={editingPlayer} team={team} />}
       </Modal>
 
       <Modal

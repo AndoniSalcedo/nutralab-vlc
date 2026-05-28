@@ -153,7 +153,7 @@ function buildCsv(rows) {
   return [headers.join(','), ...body].join('\n');
 }
 
-export default function TeamEvolutionDashboard({ players = [], evolutions = [] }) {
+export default function TeamEvolutionDashboard({ players = [], evolutions = [], team }) {
   const router = useRouter();
   const [position, setPosition] = useState('');
   const [dateFrom, setDateFrom] = useState('');
@@ -212,7 +212,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
           <Group justify="space-between" align="center" wrap="wrap" gap="md">
             <Group gap="sm" wrap="nowrap">
               <Tooltip label="Volver al panel" withArrow>
-                <ActionIcon component={Anchor} href="/dashboard" variant="light" color="gray" radius="xl" size={42}>
+                <ActionIcon component={Anchor} href={team?.id ? `/dashboard/equipo/${team.id}` : '/dashboard'} variant="light" color="gray" radius="xl" size={42}>
                   <IconArrowLeft size={20} />
                 </ActionIcon>
               </Tooltip>
@@ -221,10 +221,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
               </ThemeIcon>
               <Box>
                 <Title order={3} fw={850} c="#24291f" lh={1.1}>
-                  Evolución de equipo
+                  Evolución de {team?.nombre || 'equipo'}
                 </Title>
                 <Text size="xs" c="dimmed" mt={2}>
-                  Tendencias corporales, cobertura de mediciones y cambios recientes.
+                  {team?.temporada ? `${team.temporada} · ` : ''}Tendencias corporales, cobertura de mediciones y cambios recientes.
                 </Text>
               </Box>
             </Group>

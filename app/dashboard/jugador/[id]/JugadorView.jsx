@@ -1,6 +1,7 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { withLatestMeasurement } from '@/lib/player-metrics';
+import { getOwnedPlayer } from '@/lib/team-access';
 import JugadorHeader from '@/components/JugadorHeader';
 import { Anchor, Stack, Text } from '@mantine/core';
 import PlayerTabs from './_tabs/PlayerTabs';
@@ -10,6 +11,18 @@ export default async function JugadorView({ id, activeTab = 'general', activeSub
   const user = await getUser();
   const isPlayer = user?.role === 'jugador';
 
+  if (!isPlayer) {
+    const ownedPlayer = await getOwnedPlayer(supabase, user, id);
+    if (!ownedPlayer) {
+      return (
+        <Stack gap="lg" mt="md">
+          <Text c="red">No tienes acceso a este jugador.</Text>
+          <Anchor href="/dashboard">Volver al panel</Anchor>
+        </Stack>
+      );
+    }
+  }
+
   let jugador = null;
   let analiticas = [];
   let evoluciones = [];
@@ -17,23 +30,27 @@ export default async function JugadorView({ id, activeTab = 'general', activeSub
   let menus = [];
 
   try {
-    const [resJugador, resAnaliticas, resEvoluciones, resMessages, resMenus] = await Promise.all([
+    const [resJugador, resAnaliticas, resEvoluciones, resMenus] = await Promise.all([
       supabase.from('jugadores').select('*').eq('id', id).single(),
       supabase.from('analiticas').select('*').eq('jugador_id', id).order('fecha_extraccion', { ascending: false }),
       supabase.from('evoluciones').select('*').eq('jugador_id', id).order('fecha', { ascending: true }),
-      supabase
-        .from('mensajes')
-        .select('id,jugador_id,titulo,contenido,created_by_name,created_at')
-        .or(`jugador_id.is.null,jugador_id.eq.${id}`)
-        .order('created_at', { ascending: false }),
       supabase.from('menu_semanal').select('*').order('semana', { ascending: false }).limit(10),
     ]);
 
     analiticas = resAnaliticas.data || [];
     evoluciones = resEvoluciones.data || [];
     jugador = withLatestMeasurement(resJugador.data, evoluciones);
-    messages = resMessages.data || [];
     menus = resMenus.data || [];
+
+    if (jugador?.equipo_id) {
+      const resMessages = await supabase
+        .from('mensajes')
+        .select('id,jugador_id,titulo,contenido,created_by_name,created_at')
+        .eq('equipo_id', jugador.equipo_id)
+        .or(`jugador_id.is.null,jugador_id.eq.${id}`)
+        .order('created_at', { ascending: false });
+      messages = resMessages.data || [];
+    }
   } catch (err) {
     console.error('Error fetching jugador details:', err);
   }

@@ -65,6 +65,7 @@ export default function MensajesTab({ jugador, messages = [], readOnly = false }
           players={playerOption}
           defaultRecipientIds={[jugador.id]}
           forceRecipients
+          team={{ id: jugador.equipo_id }}
           onSent={close}
         />
       </Modal>

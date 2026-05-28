@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getUser } from '@/lib/auth';
+import { forbidden, getOwnedPlayer } from '@/lib/team-access';
 import Anthropic from '@anthropic-ai/sdk';
 
 const client = new Anthropic();
@@ -11,6 +13,12 @@ export async function POST(req) {
     const jugadorId = formData.get('jugador_id');
     const fechaExtraccion = formData.get('fecha_extraccion');
     if (!archivo || !jugadorId) return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
+
+    const supabase = getSupabaseAdmin();
+    const user = await getUser();
+    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+    if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
     const buffer = Buffer.from(await archivo.arrayBuffer());
     const base64 = buffer.toString('base64');
@@ -38,7 +46,6 @@ export async function POST(req) {
     const clean = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
 
-    const supabase = getSupabaseAdmin();
     const { data, error } = await supabase.from('analiticas').insert({
       jugador_id: parseInt(jugadorId),
       fecha_extraccion: fechaExtraccion || null,

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getUser } from '@/lib/auth';
+import { forbidden, getOwnedTeam } from '@/lib/team-access';
 import * as XLSX from 'xlsx';
 
 function esHojaJugador(nombre) {
@@ -150,8 +152,15 @@ export async function POST(req) {
       const j = parsearJugador(nombreHoja, filas);
       if (j) jugadores.push(j);
     }
-    if (modo === 'preview') return NextResponse.json({ jugadores });
     const supabase = getSupabaseAdmin();
+    if (modo === 'preview') return NextResponse.json({ jugadores });
+
+    const user = await getUser();
+    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+
+    const team = await getOwnedTeam(supabase, user, formData.get('team_id'));
+    if (!team) return forbidden('Debes importar dentro de un equipo propio');
+
     const selStr = formData.get('seleccionados');
     const sel = selStr ? JSON.parse(selStr) : jugadores.map(j => j?._nombre_completo).filter(Boolean);
     const resultados = [];
@@ -159,14 +168,24 @@ export async function POST(req) {
       if (!j || !sel.includes(j._nombre_completo)) continue;
       const { _nombre_completo, ...datos } = j;
       const { jugador: jugadorPayload, medicion } = splitJugadorAndMedicion(datos);
-      const { data: existente } = await supabase.from('jugadores').select('id').ilike('nombre', '%' + datos.nombre + '%').limit(1).single();
+      const { data: existente } = await supabase
+        .from('jugadores')
+        .select('id')
+        .eq('equipo_id', team.id)
+        .ilike('nombre', '%' + datos.nombre + '%')
+        .limit(1)
+        .maybeSingle();
       let jugadorId = existente?.id;
 
       if (existente) {
         const { error } = await supabase.from('jugadores').update(jugadorPayload).eq('id', existente.id);
         resultados.push({ nombre: _nombre_completo, accion: 'actualizado', error: error?.message });
       } else {
-        const { data: creado, error } = await supabase.from('jugadores').insert({ ...jugadorPayload, factor_actividad: 1.6 }).select('id').single();
+        const { data: creado, error } = await supabase
+          .from('jugadores')
+          .insert({ ...jugadorPayload, factor_actividad: 1.6, equipo_id: team.id })
+          .select('id')
+          .single();
         jugadorId = creado?.id;
         resultados.push({ nombre: _nombre_completo, accion: 'creado', error: error?.message });
       }

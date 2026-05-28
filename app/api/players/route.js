@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getUser } from '@/lib/auth';
+import { forbidden, getOwnedPlayer, getOwnedTeam } from '@/lib/team-access';
 
 function toNumber(value) {
   const n = Number(value);
@@ -11,9 +13,18 @@ export async function POST(request) {
   const deleting = url.searchParams.get('delete') === '1';
   const form = await request.formData();
   const id = String(form.get('id') || '');
+  const teamId = String(form.get('team_id') || '');
   const supabase = getSupabaseAdmin();
+  const user = await getUser();
+
+  if (!user || user.role === 'jugador') {
+    return forbidden('No autorizado');
+  }
 
   if (deleting && id) {
+    const ownedPlayer = await getOwnedPlayer(supabase, user, id);
+    if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+
     const { data: jugador } = await supabase
       .from('jugadores')
       .select('auth_user_id')
@@ -24,10 +35,23 @@ export async function POST(request) {
     if (jugador?.auth_user_id) {
       await supabase.auth.admin.deleteUser(jugador.auth_user_id);
     }
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    const redirectTeamId = ownedPlayer.equipo_id || teamId;
+    return NextResponse.redirect(new URL(redirectTeamId ? `/dashboard/equipo/${redirectTeamId}` : '/dashboard', request.url));
+  }
+
+  let targetTeam = null;
+  if (id) {
+    const ownedPlayer = await getOwnedPlayer(supabase, user, id);
+    if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+    targetTeam = await getOwnedTeam(supabase, user, ownedPlayer.equipo_id);
+    if (!targetTeam) return forbidden('No tienes acceso a este equipo');
+  } else {
+    targetTeam = await getOwnedTeam(supabase, user, teamId);
+    if (!targetTeam) return forbidden('Debes crear o seleccionar un equipo antes de añadir jugadores');
   }
 
   const payload = {
+    equipo_id: targetTeam.id,
     nombre: String(form.get('nombre') || ''),
     apellidos: String(form.get('apellidos') || ''),
     posicion: String(form.get('posicion') || ''),
@@ -48,5 +72,5 @@ export async function POST(request) {
     await supabase.from('jugadores').insert(payload);
   }
 
-  return NextResponse.redirect(new URL('/dashboard', request.url), 303);
+  return NextResponse.redirect(new URL(`/dashboard/equipo/${targetTeam.id}`, request.url), 303);
 }

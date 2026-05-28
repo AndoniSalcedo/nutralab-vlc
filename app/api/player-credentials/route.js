@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getOwnedPlayer } from '@/lib/team-access';
 
 function isValidPassword(password) {
   return typeof password === 'string' && password.length >= 8;
@@ -50,6 +51,11 @@ export async function POST(request) {
     }
 
     const supabase = getSupabaseAdmin();
+    const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+    if (!ownedPlayer) {
+      return NextResponse.json({ error: 'No tienes acceso a este jugador' }, { status: 403 });
+    }
+
     const { data: jugador, error: jugadorError } = await supabase
       .from('jugadores')
       .select('id,nombre,apellidos,auth_user_id')

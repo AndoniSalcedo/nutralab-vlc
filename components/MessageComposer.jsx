@@ -10,6 +10,7 @@ export default function MessageComposer({
   players = [],
   defaultRecipientIds = [],
   forceRecipients = false,
+  team,
   onSent,
 }) {
   const router = useRouter();
@@ -37,6 +38,7 @@ export default function MessageComposer({
           contenido,
           sendToAll: mode === 'all',
           recipientIds,
+          team_id: team?.id,
         }),
       });
 

@@ -1,7 +1,7 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
-import DashboardContent from '@/components/DashboardContent';
+import TeamsDashboard from '@/components/TeamsDashboard';
 import { getUser } from '@/lib/auth';
-import { withLatestMeasurement } from '@/lib/player-metrics';
+import { getOwnerId } from '@/lib/team-access';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -22,29 +22,39 @@ export default async function Dashboard() {
     redirect(`/dashboard/jugador/${jugador.id}`);
   }
 
-  // Admin flow
-  let players = [];
+  const ownerId = getOwnerId(user);
+  if (!ownerId) redirect('/login');
+
+  let teams = [];
   try {
-    const [resJugadores, resEvoluciones] = await Promise.all([
+    const [resEquipos, resJugadores] = await Promise.all([
       supabase
-        .from('jugadores')
-        .select('id,nombre,apellidos,posicion,kcal_objetivo,factor_actividad,auth_user_id,auth_email,credentials_created_at')
+        .from('equipos')
+        .select('*')
+        .eq('owner_id', ownerId)
+        .order('temporada', { ascending: false })
         .order('nombre'),
       supabase
-        .from('evoluciones')
-        .select('jugador_id,fecha,peso_kg,porcentaje_grasa,masa_magra_kg')
+        .from('jugadores')
+        .select('id,equipo_id,equipos!inner(owner_id)')
+        .eq('equipos.owner_id', ownerId)
     ]);
 
+    if (resEquipos.error) throw resEquipos.error;
     if (resJugadores.error) throw resJugadores.error;
-    if (resEvoluciones.error) throw resEvoluciones.error;
-    
-    const evoluciones = resEvoluciones.data || [];
-    players = (resJugadores.data || []).map((player) => (
-      withLatestMeasurement(player, evoluciones.filter((item) => String(item.jugador_id) === String(player.id)))
-    ));
+
+    const counts = new Map();
+    for (const player of resJugadores.data || []) {
+      counts.set(String(player.equipo_id), (counts.get(String(player.equipo_id)) || 0) + 1);
+    }
+
+    teams = (resEquipos.data || []).map((team) => ({
+      ...team,
+      players_count: counts.get(String(team.id)) || 0,
+    }));
   } catch (err) {
-    console.error('Error fetching players/evolutions:', err);
+    console.error('Error fetching teams:', err);
   }
 
-  return <DashboardContent players={players} />;
+  return <TeamsDashboard teams={teams} />;
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getOwnedTeam } from '@/lib/team-access';
 
 function canManage(user) {
   return user && user.role !== 'jugador';
@@ -221,13 +222,18 @@ export async function POST(request) {
 
   if (action === 'assign_all') {
     const listaId = toPositiveNumber(body.lista_id);
+    const team = await getOwnedTeam(supabase, user, body.team_id);
     if (!listaId) {
       return NextResponse.json({ error: 'Selecciona un catálogo' }, { status: 400 });
+    }
+    if (!team) {
+      return NextResponse.json({ error: 'No tienes acceso a este equipo' }, { status: 403 });
     }
 
     const { data: players, error: playersError } = await supabase
       .from('jugadores')
-      .select('id');
+      .select('id')
+      .eq('equipo_id', team.id);
 
     if (playersError) return NextResponse.json({ error: playersError.message }, { status: 500 });
 

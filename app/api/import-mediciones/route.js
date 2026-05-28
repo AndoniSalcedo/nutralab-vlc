@@ -1,17 +1,27 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getUser } from '@/lib/auth';
+import { forbidden, getOwnedTeam } from '@/lib/team-access';
 
 export async function POST(req) {
   try {
-    const { data } = await req.json();
+    const { data, team_id } = await req.json();
     if (!data || !Array.isArray(data)) {
       return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 });
     }
 
     const supabase = getSupabaseAdmin();
+    const user = await getUser();
+    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+
+    const team = await getOwnedTeam(supabase, user, team_id);
+    if (!team) return forbidden('Debes importar dentro de un equipo propio');
     
     // 1. Obtener todos los jugadores actuales para machear por nombre/apellido
-    const { data: jugadoresDb, error: jugError } = await supabase.from('jugadores').select('id, nombre, apellidos');
+    const { data: jugadoresDb, error: jugError } = await supabase
+      .from('jugadores')
+      .select('id, nombre, apellidos')
+      .eq('equipo_id', team.id);
     if (jugError) throw jugError;
 
     let successCount = 0;
@@ -58,7 +68,8 @@ export async function POST(req) {
       if (!jugador) {
         const { data: newJugador, error: createError } = await supabase.from('jugadores').insert({
           nombre,
-          apellidos
+          apellidos,
+          equipo_id: team.id,
         }).select().single();
         
         if (createError) {

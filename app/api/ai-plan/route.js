@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getUser } from '@/lib/auth';
+import { forbidden, getOwnedPlayer } from '@/lib/team-access';
 
 const client = new Anthropic();
 
@@ -114,6 +116,14 @@ export async function GET(req) {
     if (!jugadorId) return NextResponse.json({ error: 'Falta jugador_id' }, { status: 400 });
 
     const supabase = getSupabaseAdmin();
+    const user = await getUser();
+    if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+    if (user.role === 'jugador' && String(user.id) !== String(jugadorId)) return forbidden();
+    if (user.role !== 'jugador') {
+      const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+      if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+    }
+
     const { data, error } = await supabase
       .from('planes_ia')
       .select('id,jugador_id,nombre,contexto,contexto_adicional,contenido,created_at,updated_at')
@@ -134,6 +144,12 @@ export async function POST(req) {
     if (!jugador?.id) return NextResponse.json({ error: 'Falta jugador' }, { status: 400 });
     if (!planNombre) return NextResponse.json({ error: 'El nombre del plan es obligatorio' }, { status: 400 });
 
+    const supabase = getSupabaseAdmin();
+    const user = await getUser();
+    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    const ownedPlayer = await getOwnedPlayer(supabase, user, jugador.id);
+    if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+
     const generatedContent = draftOnly || contenido === undefined
       ? await generarContenidoPlan({ jugador, contexto, contextoAdicional })
       : String(contenido || '');
@@ -142,7 +158,6 @@ export async function POST(req) {
       return NextResponse.json({ contenido: generatedContent });
     }
 
-    const supabase = getSupabaseAdmin();
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('planes_ia')
@@ -173,6 +188,19 @@ export async function PATCH(req) {
     if (!planNombre) return NextResponse.json({ error: 'El nombre del plan es obligatorio' }, { status: 400 });
 
     const supabase = getSupabaseAdmin();
+    const user = await getUser();
+    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+
+    const { data: currentPlan, error: currentPlanError } = await supabase
+      .from('planes_ia')
+      .select('jugador_id')
+      .eq('id', id)
+      .single();
+
+    if (currentPlanError) throw currentPlanError;
+    const ownedPlayer = await getOwnedPlayer(supabase, user, currentPlan.jugador_id);
+    if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+
     const { data, error } = await supabase
       .from('planes_ia')
       .update({
