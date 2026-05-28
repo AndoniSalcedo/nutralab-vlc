@@ -1,19 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
+import {
   ActionIcon,
   Anchor,
-  Paper, 
-  Stack, 
-  Group, 
-  Title, 
-  Text, 
-  Button, 
-  FileButton, 
-  TextInput, 
-  Badge, 
-  Box, 
+  Paper,
+  Stack,
+  Group,
+  Title,
+  Text,
+  Button,
+  FileButton,
+  TextInput,
+  Badge,
+  Box,
   Divider,
   Select,
   ThemeIcon,
@@ -25,11 +25,9 @@ import {
   IconArrowLeft,
   IconCalendar,
   IconChefHat,
-  IconClock,
   IconFlame,
   IconToolsKitchen,
   IconUpload,
-  IconCheck,
   IconList,
 } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
@@ -225,10 +223,10 @@ function DaySelectorButton({ dayName, isSelected, isHoy, dateStr, onClick }) {
         textAlign: 'center',
         transition: 'all 0.2s ease',
         backgroundColor: isSelected ? 'var(--mantine-color-dark-8)' : 'var(--mantine-color-gray-0)',
-        borderColor: isSelected 
-          ? 'var(--mantine-color-dark-8)' 
-          : isHoy 
-            ? 'var(--mantine-color-teal-3)' 
+        borderColor: isSelected
+          ? 'var(--mantine-color-dark-8)'
+          : isHoy
+            ? 'var(--mantine-color-teal-3)'
             : 'var(--mantine-color-gray-2)',
         boxShadow: isSelected ? '0 4px 10px rgba(0, 0, 0, 0.08)' : 'none',
         transform: isSelected ? 'translateY(-1px)' : 'none',
@@ -236,36 +234,36 @@ function DaySelectorButton({ dayName, isSelected, isHoy, dateStr, onClick }) {
     >
       <Stack gap={2} align="center">
         {isHoy && (
-          <Box style={{ 
-            width: 4, 
-            height: 4, 
-            borderRadius: '50%', 
-            backgroundColor: isSelected ? 'var(--mantine-color-teal-3)' : 'var(--mantine-color-teal-5)' 
+          <Box style={{
+            width: 4,
+            height: 4,
+            borderRadius: '50%',
+            backgroundColor: isSelected ? 'var(--mantine-color-teal-3)' : 'var(--mantine-color-teal-5)'
           }} />
         )}
         {!isHoy && <Box style={{ height: 4 }} />}
-        
-        <Text 
-          size="xs" 
-          fw={700} 
-          tt="uppercase" 
-          c={isSelected ? 'gray.3' : 'dimmed'} 
+
+        <Text
+          size="xs"
+          fw={700}
+          tt="uppercase"
+          c={isSelected ? 'gray.3' : 'dimmed'}
           style={{ letterSpacing: '0.5px', fontSize: '9px' }}
         >
           {dayName.slice(0, 3)}
         </Text>
-        <Text 
-          size="md" 
-          fw={900} 
-          lh={1.1} 
+        <Text
+          size="md"
+          fw={900}
+          lh={1.1}
           c={isSelected ? 'white' : 'dark.4'}
         >
           {dateStr ? dateStr.split(' ')[0] : ''}
         </Text>
-        <Text 
-          size="xs" 
-          fw={600} 
-          c={isSelected ? 'gray.4' : 'dimmed'} 
+        <Text
+          size="xs"
+          fw={600}
+          c={isSelected ? 'gray.4' : 'dimmed'}
           style={{ fontSize: '9px' }}
         >
           {dateStr ? dateStr.split(' ')[1] : ''}
@@ -319,7 +317,7 @@ export default function MenuSemanal({ menusIniciales, isSubtab = false, readOnly
 
   async function handleUploadFile(file) {
     if (!file) return;
-    setUploading(true); 
+    setUploading(true);
     const notificationId = 'menu-semanal-upload';
     notifications.show({
       id: notificationId,
@@ -330,16 +328,16 @@ export default function MenuSemanal({ menusIniciales, isSubtab = false, readOnly
       autoClose: false,
       withCloseButton: false,
     });
-    
+
     try {
       const fd = new FormData();
       fd.append('file', file);
       fd.append('semana', weekDate);
-      
+
       const res = await fetch('/api/menu-semanal', { method: 'POST', body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error al subir el archivo');
-      
+
       setMenus(prev => {
         const filtered = prev.filter(m => m.semana !== data.menu.semana);
         return [data.menu, ...filtered].sort((a, b) => b.semana.localeCompare(a.semana));
@@ -354,7 +352,7 @@ export default function MenuSemanal({ menusIniciales, isSubtab = false, readOnly
         autoClose: 4000,
         withCloseButton: true,
       });
-    } catch (e) { 
+    } catch (e) {
       notifications.update({
         id: notificationId,
         color: 'red',
@@ -364,8 +362,8 @@ export default function MenuSemanal({ menusIniciales, isSubtab = false, readOnly
         autoClose: 5000,
         withCloseButton: true,
       });
-    } finally { 
-      setUploading(false); 
+    } finally {
+      setUploading(false);
     }
   }
 

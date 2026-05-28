@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import {
-  LineChart,
+  ComposedChart,
+  Bar,
   Line,
   XAxis,
   YAxis,
@@ -26,6 +27,8 @@ import {
   Textarea,
   ThemeIcon,
   Title,
+  Grid,
+  ScrollArea,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconCalendarStats, IconChartLine, IconCheck, IconEdit, IconPlus, IconRuler2 } from '@tabler/icons-react';
@@ -78,7 +81,6 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   const [currentId, setCurrentId] = useState(evolucionesIniciales.length ? String(evolucionesIniciales[evolucionesIniciales.length - 1].id) : null);
   const [modalMode, setModalMode] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [metrica, setMetrica] = useState('peso_kg');
   const [form, setForm] = useState(emptyForm);
 
   const sortedAsc = useMemo(
@@ -89,7 +91,6 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   const selected = sortedAsc.find((e) => String(e.id) === String(currentId)) || sortedAsc[sortedAsc.length - 1] || null;
   const first = sortedAsc[0];
   const last = sortedAsc[sortedAsc.length - 1];
-  const metricaActual = METRICAS.find((m) => m.key === metrica) || METRICAS[0];
 
   function startNew() {
     setModalMode('new');
@@ -247,63 +248,130 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
           </Box>
         ) : selected ? (
           <Stack gap={0}>
-            <SimpleGrid cols={{ base: 1, sm: 3 }} spacing={{ base: 'md', sm: 'md' }} mb={{ base: 'md', sm: 'xl' }}>
-            {[
-              { label: 'Peso actual', key: 'peso_kg', unit: 'kg' },
-              { label: '% Grasa actual', key: 'porcentaje_grasa', unit: '%' },
-              { label: 'Masa magra actual', key: 'masa_magra_kg', unit: 'kg' },
-            ].map((m) => {
-              const d = diff(m.key);
-              return (
-                <Paper key={m.key} p="md" radius="lg" withBorder shadow="xs" style={{ borderLeft: '4px solid var(--mantine-color-blue-filled)' }}>
-                  <Text size="xs" c="dimmed" tt="uppercase" fw={700}>{m.label}</Text>
-                  <Group justify="space-between" align="flex-end" mt={5}>
-                    <Title order={2}>{selected?.[m.key] ?? '-'} {m.unit}</Title>
-                    {d && <Badge variant="light" color={d.color} size="sm">{d.val} {m.unit}</Badge>}
-                  </Group>
-                </Paper>
-              );
-            })}
-          </SimpleGrid>
+            <SimpleGrid cols={{ base: 1, md: 1, lg: 2 }} spacing="lg" mb={{ base: 'md', sm: 'xl' }}>
+              {METRICAS.map((m) => {
+                const metricData = sortedAsc.filter((d) => d[m.key] !== null && d[m.key] !== undefined);
+                const d = diff(m.key);
+                const unit = m.key === 'peso_kg' || m.key === 'masa_magra_kg' ? 'kg' : m.key === 'porcentaje_grasa' ? '%' : 'mm';
+                const reverseMetricData = [...metricData].reverse();
+                
+                return (
+                  <Paper
+                    key={m.key}
+                    p="md"
+                    radius="lg"
+                    withBorder
+                    bg="white"
+                  >
+                    <Group justify="space-between" align="flex-start" mb="xs">
+                      <Box>
+                        <Text size="xs" c="dimmed" tt="uppercase" fw={750}>
+                          {m.label}
+                        </Text>
+                        <Title order={2} mt={4}>
+                          {selected?.[m.key] ?? '-'} <Text span size="sm" fw={500} c="dimmed">{unit}</Text>
+                        </Title>
+                      </Box>
+                      {d && (
+                        <Badge variant="light" color={d.color} size="sm">
+                          {d.val} {unit}
+                        </Badge>
+                      )}
+                    </Group>
 
-          <BentoCard title="Gráfico de evolución" icon={IconChartLine} color="blue" mb={{ base: 'md', sm: 'xl' }}>
-            <Stack gap="md">
-              <Group gap="xs">
-                {METRICAS.map((m) => (
-                  <Button key={m.key} variant={metrica === m.key ? 'filled' : 'light'} color={metrica === m.key ? 'blue' : 'gray'} size="xs" onClick={() => setMetrica(m.key)} radius="xl">
-                    {m.label}
-                  </Button>
-                ))}
-              </Group>
+                    <Stack gap="md">
+                      <Box h={180}>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <ComposedChart data={metricData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                            <defs>
+                              <linearGradient id={`gradient_player_${m.key}`} x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor={m.color} stopOpacity={0.4}/>
+                                <stop offset="95%" stopColor={m.color} stopOpacity={0.05}/>
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
+                            <XAxis
+                              dataKey="fecha"
+                              tick={{ fontSize: 9 }}
+                              tickFormatter={(v) => String(v).slice(5)}
+                              stroke="var(--mantine-color-gray-5)"
+                              axisLine={false}
+                              tickLine={false}
+                            />
+                            <YAxis
+                              tick={{ fontSize: 9 }}
+                              domain={['auto', 'auto']}
+                              stroke="var(--mantine-color-gray-5)"
+                              axisLine={false}
+                              tickLine={false}
+                            />
+                            <Tooltip
+                              labelFormatter={(value) => fechaLabel(value)}
+                              formatter={(value) => [`${value} ${unit}`, m.label]}
+                              labelStyle={{ fontWeight: 700, color: 'var(--mantine-color-dark-4)', fontSize: 10 }}
+                              contentStyle={{ borderRadius: '8px', border: '1px solid var(--mantine-color-gray-2)', padding: '4px 8px', fontSize: 10 }}
+                            />
+                            <Bar
+                              dataKey={m.key}
+                              fill={`url(#gradient_player_${m.key})`}
+                              radius={[4, 4, 0, 0]}
+                              maxBarSize={32}
+                            />
+                            <Line
+                              type="monotone"
+                              dataKey={m.key}
+                              stroke={m.color}
+                              strokeWidth={2}
+                              dot={{ r: 3.5, fill: 'white', stroke: m.color, strokeWidth: 2 }}
+                              activeDot={{ r: 5, strokeWidth: 0 }}
+                              connectNulls
+                            />
+                          </ComposedChart>
+                        </ResponsiveContainer>
+                      </Box>
 
-              <Box h={300} mt="md">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={sortedAsc} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" />
-                    <XAxis dataKey="fecha" tick={{ fontSize: 11 }} tickFormatter={(v) => String(v).slice(5)} stroke="var(--mantine-color-gray-5)" />
-                    <YAxis tick={{ fontSize: 11 }} domain={['auto', 'auto']} stroke="var(--mantine-color-gray-5)" />
-                    <Tooltip labelStyle={{ fontWeight: 700, color: 'var(--mantine-color-dark-4)' }} contentStyle={{ borderRadius: '8px', border: '1px solid var(--mantine-color-gray-3)' }} />
-                    <Line type="monotone" dataKey={metrica} stroke={metricaActual.color} strokeWidth={3} dot={{ r: 4, fill: metricaActual.color, strokeWidth: 2, stroke: 'white' }} activeDot={{ r: 6, strokeWidth: 0 }} connectNulls />
-                  </LineChart>
-                </ResponsiveContainer>
+                      <ScrollArea h={120} offsetScrollbars>
+                        <Table verticalSpacing={4} striped highlightOnHover style={{ minWidth: 150 }}>
+                          <Table.Thead bg="gray.0">
+                            <Table.Tr>
+                              <Table.Th style={{ fontSize: 10, padding: '4px 8px' }}>Fecha</Table.Th>
+                              <Table.Th style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right' }}>Valor</Table.Th>
+                            </Table.Tr>
+                          </Table.Thead>
+                          <Table.Tbody>
+                            {reverseMetricData.map((row) => (
+                              <Table.Tr key={row.fecha}>
+                                <Table.Td style={{ fontSize: 10, padding: '4px 8px' }}>
+                                  {row.fecha ? new Date(`${row.fecha}T00:00:00`).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '-'}
+                                </Table.Td>
+                                <Table.Td style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right', fontWeight: 650 }}>
+                                  {row[m.key]} {unit}
+                                </Table.Td>
+                              </Table.Tr>
+                            ))}
+                          </Table.Tbody>
+                        </Table>
+                      </ScrollArea>
+                    </Stack>
+                  </Paper>
+                );
+              })}
+            </SimpleGrid>
+
+            <BentoCard title="Detalle de mediciones" icon={IconRuler2} color="gray">
+              <Box style={{ overflowX: 'auto' }}>
+                <Table variant="simple" verticalSpacing="sm">
+                  <Table.Tbody>
+                    <Table.Tr><Table.Th>Fecha</Table.Th><Table.Td>{fechaLabel(selected.fecha)}</Table.Td></Table.Tr>
+                    <Table.Tr><Table.Th>Altura</Table.Th><Table.Td>{selected.altura_cm ?? '-'} cm</Table.Td></Table.Tr>
+                    <Table.Tr><Table.Th>Peso</Table.Th><Table.Td>{selected.peso_kg ?? '-'} kg</Table.Td></Table.Tr>
+                    <Table.Tr><Table.Th>% Grasa</Table.Th><Table.Td>{selected.porcentaje_grasa ?? '-'} %</Table.Td></Table.Tr>
+                    <Table.Tr><Table.Th>Masa magra</Table.Th><Table.Td>{selected.masa_magra_kg ?? '-'} kg</Table.Td></Table.Tr>
+                    <Table.Tr><Table.Th>Σ6 pliegues</Table.Th><Table.Td>{selected.suma_6_pliegues ?? '-'} mm</Table.Td></Table.Tr>
+                    <Table.Tr><Table.Th>Notas</Table.Th><Table.Td>{selected.notas || '-'}</Table.Td></Table.Tr>
+                  </Table.Tbody>
+                </Table>
               </Box>
-            </Stack>
-          </BentoCard>
-
-          <BentoCard title="Detalle de mediciones" icon={IconRuler2} color="gray">
-            <Box style={{ overflowX: 'auto' }}>
-              <Table variant="simple" verticalSpacing="sm">
-                <Table.Tbody>
-                  <Table.Tr><Table.Th>Fecha</Table.Th><Table.Td>{fechaLabel(selected.fecha)}</Table.Td></Table.Tr>
-                  <Table.Tr><Table.Th>Altura</Table.Th><Table.Td>{selected.altura_cm ?? '-'} cm</Table.Td></Table.Tr>
-                  <Table.Tr><Table.Th>Peso</Table.Th><Table.Td>{selected.peso_kg ?? '-'} kg</Table.Td></Table.Tr>
-                  <Table.Tr><Table.Th>% Grasa</Table.Th><Table.Td>{selected.porcentaje_grasa ?? '-'} %</Table.Td></Table.Tr>
-                  <Table.Tr><Table.Th>Masa magra</Table.Th><Table.Td>{selected.masa_magra_kg ?? '-'} kg</Table.Td></Table.Tr>
-                  <Table.Tr><Table.Th>Σ6 pliegues</Table.Th><Table.Td>{selected.suma_6_pliegues ?? '-'} mm</Table.Td></Table.Tr>
-                  <Table.Tr><Table.Th>Notas</Table.Th><Table.Td>{selected.notas || '-'}</Table.Td></Table.Tr>
-                </Table.Tbody>
-              </Table>
-            </Box>
             </BentoCard>
           </Stack>
         ) : (

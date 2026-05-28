@@ -10,18 +10,19 @@ import {
   Group,
   Paper,
   ScrollArea,
-  Select,
   SimpleGrid,
   Stack,
   Table,
   Text,
-  TextInput,
   ThemeIcon,
   Title,
   Tooltip,
 } from '@mantine/core';
+import { DateInput } from '@mantine/dates';
+import { useRouter } from 'next/navigation';
 import {
-  LineChart,
+  ComposedChart,
+  Bar,
   Line,
   XAxis,
   YAxis,
@@ -153,12 +154,11 @@ function buildCsv(rows) {
 }
 
 export default function TeamEvolutionDashboard({ players = [], evolutions = [] }) {
-  const [metricKey, setMetricKey] = useState('peso_kg');
+  const router = useRouter();
   const [position, setPosition] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
-  const metric = METRICS.find((item) => item.key === metricKey) || METRICS[0];
   const positionOptions = useMemo(() => {
     const values = Array.from(new Set(players.map((player) => player.posicion).filter(Boolean))).sort();
     return [{ value: '', label: 'Todas' }, ...values.map((value) => ({ value, label: value }))];
@@ -181,10 +181,6 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
 
   const chartData = useMemo(() => aggregateByDate(rows), [rows]);
   const latestRows = rows.filter((row) => row.latest);
-  const latestValues = latestRows
-    .map((row) => Number(row.latest?.[metric.key]))
-    .filter(Number.isFinite);
-  const average = latestValues.length ? number(latestValues.reduce((sum, value) => sum + value, 0) / latestValues.length) : null;
   const measuredPct = scopedPlayers.length ? Math.round((latestRows.length / scopedPlayers.length) * 100) : 0;
   const totalRecords = rows.reduce((sum, row) => sum + row.records.length, 0);
   const lastDate = chartData.at(-1)?.fecha;
@@ -248,48 +244,29 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
 
           <Paper p={6} radius="xl" shadow="xs" withBorder bg="white" w="100%">
             <Group gap={8} w="100%" wrap="wrap" align="center">
-              <Select
-                placeholder="Métrica"
-                leftSection={<IconScale size={16} style={{ opacity: 0.7 }} />}
-                data={METRICS.map((item) => ({ value: item.key, label: item.label }))}
-                value={metricKey}
-                onChange={(value) => value && setMetricKey(value)}
+              <DateInput
+                placeholder="Fecha de inicio"
+                leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+                value={dateFrom ? new Date(`${dateFrom}T00:00:00`) : null}
+                onChange={(value) => setDateFrom(value ? value.toISOString().split('T')[0] : '')}
                 variant="filled"
                 radius="xl"
                 size="sm"
-                allowDeselect={false}
-                style={{ flex: 1, minWidth: 180 }}
-              />
-              <Select
-                placeholder="Posición"
-                leftSection={<IconUsers size={16} style={{ opacity: 0.7 }} />}
-                data={positionOptions}
-                value={position}
-                onChange={(value) => setPosition(value || '')}
-                variant="filled"
-                radius="xl"
-                size="sm"
-                allowDeselect={false}
+                valueFormat="DD/MM/YYYY"
+                clearable
                 style={{ flex: 1, minWidth: 160 }}
               />
-              <TextInput
-                type="date"
-                value={dateFrom}
-                onChange={(event) => setDateFrom(event.currentTarget.value)}
+              <DateInput
+                placeholder="Fecha de fin"
                 leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+                value={dateTo ? new Date(`${dateTo}T00:00:00`) : null}
+                onChange={(value) => setDateTo(value ? value.toISOString().split('T')[0] : '')}
                 variant="filled"
                 radius="xl"
                 size="sm"
-                style={{ flex: 1, minWidth: 150 }}
-              />
-              <TextInput
-                type="date"
-                value={dateTo}
-                onChange={(event) => setDateTo(event.currentTarget.value)}
-                variant="filled"
-                radius="xl"
-                size="sm"
-                style={{ flex: 1, minWidth: 150 }}
+                valueFormat="DD/MM/YYYY"
+                clearable
+                style={{ flex: 1, minWidth: 160 }}
               />
             </Group>
           </Paper>
@@ -298,9 +275,9 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
 
       <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md">
         <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-          <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Media actual</Text>
-          <Title order={2} c="dark.4" mt={4}>{average === null ? '-' : `${average} ${metric.unit}`}</Title>
-          <Text size="xs" c="dimmed">{metric.label}</Text>
+          <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Plantilla total</Text>
+          <Title order={2} c="dark.4" mt={4}>{scopedPlayers.length}</Title>
+          <Text size="xs" c="dimmed">jugadores activos</Text>
         </Paper>
         <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
           <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Jugadores medidos</Text>
@@ -320,40 +297,107 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
       </SimpleGrid>
 
       {chartData.length > 0 ? (
-        <Paper p={{ base: 'md', sm: 'lg' }} radius="lg" withBorder shadow="sm" bg="white">
-          <Group justify="space-between" align="flex-start" gap="sm" mb="md">
-            <Box>
-              <Title order={3} fw={800} c="dark.4">Tendencia media</Title>
-              <Text size="sm" c="dimmed">Media del equipo por fecha de medición.</Text>
-            </Box>
-            <Badge color="blue" variant="light" radius="sm">{metric.label}</Badge>
-          </Group>
+        <SimpleGrid cols={{ base: 1, md: 1, lg: 2 }} spacing="lg">
+          {METRICS.map((item) => {
+            const latestValuesForMetric = latestRows
+              .map((row) => Number(row.latest?.[item.key]))
+              .filter(Number.isFinite);
+            const avg = latestValuesForMetric.length
+              ? number(latestValuesForMetric.reduce((sum, value) => sum + value, 0) / latestValuesForMetric.length)
+              : null;
+            const metricData = chartData.filter(d => d[item.key] !== null);
+            const reverseMetricData = [...metricData].reverse();
 
-          <Box h={330}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
-                <XAxis dataKey="fecha" tick={{ fontSize: 11 }} tickFormatter={(value) => String(value).slice(5)} stroke="var(--mantine-color-gray-5)" axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11 }} domain={['auto', 'auto']} stroke="var(--mantine-color-gray-5)" axisLine={false} tickLine={false} />
-                <ChartTooltip
-                  labelFormatter={(value) => formatDate(value)}
-                  formatter={(value) => [`${value} ${metric.unit}`, metric.label]}
-                  labelStyle={{ fontWeight: 700, color: 'var(--mantine-color-dark-4)' }}
-                  contentStyle={{ borderRadius: '12px', border: '1px solid var(--mantine-color-gray-2)' }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey={metric.key}
-                  stroke={metric.color}
-                  strokeWidth={3}
-                  dot={{ r: 4, fill: metric.color, strokeWidth: 2, stroke: 'white' }}
-                  activeDot={{ r: 6, strokeWidth: 0 }}
-                  connectNulls
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </Box>
-        </Paper>
+            return (
+              <Paper key={item.key} p="md" radius="lg" withBorder bg="white">
+                <Group justify="space-between" align="flex-start" gap="sm" mb="md">
+                  <Box>
+                    <Title order={4} fw={800} c="dark.4">{item.label}</Title>
+                    <Text size="xs" c="dimmed">Tendencia media del equipo</Text>
+                  </Box>
+                  <Badge color={item.goodDown === true ? 'red' : item.goodDown === false ? 'green' : 'blue'} variant="light" radius="sm">
+                    Media: {avg === null ? '-' : `${avg} ${item.unit}`}
+                  </Badge>
+                </Group>
+
+                <Stack gap="md">
+                  <Box h={200}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={metricData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id={`gradient_${item.key}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={item.color} stopOpacity={0.4}/>
+                            <stop offset="95%" stopColor={item.color} stopOpacity={0.05}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
+                        <XAxis
+                          dataKey="fecha"
+                          tick={{ fontSize: 9 }}
+                          tickFormatter={(value) => String(value).slice(5)}
+                          stroke="var(--mantine-color-gray-5)"
+                          axisLine={false}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          tick={{ fontSize: 9 }}
+                          domain={['auto', 'auto']}
+                          stroke="var(--mantine-color-gray-5)"
+                          axisLine={false}
+                          tickLine={false}
+                        />
+                        <ChartTooltip
+                          labelFormatter={(value) => formatDate(value)}
+                          formatter={(value) => [`${value} ${item.unit}`, item.label]}
+                          labelStyle={{ fontWeight: 700, color: 'var(--mantine-color-dark-4)', fontSize: 10 }}
+                          contentStyle={{ borderRadius: '12px', border: '1px solid var(--mantine-color-gray-2)', padding: '6px 10px', fontSize: 10 }}
+                        />
+                        <Bar
+                          dataKey={item.key}
+                          fill={`url(#gradient_${item.key})`}
+                          radius={[4, 4, 0, 0]}
+                          maxBarSize={32}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey={item.key}
+                          stroke={item.color}
+                          strokeWidth={2}
+                          dot={{ r: 3.5, fill: 'white', stroke: item.color, strokeWidth: 2 }}
+                          activeDot={{ r: 5, strokeWidth: 0 }}
+                          connectNulls
+                        />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </Box>
+
+                  <ScrollArea h={120} offsetScrollbars>
+                    <Table verticalSpacing={4} striped highlightOnHover style={{ minWidth: 150 }}>
+                      <Table.Thead bg="gray.0">
+                        <Table.Tr>
+                          <Table.Th style={{ fontSize: 10, padding: '4px 8px' }}>Fecha</Table.Th>
+                          <Table.Th style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right' }}>Media</Table.Th>
+                        </Table.Tr>
+                      </Table.Thead>
+                      <Table.Tbody>
+                        {reverseMetricData.map((row) => (
+                          <Table.Tr key={row.fecha}>
+                            <Table.Td style={{ fontSize: 10, padding: '4px 8px' }}>
+                              {formatDate(row.fecha)}
+                            </Table.Td>
+                            <Table.Td style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right', fontWeight: 650 }}>
+                              {row[item.key]} {item.unit}
+                            </Table.Td>
+                          </Table.Tr>
+                        ))}
+                      </Table.Tbody>
+                    </Table>
+                  </ScrollArea>
+                </Stack>
+              </Paper>
+            );
+          })}
+        </SimpleGrid>
       ) : (
         <NothingFound
           withPaper
@@ -372,7 +416,6 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                   <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
                   <Table.Th>Última medición</Table.Th>
                   {METRICS.map((item) => <Table.Th key={item.key}>{item.label}</Table.Th>)}
-                  <Table.Th>Delta {metric.label}</Table.Th>
                   <Table.Th>Registros</Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -380,28 +423,42 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                 {rows.map((row) => {
                   const latest = row.latest || {};
                   const previous = row.previous || {};
-                  const delta = latest[metric.key] != null && previous[metric.key] != null
-                    ? number(Number(latest[metric.key]) - Number(previous[metric.key]))
-                    : null;
                   return (
-                    <Table.Tr key={row.id}>
+                    <Table.Tr
+                      key={row.id}
+                      onClick={() => router.push(`/dashboard/jugador/${row.id}/metricas/mediciones`)}
+                      style={{ cursor: 'pointer' }}
+                    >
                       <Table.Td style={{ paddingLeft: 24 }}>
                         <Text fz="sm" fw={650} c="dark.4">{row.nombre} {row.apellidos}</Text>
                         <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
                       </Table.Td>
                       <Table.Td>{formatDate(latest.fecha)}</Table.Td>
-                      {METRICS.map((item) => (
-                        <Table.Td key={item.key}>{metricDisplay(latest[item.key], item.unit)}</Table.Td>
-                      ))}
-                      <Table.Td>
-                        {delta === null ? (
-                          <Text size="sm" c="dimmed">-</Text>
-                        ) : (
-                          <Badge color={deltaColor(delta, metric)} variant="light" radius="sm">
-                            {delta > 0 ? '+' : ''}{delta} {metric.unit}
-                          </Badge>
-                        )}
-                      </Table.Td>
+                      {METRICS.map((item) => {
+                        const val = latest[item.key];
+                        const prevVal = previous[item.key];
+                        const delta = val != null && prevVal != null ? number(Number(val) - Number(prevVal)) : null;
+                        return (
+                          <Table.Td key={item.key}>
+                            <Group gap={6} wrap="nowrap">
+                              <Text fz="sm" fw={600} c="dark.4">
+                                {metricDisplay(val, item.unit)}
+                              </Text>
+                              {delta !== null && delta !== 0 && (
+                                <Badge
+                                  color={deltaColor(delta, item)}
+                                  variant="light"
+                                  size="xs"
+                                  radius="sm"
+                                  style={{ padding: '0 4px', height: 16 }}
+                                >
+                                  {delta > 0 ? `+${delta}` : delta}
+                                </Badge>
+                              )}
+                            </Group>
+                          </Table.Td>
+                        );
+                      })}
                       <Table.Td>{row.records.length}</Table.Td>
                     </Table.Tr>
                   );
