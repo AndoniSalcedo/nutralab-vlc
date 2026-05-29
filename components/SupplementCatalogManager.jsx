@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActionIcon,
   Badge,
   Button,
   Divider,
   Group,
+  Modal,
   LoadingOverlay,
   Paper,
   ScrollArea,
@@ -17,7 +18,6 @@ import {
   Text,
   Textarea,
   TextInput,
-  ThemeIcon,
   Tooltip,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -67,10 +67,14 @@ export default function SupplementCatalogManager({ players = [], team }) {
   const [editingSupplementId, setEditingSupplementId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Inline confirmation system (replaces window.confirm which is incompatible with Mantine Modal)
+  const [confirmAction, setConfirmAction] = useState(null); // { message, onConfirm }
+
+
   const filteredSupplements = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return data.suplementos;
-    return data.suplementos.filter((supp) => 
+    return data.suplementos.filter((supp) =>
       (supp.nombre || '').toLowerCase().includes(query) ||
       (supp.categoria || '').toLowerCase().includes(query)
     );
@@ -168,19 +172,21 @@ export default function SupplementCatalogManager({ players = [], team }) {
     }
   }
 
-  async function deleteSupplement(id, name) {
-    const ok = window.confirm(`¿Estás seguro de que deseas eliminar "${name}" del catálogo global? Se eliminará de todas las asignaciones.`);
-    if (!ok) return;
-
-    const result = await postCatalog(
-      { action: 'delete_supplement', id: Number(id) },
-      'El suplemento se ha eliminado del catálogo global.'
-    );
-    if (result) {
-      if (Number(editingSupplementId) === Number(id)) {
-        handleCancelEdit();
-      }
-    }
+  function deleteSupplement(id, name) {
+    setConfirmAction({
+      message: `¿Estás seguro de que deseas eliminar "${name}" del catálogo global? Se eliminará de todas las asignaciones.`,
+      onConfirm: async () => {
+        const result = await postCatalog(
+          { action: 'delete_supplement', id: Number(id) },
+          'El suplemento se ha eliminado del catálogo global.'
+        );
+        if (result) {
+          if (Number(editingSupplementId) === Number(id)) {
+            handleCancelEdit();
+          }
+        }
+      },
+    });
   }
 
   async function createList() {
@@ -218,19 +224,21 @@ export default function SupplementCatalogManager({ players = [], team }) {
     );
   }
 
-  async function assignAll() {
+  function assignAll() {
     if (!selectedListId) {
       notifications.show({ color: 'orange', title: 'Selecciona un catálogo', message: 'Elige un catálogo antes de asignar.' });
       return;
     }
 
-    const ok = window.confirm(`¿Asignar "${selectedList?.nombre}" a ${players.length} jugadores?`);
-    if (!ok) return;
-
-    await postCatalog(
-      { action: 'assign_all', lista_id: Number(selectedListId), team_id: team?.id },
-      `Catálogo asignado a ${players.length} jugadores.`
-    );
+    setConfirmAction({
+      message: `¿Asignar "${selectedList?.nombre}" a ${players.length} jugadores?`,
+      onConfirm: async () => {
+        await postCatalog(
+          { action: 'assign_all', lista_id: Number(selectedListId), team_id: team?.id },
+          `Catálogo asignado a ${players.length} jugadores.`
+        );
+      },
+    });
   }
 
   return (
@@ -370,7 +378,7 @@ export default function SupplementCatalogManager({ players = [], team }) {
                 radius="md"
                 variant="filled"
               />
-              
+
               {filteredSupplements.length ? (
                 <ScrollArea h={380}>
                   <Stack gap="xs">
@@ -425,9 +433,9 @@ export default function SupplementCatalogManager({ players = [], team }) {
             </BentoCard>
 
             {/* Right Column: Create / Edit Form */}
-            <BentoCard 
-              title={editingSupplementId ? `Editar: ${supplementForm.nombre || 'Suplemento'}` : "Crear suplemento"} 
-              icon={editingSupplementId ? IconPencil : IconCirclePlus} 
+            <BentoCard
+              title={editingSupplementId ? `Editar: ${supplementForm.nombre || 'Suplemento'}` : "Crear suplemento"}
+              icon={editingSupplementId ? IconPencil : IconCirclePlus}
               color="teal"
             >
               <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
@@ -512,6 +520,43 @@ export default function SupplementCatalogManager({ players = [], team }) {
           </SimpleGrid>
         </Tabs.Panel>
       </Tabs>
+
+      {/* Inline confirmation modal (replaces window.confirm) */}
+      <Modal
+        opened={!!confirmAction}
+        onClose={() => setConfirmAction(null)}
+        title="Confirmar acción"
+        size="sm"
+        centered
+        zIndex={1000}
+        withCloseButton={false}
+      >
+        <Stack gap="md">
+          <Text size="sm">{confirmAction?.message}</Text>
+          <Group justify="flex-end" gap="xs">
+            <Button
+              variant="default"
+              size="xs"
+              radius="xl"
+              onClick={() => setConfirmAction(null)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              color="red"
+              size="xs"
+              radius="xl"
+              loading={saving}
+              onClick={async () => {
+                await confirmAction?.onConfirm?.();
+                setConfirmAction(null);
+              }}
+            >
+              Confirmar
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Stack>
   );
 }

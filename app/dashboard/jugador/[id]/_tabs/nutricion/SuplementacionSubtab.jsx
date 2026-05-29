@@ -25,66 +25,16 @@ import {
 import { notifications } from '@mantine/notifications';
 import {
   IconAlertCircle,
-  IconActivity,
   IconBottle,
-  IconBolt,
   IconCalendarStats,
   IconCirclePlus,
-  IconHeartbeat,
-  IconMoonStars,
   IconPill,
-  IconRun,
-  IconShieldCheck,
   IconSparkles,
   IconTrash,
 } from '@tabler/icons-react';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/Bento/BentoItem';
 
-const GUIDE_SECTIONS = [
-  {
-    title: 'Base del día a día',
-    color: 'teal',
-    icon: IconShieldCheck,
-    items: ['creatina', 'omega-3', 'vitamina-d', 'magnesio', 'turmeric', 'ashwagandha'],
-  },
-  {
-    title: 'Entrenamiento',
-    color: 'blue',
-    icon: IconBolt,
-    items: ['cafeina', 'beta-alanina', 'nitratos', 'taurina'],
-  },
-  {
-    title: 'Matchday',
-    color: 'orange',
-    icon: IconRun,
-    items: ['carbohidratos-intra', 'sodio-electrolitos', 'mentol'],
-  },
-  {
-    title: 'Post partido',
-    color: 'grape',
-    icon: IconActivity,
-    items: ['proteina-whey', 'caseina', 'tart-cherry', 'doms'],
-  },
-  {
-    title: 'Lesiones y RTP',
-    color: 'red',
-    icon: IconHeartbeat,
-    items: ['colageno-vit-c', 'creatina', 'omega-3', 'turmeric', 'hmb'],
-  },
-  {
-    title: 'Sueño, viajes y estrés',
-    color: 'indigo',
-    icon: IconMoonStars,
-    items: ['melatonina', 'stack-nocturno'],
-  },
-  {
-    title: 'Clubes top',
-    color: 'cyan',
-    icon: IconSparkles,
-    items: ['creatina', 'cafeina', 'sodio-electrolitos', 'proteina-whey', 'omega-3', 'vitamina-d', 'nitratos', 'taurina', 'turmeric', 'colageno-vit-c', 'tart-cherry', 'ashwagandha'],
-  },
-];
 
 function byId(items) {
   return new Map((items || []).map((item) => [Number(item.id), item]));
@@ -189,7 +139,7 @@ function AssignedProtocol({ items, peso, onDelete, canManage }) {
             <Stack gap={2}>
               <Text fw={800}>Sin suplementos asignados</Text>
               <Text size="sm" c="dimmed">
-                Asigna una lista mensual o añade suplementos extra para generar el protocolo.
+                Asigna un catálogo o añade suplementos extra para generar el protocolo.
               </Text>
             </Stack>
           </Group>
@@ -199,59 +149,13 @@ function AssignedProtocol({ items, peso, onDelete, canManage }) {
   );
 }
 
-function GuideSupplementRow({ suplemento, compact = false }) {
-  if (!suplemento) return null;
 
-  return (
-    <Paper p="xs" radius="md" bg={compact ? 'white' : 'gray.0'} withBorder>
-      <Stack gap={3}>
-        <Group justify="space-between" gap="xs" wrap="nowrap" align="flex-start">
-          <Text size="sm" fw={900} c="dark.5">{suplemento.nombre}</Text>
-          <Badge color="gray" variant="light" radius="sm" size="xs">{suplemento.categoria || 'Base'}</Badge>
-        </Group>
-        <Text size="xs" fw={800} c="teal.8">{suplemento.dose_text || suplemento.pauta || 'Según pauta'}</Text>
-        <Text size="xs" c="dimmed" lineClamp={2}>{suplemento.timing || 'Timing individual'} · {suplemento.descripcion || suplemento.notas || 'Personalizar según contexto.'}</Text>
-      </Stack>
-    </Paper>
-  );
-}
-
-function SupplementGuide({ supplementBySlug, value, onChange }) {
-  const active = GUIDE_SECTIONS.find((section) => section.title === value) || GUIDE_SECTIONS[0];
-
-  return (
-    <BentoCard title="Guía de referencia" icon={active.icon} color={active.color}>
-      <Group justify="space-between" align="flex-end" wrap="wrap">
-        <Stack gap={2}>
-          <Text fw={900} c="dark.5">{active.title}</Text>
-          <Text size="xs" c="dimmed">Consulta por contexto sin mezclarlo con el protocolo asignado.</Text>
-        </Stack>
-        <Badge color={active.color} variant="light" radius="sm">Fútbol élite</Badge>
-      </Group>
-
-      <Select
-        value={value}
-        onChange={(next) => onChange(next || GUIDE_SECTIONS[0].title)}
-        data={GUIDE_SECTIONS.map((section) => ({ value: section.title, label: section.title }))}
-        variant="filled"
-        radius="md"
-        allowDeselect={false}
-      />
-
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
-        {active.items.map((slug) => (
-          <GuideSupplementRow key={`${active.title}-${slug}`} suplemento={supplementBySlug.get(slug)} compact />
-        ))}
-      </SimpleGrid>
-    </BentoCard>
-  );
-}
 
 function buildProtocol(jugador, lista, items, peso) {
   const title = `SUPLEMENTACION - ${jugador.nombre || ''} ${jugador.apellidos || ''}`.trim();
   const lines = [
     title,
-    lista ? `Lista activa: ${lista.nombre}` : 'Lista activa: sin asignar',
+    lista ? `Catálogo activo: ${lista.nombre}` : 'Catálogo activo: sin asignar',
     peso ? `Peso usado para dosis: ${peso} kg` : 'Peso usado para dosis: pendiente de registrar',
     '',
   ];
@@ -279,7 +183,6 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
   const [saving, setSaving] = useState(false);
   const [modalOpened, setModalOpened] = useState(false);
   const [modalMode, setModalMode] = useState('lista');
-  const [guideSection, setGuideSection] = useState(GUIDE_SECTIONS[0].title);
   const [data, setData] = useState({
     suplementos: [],
     listas: [],
@@ -296,7 +199,6 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
   });
 
   const supplementMap = useMemo(() => byId(data.suplementos), [data.suplementos]);
-  const supplementBySlug = useMemo(() => new Map((data.suplementos || []).map((item) => [item.slug, item])), [data.suplementos]);
   const listMap = useMemo(() => byId(data.listas), [data.listas]);
   const activeList = data.asignacion?.lista_id ? listMap.get(Number(data.asignacion.lista_id)) : null;
 
@@ -416,7 +318,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
   async function handleListChange(value) {
     const ok = await postSupplementation(
       { action: 'set_list', lista_id: value ? Number(value) : null },
-      'La lista mensual se ha asignado correctamente.'
+      'El catálogo se ha asignado correctamente.'
     );
     if (ok) closeModal();
   }
@@ -471,14 +373,14 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
           {modalMode === 'lista' ? (
             <Stack gap="md">
               <Stack gap={3}>
-                <Text size="sm" fw={900}>Catálogo mensual</Text>
+                <Text size="sm" fw={900}>Catálogo</Text>
                 <Text size="xs" c="dimmed">
-                  Selecciona la lista mensual que generará la suplementación base del jugador.
+                  Selecciona el catálogo que generará la suplementación base del jugador.
                 </Text>
               </Stack>
               <Select
-                label="Lista"
-                placeholder="Selecciona una lista mensual"
+                label="Catálogo"
+                placeholder="Selecciona un catálogo"
                 data={data.listas.map((lista) => ({ value: String(lista.id), label: lista.nombre }))}
                 value={data.asignacion?.lista_id ? String(data.asignacion.lista_id) : null}
                 onChange={handleListChange}
@@ -491,7 +393,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
               <Stack gap={3}>
                 <Text size="sm" fw={900}>Suplemento adicional</Text>
                 <Text size="xs" c="dimmed">
-                  Añade un suplemento fuera del catálogo mensual o personaliza dosis, timing y notas.
+                  Añade un suplemento fuera del catálogo o personaliza dosis, timing y notas.
                 </Text>
               </Stack>
 
@@ -554,7 +456,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
               <Stack gap={2}>
                 <Title order={3} fw={800} c="dark.4">Suplementación</Title>
                 <Text size="sm" c="dimmed">
-                  Asignación mensual, extras y guía completa de suplementación.
+                  Asignación de catálogo, extras y suplementación.
                 </Text>
               </Stack>
             </Group>
@@ -621,26 +523,21 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
             </Alert>
           )}
 
-          <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md" verticalSpacing="md">
+          <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md" verticalSpacing="md" style={{ alignItems: 'start' }}>
             <AssignedProtocol
               items={assignedItems}
               peso={peso}
               canManage={canManage}
               onDelete={handleDeleteExtra}
             />
-            <SupplementGuide
-              supplementBySlug={supplementBySlug}
-              value={guideSection}
-              onChange={setGuideSection}
+            <EditableSection
+              key={jugador.notas_suplementacion || protocolText}
+              title="Notas libres de suplementación"
+              defaultValue={jugador.notas_suplementacion || protocolText}
+              onSave={(value) => saveField('notas_suplementacion', value)}
+              readOnly={readOnly}
             />
           </SimpleGrid>
-          <EditableSection
-            key={jugador.notas_suplementacion || protocolText}
-            title="Notas libres de suplementación"
-            defaultValue={jugador.notas_suplementacion || protocolText}
-            onSave={(value) => saveField('notas_suplementacion', value)}
-            readOnly={readOnly}
-          />
         </Stack>
       </Box>
     </Stack>

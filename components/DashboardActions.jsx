@@ -88,7 +88,15 @@ export default function DashboardActions({ players = [], team }) {
         <MessageComposer players={players} team={team} onSent={closeModal} />
       </Modal>
 
-      <Modal opened={openedModal === 'supplementation'} onClose={closeModal} title="Gestión de suplementación" size="xl">
+      <Modal
+        opened={openedModal === 'supplementation'}
+        onClose={closeModal}
+        title="Gestión de suplementación"
+        size="xl"
+        closeOnClickOutside={false}
+        closeOnEscape={false}
+        trapFocus={false}
+      >
         <SupplementCatalogManager players={players} team={team} />
       </Modal>
     </>
