@@ -18,8 +18,10 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconBrain, IconCheck, IconEdit, IconFileAi, IconPlus, IconSparkles } from '@tabler/icons-react';
+import { IconBrain, IconCheck, IconEdit, IconFileAi, IconPlus, IconSparkles, IconArrowsLeftRight } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
+import IntercambiosModal from './IntercambiosModal';
+
 
 const CONTEXTOS = [
   { value: 'semana_normal', label: 'Semana normal de entrenamiento' },
@@ -41,6 +43,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [planes, setPlanes] = useState([]);
   const [currentId, setCurrentId] = useState(null);
   const [mode, setMode] = useState('view');
+  const [intercambiosOpened, setIntercambiosOpened] = useState(false);
+
   const [nombre, setNombre] = useState('');
   const [contexto, setContexto] = useState('semana_normal');
   const [contextoAdicional, setContextoAdicional] = useState('');
@@ -284,16 +288,28 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                 </Stack>
               </Group>
             </Box>
-            {!readOnly && (
-              <Group gap="xs">
-                <Button size="xs" radius="xl" variant="light" leftSection={<IconEdit size={16} />} onClick={startEdit} disabled={!currentPlan || mode !== 'view'}>
-                  Editar actual
-                </Button>
-                <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={startCreate}>
-                  Crear plan
-                </Button>
-              </Group>
-            )}
+            <Group gap="xs">
+              <Button
+                size="xs"
+                radius="xl"
+                color="dark"
+                leftSection={<IconArrowsLeftRight size={16} />}
+                onClick={() => setIntercambiosOpened(true)}
+              >
+                Intercambios
+              </Button>
+              {!readOnly && (
+                <>
+                  <Button size="xs" radius="xl" variant="light" leftSection={<IconEdit size={16} />} onClick={startEdit} disabled={!currentPlan || mode !== 'view'}>
+                    Editar actual
+                  </Button>
+                  <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={startCreate}>
+                    Crear plan
+                  </Button>
+                </>
+              )}
+            </Group>
+
           </Group>
 
           {perfilResumen.length > 0 && (
@@ -441,7 +457,10 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         )}
       </Box>
 
+      <IntercambiosModal opened={intercambiosOpened} onClose={() => setIntercambiosOpened(false)} />
+
       <style>{`
+
         .plan-md h1 { font-size: 24px; font-weight: 800; color: var(--mantine-color-dark-4); margin: 0 0 12px; letter-spacing: -0.5px; }
         .plan-md h2 { font-size: 14px; font-weight: 700; color: var(--mantine-color-blue-filled); text-transform: uppercase; letter-spacing: 1px; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--mantine-color-blue-light); }
         .plan-md h3 { font-size: 16px; font-weight: 600; color: var(--mantine-color-dark-4); margin: 20px 0 10px; }
