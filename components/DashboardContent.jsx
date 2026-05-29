@@ -79,7 +79,15 @@ function DashboardStat({ title, icon: Icon, color = 'blue', value, description, 
 }
 
 function defaultReportForm() {
+  const today = new Date();
+  const monday = new Date(today);
+  const day = today.getDay();
+  const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+  monday.setDate(diff);
+  const weekStr = monday.toISOString().split('T')[0];
+
   return {
+    semana: weekStr,
     title: 'Semana 10-17 Mayo',
     subtitle: 'Plan nutricional · 3 partidos en 8 dias',
     team: 'Valencia CF · Primer Equipo',
@@ -104,7 +112,12 @@ function defaultReportForm() {
 
 function filenameFromResponse(response, fallback) {
   const header = response.headers.get('Content-Disposition') || '';
-  const match = header.match(/filename="([^"]+)"/);
+  const encodedMatch = header.match(/filename\*=UTF-8''([^;]+)/i);
+  if (encodedMatch?.[1]) {
+    return decodeURIComponent(encodedMatch[1]);
+  }
+
+  const match = header.match(/filename="?([^";]+)"?/i);
   return match?.[1] || fallback;
 }
 
@@ -547,6 +560,12 @@ export default function DashboardContent({ players = [], team }) {
       >
         <Stack gap="md">
           <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+            <TextInput
+              type="date"
+              label="Fecha de la semana (Lunes)"
+              value={reportForm.semana}
+              onChange={(event) => updateReportField('semana', event.currentTarget.value)}
+            />
             <TextInput
               label="Rango / titulo de semana"
               value={reportForm.title}

@@ -14,11 +14,6 @@ const DEFAULT_SUBTABS = {
 };
 
 const VALID_TABS = Object.keys(DEFAULT_SUBTABS);
-const VALID_SUBTABS = {
-  general: ['perfil', 'mensajes'],
-  metricas: ['mediciones', 'analiticas', 'hidratacion', 'protocolos'],
-  nutricion: ['plan', 'suplementacion', 'menu'],
-};
 
 export default function PlayerTabs({
   jugador,
@@ -27,6 +22,7 @@ export default function PlayerTabs({
   registrosHidratacion = [],
   messages = [],
   menus = [],
+  informes = [],
   activeTab: activeTabProp = 'general',
   activeSubtab: activeSubtabProp,
   readOnly = false,
@@ -87,6 +83,7 @@ export default function PlayerTabs({
             jugador={jugador}
             evoluciones={evoluciones}
             messages={messages}
+            informes={informes}
             activeSubtab={activeTab === 'general' ? activeSubtab : DEFAULT_SUBTABS.general}
             onSubtabChange={(value) => navigate('general', value)}
             readOnly={readOnly}
