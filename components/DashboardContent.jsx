@@ -418,7 +418,7 @@ export default function DashboardContent({ players = [], team }) {
                     <Table.Tr
                       h={75}
                       key={player.id}
-                      onClick={() => router.push(`/dashboard/jugador/${player.id}/metricas/mediciones`)}
+                      onClick={() => router.push(`/dashboard/jugador/${player.id}`)}
                       style={{ cursor: 'pointer' }}
                     >
                       {/* COLUMNA 1: JUGADOR */}
