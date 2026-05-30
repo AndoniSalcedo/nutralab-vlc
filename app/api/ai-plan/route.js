@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
+import { buildBasePlanData, mergeAiPlanData, planDataToLegacyContent, sanitizePlanData } from '@/lib/nutrition-plan-card';
 
 const client = new Anthropic();
 
@@ -16,97 +17,123 @@ const CONTEXTOS = {
   pretemporada: 'pretemporada (alta carga de trabajo)',
 };
 
-async function generarContenidoPlan({ jugador, contexto, contextoAdicional }) {
-  const supabase = getSupabaseAdmin();
-  const { data: menuData } = await supabase
-      .from('menu_semanal')
-      .select('*')
-      .order('semana', { ascending: false })
-      .limit(1)
-      .single();
+function maxTokens() {
+  const parsed = Number(process.env.AI_PLAN_MAX_TOKENS);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.round(parsed) : 8192;
+}
 
-  let menuTexto = 'No hay menu semanal cargado en la ciudad deportiva.';
-  if (menuData?.dias && menuData.dias.length > 0) {
-    menuTexto = 'MENU CIUDAD DEPORTIVA (semana del ' + menuData.semana + '):\n';
-    menuData.dias.forEach((dia) => {
-      menuTexto += '\n' + dia.dia.toUpperCase() + ':\n';
-      if (dia.comida) {
-        menuTexto += '  Comida: ';
-        const c = [dia.comida.primero, dia.comida.segundo, dia.comida.postre].filter(Boolean);
-        menuTexto += c.join(' + ') + '\n';
-      }
-      if (dia.cena) {
-        menuTexto += '  Cena: ';
-        const c = [dia.cena.primero, dia.cena.segundo, dia.cena.postre].filter(Boolean);
-        menuTexto += c.join(' + ') + '\n';
-      }
-    });
+function extractJson(text) {
+  const value = String(text || '').replace(/```json|```/g, '').trim();
+  const start = value.indexOf('{');
+  const end = value.lastIndexOf('}');
+  if (start === -1 || end === -1 || end <= start) {
+    throw new Error('La IA no devolvió un JSON válido');
   }
+  return JSON.parse(value.slice(start, end + 1));
+}
 
-  const kcal = jugador.kcal_objetivo || Math.round(500 + 22 * (jugador.masa_magra_kg || 70));
-  const proteina = jugador.proteina_objetivo_g || Math.round((jugador.masa_magra_kg || 70) * 1.8);
-  const cho = jugador.cho_objetivo_g || Math.round((jugador.peso_kg || 80) * 5);
-  const grasa = jugador.grasa_objetivo_g || Math.round((kcal - proteina * 4 - cho * 4) / 9);
-  const ingestas = jugador.num_comidas || '5 ingestas';
+async function latestMenu(supabase) {
+  const { data } = await supabase
+    .from('menu_semanal')
+    .select('*')
+    .order('semana', { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
-  const restricciones = [
-    jugador.alergias ? 'ALERGIAS - OBLIGATORIO EVITAR: ' + jugador.alergias : null,
-    jugador.intolerancias ? 'INTOLERANCIAS - OBLIGATORIO EVITAR: ' + jugador.intolerancias : null,
-    jugador.aversiones ? 'AVERSIONES (no incluir): ' + jugador.aversiones : null,
-  ].filter(Boolean).join('\n');
+  return data || null;
+}
 
-  const prompt = [
+function menuToPrompt(menu) {
+  if (!menu?.dias?.length) return 'No hay menú semanal cargado en la ciudad deportiva.';
+
+  return menu.dias.map((dia) => {
+    const comida = dia.comida
+      ? [dia.comida.primero, dia.comida.segundo, dia.comida.postre].filter(Boolean).join(' + ')
+      : 'Sin comida';
+    const cena = dia.cena
+      ? [dia.cena.primero, dia.cena.segundo, dia.cena.postre].filter(Boolean).join(' + ')
+      : 'Sin cena';
+
+    return `${dia.dia}: comida (${comida}); cena (${cena})`;
+  }).join('\n');
+}
+
+function restrictionsToPrompt(jugador) {
+  return [
+    jugador.alergias ? `Alergias obligatorias a evitar: ${jugador.alergias}` : null,
+    jugador.intolerancias ? `Intolerancias obligatorias a evitar: ${jugador.intolerancias}` : null,
+    jugador.aversiones ? `Aversiones a evitar: ${jugador.aversiones}` : null,
+  ].filter(Boolean).join('\n') || 'Sin restricciones registradas.';
+}
+
+function buildPrompt({ jugador, contexto, contextoAdicional, menu, baseData, retry = false }) {
+  return [
     'Eres Carlos Ferrando, nutricionista del Valencia CF.',
-    'Genera un plan nutricional PERSONALIZADO y detallado.',
-    'IMPORTANTE: Dirígete al jugador siempre en 2ª persona del singular ("tú"). Háblale directamente con cercanía y profesionalidad.',
-    'Ejemplo de tono: "He preparado este plan para ti porque el míster me ha comentado que vas a jugar más minutos..."',
+    'Completa una ficha nutricional breve. Devuelve SOLO JSON válido, sin Markdown ni texto alrededor.',
+    retry ? 'Respuesta anterior inválida o incompleta. Hazla más corta y estrictamente JSON.' : '',
     '',
-    '## DATOS DEL JUGADOR',
-    'Nombre: ' + jugador.nombre + ' ' + jugador.apellidos,
-    'Posicion: ' + (jugador.posicion || 'No especificada'),
-    'Peso: ' + (jugador.peso_kg || '?') + ' kg | Masa magra: ' + (jugador.masa_magra_kg || '?') + ' kg | % Grasa: ' + (jugador.porcentaje_grasa || '?') + '%',
+    'Formato exacto:',
+    '{"tiposDia":{"entreno":{"ingestas":[{"nombre":"Desayuno","detalle":"..."},{"nombre":"Batido post","detalle":"..."},{"nombre":"Comida","detalle":"..."},{"nombre":"Merienda","detalle":"..."},{"nombre":"Cena","detalle":"..."}]},"descanso":{"ingestas":[{"nombre":"Desayuno","detalle":"..."},{"nombre":"Media mañana","detalle":"..."},{"nombre":"Comida","detalle":"..."},{"nombre":"Merienda","detalle":"..."},{"nombre":"Cena","detalle":"..."}]},"partido":{"ingestas":[{"nombre":"Desayuno","detalle":"..."},{"nombre":"Comida pre","detalle":"..."},{"nombre":"-60 min","detalle":"..."},{"nombre":"Durante","detalle":"..."},{"nombre":"Post","detalle":"..."}]}},"notas":["...","...","...","..."]}',
     '',
-    '## OBJETIVOS NUTRICIONALES',
-    'Kcal: ' + kcal + ' kcal/dia',
-    'Proteina: ' + proteina + ' g | CHO: ' + cho + ' g | Grasa: ' + grasa + ' g',
-    'Agua: ' + (jugador.agua_objetivo_ml || Math.round((jugador.peso_kg || 80) * 40)) + ' ml/dia',
+    'Reglas:',
+    '- Cada detalle debe ser una frase corta con cantidades aproximadas.',
+    '- Comida y cena deben usar como base el menú de ciudad deportiva cuando exista.',
+    '- Evita estrictamente alergias, intolerancias y aversiones.',
+    '- No cambies nombres de tipos de día.',
+    '- No incluyas explicación larga.',
     '',
-    '## DISTRIBUCION DE INGESTAS',
-    ingestas,
-    '(Respeta exactamente este esquema de ingestas, horarios y nombres que indica Carlos)',
+    'Jugador:',
+    `Nombre: ${jugador.nombre || ''} ${jugador.apellidos || ''}`,
+    `Posición: ${jugador.posicion || 'No especificada'}`,
+    `Peso: ${jugador.peso_kg || '?'} kg | Grasa: ${jugador.porcentaje_grasa || '?'}% | Masa magra: ${jugador.masa_magra_kg || '?'} kg`,
+    `Objetivo: ${jugador.objetivo || 'Rendimiento deportivo óptimo'}`,
+    `Gustos/preferencias: ${jugador.gustos_preferencias || 'No especificados'}`,
+    `Contexto clínico: ${jugador.contexto_clinico || 'Sin particularidades'}`,
+    restrictionsToPrompt(jugador),
     '',
-    '## PERFIL PERSONAL',
-    'Objetivo: ' + (jugador.objetivo || 'Rendimiento deportivo optimo'),
-    'Gustos: ' + (jugador.gustos_preferencias || 'No especificados'),
-    restricciones ? restricciones : '',
-    'Contexto clinico: ' + (jugador.contexto_clinico || 'Sin particularidades'),
+    `Contexto actual: ${CONTEXTOS[contexto] || contexto || 'semana normal'}`,
+    contextoAdicional ? `Contexto adicional: ${contextoAdicional}` : '',
     '',
-    '## MENU CIUDAD DEPORTIVA (base para comida y cena)',
-    menuTexto,
+    'Menú ciudad deportiva:',
+    menuToPrompt(menu),
     '',
-    '## INSTRUCCIONES',
-    'Contexto actual: ' + (CONTEXTOS[contexto] || contexto),
-    contextoAdicional ? 'Contexto adicional de Carlos (MÚY IMPORTANTE, inclúyelo en tu justificación inicial): ' + contextoAdicional : '',
-    '',
-    'IMPORTANTE:',
-    '- Inicia el plan con un pequeño párrafo de justificación en 2ª persona ("tú") explicando al jugador por qué le has ajustado el plan así (basándote en el contexto actual y el contexto adicional si lo hay).',
-    '- Para COMIDA y CENA: usa como base el menu de la ciudad deportiva. Puedes complementar o ajustar porciones segun los objetivos del jugador pero respeta los platos disponibles.',
-    '- Para el RESTO de ingestas (desayuno, media manana, merienda, etc.): propones tu libremente segun el perfil y objetivos del jugador.',
-    '- Respeta el esquema de ingestas exacto que ha definido Carlos (numero, nombre y horarios).',
-    '- OBLIGATORIO: evita siempre los alimentos con alergia e intolerancia.',
-    '- Incluye cantidades en gramos para los alimentos principales.',
-    '- Genera el plan para 5 dias (Lunes a Viernes).',
-    '- Al final, incluye 3-4 recomendaciones especificas para su contexto, también en 2ª persona.',
-    '- Formato: usa Markdown con titulos, tablas y listas claras.',
-  ].filter(s => s !== undefined).join('\n');
+    'Macros ya calculados por la app, no los cambies:',
+    JSON.stringify(baseData.tiposDia),
+  ].filter(Boolean).join('\n');
+}
 
+async function requestAiJson(prompt) {
   const message = await client.messages.create({
     model: 'claude-opus-4-5',
-    max_tokens: 3000,
+    max_tokens: maxTokens(),
     messages: [{ role: 'user', content: prompt }],
   });
 
-  return message.content[0].type === 'text' ? message.content[0].text : '';
+  const text = message.content.find((item) => item.type === 'text')?.text || '';
+  if (message.stop_reason === 'max_tokens') {
+    throw new Error('La generación se cortó por límite de tokens');
+  }
+
+  return extractJson(text);
+}
+
+async function generarDatosPlan({ jugador, nombre, contexto, contextoAdicional }) {
+  const supabase = getSupabaseAdmin();
+  const menu = await latestMenu(supabase);
+  const baseData = buildBasePlanData({ jugador, nombre, contexto, contextoAdicional, menu });
+
+  try {
+    const aiData = await requestAiJson(buildPrompt({ jugador, contexto, contextoAdicional, menu, baseData }));
+    return mergeAiPlanData(baseData, aiData);
+  } catch (firstError) {
+    try {
+      const aiData = await requestAiJson(buildPrompt({ jugador, contexto, contextoAdicional, menu, baseData, retry: true }));
+      return mergeAiPlanData(baseData, aiData);
+    } catch (secondError) {
+      console.warn('AI plan JSON fallback:', firstError.message, secondError.message);
+      return baseData;
+    }
+  }
 }
 
 export async function GET(req) {
@@ -126,7 +153,7 @@ export async function GET(req) {
 
     const { data, error } = await supabase
       .from('planes_ia')
-      .select('id,jugador_id,nombre,contexto,contexto_adicional,contenido,created_at,updated_at')
+      .select('id,jugador_id,nombre,contexto,contexto_adicional,contenido,datos,created_at,updated_at')
       .eq('jugador_id', jugadorId)
       .order('updated_at', { ascending: false });
 
@@ -139,7 +166,7 @@ export async function GET(req) {
 
 export async function POST(req) {
   try {
-    const { jugador, nombre, contexto, contextoAdicional, contenido, draftOnly = false } = await req.json();
+    const { jugador, nombre, contexto, contextoAdicional, contenido, datos, draftOnly = false } = await req.json();
     const planNombre = String(nombre || '').trim();
     if (!jugador?.id) return NextResponse.json({ error: 'Falta jugador' }, { status: 400 });
     if (!planNombre) return NextResponse.json({ error: 'El nombre del plan es obligatorio' }, { status: 400 });
@@ -150,14 +177,15 @@ export async function POST(req) {
     const ownedPlayer = await getOwnedPlayer(supabase, user, jugador.id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
-    const generatedContent = draftOnly || contenido === undefined
-      ? await generarContenidoPlan({ jugador, contexto, contextoAdicional })
-      : String(contenido || '');
+    const generatedDatos = draftOnly || (!datos && contenido === undefined)
+      ? await generarDatosPlan({ jugador, nombre: planNombre, contexto, contextoAdicional })
+      : sanitizePlanData(datos);
 
     if (draftOnly) {
-      return NextResponse.json({ contenido: generatedContent });
+      return NextResponse.json({ datos: generatedDatos });
     }
 
+    const finalContenido = generatedDatos ? planDataToLegacyContent(generatedDatos) : String(contenido || '');
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('planes_ia')
@@ -166,7 +194,8 @@ export async function POST(req) {
         nombre: planNombre,
         contexto,
         contexto_adicional: contextoAdicional || '',
-        contenido: generatedContent,
+        contenido: finalContenido,
+        datos: generatedDatos,
         created_at: now,
         updated_at: now,
       })
@@ -182,7 +211,7 @@ export async function POST(req) {
 
 export async function PATCH(req) {
   try {
-    const { id, nombre, contenido, contexto, contextoAdicional } = await req.json();
+    const { id, nombre, contenido, datos, contexto, contextoAdicional } = await req.json();
     if (!id) return NextResponse.json({ error: 'Falta id del plan' }, { status: 400 });
     const planNombre = String(nombre || '').trim();
     if (!planNombre) return NextResponse.json({ error: 'El nombre del plan es obligatorio' }, { status: 400 });
@@ -201,11 +230,15 @@ export async function PATCH(req) {
     const ownedPlayer = await getOwnedPlayer(supabase, user, currentPlan.jugador_id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
+    const sanitizedDatos = sanitizePlanData(datos);
+    const finalContenido = sanitizedDatos ? planDataToLegacyContent(sanitizedDatos) : String(contenido || '');
+
     const { data, error } = await supabase
       .from('planes_ia')
       .update({
         nombre: planNombre,
-        contenido: contenido || '',
+        contenido: finalContenido,
+        datos: sanitizedDatos,
         contexto,
         contexto_adicional: contextoAdicional || '',
         updated_at: new Date().toISOString(),
