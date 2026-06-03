@@ -37,7 +37,7 @@ function DashboardStat({ title, icon: Icon, color = 'blue', value, description, 
         font: 'inherit',
         height: '100%',
         minHeight: 62,
-        borderRadius: 14,
+        borderRadius: 'var(--mantine-radius-xl)',
         background: 'rgba(248,249,245,0.82)',
         border: '1px solid rgba(222,226,230,0.9)',
         transition: 'border-color 120ms ease, transform 120ms ease',
@@ -621,6 +621,7 @@ export default function DashboardContent({ players = [], team }) {
             </Text>
             <Button
               leftSection={<IconDownload size={16} />}
+              radius="xl"
               loading={generatingReport}
               onClick={generateReport}
             >

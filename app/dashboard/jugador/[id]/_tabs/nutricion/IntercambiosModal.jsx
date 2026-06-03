@@ -234,7 +234,7 @@ export default function IntercambiosModal({ opened, onClose }) {
           <Button
             variant={showCalculator ? 'light' : 'default'}
             color="dark"
-            radius="md"
+            radius="xl"
             leftSection={<IconCalculator size={16} />}
             onClick={() => {
               setShowCalculator(!showCalculator);
@@ -264,6 +264,7 @@ export default function IntercambiosModal({ opened, onClose }) {
                     variant="subtle"
                     size="xs"
                     color="red"
+                    radius="xl"
                     leftSection={<IconRefresh size={12} />}
                     onClick={resetCalculator}
                     compact="true"

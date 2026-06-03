@@ -1,6 +1,6 @@
 'use client';
 
-import { createTheme, MantineProvider, Modal } from '@mantine/core';
+import { ActionIcon, createTheme, MantineProvider, Modal } from '@mantine/core';
 
 const nutralabColor = [
   '#f5f6ef',
@@ -17,6 +17,11 @@ const nutralabColor = [
 
 const theme = createTheme({
   components: {
+    ActionIcon: ActionIcon.extend({
+      defaultProps: {
+        radius: 'xl',
+      },
+    }),
     Modal: Modal.extend({
       defaultProps: {
         lockScroll: false,

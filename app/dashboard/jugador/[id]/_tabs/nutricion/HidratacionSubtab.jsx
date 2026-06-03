@@ -606,7 +606,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
                                 <ActionIcon
                                   color="blue"
                                   variant="subtle"
-                                  radius="md"
+                                  radius="xl"
                                   onClick={() => startEditRecord(row)}
                                 >
                                   <IconEdit size={14} />
@@ -614,7 +614,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
                                 <ActionIcon
                                   color="red"
                                   variant="subtle"
-                                  radius="md"
+                                  radius="xl"
                                   onClick={() => handleDelete(row.id)}
                                   loading={deletingId === row.id}
                                 >

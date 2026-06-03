@@ -6,7 +6,7 @@
 .user {
   color: light-dark(var(--mantine-color-black), var(--mantine-color-dark-0));
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
-  border-radius: var(--mantine-radius-sm);
+  border-radius: var(--mantine-radius-xl);
   transition: background-color 100ms ease;
 
   &:hover {

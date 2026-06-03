@@ -601,6 +601,7 @@ export default function MenuSemanal({ menusIniciales, isSubtab = false, readOnly
                       <Button
                         {...props}
                         loading={uploading}
+                        radius="xl"
                         leftSection={<IconUpload size={12} />}
                         color="blue"
                         radius="xl"

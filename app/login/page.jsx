@@ -204,7 +204,7 @@ export default function LoginPage() {
                       mt="sm"
                       type="submit"
                       size="md"
-                      radius="md"
+                      radius="xl"
                       loading={loading}
                       color="nutralabColor.8"
                       rightSection={<IconArrowRight size={18} />}
