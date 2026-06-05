@@ -5,16 +5,26 @@ import { forbidden, getOwnedPlayer } from '@/lib/team-access';
 
 function parseCsvDate(dateStr) {
   if (!dateStr) return null;
-  const cleaned = String(dateStr).trim();
-  
-  // Try to parse directly
-  const d = new Date(cleaned);
-  if (!isNaN(d.getTime())) {
-    return d.toISOString().split('T')[0];
+  const cleaned = String(dateStr).replace(/^\uFEFF/, '').trim();
+  if (!cleaned) return null;
+
+  const isoMatch = cleaned.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s].*)?$/);
+  if (isoMatch) {
+    return buildDate(isoMatch[1], isoMatch[2], isoMatch[3]);
   }
-  
+
+  const numericMatch = cleaned.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/);
+  if (numericMatch) {
+    const first = Number(numericMatch[1]);
+    const second = Number(numericMatch[2]);
+    const year = normalizeYear(numericMatch[3]);
+    if (first > 12) return buildDate(year, second, first);
+    if (second > 12) return buildDate(year, first, second);
+    return buildDate(year, second, first);
+  }
+
   // Try split parts: e.g. "22 May 2026" or "22 de Mayo de 2026" or "22-May-2026"
-  const cleanedSplit = cleaned.replace(/de/gi, '').replace(/[-/]/g, ' ');
+  const cleanedSplit = cleaned.replace(/\bde\b/gi, '').replace(/[-/]/g, ' ');
   const parts = cleanedSplit.split(/\s+/).filter(Boolean);
   if (parts.length === 3) {
     const day = parseInt(parts[0], 10);
@@ -31,10 +41,59 @@ function parseCsvDate(dateStr) {
     const prefix = monthStr.slice(0, 3);
     let month = months[prefix] || months[monthStr];
     if (month && !isNaN(day) && !isNaN(year)) {
-      return `${year}-${month}-${String(day).padStart(2, '0')}`;
+      return buildDate(year, month, day);
     }
   }
+
+  const d = new Date(cleaned);
+  if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
+
   return null;
+}
+
+function normalizeYear(year) {
+  const parsed = Number(year);
+  if (String(year).length === 2) return parsed >= 70 ? 1900 + parsed : 2000 + parsed;
+  return parsed;
+}
+
+function buildDate(year, month, day) {
+  const y = Number(year);
+  const m = Number(month);
+  const d = Number(day);
+  if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) return null;
+  if (y < 1900 || y > 2100 || m < 1 || m > 12 || d < 1 || d > 31) return null;
+  const date = new Date(Date.UTC(y, m - 1, d));
+  if (date.getUTCFullYear() !== y || date.getUTCMonth() !== m - 1 || date.getUTCDate() !== d) return null;
+  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+}
+
+function normalizeKey(key) {
+  return String(key || '')
+    .replace(/^\uFEFF/, '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function parseCsvNumber(value) {
+  if (value === null || value === undefined || String(value).trim() === '') return null;
+  const cleaned = String(value).trim().replace(/\s/g, '');
+  const lastComma = cleaned.lastIndexOf(',');
+  const lastDot = cleaned.lastIndexOf('.');
+  let normalized = cleaned;
+
+  if (lastComma > -1 && lastDot > -1) {
+    normalized = lastComma > lastDot
+      ? cleaned.replace(/\./g, '').replace(',', '.')
+      : cleaned.replace(/,/g, '');
+  } else if (lastComma > -1) {
+    normalized = cleaned.replace(',', '.');
+  }
+
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 export async function POST(req) {
@@ -53,35 +112,46 @@ export async function POST(req) {
 
     if (Array.isArray(data)) {
       // Bulk CSV Import
-      const recordsToUpsert = [];
+      const recordsByDate = new Map();
+      let skippedRows = 0;
+      let duplicateDateRows = 0;
       
       for (const row of data) {
-        // We match CSV columns: Date, Time, Type, Value, Unit, Status, Notes, Questionaire
+        // We match CSV columns: Date, Time, Type, Value, Unit, Status, Notes, Questionnaire
         // Map keys ignoring case and whitespace
         const getVal = (keys) => {
+          const normalizedKeys = keys.map(normalizeKey);
           for (const k of keys) {
-            const foundKey = Object.keys(row).find(rk => rk.toLowerCase().trim() === k.toLowerCase().trim());
+            const foundKey = Object.keys(row).find(rk => normalizeKey(rk) === normalizeKey(k));
             if (foundKey) return row[foundKey];
           }
+          const foundKey = Object.keys(row).find(rk => normalizedKeys.includes(normalizeKey(rk)));
+          if (foundKey) return row[foundKey];
           return null;
         };
 
-        const rawDate = getVal(['Date', 'fecha']);
-        if (!rawDate) continue;
+        const rawDate = getVal(['Date', 'fecha', 'dia', 'measurement date']);
+        if (!rawDate) {
+          skippedRows += 1;
+          continue;
+        }
 
         const parsedDate = parseCsvDate(rawDate);
-        if (!parsedDate) continue;
+        if (!parsedDate) {
+          skippedRows += 1;
+          continue;
+        }
 
         const time = getVal(['Time', 'hora']) || '';
         const type = getVal(['Type', 'tipo']) || '';
-        const rawValue = getVal(['Value', 'valor']);
-        const value = rawValue !== null && rawValue !== undefined ? parseFloat(String(rawValue).replace(',', '.')) : null;
+        const rawValue = getVal(['Value', 'valor', 'sosm', 'osmolarity', 'osmolaridad']);
+        const value = parseCsvNumber(rawValue);
         const unit = getVal(['Unit', 'unidad']) || '';
         const status = getVal(['Status', 'estado']) || '';
         const notes = getVal(['Notes', 'notas']) || '';
-        const questionnaire = getVal(['Questionaire', 'cuestionario']) || '';
+        const questionnaire = getVal(['Questionaire', 'Questionnaire', 'cuestionario']) || '';
 
-        recordsToUpsert.push({
+        const record = {
           jugador_id: Number(jugador_id),
           fecha: parsedDate,
           hora: String(time).trim(),
@@ -91,8 +161,13 @@ export async function POST(req) {
           estado: String(status).trim(),
           notas: String(notes).trim(),
           cuestionario: String(questionnaire).trim()
-        });
+        };
+
+        if (recordsByDate.has(parsedDate)) duplicateDateRows += 1;
+        recordsByDate.set(parsedDate, record);
       }
+
+      const recordsToUpsert = Array.from(recordsByDate.values());
 
       if (recordsToUpsert.length === 0) {
         return NextResponse.json({ error: 'No se encontraron registros válidos para importar. Revisa el formato y las fechas.' }, { status: 400 });
@@ -105,7 +180,12 @@ export async function POST(req) {
 
       if (error) throw error;
 
-      return NextResponse.json({ success: true, count: recordsToUpsert.length });
+      return NextResponse.json({
+        success: true,
+        count: recordsToUpsert.length,
+        skippedRows,
+        duplicateDateRows
+      });
     } else {
       // Single Upsert
       const { fecha, hora, tipo, valor, unidad, estado, notas, cuestionario } = body;
@@ -118,7 +198,7 @@ export async function POST(req) {
           fecha,
           hora,
           tipo,
-          valor: valor !== null && valor !== undefined ? parseFloat(valor) : null,
+          valor: parseCsvNumber(valor),
           unidad,
           estado,
           notas,

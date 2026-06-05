@@ -72,6 +72,21 @@ function getStatusConfig(statusStr) {
   return STATUS_CONFIGS['unknown'];
 }
 
+function normalizeCsvKey(key) {
+  return String(key || '')
+    .replace(/^\uFEFF/, '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function getCsvVal(row, keys) {
+  const normalizedKeys = keys.map(normalizeCsvKey);
+  const foundKey = Object.keys(row).find((key) => normalizedKeys.includes(normalizeCsvKey(key)));
+  return foundKey ? row[foundKey] : '';
+}
+
 export default function HidratacionSubtab({ jugador, registrosHidratacion = [], readOnly = false }) {
   const jugadorId = jugador.id;
   const peso = Number(jugador.peso_kg || 0);
@@ -219,8 +234,65 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       const text = e.target?.result;
       if (!text) return;
 
-      const lines = text.split(/\r?\n/);
-      if (lines.length < 2) {
+      const cleanText = String(text).replace(/^\uFEFF/, '');
+      const detectDelimiter = (sample) => {
+        let commas = 0;
+        let semicolons = 0;
+        let insideQuotes = false;
+        for (let j = 0; j < sample.length; j++) {
+          const char = sample[j];
+          const next = sample[j + 1];
+          if (char === '"' && insideQuotes && next === '"') {
+            j += 1;
+          } else if (char === '"') {
+            insideQuotes = !insideQuotes;
+          } else if (!insideQuotes && char === ',') {
+            commas += 1;
+          } else if (!insideQuotes && char === ';') {
+            semicolons += 1;
+          }
+        }
+        return semicolons > commas ? ';' : ',';
+      };
+
+      const delimiter = detectDelimiter(cleanText.slice(0, 2000));
+
+      const parseCSV = (csvText) => {
+        const rows = [];
+        let row = [];
+        let currentVal = '';
+        let insideQuotes = false;
+
+        for (let j = 0; j < csvText.length; j++) {
+          const char = csvText[j];
+          const next = csvText[j + 1];
+
+          if (char === '"' && insideQuotes && next === '"') {
+            currentVal += '"';
+            j += 1;
+          } else if (char === '"') {
+            insideQuotes = !insideQuotes;
+          } else if (char === delimiter && !insideQuotes) {
+            row.push(currentVal.trim());
+            currentVal = '';
+          } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+            if (char === '\r' && next === '\n') j += 1;
+            row.push(currentVal.trim());
+            if (row.some((value) => value !== '')) rows.push(row);
+            row = [];
+            currentVal = '';
+          } else {
+            currentVal += char;
+          }
+        }
+
+        row.push(currentVal.trim());
+        if (row.some((value) => value !== '')) rows.push(row);
+        return rows;
+      };
+
+      const rows = parseCSV(cleanText);
+      if (rows.length < 2) {
         notifications.show({
           color: 'red',
           title: 'Error de formato',
@@ -229,36 +301,11 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
         return;
       }
 
-      // Robust CSV parser supporting commas inside quoted values
-      const parseCSVLine = (lineStr) => {
-        const values = [];
-        let currentVal = '';
-        let insideQuotes = false;
-        for (let j = 0; j < lineStr.length; j++) {
-          const char = lineStr[j];
-          if (char === '"') {
-            insideQuotes = !insideQuotes;
-          } else if (char === ',' && !insideQuotes) {
-            values.push(currentVal.trim().replace(/^"|"$/g, ''));
-            currentVal = '';
-          } else {
-            currentVal += char;
-          }
-        }
-        values.push(currentVal.trim().replace(/^"|"$/g, ''));
-        return values;
-      };
-
-      const headers = parseCSVLine(lines[0]);
+      const headers = rows[0].map((header) => header.replace(/^\uFEFF/, '').trim());
       const parsedData = [];
 
-      for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
-
-        const values = parseCSVLine(line);
-        if (values.length < headers.length) continue;
-
+      for (let i = 1; i < rows.length; i++) {
+        const values = rows[i];
         const row = {};
         headers.forEach((h, idx) => {
           row[h] = values[idx] !== undefined ? values[idx] : '';
@@ -297,7 +344,11 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       notifications.show({
         color: 'green',
         title: 'Carga Completada',
-        message: `Se importaron/actualizaron con éxito ${result.count} tomas de hidratación.`,
+        message: [
+          `Se importaron/actualizaron con éxito ${result.count} tomas de hidratación.`,
+          result.duplicateDateRows ? `${result.duplicateDateRows} fila(s) repetidas por fecha actualizaron la toma del día.` : '',
+          result.skippedRows ? `${result.skippedRows} fila(s) se omitieron por fecha inválida o ausente.` : ''
+        ].filter(Boolean).join(' '),
         icon: <IconCheck size={18} />
       });
 
@@ -666,13 +717,13 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
               </Table.Thead>
               <Table.Tbody>
                 {previewRows.map((r, i) => {
-                  const rawDate = r['Date'] || r['fecha'];
-                  const rawTime = r['Time'] || r['hora'];
-                  const rawType = r['Type'] || r['tipo'];
-                  const rawVal = r['Value'] || r['valor'];
-                  const rawUnit = r['Unit'] || r['unidad'];
-                  const rawStatus = r['Status'] || r['estado'];
-                  const rawNotes = r['Notes'] || r['notas'];
+                  const rawDate = getCsvVal(r, ['Date', 'fecha', 'dia', 'measurement date']);
+                  const rawTime = getCsvVal(r, ['Time', 'hora']);
+                  const rawType = getCsvVal(r, ['Type', 'tipo']);
+                  const rawVal = getCsvVal(r, ['Value', 'valor', 'sosm', 'osmolarity', 'osmolaridad']);
+                  const rawUnit = getCsvVal(r, ['Unit', 'unidad']);
+                  const rawStatus = getCsvVal(r, ['Status', 'estado']);
+                  const rawNotes = getCsvVal(r, ['Notes', 'notas']);
 
                   const cfg = getStatusConfig(rawStatus);
 
