@@ -273,7 +273,7 @@ function DaySelectorButton({ dayName, isSelected, isHoy, dateStr, onClick }) {
   );
 }
 
-export default function MenuSemanal({ menusIniciales, isSubtab = false, readOnly = false }) {
+export default function MenuSemanal({ menusIniciales, isSubtab = false, readOnly = false, teamId }) {
   const [menus, setMenus] = useState(menusIniciales);
   const [selectedMenu, setSelectedMenu] = useState(menusIniciales[0] || null);
   const [uploading, setUploading] = useState(false);
@@ -509,7 +509,7 @@ export default function MenuSemanal({ menusIniciales, isSubtab = false, readOnly
             <Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
               <Group gap="sm" wrap="nowrap">
                 <Tooltip label="Volver al panel" withArrow>
-                  <ActionIcon component={Anchor} href="/dashboard" variant="light" color="gray" radius="xl" size={42}>
+                  <ActionIcon component={Anchor} href={teamId ? `/dashboard/equipo/${teamId}` : "/dashboard"} variant="light" color="gray" radius="xl" size={42}>
                     <IconArrowLeft size={20} />
                   </ActionIcon>
                 </Tooltip>
@@ -604,7 +604,6 @@ export default function MenuSemanal({ menusIniciales, isSubtab = false, readOnly
                         radius="xl"
                         leftSection={<IconUpload size={12} />}
                         color="blue"
-                        radius="xl"
                         size="xs"
                       >
                         Subir PDF / Imagen

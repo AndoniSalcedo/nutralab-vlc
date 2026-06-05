@@ -3,9 +3,10 @@ import MenuSemanal from '@/components/MenuSemanal';
 
 export const dynamic = 'force-dynamic';
 
-export default async function MenuPage() {
+export default async function MenuPage({ params }) {
   const supabase = getSupabaseAdmin();
   let menus = [];
+  const teamId = params?.teamId;
 
   try {
     const { data, error } = await supabase
@@ -22,6 +23,6 @@ export default async function MenuPage() {
   }
 
   return (
-    <MenuSemanal menusIniciales={menus || []} />
+    <MenuSemanal menusIniciales={menus || []} teamId={teamId} />
   );
 }

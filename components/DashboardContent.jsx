@@ -341,7 +341,7 @@ export default function DashboardContent({ players = [], team }) {
               color="blue"
               value="Ver análisis →"
               description="Tendencias y comparativas"
-              href={team?.id ? `/dashboard/equipo/${team.id}/evolucion` : '/dashboard/evolucion'}
+              href={team?.id ? `/dashboard/equipo/${team.id}/evolucion` : '#'}
             />
             <DashboardStat
               title="Menú esta semana"
@@ -349,7 +349,7 @@ export default function DashboardContent({ players = [], team }) {
               color="teal"
               value="Ver menú →"
               description="Sube foto o PDF del comedor"
-              href="/dashboard/menu"
+              href={team?.id ? `/dashboard/equipo/${team.id}/menu` : '#'}
             />
           </SimpleGrid>
 
