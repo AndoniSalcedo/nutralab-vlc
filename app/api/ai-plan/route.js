@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
 import { buildBasePlanData, mergeAiPlanData, planDataToLegacyContent, sanitizePlanData } from '@/lib/nutrition-plan-card';
+import { withLatestMeasurement } from '@/lib/player-metrics';
 
 const client = new Anthropic();
 
@@ -136,6 +137,17 @@ async function generarDatosPlan({ jugador, nombre, contexto, contextoAdicional }
   }
 }
 
+async function loadPlayerWithLatestMetrics(supabase, jugadorId) {
+  const [{ data: jugador, error: jugadorError }, { data: evoluciones, error: evolucionesError }] = await Promise.all([
+    supabase.from('jugadores').select('*').eq('id', jugadorId).single(),
+    supabase.from('evoluciones').select('*').eq('jugador_id', jugadorId).order('fecha', { ascending: true }),
+  ]);
+
+  if (jugadorError) throw jugadorError;
+  if (evolucionesError) throw evolucionesError;
+  return withLatestMeasurement(jugador, evoluciones || []);
+}
+
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
@@ -176,9 +188,10 @@ export async function POST(req) {
     if (!user || user.role === 'jugador') return forbidden('No autorizado');
     const ownedPlayer = await getOwnedPlayer(supabase, user, jugador.id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+    const jugadorConMetricas = await loadPlayerWithLatestMetrics(supabase, jugador.id);
 
     const generatedDatos = draftOnly || (!datos && contenido === undefined)
-      ? await generarDatosPlan({ jugador, nombre: planNombre, contexto, contextoAdicional })
+      ? await generarDatosPlan({ jugador: jugadorConMetricas, nombre: planNombre, contexto, contextoAdicional })
       : sanitizePlanData(datos);
 
     if (draftOnly) {

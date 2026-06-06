@@ -89,8 +89,6 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   );
   const sortedDesc = useMemo(() => [...sortedAsc].reverse(), [sortedAsc]);
   const selected = sortedAsc.find((e) => String(e.id) === String(currentId)) || sortedAsc[sortedAsc.length - 1] || null;
-  const first = sortedAsc[0];
-  const last = sortedAsc[sortedAsc.length - 1];
 
   function startNew() {
     setModalMode('new');
@@ -112,8 +110,12 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   }
 
   function diff(key) {
-    if (!first || !last || first === last) return null;
-    const d = Number(last[key]) - Number(first[key]);
+    const metricData = sortedAsc.filter((item) => item[key] !== null && item[key] !== undefined && item[key] !== '');
+    if (metricData.length < 2) return null;
+    const firstMetric = metricData[0];
+    const lastMetric = metricData[metricData.length - 1];
+    const d = Number(lastMetric[key]) - Number(firstMetric[key]);
+    if (!Number.isFinite(d)) return null;
     return {
       val: d > 0 ? `+${d.toFixed(1)}` : d.toFixed(1),
       color: d > 0 ? (key === 'masa_magra_kg' ? 'green' : 'red') : (key === 'masa_magra_kg' ? 'red' : 'green'),

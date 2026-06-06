@@ -63,6 +63,13 @@ function metricDisplay(value, unit) {
   return n === null ? '-' : `${n} ${unit}`;
 }
 
+function metricRecord(records = [], key, offset = 0) {
+  return [...records]
+    .filter((record) => record?.fecha && record[key] !== null && record[key] !== undefined && record[key] !== '')
+    .sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)))
+    .at(-(offset + 1)) || null;
+}
+
 function deltaColor(delta, metric) {
   if (!Number.isFinite(delta) || delta === 0 || metric.goodDown === null) return 'gray';
   const improved = metric.goodDown ? delta < 0 : delta > 0;
@@ -78,7 +85,6 @@ function latestByPlayer(players, evolutions) {
       ...player,
       records,
       latest: records.at(-1) || null,
-      previous: records.at(-2) || null,
     };
   });
 }
@@ -135,19 +141,29 @@ function buildCsv(rows) {
   ];
   const body = rows.map((row) => {
     const latest = row.latest || {};
-    const previous = row.previous || {};
+    const metricValues = Object.fromEntries(METRICS.map((metric) => {
+      const latestMetric = metricRecord(row.records, metric.key, 0);
+      const previousMetric = metricRecord(row.records, metric.key, 1);
+      const delta = latestMetric?.[metric.key] != null && previousMetric?.[metric.key] != null
+        ? number(Number(latestMetric[metric.key]) - Number(previousMetric[metric.key]))
+        : '';
+      return [metric.key, {
+        value: latestMetric?.[metric.key] ?? '',
+        delta,
+      }];
+    }));
     return [
       `${row.nombre || ''} ${row.apellidos || ''}`.trim(),
       row.posicion || '',
       latest.fecha || '',
-      latest.peso_kg ?? '',
-      latest.porcentaje_grasa ?? '',
-      latest.masa_magra_kg ?? '',
-      latest.suma_6_pliegues ?? '',
-      latest.peso_kg != null && previous.peso_kg != null ? number(latest.peso_kg - previous.peso_kg) : '',
-      latest.porcentaje_grasa != null && previous.porcentaje_grasa != null ? number(latest.porcentaje_grasa - previous.porcentaje_grasa) : '',
-      latest.masa_magra_kg != null && previous.masa_magra_kg != null ? number(latest.masa_magra_kg - previous.masa_magra_kg) : '',
-      latest.suma_6_pliegues != null && previous.suma_6_pliegues != null ? number(latest.suma_6_pliegues - previous.suma_6_pliegues) : '',
+      metricValues.peso_kg.value,
+      metricValues.porcentaje_grasa.value,
+      metricValues.masa_magra_kg.value,
+      metricValues.suma_6_pliegues.value,
+      metricValues.peso_kg.delta,
+      metricValues.porcentaje_grasa.delta,
+      metricValues.masa_magra_kg.delta,
+      metricValues.suma_6_pliegues.delta,
     ].map((value) => `"${String(value).replaceAll('"', '""')}"`).join(',');
   });
   return [headers.join(','), ...body].join('\n');
@@ -422,7 +438,6 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               <Table.Tbody>
                 {rows.map((row) => {
                   const latest = row.latest || {};
-                  const previous = row.previous || {};
                   return (
                     <Table.Tr
                       key={row.id}
@@ -435,8 +450,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                       </Table.Td>
                       <Table.Td>{formatDate(latest.fecha)}</Table.Td>
                       {METRICS.map((item) => {
-                        const val = latest[item.key];
-                        const prevVal = previous[item.key];
+                        const latestMetric = metricRecord(row.records, item.key, 0);
+                        const previousMetric = metricRecord(row.records, item.key, 1);
+                        const val = latestMetric?.[item.key] ?? null;
+                        const prevVal = previousMetric?.[item.key] ?? null;
                         const delta = val != null && prevVal != null ? number(Number(val) - Number(prevVal)) : null;
                         return (
                           <Table.Td key={item.key}>

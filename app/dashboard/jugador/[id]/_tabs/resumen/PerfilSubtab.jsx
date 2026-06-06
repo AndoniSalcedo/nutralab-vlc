@@ -20,7 +20,7 @@ import { notifications } from '@mantine/notifications';
 import { IconClipboardList, IconTargetArrow, IconUser, IconInfoCircle, IconCalendar, IconDownload } from '@tabler/icons-react';
 import { cunninghamPlan } from '@/lib/calculations';
 import { CampoEditable } from '../editable';
-import { latestEvolution } from '@/lib/player-metrics';
+import { latestMetricValue } from '@/lib/player-metrics';
 
 function filenameFromResponse(response, fallback) {
   const header = response.headers.get('Content-Disposition') || '';
@@ -49,10 +49,6 @@ function StatCard({ label, value, order = 2, subtext }) {
       {subtext && <Text size="xs" c="dimmed" mt={4}>{subtext}</Text>}
     </Paper>
   );
-}
-
-function metricValue(jugador, latest, key) {
-  return latest?.[key] ?? jugador?.[key] ?? null;
 }
 
 function formatWeek(value) {
@@ -119,10 +115,9 @@ export default function PerfilSubtab({ jugador, evoluciones = [], informes = [],
       setDownloading(false);
     }
   }
-  const latest = latestEvolution(evoluciones);
-  const pesoActual = metricValue(jugador, latest, 'peso_kg');
-  const grasaActual = metricValue(jugador, latest, 'porcentaje_grasa');
-  const masaMagraActual = metricValue(jugador, latest, 'masa_magra_kg');
+  const pesoActual = latestMetricValue(evoluciones, 'peso_kg', jugador?.peso_kg);
+  const grasaActual = latestMetricValue(evoluciones, 'porcentaje_grasa', jugador?.porcentaje_grasa);
+  const masaMagraActual = latestMetricValue(evoluciones, 'masa_magra_kg', jugador?.masa_magra_kg);
   const weightKg = Number(pesoActual || 0);
 
   const dayTypes = [
