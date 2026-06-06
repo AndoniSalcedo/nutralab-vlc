@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Dropzone } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
 import {
@@ -9,7 +9,9 @@ import {
   Box,
   Button,
   Group,
+  Loader,
   Paper,
+  Progress,
   ScrollArea,
   Select,
   Stack,
@@ -23,7 +25,9 @@ import {
   IconAlertTriangle,
   IconCheck,
   IconCloudUpload,
+  IconDatabaseImport,
   IconDownload,
+  IconFileSpreadsheet,
   IconRefresh,
   IconUsers,
   IconX,
@@ -72,6 +76,106 @@ function initialDecisions(players) {
   );
 }
 
+const BUSY_STATES = {
+  loading: {
+    color: 'teal',
+    icon: IconFileSpreadsheet,
+    title: 'Analizando Excel',
+    subtitle: 'Leyendo hojas, fechas y mediciones del archivo.',
+    stages: ['Hojas', 'Fechas', 'Duplicados', 'Vista previa'],
+  },
+  importing: {
+    color: 'blue',
+    icon: IconDatabaseImport,
+    title: 'Guardando importación',
+    subtitle: 'Creando jugadores y actualizando mediciones del equipo.',
+    stages: ['Jugadores', 'Mediciones', 'Métricas', 'Dashboard'],
+  },
+};
+
+function BusyImportState({ mode, fileName }) {
+  const config = BUSY_STATES[mode] || BUSY_STATES.loading;
+  const Icon = config.icon;
+  const [progress, setProgress] = useState(14);
+  const [stage, setStage] = useState(0);
+
+  useEffect(() => {
+    setProgress(14);
+    setStage(0);
+
+    const timer = window.setInterval(() => {
+      setProgress((current) => Math.min(94, current + 9));
+      setStage((current) => (current + 1) % config.stages.length);
+    }, 650);
+
+    return () => window.clearInterval(timer);
+  }, [config.stages.length, mode]);
+
+  return (
+    <Paper
+      radius="md"
+      p={{ base: 'md', sm: 'lg' }}
+      withBorder
+      bg="gray.0"
+      style={{
+        overflow: 'hidden',
+        borderStyle: 'dashed',
+        position: 'relative',
+      }}
+    >
+      <Stack gap="md">
+        <Group justify="space-between" align="center" wrap="nowrap">
+          <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
+            <ThemeIcon color={config.color} variant="light" radius="xl" size={46}>
+              <Icon size={22} />
+            </ThemeIcon>
+            <Box style={{ minWidth: 0 }}>
+              <Group gap="xs" wrap="nowrap">
+                <Title order={4} c="dark.7" lh={1.1}>
+                  {config.title}
+                </Title>
+                <Loader color={config.color} size="xs" />
+              </Group>
+              <Text size="xs" c="dimmed" truncate>
+                {fileName || config.subtitle}
+              </Text>
+            </Box>
+          </Group>
+          <Badge color={config.color} variant="light" radius="sm">
+            {Math.round(progress)}%
+          </Badge>
+        </Group>
+
+        <Progress
+          value={progress}
+          color={config.color}
+          radius="xl"
+          size="md"
+          animated
+          striped
+        />
+
+        <Group gap="xs" wrap="wrap">
+          {config.stages.map((label, index) => (
+            <Badge
+              key={label}
+              color={index === stage ? config.color : 'gray'}
+              variant={index === stage ? 'filled' : 'light'}
+              radius="sm"
+            >
+              {label}
+            </Badge>
+          ))}
+        </Group>
+
+        <Text size="sm" c="dimmed">
+          {config.stages[stage]} en curso...
+        </Text>
+      </Stack>
+    </Paper>
+  );
+}
+
 export default function PlayerExcelImporter({ team }) {
   const openRef = useRef(null);
   const theme = useMantineTheme();
@@ -91,6 +195,7 @@ export default function PlayerExcelImporter({ team }) {
   }
 
   async function requestPreview(nextFile) {
+    setFile(nextFile);
     setState('loading');
     setResults(null);
 
@@ -226,7 +331,11 @@ export default function PlayerExcelImporter({ team }) {
           )}
         </Group>
 
-        {state === 'idle' || state === 'loading' || state === 'error' ? (
+        {state === 'loading' ? (
+          <BusyImportState mode="loading" fileName={file?.name} />
+        ) : null}
+
+        {state === 'idle' || state === 'error' ? (
           <Box pos="relative">
             <Dropzone
               openRef={openRef}
@@ -235,13 +344,12 @@ export default function PlayerExcelImporter({ team }) {
               maxSize={30 * 1024 ** 2}
               radius="md"
               activateOnClick={false}
-              disabled={state === 'loading'}
               style={{
                 border: '2px dashed var(--mantine-color-gray-4)',
                 backgroundColor: 'var(--mantine-color-gray-0)',
                 padding: '40px',
                 textAlign: 'center',
-                cursor: state === 'loading' ? 'default' : 'pointer',
+                cursor: 'pointer',
                 transition: 'border-color 150ms ease, background-color 150ms ease',
               }}
             >
@@ -259,13 +367,9 @@ export default function PlayerExcelImporter({ team }) {
                 </Group>
 
                 <Text ta="center" fw={700} fz="lg" mt="xl">
-                  {state === 'loading' ? 'Procesando Excel...' : (
-                    <>
-                      <Dropzone.Accept>¡Suelta el archivo aquí!</Dropzone.Accept>
-                      <Dropzone.Reject>Solo Excel</Dropzone.Reject>
-                      <Dropzone.Idle>Subir Excel (.xls / .xlsx)</Dropzone.Idle>
-                    </>
-                  )}
+                  <Dropzone.Accept>¡Suelta el archivo aquí!</Dropzone.Accept>
+                  <Dropzone.Reject>Solo Excel</Dropzone.Reject>
+                  <Dropzone.Idle>Subir Excel (.xls / .xlsx)</Dropzone.Idle>
                 </Text>
 
                 <Text ta="center" size="sm" c="dimmed" mt={7}>
@@ -279,7 +383,6 @@ export default function PlayerExcelImporter({ team }) {
                 style={{ pointerEvents: 'all', marginTop: 20 }}
                 onClick={() => openRef.current?.()}
                 variant="light"
-                disabled={state === 'loading'}
               >
                 Seleccionar archivo
               </Button>
@@ -380,9 +483,7 @@ export default function PlayerExcelImporter({ team }) {
         ) : null}
 
         {state === 'importing' ? (
-          <Box py="xl" ta="center">
-            <Text c="dimmed" size="sm">Guardando jugadores y mediciones...</Text>
-          </Box>
+          <BusyImportState mode="importing" fileName={file?.name} />
         ) : null}
 
         {state === 'done' && results ? (
