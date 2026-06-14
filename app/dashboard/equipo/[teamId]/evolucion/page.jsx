@@ -38,7 +38,7 @@ export default async function TeamEvolutionPage({ params }) {
     if (playerIds.length) {
       const resEvolutions = await supabase
         .from('evoluciones')
-        .select('id,jugador_id,fecha,peso_kg,porcentaje_grasa,masa_magra_kg,suma_6_pliegues')
+        .select('*')
         .in('jugador_id', playerIds)
         .order('fecha', { ascending: true });
 

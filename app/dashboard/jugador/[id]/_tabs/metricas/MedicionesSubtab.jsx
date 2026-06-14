@@ -27,20 +27,21 @@ import {
   Textarea,
   ThemeIcon,
   Title,
-  Grid,
   ScrollArea,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconCalendarStats, IconChartLine, IconCheck, IconEdit, IconPlus, IconRuler2 } from '@tabler/icons-react';
+import { IconCalendarStats, IconCheck, IconEdit, IconPlus, IconRuler2 } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
 import NothingFound from '@/components/NothingFound/NothingFound';
+import {
+  MEASUREMENT_DETAIL_SECTIONS,
+  TREND_MEASUREMENT_METRICS,
+  formatMetricValue,
+  hasMetricValue,
+  metricValue,
+} from '@/lib/measurement-metrics';
 
-const METRICAS = [
-  { key: 'peso_kg', label: 'Peso (kg)', color: '#3b82f6' },
-  { key: 'porcentaje_grasa', label: '% Grasa', color: '#ef4444' },
-  { key: 'masa_magra_kg', label: 'Masa magra (kg)', color: '#22c55e' },
-  { key: 'suma_6_pliegues', label: 'Suma 6 pliegues (mm)', color: '#f59e0b' },
-];
+const METRICAS = TREND_MEASUREMENT_METRICS;
 
 function emptyForm() {
   return {
@@ -73,6 +74,32 @@ function fechaLabel(fecha) {
     month: 'long',
     year: 'numeric',
   });
+}
+
+function rawMetricEntries(medicion) {
+  const raw = medicion?.metricas_excel;
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return [];
+  return Object.entries(raw)
+    .filter(([, value]) => hasMetricValue(value))
+    .sort(([a], [b]) => a.localeCompare(b, 'es'));
+}
+
+function displayRawValue(value) {
+  if (value === true) return 'Sí';
+  if (value === false) return 'No';
+  if (value instanceof Date) return fechaLabel(value.toISOString().split('T')[0]);
+  if (typeof value === 'object' && value !== null) return JSON.stringify(value);
+  return String(value);
+}
+
+function sourceRows(medicion) {
+  return [
+    ['Fecha', fechaLabel(medicion?.fecha)],
+    ['Hoja Excel', medicion?.fuente_hoja],
+    ['Fila Excel', medicion?.fuente_fila],
+    ['Fecha original Excel', medicion?.fecha_original_excel ? fechaLabel(medicion.fecha_original_excel) : null],
+    ['Fecha corregida', medicion?.fecha_corregida ? 'Sí' : null],
+  ].filter(([, value]) => hasMetricValue(value));
 }
 
 export default function MedicionesSubtab({ jugador, evoluciones: evolucionesIniciales = [], readOnly = false }) {
@@ -109,16 +136,23 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
     setForm((current) => ({ ...current, [field]: value }));
   }
 
-  function diff(key) {
-    const metricData = sortedAsc.filter((item) => item[key] !== null && item[key] !== undefined && item[key] !== '');
+  function diff(metric) {
+    const metricData = sortedAsc
+      .map((item) => ({ ...item, value: metricValue(item, metric) }))
+      .filter((item) => hasMetricValue(item.value));
     if (metricData.length < 2) return null;
     const firstMetric = metricData[0];
     const lastMetric = metricData[metricData.length - 1];
-    const d = Number(lastMetric[key]) - Number(firstMetric[key]);
+    const d = Number(lastMetric.value) - Number(firstMetric.value);
     if (!Number.isFinite(d)) return null;
+    const goodDown = metric.goodDown === true;
+    const goodUp = metric.goodDown === false;
+    const color = d > 0
+      ? (goodDown ? 'red' : goodUp ? 'green' : 'blue')
+      : (goodDown ? 'green' : goodUp ? 'red' : 'blue');
     return {
       val: d > 0 ? `+${d.toFixed(1)}` : d.toFixed(1),
-      color: d > 0 ? (key === 'masa_magra_kg' ? 'green' : 'red') : (key === 'masa_magra_kg' ? 'red' : 'green'),
+      color,
     };
   }
 
@@ -256,9 +290,11 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
           <Stack gap={0}>
             <SimpleGrid cols={{ base: 1, md: 1, lg: 2 }} spacing="lg" mb={{ base: 'md', sm: 'xl' }}>
               {METRICAS.map((m) => {
-                const metricData = sortedAsc.filter((d) => d[m.key] !== null && d[m.key] !== undefined);
-                const d = diff(m.key);
-                const unit = m.key === 'peso_kg' || m.key === 'masa_magra_kg' ? 'kg' : m.key === 'porcentaje_grasa' ? '%' : 'mm';
+                const metricData = sortedAsc
+                  .map((item) => ({ ...item, [m.key]: metricValue(item, m) }))
+                  .filter((d) => hasMetricValue(d[m.key]));
+                const d = diff(m);
+                const unit = m.unit || '';
                 const reverseMetricData = [...metricData].reverse();
                 
                 return (
@@ -275,7 +311,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                           {m.label}
                         </Text>
                         <Title order={2} mt={4}>
-                          {selected?.[m.key] ?? '-'} <Text span size="sm" fw={500} c="dimmed">{unit}</Text>
+                          {formatMetricValue(metricValue(selected, m), unit)}
                         </Title>
                       </Box>
                       {d && (
@@ -364,20 +400,80 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
               })}
             </SimpleGrid>
 
-            <BentoCard title="Detalle de mediciones" icon={IconRuler2} color="gray">
-              <Box style={{ overflowX: 'auto' }}>
-                <Table variant="simple" verticalSpacing="sm">
-                  <Table.Tbody>
-                    <Table.Tr><Table.Th>Fecha</Table.Th><Table.Td>{fechaLabel(selected.fecha)}</Table.Td></Table.Tr>
-                    <Table.Tr><Table.Th>Altura</Table.Th><Table.Td>{selected.altura_cm ?? '-'} cm</Table.Td></Table.Tr>
-                    <Table.Tr><Table.Th>Peso</Table.Th><Table.Td>{selected.peso_kg ?? '-'} kg</Table.Td></Table.Tr>
-                    <Table.Tr><Table.Th>% Grasa</Table.Th><Table.Td>{selected.porcentaje_grasa ?? '-'} %</Table.Td></Table.Tr>
-                    <Table.Tr><Table.Th>Masa magra</Table.Th><Table.Td>{selected.masa_magra_kg ?? '-'} kg</Table.Td></Table.Tr>
-                    <Table.Tr><Table.Th>Σ6 pliegues</Table.Th><Table.Td>{selected.suma_6_pliegues ?? '-'} mm</Table.Td></Table.Tr>
-                    <Table.Tr><Table.Th>Notas</Table.Th><Table.Td>{selected.notas || '-'}</Table.Td></Table.Tr>
-                  </Table.Tbody>
-                </Table>
-              </Box>
+            <BentoCard title="Detalle completo" icon={IconRuler2} color="gray">
+              <Stack gap="lg">
+                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
+                  <Box>
+                    <Text size="xs" c="dimmed" tt="uppercase" fw={800} mb={6}>Origen</Text>
+                    <Table variant="simple" verticalSpacing={5}>
+                      <Table.Tbody>
+                        {sourceRows(selected).map(([label, value]) => (
+                          <Table.Tr key={label}>
+                            <Table.Th style={{ width: '44%' }}>{label}</Table.Th>
+                            <Table.Td>{value}</Table.Td>
+                          </Table.Tr>
+                        ))}
+                        <Table.Tr>
+                          <Table.Th>Notas</Table.Th>
+                          <Table.Td>{selected.notas || '-'}</Table.Td>
+                        </Table.Tr>
+                      </Table.Tbody>
+                    </Table>
+                  </Box>
+
+                  {MEASUREMENT_DETAIL_SECTIONS.map((section) => {
+                    const rows = section.fields
+                      .map((field) => ({ ...field, value: metricValue(selected, field) }))
+                      .filter((field) => hasMetricValue(field.value));
+                    if (!rows.length) return null;
+
+                    return (
+                      <Box key={section.title}>
+                        <Text size="xs" c="dimmed" tt="uppercase" fw={800} mb={6}>{section.title}</Text>
+                        <Table variant="simple" verticalSpacing={5}>
+                          <Table.Tbody>
+                            {rows.map((field) => (
+                              <Table.Tr key={field.key}>
+                                <Table.Th style={{ width: '58%' }}>{field.label}</Table.Th>
+                                <Table.Td ta="right" fw={650}>
+                                  {formatMetricValue(field.value, field.unit)}
+                                </Table.Td>
+                              </Table.Tr>
+                            ))}
+                          </Table.Tbody>
+                        </Table>
+                      </Box>
+                    );
+                  })}
+                </SimpleGrid>
+
+                {rawMetricEntries(selected).length > 0 && (
+                  <Box>
+                    <Group justify="space-between" align="center" mb="xs">
+                      <Text size="xs" c="dimmed" tt="uppercase" fw={800}>Columnas Excel importadas</Text>
+                      <Badge variant="light" color="gray">{rawMetricEntries(selected).length}</Badge>
+                    </Group>
+                    <ScrollArea h={300} offsetScrollbars>
+                      <Table striped highlightOnHover verticalSpacing={5} style={{ minWidth: 620 }}>
+                        <Table.Thead bg="gray.0">
+                          <Table.Tr>
+                            <Table.Th>Campo original</Table.Th>
+                            <Table.Th style={{ textAlign: 'right' }}>Valor</Table.Th>
+                          </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>
+                          {rawMetricEntries(selected).map(([label, value]) => (
+                            <Table.Tr key={label}>
+                              <Table.Td>{label}</Table.Td>
+                              <Table.Td ta="right" fw={650}>{displayRawValue(value)}</Table.Td>
+                            </Table.Tr>
+                          ))}
+                        </Table.Tbody>
+                      </Table>
+                    </ScrollArea>
+                  </Box>
+                )}
+              </Stack>
             </BentoCard>
           </Stack>
         ) : (
