@@ -7,6 +7,11 @@ function clean(value) {
   return String(value || '').trim();
 }
 
+function cleanPlayerIds(value) {
+  if (!Array.isArray(value)) return null;
+  return Array.from(new Set(value.map((item) => clean(item)).filter(Boolean)));
+}
+
 function currentSeason() {
   const now = new Date();
   const year = now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
@@ -80,10 +85,36 @@ export async function POST(request) {
       const teamId = clean(body.team_id);
       const nombre = clean(body.nombre);
       const temporada = clean(body.temporada);
+      const selectedPlayerIds = cleanPlayerIds(body.player_ids);
+      const hasDescripcion = Object.prototype.hasOwnProperty.call(body, 'descripcion');
+      const descripcion = hasDescripcion ? clean(body.descripcion) || null : undefined;
       const sourceTeam = await getOwnedTeam(supabase, user, teamId);
       if (!sourceTeam) return forbidden('No tienes acceso a este equipo');
       if (!temporada) {
         return NextResponse.json({ error: 'La temporada destino es obligatoria' }, { status: 400 });
+      }
+
+      let players = [];
+      if (selectedPlayerIds?.length !== 0) {
+        let playersQuery = supabase
+          .from('jugadores')
+          .select(`id,${PLAYER_COPY_FIELDS.join(',')}`)
+          .eq('equipo_id', sourceTeam.id)
+          .order('nombre');
+
+        if (selectedPlayerIds) {
+          playersQuery = playersQuery.in('id', selectedPlayerIds);
+        }
+
+        const { data, error: playersError } = await playersQuery;
+        if (playersError) throw playersError;
+        players = data || [];
+
+        if (selectedPlayerIds) {
+          const foundIds = new Set(players.map((player) => String(player.id)));
+          const missingIds = selectedPlayerIds.filter((playerId) => !foundIds.has(playerId));
+          if (missingIds.length) return forbidden('Algún jugador seleccionado no pertenece a este equipo');
+        }
       }
 
       const { data: newTeam, error: teamError } = await supabase
@@ -92,22 +123,15 @@ export async function POST(request) {
           owner_id: ownerId,
           nombre: nombre || sourceTeam.nombre,
           temporada,
-          descripcion: sourceTeam.descripcion,
+          descripcion: hasDescripcion ? descripcion : sourceTeam.descripcion,
         })
         .select('*')
         .single();
 
       if (teamError) throw teamError;
 
-      const { data: players, error: playersError } = await supabase
-        .from('jugadores')
-        .select(`id,${PLAYER_COPY_FIELDS.join(',')}`)
-        .eq('equipo_id', sourceTeam.id)
-        .order('nombre');
-
-      if (playersError) throw playersError;
-
       let copiedPlayers = 0;
+      const copiedPlayerSummaries = [];
       for (const player of players || []) {
         const sourcePlayerId = player.id;
         const payload = Object.fromEntries(
@@ -117,11 +141,12 @@ export async function POST(request) {
         const { data: newPlayer, error: playerError } = await supabase
           .from('jugadores')
           .insert({ ...payload, equipo_id: newTeam.id })
-          .select('id')
+          .select('id,nombre,apellidos,posicion')
           .single();
 
         if (playerError) throw playerError;
         copiedPlayers++;
+        copiedPlayerSummaries.push(newPlayer);
 
         const { data: evolutions, error: evolutionsError } = await supabase
           .from('evoluciones')
@@ -144,7 +169,7 @@ export async function POST(request) {
         }
       }
 
-      return NextResponse.json({ equipo: newTeam, copiedPlayers });
+      return NextResponse.json({ equipo: newTeam, copiedPlayers, players: copiedPlayerSummaries });
     }
 
     return NextResponse.json({ error: 'Acción no soportada' }, { status: 400 });

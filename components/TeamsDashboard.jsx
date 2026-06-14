@@ -6,13 +6,17 @@ import {
   Badge,
   Box,
   Button,
+  Checkbox,
+  Divider,
   Group,
   Menu,
   Modal,
   Paper,
+  ScrollArea,
   Select,
   SimpleGrid,
   Stack,
+  Switch,
   Text,
   TextInput,
   ThemeIcon,
@@ -37,6 +41,14 @@ function nextSeasonLabel() {
   return `${year}/${String(year + 1).slice(-2)}`;
 }
 
+function playerName(player) {
+  return `${player?.nombre || ''} ${player?.apellidos || ''}`.trim() || 'Jugador sin nombre';
+}
+
+function playerCountLabel(count) {
+  return `${count} jugador${Number(count) === 1 ? '' : 'es'}`;
+}
+
 export default function TeamsDashboard({ teams = [] }) {
   const router = useRouter();
   const [teamsState, setTeamsState] = useState(teams);
@@ -49,6 +61,19 @@ export default function TeamsDashboard({ teams = [] }) {
     temporada: '',
     descripcion: '',
   });
+  const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
+  const [createSourceTeamId, setCreateSourceTeamId] = useState('');
+
+  const createSourceTeam = useMemo(
+    () => teamsState.find((team) => String(team.id) === String(createSourceTeamId)) || null,
+    [createSourceTeamId, teamsState]
+  );
+  const sourceTeam = modal.type === 'copy' ? modal.team : createSourceTeam;
+  const isImportingPlayers = modal.type === 'copy' || Boolean(createSourceTeamId);
+  const copyPlayers = isImportingPlayers ? sourceTeam?.players || [] : [];
+  const selectedCount = selectedPlayerIds.length;
+  const allCopyPlayersSelected = copyPlayers.length > 0 && selectedCount === copyPlayers.length;
+  const someCopyPlayersSelected = selectedCount > 0 && selectedCount < copyPlayers.length;
 
   const seasons = useMemo(() => {
     const values = Array.from(new Set(teamsState.map((team) => team.temporada).filter(Boolean))).sort().reverse();
@@ -64,18 +89,64 @@ export default function TeamsDashboard({ teams = [] }) {
     });
   }, [search, season, teamsState]);
 
+  const sourceTeamOptions = useMemo(
+    () => teamsState.map((team) => ({
+      value: String(team.id),
+      label: `${team.nombre} · ${team.temporada} (${playerCountLabel(team.players_count || 0)})`,
+    })),
+    [teamsState]
+  );
+
+  function selectCreateSourceTeam(teamId) {
+    const id = String(teamId || '');
+    const team = teamsState.find((item) => String(item.id) === id);
+    setCreateSourceTeamId(id);
+    setSelectedPlayerIds((team?.players || []).map((player) => String(player.id)));
+  }
+
   function openCreate() {
+    setSelectedPlayerIds([]);
+    setCreateSourceTeamId('');
     setForm({ nombre: '', temporada: season || nextSeasonLabel(), descripcion: '' });
     setModal({ type: 'create', team: null });
   }
 
   function openCopy(team) {
+    setCreateSourceTeamId('');
+    setSelectedPlayerIds((team.players || []).map((player) => String(player.id)));
     setForm({ nombre: team.nombre, temporada: nextSeasonLabel(), descripcion: team.descripcion || '' });
     setModal({ type: 'copy', team });
   }
 
   function closeModal() {
-    if (!saving) setModal({ type: null, team: null });
+    if (!saving) {
+      setSelectedPlayerIds([]);
+      setCreateSourceTeamId('');
+      setModal({ type: null, team: null });
+    }
+  }
+
+  function toggleCreateImport(checked) {
+    if (!checked) {
+      setCreateSourceTeamId('');
+      setSelectedPlayerIds([]);
+      return;
+    }
+
+    const defaultTeam = teamsState.find((team) => Number(team.players_count || 0) > 0) || teamsState[0];
+    selectCreateSourceTeam(defaultTeam?.id || '');
+  }
+
+  function toggleAllCopyPlayers(checked) {
+    setSelectedPlayerIds(checked ? copyPlayers.map((player) => String(player.id)) : []);
+  }
+
+  function toggleCopyPlayer(playerId, checked) {
+    const id = String(playerId);
+    setSelectedPlayerIds((current) => {
+      if (!checked) return current.filter((item) => item !== id);
+      return Array.from(new Set([...current, id]));
+    });
   }
 
   async function submitTeam(event) {
@@ -83,26 +154,43 @@ export default function TeamsDashboard({ teams = [] }) {
     setSaving(true);
     try {
       const isCopy = modal.type === 'copy';
+      const sourceTeamId = isCopy ? modal.team?.id : createSourceTeamId;
+      const shouldCopyPlayers = Boolean(sourceTeamId);
+      const payload = {
+        action: shouldCopyPlayers ? 'copy_season' : 'create',
+        team_id: sourceTeamId,
+        ...form,
+      };
+
+      if (shouldCopyPlayers) {
+        payload.player_ids = selectedPlayerIds;
+      }
+
       const res = await fetch('/api/teams', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: isCopy ? 'copy_season' : 'create',
-          team_id: modal.team?.id,
-          ...form,
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'No se pudo guardar el equipo');
 
-      setTeamsState((current) => [data.equipo, ...current]);
+      const copiedPlayers = Number(data.copiedPlayers || 0);
+      const newTeam = {
+        ...data.equipo,
+        players_count: shouldCopyPlayers ? copiedPlayers : 0,
+        players: data.players || [],
+      };
+
+      setTeamsState((current) => [newTeam, ...current]);
       notifications.show({
         color: 'green',
-        title: isCopy ? 'Temporada creada' : 'Equipo creado',
-        message: isCopy
-          ? `${data.copiedPlayers || 0} jugadores copiados a ${data.equipo.temporada}.`
+        title: shouldCopyPlayers ? 'Equipo creado con plantilla' : 'Equipo creado',
+        message: shouldCopyPlayers
+          ? `${playerCountLabel(copiedPlayers)} importado${copiedPlayers === 1 ? '' : 's'} a ${data.equipo.temporada}.`
           : `${data.equipo.nombre} está listo.`,
       });
+      setSelectedPlayerIds([]);
+      setCreateSourceTeamId('');
       setModal({ type: null, team: null });
       router.refresh();
     } catch (error) {
@@ -293,9 +381,110 @@ export default function TeamsDashboard({ teams = [] }) {
                 setForm((current) => ({ ...current, descripcion: value }));
               }}
             />
+            {modal.type === 'create' && sourceTeamOptions.length ? (
+              <Paper withBorder radius="md" p="sm" bg={createSourceTeamId ? 'blue.0' : 'gray.0'}>
+                <Stack gap="sm">
+                  <Switch
+                    label="Copiar jugadores desde otra temporada"
+                    checked={Boolean(createSourceTeamId)}
+                    onChange={(event) => toggleCreateImport(event.currentTarget.checked)}
+                  />
+                  {createSourceTeamId ? (
+                    <Select
+                      label="Equipo origen"
+                      data={sourceTeamOptions}
+                      value={createSourceTeamId}
+                      onChange={selectCreateSourceTeam}
+                      searchable
+                      allowDeselect={false}
+                    />
+                  ) : null}
+                </Stack>
+              </Paper>
+            ) : null}
+            {isImportingPlayers && (
+              <>
+                <Divider />
+                <Stack gap="sm">
+                  <Group justify="space-between" align="flex-start" wrap="nowrap">
+                    <Box>
+                      <Text size="sm" fw={800} c="#24291f">
+                        Jugadores a importar
+                      </Text>
+                      <Text size="xs" c="dimmed">
+                        {sourceTeam?.nombre} · {sourceTeam?.temporada}
+                      </Text>
+                    </Box>
+                    <Badge variant="light" color={selectedCount ? 'blue' : 'gray'} radius="sm">
+                      {selectedCount}/{copyPlayers.length}
+                    </Badge>
+                  </Group>
+
+                  {copyPlayers.length ? (
+                    <>
+                      <Checkbox
+                        label="Seleccionar toda la plantilla"
+                        checked={allCopyPlayersSelected}
+                        indeterminate={someCopyPlayersSelected}
+                        onChange={(event) => toggleAllCopyPlayers(event.currentTarget.checked)}
+                      />
+                      <Paper withBorder radius="md" p={0}>
+                        <ScrollArea h={Math.min(292, 54 * copyPlayers.length)} offsetScrollbars>
+                          <Stack gap={0}>
+                            {copyPlayers.map((player, index) => {
+                              const playerId = String(player.id);
+                              const checked = selectedPlayerIds.includes(playerId);
+
+                              return (
+                                <Box
+                                  key={playerId}
+                                  px="sm"
+                                  py="xs"
+                                  style={{
+                                    borderBottom:
+                                      index === copyPlayers.length - 1
+                                        ? 'none'
+                                        : '1px solid var(--mantine-color-gray-2)',
+                                  }}
+                                >
+                                  <Checkbox
+                                    checked={checked}
+                                    onChange={(event) => toggleCopyPlayer(playerId, event.currentTarget.checked)}
+                                    label={
+                                      <Box>
+                                        <Text size="sm" fw={650} c="#24291f">
+                                          {playerName(player)}
+                                        </Text>
+                                        {player.posicion ? (
+                                          <Text size="xs" c="dimmed">
+                                            {player.posicion}
+                                          </Text>
+                                        ) : null}
+                                      </Box>
+                                    }
+                                  />
+                                </Box>
+                              );
+                            })}
+                          </Stack>
+                        </ScrollArea>
+                      </Paper>
+                    </>
+                  ) : (
+                    <Paper withBorder radius="md" p="sm" bg="gray.0">
+                      <Text size="sm" c="dimmed">
+                        Este equipo no tiene jugadores para importar.
+                      </Text>
+                    </Paper>
+                  )}
+                </Stack>
+              </>
+            )}
             <Group justify="flex-end">
               <Button type="submit" radius="xl" size="xs" loading={saving}>
-                {modal.type === 'copy' ? 'Crear temporada' : 'Crear equipo'}
+                {isImportingPlayers
+                  ? `Crear equipo${copyPlayers.length ? ` con ${playerCountLabel(selectedCount)}` : ''}`
+                  : 'Crear equipo'}
               </Button>
             </Group>
           </Stack>

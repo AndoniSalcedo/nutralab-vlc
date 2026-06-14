@@ -36,21 +36,33 @@ export default async function Dashboard() {
         .order('nombre'),
       supabase
         .from('jugadores')
-        .select('id,equipo_id,equipos!inner(owner_id)')
+        .select('id,equipo_id,nombre,apellidos,posicion,equipos!inner(owner_id)')
         .eq('equipos.owner_id', ownerId)
+        .order('nombre')
     ]);
 
     if (resEquipos.error) throw resEquipos.error;
     if (resJugadores.error) throw resJugadores.error;
 
     const counts = new Map();
+    const playersByTeam = new Map();
     for (const player of resJugadores.data || []) {
-      counts.set(String(player.equipo_id), (counts.get(String(player.equipo_id)) || 0) + 1);
+      const teamId = String(player.equipo_id);
+      counts.set(teamId, (counts.get(teamId) || 0) + 1);
+      const currentPlayers = playersByTeam.get(teamId) || [];
+      currentPlayers.push({
+        id: player.id,
+        nombre: player.nombre,
+        apellidos: player.apellidos,
+        posicion: player.posicion,
+      });
+      playersByTeam.set(teamId, currentPlayers);
     }
 
     teams = (resEquipos.data || []).map((team) => ({
       ...team,
       players_count: counts.get(String(team.id)) || 0,
+      players: playersByTeam.get(String(team.id)) || [],
     }));
   } catch (err) {
     console.error('Error fetching teams:', err);

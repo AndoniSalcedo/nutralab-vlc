@@ -318,7 +318,7 @@ export default function DashboardContent({ players = [], team }) {
                   {team?.nombre || 'Equipo'}
                 </Title>
                 <Text size="xs" c="dimmed" mt={2}>
-                  {team?.temporada ? `${team.temporada} · ` : ''}Control de plantilla, cálculos y cargas nutricionales.
+                  {team?.temporada ? `${team.temporada}` : ''}
                 </Text>
               </Box>
             </Group>
