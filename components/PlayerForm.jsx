@@ -17,6 +17,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconUser, IconActivity, IconCheck } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
+import { NUTRITION_DAY_TYPES, resolveNutritionDayType } from '@/lib/calculations';
 
 export default function PlayerForm({ initial, team }) {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function PlayerForm({ initial, team }) {
   const [nombre, setNombre] = useState(initial?.nombre ?? '');
   const [apellidos, setApellidos] = useState(initial?.apellidos ?? '');
   const [posicion, setPosicion] = useState(initial?.posicion ?? '');
-  const [activityFactor, setActivityFactor] = useState(String(initial?.factor_actividad ?? '1.6'));
+  const [activityFactor, setActivityFactor] = useState(String(resolveNutritionDayType(initial?.factor_actividad ?? 1.55).factor));
   const [gustos, setGustos] = useState(initial?.gustos_preferencias ?? '');
   const [contexto, setContexto] = useState(initial?.contexto_clinico ?? '');
   const [objetivo, setObjetivo] = useState(initial?.objetivo ?? '');
@@ -127,13 +128,10 @@ export default function PlayerForm({ initial, team }) {
               value={activityFactor}
               onChange={setActivityFactor}
               leftSection={<IconActivity size={16} />}
-              data={[
-                { label: 'Descanso (1.2)', value: '1.2' },
-                { label: 'Recuperación (1.4)', value: '1.4' },
-                { label: 'Entreno normal (1.6)', value: '1.6' },
-                { label: 'Doble sesión (1.75)', value: '1.75' },
-                { label: 'Partido (1.9)', value: '1.9' },
-              ]}
+              data={NUTRITION_DAY_TYPES.map((dayType) => ({
+                label: `${dayType.label} (${dayType.factor})`,
+                value: String(dayType.factor),
+              }))}
             />
 
             {/* Contexto y Preferencias */}

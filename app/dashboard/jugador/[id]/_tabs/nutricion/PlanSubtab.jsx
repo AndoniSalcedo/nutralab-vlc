@@ -98,9 +98,12 @@ function MetricCard({ label, value, color = 'orange' }) {
 }
 
 function MacroCard({ item, index }) {
+  const isTraining = item?.key === 'entreno' || index === 2;
+  const isMatch = item?.key === 'partido';
+
   return (
-    <Paper className={`ficha-macro ${index === 1 ? 'is-middle' : ''}`} p="md" radius="sm">
-      <Text size="xs" fw={800} tt="uppercase" c={index === 2 ? 'orange.4' : 'teal.3'}>{item.kcalLabel}</Text>
+    <Paper className={`ficha-macro ${isTraining ? 'is-middle' : ''}`} p="md" radius="sm">
+      <Text size="xs" fw={800} tt="uppercase" c={isMatch ? 'orange.4' : 'teal.3'}>{item.kcalLabel}</Text>
       <Title order={2} c="orange.4" mt={4}>{formatInt(item.kcal)}</Title>
       <Text size="xs" c="dimmed">kcal</Text>
       <SimpleGrid cols={3} spacing={4} mt="sm">
@@ -144,7 +147,7 @@ function PlanFicha({ data }) {
         </SimpleGrid>
 
         <Text className="ficha-section">Distribución calórica por tipo de día</Text>
-        <SimpleGrid cols={{ base: 1, md: 3 }} spacing="sm">
+        <SimpleGrid cols={{ base: 1, md: 5 }} spacing="sm">
           {PLAN_DAY_TYPES.map((dayType, index) => (
             <MacroCard key={dayType.key} item={plan.tiposDia[dayType.key]} index={index} />
           ))}
@@ -152,12 +155,12 @@ function PlanFicha({ data }) {
 
         <Divider my="md" color="#343963" />
 
-        <SimpleGrid cols={{ base: 1, md: 3 }} spacing="sm">
-          {PLAN_DAY_TYPES.map((dayType, index) => {
+        <SimpleGrid cols={{ base: 1, md: 5 }} spacing="sm">
+          {PLAN_DAY_TYPES.map((dayType) => {
             const item = plan.tiposDia[dayType.key];
             return (
               <Stack key={dayType.key} gap={4}>
-                <Box className="ficha-day-header" data-match={index === 2 ? 'true' : 'false'}>
+                <Box className="ficha-day-header" data-match={dayType.key === 'partido' ? 'true' : 'false'}>
                   {item.label}
                 </Box>
                 {item.ingestas.map((meal, mealIndex) => (

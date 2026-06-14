@@ -18,7 +18,7 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconClipboardList, IconTargetArrow, IconUser, IconInfoCircle, IconCalendar, IconDownload } from '@tabler/icons-react';
-import { cunninghamPlan } from '@/lib/calculations';
+import { cunninghamPlan, NUTRITION_DAY_TYPES, resolveNutritionDayType } from '@/lib/calculations';
 import { CampoEditable } from '../editable';
 import { latestMetricValue } from '@/lib/player-metrics';
 
@@ -40,6 +40,16 @@ const NUM_COMIDAS = [
   { value: '6', label: '6 comidas' },
   { value: '7', label: '7 comidas' },
 ];
+
+const DAY_TYPES = NUTRITION_DAY_TYPES.map((dayType) => ({
+  value: dayType.key,
+  label: dayType.label,
+  factor: dayType.factor,
+  proteinGkg: dayType.proteinGkg,
+  carbsGkg: dayType.carbsGkg,
+  fatGkg: dayType.fatGkg,
+  color: dayType.color,
+}));
 
 function StatCard({ label, value, order = 2, subtext }) {
   return (
@@ -120,22 +130,9 @@ export default function PerfilSubtab({ jugador, evoluciones = [], informes = [],
   const masaMagraActual = latestMetricValue(evoluciones, 'masa_magra_kg', jugador?.masa_magra_kg);
   const weightKg = Number(pesoActual || 0);
 
-  const dayTypes = [
-    { value: 'descanso', label: 'Descanso', factor: 1.2, color: 'blue' },
-    { value: 'recuperacion', label: 'Recuperación', factor: 1.4, color: 'teal' },
-    { value: 'entreno', label: 'Entrenamiento', factor: 1.6, color: 'green' },
-    { value: 'doble', label: 'Doble sesión', factor: 1.75, color: 'orange' },
-    { value: 'partido', label: 'Partido', factor: 1.9, color: 'red' },
-  ];
-
   // Map configured factor_actividad to nearest dayType segment
   const defaultDiaType = useMemo(() => {
-    const f = Number(jugador.factor_actividad || 1.6);
-    if (f <= 1.3) return 'descanso';
-    if (f <= 1.5) return 'recuperacion';
-    if (f <= 1.7) return 'entreno';
-    if (f <= 1.8) return 'doble';
-    return 'partido';
+    return resolveNutritionDayType(jugador.factor_actividad || 1.55).key;
   }, [jugador.factor_actividad]);
 
   const [activeDayType, setActiveDayType] = useState(defaultDiaType);
@@ -143,12 +140,15 @@ export default function PerfilSubtab({ jugador, evoluciones = [], informes = [],
   // Pre-calculate plans for all day types using Cunningham formula
   const plans = useMemo(() => {
     const out = {};
-    dayTypes.forEach(dt => {
+    DAY_TYPES.forEach(dt => {
       out[dt.value] = weightKg ? cunninghamPlan({
         weightKg,
         bodyFatPct: grasaActual ? Number(grasaActual) : null,
         leanMassKg: masaMagraActual ? Number(masaMagraActual) : null,
         activityFactor: dt.factor,
+        proteinGkg: dt.proteinGkg,
+        carbsGkg: dt.carbsGkg,
+        fatGkg: dt.fatGkg,
       }) : null;
     });
     return out;
@@ -251,7 +251,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], informes = [],
               <SegmentedControl
                 value={activeDayType}
                 onChange={setActiveDayType}
-                data={dayTypes.map(dt => ({
+                data={DAY_TYPES.map(dt => ({
                   value: dt.value,
                   label: `${dt.label} (${dt.factor})`
                 }))}

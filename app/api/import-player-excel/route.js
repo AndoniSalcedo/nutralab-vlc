@@ -49,7 +49,7 @@ async function createPlayer(supabase, teamId, group) {
       nombre: cleanText(group.nombre || group.nombreCompleto),
       apellidos: cleanText(group.apellidos),
       fecha_nacimiento: group.fechaNacimiento || null,
-      factor_actividad: 1.6,
+      factor_actividad: 1.55,
     })
     .select('id,nombre,apellidos,fecha_nacimiento')
     .single();

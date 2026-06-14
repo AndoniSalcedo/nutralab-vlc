@@ -8,7 +8,7 @@ import DashboardActions from '@/components/DashboardActions';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import PlayerForm from '@/components/PlayerForm';
-import { cunninghamPlan } from '@/lib/calculations';
+import { cunninghamPlan, resolveNutritionDayType } from '@/lib/calculations';
 import { useRouter } from 'next/navigation';
 
 const PAGE_SIZE = 8;
@@ -129,11 +129,15 @@ function getPlayerPlan(player) {
   const weightKg = Number(player.peso_kg || 0);
   if (!weightKg) return { kcal: null, calculated: false };
 
+  const dayType = resolveNutritionDayType(player.factor_actividad || 1.55);
   const calc = cunninghamPlan({
     weightKg,
     bodyFatPct: player.porcentaje_grasa ? Number(player.porcentaje_grasa) : null,
     leanMassKg: player.masa_magra_kg ? Number(player.masa_magra_kg) : null,
-    activityFactor: Number(player.factor_actividad || 1.6),
+    activityFactor: dayType.factor,
+    proteinGkg: dayType.proteinGkg,
+    carbsGkg: dayType.carbsGkg,
+    fatGkg: dayType.fatGkg,
   });
 
   return { kcal: calc.kcal, calculated: true };

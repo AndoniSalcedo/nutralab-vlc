@@ -233,9 +233,12 @@ function Metric({ label, value, color }) {
 }
 
 function MacroCard({ item, index }) {
+  const isTraining = item?.key === 'entreno' || index === 2;
+  const isMatch = item?.key === 'partido';
+
   return (
-    <View style={[styles.macroBox, index === 1 ? styles.macroBoxMiddle : null]}>
-      <Text style={[styles.macroLabel, index === 2 ? { color: COLORS.orange } : null]}>{item.kcalLabel}</Text>
+    <View style={[styles.macroBox, isTraining ? styles.macroBoxMiddle : null]}>
+      <Text style={[styles.macroLabel, isMatch ? { color: COLORS.orange } : null]}>{item.kcalLabel}</Text>
       <Text style={styles.macroKcal}>{formatInt(item.kcal)}</Text>
       <Text style={styles.macroUnit}>kcal</Text>
       <View style={styles.macroStats}>
@@ -289,8 +292,8 @@ export default function NutritionPlanCardDocument({ data }) {
           <View style={styles.separator} />
 
           <View style={styles.mealHeaders}>
-            {PLAN_DAY_TYPES.map((dayType, index) => (
-              <Text key={dayType.key} style={[styles.mealHeader, index === 2 ? { color: COLORS.orange } : null]}>
+            {PLAN_DAY_TYPES.map((dayType) => (
+              <Text key={dayType.key} style={[styles.mealHeader, dayType.key === 'partido' ? { color: COLORS.orange } : null]}>
                 {plan.tiposDia[dayType.key].label}
               </Text>
             ))}

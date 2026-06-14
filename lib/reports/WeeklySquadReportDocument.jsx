@@ -1,6 +1,6 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
-import { cunninghamPlan } from '@/lib/calculations';
+import { cunninghamPlan, resolveNutritionDayType } from '@/lib/calculations';
 
 const COLORS = {
   bg: '#10142f',
@@ -243,12 +243,16 @@ function ageFromBirthDate(value) {
 
 function playerTargets(player) {
   const weightKg = Number(player.peso_kg || 0);
+  const dayType = resolveNutritionDayType(player.factor_actividad || 1.55);
   const calc = weightKg
     ? cunninghamPlan({
         weightKg,
         bodyFatPct: player.porcentaje_grasa ? Number(player.porcentaje_grasa) : null,
         leanMassKg: player.masa_magra_kg ? Number(player.masa_magra_kg) : null,
-        activityFactor: Number(player.factor_actividad || 1.6),
+        activityFactor: dayType.factor,
+        proteinGkg: dayType.proteinGkg,
+        carbsGkg: dayType.carbsGkg,
+        fatGkg: dayType.fatGkg,
       })
     : null;
 

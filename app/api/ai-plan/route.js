@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
-import { buildBasePlanData, mergeAiPlanData, planDataToLegacyContent, sanitizePlanData } from '@/lib/nutrition-plan-card';
+import { buildBasePlanData, mergeAiPlanData, PLAN_DAY_TYPES, planDataToLegacyContent, sanitizePlanData } from '@/lib/nutrition-plan-card';
 import { withLatestMeasurement } from '@/lib/player-metrics';
 
 const client = new Anthropic();
@@ -67,6 +67,20 @@ function restrictionsToPrompt(jugador) {
   ].filter(Boolean).join('\n') || 'Sin restricciones registradas.';
 }
 
+function planFormatExample() {
+  const tiposDia = {};
+  PLAN_DAY_TYPES.forEach((dayType) => {
+    tiposDia[dayType.key] = {
+      ingestas: dayType.meals.map((nombre) => ({ nombre, detalle: '...' })),
+    };
+  });
+
+  return JSON.stringify({
+    tiposDia,
+    notas: ['...', '...', '...', '...'],
+  });
+}
+
 function buildPrompt({ jugador, contexto, contextoAdicional, menu, baseData, retry = false }) {
   return [
     'Eres Carlos Ferrando, nutricionista del Valencia CF.',
@@ -74,7 +88,7 @@ function buildPrompt({ jugador, contexto, contextoAdicional, menu, baseData, ret
     retry ? 'Respuesta anterior inválida o incompleta. Hazla más corta y estrictamente JSON.' : '',
     '',
     'Formato exacto:',
-    '{"tiposDia":{"entreno":{"ingestas":[{"nombre":"Desayuno","detalle":"..."},{"nombre":"Batido post","detalle":"..."},{"nombre":"Comida","detalle":"..."},{"nombre":"Merienda","detalle":"..."},{"nombre":"Cena","detalle":"..."}]},"descanso":{"ingestas":[{"nombre":"Desayuno","detalle":"..."},{"nombre":"Media mañana","detalle":"..."},{"nombre":"Comida","detalle":"..."},{"nombre":"Merienda","detalle":"..."},{"nombre":"Cena","detalle":"..."}]},"partido":{"ingestas":[{"nombre":"Desayuno","detalle":"..."},{"nombre":"Comida pre","detalle":"..."},{"nombre":"-60 min","detalle":"..."},{"nombre":"Durante","detalle":"..."},{"nombre":"Post","detalle":"..."}]}},"notas":["...","...","...","..."]}',
+    planFormatExample(),
     '',
     'Reglas:',
     '- Cada detalle debe ser una frase corta con cantidades aproximadas.',
