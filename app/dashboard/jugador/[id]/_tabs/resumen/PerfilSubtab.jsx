@@ -11,8 +11,10 @@ import {
   ThemeIcon,
   Title,
   SegmentedControl,
-  Badge
+  Badge,
+  ScrollArea
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 import { IconClipboardList, IconTargetArrow, IconUser, IconInfoCircle } from '@tabler/icons-react';
 import { cunninghamPlan, NUTRITION_DAY_TYPES, resolveNutritionDayType } from '@/lib/calculations';
@@ -48,6 +50,7 @@ const DAY_TYPES = NUTRITION_DAY_TYPES.map((dayType) => ({
 }));
 
 export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = false }) {
+  const isMobile = useMediaQuery('(max-width: 48em)');
   const pesoActual = latestMetricValue(evoluciones, 'peso_kg', jugador?.peso_kg);
   const grasaActual = latestMetricValue(evoluciones, 'porcentaje_grasa', jugador?.porcentaje_grasa);
   const masaMagraActual = latestMetricValue(evoluciones, 'masa_magra_kg', jugador?.masa_magra_kg);
@@ -148,10 +151,24 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
               <SegmentedControl
                 value={activeDayType}
                 onChange={setActiveDayType}
-                data={DAY_TYPES.map(dt => ({
-                  value: dt.value,
-                  label: `${dt.label} (${dt.factor})`
-                }))}
+                data={DAY_TYPES.map(dt => {
+                  let shortLabel = dt.label;
+                  if (dt.label === 'Doble sesión') shortLabel = 'Doble';
+                  if (dt.label === 'Entrenamiento') shortLabel = 'Entreno';
+                  if (dt.label === 'Recuperación') shortLabel = 'Recup.';
+
+                  const isActive = activeDayType === dt.value;
+
+                  return {
+                    value: dt.value,
+                    label: isMobile ? (
+                      <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
+                        <Text size="xs" fw={700} style={{ fontSize: '11px' }}>{shortLabel}</Text>
+                        <Text size="xxs" c={isActive ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>({dt.factor})</Text>
+                      </Stack>
+                    ) : `${dt.label} (${dt.factor})`
+                  };
+                })}
                 fullWidth
                 radius="md"
                 color="blue"

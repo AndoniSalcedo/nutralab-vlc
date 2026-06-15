@@ -14,12 +14,15 @@ import {
   Button,
   SegmentedControl,
   Box,
-  Badge
+  Badge,
+  ScrollArea
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconDroplet, IconBottle, IconCup, IconCheck, IconRotate } from '@tabler/icons-react';
 import { BentoCard } from './Bento/BentoItem';
 
 export default function HydrationCalculator({ jugador }) {
+  const isMobile = useMediaQuery('(max-width: 48em)');
   const [targetType, setTargetType] = useState('descanso');
   const [consumed, setConsumed] = useState(0);
   const [isClient, setIsClient] = useState(false);
@@ -41,9 +44,24 @@ export default function HydrationCalculator({ jugador }) {
   const isGoalReached = percentage >= 100;
 
   const targetOptions = [
-    { value: 'descanso', label: `Descanso · ${targets.descanso} ml` },
-    { value: 'entreno', label: `Entreno · ${targets.entreno} ml` },
-    { value: 'partido', label: `Partido · ${targets.partido} ml` },
+    { value: 'descanso', label: isMobile ? (
+      <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
+        <Text size="xs" fw={700} style={{ fontSize: '11px' }}>Descanso</Text>
+        <Text size="xxs" c={targetType === 'descanso' ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets.descanso} ml</Text>
+      </Stack>
+    ) : `Descanso · ${targets.descanso} ml` },
+    { value: 'entreno', label: isMobile ? (
+      <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
+        <Text size="xs" fw={700} style={{ fontSize: '11px' }}>Entreno</Text>
+        <Text size="xxs" c={targetType === 'entreno' ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets.entreno} ml</Text>
+      </Stack>
+    ) : `Entreno · ${targets.entreno} ml` },
+    { value: 'partido', label: isMobile ? (
+      <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
+        <Text size="xs" fw={700} style={{ fontSize: '11px' }}>Partido</Text>
+        <Text size="xxs" c={targetType === 'partido' ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets.partido} ml</Text>
+      </Stack>
+    ) : `Partido · ${targets.partido} ml` },
   ];
 
   useEffect(() => {
@@ -107,7 +125,7 @@ export default function HydrationCalculator({ jugador }) {
           color="blue"
         />
 
-        <Group justify="center" wrap="nowrap">
+        <Group justify="center" wrap={isMobile ? 'wrap' : 'nowrap'} align="center">
           <RingProgress
             size={180}
             thickness={16}

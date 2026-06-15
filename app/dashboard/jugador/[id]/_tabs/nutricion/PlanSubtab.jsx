@@ -19,6 +19,7 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import {
   IconArrowsLeftRight,
@@ -293,6 +294,7 @@ function AiGenerationOverlay({ opened, messages = [] }) {
 }
 
 export default function PlanSubtab({ jugador, readOnly = false }) {
+  const isMobile = useMediaQuery('(max-width: 48em)');
   const [planes, setPlanes] = useState([]);
   const [currentId, setCurrentId] = useState(null);
   const [mode, setMode] = useState('view');
@@ -595,7 +597,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     <Stack gap={0}>
       <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Stack gap="md">
-          <Group justify="space-between" align="flex-start">
+          <Group justify="space-between" align={isMobile ? 'stretch' : 'flex-start'} style={{ flexDirection: isMobile ? 'column' : 'row' }} gap="md">
             <Group gap="xs">
               <IconBrain size={22} color="var(--mantine-color-blue-filled)" />
               <Stack gap={2}>
@@ -605,13 +607,14 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                 </Text>
               </Stack>
             </Group>
-            <Group gap="xs">
+            <Group gap="xs" style={{ width: isMobile ? '100%' : 'auto', flexDirection: isMobile ? 'column' : 'row' }} align={isMobile ? 'stretch' : 'center'}>
               <Button
                 size="xs"
                 radius="xl"
                 color="dark"
                 leftSection={<IconArrowsLeftRight size={16} />}
                 onClick={() => setIntercambiosOpened(true)}
+                fullWidth={isMobile}
               >
                 Intercambios
               </Button>
@@ -623,16 +626,17 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                   leftSection={<IconDownload size={16} />}
                   onClick={downloadPdf}
                   loading={actionType === 'download'}
+                  fullWidth={isMobile}
                 >
                   Descargar PDF
                 </Button>
               )}
               {!readOnly && (
                 <>
-                  <Button size="xs" radius="xl" variant="light" leftSection={<IconEdit size={16} />} onClick={startEdit} disabled={!currentPlan || mode !== 'view'}>
+                  <Button size="xs" radius="xl" variant="light" leftSection={<IconEdit size={16} />} onClick={startEdit} disabled={!currentPlan || mode !== 'view'} fullWidth={isMobile}>
                     Editar actual
                   </Button>
-                  <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={startCreate}>
+                  <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={startCreate} fullWidth={isMobile}>
                     Crear ficha
                   </Button>
                 </>
@@ -768,9 +772,9 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                     if (!item) return null;
                     return (
                       <Paper key={dayKey} p="md" radius="md" withBorder>
-                        <Group justify="space-between" align="center" mb="md" wrap="wrap">
-                          <Group gap="xs">
-                            <Title order={4}>{item.label}</Title>
+                        <Group justify="space-between" align={isMobile ? 'stretch' : 'center'} mb="md" wrap="wrap" style={{ flexDirection: isMobile ? 'column' : 'row' }} gap="xs">
+                          <Group gap="xs" wrap="wrap" style={{ width: isMobile ? '100%' : 'auto', flexDirection: isMobile ? 'column' : 'row' }} align={isMobile ? 'stretch' : 'center'}>
+                            <Title order={4} style={{ textAlign: isMobile ? 'center' : 'left' }}>{item.label}</Title>
                             <Select
                               placeholder="Tipo de día"
                               data={[
@@ -820,10 +824,10 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                               }}
                               size="xs"
                               radius="xl"
-                              style={{ width: 150 }}
+                              style={{ width: isMobile ? '100%' : 150 }}
                             />
                           </Group>
-                          <Badge variant="light" color={item.tipoDia === 'partido' ? 'orange' : 'teal'}>
+                          <Badge variant="light" color={item.tipoDia === 'partido' ? 'orange' : 'teal'} style={{ alignSelf: isMobile ? 'stretch' : 'center', height: '24px' }}>
                             {formatInt(item.kcal)} kcal
                           </Badge>
                         </Group>

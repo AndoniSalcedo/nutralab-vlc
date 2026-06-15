@@ -61,7 +61,7 @@ export default function MenuSemanalSubtab({ menus = [] }) {
               <Stack gap={2}>
                 <Title order={3} fw={800} c="dark.4">Menú comedor</Title>
                 <Text size="sm" c="dimmed">
-                  Comedor del primer equipo, comida y cena.
+                  Comedor del equipo.
                 </Text>
               </Stack>
             </Group>
