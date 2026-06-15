@@ -18,11 +18,10 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconAlertTriangle, IconCalculator, IconChevronLeft, IconEdit, IconLogout, IconMenu2 } from '@tabler/icons-react';
+import { IconAlertTriangle, IconChevronLeft, IconEdit, IconLogout, IconMenu2 } from '@tabler/icons-react';
 import PlayerForm from './PlayerForm';
 import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
-import FoodCalculator from './FoodCalculator';
 
 function BackButton({ size = 42, iconSize = 24, equipoId }) {
   const url = equipoId ? `/dashboard/equipo/${equipoId}` : '/dashboard';
@@ -74,30 +73,7 @@ function PlayerLogoutButton({ menuItem = false }) {
   );
 }
 
-function CalculatorButton({ menuItem = false, onOpen }) {
-  if (menuItem) {
-    return (
-      <Menu.Item leftSection={<IconCalculator size={14} />} onClick={onOpen}>
-        Calculadora
-      </Menu.Item>
-    );
-  }
-
-  return (
-    <Button
-      size="xs"
-      radius="xl"
-      variant="light"
-      color="gray"
-      leftSection={<IconCalculator size={14} />}
-      onClick={onOpen}
-    >
-      Calculadora
-    </Button>
-  );
-}
-
-function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, onOpenCalculator, compact = false }) {
+function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, compact = false }) {
   if (!isAdmin && !isPlayer) return null;
 
   if (compact) {
@@ -110,7 +86,6 @@ function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, onOpenCalculator, c
         </Menu.Target>
 
         <Menu.Dropdown>
-          <CalculatorButton menuItem onOpen={onOpenCalculator} />
           {isPlayer && (
             <>
               <PlayerPasswordButton menuItem />
@@ -133,7 +108,6 @@ function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, onOpenCalculator, c
 
   return (
     <Group gap="xs" wrap="wrap">
-      <CalculatorButton onOpen={onOpenCalculator} />
       {isPlayer && (
         <>
           <PlayerPasswordButton />
@@ -187,7 +161,7 @@ function PlayerIdentity({ jugador, isAdmin, hasCredentials, avatarSize = 84, tit
   );
 }
 
-function JugadorHeaderDesktop({ jugador, isAdmin, isPlayer, hasCredentials, onEdit, onOpenCalculator }) {
+function JugadorHeaderDesktop({ jugador, isAdmin, isPlayer, hasCredentials, onEdit }) {
   return (
     <Paper
       radius="lg"
@@ -203,13 +177,13 @@ function JugadorHeaderDesktop({ jugador, isAdmin, isPlayer, hasCredentials, onEd
           <PlayerIdentity jugador={jugador} isAdmin={isAdmin} hasCredentials={hasCredentials} />
         </Group>
 
-        <HeaderActions jugador={jugador} isAdmin={isAdmin} isPlayer={isPlayer} onEdit={onEdit} onOpenCalculator={onOpenCalculator} />
+        <HeaderActions jugador={jugador} isAdmin={isAdmin} isPlayer={isPlayer} onEdit={onEdit} />
       </Group>
     </Paper>
   );
 }
 
-function JugadorHeaderMobile({ jugador, isAdmin, isPlayer, hasCredentials, onEdit, onOpenCalculator }) {
+function JugadorHeaderMobile({ jugador, isAdmin, isPlayer, hasCredentials, onEdit }) {
   return (
     <Paper
       radius={0}
@@ -227,7 +201,7 @@ function JugadorHeaderMobile({ jugador, isAdmin, isPlayer, hasCredentials, onEdi
       )}
 
       <Box style={{ position: 'absolute', top: 10, right: 10, zIndex: 2 }}>
-        <HeaderActions jugador={jugador} isAdmin={isAdmin} isPlayer={isPlayer} onEdit={onEdit} onOpenCalculator={onOpenCalculator} compact />
+        <HeaderActions jugador={jugador} isAdmin={isAdmin} isPlayer={isPlayer} onEdit={onEdit} compact />
       </Box>
 
       <Stack gap="xs" align="center">
@@ -246,7 +220,6 @@ function JugadorHeaderMobile({ jugador, isAdmin, isPlayer, hasCredentials, onEdi
 
 export default function JugadorHeader({ jugador, user }) {
   const [opened, setOpened] = useState(false);
-  const [calculatorOpened, setCalculatorOpened] = useState(false);
   const isMobile = useMediaQuery('(max-width: 48em)');
   const isAdmin = user?.role === 'admin';
   const isPlayer = user?.role === 'jugador';
@@ -261,7 +234,6 @@ export default function JugadorHeader({ jugador, user }) {
           isPlayer={isPlayer}
           hasCredentials={hasCredentials}
           onEdit={() => setOpened(true)}
-          onOpenCalculator={() => setCalculatorOpened(true)}
         />
       ) : (
         <JugadorHeaderDesktop
@@ -270,7 +242,6 @@ export default function JugadorHeader({ jugador, user }) {
           isPlayer={isPlayer}
           hasCredentials={hasCredentials}
           onEdit={() => setOpened(true)}
-          onOpenCalculator={() => setCalculatorOpened(true)}
         />
       )}
 
@@ -288,22 +259,6 @@ export default function JugadorHeader({ jugador, user }) {
         overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
       >
         <PlayerForm initial={jugador} />
-      </Modal>
-
-      <Modal
-        opened={calculatorOpened}
-        onClose={() => setCalculatorOpened(false)}
-        title={
-          <Group gap="xs">
-            <IconCalculator size={20} style={{ color: 'var(--mantine-color-teal-6)' }} />
-            <Text fw={700}>Calculadora rápida</Text>
-          </Group>
-        }
-        size="lg"
-        radius="lg"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-      >
-        <FoodCalculator />
       </Modal>
     </>
   );

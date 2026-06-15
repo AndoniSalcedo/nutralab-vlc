@@ -28,6 +28,7 @@ import {
   IconInfoCircle,
   IconRefresh,
 } from '@tabler/icons-react';
+import FoodCalculator from '@/components/FoodCalculator';
 
 const INTERCAMBIOS_DATA = {
   proteinas: {
@@ -103,10 +104,11 @@ export default function IntercambiosModal({ opened, onClose }) {
   const [calcQty, setCalcQty] = useState(null);
 
   const isMobile = useMediaQuery('(max-width: 48em)');
-  const activeCategory = useMemo(() => INTERCAMBIOS_DATA[activeTab], [activeTab]);
+  const activeCategory = useMemo(() => INTERCAMBIOS_DATA[activeTab] || null, [activeTab]);
 
   // Food options for the calculator select dropdown in the active category
   const foodOptions = useMemo(() => {
+    if (!activeCategory) return [];
     return activeCategory.alimentos.map((a) => ({
       value: a.name,
       label: a.name,
@@ -115,7 +117,7 @@ export default function IntercambiosModal({ opened, onClose }) {
 
   // Selected food item details for calculator
   const selectedFoodObj = useMemo(() => {
-    if (!calcFood) return null;
+    if (!calcFood || !activeCategory) return null;
     return activeCategory.alimentos.find((a) => a.name === calcFood) || null;
   }, [calcFood, activeCategory]);
 
@@ -135,6 +137,7 @@ export default function IntercambiosModal({ opened, onClose }) {
   // Filter and compute equivalents dynamically
   const tableRowsData = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
+    if (!activeCategory) return [];
     let list = activeCategory.alimentos;
 
     if (query) {
@@ -209,6 +212,7 @@ export default function IntercambiosModal({ opened, onClose }) {
               { value: 'proteinas', label: isMobile ? '🥩 Prot.' : '🥩 Proteínas' },
               { value: 'carbohidratos', label: isMobile ? '🍚 Carbos' : '🍚 Carbohidratos' },
               { value: 'grasas', label: isMobile ? '🥑 Grasas' : '🥑 Grasas' },
+              { value: 'calculadora', label: isMobile ? '🧮 Calcu' : '🧮 Calculadora BEDCA' },
             ]}
             fullWidth
             radius="md"
@@ -219,210 +223,218 @@ export default function IntercambiosModal({ opened, onClose }) {
           />
         </Box>
 
-        {/* Controls Bar (stacked on mobile) */}
-        <Group justify="space-between" align="stretch" gap="xs" wrap="wrap">
-          <TextInput
-            placeholder="Buscar alimento..."
-            leftSection={<IconSearch size={16} />}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ flex: 1, minWidth: isMobile ? '100%' : 200 }}
-            radius="md"
-            clearable
-          />
+        {activeTab === 'calculadora' ? (
+          <FoodCalculator />
+        ) : (
+          <>
+            {/* Controls Bar (stacked on mobile) */}
+            <Group justify="space-between" align="stretch" gap="xs" wrap="wrap">
+              <TextInput
+                placeholder="Buscar alimento..."
+                leftSection={<IconSearch size={16} />}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ flex: 1, minWidth: isMobile ? '100%' : 200 }}
+                radius="md"
+                clearable
+              />
 
-          <Button
-            variant={showCalculator ? 'light' : 'default'}
-            color="dark"
-            radius="xl"
-            leftSection={<IconCalculator size={16} />}
-            onClick={() => {
-              setShowCalculator(!showCalculator);
-              if (showCalculator) resetCalculator();
-            }}
-            fullWidth={isMobile}
-          >
-            {showCalculator ? 'Ocultar calculadora' : 'Calculadora de intercambios'}
-          </Button>
-        </Group>
+              <Button
+                variant={showCalculator ? 'light' : 'default'}
+                color="dark"
+                radius="xl"
+                leftSection={<IconCalculator size={16} />}
+                onClick={() => {
+                  setShowCalculator(!showCalculator);
+                  if (showCalculator) resetCalculator();
+                }}
+                fullWidth={isMobile}
+              >
+                {showCalculator ? 'Ocultar calculadora' : 'Calculadora de intercambios'}
+              </Button>
+            </Group>
 
-        {/* Calculator panel */}
-        {showCalculator && (
-          <Paper withBorder p="md" radius="md" bg="gray.0">
-            <Stack gap="xs">
-              <Group justify="space-between" align="center">
-                <Group gap="xs">
-                  <ThemeIcon color="dark" variant="light" radius="xl" size="md">
-                    <IconScale size={16} />
-                  </ThemeIcon>
-                  <Text fw={800} size="sm" c="dark.5">
-                    Calculadora de equivalencias en vivo
-                  </Text>
-                </Group>
-                {(calcFood || calcQty) && (
-                  <Button
-                    variant="subtle"
-                    size="xs"
-                    color="red"
-                    radius="xl"
-                    leftSection={<IconRefresh size={12} />}
-                    onClick={resetCalculator}
-                    compact="true"
-                  >
-                    Limpiar
-                  </Button>
-                )}
-              </Group>
-
-              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md" mt={4}>
-                <Select
-                  label="Alimento original de tu plan"
-                  placeholder="Elige alimento"
-                  data={foodOptions}
-                  value={calcFood}
-                  onChange={(val) => {
-                    setCalcFood(val);
-                    if (val && !calcQty) {
-                      const original = activeCategory.alimentos.find((a) => a.name === val);
-                      if (original) setCalcQty(original.qty);
-                    }
-                  }}
-                  searchable
-                  radius="md"
-                  comboboxProps={{ shadow: 'md' }}
-                />
-
-                <NumberInput
-                  label="Cantidad pautada"
-                  placeholder="Introduce la cantidad"
-                  value={calcQty}
-                  onChange={(val) => setCalcQty(val ? Number(val) : '')}
-                  min={1}
-                  radius="md"
-                  suffix={` ${selectedFoodObj?.unit || activeCategory.unit}`}
-                  disabled={!calcFood}
-                />
-              </SimpleGrid>
-
-              {calcFood && calcQty > 0 && (
-                <Text size="xs" fw={600} c="dimmed" mt={4}>
-                  Sustituyendo {calcQty}{selectedFoodObj?.unit || activeCategory.unit} de {calcFood} por:
-                </Text>
-              )}
-            </Stack>
-          </Paper>
-        )}
-
-        {/* Premium Bento Card List Layout (completely replaces table!) */}
-        <ScrollArea h={410} scrollbarSize={6} type="hover" style={{ paddingRight: 4 }}>
-          <Stack gap="xs">
-            {tableRowsData.length === 0 ? (
-              <Paper withBorder p="xl" radius="md" bg="gray.0" style={{ textAlign: 'center' }}>
-                <Text c="dimmed" size="sm">
-                  No se encontraron alimentos que coincidan con la búsqueda.
-                </Text>
-              </Paper>
-            ) : (
-              tableRowsData.map((food) => {
-                const foodUnit = food.unit || activeCategory.unit;
-                const isSourceFood = showCalculator && calcFood === food.name;
-
-                return (
-                  <Paper
-                    key={food.name}
-                    p="sm"
-                    px="md"
-                    radius="md"
-                    withBorder
-                    bg={isSourceFood ? 'var(--mantine-color-dark-8)' : 'white'}
-                    style={{
-                      borderColor: isSourceFood ? 'var(--mantine-color-dark-8)' : 'var(--mantine-color-gray-2)',
-                      transition: 'all 0.15s ease',
-                      boxShadow: isSourceFood ? '0 4px 12px rgba(0,0,0,0.06)' : 'none',
-                    }}
-                  >
-                    <Group justify="space-between" align="center" wrap="nowrap">
-                      {/* Left Side: Food name and Inline Note */}
-                      <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
-                        <Text fw={700} size="sm" c={isSourceFood ? 'white' : 'dark.5'} truncate>
-                          {food.name}
-                        </Text>
-                        {food.note && (
-                          <Text
-                            size="xs"
-                            c={
-                              isSourceFood
-                                ? 'teal.2'
-                                : food.type === 'warning'
-                                ? 'red.6'
-                                : food.type === 'success'
-                                ? 'teal.6'
-                                : food.type === 'primary'
-                                ? 'blue.6'
-                                : 'gray.5'
-                            }
-                            fw={600}
-                            style={{ lineHeight: 1.2 }}
-                          >
-                            {food.note}
-                          </Text>
-                        )}
-                      </Stack>
-
-                      {/* Right Side: Bento Quantities Layout */}
-                      <Group gap={isMobile ? 'xs' : 'xl'} align="center" style={{ flexShrink: 0 }}>
-                        {/* Reference standard quantity block */}
-                        <Stack gap={0} align="flex-end" style={{ minWidth: isMobile ? 65 : 80 }}>
-                          <Text
-                            size="xxs"
-                            c={isSourceFood ? 'gray.4' : 'dimmed'}
-                            tt="uppercase"
-                            fw={850}
-                            style={{ fontSize: '8px', letterSpacing: '0.6px', lineHeight: 1 }}
-                          >
-                            Ref. Base
-                          </Text>
-                          <Text fw={700} size="sm" c={isSourceFood ? 'gray.2' : 'dark.3'} mt={2}>
-                            {food.qty} {foodUnit}
-                          </Text>
-                        </Stack>
-
-                        {/* Equivalency quantity block (only shown when calculator is active) */}
-                        {showCalculator && calcFood && calcQty > 0 && (
-                          <Stack gap={0} align="flex-end" style={{ minWidth: isMobile ? 75 : 90 }}>
-                            <Text
-                              size="xxs"
-                              c={isSourceFood ? 'teal.3' : 'teal.6'}
-                              tt="uppercase"
-                              fw={850}
-                              style={{ fontSize: '8px', letterSpacing: '0.6px', lineHeight: 1 }}
-                            >
-                              {isSourceFood ? 'Origen' : 'Equivalente'}
-                            </Text>
-                            <Text fw={850} size="md" c={isSourceFood ? 'teal.3' : 'teal.6'} mt={2}>
-                              {isSourceFood ? calcQty : food.calcValue} {foodUnit}
-                            </Text>
-                          </Stack>
-                        )}
-                      </Group>
+            {/* Calculator panel */}
+            {showCalculator && (
+              <Paper withBorder p="md" radius="md" bg="gray.0">
+                <Stack gap="xs">
+                  <Group justify="space-between" align="center">
+                    <Group gap="xs">
+                      <ThemeIcon color="dark" variant="light" radius="xl" size="md">
+                        <IconScale size={16} />
+                      </ThemeIcon>
+                      <Text fw={800} size="sm" c="dark.5">
+                        Calculadora de equivalencias en vivo
+                      </Text>
                     </Group>
-                  </Paper>
-                );
-              })
-            )}
-          </Stack>
-        </ScrollArea>
+                    {(calcFood || calcQty) && (
+                      <Button
+                        variant="subtle"
+                        size="xs"
+                        color="red"
+                        radius="xl"
+                        leftSection={<IconRefresh size={12} />}
+                        onClick={resetCalculator}
+                        compact="true"
+                      >
+                        Limpiar
+                      </Button>
+                    )}
+                  </Group>
 
-        {/* Info Alert Box in Premium Dark variant */}
-        <Alert
-          variant="light"
-          color="dark"
-          radius="md"
-          title="Recomendación Nutricional"
-          icon={<IconInfoCircle size={18} />}
-        >
-          {activeCategory.alertText}
-        </Alert>
+                  <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md" mt={4}>
+                    <Select
+                      label="Alimento original de tu plan"
+                      placeholder="Elige alimento"
+                      data={foodOptions}
+                      value={calcFood}
+                      onChange={(val) => {
+                        setCalcFood(val);
+                        if (val && !calcQty) {
+                          const original = activeCategory?.alimentos.find((a) => a.name === val);
+                          if (original) setCalcQty(original.qty);
+                        }
+                      }}
+                      searchable
+                      radius="md"
+                      comboboxProps={{ shadow: 'md' }}
+                    />
+
+                    <NumberInput
+                      label="Cantidad pautada"
+                      placeholder="Introduce la cantidad"
+                      value={calcQty}
+                      onChange={(val) => setCalcQty(val ? Number(val) : '')}
+                      min={1}
+                      radius="md"
+                      suffix={` ${selectedFoodObj?.unit || activeCategory?.unit}`}
+                      disabled={!calcFood}
+                    />
+                  </SimpleGrid>
+
+                  {calcFood && calcQty > 0 && (
+                    <Text size="xs" fw={600} c="dimmed" mt={4}>
+                      Sustituyendo {calcQty}{selectedFoodObj?.unit || activeCategory?.unit} de {calcFood} por:
+                    </Text>
+                  )}
+                </Stack>
+              </Paper>
+            )}
+
+            {/* Premium Bento Card List Layout (completely replaces table!) */}
+            <ScrollArea h={410} scrollbarSize={6} type="hover" style={{ paddingRight: 4 }}>
+              <Stack gap="xs">
+                {tableRowsData.length === 0 ? (
+                  <Paper withBorder p="xl" radius="md" bg="gray.0" style={{ textAlign: 'center' }}>
+                    <Text c="dimmed" size="sm">
+                      No se encontraron alimentos que coincidan con la búsqueda.
+                    </Text>
+                  </Paper>
+                ) : (
+                  tableRowsData.map((food) => {
+                    const foodUnit = food.unit || activeCategory?.unit;
+                    const isSourceFood = showCalculator && calcFood === food.name;
+
+                    return (
+                      <Paper
+                        key={food.name}
+                        p="sm"
+                        px="md"
+                        radius="md"
+                        withBorder
+                        bg={isSourceFood ? 'var(--mantine-color-dark-8)' : 'white'}
+                        style={{
+                          borderColor: isSourceFood ? 'var(--mantine-color-dark-8)' : 'var(--mantine-color-gray-2)',
+                          transition: 'all 0.15s ease',
+                          boxShadow: isSourceFood ? '0 4px 12px rgba(0,0,0,0.06)' : 'none',
+                        }}
+                      >
+                        <Group justify="space-between" align="center" wrap="nowrap">
+                          {/* Left Side: Food name and Inline Note */}
+                          <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
+                            <Text fw={700} size="sm" c={isSourceFood ? 'white' : 'dark.5'} truncate>
+                              {food.name}
+                            </Text>
+                            {food.note && (
+                              <Text
+                                size="xs"
+                                c={
+                                  isSourceFood
+                                    ? 'teal.2'
+                                    : food.type === 'warning'
+                                    ? 'red.6'
+                                    : food.type === 'success'
+                                    ? 'teal.6'
+                                    : food.type === 'primary'
+                                    ? 'blue.6'
+                                    : 'gray.5'
+                                }
+                                fw={600}
+                                style={{ lineHeight: 1.2 }}
+                              >
+                                {food.note}
+                              </Text>
+                            )}
+                          </Stack>
+
+                          {/* Right Side: Bento Quantities Layout */}
+                          <Group gap={isMobile ? 'xs' : 'xl'} align="center" style={{ flexShrink: 0 }}>
+                            {/* Reference standard quantity block */}
+                            <Stack gap={0} align="flex-end" style={{ minWidth: isMobile ? 65 : 80 }}>
+                              <Text
+                                size="xxs"
+                                c={isSourceFood ? 'gray.4' : 'dimmed'}
+                                tt="uppercase"
+                                fw={850}
+                                style={{ fontSize: '8px', letterSpacing: '0.6px', lineHeight: 1 }}
+                              >
+                                Ref. Base
+                              </Text>
+                              <Text fw={700} size="sm" c={isSourceFood ? 'gray.2' : 'dark.3'} mt={2}>
+                                {food.qty} {foodUnit}
+                              </Text>
+                            </Stack>
+
+                            {/* Equivalency quantity block (only shown when calculator is active) */}
+                            {showCalculator && calcFood && calcQty > 0 && (
+                              <Stack gap={0} align="flex-end" style={{ minWidth: isMobile ? 75 : 90 }}>
+                                <Text
+                                  size="xxs"
+                                  c={isSourceFood ? 'teal.3' : 'teal.6'}
+                                  tt="uppercase"
+                                  fw={850}
+                                  style={{ fontSize: '8px', letterSpacing: '0.6px', lineHeight: 1 }}
+                                >
+                                  {isSourceFood ? 'Origen' : 'Equivalente'}
+                                </Text>
+                                <Text fw={850} size="md" c={isSourceFood ? 'teal.3' : 'teal.6'} mt={2}>
+                                  {isSourceFood ? calcQty : food.calcValue} {foodUnit}
+                                </Text>
+                              </Stack>
+                            )}
+                          </Group>
+                        </Group>
+                      </Paper>
+                    );
+                  })
+                )}
+              </Stack>
+            </ScrollArea>
+
+            {/* Info Alert Box in Premium Dark variant */}
+            {activeCategory?.alertText && (
+              <Alert
+                variant="light"
+                color="dark"
+                radius="md"
+                title="Recomendación Nutricional"
+                icon={<IconInfoCircle size={18} />}
+              >
+                {activeCategory.alertText}
+              </Alert>
+            )}
+          </>
+        )}
       </Stack>
     </Modal>
   );
