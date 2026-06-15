@@ -190,6 +190,107 @@ function PlanFicha({ data, jugador }) {
   );
 }
 
+const INDIVIDUAL_GENERATION_MESSAGES = [
+  "Analizando métricas corporales...",
+  "Calculando tasas de metabolismo basal (Cunningham)...",
+  "Sincronizando con el menú del buffet...",
+  "IA: Diseñando distribución de macronutrientes...",
+  "IA: Optimizando ingestas para los días de entrenamiento...",
+  "IA: Personalizando suplementación y sugerencias..."
+];
+
+function AiGenerationOverlay({ opened, messages = [] }) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (!opened) {
+      setIndex(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % messages.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [opened, messages.length]);
+
+  if (!opened) return null;
+
+  return (
+    <div style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(255, 255, 255, 0.94)',
+      backdropFilter: 'blur(8px)',
+      zIndex: 1000,
+      borderRadius: 'var(--mantine-radius-lg)',
+      display: 'block',
+    }}>
+      <div style={{
+        position: 'sticky',
+        top: '200px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '2rem',
+        textAlign: 'center',
+      }}>
+        <div style={{ marginBottom: '1.5rem', position: 'relative' }}>
+          <div style={{
+            width: '70px',
+            height: '70px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, var(--mantine-color-blue-5), var(--mantine-color-grape-5))',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 8px 20px rgba(34, 139, 230, 0.35)',
+            animation: 'pulseGlow 2s infinite ease-in-out',
+          }}>
+            <IconSparkles size={32} color="white" style={{ animation: 'spinSlow 6s infinite linear' }} />
+          </div>
+        </div>
+
+        <Text fw={800} size="lg" variant="gradient" gradient={{ from: 'blue.6', to: 'grape.6', deg: 135 }} mb="xs">
+          Generando Planificación Inteligente
+        </Text>
+        
+        <Text size="sm" c="dimmed" fw={500} style={{ minHeight: '24px' }}>
+          {messages[index]}
+        </Text>
+
+        <div style={{ width: '150px', height: '4px', backgroundColor: 'var(--mantine-color-gray-2)', borderRadius: '2px', marginTop: '1.5rem', overflow: 'hidden' }}>
+          <div style={{
+            height: '100%',
+            background: 'linear-gradient(90deg, var(--mantine-color-blue-5), var(--mantine-color-grape-5))',
+            width: '100%',
+            animation: 'loadingProgress 2s infinite ease-in-out',
+          }} />
+        </div>
+      </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes pulseGlow {
+          0%, 100% { transform: scale(1); box-shadow: 0 8px 20px rgba(34, 139, 230, 0.35); }
+          50% { transform: scale(1.08); box-shadow: 0 8px 30px rgba(156, 54, 181, 0.5); }
+        }
+        @keyframes spinSlow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes loadingProgress {
+          0% { transform: translateX(-100%); }
+          50% { transform: translateX(0%); }
+          100% { transform: translateX(100%); }
+        }
+      ` }} />
+    </div>
+  );
+}
+
 export default function PlanSubtab({ jugador, readOnly = false }) {
   const [planes, setPlanes] = useState([]);
   const [currentId, setCurrentId] = useState(null);
@@ -575,7 +676,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
             <Loader size="lg" />
           </Paper>
         ) : isDocumentMode ? (
-          <Paper p={{ base: 'sm', sm: 'lg' }} radius="lg" withBorder shadow="sm">
+          <Paper p={{ base: 'sm', sm: 'lg' }} radius="lg" withBorder shadow="sm" style={{ position: 'relative', overflow: 'hidden', minHeight: (actionType === 'generate' || (actionType === 'save' && !hasGeneratedAi)) ? '400px' : 'auto' }}>
+            <AiGenerationOverlay opened={actionType === 'generate' || (actionType === 'save' && !hasGeneratedAi)} messages={INDIVIDUAL_GENERATION_MESSAGES} />
             <Stack gap="lg">
               <Group justify="space-between" align="flex-start" wrap="wrap">
                 <Box>
