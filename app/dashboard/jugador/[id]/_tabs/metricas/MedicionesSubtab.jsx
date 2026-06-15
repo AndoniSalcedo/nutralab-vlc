@@ -249,8 +249,21 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
       <Modal
         opened={!!modalMode && !readOnly}
         onClose={cancelForm}
-        title={modalMode === 'new' ? 'Registrar medición' : 'Editar medición'}
+        title={
+          <Group gap="xs">
+            {modalMode === 'new' ? (
+              <IconRuler2 size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            ) : (
+              <IconEdit size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            )}
+            <Text fw={700}>
+              {modalMode === 'new' ? 'Registrar medición' : 'Editar medición'}
+            </Text>
+          </Group>
+        }
         size="lg"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
       >
         <Stack gap="md">
           <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
@@ -296,7 +309,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                 const d = diff(m);
                 const unit = m.unit || '';
                 const reverseMetricData = [...metricData].reverse();
-                
+
                 return (
                   <Paper
                     key={m.key}
@@ -327,8 +340,8 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                           <ComposedChart data={metricData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                             <defs>
                               <linearGradient id={`gradient_player_${m.key}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor={m.color} stopOpacity={0.4}/>
-                                <stop offset="95%" stopColor={m.color} stopOpacity={0.05}/>
+                                <stop offset="5%" stopColor={m.color} stopOpacity={0.4} />
+                                <stop offset="95%" stopColor={m.color} stopOpacity={0.05} />
                               </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />

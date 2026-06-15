@@ -689,9 +689,15 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       <Modal
         opened={modalOpen}
         onClose={() => setModalOpen(false)}
-        title="Vista Previa de Importación de Hidratación"
+        title={
+          <Group gap="xs">
+            <IconDatabaseImport size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Text fw={700}>Vista Previa de Importación de Hidratación</Text>
+          </Group>
+        }
         size="xl"
         radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
       >
         <Stack gap="md">
           <Alert color="blue" icon={<IconAlertCircle size={18} />}>
@@ -776,9 +782,15 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
           setEditModalOpen(false);
           setEditingRecord(null);
         }}
-        title="Editar Toma de Hidratación"
+        title={
+          <Group gap="xs">
+            <IconEdit size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Text fw={700}>Editar Toma de Hidratación</Text>
+          </Group>
+        }
         radius="lg"
         size="md"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
       >
         <Stack gap="md">
           <SimpleGrid cols={2} spacing="sm">

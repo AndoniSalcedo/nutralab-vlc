@@ -525,9 +525,16 @@ export default function SupplementCatalogManager({ players = [], team }) {
       <Modal
         opened={!!confirmAction}
         onClose={() => setConfirmAction(null)}
-        title="Confirmar acción"
+        title={
+          <Group gap="xs">
+            <IconInfoCircle size={20} style={{ color: 'var(--mantine-color-red-6)' }} />
+            <Text fw={700}>Confirmar acción</Text>
+          </Group>
+        }
         size="sm"
         centered
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
         zIndex={1000}
         withCloseButton={false}
       >

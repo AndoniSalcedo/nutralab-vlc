@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Anchor, Button, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination, Textarea } from '@mantine/core';
+import { Anchor, Button, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination, Textarea, Checkbox } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconDownload, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil } from '@tabler/icons-react';
+import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconDownload, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconFileText, IconChefHat, IconBook, IconCalendar, IconSettings } from '@tabler/icons-react';
 import DashboardActions from '@/components/DashboardActions';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
@@ -78,6 +78,24 @@ function DashboardStat({ title, icon: Icon, color = 'blue', value, description, 
   );
 }
 
+const DAYS_OF_WEEK = [
+  { key: 'lunes', label: 'Lunes' },
+  { key: 'martes', label: 'Martes' },
+  { key: 'miercoles', label: 'Miércoles' },
+  { key: 'jueves', label: 'Jueves' },
+  { key: 'viernes', label: 'Viernes' },
+  { key: 'sabado', label: 'Sábado' },
+  { key: 'domingo', label: 'Domingo' },
+];
+
+const DAY_TYPE_OPTIONS = [
+  { value: 'descanso', label: '💤 Descanso' },
+  { value: 'recuperacion', label: '🟢 Recuperación' },
+  { value: 'entreno', label: '⚡ Entrenamiento' },
+  { value: 'doble', label: '🔥 Doble sesión' },
+  { value: 'partido', label: '⚽ Partido' },
+];
+
 function defaultReportForm() {
   const today = new Date();
   const monday = new Date(today);
@@ -89,7 +107,7 @@ function defaultReportForm() {
   return {
     semana: weekStr,
     title: 'Semana 10-17 Mayo',
-    subtitle: 'Plan nutricional · 3 partidos en 8 dias',
+    subtitle: 'Plan nutricional',
     team: 'Valencia CF · Primer Equipo',
     author: 'Carlos Ferrando · Nutralab',
     handle: '@c.ferrando',
@@ -107,6 +125,15 @@ function defaultReportForm() {
       'Sueno 8 h. Cero alcohol. Cafeina solo el dia de partido (3 mg/kg a -45 min).',
     ].join('\n'),
     buffet: 'Desayuno y comidas usan exclusivamente las opciones del listado oficial de Paterna (huevos, pavo, jamon serrano, porridge, focaccia, pan blanco, frutos rojos, fruta entera, yogur de proteina, AOVE...). Las meriendas se hacen en casa: yogur de proteina + tortitas de arroz + fruta + frutos secos (15 g) y, solo MD-1, browniato disponible.',
+    calendario: {
+      lunes: 'entreno',
+      martes: 'entreno',
+      miercoles: 'descanso',
+      jueves: 'entreno',
+      viernes: 'entreno',
+      sabado: 'descanso',
+      domingo: 'descanso',
+    },
   };
 }
 
@@ -150,7 +177,12 @@ export default function DashboardContent({ players = [], team }) {
   const [deletingId, setDeletingId] = useState(null);
   const [reportModal, setReportModal] = useState({ opened: false, player: null });
   const [reportForm, setReportForm] = useState(defaultReportForm);
+  const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
+
   const [generatingReport, setGeneratingReport] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [availableMenus, setAvailableMenus] = useState([]);
+  const [selectedMenuWeek, setSelectedMenuWeek] = useState('');
   const [filters, setFilters] = useState({ name: '', email: '', position: '' });
   const [page, setPage] = useState(1);
   const totalPlayers = playersState.length;
@@ -231,8 +263,40 @@ export default function DashboardContent({ players = [], team }) {
     }
   }
 
+  async function loadAvailableMenus(weekStr) {
+    try {
+      const res = await fetch('/api/menu-semanal');
+      if (res.ok) {
+        const data = await res.json();
+        const menusList = data.menus || [];
+        setAvailableMenus(menusList);
+        
+        // Find if a menu matches the selected week
+        const match = menusList.find((m) => m.semana === weekStr);
+        if (match) {
+          setSelectedMenuWeek(match.semana);
+          updateReportField('semanaMenu', match.semana);
+        } else if (menusList.length > 0) {
+          setSelectedMenuWeek(menusList[0].semana);
+          updateReportField('semanaMenu', menusList[0].semana);
+        }
+      }
+    } catch (e) {
+      console.error('Error loading menus list:', e);
+    }
+  }
+
   function openReportModal(player = null) {
     setReportModal({ opened: true, player });
+    setShowAdvanced(false);
+    
+    if (player) {
+      setSelectedPlayerIds([player.id]);
+    } else {
+      setSelectedPlayerIds(playersState.map((p) => p.id));
+    }
+    
+    loadAvailableMenus(reportForm.semana);
   }
 
   function closeReportModal() {
@@ -244,14 +308,41 @@ export default function DashboardContent({ players = [], team }) {
     setReportForm((current) => ({ ...current, [field]: value }));
   }
 
+  function updateCalendarioDay(dayKey, value) {
+    setReportForm((current) => ({
+      ...current,
+      calendario: {
+        ...current.calendario,
+        [dayKey]: value,
+      },
+    }));
+  }
+
+
+
   async function generateReport() {
+    const jugadorIds = reportModal.player ? [reportModal.player.id] : selectedPlayerIds;
+    if (jugadorIds.length === 0) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al generar informe',
+        message: 'Debes seleccionar al menos un jugador.',
+      });
+      return;
+    }
+
     setGeneratingReport(true);
     try {
-      const jugadorIds = reportModal.player ? [reportModal.player.id] : undefined;
       const res = await fetch('/api/reports/weekly-squad', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ meta: reportForm, jugadorIds, team_id: team?.id }),
+        body: JSON.stringify({
+          meta: reportForm,
+          jugadorIds,
+          calendario: reportForm.calendario,
+          team_id: team?.id,
+          semanaMenu: selectedMenuWeek
+        }),
       });
 
       if (!res.ok) {
@@ -552,80 +643,270 @@ export default function DashboardContent({ players = [], team }) {
         )}
       </Box>
 
-      <Modal opened={!!editingPlayer} onClose={() => setEditingPlayer(null)} title="Editar jugador" size="xl">
+      <Modal
+        opened={!!editingPlayer}
+        onClose={() => setEditingPlayer(null)}
+        title={
+          <Group gap="xs">
+            <IconPencil size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Text fw={700}>Editar jugador</Text>
+          </Group>
+        }
+        size="xl"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
+      >
         {editingPlayer && <PlayerForm initial={editingPlayer} team={team} />}
       </Modal>
 
       <Modal
         opened={reportModal.opened}
         onClose={closeReportModal}
-        title={reportModal.player ? `Informe de ${reportModal.player.nombre}` : 'Informe semanal de plantilla'}
-        size="xl"
+        title={
+          <Group gap="xs">
+            <IconFileText size={22} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Stack gap={0}>
+              <Text fw={800} size="md">
+                {reportModal.player ? `Informe de ${reportModal.player.nombre}` : 'Informe semanal de plantilla'}
+              </Text>
+              <Text size="xs" c="dimmed">
+                Configuración del plan y la estructura de la semana
+              </Text>
+            </Stack>
+          </Group>
+        }
+        size="1000px"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
       >
         <Stack gap="md">
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-            <TextInput
-              type="date"
-              label="Fecha de la semana (Lunes)"
-              value={reportForm.semana}
-              onChange={(event) => updateReportField('semana', event.currentTarget.value)}
-            />
-            <TextInput
-              label="Rango / titulo de semana"
-              value={reportForm.title}
-              onChange={(event) => updateReportField('title', event.currentTarget.value)}
-            />
-            <TextInput
-              label="Subtitulo"
-              value={reportForm.subtitle}
-              onChange={(event) => updateReportField('subtitle', event.currentTarget.value)}
-            />
-            <TextInput
-              label="Club / equipo"
-              value={reportForm.team}
-              onChange={(event) => updateReportField('team', event.currentTarget.value)}
-            />
-            <TextInput
-              label="Autor / firma"
-              value={reportForm.author}
-              onChange={(event) => updateReportField('author', event.currentTarget.value)}
-            />
-          </SimpleGrid>
-          <TextInput
-            label="Handle / contacto"
-            value={reportForm.handle}
-            onChange={(event) => updateReportField('handle', event.currentTarget.value)}
-          />
-          <Textarea
-            label="Microciclo / calendario"
-            minRows={4}
-            autosize
-            value={reportForm.microcycle}
-            onChange={(event) => updateReportField('microcycle', event.currentTarget.value)}
-          />
-          <Textarea
-            label="Reglas de la semana"
-            minRows={5}
-            autosize
-            value={reportForm.rules}
-            onChange={(event) => updateReportField('rules', event.currentTarget.value)}
-          />
-          <Textarea
-            label="Equipamiento del buffet"
-            minRows={3}
-            autosize
-            value={reportForm.buffet}
-            onChange={(event) => updateReportField('buffet', event.currentTarget.value)}
-          />
+          {/* Panel 1: Datos de la Semana */}
+          <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(231, 245, 255, 0.35)', borderColor: '#a5d8ff' }}>
+            <Group gap="xs" mb="xs">
+              <ThemeIcon color="blue" size="sm" radius="xl" variant="light">
+                <IconCalendar size={14} />
+              </ThemeIcon>
+              <Text fw={700} size="sm" c="blue.9">Configuración de la Semana</Text>
+            </Group>
+            
+            <Stack gap="sm">
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+                <TextInput
+                  type="date"
+                  label="Fecha de la semana (Lunes)"
+                  value={reportForm.semana}
+                  onChange={(event) => {
+                    const val = event.currentTarget.value;
+                    updateReportField('semana', val);
+                    const match = availableMenus.find((m) => m.semana === val);
+                    if (match) {
+                      setSelectedMenuWeek(match.semana);
+                      updateReportField('semanaMenu', match.semana);
+                    }
+                  }}
+                />
+                <TextInput
+                  label="Rango / título de semana"
+                  value={reportForm.title}
+                  onChange={(event) => updateReportField('title', event.currentTarget.value)}
+                />
+              </SimpleGrid>
+
+              <Box>
+                <Button
+                  variant="subtle"
+                  size="xs"
+                  color="blue"
+                  leftSection={<IconSettings size={14} />}
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                  style={{ paddingLeft: 0 }}
+                >
+                  {showAdvanced ? 'Ocultar configuración avanzada ▲' : 'Mostrar configuración avanzada ▼'}
+                </Button>
+
+                {showAdvanced && (
+                  <Paper withBorder p="md" radius="md" mt="xs" style={{ background: '#ffffff', borderColor: '#e9ecef' }}>
+                    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+                      <TextInput
+                        label="Subtítulo"
+                        value={reportForm.subtitle}
+                        onChange={(event) => updateReportField('subtitle', event.currentTarget.value)}
+                      />
+                      <TextInput
+                        label="Club / equipo"
+                        value={reportForm.team}
+                        onChange={(event) => updateReportField('team', event.currentTarget.value)}
+                      />
+                      <TextInput
+                        label="Autor / firma"
+                        value={reportForm.author}
+                        onChange={(event) => updateReportField('author', event.currentTarget.value)}
+                      />
+                      <TextInput
+                        label="Handle / contacto"
+                        value={reportForm.handle}
+                        onChange={(event) => updateReportField('handle', event.currentTarget.value)}
+                      />
+                    </SimpleGrid>
+                  </Paper>
+                )}
+              </Box>
+            </Stack>
+          </Paper>
+
+          {/* Panel 2: Menú del Buffet Comedor */}
+          <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(230, 252, 245, 0.35)', borderColor: '#96f2d7' }}>
+            <Group gap="xs" mb="xs">
+              <ThemeIcon color="teal" size="sm" radius="xl" variant="light">
+                <IconChefHat size={14} />
+              </ThemeIcon>
+              <Text fw={700} size="sm" c="teal.9">Menú del Buffet Comedor</Text>
+            </Group>
+            
+            <Box>
+              <Select
+                label="Menú del comedor a sincronizar"
+                placeholder="Selecciona una semana..."
+                value={selectedMenuWeek}
+                onChange={(val) => {
+                  setSelectedMenuWeek(val || '');
+                  updateReportField('semanaMenu', val || '');
+                }}
+                data={availableMenus.map((m) => ({
+                  value: m.semana,
+                  label: `Menú de la semana del ${m.semana}`,
+                }))}
+              />
+            </Box>
+          </Paper>
+
+          {/* Panel 3: Tipos de Día */}
+          <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(243, 240, 246, 0.4)', borderColor: '#e1dbec' }}>
+            <Group gap="xs" mb="xs">
+              <ThemeIcon color="grape" size="sm" radius="xl" variant="light">
+                <IconCalendarEvent size={14} />
+              </ThemeIcon>
+              <Text fw={700} size="sm" c="grape.9">Planificación del Tipo de Día</Text>
+            </Group>
+
+            <SimpleGrid cols={{ base: 2, sm: 3, md: 4 }} spacing="sm">
+              {DAYS_OF_WEEK.map((day) => (
+                <Select
+                  key={day.key}
+                  label={day.label}
+                  value={reportForm.calendario?.[day.key] || 'entreno'}
+                  onChange={(val) => updateCalendarioDay(day.key, val)}
+                  data={DAY_TYPE_OPTIONS}
+                  size="sm"
+                />
+              ))}
+            </SimpleGrid>
+          </Paper>
+
+          {/* Panel 4: Seleccionar Jugadores */}
+          {!reportModal.player && (
+            <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(237, 242, 255, 0.35)', borderColor: '#bac8ff' }}>
+              <Group justify="space-between" mb="xs" align="center">
+                <Group gap="xs">
+                  <ThemeIcon color="indigo" size="sm" radius="xl" variant="light">
+                    <IconUsers size={14} />
+                  </ThemeIcon>
+                  <Text fw={700} size="sm" c="indigo.9">
+                    Destinatarios ({selectedPlayerIds.length} de {playersState.length})
+                  </Text>
+                </Group>
+                <Group gap="xs">
+                  <Button
+                    variant="subtle"
+                    size="compact-xs"
+                    color="indigo"
+                    onClick={() => setSelectedPlayerIds(playersState.map((p) => p.id))}
+                  >
+                    Seleccionar todos
+                  </Button>
+                  <Button
+                    variant="subtle"
+                    color="red"
+                    size="compact-xs"
+                    onClick={() => setSelectedPlayerIds([])}
+                  >
+                    Deseleccionar todos
+                  </Button>
+                </Group>
+              </Group>
+              <ScrollArea h={140} offsetScrollbars style={{ border: '1px solid var(--mantine-color-gray-2)', borderRadius: 'var(--mantine-radius-md)', padding: '8px', backgroundColor: '#ffffff' }}>
+                <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="xs">
+                  {playersState.map((player) => {
+                    const isSelected = selectedPlayerIds.includes(player.id);
+                    return (
+                      <Checkbox
+                        key={player.id}
+                        label={`${player.nombre} ${player.apellidos || ''}`.trim()}
+                        checked={isSelected}
+                        onChange={(event) => {
+                          const checked = event.currentTarget.checked;
+                          setSelectedPlayerIds((prev) =>
+                            checked
+                              ? [...prev, player.id]
+                              : prev.filter((id) => id !== player.id)
+                          );
+                        }}
+                        size="sm"
+                      />
+                    );
+                  })}
+                </SimpleGrid>
+              </ScrollArea>
+            </Paper>
+          )}
+
+          {/* Panel 5: Textos e Indicaciones */}
+          <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(248, 249, 250, 0.5)', borderColor: '#e9ecef' }}>
+            <Group gap="xs" mb="xs">
+              <ThemeIcon color="gray" size="sm" radius="xl" variant="light">
+                <IconBook size={14} />
+              </ThemeIcon>
+              <Text fw={700} size="sm" c="gray.9">Contenido e Indicaciones del PDF</Text>
+            </Group>
+            
+            <Stack gap="sm">
+              <Textarea
+                label="Microciclo / calendario"
+                placeholder="Ej. Partido Domingo vs Barcelona. Lunes y Martes entreno normal..."
+                minRows={3}
+                autosize
+                value={reportForm.microcycle}
+                onChange={(event) => updateReportField('microcycle', event.currentTarget.value)}
+              />
+              <Textarea
+                label="Reglas de la semana"
+                placeholder="Ej. Hidratación regular, suplementación básica..."
+                minRows={3}
+                autosize
+                value={reportForm.rules}
+                onChange={(event) => updateReportField('rules', event.currentTarget.value)}
+              />
+              <Textarea
+                label="Equipamiento del buffet"
+                placeholder="Ej. Indicaciones de cómo servirse según día de entreno/partido..."
+                minRows={3}
+                autosize
+                value={reportForm.buffet}
+                onChange={(event) => updateReportField('buffet', event.currentTarget.value)}
+              />
+            </Stack>
+          </Paper>
+
           <Group justify="space-between" align="center" mt="xs">
             <Text size="sm" c="dimmed">
               {reportModal.player
-                ? 'Se generara un PDF individual en una sola pagina A4.'
-                : `Se generara un PDF con portada y ${totalPlayers} fichas individuales.`}
+                ? 'Se generará un PDF individual en una sola página A4.'
+                : `Se generará un PDF con portada y ${selectedPlayerIds.length} fichas individuales.`}
             </Text>
             <Button
               leftSection={<IconDownload size={16} />}
               radius="xl"
+              color="blue"
               loading={generatingReport}
               onClick={generateReport}
             >

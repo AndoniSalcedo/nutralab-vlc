@@ -60,7 +60,19 @@ export default function MensajesTab({ jugador, messages = [], readOnly = false }
         </Group>
       </Paper>
 
-      <Modal opened={opened && !readOnly} onClose={close} title="Nuevo mensaje" size="lg">
+      <Modal
+        opened={opened && !readOnly}
+        onClose={close}
+        title={
+          <Group gap="xs">
+            <IconMail size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Text fw={700}>Nuevo mensaje</Text>
+          </Group>
+        }
+        size="lg"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
+      >
         <MessageComposer
           players={playerOption}
           defaultRecipientIds={[jugador.id]}

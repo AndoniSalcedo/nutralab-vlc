@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { cunninghamPlan, resolveNutritionDayType } from '@/lib/calculations';
+import { PlanCardPage } from './NutritionPlanCardDocument';
 
 const COLORS = {
   bg: '#10142f',
@@ -311,7 +312,7 @@ function Footer({ meta }) {
 }
 
 function CoverPage({ meta, playersCount }) {
-  const microcycle = toLines(meta.microcycle);
+  const microcycle = toLines(meta.microcycle).slice(0, 7);
   const rules = toLines(meta.rules);
   const buffet = toLines(meta.buffet);
 
@@ -329,117 +330,33 @@ function CoverPage({ meta, playersCount }) {
         </View>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Microciclo comprimido</Text>
-        {microcycle.map((line) => (
-          <Text key={line} style={styles.lineItem}>{line}</Text>
-        ))}
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Reglas de la semana</Text>
-        {rules.map((line) => (
-          <Text key={line} style={styles.lineItem}>{line}</Text>
-        ))}
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Equipamiento del buffet</Text>
-        {buffet.map((line) => (
-          <Text key={line} style={styles.paragraph}>{line}</Text>
-        ))}
-      </View>
-
-      <Footer meta={meta} />
-    </Page>
-  );
-}
-
-function StatCard({ label, value, hint, last, color }) {
-  return (
-    <View style={[styles.statCard, last ? styles.statCardLast : null]}>
-      <Text style={styles.statLabel}>{label}</Text>
-      <Text style={[styles.statValue, color ? { color } : null]}>{value}</Text>
-      {hint ? <Text style={styles.statHint}>{hint}</Text> : null}
-    </View>
-  );
-}
-
-function PlayerPage({ player, meta }) {
-  const targets = playerTargets(player);
-  const age = ageFromBirthDate(player.fecha_nacimiento);
-  const microcycle = toLines(meta.microcycle).slice(0, 3).map((line) => truncate(line, 120));
-  const dayType = buildDayType(player, targets).slice(0, 5).map((line) => truncate(line, 138));
-  const hydration = previewLines(player.notas_hidratacion, defaultHydration(player), 3);
-  const supplementation = previewLines(player.notas_suplementacion, ['Creatina 5 g/dia si esta pautada.', 'Omega-3 y vitamina D segun criterio individual.', 'Nada nuevo el dia de partido.'], 3);
-  const protocols = previewLines(player.notas_protocolos, ['Comida principal -3/-4 h: alta en HC, baja en grasa y fibra.', 'Snack -90 min: platano, gel u opcion habitual.', 'Post +30 min: proteina + HC rapidos.'], 3);
-
-  return (
-    <Page size="A4" style={[styles.page, styles.pageAlt]} wrap={false}>
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.playerTitle}>{truncate(`${player.nombre || ''} ${player.apellidos || ''}`.trim() || 'Jugador', 34)}</Text>
-          <Text style={styles.subtitle}>{player.posicion || 'Sin posicion'}</Text>
-          <View style={styles.tags}>
-            {age ? <Text style={styles.tag}>{age} anos</Text> : null}
-            {player.posicion ? <Text style={styles.tag}>{player.posicion}</Text> : null}
-          </View>
-        </View>
-        <View style={styles.rightHeader}>
-          <Text style={styles.rightStrong}>{meta.title || 'Informe semanal'}</Text>
-          <Text>{decimalOrDash(player.peso_kg, ' kg')} · talla {decimalOrDash(player.altura_cm, ' cm')}</Text>
-          <Text>% grasa {decimalOrDash(player.porcentaje_grasa, '%')} · 6 pliegues {decimalOrDash(player.suma_6_pliegues)}</Text>
-        </View>
-      </View>
-
-      <View style={styles.grid}>
-        <StatCard label="Kcal/dia" value={numberOrDash(targets.kcal)} hint={player.kcal_objetivo ? 'objetivo fijado' : 'estimado'} />
-        <StatCard label="HC (g)" value={numberOrDash(targets.cho)} hint={player.peso_kg ? `≈ ${decimalOrDash(Number(targets.cho || 0) / Number(player.peso_kg), ' g/kg')}` : 'pendiente'} />
-        <StatCard label="Proteina (g)" value={numberOrDash(targets.protein)} hint={player.peso_kg ? `≈ ${decimalOrDash(Number(targets.protein || 0) / Number(player.peso_kg), ' g/kg')}` : 'pendiente'} color={COLORS.orange} />
-        <StatCard label="Grasas (g)" value={numberOrDash(targets.fat)} hint={player.peso_kg ? `≈ ${decimalOrDash(Number(targets.fat || 0) / Number(player.peso_kg), ' g/kg')}` : 'pendiente'} last />
-      </View>
-
       <View style={styles.columns}>
         <View style={styles.col}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Dia tipo</Text>
-            {dayType.map((line) => (
-              <Text key={line} style={styles.lineItem}>{line}</Text>
-            ))}
+            <Text style={styles.sectionTitle}>Calendario de la semana</Text>
+            <View style={styles.box}>
+              {microcycle.map((line) => (
+                <Text key={line} style={styles.lineItem}>{line}</Text>
+              ))}
+            </View>
           </View>
-
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Calendario · claves de partido</Text>
-            {microcycle.map((line) => (
-              <View key={line} style={styles.matchCard}>
-                <Text style={styles.matchTitle}>{truncate(line.split('.')[0], 32)}</Text>
-                <Text>{line}</Text>
-              </View>
-            ))}
+            <Text style={styles.sectionTitle}>Equipamiento del buffet</Text>
+            <View style={styles.box}>
+              {buffet.map((line) => (
+                <Text key={line} style={styles.paragraph}>{line}</Text>
+              ))}
+            </View>
           </View>
         </View>
-
         <View style={[styles.col, styles.colLast]}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Hidratacion</Text>
+            <Text style={styles.sectionTitle}>Reglas de la semana</Text>
             <View style={styles.box}>
-              {hydration.map((line) => <Text key={line} style={styles.paragraph}>{line}</Text>)}
+              {rules.map((line) => (
+                <Text key={line} style={styles.lineItem}>• {line}</Text>
+              ))}
             </View>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Suplementacion</Text>
-            <View style={styles.box}>
-              {supplementation.map((line) => <Text key={line} style={styles.paragraph}>{line}</Text>)}
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Protocolo individual</Text>
-            <View style={styles.box}>
-              {protocols.map((line) => <Text key={line} style={styles.paragraph}>{line}</Text>)}
-            </View>
-            <Text style={styles.warningBox}>No olvides: sueno 8 h, caseina nocturna si esta pautada y cero alcohol entre partidos.</Text>
           </View>
         </View>
       </View>
@@ -460,7 +377,7 @@ export default function WeeklySquadReportDocument({ meta, players }) {
     >
       {includeCover ? <CoverPage meta={meta} playersCount={players.length} /> : null}
       {players.map((player) => (
-        <PlayerPage key={player.id} player={player} meta={meta} />
+        <PlanCardPage key={player.id} plan={player.plan} />
       ))}
     </Document>
   );

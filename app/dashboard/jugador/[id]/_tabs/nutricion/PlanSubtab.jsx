@@ -32,6 +32,7 @@ import {
 } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import { buildBasePlanData, PLAN_DAY_TYPES, sanitizePlanData } from '@/lib/nutrition-plan-card';
+import { cunninghamPlan } from '@/lib/calculations';
 import IntercambiosModal from './IntercambiosModal';
 
 const CONTEXTOS = [
@@ -97,36 +98,54 @@ function MetricCard({ label, value, color = 'orange' }) {
   );
 }
 
-function MacroCard({ item, index }) {
-  const isTraining = item?.key === 'entreno' || index === 2;
-  const isMatch = item?.key === 'partido';
-
-  return (
-    <Paper className={`ficha-macro ${isTraining ? 'is-middle' : ''}`} p="md" radius="sm">
-      <Text size="xs" fw={800} tt="uppercase" c={isMatch ? 'orange.4' : 'teal.3'}>{item.kcalLabel}</Text>
-      <Title order={2} c="orange.4" mt={4}>{formatInt(item.kcal)}</Title>
-      <Text size="xs" c="dimmed">kcal</Text>
-      <SimpleGrid cols={3} spacing={4} mt="sm">
-        <Box ta="center">
-          <Text size="sm" fw={800} c="grape.3">{formatInt(item.proteina)} g</Text>
-          <Text size="9px" c="dimmed" tt="uppercase">Proteína</Text>
-        </Box>
-        <Box ta="center">
-          <Text size="sm" fw={800} c="teal.3">{formatInt(item.hidratos)} g</Text>
-          <Text size="9px" c="dimmed" tt="uppercase">Hidratos</Text>
-        </Box>
-        <Box ta="center">
-          <Text size="sm" fw={800} c="orange.3">{formatInt(item.grasa)} g</Text>
-          <Text size="9px" c="dimmed" tt="uppercase">Grasas</Text>
-        </Box>
-      </SimpleGrid>
-    </Paper>
-  );
-}
-
-function PlanFicha({ data }) {
+function PlanFicha({ data, jugador }) {
   const plan = sanitizePlanData(data);
   if (!plan) return null;
+
+  const leftDays = ['lunes', 'martes', 'miercoles', 'jueves'];
+  const rightDays = ['viernes', 'sabado', 'domingo'];
+
+  const dayTypeLabels = {
+    descanso: 'Descanso',
+    recuperacion: 'Recuperación',
+    entreno: 'Entrenamiento',
+    doble: 'Doble sesión',
+    partido: 'Partido',
+  };
+
+  const dayTypeColors = {
+    descanso: 'blue',
+    recuperacion: 'teal',
+    entreno: 'green',
+    doble: 'orange',
+    partido: 'red',
+  };
+
+  const renderDayBox = (dayKey) => {
+    const dayData = plan.dias[dayKey];
+    if (!dayData) return null;
+    const color = dayTypeColors[dayData.tipoDia] || 'green';
+    const label = dayTypeLabels[dayData.tipoDia] || dayData.tipoDia;
+    return (
+      <Paper key={dayKey} p="md" radius="md" style={{ backgroundColor: '#151932', border: '1px solid #2d335a' }} mb="sm">
+        <Group justify="space-between" align="center" mb="xs">
+          <Text size="md" fw={900} tt="uppercase">{dayData.label}</Text>
+          <Badge variant="light" color={color}>{label}</Badge>
+        </Group>
+        <Text size="xs" fw={700} c="dimmed" mb="sm">
+          {formatInt(dayData.kcal)} kcal · P: {formatInt(dayData.proteina)}g · HC: {formatInt(dayData.hidratos)}g · G: {formatInt(dayData.grasa)}g
+        </Text>
+        <Stack gap="xs">
+          {dayData.ingestas.map((meal, mealIndex) => (
+            <Box key={mealIndex} p="xs" style={{ backgroundColor: '#1d1f46', borderRadius: '4px' }}>
+              <Text size="xs" fw={800} c="orange.4" tt="uppercase" lh={1.1}>{meal.nombre}</Text>
+              <Text size="sm" c="gray.3" mt={2} style={{ lineHeight: 1.35 }}>{meal.detalle || '-'}</Text>
+            </Box>
+          ))}
+        </Stack>
+      </Paper>
+    );
+  };
 
   return (
     <Paper className="ficha" radius="sm" shadow="sm">
@@ -139,48 +158,33 @@ function PlanFicha({ data }) {
         <Text className="ficha-position">{plan.jugador.posicion}</Text>
         <Box className="ficha-rule" />
 
-        <SimpleGrid cols={{ base: 2, md: 4 }} spacing="sm" mt="xl">
+        <SimpleGrid cols={{ base: 2, md: 4 }} spacing="sm" mt="xl" mb="xl">
           <MetricCard label="Peso" value={formatNumber(plan.metricas.peso, ' kg')} color="orange.4" />
           <MetricCard label="Grasa" value={formatNumber(plan.metricas.grasa, ' %')} color="orange.4" />
           <MetricCard label="M. magra" value={formatNumber(plan.metricas.masaMagra, ' kg')} color="green.4" />
           <MetricCard label="Objetivo" value={plan.metricas.pesoObjetivo ? `~${formatNumber(plan.metricas.pesoObjetivo, ' kg')}` : '-'} color="teal.3" />
         </SimpleGrid>
 
-        <Text className="ficha-section">Distribución calórica por tipo de día</Text>
-        <SimpleGrid cols={{ base: 1, md: 5 }} spacing="sm">
-          {PLAN_DAY_TYPES.map((dayType, index) => (
-            <MacroCard key={dayType.key} item={plan.tiposDia[dayType.key]} index={index} />
-          ))}
+        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+          <Stack gap={0}>
+            {leftDays.map(renderDayBox)}
+          </Stack>
+          <Stack gap={0}>
+            {rightDays.map(renderDayBox)}
+            {plan.notas?.length > 0 && (
+              <Paper p="md" radius="md" style={{ backgroundColor: '#071e36', border: '1px solid #1e3a8a' }}>
+                <Title order={5} c="teal.3" tt="uppercase" mb="xs">Indicaciones de la semana</Title>
+                <Stack gap={4}>
+                  {plan.notas.map((note, index) => (
+                    <Text key={index} size="sm" c="blue.1">• {note}</Text>
+                  ))}
+                </Stack>
+              </Paper>
+            )}
+          </Stack>
         </SimpleGrid>
 
-        <Divider my="md" color="#343963" />
-
-        <SimpleGrid cols={{ base: 1, md: 5 }} spacing="sm">
-          {PLAN_DAY_TYPES.map((dayType) => {
-            const item = plan.tiposDia[dayType.key];
-            return (
-              <Stack key={dayType.key} gap={4}>
-                <Box className="ficha-day-header" data-match={dayType.key === 'partido' ? 'true' : 'false'}>
-                  {item.label}
-                </Box>
-                {item.ingestas.map((meal, mealIndex) => (
-                  <Box key={`${dayType.key}-${meal.nombre}-${mealIndex}`} className="ficha-meal">
-                    <Text className="ficha-meal-name">{meal.nombre}</Text>
-                    <Text className="ficha-meal-detail">{meal.detalle || '-'}</Text>
-                  </Box>
-                ))}
-              </Stack>
-            );
-          })}
-        </SimpleGrid>
-
-        {plan.notas.length > 0 && (
-          <Box className="ficha-notes">
-            {plan.notas.join('   ·   ')}
-          </Box>
-        )}
-
-        <Text className="ficha-footer">Carlos Ferrando · Valencia CF · @c.ferrando · Nutricionista Deportivo y Clínico</Text>
+        <Text className="ficha-footer" mt="xl">Carlos Ferrando · Valencia CF · @c.ferrando · Nutricionista Deportivo y Clínico</Text>
       </Box>
     </Paper>
   );
@@ -199,6 +203,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [datos, setDatos] = useState(null);
   const [loadingList, setLoadingList] = useState(true);
   const [actionType, setActionType] = useState(null);
+  const [hasGeneratedAi, setHasGeneratedAi] = useState(false);
   const isDocumentMode = mode === 'create' || mode === 'edit';
   const loadingAction = Boolean(actionType);
 
@@ -255,6 +260,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setContextoAdicional('');
     setContenido('');
     setDatos(buildBasePlanData({ jugador, nombre: nextNombre, contexto: 'semana_normal', contextoAdicional: '' }));
+    setHasGeneratedAi(false);
   }
 
   function startEdit() {
@@ -265,6 +271,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setContextoAdicional(currentPlan.contexto_adicional || currentPlan.datos?.meta?.contextoAdicional || '');
     setContenido(currentPlan.contenido || '');
     setDatos(currentDatos ? clonePlan(currentDatos) : null);
+    setHasGeneratedAi(true);
   }
 
   function cancelForm() {
@@ -302,6 +309,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       if (!res.ok) throw new Error(data.error || 'Error al generar la ficha');
       setDatos(data.datos || null);
       setContenido('');
+      setHasGeneratedAi(true);
       notifications.update({
         id: notificationId,
         color: 'green',
@@ -343,7 +351,14 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       const res = await fetch('/api/ai-plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jugador, nombre, contexto, contextoAdicional, datos: finalDatos, contenido }),
+        body: JSON.stringify({
+          jugador,
+          nombre,
+          contexto,
+          contextoAdicional,
+          datos: hasGeneratedAi ? finalDatos : undefined,
+          contenido
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error al guardar el plan');
@@ -647,14 +662,68 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                     </SimpleGrid>
                   </Paper>
 
-                  {PLAN_DAY_TYPES.map((dayType) => {
-                    const item = datos.tiposDia?.[dayType.key];
+                  {['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'].map((dayKey) => {
+                    const item = datos.dias?.[dayKey];
+                    if (!item) return null;
                     return (
-                      <Paper key={dayType.key} p="md" radius="md" withBorder>
-                        <Group justify="space-between" align="center" mb="md">
-                          <Title order={4}>{item?.label || dayType.label}</Title>
-                          <Badge variant="light" color={dayType.key === 'partido' ? 'orange' : 'teal'}>
-                            {formatInt(item?.kcal)} kcal
+                      <Paper key={dayKey} p="md" radius="md" withBorder>
+                        <Group justify="space-between" align="center" mb="md" wrap="wrap">
+                          <Group gap="xs">
+                            <Title order={4}>{item.label}</Title>
+                            <Select
+                              placeholder="Tipo de día"
+                              data={[
+                                { value: 'descanso', label: 'Descanso' },
+                                { value: 'recuperacion', label: 'Recuperación' },
+                                { value: 'entreno', label: 'Entrenamiento' },
+                                { value: 'doble', label: 'Doble sesión' },
+                                { value: 'partido', label: 'Partido' },
+                              ]}
+                              value={item.tipoDia}
+                              onChange={(value) => {
+                                if (!value) return;
+                                updateDatos((draft) => {
+                                  draft.dias[dayKey].tipoDia = value;
+                                  
+                                  const dayTypeConfig = PLAN_DAY_TYPES.find((t) => t.key === value) || PLAN_DAY_TYPES[0];
+                                  const weight = Number(draft.metricas?.peso || jugador?.peso_kg || 0);
+                                  
+                                  if (weight) {
+                                    const cPlan = cunninghamPlan({
+                                      weightKg: weight,
+                                      bodyFatPct: draft.metricas?.grasa,
+                                      bodyFat: draft.metricas?.grasa,
+                                      leanMassKg: draft.metricas?.masaMagra,
+                                      activityFactor: dayTypeConfig.factor,
+                                      proteinGkg: dayTypeConfig.proteinGkg,
+                                      carbsGkg: dayTypeConfig.carbsGkg,
+                                      fatGkg: dayTypeConfig.fatGkg,
+                                    });
+                                    
+                                    draft.dias[dayKey].kcal = Math.round(cPlan.kcal);
+                                    draft.dias[dayKey].proteina = Math.round(cPlan.protein);
+                                    draft.dias[dayKey].hidratos = Math.round(cPlan.cho);
+                                    draft.dias[dayKey].grasa = Math.round(cPlan.fat);
+                                  }
+
+                                  const existingMeals = draft.dias[dayKey].ingestas || [];
+                                  const fallbackMeals = dayTypeConfig.meals.map((name) => {
+                                    const existing = existingMeals.find(m => m.nombre.toLowerCase() === name.toLowerCase());
+                                    return {
+                                      nombre: name,
+                                      detalle: existing?.detalle || '',
+                                    };
+                                  });
+                                  draft.dias[dayKey].ingestas = fallbackMeals;
+                                });
+                              }}
+                              size="xs"
+                              radius="xl"
+                              style={{ width: 150 }}
+                            />
+                          </Group>
+                          <Badge variant="light" color={item.tipoDia === 'partido' ? 'orange' : 'teal'}>
+                            {formatInt(item.kcal)} kcal
                           </Badge>
                         </Group>
                         <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md" mb="md">
@@ -667,22 +736,22 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                             <NumberInput
                               key={key}
                               label={label}
-                              value={item?.[key] ?? ''}
+                              value={item[key] ?? ''}
                               min={0}
                               onChange={(value) => updateDatos((draft) => {
-                                draft.tiposDia[dayType.key][key] = value === '' ? null : Number(value);
+                                draft.dias[dayKey][key] = value === '' ? null : Number(value);
                               })}
                             />
                           ))}
                         </SimpleGrid>
                         <Stack gap="sm">
-                          {item?.ingestas?.map((meal, index) => (
-                            <SimpleGrid key={`${dayType.key}-${index}`} cols={{ base: 1, md: 4 }} spacing="sm">
+                          {item.ingestas?.map((meal, index) => (
+                            <SimpleGrid key={`${dayKey}-${index}`} cols={{ base: 1, md: 4 }} spacing="sm">
                               <TextInput
                                 label="Ingesta"
                                 value={meal.nombre}
                                 onChange={(e) => updateDatos((draft) => {
-                                  draft.tiposDia[dayType.key].ingestas[index].nombre = e.target.value;
+                                  draft.dias[dayKey].ingestas[index].nombre = e.target.value;
                                 })}
                               />
                               <Box className="meal-detail-field">
@@ -692,7 +761,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                                   autosize
                                   minRows={1}
                                   onChange={(e) => updateDatos((draft) => {
-                                    draft.tiposDia[dayType.key].ingestas[index].detalle = e.target.value;
+                                    draft.dias[dayKey].ingestas[index].detalle = e.target.value;
                                   })}
                                 />
                               </Box>
@@ -747,7 +816,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
             />
           </Box>
         ) : currentDatos ? (
-          <PlanFicha data={currentDatos} />
+          <PlanFicha data={currentDatos} jugador={jugador} />
         ) : planHtml ? (
           <Paper p={{ base: 'sm', sm: 'xl' }} radius="lg" withBorder shadow="sm">
             <Badge mb="md" color="gray" variant="light">Plan legado</Badge>

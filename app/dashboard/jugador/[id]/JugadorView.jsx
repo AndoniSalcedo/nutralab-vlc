@@ -29,7 +29,6 @@ export default async function JugadorView({ id, activeTab = 'general', activeSub
   let messages = [];
   let menus = [];
   let registrosHidratacion = [];
-  let informes = [];
 
   try {
     const [resJugador, resAnaliticas, resEvoluciones, resMenus, resHidratacion] = await Promise.all([
@@ -47,21 +46,13 @@ export default async function JugadorView({ id, activeTab = 'general', activeSub
     registrosHidratacion = resHidratacion.data || [];
 
     if (jugador?.equipo_id) {
-      const [resMessages, resInformes] = await Promise.all([
-        supabase
-          .from('mensajes')
-          .select('id,jugador_id,titulo,contenido,created_by_name,created_at')
-          .eq('equipo_id', jugador.equipo_id)
-          .or(`jugador_id.is.null,jugador_id.eq.${id}`)
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('informes_semanales')
-          .select('*')
-          .eq('equipo_id', jugador.equipo_id)
-          .order('semana', { ascending: false })
-      ]);
-      messages = resMessages.data || [];
-      informes = resInformes.data || [];
+      const { data: resMessages } = await supabase
+        .from('mensajes')
+        .select('id,jugador_id,titulo,contenido,created_by_name,created_at')
+        .eq('equipo_id', jugador.equipo_id)
+        .or(`jugador_id.is.null,jugador_id.eq.${id}`)
+        .order('created_at', { ascending: false });
+      messages = resMessages || [];
     }
   } catch (err) {
     console.error('Error fetching jugador details:', err);
@@ -95,7 +86,6 @@ export default async function JugadorView({ id, activeTab = 'general', activeSub
         registrosHidratacion={registrosHidratacion}
         messages={messages}
         menus={menus}
-        informes={informes}
         activeTab={activeTab}
         activeSubtab={activeSubtab}
         readOnly={isPlayer}

@@ -274,11 +274,35 @@ export default function JugadorHeader({ jugador, user }) {
         />
       )}
 
-      <Modal opened={opened} onClose={() => setOpened(false)} title="Editar Ficha de Jugador" size="xl">
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title={
+          <Group gap="xs">
+            <IconEdit size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Text fw={700}>Editar Ficha de Jugador</Text>
+          </Group>
+        }
+        size="xl"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
+      >
         <PlayerForm initial={jugador} />
       </Modal>
 
-      <Modal opened={calculatorOpened} onClose={() => setCalculatorOpened(false)} title="Calculadora rápida" size="lg">
+      <Modal
+        opened={calculatorOpened}
+        onClose={() => setCalculatorOpened(false)}
+        title={
+          <Group gap="xs">
+            <IconCalculator size={20} style={{ color: 'var(--mantine-color-teal-6)' }} />
+            <Text fw={700}>Calculadora rápida</Text>
+          </Group>
+        }
+        size="lg"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
+      >
         <FoodCalculator />
       </Modal>
     </>

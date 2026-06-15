@@ -358,7 +358,23 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
 
   return (
     <Stack gap={0}>
-      <Modal opened={modalOpened && canManage} onClose={closeModal} title={modalTitle} size="lg">
+      <Modal
+        opened={modalOpened && canManage}
+        onClose={closeModal}
+        title={
+          <Group gap="xs">
+            {modalMode === 'lista' ? (
+              <IconBottle size={20} style={{ color: 'var(--mantine-color-grape-6)' }} />
+            ) : (
+              <IconPill size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            )}
+            <Text fw={700}>{modalTitle}</Text>
+          </Group>
+        }
+        size="lg"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
+      >
         <Stack gap="md">
           <SegmentedControl
             value={modalMode}

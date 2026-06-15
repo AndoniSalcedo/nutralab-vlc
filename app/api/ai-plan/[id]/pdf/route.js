@@ -54,7 +54,40 @@ export async function GET(_request, { params }) {
       if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
     }
 
-    const stream = await renderToStream(<NutritionPlanCardDocument data={plan.datos} />);
+    let weeklyReportMeta = null;
+    const { data: jugador } = await supabase
+      .from('jugadores')
+      .select('equipo_id')
+      .eq('id', plan.jugador_id)
+      .single();
+
+    let semana = plan.datos?.meta?.semanaMenu;
+    if (!semana && plan.datos?.meta?.fecha) {
+      const d = new Date(plan.datos.meta.fecha);
+      if (!Number.isNaN(d.getTime())) {
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(d);
+        monday.setDate(diff);
+        semana = monday.toISOString().split('T')[0];
+      }
+    }
+
+    if (jugador?.equipo_id && semana) {
+      const { data: report } = await supabase
+        .from('informes_semanales')
+        .select('meta')
+        .eq('equipo_id', jugador.equipo_id)
+        .eq('semana', semana)
+        .maybeSingle();
+      if (report) {
+        weeklyReportMeta = report.meta;
+      }
+    }
+
+    const stream = await renderToStream(
+      <NutritionPlanCardDocument data={plan.datos} weeklyReportMeta={weeklyReportMeta} />
+    );
     const chunks = [];
     for await (const chunk of stream) {
       chunks.push(chunk);

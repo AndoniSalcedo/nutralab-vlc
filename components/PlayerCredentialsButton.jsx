@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Button, Group, Menu, Modal, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
+import { Alert, Button, Group, Menu, Modal, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconKey, IconRefresh, IconShieldCheck } from '@tabler/icons-react';
 
@@ -102,14 +102,27 @@ export default function PlayerCredentialsButton({ jugador, compact = false, menu
         </Button>
       )}
 
-      <Modal opened={opened} onClose={() => setOpened(false)} title={buttonLabel} size="md">
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title={
+          <Group gap="xs">
+            {hasCredentials ? <IconShieldCheck size={20} style={{ color: 'var(--mantine-color-green-6)' }} /> : <IconKey size={20} style={{ color: 'var(--mantine-color-yellow-6)' }} />}
+            <Text fw={700}>{buttonLabel}</Text>
+          </Group>
+        }
+        size="md"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
+      >
         <Stack gap="md">
           {savedPassword && (
-            <Stack gap={2}>
-              <Text size="sm" fw={700}>Credenciales listas</Text>
-              <Text size="sm">Correo: {email}</Text>
-              <Text size="sm">Contraseña: {savedPassword}</Text>
-            </Stack>
+            <Alert color="green" icon={<IconShieldCheck size={16} />} radius="md" title="Credenciales listas">
+              <Stack gap={2}>
+                <Text size="xs"><strong>Correo:</strong> {email}</Text>
+                <Text size="xs"><strong>Contraseña:</strong> {savedPassword}</Text>
+              </Stack>
+            </Alert>
           )}
 
           <TextInput

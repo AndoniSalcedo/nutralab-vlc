@@ -6,6 +6,8 @@ import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getOwnedTeam } from '@/lib/team-access';
 import { withLatestMeasurement } from '@/lib/player-metrics';
 import WeeklySquadReportDocument from '@/lib/reports/WeeklySquadReportDocument';
+import { planDataToLegacyContent } from '@/lib/nutrition-plan-card';
+import { generarDatosPlan } from '@/lib/ai-plan-generator';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -38,6 +40,15 @@ function defaultMeta(meta = {}) {
     microcycle: meta.microcycle || 'DOM 10 · 16:15. Partido.\nJUE 14 · 19:00. Partido.\nDOM 17 · 19:00. Partido.',
     rules: meta.rules || 'Ningun dia en deficit calorico. Carga glucogenica continua.\nPescado azul 4-5 tomas minimo. Frutos rojos diarios.\nBatido post-entreno y post-partido obligatorio.\nHidratacion reforzada y sueno 8 h.',
     buffet: meta.buffet || 'Desayuno y comidas usan exclusivamente las opciones disponibles del buffet. Las meriendas se hacen en casa con yogur de proteina, tortitas de arroz, fruta y frutos secos.',
+    calendario: meta.calendario || {
+      lunes: 'entreno',
+      martes: 'entreno',
+      miercoles: 'descanso',
+      jueves: 'entreno',
+      viernes: 'entreno',
+      sabado: 'descanso',
+      domingo: 'descanso',
+    },
   };
 }
 
@@ -129,7 +140,7 @@ async function persistWeeklyReport(supabase, teamId, meta, semana) {
   return semanaVal;
 }
 
-async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds) {
+async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds, semana, calendario, semanaMenu) {
   let playersQuery = supabase.from('jugadores').select('*').eq('equipo_id', teamId).order('nombre');
   if (jugadorIds.length) {
     playersQuery = playersQuery.in('id', jugadorIds);
@@ -152,12 +163,68 @@ async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds) {
 
   if (evolucionesError) throw evolucionesError;
 
-  return players.map((player) => (
-    withLatestMeasurement(
-      player,
-      (evoluciones || []).filter((item) => String(item.jugador_id) === String(player.id))
-    )
-  ));
+  // Load menu
+  const menuWeekKey = semanaMenu || semana;
+  const { data: menu } = await supabase
+    .from('menu_semanal')
+    .select('*')
+    .eq('semana', menuWeekKey)
+    .maybeSingle();
+
+  // Load all plans for these players
+  const { data: allPlans, error: plansError } = await supabase
+    .from('planes_ia')
+    .select('*')
+    .in('jugador_id', playerIds);
+
+  if (plansError) throw plansError;
+
+  const resolvedPlayers = await Promise.all(
+    players.map(async (rawPlayer) => {
+      const playerEvoluciones = (evoluciones || []).filter((item) => String(item.jugador_id) === String(rawPlayer.id));
+      const player = withLatestMeasurement(rawPlayer, playerEvoluciones);
+
+      // Find if player has plan for this week
+      const playerPlans = (allPlans || []).filter((p) => String(p.jugador_id) === String(player.id));
+      let activePlan = playerPlans.find((p) => p.datos?.meta?.semanaMenu === menuWeekKey);
+
+      if (!activePlan) {
+        // Create and save AI plan
+        const baseData = await generarDatosPlan({
+          jugador: player,
+          nombre: `Plan ${semana}`,
+          contexto: 'semana_partido',
+          menu,
+          calendario,
+        });
+        const finalContenido = planDataToLegacyContent(baseData);
+
+        const { data: newPlan, error: insertError } = await supabase
+          .from('planes_ia')
+          .insert({
+            jugador_id: player.id,
+            nombre: `Plan ${semana}`,
+            contexto: 'semana_partido',
+            contenido: finalContenido,
+            datos: baseData,
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error('Error inserting default plan for player:', player.id, insertError);
+        }
+        activePlan = newPlan || { datos: baseData };
+      }
+
+      return {
+        ...player,
+        plan: activePlan.datos,
+      };
+    })
+  );
+
+  return resolvedPlayers;
 }
 
 async function renderReportResponse(meta, players, semana) {
@@ -195,14 +262,16 @@ export async function POST(request) {
 
   try {
     const body = await request.json();
-    const meta = defaultMeta(body?.meta);
+    const meta = defaultMeta({ ...body?.meta, calendario: body?.calendario || body?.meta?.calendario });
     const jugadorIds = normalizeIds(body?.jugadorIds);
+    const calendario = meta.calendario;
+    const semanaMenu = body?.semanaMenu || body?.meta?.semanaMenu;
 
     const team = await resolveTeam(supabase, user, body?.team_id);
     let semana = body?.meta?.semana;
 
-    semana = await persistWeeklyReport(supabase, team.id, meta, semana);
-    const players = await loadPlayersWithMeasurements(supabase, team.id, jugadorIds);
+    semana = await persistWeeklyReport(supabase, team.id, { ...meta, semanaMenu }, semana);
+    const players = await loadPlayersWithMeasurements(supabase, team.id, jugadorIds, semana, calendario, semanaMenu);
     return renderReportResponse(meta, players, semana);
   } catch (error) {
     console.error('Error generating weekly squad report:', error);
@@ -233,7 +302,7 @@ export async function GET(request) {
 
     const team = await resolveTeam(supabase, user, paramTeamId);
     const meta = await loadStoredMeta(supabase, team.id, semanaParam);
-    const players = await loadPlayersWithMeasurements(supabase, team.id, jugadorIds);
+    const players = await loadPlayersWithMeasurements(supabase, team.id, jugadorIds, semanaParam, meta?.calendario, meta?.semanaMenu);
 
     return renderReportResponse(meta, players, semanaParam);
   } catch (error) {

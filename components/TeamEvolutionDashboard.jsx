@@ -907,8 +907,17 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
       <Modal
         opened={Boolean(detailRow)}
         onClose={() => setDetailRow(null)}
-        title={detailRow ? `${playerName(detailRow)} · ${formatDate(detailMeasurement?.fecha)}` : 'Detalle de medición'}
+        title={
+          <Group gap="xs">
+            <IconEye size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Text fw={700}>
+              {detailRow ? `${playerName(detailRow)} · ${formatDate(detailMeasurement?.fecha)}` : 'Detalle de medición'}
+            </Text>
+          </Group>
+        }
         size="xl"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
       >
         {detailRow && detailMeasurement && (
           <Stack gap="lg">
