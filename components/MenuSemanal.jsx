@@ -2,41 +2,27 @@
 
 import { useState, useEffect } from 'react';
 import {
-  ActionIcon,
-  Anchor,
   Paper,
   Stack,
   Group,
-  Title,
   Text,
-  Button,
-  FileButton,
-  TextInput,
   Badge,
   Box,
   Divider,
-  Select,
   ThemeIcon,
-  Tooltip,
   Grid,
 } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
 import {
-  IconArrowLeft,
-  IconCalendar,
-  IconChefHat,
   IconFlame,
   IconToolsKitchen,
-  IconUpload,
-  IconList,
 } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import { BentoCard } from '@/components/Bento/BentoItem';
 
 // Standard Spanish weekday names to match database records
-const WEEKDAY_ORDER = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+export const WEEKDAY_ORDER = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-function formatWeek(value) {
+export function formatWeek(value) {
   if (!value) return 'Sin semana';
   return new Intl.DateTimeFormat('es-ES', {
     day: '2-digit',
@@ -45,7 +31,7 @@ function formatWeek(value) {
   }).format(new Date(`${value}T00:00:00`));
 }
 
-function getDayDate(weekStr, dayName) {
+export function getDayDate(weekStr, dayName) {
   if (!weekStr) return null;
   try {
     const date = new Date(`${weekStr}T00:00:00`);
@@ -273,34 +259,12 @@ function DaySelectorButton({ dayName, isSelected, isHoy, dateStr, onClick }) {
   );
 }
 
-export default function MenuSemanal({ menusIniciales, isSubtab = false, readOnly = false, teamId }) {
-  const [menus, setMenus] = useState(menusIniciales);
-  const [selectedMenu, setSelectedMenu] = useState(menusIniciales[0] || null);
-  const [uploading, setUploading] = useState(false);
-  const [viewMode, setViewMode] = useState('diaria'); // 'diaria' or 'semanal'
+export default function MenuSemanal({ selectedMenu = null, viewMode = 'diaria' }) {
   const [activeDay, setActiveDay] = useState('');
-  const [weekDate, setWeekDate] = useState(() => {
-    const today = new Date();
-    const monday = new Date(today);
-    monday.setDate(today.getDate() - today.getDay() + 1);
-    return monday.toISOString().split('T')[0];
-  });
 
-  const orderedDays = selectedMenu ? [...selectedMenu.dias].sort((a, b) => WEEKDAY_ORDER.indexOf(a.dia) - WEEKDAY_ORDER.indexOf(b.dia)) : [];
-  const weekOptions = menus.map((menu) => ({
-    value: menu.semana,
-    label: `Semana del ${formatWeek(menu.semana)}`,
-  }));
-
-  useEffect(() => {
-    setMenus(menusIniciales);
-    setSelectedMenu(prev => {
-      const updated = prev && menusIniciales.some(m => m.semana === prev.semana)
-        ? menusIniciales.find(m => m.semana === prev.semana)
-        : menusIniciales[0] || null;
-      return updated;
-    });
-  }, [menusIniciales]);
+  const orderedDays = selectedMenu
+    ? [...selectedMenu.dias].sort((a, b) => WEEKDAY_ORDER.indexOf(a.dia) - WEEKDAY_ORDER.indexOf(b.dia))
+    : [];
 
   useEffect(() => {
     if (orderedDays.length > 0) {
@@ -315,61 +279,8 @@ export default function MenuSemanal({ menusIniciales, isSubtab = false, readOnly
     }
   }, [selectedMenu]);
 
-  async function handleUploadFile(file) {
-    if (!file) return;
-    setUploading(true);
-    const notificationId = 'menu-semanal-upload';
-    notifications.show({
-      id: notificationId,
-      color: 'blue',
-      title: 'IA procesando',
-      message: 'La IA está leyendo e indexando el menú.',
-      loading: true,
-      autoClose: false,
-      withCloseButton: false,
-    });
-
-    try {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('semana', weekDate);
-
-      const res = await fetch('/api/menu-semanal', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al subir el archivo');
-
-      setMenus(prev => {
-        const filtered = prev.filter(m => m.semana !== data.menu.semana);
-        return [data.menu, ...filtered].sort((a, b) => b.semana.localeCompare(a.semana));
-      });
-      setSelectedMenu(data.menu);
-      notifications.update({
-        id: notificationId,
-        color: 'green',
-        title: 'Menú actualizado',
-        message: 'El menú semanal se ha procesado correctamente.',
-        loading: false,
-        autoClose: 4000,
-        withCloseButton: true,
-      });
-    } catch (e) {
-      notifications.update({
-        id: notificationId,
-        color: 'red',
-        title: 'Error al subir menú',
-        message: e.message,
-        loading: false,
-        autoClose: 5000,
-        withCloseButton: true,
-      });
-    } finally {
-      setUploading(false);
-    }
-  }
-
   const activeDayData = orderedDays.find((d) => d.dia === activeDay) || null;
 
-  // Render hero view for selected day using BentoCard
   const renderHeroDay = (dayData) => {
     if (!dayData) return null;
 
@@ -412,262 +323,46 @@ export default function MenuSemanal({ menusIniciales, isSubtab = false, readOnly
     );
   };
 
-  const renderCompactHeader = () => (
-    <Paper
-      p={{ base: 'sm', sm: 'md' }}
-      shadow="xs"
-      radius="lg"
-      withBorder
-      style={{
-        borderTop: 0,
-        borderTopLeftRadius: 0,
-        borderTopRightRadius: 0,
-      }}
-      bg="white"
-    >
-      <Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
-        <Group gap="xs">
-          <ThemeIcon color="teal" variant="light" radius="xl" size="lg">
-            <IconChefHat size={20} />
-          </ThemeIcon>
-          <Stack gap={2}>
-            <Title order={3} fw={800} c="dark.4">Menú comedor</Title>
-            <Text size="sm" c="dimmed">
-              Comedor del primer equipo, comida y cena.
-            </Text>
-          </Stack>
-        </Group>
-
-        <Group gap="xs" align="center">
-          <Select
-            placeholder="Selecciona una semana"
-            leftSection={<IconCalendar size={14} style={{ opacity: 0.7 }} />}
-            data={weekOptions}
-            value={selectedMenu?.semana || null}
-            onChange={(value) => {
-              const next = menus.find((menu) => menu.semana === value);
-              if (next) setSelectedMenu(next);
-            }}
-            disabled={menus.length === 0}
-            variant="filled"
-            radius="xl"
-            size="xs"
-            allowDeselect={false}
-            style={{ width: 180 }}
-          />
-
-          {/* Premium Micro-segmented Pill Switcher */}
-          <Group gap={4} p={3} bg="gray.1" style={{ borderRadius: 'var(--mantine-radius-xl)', border: '1px solid var(--mantine-color-gray-2)' }}>
-            <Tooltip label="Día a Día (Vista diaria)" withArrow>
-              <ActionIcon
-                onClick={() => setViewMode('diaria')}
-                variant={viewMode === 'diaria' ? 'filled' : 'transparent'}
-                color={viewMode === 'diaria' ? 'dark' : 'gray'}
-                radius="xl"
-                size="sm"
-                style={{ width: 28, height: 28 }}
-              >
-                <IconCalendar size={14} />
-              </ActionIcon>
-            </Tooltip>
-
-            <Tooltip label="Semana completa (Vista general)" withArrow>
-              <ActionIcon
-                onClick={() => setViewMode('semanal')}
-                variant={viewMode === 'semanal' ? 'filled' : 'transparent'}
-                color={viewMode === 'semanal' ? 'dark' : 'gray'}
-                radius="xl"
-                size="sm"
-                style={{ width: 28, height: 28 }}
-              >
-                <IconList size={14} />
-              </ActionIcon>
-            </Tooltip>
-          </Group>
-        </Group>
-      </Group>
-    </Paper>
-  );
+  if (!selectedMenu) {
+    return (
+      <NothingFound
+        withPaper
+        icon={IconToolsKitchen}
+        title="Sin menús"
+        description="No hay menús registrados. Sube la foto o PDF del menú de esta semana para empezar."
+      />
+    );
+  }
 
   return (
-    <Stack gap={0}>
-      {isSubtab ? (
-        renderCompactHeader()
-      ) : (
-        <Paper
-          p={{ base: 'sm', sm: 'md' }}
-          shadow="sm"
-          radius="xl"
-          withBorder
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
-            zIndex: 10,
-            position: 'relative',
-          }}
-        >
-          <Stack gap="sm">
-            <Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
-              <Group gap="sm" wrap="nowrap">
-                <Tooltip label="Volver al panel" withArrow>
-                  <ActionIcon component={Anchor} href={teamId ? `/dashboard/equipo/${teamId}` : "/dashboard"} variant="light" color="gray" radius="xl" size={42}>
-                    <IconArrowLeft size={20} />
-                  </ActionIcon>
-                </Tooltip>
-                <ThemeIcon color="teal" variant="light" radius="xl" size="lg">
-                  <IconChefHat size={20} />
-                </ThemeIcon>
-                <Stack gap={2}>
-                  <Title order={3} fw={800} c="dark.4">Menú comedor</Title>
-                  <Text size="sm" c="dimmed">
-                    Comedor del primer equipo, comida y cena.
-                  </Text>
-                </Stack>
-              </Group>
-
-              <Group align="center" gap="xs" wrap="wrap">
-                <Select
-                  placeholder="Selecciona una semana"
-                  leftSection={<IconCalendar size={14} style={{ opacity: 0.7 }} />}
-                  data={weekOptions}
-                  value={selectedMenu?.semana || null}
-                  onChange={(value) => {
-                    const next = menus.find((menu) => menu.semana === value);
-                    if (next) setSelectedMenu(next);
-                  }}
-                  disabled={menus.length === 0}
-                  variant="filled"
-                  radius="xl"
-                  size="xs"
-                  allowDeselect={false}
-                  style={{ width: 180 }}
-                />
-
-                {/* Premium Micro-segmented Pill Switcher */}
-                <Group gap={4} p={3} bg="gray.1" style={{ borderRadius: 'var(--mantine-radius-xl)', border: '1px solid var(--mantine-color-gray-2)' }}>
-                  <Tooltip label="Día a Día (Vista diaria)" withArrow>
-                    <ActionIcon
-                      onClick={() => setViewMode('diaria')}
-                      variant={viewMode === 'diaria' ? 'filled' : 'transparent'}
-                      color={viewMode === 'diaria' ? 'dark' : 'gray'}
-                      radius="xl"
-                      size="sm"
-                      style={{ width: 28, height: 28 }}
-                    >
-                      <IconCalendar size={14} />
-                    </ActionIcon>
-                  </Tooltip>
-
-                  <Tooltip label="Semana completa (Vista general)" withArrow>
-                    <ActionIcon
-                      onClick={() => setViewMode('semanal')}
-                      variant={viewMode === 'semanal' ? 'filled' : 'transparent'}
-                      color={viewMode === 'semanal' ? 'dark' : 'gray'}
-                      radius="xl"
-                      size="sm"
-                      style={{ width: 28, height: 28 }}
-                    >
-                      <IconList size={14} />
-                    </ActionIcon>
-                  </Tooltip>
-                </Group>
-              </Group>
-            </Group>
-          </Stack>
-        </Paper>
-      )}
-
-      <Box py={{ base: 'sm', sm: 'md' }} px={isSubtab ? { base: 'sm', sm: 0 } : undefined}>
+    <Box>
+      {viewMode === 'diaria' ? (
         <Stack gap="md">
-          {/* Admin Coach Upload Bar (Only shown on the main weekly menu page /dashboard/menu, never in the player's profile subtab) */}
-          {!readOnly && !isSubtab && (
-            <Paper p="sm" radius="md" bg="gray.0" withBorder style={{ borderStyle: 'dashed' }}>
-              <Group justify="space-between" align="center" gap="xs" wrap="wrap">
-                <Text size="xs" fw={700} c="dimmed">
-                  SUBIR O ACTUALIZAR PLANIFICACIÓN DE MENÚ:
-                </Text>
-                <Group gap="xs">
-                  <TextInput
-                    type="date"
-                    value={weekDate}
-                    onChange={(e) => setWeekDate(e.target.value)}
-                    leftSection={<IconCalendar size={14} />}
-                    size="xs"
-                    radius="xl"
-                    variant="filled"
-                    style={{ width: 135 }}
-                  />
-                  <FileButton onChange={handleUploadFile} accept="image/*,.pdf" disabled={uploading}>
-                    {(props) => (
-                      <Button
-                        {...props}
-                        loading={uploading}
-                        radius="xl"
-                        leftSection={<IconUpload size={12} />}
-                        color="blue"
-                        size="xs"
-                      >
-                        Subir PDF / Imagen
-                      </Button>
-                    )}
-                  </FileButton>
-                </Group>
-              </Group>
-            </Paper>
-          )}
+          {/* Day Buttons Selector */}
+          <Group gap="xs" justify="stretch" wrap="nowrap" style={{ width: '100%', overflowX: 'auto' }}>
+            {orderedDays.map((dia) => (
+              <DaySelectorButton
+                key={dia.dia}
+                dayName={dia.dia}
+                isSelected={activeDay === dia.dia}
+                isHoy={isToday(dia.dia)}
+                dateStr={getDayDate(selectedMenu.semana, dia.dia)}
+                onClick={() => setActiveDay(dia.dia)}
+              />
+            ))}
+          </Group>
 
-          {selectedMenu ? (
-            <Stack gap="md">
-              {!isSubtab && viewMode === 'semanal' && (
-                <Group justify="space-between" align="center" wrap="wrap" gap="xs">
-                  <Box>
-                    <Title order={4} fw={800} c="dark.4">
-                      Semana del {formatWeek(selectedMenu.semana)}
-                    </Title>
-                    <Text size="xs" c="dimmed">
-                      Platos extraídos y estructurados para planificación nutritional.
-                    </Text>
-                  </Box>
-                </Group>
-              )}
-
-              {viewMode === 'diaria' ? (
-                <Stack gap="md">
-                  {/* Timeline Selector */}
-                  <Group gap="xs" justify="stretch" wrap="nowrap" style={{ width: '100%', overflowX: 'auto' }}>
-                    {orderedDays.map((dia) => (
-                      <DaySelectorButton
-                        key={dia.dia}
-                        dayName={dia.dia}
-                        isSelected={activeDay === dia.dia}
-                        isHoy={isToday(dia.dia)}
-                        dateStr={getDayDate(selectedMenu.semana, dia.dia)}
-                        onClick={() => setActiveDay(dia.dia)}
-                      />
-                    ))}
-                  </Group>
-
-                  {/* Hero Active Day Menu using native BentoCard */}
-                  {renderHeroDay(activeDayData)}
-                </Stack>
-              ) : (
-                /* Weekly Agenda View in Native App Style */
-                <Stack gap="sm">
-                  {orderedDays.map(dia => (
-                    <AgendaDayRow key={dia.dia} dayData={dia} weekStr={selectedMenu.semana} />
-                  ))}
-                </Stack>
-              )}
-            </Stack>
-          ) : (
-            <NothingFound
-              withPaper
-              icon={IconToolsKitchen}
-              title="Sin menús"
-              description="No hay menús registrados. Sube la foto o PDF del menú de esta semana para empezar."
-            />
-          )}
+          {/* Hero Active Day Menu */}
+          {renderHeroDay(activeDayData)}
         </Stack>
-      </Box>
-    </Stack>
+      ) : (
+        /* Weekly Agenda View */
+        <Stack gap="sm">
+          {orderedDays.map((dia) => (
+            <AgendaDayRow key={dia.dia} dayData={dia} weekStr={selectedMenu.semana} />
+          ))}
+        </Stack>
+      )}
+    </Box>
   );
 }

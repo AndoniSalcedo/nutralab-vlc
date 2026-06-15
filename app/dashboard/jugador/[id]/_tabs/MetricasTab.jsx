@@ -5,8 +5,8 @@ import { IconChartLine, IconReportAnalytics, IconDroplet, IconClipboardList } fr
 import { tabLabel } from './tab-label';
 import AnaliticasSubtab from './metricas/AnaliticasSubtab';
 import MedicionesSubtab from './metricas/MedicionesSubtab';
-import HidratacionSubtab from './nutricion/HidratacionSubtab';
-import ProtocolosSubtab from './nutricion/ProtocolosSubtab';
+import HidratacionSubtab from './metricas/HidratacionSubtab';
+import ProtocolosSubtab from './metricas/ProtocolosSubtab';
 
 export default function MetricasTab({ jugador, analiticas, evoluciones, registrosHidratacion = [], activeSubtab, onSubtabChange, readOnly = false }) {
   const tabsData = readOnly ? [

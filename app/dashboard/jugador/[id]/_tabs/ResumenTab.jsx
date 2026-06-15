@@ -3,7 +3,7 @@
 import { Box, Paper, SegmentedControl, Stack } from '@mantine/core';
 import { IconMail, IconUser } from '@tabler/icons-react';
 import { tabLabel } from './tab-label';
-import MensajesTab from './MensajesTab';
+import MensajesSubtab from './resumen/MensajesSubtab';
 import PerfilSubtab from './resumen/PerfilSubtab';
 
 export default function ResumenTab({ jugador, evoluciones = [], messages = [], activeSubtab, onSubtabChange, readOnly = false }) {
@@ -45,7 +45,7 @@ export default function ResumenTab({ jugador, evoluciones = [], messages = [], a
 
       <Box mt={0}>
         {activeSubtab === 'perfil' && <PerfilSubtab jugador={jugador} evoluciones={evoluciones} readOnly={readOnly} />}
-        {activeSubtab === 'mensajes' && <MensajesTab jugador={jugador} messages={messages} readOnly={readOnly} />}
+        {activeSubtab === 'mensajes' && <MensajesSubtab jugador={jugador} messages={messages} readOnly={readOnly} />}
       </Box>
     </Stack>
   );

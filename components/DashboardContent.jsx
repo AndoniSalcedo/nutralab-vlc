@@ -199,6 +199,16 @@ const DAY_TYPE_OPTIONS = [
   { value: 'partido', label: '⚽ Partido' },
 ];
 
+const CONTEXTOS = [
+  { value: 'semana_normal', label: 'Semana normal de entrenamiento' },
+  { value: 'semana_partido', label: 'Semana con partido oficial' },
+  { value: 'dia_partido', label: 'Día de partido' },
+  { value: 'viaje', label: 'Viaje / desplazamiento' },
+  { value: 'lesion', label: 'Lesión / inactividad' },
+  { value: 'vacaciones', label: 'Vacaciones / fuera de temporada' },
+  { value: 'pretemporada', label: 'Pretemporada (alta carga)' },
+];
+
 function defaultReportForm() {
   const today = new Date();
   const monday = new Date(today);
@@ -209,6 +219,7 @@ function defaultReportForm() {
 
   return {
     semana: weekStr,
+    contexto: 'semana_partido',
     title: 'Semana 10-17 Mayo',
     subtitle: 'Plan nutricional',
     team: 'Valencia CF · Primer Equipo',
@@ -795,7 +806,7 @@ export default function DashboardContent({ players = [], team }) {
               </Group>
               
               <Stack gap="sm">
-                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+                <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
                   <TextInput
                     type="date"
                     label="Fecha de la semana (Lunes)"
@@ -814,6 +825,14 @@ export default function DashboardContent({ players = [], team }) {
                     label="Rango / título de semana"
                     value={reportForm.title}
                     onChange={(event) => updateReportField('title', event.currentTarget.value)}
+                  />
+                  <Select
+                    label="Contexto general (IA)"
+                    placeholder="Selecciona el contexto"
+                    data={CONTEXTOS}
+                    value={reportForm.contexto || 'semana_partido'}
+                    onChange={(val) => updateReportField('contexto', val || 'semana_partido')}
+                    allowDeselect={false}
                   />
                 </SimpleGrid>
 

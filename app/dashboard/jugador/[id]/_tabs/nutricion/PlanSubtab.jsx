@@ -257,7 +257,7 @@ function AiGenerationOverlay({ opened, messages = [] }) {
         <Text fw={800} size="lg" variant="gradient" gradient={{ from: 'blue.6', to: 'grape.6', deg: 135 }} mb="xs">
           Generando Planificación Inteligente
         </Text>
-        
+
         <Text size="sm" c="dimmed" fw={500} style={{ minHeight: '24px' }}>
           {messages[index]}
         </Text>
@@ -272,7 +272,8 @@ function AiGenerationOverlay({ opened, messages = [] }) {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes pulseGlow {
           0%, 100% { transform: scale(1); box-shadow: 0 8px 20px rgba(34, 139, 230, 0.35); }
           50% { transform: scale(1.08); box-shadow: 0 8px 30px rgba(156, 54, 181, 0.5); }
@@ -659,12 +660,10 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
               setMode('view');
             }}
             allowDeselect={false}
-            searchable
             variant="filled"
             radius="md"
             leftSection={<IconFileAi size={16} />}
             disabled={loadingList || planes.length === 0 || isDocumentMode}
-            rightSection={loadingList ? <Loader size={16} /> : null}
             style={{ flex: 1, minWidth: 260 }}
           />
         </Stack>
@@ -786,10 +785,10 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                                 if (!value) return;
                                 updateDatos((draft) => {
                                   draft.dias[dayKey].tipoDia = value;
-                                  
+
                                   const dayTypeConfig = PLAN_DAY_TYPES.find((t) => t.key === value) || PLAN_DAY_TYPES[0];
                                   const weight = Number(draft.metricas?.peso || jugador?.peso_kg || 0);
-                                  
+
                                   if (weight) {
                                     const cPlan = cunninghamPlan({
                                       weightKg: weight,
@@ -801,7 +800,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                                       carbsGkg: dayTypeConfig.carbsGkg,
                                       fatGkg: dayTypeConfig.fatGkg,
                                     });
-                                    
+
                                     draft.dias[dayKey].kcal = Math.round(cPlan.kcal);
                                     draft.dias[dayKey].proteina = Math.round(cPlan.protein);
                                     draft.dias[dayKey].hidratos = Math.round(cPlan.cho);

@@ -5,7 +5,7 @@ import { IconBottle, IconBrain, IconChefHat } from '@tabler/icons-react';
 import { tabLabel } from './tab-label';
 import PlanSubtab from './nutricion/PlanSubtab';
 import SuplementacionSubtab from './nutricion/SuplementacionSubtab';
-import MenuSemanal from '@/components/MenuSemanal';
+import MenuSemanalSubtab from './nutricion/MenuSemanalSubtab';
 
 export default function NutricionTab({ jugador, menus = [], activeSubtab, onSubtabChange, readOnly = false }) {
   return (
@@ -36,7 +36,7 @@ export default function NutricionTab({ jugador, menus = [], activeSubtab, onSubt
           data={[
             { value: 'plan', label: tabLabel(IconBrain, 'Plan nutricional', 'Plan') },
             { value: 'suplementacion', label: tabLabel(IconBottle, 'Suplementación', 'Supl.') },
-            { value: 'menu', label: tabLabel(IconChefHat, 'Menú comedor', 'Menú') },
+            { value: 'menu', label: tabLabel(IconChefHat, 'Menú semanal', 'Menú') },
           ]}
           styles={{
             root: { border: 'none', width: '100%' },
@@ -48,7 +48,7 @@ export default function NutricionTab({ jugador, menus = [], activeSubtab, onSubt
       <Box mt={0}>
         {activeSubtab === 'plan' && <PlanSubtab jugador={jugador} readOnly={readOnly} />}
         {activeSubtab === 'suplementacion' && <SuplementacionSubtab jugador={jugador} readOnly={readOnly} />}
-        {activeSubtab === 'menu' && <MenuSemanal menusIniciales={menus} isSubtab={true} readOnly={readOnly} />}
+        {activeSubtab === 'menu' && <MenuSemanalSubtab menus={menus} />}
       </Box>
     </Stack>
   );

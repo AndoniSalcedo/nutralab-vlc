@@ -8,7 +8,7 @@ import NutricionTab from './NutricionTab';
 import ResumenTab from './ResumenTab';
 
 const DEFAULT_SUBTABS = {
-  general: 'perfil',
+  resumen: 'perfil',
   metricas: 'mediciones',
   nutricion: 'plan',
 };
@@ -22,26 +22,26 @@ export default function PlayerTabs({
   registrosHidratacion = [],
   messages = [],
   menus = [],
-  activeTab: activeTabProp = 'general',
+  activeTab: activeTabProp = 'resumen',
   activeSubtab: activeSubtabProp,
   readOnly = false,
 }) {
   const router = useRouter();
 
-  const normalizedTab = activeTabProp === 'resumen' ? 'general' : activeTabProp;
+  const normalizedTab = activeTabProp === 'general' ? 'resumen' : activeTabProp;
   const normalizedSubtab = activeSubtabProp === 'ficha' || activeSubtabProp === 'objetivos'
     ? 'perfil'
     : activeSubtabProp;
   const validSubtabs = {
-    general: ['perfil', 'mensajes'],
+    resumen: ['perfil', 'mensajes'],
     metricas: readOnly 
       ? ['mediciones', 'hidratacion', 'protocolos'] 
       : ['mediciones', 'analiticas', 'hidratacion', 'protocolos'],
     nutricion: ['plan', 'suplementacion', 'menu'],
   };
 
-  const activeTab = VALID_TABS.includes(normalizedTab) ? normalizedTab : 'general';
-  const activeSubtab = validSubtabs[activeTab].includes(normalizedSubtab)
+  const activeTab = VALID_TABS.includes(normalizedTab) ? normalizedTab : 'resumen';
+  const activeSubtab = validSubtabs[activeTab]?.includes(normalizedSubtab)
     ? normalizedSubtab
     : DEFAULT_SUBTABS[activeTab];
 
@@ -71,19 +71,19 @@ export default function PlayerTabs({
       }}
     >
       <Tabs.List grow>
-        <Tabs.Tab value="general" leftSection={<IconInfoCircle size={18} />} style={activeTabStyle('general')}>General</Tabs.Tab>
+        <Tabs.Tab value="resumen" leftSection={<IconInfoCircle size={18} />} style={activeTabStyle('resumen')}>Resumen</Tabs.Tab>
         <Tabs.Tab value="metricas" leftSection={<IconChartBar size={18} />} style={activeTabStyle('metricas')}>Métricas</Tabs.Tab>
         <Tabs.Tab value="nutricion" leftSection={<IconSalad size={18} />} style={activeTabStyle('nutricion')}>Nutrición</Tabs.Tab>
       </Tabs.List>
 
       <Box>
-        <Tabs.Panel value="general">
+        <Tabs.Panel value="resumen">
           <ResumenTab
             jugador={jugador}
             evoluciones={evoluciones}
             messages={messages}
-            activeSubtab={activeTab === 'general' ? activeSubtab : DEFAULT_SUBTABS.general}
-            onSubtabChange={(value) => navigate('general', value)}
+            activeSubtab={activeTab === 'resumen' ? activeSubtab : DEFAULT_SUBTABS.resumen}
+            onSubtabChange={(value) => navigate('resumen', value)}
             readOnly={readOnly}
           />
         </Tabs.Panel>

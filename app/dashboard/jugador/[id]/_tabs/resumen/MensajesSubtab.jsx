@@ -18,7 +18,7 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
-export default function MensajesTab({ jugador, messages = [], readOnly = false }) {
+export default function MensajesSubtab({ jugador, messages = [], readOnly = false }) {
   const [opened, { open, close }] = useDisclosure(false);
   const playerOption = useMemo(() => [jugador], [jugador]);
 

@@ -6,7 +6,7 @@ import JugadorHeader from '@/components/JugadorHeader';
 import { Anchor, Stack, Text } from '@mantine/core';
 import PlayerTabs from './_tabs/PlayerTabs';
 
-export default async function JugadorView({ id, activeTab = 'general', activeSubtab }) {
+export default async function JugadorView({ id, activeTab = 'resumen', activeSubtab }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
   const isPlayer = user?.role === 'jugador';
