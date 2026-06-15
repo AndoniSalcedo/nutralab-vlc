@@ -48,7 +48,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
             <Stack gap={2}>
               <Title order={3} fw={800} c="dark.4">Protocolos</Title>
               <Text size="sm" c="dimmed">
-                Guía práctica para ordenar comida, ayudas, hidratación y recuperación del día de partido.
+                Guía nutricional para distintos protocolos.
               </Text>
             </Stack>
           </Group>

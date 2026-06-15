@@ -474,7 +474,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
             <Stack gap={2}>
               <Title order={3} fw={800} c="dark.4">Hidratación</Title>
               <Text size="sm" c="dimmed">
-                Control histórico, análisis de osmolaridad saliva (`sosm`) e importación de tomas.
+                Análisis de osmolaridad saliva.
               </Text>
             </Stack>
           </Group>

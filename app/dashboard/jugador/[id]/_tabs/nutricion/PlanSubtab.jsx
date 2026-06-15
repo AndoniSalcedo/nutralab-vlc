@@ -603,7 +603,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
               <Stack gap={2}>
                 <Title order={3} fw={800} c="dark.4">Planes nutricionales</Title>
                 <Text size="sm" c="dimmed">
-                  Fichas compactas con métricas, macros y pautas editables.
+                  Fichas con métricas, macros y pautas.
                 </Text>
               </Stack>
             </Group>
