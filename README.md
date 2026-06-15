@@ -49,17 +49,3 @@ Para añadir un cambio de base de datos, crea un archivo nuevo con formato:
 ```txt
 supabase/migrations/YYYYMMDDHHMMSS_nombre_del_cambio.sql
 ```
-
-El runner guarda el historial en `teams.schema_migrations`, ejecuta solo las pendientes y recarga la caché de PostgREST con `notify pgrst, 'reload schema';`.
-
-## Despliegue en Vercel
-- Sube esta carpeta a un repositorio privado de GitHub
-- En Vercel: Add New Project -> importa el repo
-- Añade las variables de entorno de `.env.example`
-- Deploy
-
-## Siguiente fase recomendada
-1. Importador real de tu Excel de composición corporal
-2. Subida de PDFs a Supabase Storage + extracción IA
-3. Generación de planes con Claude desde rutas API seguras
-4. Registro de tomas y comparación diaria vs objetivo
