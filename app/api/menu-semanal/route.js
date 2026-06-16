@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import Anthropic from '@anthropic-ai/sdk';
+import { env } from '@/lib/env';
 
-const client = new Anthropic();
+const client = new Anthropic({ apiKey: env.AI_API_KEY });
 
 export async function POST(req) {
   try {
@@ -21,7 +22,7 @@ export async function POST(req) {
       : { type: 'document', source: { type: 'base64', media_type: mediaPDF, data: base64 } };
 
     const message = await client.messages.create({
-      model: 'claude-opus-4-5',
+      model: env.CHAT_MODEL,
       max_tokens: 2000,
       messages: [{
         role: 'user',

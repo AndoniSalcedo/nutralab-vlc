@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { env } from '@/lib/env';
 import {
   IconChevronDown,
   IconLogout,
@@ -28,7 +29,7 @@ import Logo from './Logo';
 export default function DashboardShell({ children, user }) {
   const [opened, setOpened] = useState(false);
   const router = useRouter();
-  const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL;
+  const frontendUrl = env.NEXT_PUBLIC_FRONTEND_URL;
 
   const initials = (name) => {
     if (!name) return '';

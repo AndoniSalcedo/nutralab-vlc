@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { buildSessionValue, COOKIE_NAME } from '@/lib/auth';
+import { env } from '@/lib/env';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -12,7 +13,7 @@ export async function GET(request) {
 
   try {
     // Verify the JWT token from the backend
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, env.JWT_SECRET);
 
     // The decoded token will have nutritionist details: { id, name, email, role, ... }
     const sessionObj = {
@@ -26,7 +27,7 @@ export async function GET(request) {
 
     response.cookies.set(COOKIE_NAME, buildSessionValue(sessionObj), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 12,

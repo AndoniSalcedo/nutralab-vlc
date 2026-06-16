@@ -30,6 +30,7 @@ import {
 } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
+import { env } from '@/lib/env';
 
 const highlights = [
   { icon: IconSalad, label: 'Plan nutricional', value: 'seguimiento diario' },
@@ -43,7 +44,7 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:5173';
+  const frontendUrl = env.NEXT_PUBLIC_FRONTEND_URL;
 
   async function handleSubmit(e) {
     e.preventDefault();

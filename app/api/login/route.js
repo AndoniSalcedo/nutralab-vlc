@@ -59,7 +59,7 @@ export async function POST(request) {
 
     response.cookies.set(COOKIE_NAME, buildSessionValue(sessionObj), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 días para jugadores

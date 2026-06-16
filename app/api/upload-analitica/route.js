@@ -3,10 +3,11 @@ import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
 import Anthropic from '@anthropic-ai/sdk';
+import { env } from '@/lib/env';
 
-const client = new Anthropic();
+const client = new Anthropic({ apiKey: env.AI_API_KEY });
 const ANALITICA_TOOL_NAME = 'guardar_analitica';
-const ANALITICA_MAX_TOKENS = Number(process.env.ANALITICA_MAX_TOKENS || 16000);
+const ANALITICA_MAX_TOKENS = env.ANALITICA_MAX_TOKENS;
 
 function extractAnalitica(message) {
   if (message.stop_reason === 'max_tokens') {
@@ -40,7 +41,7 @@ export async function POST(req) {
     const base64 = buffer.toString('base64');
 
     const message = await client.messages.create({
-      model: 'claude-opus-4-5',
+      model: env.CHAT_MODEL,
       max_tokens: ANALITICA_MAX_TOKENS,
       tool_choice: { type: 'tool', name: ANALITICA_TOOL_NAME },
       tools: [{
