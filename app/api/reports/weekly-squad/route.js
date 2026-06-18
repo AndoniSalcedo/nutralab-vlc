@@ -180,69 +180,68 @@ async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds, semana,
 
   if (plansError) throw plansError;
 
-  const resolvedPlayers = await Promise.all(
-    players.map(async (rawPlayer) => {
-      const playerEvoluciones = (evoluciones || []).filter((item) => String(item.jugador_id) === String(rawPlayer.id));
-      const player = withLatestMeasurement(rawPlayer, playerEvoluciones);
+  const resolvedPlayers = [];
+  for (const rawPlayer of players) {
+    const playerEvoluciones = (evoluciones || []).filter((item) => String(item.jugador_id) === String(rawPlayer.id));
+    const player = withLatestMeasurement(rawPlayer, playerEvoluciones);
 
-      // Find if player has plan for this week
-      const playerPlans = (allPlans || []).filter((p) => String(p.jugador_id) === String(player.id));
-      let activePlan = playerPlans.find((p) => p.datos?.meta?.semanaMenu === menuWeekKey);
+    // Find if player has plan for this week
+    const playerPlans = (allPlans || []).filter((p) => String(p.jugador_id) === String(player.id));
+    let activePlan = playerPlans.find((p) => p.nombre === `Plan ${semana}`);
 
-      if (!activePlan || forceRegenerate) {
-        // Create and save AI plan
-        const baseData = await generarDatosPlan({
-          jugador: player,
-          nombre: `Plan ${semana}`,
-          contexto: contexto || 'semana_partido',
-          menu,
-          calendario,
-        });
-        const finalContenido = planDataToLegacyContent(baseData);
+    if (!activePlan || forceRegenerate) {
+      // Create and save AI plan
+      const baseData = await generarDatosPlan({
+        jugador: player,
+        nombre: `Plan ${semana}`,
+        contexto: contexto || 'semana_partido',
+        menu,
+        calendario,
+      });
+      const finalContenido = planDataToLegacyContent(baseData);
 
-        if (activePlan) {
-          // Overwrite existing plan
-          const { error: updateError } = await supabase
-            .from('planes_ia')
-            .update({
-              contexto: contexto || 'semana_partido',
-              contenido: finalContenido,
-              datos: baseData,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', activePlan.id);
+      if (activePlan) {
+        // Overwrite existing plan
+        const { error: updateError } = await supabase
+          .from('planes_ia')
+          .update({
+            contexto: contexto || 'semana_partido',
+            contenido: finalContenido,
+            datos: baseData,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', activePlan.id);
 
-          if (updateError) {
-            console.error('Error updating plan for player:', player.id, updateError);
-          }
-          activePlan.datos = baseData;
-        } else {
-          // Insert new plan
-          const { data: newPlan, error: insertError } = await supabase
-            .from('planes_ia')
-            .insert({
-              jugador_id: player.id,
-              nombre: `Plan ${semana}`,
-              contexto: contexto || 'semana_partido',
-              contenido: finalContenido,
-              datos: baseData,
-            })
-            .select()
-            .single();
-
-          if (insertError) {
-            console.error('Error inserting plan for player:', player.id, insertError);
-          }
-          activePlan = newPlan || { datos: baseData };
+        if (updateError) {
+          console.error('Error updating plan for player:', player.id, updateError);
         }
-      }
+        activePlan.datos = baseData;
+      } else {
+        // Insert new plan
+        const { data: newPlan, error: insertError } = await supabase
+          .from('planes_ia')
+          .insert({
+            jugador_id: player.id,
+            nombre: `Plan ${semana}`,
+            contexto: contexto || 'semana_partido',
+            contenido: finalContenido,
+            datos: baseData,
+          })
+          .select()
+          .single();
 
-      return {
-        ...player,
-        plan: activePlan.datos,
-      };
-    })
-  );
+        if (insertError) {
+          console.error('Error inserting plan for player:', player.id, insertError);
+        }
+        activePlan = newPlan || { datos: baseData };
+      }
+    }
+
+    resolvedPlayers.push({
+      ...player,
+      plan: activePlan.datos,
+    });
+  }
 
   return resolvedPlayers;
 }
