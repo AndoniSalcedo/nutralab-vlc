@@ -141,7 +141,7 @@ async function persistWeeklyReport(supabase, teamId, meta, semana) {
   return semanaVal;
 }
 
-async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds, semana, calendario, semanaMenu, contexto) {
+async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds, semana, calendario, semanaMenu, contexto, forceRegenerate = false) {
   let playersQuery = supabase.from('jugadores').select('*').eq('equipo_id', teamId).order('nombre');
   if (jugadorIds.length) {
     playersQuery = playersQuery.in('id', jugadorIds);
@@ -189,7 +189,7 @@ async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds, semana,
       const playerPlans = (allPlans || []).filter((p) => String(p.jugador_id) === String(player.id));
       let activePlan = playerPlans.find((p) => p.datos?.meta?.semanaMenu === menuWeekKey);
 
-      if (!activePlan) {
+      if (!activePlan || forceRegenerate) {
         // Create and save AI plan
         const baseData = await generarDatosPlan({
           jugador: player,
@@ -200,22 +200,41 @@ async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds, semana,
         });
         const finalContenido = planDataToLegacyContent(baseData);
 
-        const { data: newPlan, error: insertError } = await supabase
-          .from('planes_ia')
-          .insert({
-            jugador_id: player.id,
-            nombre: `Plan ${semana}`,
-            contexto: contexto || 'semana_partido',
-            contenido: finalContenido,
-            datos: baseData,
-          })
-          .select()
-          .single();
+        if (activePlan) {
+          // Overwrite existing plan
+          const { error: updateError } = await supabase
+            .from('planes_ia')
+            .update({
+              contexto: contexto || 'semana_partido',
+              contenido: finalContenido,
+              datos: baseData,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', activePlan.id);
 
-        if (insertError) {
-          console.error('Error inserting default plan for player:', player.id, insertError);
+          if (updateError) {
+            console.error('Error updating plan for player:', player.id, updateError);
+          }
+          activePlan.datos = baseData;
+        } else {
+          // Insert new plan
+          const { data: newPlan, error: insertError } = await supabase
+            .from('planes_ia')
+            .insert({
+              jugador_id: player.id,
+              nombre: `Plan ${semana}`,
+              contexto: contexto || 'semana_partido',
+              contenido: finalContenido,
+              datos: baseData,
+            })
+            .select()
+            .single();
+
+          if (insertError) {
+            console.error('Error inserting plan for player:', player.id, insertError);
+          }
+          activePlan = newPlan || { datos: baseData };
         }
-        activePlan = newPlan || { datos: baseData };
       }
 
       return {
@@ -272,7 +291,7 @@ export async function POST(request) {
     let semana = body?.meta?.semana;
 
     semana = await persistWeeklyReport(supabase, team.id, { ...meta, semanaMenu }, semana);
-    const players = await loadPlayersWithMeasurements(supabase, team.id, jugadorIds, semana, calendario, semanaMenu, meta.contexto);
+    const players = await loadPlayersWithMeasurements(supabase, team.id, jugadorIds, semana, calendario, semanaMenu, meta.contexto, true);
     return renderReportResponse(meta, players, semana);
   } catch (error) {
     console.error('Error generating weekly squad report:', error);
