@@ -170,6 +170,7 @@ async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds, semana,
     .from('menu_semanal')
     .select('*')
     .eq('semana', menuWeekKey)
+    .eq('equipo_id', teamId)
     .maybeSingle();
 
   // Load all plans for these players

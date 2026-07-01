@@ -31,17 +31,26 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
   let registrosHidratacion = [];
 
   try {
-    const [resJugador, resAnaliticas, resEvoluciones, resMenus, resHidratacion] = await Promise.all([
-      supabase.from('jugadores').select('*').eq('id', id).single(),
+    const { data: rawJugador, error: jugadorErr } = await supabase.from('jugadores').select('*').eq('id', id).single();
+    if (jugadorErr) throw jugadorErr;
+
+    let menuQuery = supabase.from('menu_semanal').select('*').order('semana', { ascending: false }).limit(10);
+    if (rawJugador?.equipo_id) {
+      menuQuery = menuQuery.eq('equipo_id', rawJugador.equipo_id);
+    } else {
+      menuQuery = menuQuery.eq('id', -1);
+    }
+
+    const [resAnaliticas, resEvoluciones, resMenus, resHidratacion] = await Promise.all([
       supabase.from('analiticas').select('*').eq('jugador_id', id).order('fecha_extraccion', { ascending: false }),
       supabase.from('evoluciones').select('*').eq('jugador_id', id).order('fecha', { ascending: true }),
-      supabase.from('menu_semanal').select('*').order('semana', { ascending: false }).limit(10),
+      menuQuery,
       supabase.from('registros_hidratacion').select('*').eq('jugador_id', id).order('fecha', { ascending: true }),
     ]);
 
     analiticas = resAnaliticas.data || [];
     evoluciones = resEvoluciones.data || [];
-    jugador = withLatestMeasurement(resJugador.data, evoluciones);
+    jugador = withLatestMeasurement(rawJugador, evoluciones);
     menus = resMenus.data || [];
     registrosHidratacion = resHidratacion.data || [];
 

@@ -10,7 +10,8 @@ export async function POST(req) {
     const formData = await req.formData();
     const archivo = formData.get('file');
     const semana = formData.get('semana');
-    if (!archivo || !semana) return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
+    const equipoId = formData.get('equipo_id');
+    if (!archivo || !semana || !equipoId) return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
 
     const buffer = Buffer.from(await archivo.arrayBuffer());
     const base64 = buffer.toString('base64');
@@ -50,7 +51,7 @@ export async function POST(req) {
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
       .from('menu_semanal')
-      .upsert({ semana, dias: parsed.dias, updated_at: new Date().toISOString() }, { onConflict: 'semana' })
+      .upsert({ semana, equipo_id: equipoId, dias: parsed.dias, updated_at: new Date().toISOString() }, { onConflict: 'semana,equipo_id' })
       .select().single();
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -63,8 +64,15 @@ export async function POST(req) {
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const semana = searchParams.get('semana');
+  const equipoId = searchParams.get('equipo_id');
+  if (!equipoId) return NextResponse.json({ error: 'Falta equipo_id' }, { status: 400 });
+
   const supabase = getSupabaseAdmin();
-  const query = supabase.from('menu_semanal').select('*').order('semana', { ascending: false });
+  const query = supabase
+    .from('menu_semanal')
+    .select('*')
+    .eq('equipo_id', equipoId)
+    .order('semana', { ascending: false });
   if (semana) query.eq('semana', semana);
   const { data, error } = await query.limit(10);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

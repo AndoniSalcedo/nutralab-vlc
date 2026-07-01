@@ -42,7 +42,8 @@ export default function MenuPage({ params }) {
 
   useEffect(() => {
     let active = true;
-    fetch('/api/menu-semanal')
+    if (!teamId) return;
+    fetch(`/api/menu-semanal?equipo_id=${teamId}`)
       .then((res) => res.json())
       .then((data) => {
         if (active) {
@@ -55,7 +56,7 @@ export default function MenuPage({ params }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [teamId]);
 
   useEffect(() => {
     setSelectedMenu((prev) => {
@@ -88,6 +89,7 @@ export default function MenuPage({ params }) {
       const fd = new FormData();
       fd.append('file', file);
       fd.append('semana', weekDate);
+      fd.append('equipo_id', teamId);
 
       const res = await fetch('/api/menu-semanal', { method: 'POST', body: fd });
       const data = await res.json();
