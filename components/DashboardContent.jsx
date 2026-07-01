@@ -82,7 +82,7 @@ function AiGenerationOverlay({ opened, messages = [] }) {
         <Text fw={800} size="lg" variant="gradient" gradient={{ from: 'blue.6', to: 'grape.6', deg: 135 }} mb="xs">
           Generando Planificación Inteligente
         </Text>
-        
+
         <Text size="sm" c="dimmed" fw={500} style={{ minHeight: '24px' }}>
           {messages[index]}
         </Text>
@@ -97,7 +97,8 @@ function AiGenerationOverlay({ opened, messages = [] }) {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes pulseGlow {
           0%, 100% { transform: scale(1); box-shadow: 0 8px 20px rgba(34, 139, 230, 0.35); }
           50% { transform: scale(1.08); box-shadow: 0 8px 30px rgba(156, 54, 181, 0.5); }
@@ -209,6 +210,25 @@ const CONTEXTOS = [
   { value: 'pretemporada', label: 'Pretemporada (alta carga)' },
 ];
 
+function getWeekRangeLabel(mondayInput) {
+  const monday = mondayInput instanceof Date ? mondayInput : new Date(`${mondayInput}T00:00:00`);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+  const mondayDay = monday.getDate();
+  const mondayMonth = months[monday.getMonth()];
+  const sundayDay = sunday.getDate();
+  const sundayMonth = months[sunday.getMonth()];
+
+  if (monday.getMonth() === sunday.getMonth()) {
+    return `Semana ${mondayDay}-${sundayDay} ${sundayMonth}`;
+  } else {
+    return `Semana ${mondayDay} ${mondayMonth} - ${sundayDay} ${sundayMonth}`;
+  }
+}
+
 function defaultReportForm() {
   const today = new Date();
   const monday = new Date(today);
@@ -220,16 +240,12 @@ function defaultReportForm() {
   return {
     semana: weekStr,
     contexto: 'semana_partido',
-    title: 'Semana 10-17 Mayo',
+    title: getWeekRangeLabel(monday),
     subtitle: 'Plan nutricional',
     team: 'Valencia CF · Primer Equipo',
     author: 'Carlos Ferrando · Nutralab',
     handle: '@c.ferrando',
-    microcycle: [
-      'DOM 10 · 16:15. Athletic Club — San Mames (Bilbao). Atlantico, 18-21 °C, humedad alta.',
-      'JUE 14 · 19:00. Rayo Vallecano — Mestalla. Calor moderado y humedad costera, 24-27 °C tarde.',
-      'DOM 17 · 19:00. Real Sociedad — Reale Arena (Donostia). Atlantico templado-humedo, 17-21 °C.',
-    ].join('\n'),
+    microcycle: '',
     rules: [
       'Ningun dia en deficit calorico. Carga glucogenica continua, HC en cada ingesta principal.',
       'Pescado azul 4-5 tomas minimo. Frutos rojos diarios. Curcuma cada cena.',
@@ -384,7 +400,7 @@ export default function DashboardContent({ players = [], team }) {
         const data = await res.json();
         const menusList = data.menus || [];
         setAvailableMenus(menusList);
-        
+
         // Find if a menu matches the selected week
         const match = menusList.find((m) => m.semana === weekStr);
         if (match) {
@@ -403,13 +419,13 @@ export default function DashboardContent({ players = [], team }) {
   function openReportModal(player = null) {
     setReportModal({ opened: true, player });
     setShowAdvanced(false);
-    
+
     if (player) {
       setSelectedPlayerIds([player.id]);
     } else {
       setSelectedPlayerIds(playersState.map((p) => p.id));
     }
-    
+
     loadAvailableMenus(reportForm.semana);
   }
 
@@ -804,7 +820,7 @@ export default function DashboardContent({ players = [], team }) {
                 </ThemeIcon>
                 <Text fw={700} size="sm" c="blue.9">Configuración de la Semana</Text>
               </Group>
-              
+
               <Stack gap="sm">
                 <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
                   <TextInput
@@ -814,6 +830,9 @@ export default function DashboardContent({ players = [], team }) {
                     onChange={(event) => {
                       const val = event.currentTarget.value;
                       updateReportField('semana', val);
+                      if (val) {
+                        updateReportField('title', getWeekRangeLabel(val));
+                      }
                       const match = availableMenus.find((m) => m.semana === val);
                       if (match) {
                         setSelectedMenuWeek(match.semana);
@@ -822,12 +841,12 @@ export default function DashboardContent({ players = [], team }) {
                     }}
                   />
                   <TextInput
-                    label="Rango / título de semana"
+                    label="Título de semana"
                     value={reportForm.title}
                     onChange={(event) => updateReportField('title', event.currentTarget.value)}
                   />
                   <Select
-                    label="Contexto general (IA)"
+                    label="Contexto general"
                     placeholder="Selecciona el contexto"
                     data={CONTEXTOS}
                     value={reportForm.contexto || 'semana_partido'}
@@ -886,7 +905,7 @@ export default function DashboardContent({ players = [], team }) {
                 </ThemeIcon>
                 <Text fw={700} size="sm" c="teal.9">Menú del Buffet Comedor</Text>
               </Group>
-              
+
               <Box>
                 <Select
                   label="Menú del comedor a sincronizar"
@@ -992,7 +1011,7 @@ export default function DashboardContent({ players = [], team }) {
                 </ThemeIcon>
                 <Text fw={700} size="sm" c="gray.9">Contenido e Indicaciones del PDF</Text>
               </Group>
-              
+
               <Stack gap="sm">
                 <Textarea
                   label="Microciclo / calendario"
