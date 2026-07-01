@@ -45,6 +45,7 @@ const METRICAS = TREND_MEASUREMENT_METRICS;
 
 function emptyForm() {
   return {
+    id: null,
     fecha: new Date().toISOString().split('T')[0],
     altura_cm: '',
     peso_kg: '',
@@ -57,6 +58,7 @@ function emptyForm() {
 
 function formFromMedicion(medicion) {
   return {
+    id: medicion?.id || null,
     fecha: medicion?.fecha || new Date().toISOString().split('T')[0],
     altura_cm: medicion?.altura_cm ?? '',
     peso_kg: medicion?.peso_kg ?? '',

@@ -28,7 +28,7 @@ export async function GET(req) {
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { jugador_id, fecha, altura_cm, peso_kg, porcentaje_grasa, masa_magra_kg, suma_6_pliegues, notas } = body;
+    const { id, jugador_id, fecha, altura_cm, peso_kg, porcentaje_grasa, masa_magra_kg, suma_6_pliegues, notas } = body;
     if (!jugador_id || !fecha) return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
     const supabase = getSupabaseAdmin();
     const user = await getUser();
@@ -36,10 +36,19 @@ export async function POST(req) {
     const ownedPlayer = await getOwnedPlayer(supabase, user, jugador_id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
-    const { data, error } = await supabase
-      .from('evoluciones')
-      .upsert({ jugador_id, fecha, altura_cm, peso_kg, porcentaje_grasa, masa_magra_kg, suma_6_pliegues, notas }, { onConflict: 'jugador_id,fecha' })
-      .select().single();
+    let query;
+    if (id) {
+      query = supabase
+        .from('evoluciones')
+        .update({ fecha, altura_cm, peso_kg, porcentaje_grasa, masa_magra_kg, suma_6_pliegues, notas })
+        .eq('id', id);
+    } else {
+      query = supabase
+        .from('evoluciones')
+        .upsert({ jugador_id, fecha, altura_cm, peso_kg, porcentaje_grasa, masa_magra_kg, suma_6_pliegues, notas }, { onConflict: 'jugador_id,fecha' });
+    }
+
+    const { data, error } = await query.select().single();
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ ok: true, evolucion: data });
   } catch (e) {
