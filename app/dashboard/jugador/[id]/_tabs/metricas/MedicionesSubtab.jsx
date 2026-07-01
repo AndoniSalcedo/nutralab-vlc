@@ -30,7 +30,7 @@ import {
   ScrollArea,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconCalendarStats, IconCheck, IconEdit, IconPlus, IconRuler2 } from '@tabler/icons-react';
+import { IconCalendarStats, IconCheck, IconEdit, IconPlus, IconRuler2, IconTrash } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import {
@@ -108,6 +108,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   const [currentId, setCurrentId] = useState(evolucionesIniciales.length ? String(evolucionesIniciales[evolucionesIniciales.length - 1].id) : null);
   const [modalMode, setModalMode] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState(emptyForm);
 
   const sortedAsc = useMemo(
@@ -198,6 +199,40 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
     }
   }
 
+  async function handleDelete() {
+    if (readOnly || !selected) return;
+    const confirmed = window.confirm(`¿Seguro que quieres borrar la medición del ${fechaLabel(selected.fecha)}?`);
+    if (!confirmed) return;
+
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/evoluciones?id=${selected.id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al borrar medición');
+
+      const remaining = evoluciones.filter((e) => String(e.id) !== String(selected.id));
+      setEvoluciones(remaining);
+      
+      const nextSorted = [...remaining].sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+      const nextSelected = nextSorted[nextSorted.length - 1];
+      setCurrentId(nextSelected?.id ? String(nextSelected.id) : null);
+
+      notifications.show({
+        color: 'green',
+        title: 'Medición borrada',
+        message: 'La medición se ha eliminado correctamente.',
+      });
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'No se pudo borrar la medición',
+        message: e.message,
+      });
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <Stack gap={0}>
       <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
@@ -217,6 +252,18 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
 
             {!readOnly && (
               <Group gap="xs">
+                <Button
+                  size="xs"
+                  variant="light"
+                  color="red"
+                  radius="xl"
+                  leftSection={<IconTrash size={14} />}
+                  onClick={handleDelete}
+                  loading={deleting}
+                  disabled={!selected}
+                >
+                  Borrar actual
+                </Button>
                 <Button size="xs" variant="light" color="dark" radius="xl" leftSection={<IconEdit size={14} />} disabled={!selected} onClick={startEdit}>
                   Editar actual
                 </Button>
