@@ -59,7 +59,7 @@ export async function POST(req) {
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
     const jugadorConMetricas = await loadPlayerWithLatestMetrics(supabase, jugador.id);
 
-    const generatedDatos = draftOnly || (!datos && contenido === undefined)
+    const generatedDatos = draftOnly || (!datos && (contenido === undefined || contenido === ''))
       ? await generarDatosPlan({ jugador: jugadorConMetricas, nombre: planNombre, contexto, contextoAdicional, calendario })
       : sanitizePlanData(datos);
 
