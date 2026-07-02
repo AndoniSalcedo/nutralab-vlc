@@ -461,6 +461,15 @@ export default function DashboardContent({ players = [], team }) {
       return;
     }
 
+    if (!selectedMenuWeek) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al generar informe',
+        message: 'Debes seleccionar un menú del buffet comedor para poder generar el informe.',
+      });
+      return;
+    }
+
     setGeneratingReport(true);
     try {
       const res = await fetch('/api/reports/weekly-squad', {

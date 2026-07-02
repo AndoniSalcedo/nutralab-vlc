@@ -1,9 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ComposedChart,
   Bar,
+  Cell,
   Line,
   XAxis,
   YAxis,
@@ -29,8 +30,9 @@ import {
   Title,
   ScrollArea,
 } from '@mantine/core';
+import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
-import { IconCalendarStats, IconCheck, IconEdit, IconPlus, IconRuler2, IconTrash } from '@tabler/icons-react';
+import { IconCalendarStats, IconCheck, IconEdit, IconPlus, IconRuler2, IconTrash, IconFilter } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import {
@@ -39,9 +41,30 @@ import {
   formatMetricValue,
   hasMetricValue,
   metricValue,
+  getSeason,
 } from '@/lib/measurement-metrics';
 
 const METRICAS = TREND_MEASUREMENT_METRICS;
+
+function formatSeasonOption(s) {
+  if (!s) return '';
+  const [startYear, endYear] = s.split('/');
+  return `Temporada ${s} (julio ${startYear} - junio ${endYear})`;
+}
+
+function dateValue(value) {
+  return value ? new Date(`${value}T00:00:00`) : null;
+}
+
+function dateInputToIso(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
 function emptyForm() {
   return {
@@ -108,17 +131,59 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   const jugadorId = jugador.id;
   const [evoluciones, setEvoluciones] = useState(evolucionesIniciales || []);
   const [currentId, setCurrentId] = useState(evolucionesIniciales.length ? String(evolucionesIniciales[evolucionesIniciales.length - 1].id) : null);
+  const [selectedSeason, setSelectedSeason] = useState('Todas');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [modalMode, setModalMode] = useState(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [form, setForm] = useState(emptyForm);
 
+  const seasons = useMemo(() => {
+    const list = Array.from(new Set(evoluciones.map(e => getSeason(e.fecha)).filter(Boolean))).sort().reverse();
+    return list;
+  }, [evoluciones]);
+
+  const filteredEvoluciones = useMemo(() => {
+    return evoluciones.filter((e) => {
+      if (selectedSeason !== 'Todas' && getSeason(e.fecha) !== selectedSeason) return false;
+      if (dateFrom && String(e.fecha) < dateFrom) return false;
+      if (dateTo && String(e.fecha) > dateTo) return false;
+      return true;
+    });
+  }, [evoluciones, selectedSeason, dateFrom, dateTo]);
+
   const sortedAsc = useMemo(
-    () => [...evoluciones].sort((a, b) => String(a.fecha).localeCompare(String(b.fecha))),
-    [evoluciones]
+    () => [...filteredEvoluciones].sort((a, b) => String(a.fecha).localeCompare(String(b.fecha))),
+    [filteredEvoluciones]
   );
   const sortedDesc = useMemo(() => [...sortedAsc].reverse(), [sortedAsc]);
   const selected = sortedAsc.find((e) => String(e.id) === String(currentId)) || sortedAsc[sortedAsc.length - 1] || null;
+
+  useEffect(() => {
+    if (sortedDesc.length > 0) {
+      const exists = sortedDesc.some((e) => String(e.id) === String(currentId));
+      if (!exists) {
+        setCurrentId(String(sortedDesc[0].id));
+      }
+    } else {
+      setCurrentId(null);
+    }
+  }, [sortedDesc, currentId]);
+
+  const handleSeasonChange = (season) => {
+    setSelectedSeason(season);
+    const seasonEvoluciones = season === 'Todas'
+      ? evoluciones
+      : evoluciones.filter(e => getSeason(e.fecha) === season);
+
+    if (seasonEvoluciones.length > 0) {
+      const sorted = [...seasonEvoluciones].sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+      setCurrentId(String(sorted[sorted.length - 1].id));
+    } else {
+      setCurrentId(null);
+    }
+  };
 
   function startNew() {
     setModalMode('new');
@@ -183,6 +248,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         const filtered = prev.filter((e) => e.id !== data.evolucion.id && e.fecha !== data.evolucion.fecha);
         return [...filtered, data.evolucion];
       });
+      setSelectedSeason(getSeason(data.evolucion.fecha) || 'Todas');
       setCurrentId(String(data.evolucion.id));
       setModalMode(null);
       notifications.show({
@@ -215,9 +281,20 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
       const remaining = evoluciones.filter((e) => String(e.id) !== String(selected.id));
       setEvoluciones(remaining);
       
-      const nextSorted = [...remaining].sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
-      const nextSelected = nextSorted[nextSorted.length - 1];
-      setCurrentId(nextSelected?.id ? String(nextSelected.id) : null);
+      const remainingInSeason = selectedSeason === 'Todas'
+        ? remaining
+        : remaining.filter(e => getSeason(e.fecha) === selectedSeason);
+
+      if (remainingInSeason.length > 0) {
+        const nextSorted = [...remainingInSeason].sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+        const nextSelected = nextSorted[nextSorted.length - 1];
+        setCurrentId(nextSelected?.id ? String(nextSelected.id) : null);
+      } else {
+        setSelectedSeason('Todas');
+        const nextSorted = [...remaining].sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+        const nextSelected = nextSorted[nextSorted.length - 1];
+        setCurrentId(nextSelected?.id ? String(nextSelected.id) : null);
+      }
 
       notifications.show({
         color: 'green',
@@ -276,22 +353,55 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
             )}
           </Group>
 
-          <Select
-            placeholder="Selecciona fecha"
-            leftSection={<IconCalendarStats size={16} />}
-            data={sortedDesc.map((m) => ({ value: String(m.id), label: fechaLabel(m.fecha) }))}
-            value={currentId}
-            onChange={(val) => {
-              if (!val) return;
-              setCurrentId(val);
-            }}
-            searchable
-            variant="filled"
-            radius="md"
-            allowDeselect={false}
-            disabled={sortedDesc.length === 0}
-            nothingFoundMessage="No hay registros"
-          />
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="sm">
+            <Select
+              placeholder="Temporada"
+              leftSection={<IconCalendarStats size={16} />}
+              data={[{ value: 'Todas', label: 'Todas las temporadas' }, ...seasons.map(s => ({ value: s, label: formatSeasonOption(s) }))] }
+              value={selectedSeason}
+              onChange={handleSeasonChange}
+              variant="filled"
+              radius="md"
+              allowDeselect={false}
+              disabled={seasons.length === 0}
+            />
+            <DateInput
+              placeholder="Fecha de inicio"
+              leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+              value={dateValue(dateFrom)}
+              onChange={(value) => setDateFrom(dateInputToIso(value))}
+              variant="filled"
+              radius="md"
+              valueFormat="DD/MM/YYYY"
+              clearable
+            />
+            <DateInput
+              placeholder="Fecha de fin"
+              leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+              value={dateValue(dateTo)}
+              onChange={(value) => setDateTo(dateInputToIso(value))}
+              variant="filled"
+              radius="md"
+              valueFormat="DD/MM/YYYY"
+              clearable
+            />
+            <Select
+              placeholder="Selecciona fecha"
+              leftSection={<IconCalendarStats size={16} />}
+              data={sortedDesc.map((m) => ({ value: String(m.id), label: fechaLabel(m.fecha) }))}
+              value={currentId}
+              onChange={(val) => {
+                if (!val) return;
+                setCurrentId(val);
+              }}
+              searchable
+              variant="filled"
+              radius="md"
+              allowDeselect={false}
+              disabled={sortedDesc.length === 0}
+              nothingFoundMessage="No hay registros"
+            />
+          </SimpleGrid>
         </Stack>
       </Paper>
 
@@ -417,16 +527,45 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                             />
                             <Bar
                               dataKey={m.key}
-                              fill={`url(#gradient_player_${m.key})`}
                               radius={[4, 4, 0, 0]}
                               maxBarSize={32}
-                            />
+                            >
+                              {metricData.map((entry, index) => {
+                                const isSelected = String(entry.id) === String(selected?.id);
+                                return (
+                                  <Cell
+                                    key={`cell-${entry.id || index}-${m.key}`}
+                                    fill={isSelected ? 'var(--mantine-color-orange-5)' : `url(#gradient_player_${m.key})`}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => setCurrentId(String(entry.id))}
+                                  />
+                                );
+                              })}
+                            </Bar>
                             <Line
                               type="monotone"
                               dataKey={m.key}
                               stroke={m.color}
                               strokeWidth={2}
-                              dot={{ r: 3.5, fill: 'white', stroke: m.color, strokeWidth: 2 }}
+                              dot={(props) => {
+                                if (!props) return null;
+                                const { cx, cy, payload } = props;
+                                if (cx === undefined || cy === undefined || !payload) return null;
+                                const isSelected = String(payload.id) === String(selected?.id);
+                                return (
+                                  <circle
+                                    cx={cx}
+                                    cy={cy}
+                                    r={isSelected ? 6 : 3.5}
+                                    fill={isSelected ? m.color : 'white'}
+                                    stroke={m.color}
+                                    strokeWidth={isSelected ? 0 : 2}
+                                    key={`dot-${payload.id}-${m.key}`}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => setCurrentId(String(payload.id))}
+                                  />
+                                );
+                              }}
                               activeDot={{ r: 5, strokeWidth: 0 }}
                               connectNulls
                             />
@@ -443,16 +582,27 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                             </Table.Tr>
                           </Table.Thead>
                           <Table.Tbody>
-                            {reverseMetricData.map((row) => (
-                              <Table.Tr key={row.fecha}>
-                                <Table.Td style={{ fontSize: 10, padding: '4px 8px' }}>
-                                  {row.fecha ? new Date(`${row.fecha}T00:00:00`).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '-'}
-                                </Table.Td>
-                                <Table.Td style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right', fontWeight: 650 }}>
-                                  {row[m.key]} {unit}
-                                </Table.Td>
-                              </Table.Tr>
-                            ))}
+                            {reverseMetricData.map((row) => {
+                              const isSelected = String(row.id) === String(selected?.id);
+                              return (
+                                <Table.Tr
+                                  key={row.fecha}
+                                  onClick={() => setCurrentId(String(row.id))}
+                                  style={{
+                                    cursor: 'pointer',
+                                    backgroundColor: isSelected ? 'var(--mantine-color-blue-0)' : undefined,
+                                    transition: 'background-color 0.2s ease',
+                                  }}
+                                >
+                                  <Table.Td style={{ fontSize: 10, padding: '4px 8px', fontWeight: isSelected ? 700 : 400 }}>
+                                    {row.fecha ? new Date(`${row.fecha}T00:00:00`).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '-'}
+                                  </Table.Td>
+                                  <Table.Td style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right', fontWeight: isSelected ? 800 : 650 }}>
+                                    {row[m.key]} {unit}
+                                  </Table.Td>
+                                </Table.Tr>
+                              );
+                            })}
                           </Table.Tbody>
                         </Table>
                       </ScrollArea>

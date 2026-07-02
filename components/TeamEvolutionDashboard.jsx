@@ -51,9 +51,16 @@ import {
   formatMetricValue,
   hasMetricValue,
   metricValue,
+  getSeason,
 } from '@/lib/measurement-metrics';
 
 const METRICS = TREND_MEASUREMENT_METRICS;
+
+function formatSeasonOption(s) {
+  if (!s) return '';
+  const [startYear, endYear] = s.split('/');
+  return `Temporada ${s} (julio ${startYear} - junio ${endYear})`;
+}
 
 function formatDate(value) {
   if (!value) return '-';
@@ -255,6 +262,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   const router = useRouter();
   const [viewMode, setViewMode] = useState('trends');
   const [position, setPosition] = useState('');
+  const [selectedSeason, setSelectedSeason] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
@@ -264,6 +272,11 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
     const values = Array.from(new Set(players.map((player) => player.posicion).filter(Boolean))).sort();
     return [{ value: '', label: 'Todas' }, ...values.map((value) => ({ value, label: value }))];
   }, [players]);
+
+  const seasonOptions = useMemo(() => {
+    const seasons = Array.from(new Set(evolutions.map((e) => getSeason(e.fecha)).filter(Boolean))).sort().reverse();
+    return [{ value: '', label: 'Todas las temporadas' }, ...seasons.map((s) => ({ value: s, label: formatSeasonOption(s) }))];
+  }, [evolutions]);
 
   const scopedPlayers = useMemo(
     () => (position ? players.filter((player) => player.posicion === position) : players),
@@ -280,19 +293,24 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
     [evolutions, scopedPlayerIds]
   );
 
-  const filteredEvolutions = useMemo(() => scopedEvolutions.filter((record) => {
+  const seasonEvolutions = useMemo(() => {
+    if (!selectedSeason) return scopedEvolutions;
+    return scopedEvolutions.filter((record) => getSeason(record.fecha) === selectedSeason);
+  }, [scopedEvolutions, selectedSeason]);
+
+  const filteredEvolutions = useMemo(() => seasonEvolutions.filter((record) => {
     if (dateFrom && String(record.fecha) < dateFrom) return false;
     if (dateTo && String(record.fecha) > dateTo) return false;
     return true;
-  }), [dateFrom, dateTo, scopedEvolutions]);
+  }), [dateFrom, dateTo, seasonEvolutions]);
 
   const rows = useMemo(() => {
     return latestByPlayer(scopedPlayers, filteredEvolutions).filter((row) => row.records.length > 0);
   }, [filteredEvolutions, scopedPlayers]);
 
   const allRows = useMemo(
-    () => latestByPlayer(scopedPlayers, scopedEvolutions),
-    [scopedEvolutions, scopedPlayers]
+    () => latestByPlayer(scopedPlayers, seasonEvolutions),
+    [seasonEvolutions, scopedPlayers]
   );
 
   const chartData = useMemo(() => aggregateByDate(rows), [rows]);
@@ -303,18 +321,18 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
   const dateCounts = useMemo(() => {
     const counts = new Map();
-    scopedEvolutions.forEach((record) => {
+    seasonEvolutions.forEach((record) => {
       if (!record.fecha) return;
       counts.set(record.fecha, (counts.get(record.fecha) || 0) + 1);
     });
     return counts;
-  }, [scopedEvolutions]);
+  }, [seasonEvolutions]);
 
   const availableDates = useMemo(
     () => Array.from(dateCounts.keys()).sort(),
     [dateCounts]
   );
-  const currentDay = selectedDate || availableDates.at(-1) || '';
+  const currentDay = (selectedDate && availableDates.includes(selectedDate)) ? selectedDate : (availableDates.at(-1) || '');
   const daySelectValue = availableDates.includes(currentDay) ? currentDay : null;
 
   const dateOptions = useMemo(() => (
@@ -461,6 +479,20 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                 searchable
                 allowDeselect={false}
                 style={{ flex: 1, minWidth: 170 }}
+              />
+
+              <Select
+                placeholder="Temporada"
+                leftSection={<IconCalendarStats size={16} style={{ opacity: 0.7 }} />}
+                data={seasonOptions}
+                value={selectedSeason}
+                onChange={(value) => setSelectedSeason(value || '')}
+                variant="filled"
+                radius="xl"
+                size="sm"
+                searchable
+                allowDeselect={false}
+                style={{ flex: 1, minWidth: 180 }}
               />
 
               {viewMode === 'trends' ? (
