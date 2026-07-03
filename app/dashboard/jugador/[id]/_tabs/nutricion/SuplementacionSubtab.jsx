@@ -53,7 +53,11 @@ function formatDose(suplemento, peso, override) {
     const min = Math.round(Number(suplemento.dose_min || 0) * peso);
     const max = Math.round(Number(suplemento.dose_max || 0) * peso);
     const unit = suplemento.dose_unit || '';
-    return { value: `${min}-${max} ${unit}`, needsWeight: false };
+    
+    if (min === max) {
+      return { value: `${min} ${unit}`.trim(), needsWeight: false };
+    }
+    return { value: `${min}-${max} ${unit}`.trim(), needsWeight: false };
   }
 
   return {
