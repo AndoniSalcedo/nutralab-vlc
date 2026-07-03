@@ -390,6 +390,8 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
                 onChange={handleListChange}
                 disabled={saving}
                 clearable
+                variant="filled"
+                radius="md"
               />
             </Stack>
           ) : (
@@ -409,6 +411,8 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
                   data={data.suplementos.map((suplemento) => ({ value: String(suplemento.id), label: suplemento.nombre }))}
                   value={extraForm.suplemento_id}
                   onChange={(value) => setExtraForm((current) => ({ ...current, suplemento_id: value || '' }))}
+                  variant="filled"
+                  radius="md"
                 />
                 <TextInput
                   label="Dosis personalizada"

@@ -1,16 +1,18 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ActionIcon,
   Badge,
   Button,
   Checkbox,
+  Box,
   Divider,
   Group,
   Modal,
   LoadingOverlay,
   Paper,
+  ThemeIcon,
   ScrollArea,
   Select,
   SimpleGrid,
@@ -200,6 +202,21 @@ export default function SupplementCatalogManager({ players = [], team }) {
     }
   }
 
+  function deleteList(id, name) {
+    setConfirmAction({
+      message: `¿Estás seguro de que deseas eliminar el catálogo "${name}"? Se eliminará de todas las asignaciones y quitará la relación de los jugadores.`,
+      onConfirm: async () => {
+        const result = await postCatalog(
+          { action: 'delete_list', id: Number(id) },
+          'El catálogo se ha eliminado correctamente.'
+        );
+        if (result) {
+          setSelectedListId('');
+        }
+      },
+    });
+  }
+
   async function addSupplementToList() {
     if (!selectedListId || !selectedSupplementId) {
       notifications.show({
@@ -277,6 +294,8 @@ export default function SupplementCatalogManager({ players = [], team }) {
               value={selectedListId}
               onChange={(value) => setSelectedListId(value || '')}
               searchable
+              variant="filled"
+              radius="md"
             />
 
             <Divider label="Seleccionar destinatarios" labelPosition="center" my="sm" />
@@ -337,87 +356,142 @@ export default function SupplementCatalogManager({ players = [], team }) {
         </Tabs.Panel>
 
         <Tabs.Panel value="catalogs" pt="md">
-          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-            <BentoCard title="Crear catálogo" icon={IconCirclePlus} color="blue">
-              <TextInput
-                label="Nombre"
-                placeholder="Ej. Pretemporada alta carga"
-                value={listForm.nombre}
-                onChange={(event) => {
-                  const val = event.currentTarget.value;
-                  setListForm((current) => ({ ...current, nombre: val }));
-                }}
-              />
-              <Textarea
-                label="Descripción"
-                placeholder="Opcional"
-                minRows={2}
-                value={listForm.descripcion}
-                onChange={(event) => {
-                  const val = event.currentTarget.value;
-                  setListForm((current) => ({ ...current, descripcion: val }));
-                }}
-              />
-              <Group justify="flex-end">
-                <Button radius="xl" size="xs" onClick={createList} loading={saving}>
-                  Crear catálogo
-                </Button>
-              </Group>
-            </BentoCard>
+          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md" align="start">
+            {/* Left Column: Selector & Creation */}
+            <Stack gap="md">
+              <BentoCard title="Seleccionar catálogo" icon={IconBottle} color="teal">
+                <Select
+                  placeholder="Selecciona un catálogo para gestionar"
+                  data={listOptions}
+                  value={selectedListId}
+                  onChange={(value) => setSelectedListId(value || '')}
+                  searchable
+                  variant="filled"
+                  radius="md"
+                />
 
-            <BentoCard title="Añadir suplemento" icon={IconBottle} color="teal">
-              <Select
-                label="Catálogo"
-                data={listOptions}
-                value={selectedListId}
-                onChange={(value) => setSelectedListId(value || '')}
-                searchable
-              />
-              <Select
-                label="Suplemento"
-                placeholder="Selecciona suplemento"
-                data={supplementOptions}
-                value={selectedSupplementId}
-                onChange={(value) => setSelectedSupplementId(value || '')}
-                searchable
-              />
-              <Group justify="flex-end">
-                <Button radius="xl" size="xs" leftSection={<IconCirclePlus size={15} />} onClick={addSupplementToList} loading={saving}>
-                  Añadir al catálogo
-                </Button>
-              </Group>
-            </BentoCard>
+                {selectedList && (
+                  <Stack gap="xs" mt="sm">
+                    <Text size="xs" fw={700} c="dimmed">DESCRIPCIÓN:</Text>
+                    <Text size="sm">
+                      {selectedList.descripcion || 'Este catálogo no tiene descripción.'}
+                    </Text>
+                    <Button
+                      size="xs"
+                      radius="xl"
+                      variant="light"
+                      color="red"
+                      leftSection={<IconTrash size={14} />}
+                      onClick={() => deleteList(selectedList.id, selectedList.nombre)}
+                      mt="xs"
+                    >
+                      Eliminar catálogo
+                    </Button>
+                  </Stack>
+                )}
+              </BentoCard>
+
+              <BentoCard title="Crear catálogo" icon={IconCirclePlus} color="blue">
+                <TextInput
+                  label="Nombre del catálogo"
+                  placeholder="Ej. Pretemporada alta carga"
+                  value={listForm.nombre}
+                  onChange={(event) => {
+                    const val = event.currentTarget.value;
+                    setListForm((current) => ({ ...current, nombre: val }));
+                  }}
+                  required
+                />
+                <Textarea
+                  label="Descripción"
+                  placeholder="Opcional"
+                  minRows={2}
+                  value={listForm.descripcion}
+                  onChange={(event) => {
+                    const val = event.currentTarget.value;
+                    setListForm((current) => ({ ...current, descripcion: val }));
+                  }}
+                />
+                <Group justify="flex-end">
+                  <Button radius="xl" size="xs" onClick={createList} loading={saving} disabled={!listForm.nombre.trim()}>
+                    Crear catálogo
+                  </Button>
+                </Group>
+              </BentoCard>
+            </Stack>
+
+            {/* Right Column: Catalog Content and Add Supplement */}
+            <Box>
+              {selectedList ? (
+                <BentoCard title={`Contenido · ${selectedList.nombre}`} icon={IconCalendarStats} color="gray">
+                  <Text size="xs" fw={700} c="dimmed">AÑADIR SUPLEMENTO AL CATÁLOGO:</Text>
+                  <Group gap="xs" align="flex-end" wrap="nowrap" style={{ width: '100%' }}>
+                    <Select
+                      placeholder="Selecciona suplemento"
+                      data={supplementOptions}
+                      value={selectedSupplementId}
+                      onChange={(value) => setSelectedSupplementId(value || '')}
+                      searchable
+                      variant="filled"
+                      radius="md"
+                      style={{ flex: 1 }}
+                    />
+                    <Button
+                      radius="xl"
+                      size="sm"
+                      onClick={addSupplementToList}
+                      loading={saving}
+                      disabled={!selectedSupplementId}
+                    >
+                      Añadir
+                    </Button>
+                  </Group>
+
+                  <Divider my="md" label="Suplementos incluidos" labelPosition="center" />
+
+                  {selectedItems.length ? (
+                    <ScrollArea h={320}>
+                      <Stack gap="xs">
+                        {selectedItems.map((item) => {
+                          const suplemento = supplementMap.get(Number(item.suplemento_id));
+                          return (
+                            <Paper key={item.id} p="xs" radius="md" bg="gray.0" withBorder>
+                              <Group justify="space-between" wrap="nowrap" align="center">
+                                <Stack gap={0} style={{ minWidth: 0 }}>
+                                  <Group gap={6} wrap="nowrap">
+                                    <Text size="sm" fw={900} truncate>{suplemento?.nombre || 'Suplemento'}</Text>
+                                    <Badge size="xs" radius="sm" variant="light" color="gray">{suplemento?.categoria || 'Custom'}</Badge>
+                                  </Group>
+                                  <Text size="xs" c="dimmed" truncate>{suplemento?.dose_text || suplemento?.pauta || 'Según pauta'}</Text>
+                                </Stack>
+                                <ActionIcon color="red" variant="subtle" radius="xl" onClick={() => removeItem(item.id)} aria-label="Quitar suplemento">
+                                  <IconTrash size={16} />
+                                </ActionIcon>
+                              </Group>
+                            </Paper>
+                          );
+                        })}
+                      </Stack>
+                    </ScrollArea>
+                  ) : (
+                    <Text size="sm" c="dimmed" style={{ textAlign: 'center' }} py="xl">
+                      Este catálogo no tiene suplementos. Añade uno arriba.
+                    </Text>
+                  )}
+                </BentoCard>
+              ) : (
+                <Paper p="xl" radius="lg" withBorder style={{ textAlign: 'center', minHeight: 300, display: 'flex', flexDirection: 'column', justifyContent: 'center' }} bg="gray.0">
+                  <ThemeIcon color="gray" variant="light" radius="xl" size="xl" mx="auto" mb="sm">
+                    <IconBottle size={24} />
+                  </ThemeIcon>
+                  <Text fw={800} c="dimmed">Ningún catálogo seleccionado</Text>
+                  <Text size="sm" c="dimmed" mt={4}>
+                    Selecciona un catálogo en la columna izquierda para gestionar su contenido.
+                  </Text>
+                </Paper>
+              )}
+            </Box>
           </SimpleGrid>
-
-          <BentoCard title={selectedList ? `Contenido · ${selectedList.nombre}` : 'Contenido'} icon={IconCalendarStats} color="gray" mt="md">
-            {selectedItems.length ? (
-              <ScrollArea h={260}>
-                <Stack gap="xs">
-                  {selectedItems.map((item) => {
-                    const suplemento = supplementMap.get(Number(item.suplemento_id));
-                    return (
-                      <Paper key={item.id} p="xs" radius="md" bg="gray.0" withBorder>
-                        <Group justify="space-between" wrap="nowrap" align="center">
-                          <Stack gap={0} style={{ minWidth: 0 }}>
-                            <Group gap={6} wrap="nowrap">
-                              <Text size="sm" fw={900} truncate>{suplemento?.nombre || 'Suplemento'}</Text>
-                              <Badge size="xs" radius="sm" variant="light" color="gray">{suplemento?.categoria || 'Custom'}</Badge>
-                            </Group>
-                            <Text size="xs" c="dimmed" truncate>{suplemento?.dose_text || suplemento?.pauta || 'Según pauta'}</Text>
-                          </Stack>
-                          <ActionIcon color="red" variant="subtle" radius="xl" onClick={() => removeItem(item.id)} aria-label="Quitar suplemento">
-                            <IconTrash size={16} />
-                          </ActionIcon>
-                        </Group>
-                      </Paper>
-                    );
-                  })}
-                </Stack>
-              </ScrollArea>
-            ) : (
-              <Text size="sm" c="dimmed">Selecciona un catálogo o añade suplementos para ver su contenido.</Text>
-            )}
-          </BentoCard>
         </Tabs.Panel>
 
         <Tabs.Panel value="supplements" pt="md">

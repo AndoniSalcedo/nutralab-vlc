@@ -24,9 +24,10 @@ import {
   IconChefHat,
   IconUpload,
   IconList,
+  IconTrash,
 } from '@tabler/icons-react';
 import MenuSemanal, { formatWeek } from '@/components/MenuSemanal';
-import { getWeeklyMenus, uploadWeeklyMenu } from '@/services/menu';
+import { getWeeklyMenus, uploadWeeklyMenu, deleteWeeklyMenu } from '@/services/menu';
 
 export default function MenuPage({ params }) {
   const teamId = params?.teamId;
@@ -34,6 +35,7 @@ export default function MenuPage({ params }) {
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [viewMode, setViewMode] = useState('diaria'); // 'diaria' or 'semanal'
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [weekDate, setWeekDate] = useState(() => {
     const today = new Date();
     const monday = new Date(today);
@@ -118,6 +120,29 @@ export default function MenuPage({ params }) {
     }
   }
 
+  async function handleDeleteMenu(id) {
+    if (!id) return;
+    if (!confirm('¿Estás seguro de que deseas eliminar este menú comedor? Esta acción no se puede deshacer.')) return;
+    setDeleting(true);
+    try {
+      await deleteWeeklyMenu(id);
+      notifications.show({
+        color: 'green',
+        title: 'Menú eliminado',
+        message: 'El menú comedor se ha eliminado correctamente.',
+      });
+      setMenus((prev) => prev.filter((m) => m.id !== id));
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al eliminar menú',
+        message: e.message,
+      });
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <Stack gap={0}>
       <Paper
@@ -174,6 +199,22 @@ export default function MenuPage({ params }) {
                 allowDeselect={false}
                 style={{ width: 180 }}
               />
+
+              {selectedMenu && (
+                <Tooltip label="Eliminar menú seleccionado" withArrow>
+                  <ActionIcon
+                    onClick={() => handleDeleteMenu(selectedMenu.id)}
+                    variant="light"
+                    color="red"
+                    radius="xl"
+                    size="md"
+                    loading={deleting}
+                    style={{ width: 30, height: 30 }}
+                  >
+                    <IconTrash size={16} />
+                  </ActionIcon>
+                </Tooltip>
+              )}
 
               {/* Premium Micro-segmented Pill Switcher */}
               <Group gap={4} p={3} bg="gray.1" style={{ borderRadius: 'var(--mantine-radius-xl)', border: '1px solid var(--mantine-color-gray-2)' }}>

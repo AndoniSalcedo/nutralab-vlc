@@ -17,3 +17,10 @@ export async function uploadWeeklyMenu(file, weekDate, teamId) {
   if (!res.ok) throw new Error(data.error || 'Error al subir el archivo');
   return data;
 }
+
+export async function deleteWeeklyMenu(id) {
+  const res = await fetch(`/api/menu-semanal?id=${id}`, { method: 'DELETE' });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al eliminar el menú');
+  return data;
+}

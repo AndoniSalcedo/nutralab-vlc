@@ -149,6 +149,21 @@ export async function POST(request) {
     return NextResponse.json({ ok: true });
   }
 
+  if (action === 'delete_list') {
+    const id = toPositiveNumber(body.id);
+    if (!id) {
+      return NextResponse.json({ error: 'ID de catálogo no válido' }, { status: 400 });
+    }
+
+    const { error } = await supabase
+      .from('suplementacion_listas')
+      .delete()
+      .eq('id', id);
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  }
+
   if (action === 'create_list') {
     const nombre = cleanText(body.nombre);
     if (!nombre) {

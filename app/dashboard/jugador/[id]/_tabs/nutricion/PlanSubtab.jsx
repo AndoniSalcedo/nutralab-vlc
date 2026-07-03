@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { marked } from 'marked';
 import {
+  ActionIcon,
   Badge,
   Box,
   Button,
-  Divider,
   Group,
   Loader,
   NumberInput,
@@ -18,10 +18,11 @@ import {
   Textarea,
   TextInput,
   Title,
+  Tooltip,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPlanPdf } from '@/services/plan';
+import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPlanPdf, deleteAiPlan } from '@/services/plan';
 import {
   IconArrowsLeftRight,
   IconBrain,
@@ -31,6 +32,7 @@ import {
   IconFileAi,
   IconPlus,
   IconSparkles,
+  IconTrash,
 } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import { buildBasePlanData, PLAN_DAY_TYPES, sanitizePlanData } from '@/lib/nutrition-plan-card';
@@ -311,6 +313,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [hasGeneratedAi, setHasGeneratedAi] = useState(false);
   const isDocumentMode = mode === 'create' || mode === 'edit';
   const loadingAction = Boolean(actionType);
+  const [deleting, setDeleting] = useState(false);
 
   const currentPlan = useMemo(
     () => planes.find((plan) => String(plan.id) === String(currentId)) || null,
@@ -560,6 +563,33 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     }
   }
 
+  async function handleDeletePlan(id) {
+    if (!id) return;
+    if (!confirm('¿Estás seguro de que deseas eliminar este plan nutricional? Esta acción no se puede deshacer.')) return;
+    setDeleting(true);
+    try {
+      await deleteAiPlan(id);
+      notifications.show({
+        color: 'green',
+        title: 'Plan eliminado',
+        message: 'El plan nutricional se ha eliminado correctamente.',
+      });
+      setPlanes((prev) => {
+        const filtered = prev.filter((p) => p.id !== id);
+        setCurrentId(filtered.length ? String(filtered[0].id) : null);
+        return filtered;
+      });
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al eliminar el plan',
+        message: e.message,
+      });
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   const perfilResumen = [
     jugador.num_comidas ? `${jugador.num_comidas} comidas/día` : null,
     jugador.objetivo || null,
@@ -610,6 +640,20 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
               )}
               {!readOnly && (
                 <>
+                  {currentPlan && mode === 'view' && (
+                    <Button
+                      size="xs"
+                      radius="xl"
+                      variant="light"
+                      color="red"
+                      leftSection={<IconTrash size={16} />}
+                      onClick={() => handleDeletePlan(currentPlan.id)}
+                      loading={deleting}
+                      fullWidth={isMobile}
+                    >
+                      Eliminar actual
+                    </Button>
+                  )}
                   <Button size="xs" radius="xl" variant="light" leftSection={<IconEdit size={16} />} onClick={startEdit} disabled={!currentPlan || mode !== 'view'} fullWidth={isMobile}>
                     Editar actual
                   </Button>

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import Anthropic from '@anthropic-ai/sdk';
 import { env } from '@/lib/env';
+import { getUser } from '@/lib/auth';
+import { forbidden, getOwnedTeam } from '@/lib/team-access';
 
 const client = new Anthropic({ apiKey: env.AI_API_KEY });
 
@@ -77,4 +79,35 @@ export async function GET(req) {
   const { data, error } = await query.limit(10);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ menus: data });
+}
+
+export async function DELETE(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'Falta id' }, { status: 400 });
+
+    const supabase = getSupabaseAdmin();
+    const user = await getUser();
+    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+
+    const { data: menu, error: fetchError } = await supabase
+      .from('menu_semanal')
+      .select('id, equipo_id')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (fetchError) throw fetchError;
+    if (!menu) return NextResponse.json({ error: 'Menú no encontrado' }, { status: 404 });
+
+    const team = await getOwnedTeam(supabase, user, menu.equipo_id);
+    if (!team) return forbidden('No tienes acceso a este equipo');
+
+    const { error } = await supabase.from('menu_semanal').delete().eq('id', id);
+    if (error) throw error;
+
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
 }

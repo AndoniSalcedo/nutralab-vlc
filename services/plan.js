@@ -60,3 +60,12 @@ export async function downloadAiPlanPdf(planId) {
   }
   return res;
 }
+
+export async function deleteAiPlan(id) {
+  const res = await fetch(`/api/ai-plan?id=${id}`, {
+    method: 'DELETE',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al eliminar el plan');
+  return data;
+}
