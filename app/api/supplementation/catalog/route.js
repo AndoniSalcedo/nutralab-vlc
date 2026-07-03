@@ -78,6 +78,7 @@ export async function POST(request) {
     }
 
     const slug = slugify(body.slug || nombre);
+    const doseType = body.dose_type === 'per_kg_range' ? 'per_kg_range' : 'custom';
     const payload = {
       slug,
       nombre,
@@ -85,7 +86,10 @@ export async function POST(request) {
       descripcion: cleanText(body.descripcion) || null,
       pauta: cleanText(body.pauta) || 'Según producto.',
       timing: cleanText(body.timing) || 'Según pauta',
-      dose_type: 'custom',
+      dose_type: doseType,
+      dose_min: doseType === 'per_kg_range' ? toPositiveNumber(body.dose_min) : null,
+      dose_max: doseType === 'per_kg_range' ? toPositiveNumber(body.dose_max) : null,
+      dose_unit: doseType === 'per_kg_range' ? (cleanText(body.dose_unit) || null) : null,
       dose_text: cleanText(body.dose_text || body.pauta) || 'Según producto',
       notas: cleanText(body.notas) || null,
       updated_at: new Date().toISOString(),
@@ -112,12 +116,17 @@ export async function POST(request) {
       return NextResponse.json({ error: 'El nombre del suplemento es obligatorio' }, { status: 400 });
     }
 
+    const doseType = body.dose_type === 'per_kg_range' ? 'per_kg_range' : 'custom';
     const payload = {
       nombre,
       categoria: cleanText(body.categoria) || 'Custom',
       descripcion: cleanText(body.descripcion) || null,
       pauta: cleanText(body.pauta) || 'Según producto.',
       timing: cleanText(body.timing) || 'Según pauta',
+      dose_type: doseType,
+      dose_min: doseType === 'per_kg_range' ? toPositiveNumber(body.dose_min) : null,
+      dose_max: doseType === 'per_kg_range' ? toPositiveNumber(body.dose_max) : null,
+      dose_unit: doseType === 'per_kg_range' ? (cleanText(body.dose_unit) || null) : null,
       dose_text: cleanText(body.dose_text || body.pauta) || 'Según producto',
       notas: cleanText(body.notas) || null,
       updated_at: new Date().toISOString(),

@@ -46,6 +46,10 @@ function emptySupplementForm() {
     timing: '',
     descripcion: '',
     notas: '',
+    dose_type: 'custom',
+    dose_min: '',
+    dose_max: '',
+    dose_unit: '',
   };
 }
 
@@ -150,10 +154,14 @@ export default function SupplementCatalogManager({ players = [], team }) {
     setSupplementForm({
       nombre: supp.nombre || '',
       categoria: supp.categoria || '',
-      pauta: supp.pauta || '',
+      pauta: supp.pauta || supp.dose_text || '',
       timing: supp.timing || '',
       descripcion: supp.descripcion || '',
       notas: supp.notas || '',
+      dose_type: supp.dose_type === 'per_kg_range' ? 'per_kg_range' : 'custom',
+      dose_min: supp.dose_min ?? '',
+      dose_max: supp.dose_max ?? '',
+      dose_unit: supp.dose_unit || '',
     });
   }
 
@@ -586,15 +594,51 @@ export default function SupplementCatalogManager({ players = [], team }) {
                     setSupplementForm((current) => ({ ...current, categoria: val }));
                   }}
                 />
-                <TextInput
-                  label="Dosis / pauta"
-                  placeholder="Ej. 15 mg/día"
-                  value={supplementForm.pauta}
-                  onChange={(event) => {
-                    const val = event.currentTarget.value;
-                    setSupplementForm((current) => ({ ...current, pauta: val }));
-                  }}
+                <Select
+                  label="Tipo de dosificación"
+                  data={[
+                    { value: 'custom', label: 'Dosis estándar / Texto libre' },
+                    { value: 'per_kg_range', label: 'Cálculo por Kg de peso' },
+                  ]}
+                  value={supplementForm.dose_type}
+                  onChange={(value) => setSupplementForm((current) => ({ ...current, dose_type: value || 'custom' }))}
                 />
+                {supplementForm.dose_type === 'per_kg_range' ? (
+                  <Group grow gap="xs">
+                    <TextInput
+                      label="Mínimo (por kg)"
+                      placeholder="Ej. 1"
+                      type="number"
+                      step="0.1"
+                      value={supplementForm.dose_min}
+                      onChange={(event) => setSupplementForm((current) => ({ ...current, dose_min: event.currentTarget.value }))}
+                    />
+                    <TextInput
+                      label="Máximo (por kg)"
+                      placeholder="Ej. 6"
+                      type="number"
+                      step="0.1"
+                      value={supplementForm.dose_max}
+                      onChange={(event) => setSupplementForm((current) => ({ ...current, dose_max: event.currentTarget.value }))}
+                    />
+                    <TextInput
+                      label="Unidad"
+                      placeholder="Ej. mg"
+                      value={supplementForm.dose_unit}
+                      onChange={(event) => setSupplementForm((current) => ({ ...current, dose_unit: event.currentTarget.value }))}
+                    />
+                  </Group>
+                ) : (
+                  <TextInput
+                    label="Dosis / pauta"
+                    placeholder="Ej. 15 mg/día"
+                    value={supplementForm.pauta}
+                    onChange={(event) => {
+                      const val = event.currentTarget.value;
+                      setSupplementForm((current) => ({ ...current, pauta: val }));
+                    }}
+                  />
+                )}
                 <TextInput
                   label="Timing"
                   placeholder="Ej. Con comida"
