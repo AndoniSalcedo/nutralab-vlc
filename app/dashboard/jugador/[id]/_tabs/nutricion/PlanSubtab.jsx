@@ -654,9 +654,18 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                       Eliminar actual
                     </Button>
                   )}
-                  <Button size="xs" radius="xl" variant="light" leftSection={<IconEdit size={16} />} onClick={startEdit} disabled={!currentPlan || mode !== 'view'} fullWidth={isMobile}>
-                    Editar actual
-                  </Button>
+                  {currentPlan && mode === 'view' && (
+                    <Button
+                      size="xs"
+                      radius="xl"
+                      variant="light"
+                      leftSection={<IconEdit size={16} />}
+                      onClick={startEdit}
+                      fullWidth={isMobile}
+                    >
+                      Editar actual
+                    </Button>
+                  )}
                   <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={startCreate} fullWidth={isMobile}>
                     Crear ficha
                   </Button>
