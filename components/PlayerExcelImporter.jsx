@@ -262,7 +262,7 @@ export default function PlayerExcelImporter({ team }) {
     setState('importing');
 
     try {
-      const data = await importPlayerExcel({ file, modo: 'importar', teamId: team?.id, decisiones });
+      const data = await importPlayerExcel({ file, modo: 'importar', teamId: team?.id, decisiones: decisions });
 
       setResults(data);
       setState('done');
