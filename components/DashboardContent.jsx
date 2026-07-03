@@ -395,7 +395,8 @@ export default function DashboardContent({ players = [], team }) {
 
   async function loadAvailableMenus(weekStr) {
     try {
-      const res = await fetch('/api/menu-semanal');
+      const url = team?.id ? `/api/menu-semanal?equipo_id=${team.id}` : '/api/menu-semanal';
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         const menusList = data.menus || [];
