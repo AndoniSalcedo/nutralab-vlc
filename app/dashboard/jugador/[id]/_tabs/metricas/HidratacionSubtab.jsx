@@ -21,7 +21,8 @@ import {
   Tooltip as MantineTooltip,
   TextInput,
   Select,
-  Textarea
+  Textarea,
+  Tabs
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { saveHydrationRecord, importHydrationRecords, refetchHydrationRecords, deleteHydrationRecord } from '@/services/hydration';
@@ -35,7 +36,8 @@ import {
   IconCalendarStats,
   IconClock,
   IconAlertCircle,
-  IconEdit
+  IconEdit,
+  IconFlame
 } from '@tabler/icons-react';
 import {
   ComposedChart,
@@ -46,15 +48,34 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
-  ReferenceLine,
-  PieChart,
-  Pie,
-  Cell,
-  Legend
+  ReferenceLine
 } from 'recharts';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/Bento/BentoItem';
 import HydrationCalculator from '@/components/HydrationCalculator';
+
+const METRIC_TABS = {
+  hydration: {
+    label: 'Hidratación',
+    emptyTitle: 'No hay registros de osmolaridad',
+    emptyText: 'Para visualizar las gráficas de hidratación y osmolaridad, importa los datos del jugador subiendo un archivo CSV compatible.',
+    chartTitle: 'Evolución Osmolaridad de la Saliva',
+    valueLabel: 'Osmolaridad',
+    unit: 'mOsm',
+    color: '#3b82f6',
+    gradientId: 'osmColor'
+  },
+  sweat: {
+    label: 'Sudoración',
+    emptyTitle: 'No hay registros de sudoración',
+    emptyText: 'Para visualizar las métricas de sudoración, importa un CSV con Type = sweat y valores de sodio en sudor.',
+    chartTitle: 'Evolución Sodio en Sudor',
+    valueLabel: 'Sodio en sudor',
+    unit: 'mg/L',
+    color: '#f97316',
+    gradientId: 'sweatColor'
+  }
+};
 
 // Hydration status definitions & colors
 const STATUS_CONFIGS = {
@@ -65,13 +86,48 @@ const STATUS_CONFIGS = {
   'unknown': { label: 'Desconocido', color: '#94a3b8', bg: '#f1f5f9' }
 };
 
-function getStatusConfig(statusStr) {
+const SWEAT_STATUS_CONFIGS = {
+  low: { label: 'Sodio Bajo', color: '#22c55e', bg: '#dcfce7' },
+  moderate: { label: 'Sodio Moderado', color: '#f97316', bg: '#ffedd5' },
+  high: { label: 'Sodio Alto', color: '#ef4444', bg: '#fee2e2' },
+  unknown: { label: 'Desconocido', color: '#94a3b8', bg: '#f1f5f9' }
+};
+
+function isSweatRecord(record) {
+  return String(record?.tipo || '').toLowerCase().trim() === 'sweat';
+}
+
+function getHydrationStatusConfig(statusStr) {
   const norm = String(statusStr || '').toLowerCase().trim();
   if (norm.includes('mildly') || norm.includes('leve')) return STATUS_CONFIGS['mildly dehydrated'];
   if (norm.includes('moderately') || norm.includes('moderada')) return STATUS_CONFIGS['moderately dehydrated'];
   if (norm.includes('severely') || norm.includes('severa') || norm.includes('dehydrated') || norm.includes('deshidratado')) return STATUS_CONFIGS['severely dehydrated'];
   if (norm.includes('hydrated') || norm.includes('hidratado')) return STATUS_CONFIGS['hydrated'];
   return STATUS_CONFIGS['unknown'];
+}
+
+function getSweatStatusConfig(statusStr) {
+  const norm = String(statusStr || '').toLowerCase().trim();
+  if (norm.includes('high') || norm.includes('alto')) return SWEAT_STATUS_CONFIGS.high;
+  if (norm.includes('moderate') || norm.includes('medio') || norm.includes('moderado')) return SWEAT_STATUS_CONFIGS.moderate;
+  if (norm.includes('low') || norm.includes('bajo')) return SWEAT_STATUS_CONFIGS.low;
+  return SWEAT_STATUS_CONFIGS.unknown;
+}
+
+function getRecordStatusConfig(recordOrStatus, maybeType) {
+  const status = typeof recordOrStatus === 'object' ? recordOrStatus?.estado : recordOrStatus;
+  const type = typeof recordOrStatus === 'object' ? recordOrStatus?.tipo : maybeType;
+  return String(type || '').toLowerCase().trim() === 'sweat'
+    ? getSweatStatusConfig(status)
+    : getHydrationStatusConfig(status);
+}
+
+function getSweatAxisDomain(dataMin, dataMax) {
+  const min = Number.isFinite(dataMin) ? dataMin : 600;
+  const max = Number.isFinite(dataMax) ? dataMax : 900;
+  const lower = Math.min(500, Math.floor((min - 80) / 50) * 50);
+  const upper = Math.max(1000, Math.ceil((max + 80) / 50) * 50);
+  return [Math.max(0, lower), upper];
 }
 
 function normalizeCsvKey(key) {
@@ -101,6 +157,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
 
   // CSV Import States
   const [modalOpen, setModalOpen] = useState(false);
+  const [importKind, setImportKind] = useState('hydration');
   const [allImportRows, setAllImportRows] = useState([]);
   const [previewRows, setPreviewRows] = useState([]);
   const [importing, setImporting] = useState(false);
@@ -136,10 +193,27 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
     setEditModalOpen(true);
   };
 
+  const hydrationRecords = useMemo(() => {
+    return registros.filter((record) => !isSweatRecord(record));
+  }, [registros]);
+
+  const sweatRecords = useMemo(() => {
+    return registros.filter((record) => isSweatRecord(record));
+  }, [registros]);
+
+  const sortedHydrationChronological = useMemo(() => {
+    return [...hydrationRecords].sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+  }, [hydrationRecords]);
+
+  const sortedSweatChronological = useMemo(() => {
+    return [...sweatRecords].sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+  }, [sweatRecords]);
+
   const saveEditedRecord = async () => {
     setSavingEdit(true);
     try {
       const result = await saveHydrationRecord({
+        id: editingRecord?.id,
         jugador_id: jugadorId,
         fecha: editForm.fecha,
         hora: editForm.hora,
@@ -160,7 +234,9 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
 
       if (result.record) {
         setRegistros(prev => {
-          const index = prev.findIndex(r => r.fecha === editForm.fecha);
+          const index = editingRecord?.id
+            ? prev.findIndex(r => r.id === editingRecord.id)
+            : prev.findIndex(r => r.fecha === editForm.fecha && String(r.tipo || 'sosm') === String(editForm.tipo || 'sosm'));
           if (index !== -1) {
             const updated = [...prev];
             updated[index] = result.record;
@@ -185,33 +261,9 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
     }
   };
 
-  // Sorting: chronological ascending for charts
-  const sortedChronological = useMemo(() => {
-    return [...registros].sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
-  }, [registros]);
-
   // Reverse chronological for history table
   const sortedDesc = useMemo(() => {
     return [...registros].sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
-  }, [registros]);
-
-  // Aggregate stats for status breakdown
-  const statusStats = useMemo(() => {
-    const counts = {};
-    registros.forEach(r => {
-      const cfg = getStatusConfig(r.estado);
-      counts[cfg.label] = (counts[cfg.label] || 0) + 1;
-    });
-
-    return Object.entries(counts).map(([name, val]) => {
-      // Find matching color
-      const matchingCfg = Object.values(STATUS_CONFIGS).find(c => c.label === name) || STATUS_CONFIGS['unknown'];
-      return {
-        name,
-        value: val,
-        color: matchingCfg.color
-      };
-    });
   }, [registros]);
 
   async function saveField(field, value) {
@@ -219,7 +271,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
   }
 
   // Handle CSV file selected
-  const handleFileChange = (file) => {
+  const handleFileChange = (file, kind = importKind) => {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -302,6 +354,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
         headers.forEach((h, idx) => {
           row[h] = values[idx] !== undefined ? values[idx] : '';
         });
+        row.Type = kind === 'sweat' ? 'sweat' : 'sosm';
         parsedData.push(row);
       }
 
@@ -331,28 +384,18 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
         color: 'green',
         title: 'Carga Completada',
         message: [
-          `Se importaron/actualizaron con éxito ${result.count} tomas de hidratación.`,
-          result.duplicateDateRows ? `${result.duplicateDateRows} fila(s) repetidas por fecha actualizaron la toma del día.` : '',
+          `Se importaron/actualizaron con éxito ${result.count} registro(s).`,
+          result.duplicateDateRows ? `${result.duplicateDateRows} fila(s) repetidas por fecha y tipo actualizaron la toma existente.` : '',
           result.skippedRows ? `${result.skippedRows} fila(s) se omitieron por fecha inválida o ausente.` : ''
         ].filter(Boolean).join(' '),
         icon: <IconCheck size={18} />
       });
 
       // Refetch or update local state
-      // Let's do a client-side fetch of the updated registros to sync
       const refetchRes = await refetchHydrationRecords(jugadorId);
       if (refetchRes.ok) {
-        // Wait, wait, let's see. If the page is re-rendered or we just fetch from Supabase,
-        // we can trigger a state update. We can also just fetch them from database directly:
-        // Wait! Let's check how GET is handled on /api/registros-hidratacion.
-        // In our route.js we implemented GET? No, in route.js we had POST and DELETE.
-        // Let's check: did we implement GET in app/api/registros-hidratacion/route.js?
-        // Ah! In route.js we only put POST and DELETE!
-        // No problem, we can easily add a GET handler or simply refetch by doing a soft page reload or updating the state directly using the values we uploaded!
-        // To update state directly: since we know the uploaded values, we can merge them!
-        // Or wait, let's see. The API endpoint upserts them, so the server is updated. Let's add the GET method to /api/registros-hidratacion/route.js or just refresh the window router, or update the local state with mapped rows!
-        // Soft reload is `window.location.reload()` which is incredibly simple and reliable, or we can just merge the data in state. Let's reload to ensure all Server Components are fully in sync!
-        window.location.reload();
+        const freshData = await refetchRes.json();
+        setRegistros(freshData.records || []);
       } else {
         window.location.reload();
       }
@@ -369,9 +412,9 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
     }
   };
 
-  // Delete individual hydration record
+  // Delete individual hydration/sweat record
   const handleDelete = async (id) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar este registro de hidratación?')) return;
+    if (!confirm('¿Estás seguro de que deseas eliminar este registro?')) return;
     setDeletingId(id);
     try {
       await deleteHydrationRecord(id);
@@ -430,7 +473,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
   const CustomDot = (props) => {
     const { cx, cy, payload } = props;
     if (cx === undefined || cy === undefined) return null;
-    const cfg = getStatusConfig(payload.estado);
+    const cfg = getRecordStatusConfig(payload);
     return (
       <circle
         cx={cx}
@@ -444,6 +487,103 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
     );
   };
 
+  const renderMetricChart = (metricKey, data) => {
+    const metric = METRIC_TABS[metricKey];
+    const isSweat = metricKey === 'sweat';
+
+    if (data.length === 0) {
+      return (
+        <Paper p="xl" radius="lg" withBorder bg="white" shadow="sm" align="center">
+          <ThemeIcon size={44} radius="xl" color={isSweat ? 'orange' : 'blue'} variant="light" mb="xs">
+            <IconAlertCircle size={24} />
+          </ThemeIcon>
+          <Title order={4} c="dark.7">{metric.emptyTitle}</Title>
+          <Text size="xs" c="dimmed" maxW={400} mx="auto" mt={4}>
+            {metric.emptyText}
+          </Text>
+        </Paper>
+      );
+    }
+
+    return (
+      <Paper p="md" radius="lg" withBorder bg="white" shadow="sm">
+        <Stack gap="xs">
+          <Text size="xs" c="dimmed" tt="uppercase" fw={800}>{metric.chartTitle}</Text>
+          <Box h={140} mt="md">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                <defs>
+                  <linearGradient id={metric.gradientId} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={metric.color} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={metric.color} stopOpacity={0.01} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis
+                  dataKey="fecha"
+                  tick={{ fontSize: 9 }}
+                  stroke="#94a3b8"
+                  tickFormatter={(v) => {
+                    try {
+                      const parts = v.split('-');
+                      return `${parts[2]}/${parts[1]}`;
+                    } catch (e) { return v; }
+                  }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 9 }}
+                  domain={isSweat
+                    ? [
+                      (dataMin) => getSweatAxisDomain(dataMin, undefined)[0],
+                      (dataMax) => getSweatAxisDomain(undefined, dataMax)[1],
+                    ]
+                    : [0, (dataMax) => Math.max(120, Math.ceil(dataMax / 10) * 10)]}
+                  stroke="#94a3b8"
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <RechartsTooltip
+                  labelFormatter={(v) => formatDateLabel(v)}
+                  formatter={(value, name, props) => {
+                    if (name === 'valor') return [`${value} ${props?.payload?.unidad || metric.unit}`, metric.valueLabel];
+                    return [value, name];
+                  }}
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', padding: '6px 10px', fontSize: 11 }}
+                  labelStyle={{ fontWeight: 700 }}
+                />
+
+                {isSweat ? (
+                  <>
+                    <ReferenceLine y={600} stroke="#22c55e" strokeDasharray="3 3" label={{ value: 'Bajo (600)', fill: '#22c55e', fontSize: 9, position: 'top' }} />
+                    <ReferenceLine y={900} stroke="#ef4444" strokeDasharray="3 3" label={{ value: 'Alto (900)', fill: '#ef4444', fontSize: 9, position: 'top' }} />
+                  </>
+                ) : (
+                  <>
+                    <ReferenceLine y={60} stroke="#22c55e" strokeDasharray="3 3" label={{ value: 'Límite Hidratado (60)', fill: '#22c55e', fontSize: 9, position: 'top' }} />
+                    <ReferenceLine y={95} stroke="#f97316" strokeDasharray="3 3" label={{ value: 'Límite Leve (95)', fill: '#f97316', fontSize: 9, position: 'top' }} />
+                  </>
+                )}
+
+                <Area type="monotone" dataKey="valor" fill={`url(#${metric.gradientId})`} stroke="none" connectNulls />
+                <Line
+                  type="monotone"
+                  dataKey="valor"
+                  stroke={metric.color}
+                  strokeWidth={2.5}
+                  dot={<CustomDot />}
+                  activeDot={{ r: 7, strokeWidth: 0 }}
+                  connectNulls
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </Box>
+        </Stack>
+      </Paper>
+    );
+  };
+
   return (
     <Stack gap="md">
       {/* Header Panel */}
@@ -454,9 +594,9 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
               <IconDroplet size={20} />
             </ThemeIcon>
             <Stack gap={2}>
-              <Title order={3} fw={800} c="dark.4">Hidratación</Title>
+              <Title order={3} fw={800} c="dark.4">Hidratación y sudoración</Title>
               <Text size="sm" c="dimmed">
-                Análisis de osmolaridad saliva.
+                Análisis de osmolaridad salival y sodio en sudor.
               </Text>
             </Stack>
           </Group>
@@ -465,99 +605,29 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
               <Badge color="blue" variant="light" size="lg">{peso} kg · base 40 ml/kg</Badge>
             )}
             {!readOnly && (
-              <FileButton onChange={handleFileChange} accept=".csv">
-                {(props) => (
-                  <Button
-                    {...props}
-                    leftSection={<IconDatabaseImport size={16} />}
-                    color="blue"
-                    radius="xl"
-                    size="xs"
-                  >
-                    Importar CSV
-                  </Button>
-                )}
-              </FileButton>
+              <Button
+                leftSection={<IconDatabaseImport size={16} />}
+                color="blue"
+                radius="xl"
+                size="xs"
+                onClick={() => {
+                  setAllImportRows([]);
+                  setPreviewRows([]);
+                  setModalOpen(true);
+                }}
+              >
+                Importar CSV
+              </Button>
             )}
           </Group>
         </Group>
       </Paper>
 
       {/* Horizontal Charts Section */}
-      {sortedChronological.length > 0 ? (
-        <Paper p="md" radius="lg" withBorder bg="white" shadow="sm">
-          <Stack gap="xs">
-            <Text size="xs" c="dimmed" tt="uppercase" fw={800}>Evolución Osmolaridad de la Saliva</Text>
-            <Box h={140} mt="md">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={sortedChronological} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="osmColor" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.01} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                  <XAxis
-                    dataKey="fecha"
-                    tick={{ fontSize: 9 }}
-                    stroke="#94a3b8"
-                    tickFormatter={(v) => {
-                      try {
-                        const parts = v.split('-');
-                        return `${parts[2]}/${parts[1]}`;
-                      } catch (e) { return v; }
-                    }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 9 }}
-                    domain={[0, (dataMax) => Math.max(120, Math.ceil(dataMax / 10) * 10)]}
-                    stroke="#94a3b8"
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <RechartsTooltip
-                    labelFormatter={(v) => formatDateLabel(v)}
-                    formatter={(value, name, props) => {
-                      if (name === 'valor') return [`${value} mOsm`, 'Osmolaridad'];
-                      return [value, name];
-                    }}
-                    contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', padding: '6px 10px', fontSize: 11 }}
-                    labelStyle={{ fontWeight: 700 }}
-                  />
-
-                  {/* Reference zones/lines */}
-                  <ReferenceLine y={60} stroke="#22c55e" strokeDasharray="3 3" label={{ value: 'Límite Hidratado (60)', fill: '#22c55e', fontSize: 9, position: 'top' }} />
-                  <ReferenceLine y={95} stroke="#f97316" strokeDasharray="3 3" label={{ value: 'Límite Leve (95)', fill: '#f97316', fontSize: 9, position: 'top' }} />
-
-                  <Area type="monotone" dataKey="valor" fill="url(#osmColor)" stroke="none" connectNulls />
-                  <Line
-                    type="monotone"
-                    dataKey="valor"
-                    stroke="#3b82f6"
-                    strokeWidth={2.5}
-                    dot={<CustomDot />}
-                    activeDot={{ r: 7, strokeWidth: 0 }}
-                    connectNulls
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </Box>
-          </Stack>
-        </Paper>
-      ) : (
-        <Paper p="xl" radius="lg" withBorder bg="white" shadow="sm" align="center">
-          <ThemeIcon size={44} radius="xl" color="blue" variant="light" mb="xs">
-            <IconAlertCircle size={24} />
-          </ThemeIcon>
-          <Title order={4} c="dark.7">No hay registros de osmolaridad</Title>
-          <Text size="xs" c="dimmed" maxW={400} mx="auto" mt={4}>
-            Para visualizar las gráficas de hidratación y osmolaridad, importa los datos del jugador subiendo un archivo CSV compatible.
-          </Text>
-        </Paper>
-      )}
+      <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
+        {renderMetricChart('hydration', sortedHydrationChronological)}
+        {renderMetricChart('sweat', sortedSweatChronological)}
+      </SimpleGrid>
 
       {/* Main Hydration Content & Timing Cards */}
       <Box px={{ base: 'sm', sm: 0 }} pb="sm">
@@ -586,7 +656,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
 
           {/* Historical Hydration Entries Table */}
           {!readOnly && registros.length > 0 && (
-            <BentoCard title="Historial detallado de hidratación" icon={IconCalendarStats} color="blue">
+            <BentoCard title="Historial detallado de hidratación y sudoración" icon={IconCalendarStats} color="blue">
               <ScrollArea h={300}>
                 <Table striped highlightOnHover verticalSpacing="xs">
                   <Table.Thead bg="gray.0">
@@ -603,7 +673,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
                   </Table.Thead>
                   <Table.Tbody>
                     {sortedDesc.map((row) => {
-                      const cfg = getStatusConfig(row.estado);
+                      const cfg = getRecordStatusConfig(row);
                       return (
                         <Table.Tr key={row.id}>
                           <Table.Td style={{ fontSize: 11, whiteSpace: 'nowrap' }}>{formatDateLabel(row.fecha)}</Table.Td>
@@ -617,7 +687,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
                             <Badge variant="outline" color="gray" size="xs">{row.tipo || 'sosm'}</Badge>
                           </Table.Td>
                           <Table.Td style={{ fontSize: 11, fontWeight: 700, textAlign: 'right' }}>{row.valor !== null ? row.valor : '-'}</Table.Td>
-                          <Table.Td style={{ fontSize: 11, c: 'dimmed' }}>{row.unidad || 'mOsm'}</Table.Td>
+                          <Table.Td style={{ fontSize: 11, c: 'dimmed' }}>{row.unidad || (isSweatRecord(row) ? METRIC_TABS.sweat.unit : METRIC_TABS.hydration.unit)}</Table.Td>
                           <Table.Td style={{ fontSize: 11 }}>
                             <Badge
                               style={{ backgroundColor: cfg.bg, color: cfg.color, border: `1px solid ${cfg.color}33` }}
@@ -670,11 +740,15 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       {/* CSV Preview and Confirm Modal */}
       <Modal
         opened={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          setModalOpen(false);
+          setAllImportRows([]);
+          setPreviewRows([]);
+        }}
         title={
           <Group gap="xs">
             <IconDatabaseImport size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-            <Text fw={700}>Vista Previa de Importación de Hidratación</Text>
+            <Text fw={700}>Añadir datos</Text>
           </Group>
         }
         size="xl"
@@ -682,62 +756,114 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
         overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
       >
         <Stack gap="md">
-          <Alert color="blue" icon={<IconAlertCircle size={18} />}>
-            Los datos correspondientes a fechas existentes se actualizarán (upsert) de manera única por día. El identificador `Measurement ID` y `User ID` del CSV serán omitidos y asociados al jugador actual.
-          </Alert>
+          <Tabs
+            value={importKind}
+            onChange={(value) => {
+              setImportKind(value || 'hydration');
+              setAllImportRows([]);
+              setPreviewRows([]);
+            }}
+            variant="outline"
+            radius="md"
+          >
+            <Tabs.List grow>
+              <Tabs.Tab value="hydration" leftSection={<IconDroplet size={15} />}>
+                Hidratación
+              </Tabs.Tab>
+              <Tabs.Tab value="sweat" leftSection={<IconFlame size={15} />}>
+                Sudoración
+              </Tabs.Tab>
+            </Tabs.List>
 
-          <Text size="xs" fw={700} c="dimmed">
-            Vista previa de los primeros {previewRows.length} registros (Total: {allImportRows.length}):
-          </Text>
+            <Tabs.Panel value="hydration" pt="md">
+              <Group justify="space-between" align="center" wrap="wrap">
+                <Text size="sm" c="dimmed">Carga un CSV de osmolaridad salival.</Text>
+                <FileButton onChange={(file) => handleFileChange(file, 'hydration')} accept=".csv">
+                  {(props) => (
+                    <Button {...props} leftSection={<IconDatabaseImport size={16} />} color="blue" radius="xl" size="xs">
+                      Seleccionar CSV
+                    </Button>
+                  )}
+                </FileButton>
+              </Group>
+            </Tabs.Panel>
 
-          <ScrollArea>
-            <Table striped highlightOnHover verticalSpacing="xs">
-              <Table.Thead bg="gray.0">
-                <Table.Tr>
-                  <Table.Th style={{ fontSize: 10 }}>Fecha</Table.Th>
-                  <Table.Th style={{ fontSize: 10 }}>Hora</Table.Th>
-                  <Table.Th style={{ fontSize: 10 }}>Tipo</Table.Th>
-                  <Table.Th style={{ fontSize: 10, textAlign: 'right' }}>Valor</Table.Th>
-                  <Table.Th style={{ fontSize: 10 }}>Unidad</Table.Th>
-                  <Table.Th style={{ fontSize: 10 }}>Estado</Table.Th>
-                  <Table.Th style={{ fontSize: 10 }}>Notas</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {previewRows.map((r, i) => {
-                  const rawDate = getCsvVal(r, ['Date', 'fecha', 'dia', 'measurement date']);
-                  const rawTime = getCsvVal(r, ['Time', 'hora']);
-                  const rawType = getCsvVal(r, ['Type', 'tipo']);
-                  const rawVal = getCsvVal(r, ['Value', 'valor', 'sosm', 'osmolarity', 'osmolaridad']);
-                  const rawUnit = getCsvVal(r, ['Unit', 'unidad']);
-                  const rawStatus = getCsvVal(r, ['Status', 'estado']);
-                  const rawNotes = getCsvVal(r, ['Notes', 'notas']);
+            <Tabs.Panel value="sweat" pt="md">
+              <Group justify="space-between" align="center" wrap="wrap">
+                <Text size="sm" c="dimmed">Carga un CSV de sodio en sudor.</Text>
+                <FileButton onChange={(file) => handleFileChange(file, 'sweat')} accept=".csv">
+                  {(props) => (
+                    <Button {...props} leftSection={<IconDatabaseImport size={16} />} color="orange" radius="xl" size="xs">
+                      Seleccionar CSV
+                    </Button>
+                  )}
+                </FileButton>
+              </Group>
+            </Tabs.Panel>
+          </Tabs>
 
-                  const cfg = getStatusConfig(rawStatus);
+          {allImportRows.length > 0 ? (
+            <>
+              <Text size="xs" fw={700} c="dimmed">
+                Vista previa de los primeros {previewRows.length} registros (Total: {allImportRows.length}):
+              </Text>
 
-                  return (
-                    <Table.Tr key={i}>
-                      <Table.Td style={{ fontSize: 10 }}>{rawDate}</Table.Td>
-                      <Table.Td style={{ fontSize: 10 }}>{rawTime || '-'}</Table.Td>
-                      <Table.Td style={{ fontSize: 10 }}>
-                        <Badge size="xs" color="gray" variant="outline">{rawType || 'sosm'}</Badge>
-                      </Table.Td>
-                      <Table.Td style={{ fontSize: 10, fontWeight: 700, textAlign: 'right' }}>{rawVal}</Table.Td>
-                      <Table.Td style={{ fontSize: 10 }}>{rawUnit || 'mOsm'}</Table.Td>
-                      <Table.Td style={{ fontSize: 10 }}>
-                        <Badge style={{ backgroundColor: cfg.bg, color: cfg.color }} size="xs">
-                          {cfg.label}
-                        </Badge>
-                      </Table.Td>
-                      <Table.Td style={{ fontSize: 10, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {rawNotes || '-'}
-                      </Table.Td>
+              <ScrollArea>
+                <Table striped highlightOnHover verticalSpacing="xs">
+                  <Table.Thead bg="gray.0">
+                    <Table.Tr>
+                      <Table.Th style={{ fontSize: 10 }}>Fecha</Table.Th>
+                      <Table.Th style={{ fontSize: 10 }}>Hora</Table.Th>
+                      <Table.Th style={{ fontSize: 10 }}>Tipo</Table.Th>
+                      <Table.Th style={{ fontSize: 10, textAlign: 'right' }}>Valor</Table.Th>
+                      <Table.Th style={{ fontSize: 10 }}>Unidad</Table.Th>
+                      <Table.Th style={{ fontSize: 10 }}>Estado</Table.Th>
+                      <Table.Th style={{ fontSize: 10 }}>Notas</Table.Th>
                     </Table.Tr>
-                  );
-                })}
-              </Table.Tbody>
-            </Table>
-          </ScrollArea>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {previewRows.map((r, i) => {
+                      const rawDate = getCsvVal(r, ['Date', 'fecha', 'dia', 'measurement date']);
+                      const rawTime = getCsvVal(r, ['Time', 'hora']);
+                      const rawType = getCsvVal(r, ['Type', 'tipo']);
+                      const rawVal = getCsvVal(r, ['Value', 'valor', 'sosm', 'osmolarity', 'osmolaridad']);
+                      const rawUnit = getCsvVal(r, ['Unit', 'unidad']);
+                      const rawStatus = getCsvVal(r, ['Status', 'estado']);
+                      const rawNotes = getCsvVal(r, ['Notes', 'notas']);
+
+                      const cfg = getRecordStatusConfig(rawStatus, rawType);
+
+                      return (
+                        <Table.Tr key={i}>
+                          <Table.Td style={{ fontSize: 10 }}>{rawDate}</Table.Td>
+                          <Table.Td style={{ fontSize: 10 }}>{rawTime || '-'}</Table.Td>
+                          <Table.Td style={{ fontSize: 10 }}>
+                            <Badge size="xs" color="gray" variant="outline">{rawType || 'sosm'}</Badge>
+                          </Table.Td>
+                          <Table.Td style={{ fontSize: 10, fontWeight: 700, textAlign: 'right' }}>{rawVal}</Table.Td>
+                          <Table.Td style={{ fontSize: 10 }}>{rawUnit || (String(rawType).toLowerCase() === 'sweat' ? 'mg/L' : 'mOsm')}</Table.Td>
+                          <Table.Td style={{ fontSize: 10 }}>
+                            <Badge style={{ backgroundColor: cfg.bg, color: cfg.color }} size="xs">
+                              {cfg.label}
+                            </Badge>
+                          </Table.Td>
+                          <Table.Td style={{ fontSize: 10, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {rawNotes || '-'}
+                          </Table.Td>
+                        </Table.Tr>
+                      );
+                    })}
+                  </Table.Tbody>
+                </Table>
+              </ScrollArea>
+            </>
+          ) : (
+            <Paper p="md" radius="md" bg="gray.0" withBorder>
+              <Text size="sm" fw={700}>
+                Selecciona un CSV desde la pestaña {importKind === 'sweat' ? 'Sudoración' : 'Hidratación'}.
+              </Text>
+            </Paper>
+          )}
 
           <Group justify="flex-end" mt="md">
             <Button variant="light" color="gray" radius="xl" size="xs" onClick={() => setModalOpen(false)} disabled={importing}>
@@ -750,8 +876,9 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
               leftSection={<IconCheck size={16} />}
               onClick={triggerImport}
               loading={importing}
+              disabled={allImportRows.length === 0}
             >
-              Confirmar e Importar {allImportRows.length} Tomas
+              Confirmar e Importar {allImportRows.length} Registros
             </Button>
           </Group>
         </Stack>
@@ -767,7 +894,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
         title={
           <Group gap="xs">
             <IconEdit size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-            <Text fw={700}>Editar Toma de Hidratación</Text>
+            <Text fw={700}>Editar Registro</Text>
           </Group>
         }
         radius="lg"
@@ -806,18 +933,24 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
               label="Estado"
               value={editForm.estado}
               onChange={(val) => setEditForm(prev => ({ ...prev, estado: val }))}
-              data={[
-                { value: 'Hydrated', label: 'Hidratado (Hydrated)' },
-                { value: 'Mildly Dehydrated', label: 'Deshidratación Leve (Mildly)' },
-                { value: 'Moderately Dehydrated', label: 'Deshidratación Moderada (Moderately)' },
-                { value: 'Severely Dehydrated', label: 'Deshidratación Severa (Severely)' },
-              ]}
+              data={String(editForm.tipo || '').toLowerCase() === 'sweat'
+                ? [
+                  { value: 'Low Sodium', label: 'Sodio Bajo (Low)' },
+                  { value: 'Moderate Sodium', label: 'Sodio Moderado (Moderate)' },
+                  { value: 'High Sodium', label: 'Sodio Alto (High)' },
+                ]
+                : [
+                  { value: 'Hydrated', label: 'Hidratado (Hydrated)' },
+                  { value: 'Mildly Dehydrated', label: 'Deshidratación Leve (Mildly)' },
+                  { value: 'Moderately Dehydrated', label: 'Deshidratación Moderada (Moderately)' },
+                  { value: 'Severely Dehydrated', label: 'Deshidratación Severa (Severely)' },
+                ]}
             />
           </SimpleGrid>
 
           <Textarea
             label="Notas"
-            value={editForm.notes || editForm.notas}
+            value={editForm.notas}
             onChange={(e) => setEditForm(prev => ({ ...prev, notas: e.target.value }))}
             minRows={2}
           />

@@ -96,6 +96,11 @@ function parseCsvNumber(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function normalizeRecordType(type) {
+  const normalized = String(type || '').trim().toLowerCase();
+  return normalized || 'sosm';
+}
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -143,7 +148,7 @@ export async function POST(req) {
         }
 
         const time = getVal(['Time', 'hora']) || '';
-        const type = getVal(['Type', 'tipo']) || '';
+        const type = normalizeRecordType(getVal(['Type', 'tipo']));
         const rawValue = getVal(['Value', 'valor', 'sosm', 'osmolarity', 'osmolaridad']);
         const value = parseCsvNumber(rawValue);
         const unit = getVal(['Unit', 'unidad']) || '';
@@ -155,7 +160,7 @@ export async function POST(req) {
           jugador_id: Number(jugador_id),
           fecha: parsedDate,
           hora: String(time).trim(),
-          tipo: String(type).trim(),
+          tipo: type,
           valor: value,
           unidad: String(unit).trim(),
           estado: String(status).trim(),
@@ -163,8 +168,9 @@ export async function POST(req) {
           cuestionario: String(questionnaire).trim()
         };
 
-        if (recordsByDate.has(parsedDate)) duplicateDateRows += 1;
-        recordsByDate.set(parsedDate, record);
+        const recordKey = `${parsedDate}:${type}`;
+        if (recordsByDate.has(recordKey)) duplicateDateRows += 1;
+        recordsByDate.set(recordKey, record);
       }
 
       const recordsToUpsert = Array.from(recordsByDate.values());
@@ -176,7 +182,7 @@ export async function POST(req) {
       // Upsert bulk
       const { error } = await supabase
         .from('registros_hidratacion')
-        .upsert(recordsToUpsert, { onConflict: 'jugador_id,fecha' });
+        .upsert(recordsToUpsert, { onConflict: 'jugador_id,fecha,tipo' });
 
       if (error) throw error;
 
@@ -188,23 +194,39 @@ export async function POST(req) {
       });
     } else {
       // Single Upsert
-      const { fecha, hora, tipo, valor, unidad, estado, notas, cuestionario } = body;
+      const { id, fecha, hora, tipo, valor, unidad, estado, notas, cuestionario } = body;
       if (!fecha) return NextResponse.json({ error: 'Falta fecha' }, { status: 400 });
 
-      const { data: resData, error } = await supabase
-        .from('registros_hidratacion')
-        .upsert({
-          jugador_id: Number(jugador_id),
-          fecha,
-          hora,
-          tipo,
-          valor: parseCsvNumber(valor),
-          unidad,
-          estado,
-          notas,
-          cuestionario
-        }, { onConflict: 'jugador_id,fecha' })
-        .select().single();
+      const payload = {
+        jugador_id: Number(jugador_id),
+        fecha,
+        hora,
+        tipo: normalizeRecordType(tipo),
+        valor: parseCsvNumber(valor),
+        unidad,
+        estado,
+        notas,
+        cuestionario
+      };
+
+      let query;
+      if (id) {
+        query = supabase
+          .from('registros_hidratacion')
+          .update(payload)
+          .eq('id', id)
+          .eq('jugador_id', Number(jugador_id))
+          .select()
+          .single();
+      } else {
+        query = supabase
+          .from('registros_hidratacion')
+          .upsert(payload, { onConflict: 'jugador_id,fecha,tipo' })
+          .select()
+          .single();
+      }
+
+      const { data: resData, error } = await query;
 
       if (error) throw error;
 
@@ -212,6 +234,36 @@ export async function POST(req) {
     }
   } catch (e) {
     console.error('Error in registros-hidratacion POST:', e);
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}
+
+export async function GET(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const jugadorId = searchParams.get('jugador_id');
+    if (!jugadorId) return NextResponse.json({ error: 'Falta jugador_id' }, { status: 400 });
+
+    const supabase = getSupabaseAdmin();
+    const user = await getUser();
+    if (!user) return forbidden('No autorizado');
+
+    const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+    if (!ownedPlayer && String(user.id) !== String(jugadorId)) {
+      return forbidden('No tienes acceso a este jugador');
+    }
+
+    const { data, error } = await supabase
+      .from('registros_hidratacion')
+      .select('*')
+      .eq('jugador_id', jugadorId)
+      .order('fecha', { ascending: true });
+
+    if (error) throw error;
+
+    return NextResponse.json({ records: data || [] });
+  } catch (e) {
+    console.error('Error in registros-hidratacion GET:', e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
