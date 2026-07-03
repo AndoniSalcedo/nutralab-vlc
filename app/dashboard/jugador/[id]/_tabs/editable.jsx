@@ -16,6 +16,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconEdit } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
+import { updatePlayerField } from '@/services/player';
 
 export function CampoEditable({ label, campo, valor, jugadorId, tipo = 'textarea', opciones, readOnly = false }) {
   const [editing, setEditing] = useState(false);
@@ -25,13 +26,7 @@ export function CampoEditable({ label, campo, valor, jugadorId, tipo = 'textarea
   async function save() {
     setSaving(true);
     try {
-      const res = await fetch('/api/update-player', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: jugadorId, field: campo, value: val }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'No se pudo guardar el campo');
+      await updatePlayerField(jugadorId, campo, val);
       setEditing(false);
       notifications.show({
         color: 'green',

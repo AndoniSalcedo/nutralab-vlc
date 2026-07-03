@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button, Group, Menu, Modal, PasswordInput, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconLock } from '@tabler/icons-react';
+import { updatePlayerPassword } from '@/services/player';
 
 export default function PlayerPasswordButton({ compact = false, menuItem = false }) {
   const [opened, setOpened] = useState(false);
@@ -23,13 +24,7 @@ export default function PlayerPasswordButton({ compact = false, menuItem = false
 
     setSaving(true);
     try {
-      const res = await fetch('/api/player-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error actualizando contraseña');
+      await updatePlayerPassword(password);
       notifications.show({ color: 'green', title: 'Contraseña actualizada', message: 'Tu contraseña se ha cambiado correctamente.' });
       setPassword('');
       setConfirm('');

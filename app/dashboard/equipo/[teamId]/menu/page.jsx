@@ -26,6 +26,7 @@ import {
   IconList,
 } from '@tabler/icons-react';
 import MenuSemanal, { formatWeek } from '@/components/MenuSemanal';
+import { getWeeklyMenus, uploadWeeklyMenu } from '@/services/menu';
 
 export default function MenuPage({ params }) {
   const teamId = params?.teamId;
@@ -43,8 +44,7 @@ export default function MenuPage({ params }) {
   useEffect(() => {
     let active = true;
     if (!teamId) return;
-    fetch(`/api/menu-semanal?equipo_id=${teamId}`)
-      .then((res) => res.json())
+    getWeeklyMenus(teamId)
       .then((data) => {
         if (active) {
           const list = data.menus || [];
@@ -86,14 +86,7 @@ export default function MenuPage({ params }) {
     });
 
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('semana', weekDate);
-      fd.append('equipo_id', teamId);
-
-      const res = await fetch('/api/menu-semanal', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al subir el archivo');
+      const data = await uploadWeeklyMenu(file, weekDate, teamId);
 
       setMenus(prev => {
         const filtered = prev.filter(m => m.semana !== data.menu.semana);

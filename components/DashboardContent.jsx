@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Anchor, Button, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination, Textarea, Checkbox } from '@mantine/core';
+import { deletePlayer } from '@/services/player';
+import { getWeeklyMenus } from '@/services/menu';
+import { generateWeeklySquadReport } from '@/services/report';
 import { notifications } from '@mantine/notifications';
 import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconDownload, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconFileText, IconChefHat, IconBook, IconCalendar, IconSettings, IconSparkles } from '@tabler/icons-react';
 import DashboardActions from '@/components/DashboardActions';
@@ -369,13 +372,7 @@ export default function DashboardContent({ players = [], team }) {
 
     setDeletingId(player.id);
     try {
-      const formData = new FormData();
-      formData.append('id', player.id);
-      const res = await fetch('/api/players?delete=1', {
-        method: 'POST',
-        body: formData,
-      });
-      if (!res.ok) throw new Error('Error eliminando jugador');
+      await deletePlayer(player.id);
       setPlayersState((prev) => prev.filter((item) => String(item.id) !== String(player.id)));
       notifications.show({
         color: 'green',
@@ -395,22 +392,18 @@ export default function DashboardContent({ players = [], team }) {
 
   async function loadAvailableMenus(weekStr) {
     try {
-      const url = team?.id ? `/api/menu-semanal?equipo_id=${team.id}` : '/api/menu-semanal';
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        const menusList = data.menus || [];
-        setAvailableMenus(menusList);
+      const data = await getWeeklyMenus(team?.id);
+      const menusList = data.menus || [];
+      setAvailableMenus(menusList);
 
-        // Find if a menu matches the selected week
-        const match = menusList.find((m) => m.semana === weekStr);
-        if (match) {
-          setSelectedMenuWeek(match.semana);
-          updateReportField('semanaMenu', match.semana);
-        } else if (menusList.length > 0) {
-          setSelectedMenuWeek(menusList[0].semana);
-          updateReportField('semanaMenu', menusList[0].semana);
-        }
+      // Find if a menu matches the selected week
+      const match = menusList.find((m) => m.semana === weekStr);
+      if (match) {
+        setSelectedMenuWeek(match.semana);
+        updateReportField('semanaMenu', match.semana);
+      } else if (menusList.length > 0) {
+        setSelectedMenuWeek(menusList[0].semana);
+        updateReportField('semanaMenu', menusList[0].semana);
       }
     } catch (e) {
       console.error('Error loading menus list:', e);
@@ -473,22 +466,13 @@ export default function DashboardContent({ players = [], team }) {
 
     setGeneratingReport(true);
     try {
-      const res = await fetch('/api/reports/weekly-squad', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          meta: reportForm,
-          jugadorIds,
-          calendario: reportForm.calendario,
-          team_id: team?.id,
-          semanaMenu: selectedMenuWeek
-        }),
+      const res = await generateWeeklySquadReport({
+        meta: reportForm,
+        jugadorIds,
+        calendario: reportForm.calendario,
+        team_id: team?.id,
+        semanaMenu: selectedMenuWeek
       });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'No se pudo generar el informe');
-      }
 
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);

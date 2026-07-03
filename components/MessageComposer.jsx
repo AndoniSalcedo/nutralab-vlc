@@ -5,6 +5,7 @@ import { Button, Group, MultiSelect, SegmentedControl, Stack, Textarea, TextInpu
 import { notifications } from '@mantine/notifications';
 import { IconSend } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
+import { sendMessage } from '@/services/message';
 
 export default function MessageComposer({
   players = [],
@@ -30,20 +31,13 @@ export default function MessageComposer({
     setLoading(true);
 
     try {
-      const res = await fetch('/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          titulo,
-          contenido,
-          sendToAll: mode === 'all',
-          recipientIds,
-          team_id: team?.id,
-        }),
+      const data = await sendMessage({
+        titulo,
+        contenido,
+        sendToAll: mode === 'all',
+        recipientIds,
+        team_id: team?.id,
       });
-
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || 'No se pudo enviar el mensaje');
 
       notifications.show({
         color: 'green',

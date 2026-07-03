@@ -5,6 +5,7 @@ import {
   ActionIcon,
   Badge,
   Button,
+  Checkbox,
   Divider,
   Group,
   Modal,
@@ -21,6 +22,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { getSupplementationCatalog, updateSupplementationCatalog } from '@/services/supplement';
 import {
   IconBottle,
   IconCalendarStats,
@@ -67,8 +69,14 @@ export default function SupplementCatalogManager({ players = [], team }) {
   const [editingSupplementId, setEditingSupplementId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Inline confirmation system (replaces window.confirm which is incompatible with Mantine Modal)
   const [confirmAction, setConfirmAction] = useState(null); // { message, onConfirm }
+  const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
+
+  useEffect(() => {
+    if (players?.length) {
+      setSelectedPlayerIds(players.map((p) => p.id));
+    }
+  }, [players]);
 
 
   const filteredSupplements = useMemo(() => {
@@ -95,9 +103,7 @@ export default function SupplementCatalogManager({ players = [], team }) {
   async function loadData() {
     setLoading(true);
     try {
-      const res = await fetch('/api/supplementation/catalog');
-      const nextData = await res.json();
-      if (!res.ok) throw new Error(nextData.error || 'No se pudo cargar suplementación');
+      const nextData = await getSupplementationCatalog();
       setData(nextData);
       setSelectedListId((current) => current || (nextData.listas?.[0]?.id ? String(nextData.listas[0].id) : ''));
     } catch (err) {
@@ -114,13 +120,7 @@ export default function SupplementCatalogManager({ players = [], team }) {
   async function postCatalog(payload, successMessage) {
     setSaving(true);
     try {
-      const res = await fetch('/api/supplementation/catalog', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || 'No se pudo guardar');
+      const result = await updateSupplementationCatalog(payload);
       notifications.show({ color: 'green', title: 'Suplementación actualizada', message: successMessage });
       await loadData();
       return result;
@@ -224,18 +224,22 @@ export default function SupplementCatalogManager({ players = [], team }) {
     );
   }
 
-  function assignAll() {
+  function assignToSelectedPlayers() {
     if (!selectedListId) {
       notifications.show({ color: 'orange', title: 'Selecciona un catálogo', message: 'Elige un catálogo antes de asignar.' });
       return;
     }
+    if (!selectedPlayerIds.length) {
+      notifications.show({ color: 'orange', title: 'Selecciona jugadores', message: 'Elige al menos un jugador antes de asignar.' });
+      return;
+    }
 
     setConfirmAction({
-      message: `¿Asignar "${selectedList?.nombre}" a ${players.length} jugadores?`,
+      message: `¿Asignar "${selectedList?.nombre}" a los ${selectedPlayerIds.length} jugadores seleccionados?`,
       onConfirm: async () => {
         await postCatalog(
-          { action: 'assign_all', lista_id: Number(selectedListId), team_id: team?.id },
-          `Catálogo asignado a ${players.length} jugadores.`
+          { action: 'assign_to_players', lista_id: Number(selectedListId), team_id: team?.id, jugadorIds: selectedPlayerIds },
+          `Catálogo asignado a ${selectedPlayerIds.length} jugadores.`
         );
       },
     });
@@ -253,16 +257,16 @@ export default function SupplementCatalogManager({ players = [], team }) {
         </Tabs.List>
 
         <Tabs.Panel value="assign" pt="md">
-          <BentoCard title="Asignación global" icon={IconUsers} color="grape">
+          <BentoCard title="Asignar catálogo a jugadores" icon={IconUsers} color="grape">
             <Group justify="space-between" align="center">
-              <Text size="sm" fw={800}>Catálogo para toda la plantilla</Text>
+              <Text size="sm" fw={800}>Catálogo de suplementación</Text>
               <Tooltip
-                label="Esta acción asigna el catálogo seleccionado a todos los jugadores. Los extras individuales de cada jugador se mantienen."
+                label="Esta acción asignará el catálogo seleccionado a los jugadores marcados en la lista inferior. Los suplementos extras de cada jugador se mantendrán intactos."
                 multiline
                 w={280}
                 withArrow
               >
-                <ActionIcon variant="subtle" color="blue" radius="xl" aria-label="Información sobre asignación global">
+                <ActionIcon variant="subtle" color="blue" radius="xl" aria-label="Información sobre asignación de catálogo">
                   <IconInfoCircle size={17} />
                 </ActionIcon>
               </Tooltip>
@@ -274,9 +278,59 @@ export default function SupplementCatalogManager({ players = [], team }) {
               onChange={(value) => setSelectedListId(value || '')}
               searchable
             />
-            <Group justify="flex-end">
-              <Button radius="xl" size="xs" leftSection={<IconUsers size={15} />} onClick={assignAll} loading={saving}>
-                Asignar a todos
+
+            <Divider label="Seleccionar destinatarios" labelPosition="center" my="sm" />
+
+            <Group justify="space-between" align="center">
+              <Text size="sm" fw={800}>Jugadores ({selectedPlayerIds.length} de {players.length})</Text>
+              <Group gap="xs">
+                <Button
+                  variant="subtle"
+                  size="compact-xs"
+                  color="grape"
+                  onClick={() => setSelectedPlayerIds(players.map((p) => p.id))}
+                >
+                  Seleccionar todos
+                </Button>
+                <Button
+                  variant="subtle"
+                  color="red"
+                  size="compact-xs"
+                  onClick={() => setSelectedPlayerIds([])}
+                >
+                  Deseleccionar todos
+                </Button>
+              </Group>
+            </Group>
+
+            <ScrollArea h={180} offsetScrollbars style={{ border: '1px solid var(--mantine-color-gray-2)', borderRadius: 'var(--mantine-radius-md)', padding: '12px', backgroundColor: '#ffffff' }}>
+              <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="sm">
+                {players.map((player) => {
+                  const isSelected = selectedPlayerIds.includes(player.id);
+                  return (
+                    <Checkbox
+                      key={player.id}
+                      label={`${player.nombre} ${player.apellidos || ''}`.trim()}
+                      checked={isSelected}
+                      onChange={(event) => {
+                        const checked = event.currentTarget.checked;
+                        setSelectedPlayerIds((prev) =>
+                          checked
+                            ? [...prev, player.id]
+                            : prev.filter((id) => id !== player.id)
+                        );
+                      }}
+                      size="sm"
+                      color="grape"
+                    />
+                  );
+                })}
+              </SimpleGrid>
+            </ScrollArea>
+
+            <Group justify="flex-end" mt="xs">
+              <Button radius="xl" size="xs" leftSection={<IconUsers size={15} />} onClick={assignToSelectedPlayers} loading={saving}>
+                Asignar a jugadores
               </Button>
             </Group>
           </BentoCard>

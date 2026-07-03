@@ -19,6 +19,7 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { uploadAnalitica, deleteAnalitica } from '@/services/analytic';
 import {
   IconAlertTriangle,
   IconFileAnalytics,
@@ -156,13 +157,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
       withCloseButton: false,
     });
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('jugador_id', String(jugadorId));
-      fd.append('fecha_extraccion', fecha);
-      const res = await fetch('/api/upload-analitica', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al subir analítica');
+      const data = await uploadAnalitica(file, jugadorId, fecha);
       setAnaliticas((prev) => [data.analitica, ...prev]);
       setCurrentId(String(data.analitica.id));
       setUploadOpen(false);
@@ -198,9 +193,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
 
     setDeleting(true);
     try {
-      const res = await fetch(`/api/upload-analitica?id=${selected.id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al borrar analítica');
+      await deleteAnalitica(selected.id);
 
       const remaining = analiticas.filter((a) => String(a.id) !== String(selected.id));
       setAnaliticas(remaining);

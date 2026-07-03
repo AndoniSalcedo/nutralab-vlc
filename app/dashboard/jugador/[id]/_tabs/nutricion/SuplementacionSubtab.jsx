@@ -23,6 +23,8 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { getPlayerSupplementation, postPlayerSupplementation } from '@/services/supplement';
+import { updatePlayerField } from '@/services/player';
 import {
   IconAlertCircle,
   IconBottle,
@@ -264,9 +266,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
   async function loadData() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/supplementation?jugador_id=${jugador.id}`);
-      const nextData = await res.json();
-      if (!res.ok) throw new Error(nextData.error || 'No se pudo cargar suplementación');
+      const nextData = await getPlayerSupplementation(jugador.id);
       setData(nextData);
     } catch (err) {
       notifications.show({
@@ -285,25 +285,13 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
   }, [jugador.id]);
 
   async function saveField(field, value) {
-    const res = await fetch('/api/update-player', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: jugador.id, field, value }),
-    });
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error || 'No se pudo guardar');
+    await updatePlayerField(jugador.id, field, value);
   }
 
   async function postSupplementation(payload, successMessage) {
     setSaving(true);
     try {
-      const res = await fetch('/api/supplementation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jugador_id: jugador.id, ...payload }),
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || 'No se pudo guardar suplementación');
+      await postPlayerSupplementation(jugador.id, payload);
       notifications.show({ color: 'green', title: 'Suplementación actualizada', message: successMessage });
       await loadData();
       return true;

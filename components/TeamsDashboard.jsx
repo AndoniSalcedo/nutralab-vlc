@@ -23,6 +23,7 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { createTeam, deleteTeam } from '@/services/team';
 import {
   IconCalendarStats,
   IconCopy,
@@ -166,13 +167,7 @@ export default function TeamsDashboard({ teams = [] }) {
         payload.player_ids = selectedPlayerIds;
       }
 
-      const res = await fetch('/api/teams', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'No se pudo guardar el equipo');
+      const data = await createTeam(payload);
 
       const copiedPlayers = Number(data.copiedPlayers || 0);
       const newTeam = {
@@ -206,13 +201,7 @@ export default function TeamsDashboard({ teams = [] }) {
 
     setSaving(true);
     try {
-      const res = await fetch('/api/teams', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'delete', team_id: team.id }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'No se pudo eliminar el equipo');
+      const data = await deleteTeam(team.id);
       setTeamsState((current) => current.filter((item) => String(item.id) !== String(team.id)));
       notifications.show({ color: 'green', title: 'Equipo eliminado', message: team.nombre });
       router.refresh();

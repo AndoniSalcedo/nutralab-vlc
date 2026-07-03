@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Dropzone } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
+import { importPlayerExcel } from '@/services/player';
 import {
   Alert,
   Badge,
@@ -199,15 +200,8 @@ export default function PlayerExcelImporter({ team }) {
     setState('loading');
     setResults(null);
 
-    const formData = new FormData();
-    formData.append('file', nextFile);
-    formData.append('modo', 'preview');
-    if (team?.id) formData.append('team_id', team.id);
-
     try {
-      const res = await fetch('/api/import-player-excel', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'No se pudo procesar el Excel');
+      const data = await importPlayerExcel({ file: nextFile, modo: 'preview', teamId: team?.id });
 
       setFile(nextFile);
       setPreview(data);
@@ -267,16 +261,8 @@ export default function PlayerExcelImporter({ team }) {
     if (!file) return;
     setState('importing');
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('modo', 'importar');
-    if (team?.id) formData.append('team_id', team.id);
-    formData.append('decisiones', JSON.stringify(decisions));
-
     try {
-      const res = await fetch('/api/import-player-excel', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'No se pudo importar el Excel');
+      const data = await importPlayerExcel({ file, modo: 'importar', teamId: team?.id, decisiones });
 
       setResults(data);
       setState('done');

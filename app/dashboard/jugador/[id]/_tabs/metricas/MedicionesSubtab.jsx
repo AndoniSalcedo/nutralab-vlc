@@ -32,6 +32,7 @@ import {
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
+import { saveEvolution, deleteEvolution } from '@/services/evolution';
 import { IconCalendarStats, IconCheck, IconEdit, IconPlus, IconRuler2, IconTrash, IconFilter } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
 import NothingFound from '@/components/NothingFound/NothingFound';
@@ -228,21 +229,15 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
     if (readOnly) return;
     setSaving(true);
     try {
-      const res = await fetch('/api/evoluciones', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jugador_id: jugadorId,
-          ...form,
-          altura_cm: form.altura_cm ? Number(form.altura_cm) : null,
-          peso_kg: form.peso_kg ? Number(form.peso_kg) : null,
-          porcentaje_grasa: form.porcentaje_grasa ? Number(form.porcentaje_grasa) : null,
-          masa_magra_kg: form.masa_magra_kg ? Number(form.masa_magra_kg) : null,
-          suma_6_pliegues: form.suma_6_pliegues ? Number(form.suma_6_pliegues) : null,
-        }),
+      const data = await saveEvolution({
+        jugador_id: jugadorId,
+        ...form,
+        altura_cm: form.altura_cm ? Number(form.altura_cm) : null,
+        peso_kg: form.peso_kg ? Number(form.peso_kg) : null,
+        porcentaje_grasa: form.porcentaje_grasa ? Number(form.porcentaje_grasa) : null,
+        masa_magra_kg: form.masa_magra_kg ? Number(form.masa_magra_kg) : null,
+        suma_6_pliegues: form.suma_6_pliegues ? Number(form.suma_6_pliegues) : null,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al guardar medición');
 
       setEvoluciones((prev) => {
         const filtered = prev.filter((e) => e.id !== data.evolucion.id && e.fecha !== data.evolucion.fecha);
@@ -274,9 +269,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
 
     setDeleting(true);
     try {
-      const res = await fetch(`/api/evoluciones?id=${selected.id}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al borrar medición');
+      await deleteEvolution(selected.id);
 
       const remaining = evoluciones.filter((e) => String(e.id) !== String(selected.id));
       setEvoluciones(remaining);

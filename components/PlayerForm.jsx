@@ -17,6 +17,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconUser, IconActivity, IconCheck } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
+import { deletePlayer, savePlayer } from '@/services/player';
 import { NUTRITION_DAY_TYPES, resolveNutritionDayType } from '@/lib/calculations';
 
 export default function PlayerForm({ initial, team }) {
@@ -46,11 +47,7 @@ export default function PlayerForm({ initial, team }) {
       }
 
       if (isDelete) {
-        const res = await fetch(`/api/players?delete=1`, {
-          method: 'POST',
-          body: formData
-        });
-        if (!res.ok) throw new Error('Error al eliminar jugador');
+        await deletePlayer(initial.id);
       } else {
         formData.append('nombre', nombre);
         formData.append('apellidos', apellidos);
@@ -60,11 +57,7 @@ export default function PlayerForm({ initial, team }) {
         formData.append('contexto_clinico', contexto);
         formData.append('objetivo', objetivo);
 
-        const res = await fetch('/api/players', {
-          method: 'POST',
-          body: formData
-        });
-        if (!res.ok) throw new Error('Error al guardar jugador');
+        await savePlayer(formData);
       }
 
       notifications.show({

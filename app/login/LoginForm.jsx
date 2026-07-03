@@ -30,6 +30,7 @@ import {
 } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
+import { login } from '@/services/auth';
 import { env } from '@/lib/env';
 
 const highlights = [
@@ -51,17 +52,7 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password: password.trim() }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Credenciales incorrectas');
-      }
+      await login(email, password);
 
       router.push('/dashboard');
     } catch (err) {

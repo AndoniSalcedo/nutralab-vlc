@@ -24,6 +24,8 @@ import {
   Textarea
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { saveHydrationRecord, importHydrationRecords, refetchHydrationRecords, deleteHydrationRecord } from '@/services/hydration';
+import { updatePlayerField } from '@/services/player';
 import {
   IconActivityHeartbeat,
   IconDroplet,
@@ -137,23 +139,17 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
   const saveEditedRecord = async () => {
     setSavingEdit(true);
     try {
-      const res = await fetch('/api/registros-hidratacion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jugador_id: jugadorId,
-          fecha: editForm.fecha,
-          hora: editForm.hora,
-          tipo: editForm.tipo,
-          valor: editForm.valor !== '' ? parseFloat(editForm.valor) : null,
-          unidad: editForm.unidad,
-          estado: editForm.estado,
-          notas: editForm.notas,
-          cuestionario: editForm.cuestionario
-        })
+      const result = await saveHydrationRecord({
+        jugador_id: jugadorId,
+        fecha: editForm.fecha,
+        hora: editForm.hora,
+        tipo: editForm.tipo,
+        valor: editForm.valor !== '' ? parseFloat(editForm.valor) : null,
+        unidad: editForm.unidad,
+        estado: editForm.estado,
+        notas: editForm.notas,
+        cuestionario: editForm.cuestionario
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || 'Error al guardar la toma');
 
       notifications.show({
         color: 'green',
@@ -219,11 +215,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
   }, [registros]);
 
   async function saveField(field, value) {
-    await fetch('/api/update-player', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: jugador.id, field, value }),
-    });
+    await updatePlayerField(jugador.id, field, value);
   }
 
   // Handle CSV file selected
@@ -333,13 +325,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
   const triggerImport = async () => {
     setImporting(true);
     try {
-      const res = await fetch('/api/registros-hidratacion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jugador_id: jugadorId, data: allImportRows }),
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || 'Error en importación');
+      const result = await importHydrationRecords(jugadorId, allImportRows);
 
       notifications.show({
         color: 'green',
@@ -354,7 +340,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
 
       // Refetch or update local state
       // Let's do a client-side fetch of the updated registros to sync
-      const refetchRes = await fetch(`/api/registros-hidratacion?jugador_id=${jugadorId}`);
+      const refetchRes = await refetchHydrationRecords(jugadorId);
       if (refetchRes.ok) {
         // Wait, wait, let's see. If the page is re-rendered or we just fetch from Supabase,
         // we can trigger a state update. We can also just fetch them from database directly:
@@ -388,11 +374,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
     if (!confirm('¿Estás seguro de que deseas eliminar este registro de hidratación?')) return;
     setDeletingId(id);
     try {
-      const res = await fetch(`/api/registros-hidratacion?id=${id}`, {
-        method: 'DELETE'
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || 'Error al eliminar');
+      await deleteHydrationRecord(id);
 
       notifications.show({
         color: 'green',

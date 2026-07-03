@@ -4,6 +4,7 @@ import { Badge, Box, Group, Paper, SimpleGrid, Stack, Text, ThemeIcon, Timeline,
 import { IconApple, IconBatteryCharging, IconClipboardList, IconCoffee, IconDroplet, IconFlag, IconRun } from '@tabler/icons-react';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/Bento/BentoItem';
+import { updatePlayerField } from '@/services/player';
 
 export default function ProtocolosSubtab({ jugador, readOnly = false }) {
   const peso = Number(jugador.peso_kg || 0);
@@ -11,11 +12,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
   const cafMax = peso ? Math.round(peso * 6) : 400;
 
   async function saveField(field, value) {
-    await fetch('/api/update-player', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: jugador.id, field, value }),
-    });
+    await updatePlayerField(jugador.id, field, value);
   }
 
   const protDef = [

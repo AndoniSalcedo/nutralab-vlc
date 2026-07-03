@@ -21,6 +21,7 @@ import {
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
+import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPlanPdf } from '@/services/plan';
 import {
   IconArrowsLeftRight,
   IconBrain,
@@ -329,9 +330,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     async function loadPlanes() {
       setLoadingList(true);
       try {
-        const res = await fetch(`/api/ai-plan?jugador_id=${jugador.id}`);
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Error al cargar planes');
+        const data = await getAiPlans(jugador.id);
         if (!active) return;
         const list = data.planes || [];
         setPlanes(list);
@@ -404,13 +403,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       withCloseButton: false,
     });
     try {
-      const res = await fetch('/api/ai-plan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jugador, nombre, contexto, contextoAdicional, draftOnly: true }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al generar la ficha');
+      const data = await generateAiPlanDraft({ jugador, nombre, contexto, contextoAdicional });
       setDatos(data.datos || null);
       setContenido('');
       setHasGeneratedAi(true);
@@ -452,20 +445,14 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       withCloseButton: false,
     });
     try {
-      const res = await fetch('/api/ai-plan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jugador,
-          nombre,
-          contexto,
-          contextoAdicional,
-          datos: hasGeneratedAi ? finalDatos : undefined,
-          contenido
-        }),
+      const data = await saveAiPlan({
+        jugador,
+        nombre,
+        contexto,
+        contextoAdicional,
+        datos: hasGeneratedAi ? finalDatos : undefined,
+        contenido
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al guardar el plan');
       setPlanes((prev) => [data.plan, ...prev]);
       setCurrentId(String(data.plan.id));
       setMode('view');
@@ -508,20 +495,14 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       withCloseButton: false,
     });
     try {
-      const res = await fetch('/api/ai-plan', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: currentPlan.id,
-          nombre,
-          contenido,
-          datos: finalDatos,
-          contexto,
-          contextoAdicional,
-        }),
+      const data = await updateAiPlan({
+        id: currentPlan.id,
+        nombre,
+        contenido,
+        datos: finalDatos,
+        contexto,
+        contextoAdicional,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al guardar el plan');
       setPlanes((prev) => [data.plan, ...prev.filter((plan) => plan.id !== data.plan.id)]);
       setCurrentId(String(data.plan.id));
       setMode('view');
@@ -553,11 +534,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     if (!currentPlan?.id || !currentDatos) return;
     setActionType('download');
     try {
-      const res = await fetch(`/api/ai-plan/${currentPlan.id}/pdf`);
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'No se pudo descargar el PDF');
-      }
+      const res = await downloadAiPlanPdf(currentPlan.id);
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

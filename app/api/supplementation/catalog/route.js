@@ -254,5 +254,48 @@ export async function POST(request) {
     return NextResponse.json({ ok: true, assigned: rows.length });
   }
 
+  if (action === 'assign_to_players') {
+    const listaId = toPositiveNumber(body.lista_id);
+    const jugadorIds = Array.isArray(body.jugadorIds)
+      ? body.jugadorIds.map(Number).filter(Number.isFinite)
+      : [];
+
+    if (!listaId) {
+      return NextResponse.json({ error: 'Selecciona un catálogo' }, { status: 400 });
+    }
+    if (!jugadorIds.length) {
+      return NextResponse.json({ error: 'Debes seleccionar al menos un jugador' }, { status: 400 });
+    }
+
+    const team = await getOwnedTeam(supabase, user, body.team_id);
+    if (!team) {
+      return NextResponse.json({ error: 'No tienes acceso a este equipo' }, { status: 403 });
+    }
+
+    const { data: teamPlayers, error: playersError } = await supabase
+      .from('jugadores')
+      .select('id')
+      .eq('equipo_id', team.id)
+      .in('id', jugadorIds);
+
+    if (playersError) return NextResponse.json({ error: playersError.message }, { status: 500 });
+
+    const rows = (teamPlayers || []).map((player) => ({
+      jugador_id: player.id,
+      lista_id: listaId,
+      updated_at: new Date().toISOString(),
+    }));
+
+    if (rows.length) {
+      const { error } = await supabase
+        .from('jugador_suplementacion')
+        .upsert(rows, { onConflict: 'jugador_id' });
+
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true, assigned: rows.length });
+  }
+
   return NextResponse.json({ error: 'Acción no soportada' }, { status: 400 });
 }

@@ -5,6 +5,8 @@ import { Alert, Button, Group, Menu, Modal, PasswordInput, Stack, Text, TextInpu
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconKey, IconRefresh, IconShieldCheck } from '@tabler/icons-react';
 
+import { updatePlayerCredentials } from '@/services/player';
+
 function generatePassword() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@$%';
   const bytes = new Uint8Array(14);
@@ -18,11 +20,7 @@ export default function PlayerCredentialsButton({ jugador, compact = false, menu
   const [password, setPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [savedPassword, setSavedPassword] = useState('');
-  const [credentials, setCredentials] = useState({
-    auth_user_id: jugador.auth_user_id,
-    auth_email: jugador.auth_email,
-    credentials_created_at: jugador.credentials_created_at,
-  });
+  const [credentials, setCredentials] = useState(jugador);
 
   const hasCredentials = Boolean(credentials.auth_user_id);
   const buttonLabel = hasCredentials ? 'Actualizar acceso' : 'Crear acceso';
@@ -49,17 +47,7 @@ export default function PlayerCredentialsButton({ jugador, compact = false, menu
     setSavedPassword('');
     try {
       const finalPassword = password || generatePassword();
-      const res = await fetch('/api/player-credentials', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jugadorId: jugador.id,
-          email,
-          password: finalPassword,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error creando credenciales');
+      const data = await updatePlayerCredentials(jugador.id, email, finalPassword);
       const savedEmail = data.credentials.auth_email || email.trim().toLowerCase();
       setSavedPassword(finalPassword);
       setPassword(finalPassword);
