@@ -33,7 +33,7 @@ export default function PlayerTabs({
     ? 'perfil'
     : activeSubtabProp;
   const validSubtabs = {
-    resumen: ['perfil', 'mensajes'],
+    resumen: ['perfil', 'diario', 'mensajes'],
     metricas: readOnly 
       ? ['mediciones', 'hidratacion', 'protocolos'] 
       : ['mediciones', 'analiticas', 'hidratacion', 'protocolos'],

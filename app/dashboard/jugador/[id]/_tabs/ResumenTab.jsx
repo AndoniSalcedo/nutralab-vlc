@@ -1,10 +1,11 @@
 'use client';
 
 import { Box, Paper, SegmentedControl, Stack } from '@mantine/core';
-import { IconMail, IconUser } from '@tabler/icons-react';
+import { IconMail, IconUser, IconCalendar } from '@tabler/icons-react';
 import { tabLabel } from './tab-label';
 import MensajesSubtab from './resumen/MensajesSubtab';
 import PerfilSubtab from './resumen/PerfilSubtab';
+import DiarioComidasSubtab from './nutricion/DiarioComidasSubtab';
 
 export default function ResumenTab({ jugador, evoluciones = [], messages = [], activeSubtab, onSubtabChange, readOnly = false }) {
   return (
@@ -34,6 +35,7 @@ export default function ResumenTab({ jugador, evoluciones = [], messages = [], a
           bg="gray.1"
           data={[
             { value: 'perfil', label: tabLabel(IconUser, 'Perfil') },
+            { value: 'diario', label: tabLabel(IconCalendar, 'Diario de comidas', 'Diario') },
             { value: 'mensajes', label: tabLabel(IconMail, 'Mensajes') },
           ]}
           styles={{
@@ -45,6 +47,7 @@ export default function ResumenTab({ jugador, evoluciones = [], messages = [], a
 
       <Box mt={0}>
         {activeSubtab === 'perfil' && <PerfilSubtab jugador={jugador} evoluciones={evoluciones} readOnly={readOnly} />}
+        {activeSubtab === 'diario' && <DiarioComidasSubtab jugador={jugador} readOnly={!readOnly} />}
         {activeSubtab === 'mensajes' && <MensajesSubtab jugador={jugador} messages={messages} readOnly={readOnly} />}
       </Box>
     </Stack>
