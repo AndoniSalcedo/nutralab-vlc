@@ -8,10 +8,23 @@ import Providers from '@/components/Providers';
 export const metadata = {
   title: 'Nutralab - Cuídate y disfruta',
   description: 'Panel nutricional para monitorización de jugadores',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Nutralab',
+  },
   icons: {
     icon: '/favico_nutralab-32x32.png',
     apple: '/favico_nutralab-192x192.png',
   },
+};
+
+export const viewport = {
+  themeColor: '#6c705a',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({ children }) {

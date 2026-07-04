@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { ActionIcon, createTheme, MantineProvider, Modal } from '@mantine/core';
 
 const nutralabColor = [
@@ -37,6 +38,28 @@ const theme = createTheme({
 import { Notifications } from '@mantine/notifications';
 
 export default function Providers({ children }) {
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      const registerSW = () => {
+        navigator.serviceWorker.register('/sw.js').then(
+          (registration) => {
+            console.log('Service Worker registration successful with scope: ', registration.scope);
+          },
+          (err) => {
+            console.error('Service Worker registration failed: ', err);
+          }
+        );
+      };
+
+      if (document.readyState === 'complete') {
+        registerSW();
+      } else {
+        window.addEventListener('load', registerSW);
+        return () => window.removeEventListener('load', registerSW);
+      }
+    }
+  }, []);
+
   return (
     <MantineProvider theme={theme} defaultColorScheme="light">
       <Notifications />

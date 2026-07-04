@@ -1,0 +1,36 @@
+{
+  "name": "Nutralab",
+  "short_name": "Nutralab",
+  "description": "Panel nutricional para monitorización de jugadores",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f6ef",
+  "theme_color": "#6c705a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favico_nutralab-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favico_nutralab-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favico_nutralab-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favico_nutralab-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
