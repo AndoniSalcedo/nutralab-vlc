@@ -74,7 +74,7 @@ export default function DashboardActions({ players = [], team }) {
             <Text fw={700}>Importar datos</Text>
           </Group>
         }
-        size="xl"
+        size="1200px"
         radius="lg"
         overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
       >

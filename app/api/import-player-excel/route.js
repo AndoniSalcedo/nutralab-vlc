@@ -133,18 +133,20 @@ async function saveMeasurement(supabase, jugadorId, measurement) {
 
 function resolveDecision(group, decisions) {
   const decision = decisions?.[group.key] || {};
+  let actionObj = { action: 'skip', reason: 'Pendiente de revisión' };
 
-  if (decision.action === 'skip') return { action: 'skip' };
-  if (decision.action === 'create') return { action: 'create' };
-  if (decision.action === 'update' && decision.jugador_id) {
-    return { action: 'update', jugadorId: decision.jugador_id };
+  if (decision.action === 'skip') actionObj = { action: 'skip' };
+  else if (decision.action === 'create') actionObj = { action: 'create' };
+  else if (decision.action === 'update' && decision.jugador_id) {
+    actionObj = { action: 'update', jugadorId: decision.jugador_id };
+  } else if (group.accion === 'actualizar' && group.jugadorId) {
+    actionObj = { action: 'update', jugadorId: group.jugadorId };
+  } else if (group.accion === 'crear') {
+    actionObj = { action: 'create' };
   }
 
-  if (group.accion === 'actualizar' && group.jugadorId) {
-    return { action: 'update', jugadorId: group.jugadorId };
-  }
-  if (group.accion === 'crear') return { action: 'create' };
-  return { action: 'skip', reason: 'Pendiente de revisión' };
+  actionObj.fallbackDates = decision.fallbackDates || {};
+  return actionObj;
 }
 
 async function importGroups({ supabase, team, plan, players, decisions }) {
@@ -188,7 +190,14 @@ async function importGroups({ supabase, team, plan, players, decisions }) {
       }
 
       for (const measurement of group.mediciones) {
-        const status = await saveMeasurement(supabase, player.id, measurement);
+        const measurementId = `${measurement.sourceSheet}-${measurement.sourceRow}`;
+        const finalDate = measurement.fecha || decision.fallbackDates[measurementId];
+        if (!finalDate) {
+          baseResult.mediciones_omitidas = (baseResult.mediciones_omitidas || 0) + 1;
+          continue;
+        }
+        const measurementToSave = { ...measurement, fecha: finalDate };
+        const status = await saveMeasurement(supabase, player.id, measurementToSave);
         if (status === 'creada') baseResult.mediciones_creadas += 1;
         else baseResult.mediciones_actualizadas += 1;
       }

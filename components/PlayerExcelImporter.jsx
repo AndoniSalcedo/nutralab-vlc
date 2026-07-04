@@ -18,6 +18,7 @@ import {
   Stack,
   Table,
   Text,
+  TextInput,
   ThemeIcon,
   Title,
   useMantineTheme,
@@ -228,14 +229,27 @@ export default function PlayerExcelImporter({ team }) {
     if (value.startsWith('update:')) {
       setDecisions((current) => ({
         ...current,
-        [playerKey]: { action: 'update', jugador_id: value.replace('update:', '') },
+        [playerKey]: { ...current[playerKey], action: 'update', jugador_id: value.replace('update:', '') },
       }));
       return;
     }
 
     setDecisions((current) => ({
       ...current,
-      [playerKey]: { action: value },
+      [playerKey]: { ...current[playerKey], action: value },
+    }));
+  }
+
+  function setFallbackDate(playerKey, measurementId, date) {
+    setDecisions((current) => ({
+      ...current,
+      [playerKey]: {
+        ...current[playerKey],
+        fallbackDates: {
+          ...(current[playerKey]?.fallbackDates || {}),
+          [measurementId]: date,
+        },
+      },
     }));
   }
 
@@ -392,7 +406,7 @@ export default function PlayerExcelImporter({ team }) {
 
             {reviewCount ? (
               <Alert color="yellow" variant="light" icon={<IconAlertTriangle size={18} />}>
-                {reviewCount} jugador{reviewCount === 1 ? '' : 'es'} requiere revisión. Por defecto se omiten; selecciona un jugador existente o crea uno nuevo para importarlo.
+                Hay {reviewCount} jugador{reviewCount === 1 ? '' : 'es'} que requiere{reviewCount === 1 ? '' : 'n'} revisión. Estos se omitirán por defecto, así que asegúrate de seleccionar una acción o rellenar los datos que falten si quieres importarlos.
               </Alert>
             ) : null}
 
@@ -427,23 +441,43 @@ export default function PlayerExcelImporter({ team }) {
                       <Table.Td ta="center" fw={700}>{player.medicionesCount}</Table.Td>
                       <Table.Td ta="center">{formatDate(player.ultimaFecha)}</Table.Td>
                       <Table.Td style={{ minWidth: 280 }}>
-                        {player.accion === 'revision' ? (
-                          <Select
-                            size="xs"
-                            radius="md"
-                            data={decisionOptions(player)}
-                            value={decisionValue(player)}
-                            onChange={(value) => setDecision(player.key, value)}
-                            allowDeselect={false}
-                          />
-                        ) : player.warnings?.length ? (
-                          <Text size="xs" c="dimmed" lineClamp={2}>
-                            {player.warnings[0]}
-                            {player.warningsCount > 1 ? ` (+${player.warningsCount - 1})` : ''}
-                          </Text>
-                        ) : (
-                          <Text size="xs" c="dimmed">Sin avisos</Text>
-                        )}
+                        <Stack gap="xs">
+                          {player.accion === 'revision' ? (
+                            <Select
+                              size="xs"
+                              radius="md"
+                              data={decisionOptions(player)}
+                              value={decisionValue(player)}
+                              onChange={(value) => setDecision(player.key, value)}
+                              allowDeselect={false}
+                            />
+                          ) : player.warnings?.length ? (
+                            <Text size="xs" c="dimmed" lineClamp={2}>
+                              {player.warnings[0]}
+                              {player.warningsCount > 1 ? ` (+${player.warningsCount - 1})` : ''}
+                            </Text>
+                          ) : (
+                            <Text size="xs" c="dimmed">Sin avisos</Text>
+                          )}
+                          
+                          {player.missingMeasurements?.length > 0 && (
+                            <Stack gap={4} mt="xs">
+                              <Text size="xs" fw={600} c="dark.3">Fechas faltantes:</Text>
+                              {player.missingMeasurements.map((m) => (
+                                <TextInput
+                                  key={m.id}
+                                  type="date"
+                                  size="xs"
+                                  radius="md"
+                                  label={`${m.sheet} (Fila ${m.row})`}
+                                  placeholder="Selecciona una fecha"
+                                  value={decisions[player.key]?.fallbackDates?.[m.id] || ''}
+                                  onChange={(e) => setFallbackDate(player.key, m.id, e.target.value)}
+                                />
+                              ))}
+                            </Stack>
+                          )}
+                        </Stack>
                       </Table.Td>
                     </Table.Tr>
                   ))}
