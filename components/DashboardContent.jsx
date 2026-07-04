@@ -6,7 +6,7 @@ import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconDownload, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconFileText, IconChefHat, IconBook, IconCalendar, IconSettings, IconSparkles } from '@tabler/icons-react';
+import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconDownload, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconFileText, IconChefHat, IconBook, IconCalendar, IconSettings, IconSparkles, IconBottle } from '@tabler/icons-react';
 import DashboardActions from '@/components/DashboardActions';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
@@ -155,14 +155,14 @@ function DashboardStat({ title, icon: Icon, color = 'blue', value, description, 
           <Icon size={18} stroke={1.6} />
         </ThemeIcon>
         <Box style={{ minWidth: 0, flex: 1 }}>
-          <Text fw={750} c="dimmed" size="xs" tt="uppercase" lts={0.5} truncate>
+          <Text fw={400} c="dimmed" fz={11} tt="uppercase" lts={0.6} truncate>
             {title}
           </Text>
-          <Group gap={8} align="baseline" wrap="nowrap">
-            <Text fw={800} size="lg" c="#24291f" lh={1.1} truncate>
+          <Group gap={6} align="baseline">
+            <Text fw={700} size="sm" c="#24291f" lh={1.1}>
               {value}
             </Text>
-            <Text size="xs" c="dimmed" truncate visibleFrom="xs">
+            <Text size="xs" c="dimmed" truncate visibleFrom="sm">
               {description}
             </Text>
           </Group>
@@ -545,29 +545,33 @@ export default function DashboardContent({ players = [], team }) {
             <DashboardActions players={playersState} team={team} />
           </Group>
 
-          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="xs">
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="xs">
             <DashboardStat
-              title="Jugadores activos"
+              title="Plantilla"
               icon={IconUsers}
               color="blue"
-              value={totalPlayers}
-              description="Plantilla en seguimiento"
+              value={`${totalPlayers} jugadores`}
               onClick={() => openReportModal()}
+            />
+            <DashboardStat
+              title="Suplementación"
+              icon={IconBottle}
+              color="grape"
+              value="Gestionar suplementos"
+              href={team?.id ? `/dashboard/equipo/${team.id}/suplementacion` : '#'}
             />
             <DashboardStat
               title="Evolución equipo"
               icon={IconChartLine}
               color="blue"
-              value="Ver análisis →"
-              description="Tendencias y comparativas"
+              value="Ver análisis"
               href={team?.id ? `/dashboard/equipo/${team.id}/evolucion` : '#'}
             />
             <DashboardStat
               title="Menú esta semana"
               icon={IconCalendarEvent}
               color="teal"
-              value="Ver menú →"
-              description="Sube foto o PDF del comedor"
+              value="Ver menú"
               href={team?.id ? `/dashboard/equipo/${team.id}/menu` : '#'}
             />
           </SimpleGrid>

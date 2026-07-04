@@ -64,7 +64,7 @@ function byId(items) {
   return new Map((items || []).map((item) => [Number(item.id), item]));
 }
 
-export default function SupplementCatalogManager({ players = [], team }) {
+export default function SupplementCatalogManager({ players = [], team, activeTab = 'assign', onTabChange }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [data, setData] = useState({ suplementos: [], listas: [], items: [] });
@@ -274,7 +274,7 @@ export default function SupplementCatalogManager({ players = [], team }) {
     <Stack gap="md" pos="relative">
       <LoadingOverlay visible={loading} />
 
-      <Tabs defaultValue="assign" variant="outline" radius="md" keepMounted={false}>
+      <Tabs value={activeTab} onChange={onTabChange} variant="outline" radius="md" keepMounted={false}>
         <Tabs.List grow>
           <Tabs.Tab value="assign" leftSection={<IconUsers size={15} />}>Asignar</Tabs.Tab>
           <Tabs.Tab value="catalogs" leftSection={<IconBottle size={15} />}>Catálogos</Tabs.Tab>

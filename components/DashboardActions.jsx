@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Group, Modal, Text } from '@mantine/core';
+import { Button, Group, Modal, Text, Anchor } from '@mantine/core';
 import { IconPlus, IconFileSpreadsheet, IconMail, IconBottle, IconUserPlus } from '@tabler/icons-react';
 import PlayerForm from './PlayerForm';
 import PlayerExcelImporter from './PlayerExcelImporter';
 import MessageComposer from './MessageComposer';
-import SupplementCatalogManager from './SupplementCatalogManager';
 
 export default function DashboardActions({ players = [], team }) {
   const [openedModal, setOpenedModal] = useState(null);
@@ -26,6 +25,7 @@ export default function DashboardActions({ players = [], team }) {
         >
           Importar datos
         </Button>
+
         <Button
           radius="xl"
           size="xs"
@@ -36,16 +36,7 @@ export default function DashboardActions({ players = [], team }) {
         >
           Mensaje
         </Button>
-        <Button
-          radius="xl"
-          size="xs"
-          variant="light"
-          color="grape"
-          leftSection={<IconBottle size={14} />}
-          onClick={() => setOpenedModal('supplementation')}
-        >
-          Suplementación
-        </Button>
+
         <Button
           radius="xl"
           size="xs"
@@ -104,25 +95,6 @@ export default function DashboardActions({ players = [], team }) {
         overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
       >
         <MessageComposer players={players} team={team} onSent={closeModal} />
-      </Modal>
-
-      <Modal
-        opened={openedModal === 'supplementation'}
-        onClose={closeModal}
-        title={
-          <Group gap="xs">
-            <IconBottle size={20} style={{ color: 'var(--mantine-color-grape-6)' }} />
-            <Text fw={700}>Gestión de suplementación</Text>
-          </Group>
-        }
-        size="xl"
-        radius="lg"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-        closeOnClickOutside={false}
-        closeOnEscape={false}
-        trapFocus={false}
-      >
-        <SupplementCatalogManager players={players} team={team} />
       </Modal>
     </>
   );
