@@ -256,10 +256,6 @@ export function PlanCardPage({ plan }) {
           <Text style={styles.metricLabel}>Masa magra</Text>
           <Text style={[styles.metricValue, { color: COLORS.green }]}>{formatGrasa(plan?.metricas?.masaMagra)}</Text>
         </View>
-        <View style={styles.metricBox}>
-          <Text style={styles.metricLabel}>Peso objetivo</Text>
-          <Text style={[styles.metricValue, { color: COLORS.teal }]}>{plan?.metricas?.pesoObjetivo ? `~${formatWeight(plan.metricas.pesoObjetivo)}` : '-'}</Text>
-        </View>
       </View>
 
       <View style={styles.contentGrid}>

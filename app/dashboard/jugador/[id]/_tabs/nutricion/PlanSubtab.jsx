@@ -162,11 +162,10 @@ function PlanFicha({ data, jugador }) {
         <Text className="ficha-position">{plan.jugador.posicion}</Text>
         <Box className="ficha-rule" />
 
-        <SimpleGrid cols={{ base: 2, md: 4 }} spacing="sm" mt="xl" mb="xl">
+        <SimpleGrid cols={{ base: 2, md: 3 }} spacing="sm" mt="xl" mb="xl">
           <MetricCard label="Peso" value={formatNumber(plan.metricas.peso, ' kg')} color="orange.4" />
           <MetricCard label="Grasa" value={formatNumber(plan.metricas.grasa, ' %')} color="orange.4" />
           <MetricCard label="M. magra" value={formatNumber(plan.metricas.masaMagra, ' %')} color="green.4" />
-          <MetricCard label="Objetivo" value={plan.metricas.pesoObjetivo ? `~${formatNumber(plan.metricas.pesoObjetivo, ' kg')}` : '-'} color="teal.3" />
         </SimpleGrid>
 
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
@@ -776,12 +775,11 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                 <>
                   <Paper p="md" radius="md" withBorder bg="gray.0">
                     <Title order={4} mb="md">Métricas de la ficha</Title>
-                    <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md">
+                     <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
                       {[
                         ['peso', 'Peso (kg)'],
                         ['grasa', 'Grasa (%)'],
                         ['masaMagra', 'Masa magra (%)'],
-                        ['pesoObjetivo', 'Peso objetivo (kg)'],
                       ].map(([key, label]) => (
                         <NumberInput
                           key={key}
