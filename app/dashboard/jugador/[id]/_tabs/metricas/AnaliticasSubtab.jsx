@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from 'react';
 import {
+  ActionIcon,
   Badge,
   Box,
   Button,
@@ -10,16 +11,19 @@ import {
   Paper,
   ScrollArea,
   Select,
-  SimpleGrid,
   Stack,
   Table,
   Text,
-  TextInput,
   ThemeIcon,
   Title,
+  Tooltip,
+  useMantineTheme,
 } from '@mantine/core';
+import { DatePickerInput } from '@mantine/dates';
+import { Dropzone } from '@mantine/dropzone';
+import dayjs from 'dayjs';
 import { notifications } from '@mantine/notifications';
-import { uploadAnalitica, deleteAnalitica } from '@/services/analytic';
+import { uploadAnalitica, deleteAnalitica, toggleAnaliticaVisibility } from '@/services/analytic';
 import {
   IconAlertTriangle,
   IconFileAnalytics,
@@ -28,6 +32,11 @@ import {
   IconReportMedical,
   IconTrash,
   IconUpload,
+  IconDownload,
+  IconCloudUpload,
+  IconX,
+  IconEye,
+  IconEyeOff,
 } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
 import NothingFound from '@/components/NothingFound/NothingFound';
@@ -119,8 +128,8 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [fecha, setFecha] = useState('');
-  const fileRef = useRef(null);
+  const [fecha, setFecha] = useState(null);
+  const theme = useMantineTheme();
 
   const sorted = useMemo(
     () => [...analiticas].sort((a, b) => String(b.fecha_extraccion || '').localeCompare(String(a.fecha_extraccion || ''))),
@@ -132,20 +141,48 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
   const fueraRango = parametros.filter((p) => p.fuera_rango);
   const tableRows = Object.entries(grupos).flatMap(([grupo, params]) => params.map((parametro) => ({ grupo, parametro })));
 
+  const [toggling, setToggling] = useState(false);
+
+  async function handleToggleVisibility() {
+    if (readOnly || !selected) return;
+    const isVisible = !selected.visible_para_jugador;
+    setToggling(true);
+    try {
+      await toggleAnaliticaVisibility(selected.id, isVisible);
+      setAnaliticas((prev) =>
+        prev.map((a) => (String(a.id) === String(selected.id) ? { ...a, visible_para_jugador: isVisible } : a))
+      );
+      notifications.show({
+        color: 'green',
+        title: 'Visibilidad actualizada',
+        message: isVisible ? 'El jugador ahora puede ver esta analítica.' : 'La analítica se ha ocultado para el jugador.',
+      });
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al cambiar visibilidad',
+        message: e.message,
+      });
+    } finally {
+      setToggling(false);
+    }
+  }
+
   function startUpload() {
     setUploadOpen(true);
-    setFecha('');
+    setFecha(null);
   }
 
   function cancelUpload() {
     setUploadOpen(false);
   }
 
-  async function handleUpload(e) {
+  async function handleUpload(files) {
     if (readOnly) return;
-    const file = e.target.files?.[0];
+    const file = files?.[0];
     if (!file) return;
     const notificationId = 'analitica-upload';
+    const fechaString = fecha ? dayjs(fecha).format('YYYY-MM-DD') : '';
     setUploading(true);
     notifications.show({
       id: notificationId,
@@ -157,7 +194,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
       withCloseButton: false,
     });
     try {
-      const data = await uploadAnalitica(file, jugadorId, fecha);
+      const data = await uploadAnalitica(file, jugadorId, fechaString);
       setAnaliticas((prev) => [data.analitica, ...prev]);
       setCurrentId(String(data.analitica.id));
       setUploadOpen(false);
@@ -182,7 +219,6 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
       });
     } finally {
       setUploading(false);
-      if (fileRef.current) fileRef.current.value = '';
     }
   }
 
@@ -235,6 +271,21 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
 
             {!readOnly && (
               <Group gap="xs">
+                {selected && (
+                  <Tooltip label={selected.visible_para_jugador ? 'Ocultar al jugador' : 'Hacer visible al jugador'} withArrow position="top">
+                    <Button
+                      size="xs"
+                      variant={selected.visible_para_jugador ? 'light' : 'default'}
+                      color={selected.visible_para_jugador ? 'green' : 'gray'}
+                      radius="xl"
+                      leftSection={selected.visible_para_jugador ? <IconEye size={14} /> : <IconEyeOff size={14} />}
+                      onClick={handleToggleVisibility}
+                      loading={toggling}
+                    >
+                      {selected.visible_para_jugador ? 'Visible' : 'Oculto'}
+                    </Button>
+                  </Tooltip>
+                )}
                 <Button
                   size="xs"
                   variant="light"
@@ -289,18 +340,55 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
         overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
       >
         <Stack gap="md">
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-            <TextInput
-              label="Fecha extracción"
-              type="date"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-            />
-            <Button mt={{ base: 0, sm: 25 }} radius="xl" leftSection={<IconUpload size={16} />} onClick={() => fileRef.current?.click()} loading={uploading}>
-              Subir PDF
-            </Button>
-            <input ref={fileRef} type="file" accept=".pdf" onChange={handleUpload} style={{ display: 'none' }} />
-          </SimpleGrid>
+          <DatePickerInput
+            label="Fecha extracción"
+            placeholder="Selecciona la fecha del análisis"
+            value={fecha}
+            onChange={setFecha}
+            valueFormat="DD/MM/YYYY"
+            clearable
+            maxDate={new Date()}
+          />
+          <Dropzone
+            onDrop={handleUpload}
+            accept={['application/pdf']}
+            maxSize={10 * 1024 ** 2}
+            loading={uploading}
+            radius="md"
+            activateOnClick={true}
+            style={{
+              border: '2px dashed var(--mantine-color-gray-4)',
+              backgroundColor: 'var(--mantine-color-gray-0)',
+              padding: '40px',
+              textAlign: 'center',
+              cursor: 'pointer',
+              transition: 'border-color 150ms ease, background-color 150ms ease',
+            }}
+          >
+            <div style={{ pointerEvents: 'none' }}>
+              <Group justify="center">
+                <Dropzone.Accept>
+                  <IconDownload size={50} color={theme.colors.blue[6]} stroke={1.5} />
+                </Dropzone.Accept>
+                <Dropzone.Reject>
+                  <IconX size={50} color={theme.colors.red[6]} stroke={1.5} />
+                </Dropzone.Reject>
+                <Dropzone.Idle>
+                  <IconCloudUpload size={50} stroke={1.5} color="var(--mantine-color-dimmed)" />
+                </Dropzone.Idle>
+              </Group>
+
+              <Text ta="center" fw={700} fz="lg" mt="xl">
+                <Dropzone.Accept>¡Suelta el archivo aquí!</Dropzone.Accept>
+                <Dropzone.Reject>Solo PDF</Dropzone.Reject>
+                <Dropzone.Idle>Subir PDF de Analítica</Dropzone.Idle>
+              </Text>
+
+              <Text ta="center" size="sm" c="dimmed" mt={7}>
+                Arrastra y suelta el archivo o haz clic para seleccionarlo.
+              </Text>
+            </div>
+          </Dropzone>
         </Stack>
       </Modal>
 

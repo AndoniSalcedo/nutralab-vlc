@@ -82,7 +82,7 @@ function dateInputToIso(value) {
   return `${year}-${month}-${day}`;
 }
 
-function number(value, digits = 1) {
+function number(value, digits = 2) {
   return formatMetricNumber(value, digits);
 }
 
@@ -243,6 +243,7 @@ function displayRawValue(value) {
   if (value === true) return 'Sí';
   if (value === false) return 'No';
   if (value instanceof Date) return formatDate(value.toISOString().split('T')[0]);
+  if (typeof value === 'number') return String(formatMetricNumber(value, 2) ?? value);
   if (typeof value === 'object' && value !== null) return JSON.stringify(value);
   return String(value);
 }

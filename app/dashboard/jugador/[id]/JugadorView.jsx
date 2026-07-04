@@ -41,8 +41,13 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
       menuQuery = menuQuery.eq('id', -1);
     }
 
+    let analiticasQuery = supabase.from('analiticas').select('*').eq('jugador_id', id).order('fecha_extraccion', { ascending: false });
+    if (isPlayer) {
+      analiticasQuery = analiticasQuery.eq('visible_para_jugador', true);
+    }
+
     const [resAnaliticas, resEvoluciones, resMenus, resHidratacion] = await Promise.all([
-      supabase.from('analiticas').select('*').eq('jugador_id', id).order('fecha_extraccion', { ascending: false }),
+      analiticasQuery,
       supabase.from('evoluciones').select('*').eq('jugador_id', id).order('fecha', { ascending: true }),
       menuQuery,
       supabase.from('registros_hidratacion').select('*').eq('jugador_id', id).order('fecha', { ascending: true }),

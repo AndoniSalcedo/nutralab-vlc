@@ -15,3 +15,14 @@ export async function deleteAnalitica(id) {
   if (!res.ok) throw new Error(data.error || 'Error al borrar analítica');
   return data;
 }
+
+export async function toggleAnaliticaVisibility(id, visible_para_jugador) {
+  const res = await fetch('/api/upload-analitica', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, visible_para_jugador }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al actualizar visibilidad');
+  return data;
+}

@@ -127,3 +127,40 @@ export async function DELETE(req) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+
+export async function PATCH(req) {
+  try {
+    const { id, visible_para_jugador } = await req.json();
+    if (!id || typeof visible_para_jugador !== 'boolean') {
+      return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
+    }
+
+    const supabase = getSupabaseAdmin();
+    const user = await getUser();
+    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+
+    const { data: analitica, error: fetchError } = await supabase
+      .from('analiticas')
+      .select('id,jugador_id')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (fetchError) throw fetchError;
+    if (!analitica) return NextResponse.json({ error: 'Analítica no encontrada' }, { status: 404 });
+
+    const ownedPlayer = await getOwnedPlayer(supabase, user, analitica.jugador_id);
+    if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+
+    const { error, data } = await supabase
+      .from('analiticas')
+      .update({ visible_para_jugador })
+      .eq('id', id)
+      .select()
+      .single();
+      
+    if (error) throw error;
+    return NextResponse.json({ ok: true, analitica: data });
+  } catch (e) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}

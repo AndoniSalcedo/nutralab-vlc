@@ -9,13 +9,12 @@ import HidratacionSubtab from './metricas/HidratacionSubtab';
 import ProtocolosSubtab from './metricas/ProtocolosSubtab';
 
 export default function MetricasTab({ jugador, analiticas, evoluciones, registrosHidratacion = [], activeSubtab, onSubtabChange, readOnly = false }) {
-  const tabsData = readOnly ? [
+  const analiticasVisibles = readOnly ? (analiticas || []).filter(a => a.visible_para_jugador) : (analiticas || []);
+  const showAnaliticas = !readOnly || analiticasVisibles.length > 0;
+
+  const tabsData = [
     { value: 'mediciones', label: tabLabel(IconChartLine, 'Mediciones', 'Med.') },
-    { value: 'hidratacion', label: tabLabel(IconDroplet, 'Hidratación', 'Hidra.') },
-    { value: 'protocolos', label: tabLabel(IconClipboardList, 'Protocolos', 'Prot.') },
-  ] : [
-    { value: 'mediciones', label: tabLabel(IconChartLine, 'Mediciones', 'Med.') },
-    { value: 'analiticas', label: tabLabel(IconReportAnalytics, 'Analíticas', 'Anal.') },
+    ...(showAnaliticas ? [{ value: 'analiticas', label: tabLabel(IconReportAnalytics, 'Analíticas', 'Anal.') }] : []),
     { value: 'hidratacion', label: tabLabel(IconDroplet, 'Hidratación', 'Hidra.') },
     { value: 'protocolos', label: tabLabel(IconClipboardList, 'Protocolos', 'Prot.') },
   ];
@@ -57,8 +56,8 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, registro
         {activeSubtab === 'mediciones' && (
           <MedicionesSubtab jugador={jugador} evoluciones={evoluciones} readOnly={readOnly} />
         )}
-        {activeSubtab === 'analiticas' && !readOnly && (
-          <AnaliticasSubtab jugador={jugador} analiticas={analiticas} readOnly={readOnly} />
+        {activeSubtab === 'analiticas' && showAnaliticas && (
+          <AnaliticasSubtab jugador={jugador} analiticas={analiticasVisibles} readOnly={readOnly} />
         )}
         {activeSubtab === 'hidratacion' && (
           <HidratacionSubtab jugador={jugador} registrosHidratacion={registrosHidratacion} readOnly={readOnly} />

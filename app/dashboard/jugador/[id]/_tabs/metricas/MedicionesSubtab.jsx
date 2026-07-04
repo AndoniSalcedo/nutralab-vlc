@@ -43,6 +43,7 @@ import {
   hasMetricValue,
   metricValue,
   getSeason,
+  formatMetricNumber,
 } from '@/lib/measurement-metrics';
 
 const METRICAS = TREND_MEASUREMENT_METRICS;
@@ -114,6 +115,7 @@ function displayRawValue(value) {
   if (value === true) return 'Sí';
   if (value === false) return 'No';
   if (value instanceof Date) return fechaLabel(value.toISOString().split('T')[0]);
+  if (typeof value === 'number') return String(formatMetricNumber(value, 2) ?? value);
   if (typeof value === 'object' && value !== null) return JSON.stringify(value);
   return String(value);
 }
@@ -220,7 +222,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
       ? (goodDown ? 'red' : goodUp ? 'green' : 'blue')
       : (goodDown ? 'green' : goodUp ? 'red' : 'blue');
     return {
-      val: d > 0 ? `+${d.toFixed(1)}` : d.toFixed(1),
+      val: d > 0 ? `+${d.toFixed(2)}` : d.toFixed(2),
       color,
     };
   }
@@ -273,7 +275,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
 
       const remaining = evoluciones.filter((e) => String(e.id) !== String(selected.id));
       setEvoluciones(remaining);
-      
+
       const remainingInSeason = selectedSeason === 'Todas'
         ? remaining
         : remaining.filter(e => getSeason(e.fecha) === selectedSeason);
@@ -350,7 +352,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
             <Select
               placeholder="Temporada"
               leftSection={<IconCalendarStats size={16} />}
-              data={[{ value: 'Todas', label: 'Todas las temporadas' }, ...seasons.map(s => ({ value: s, label: formatSeasonOption(s) }))] }
+              data={[{ value: 'Todas', label: 'Todas las temporadas' }, ...seasons.map(s => ({ value: s, label: formatSeasonOption(s) }))]}
               value={selectedSeason}
               onChange={handleSeasonChange}
               variant="filled"
@@ -456,7 +458,11 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
             <SimpleGrid cols={{ base: 1, md: 1, lg: 2 }} spacing="lg" mb={{ base: 'md', sm: 'xl' }}>
               {METRICAS.map((m) => {
                 const metricData = sortedAsc
-                  .map((item) => ({ ...item, [m.key]: metricValue(item, m) }))
+                  .map((item) => {
+                    const rawVal = metricValue(item, m);
+                    const numVal = formatMetricNumber(rawVal);
+                    return { ...item, [m.key]: numVal !== null ? numVal : rawVal };
+                  })
                   .filter((d) => hasMetricValue(d[m.key]));
                 const d = diff(m);
                 const unit = m.unit || '';
