@@ -69,7 +69,9 @@ export function CampoEditable({ label, campo, valor, jugadorId, tipo = 'textarea
               )
             ) : (
               <Text size="sm" c={val ? 'dark' : 'dimmed'}>
-                {val || 'Sin especificar'}
+                {tipo === 'select' && val && opciones
+                  ? (opciones.find((o) => (o.value || o) === val)?.label || val)
+                  : (val || 'Sin especificar')}
               </Text>
             )}
           </Box>

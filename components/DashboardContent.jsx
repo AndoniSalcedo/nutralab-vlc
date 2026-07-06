@@ -11,7 +11,7 @@ import DashboardActions from '@/components/DashboardActions';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import PlayerForm from '@/components/PlayerForm';
-import { cunninghamPlan, resolveNutritionDayType, NUTRITION_DAY_TYPES, PLAN_CONTEXTS } from '@/lib/calculations';
+import { cunninghamPlan, calculateByObjective, resolveNutritionDayType, NUTRITION_DAY_TYPES, PLAN_CONTEXTS } from '@/lib/calculations';
 import { useRouter } from 'next/navigation';
 
 const PAGE_SIZE = 8;
@@ -284,7 +284,18 @@ function getPlayerPlan(player) {
   const weightKg = Number(player.peso_kg || 0);
   if (!weightKg) return { kcal: null, calculated: false };
 
+  const objectiveKey = player.objetivo || null;
   const dayType = resolveNutritionDayType(player.factor_actividad || 1.55);
+
+  // Use objective-based calculation if objective is valid
+  if (objectiveKey) {
+    const result = calculateByObjective({ weightKg, objectiveKey, dayTypeKey: dayType.key });
+    if (result) {
+      return { kcal: result.kcal, calculated: true };
+    }
+  }
+
+  // Fallback to Cunningham
   const calc = cunninghamPlan({
     weightKg,
     bodyFatPct: player.porcentaje_grasa ? Number(player.porcentaje_grasa) : null,

@@ -17,7 +17,7 @@ import { notifications } from '@mantine/notifications';
 import { IconUser, IconActivity, IconCheck } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { deletePlayer, savePlayer } from '@/services/player';
-import { NUTRITION_DAY_TYPES, resolveNutritionDayType } from '@/lib/calculations';
+import { NUTRITION_DAY_TYPES, resolveNutritionDayType, PLAYER_OBJECTIVES } from '@/lib/calculations';
 
 export default function PlayerForm({ initial, team }) {
   const router = useRouter();
@@ -143,12 +143,13 @@ export default function PlayerForm({ initial, team }) {
                 value={contexto}
                 onChange={(e) => setContexto(e.target.value)}
               />
-              <Textarea 
+              <Select
                 label="Objetivo Corporal"
-                placeholder="Ej. Bajar grasa manteniendo músculo..."
-                rows={3}
-                value={objetivo}
-                onChange={(e) => setObjetivo(e.target.value)}
+                placeholder="Selecciona un objetivo..."
+                data={PLAYER_OBJECTIVES}
+                value={objetivo || null}
+                onChange={(value) => setObjetivo(value || '')}
+                clearable
               />
             </SimpleGrid>
 

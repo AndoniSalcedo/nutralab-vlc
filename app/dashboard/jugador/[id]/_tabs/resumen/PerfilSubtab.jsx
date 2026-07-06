@@ -16,7 +16,7 @@ import {
 import { useMediaQuery } from '@mantine/hooks';
 
 import { IconClipboardList, IconTargetArrow, IconUser, IconInfoCircle } from '@tabler/icons-react';
-import { cunninghamPlan, NUTRITION_DAY_TYPES, resolveNutritionDayType } from '@/lib/calculations';
+import { cunninghamPlan, calculateByObjective, NUTRITION_DAY_TYPES, resolveNutritionDayType, PLAYER_OBJECTIVES, getObjectiveLabel } from '@/lib/calculations';
 import { CampoEditable, ComidasEditable } from '../editable';
 import { latestMetricValue } from '@/lib/player-metrics';
 
@@ -54,11 +54,26 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
 
   const [activeDayType, setActiveDayType] = useState(defaultDiaType);
 
-  // Pre-calculate plans for all day types using Cunningham formula
+  const playerObjective = jugador?.objetivo || null;
+
+  // Pre-calculate plans for all day types
   const plans = useMemo(() => {
     const out = {};
     DAY_TYPES.forEach(dt => {
-      out[dt.value] = weightKg ? cunninghamPlan({
+      if (!weightKg) {
+        out[dt.value] = null;
+        return;
+      }
+      // Use objective-based calculation if objective is valid
+      if (playerObjective) {
+        const result = calculateByObjective({ weightKg, objectiveKey: playerObjective, dayTypeKey: dt.value });
+        if (result) {
+          out[dt.value] = result;
+          return;
+        }
+      }
+      // Fallback to Cunningham
+      out[dt.value] = cunninghamPlan({
         weightKg,
         bodyFatPct: grasaActual ? Number(grasaActual) : null,
         leanMassKg: masaMagraActual ? Number(masaMagraActual) : null,
@@ -66,10 +81,10 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
         proteinGkg: dt.proteinGkg,
         carbsGkg: dt.carbsGkg,
         fatGkg: dt.fatGkg,
-      }) : null;
+      });
     });
     return out;
-  }, [weightKg, grasaActual, masaMagraActual]);
+  }, [weightKg, grasaActual, masaMagraActual, playerObjective]);
 
   const currentPlan = plans[activeDayType];
   const isDefaultFactorType = activeDayType === defaultDiaType;
@@ -129,16 +144,28 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
                 </Box>
               </Group>
 
-              {hasManualOverride && (
-                <Badge color="yellow" variant="light" size="md" leftSection={<IconInfoCircle size={14} />}>
-                  Objetivo manual activo para este día
-                </Badge>
-              )}
+              <Group gap="xs">
+                {playerObjective && (
+                  <Badge color="green" variant="light" size="md" leftSection={<IconTargetArrow size={14} />}>
+                    {getObjectiveLabel(playerObjective)}
+                  </Badge>
+                )}
+                {!playerObjective && (
+                  <Badge color="gray" variant="light" size="md">
+                    Sin objetivo · Fórmula Cunningham
+                  </Badge>
+                )}
+                {hasManualOverride && (
+                  <Badge color="yellow" variant="light" size="md" leftSection={<IconInfoCircle size={14} />}>
+                    Objetivo manual activo para este día
+                  </Badge>
+                )}
+              </Group>
             </Group>
 
             {/* Day Type selector Segmented Control */}
             <Box mb="md" bg="gray.0" p="xs" style={{ borderRadius: '12px' }}>
-              <Text size="xs" fw={700} c="dimmed" mb="xs" tt="uppercase">Tipo de Día (Factor de actividad)</Text>
+              <Text size="xs" fw={700} c="dimmed" mb="xs" tt="uppercase">Tipo de Día</Text>
               <SegmentedControl
                 value={activeDayType}
                 onChange={setActiveDayType}
@@ -148,16 +175,11 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
                   if (dt.label === 'Entrenamiento') shortLabel = 'Entreno';
                   if (dt.label === 'Recuperación') shortLabel = 'Recup.';
 
-                  const isActive = activeDayType === dt.value;
-
                   return {
                     value: dt.value,
                     label: isMobile ? (
-                      <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
-                        <Text size="xs" fw={700} style={{ fontSize: '11px' }}>{shortLabel}</Text>
-                        <Text size="xxs" c={isActive ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>({dt.factor})</Text>
-                      </Stack>
-                    ) : `${dt.label} (${dt.factor})`
+                      <Text size="xs" fw={700} style={{ fontSize: '11px' }}>{shortLabel}</Text>
+                    ) : dt.label
                   };
                 })}
                 fullWidth
@@ -174,22 +196,22 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
               <StatCard
                 label="Kcal objetivo"
                 value={kcal ? `${kcal} kcal` : '-'}
-                subtext={hasManualOverride ? 'Fijado manualmente' : 'Fórmula Cunningham'}
+                subtext={hasManualOverride ? 'Fijado manualmente' : playerObjective ? getObjectiveLabel(playerObjective) : 'Fórmula Cunningham'}
               />
               <StatCard
                 label="Proteína"
                 value={protein ? `${protein}g` : '-'}
-                subtext={hasManualOverride ? 'Fijado manualmente' : 'Fórmula Cunningham'}
+                subtext={hasManualOverride ? 'Fijado manualmente' : playerObjective ? getObjectiveLabel(playerObjective) : 'Fórmula Cunningham'}
               />
               <StatCard
                 label="Carbohidratos (CHO)"
                 value={cho ? `${cho}g` : '-'}
-                subtext={hasManualOverride ? 'Fijado manualmente' : 'Fórmula Cunningham'}
+                subtext={hasManualOverride ? 'Fijado manualmente' : playerObjective ? getObjectiveLabel(playerObjective) : 'Fórmula Cunningham'}
               />
               <StatCard
                 label="Grasa"
                 value={fat ? `${fat}g` : '-'}
-                subtext={hasManualOverride ? 'Fijado manualmente' : 'Fórmula Cunningham'}
+                subtext={hasManualOverride ? 'Fijado manualmente' : playerObjective ? getObjectiveLabel(playerObjective) : 'Fórmula Cunningham'}
               />
             </SimpleGrid>
           </Paper>
@@ -211,7 +233,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
 
               <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
                 <ComidasEditable label="Comidas diarias" numComidas={jugador.num_comidas} postentreno={jugador.postentreno} jugadorId={jugador.id} readOnly={readOnly} />
-                <CampoEditable label="Objetivo nutricional" campo="objetivo" valor={jugador.objetivo || ''} jugadorId={jugador.id} tipo="text" readOnly={readOnly} />
+                <CampoEditable label="Objetivo nutricional" campo="objetivo" valor={jugador.objetivo || ''} jugadorId={jugador.id} tipo="select" opciones={PLAYER_OBJECTIVES} readOnly={readOnly} />
                 <CampoEditable label="Gustos y preferencias" campo="gustos_preferencias" valor={jugador.gustos_preferencias || ''} jugadorId={jugador.id} readOnly={readOnly} />
                 <CampoEditable label="Aversiones" campo="aversiones" valor={jugador.aversiones || ''} jugadorId={jugador.id} readOnly={readOnly} />
                 <CampoEditable label="Intolerancias" campo="intolerancias" valor={jugador.intolerancias || ''} jugadorId={jugador.id} readOnly={readOnly} />

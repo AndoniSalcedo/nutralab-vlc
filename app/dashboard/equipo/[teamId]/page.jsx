@@ -26,7 +26,7 @@ export default async function TeamDashboard({ params }) {
   try {
     const resJugadores = await supabase
       .from('jugadores')
-      .select('id,nombre,apellidos,posicion,kcal_objetivo,factor_actividad,auth_user_id,auth_email,credentials_created_at,equipo_id')
+      .select('id,nombre,apellidos,posicion,kcal_objetivo,factor_actividad,objetivo,auth_user_id,auth_email,credentials_created_at,equipo_id')
       .eq('equipo_id', team.id)
       .order('nombre');
 

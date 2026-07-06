@@ -33,7 +33,7 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import { buildBasePlanData, PLAN_DAY_TYPES, sanitizePlanData } from '@/lib/nutrition-plan-card';
-import { cunninghamPlan, getDayTypeColor, getDayTypeLabel, PLAN_CONTEXTS } from '@/lib/calculations';
+import { cunninghamPlan, calculateByObjective, getDayTypeColor, getDayTypeLabel, getObjectiveLabel, PLAN_CONTEXTS } from '@/lib/calculations';
 import { getUserMeals } from '@/lib/nutrition-day-types';
 import IntercambiosModal from './IntercambiosModal';
 import NothingFound from '@/components/NothingFound/NothingFound';
@@ -576,7 +576,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
   const perfilResumen = [
     getComidasResumen(),
-    jugador.objetivo || null,
+    jugador.objetivo ? getObjectiveLabel(jugador.objetivo) : null,
     jugador.alergias ? `Alergias: ${jugador.alergias.slice(0, 30)}` : null,
     jugador.intolerancias ? `Intol: ${jugador.intolerancias.slice(0, 30)}` : null,
     jugador.gustos_preferencias ? `Gustos: ${jugador.gustos_preferencias.slice(0, 30)}` : null,
@@ -805,23 +805,42 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
                                   const dayTypeConfig = PLAN_DAY_TYPES.find((t) => t.key === value) || PLAN_DAY_TYPES[0];
                                   const weight = Number(draft.metricas?.peso || jugador?.peso_kg || 0);
+                                  const objectiveKey = jugador?.objetivo || null;
 
                                   if (weight) {
-                                    const cPlan = cunninghamPlan({
-                                      weightKg: weight,
-                                      bodyFatPct: draft.metricas?.grasa,
-                                      bodyFat: draft.metricas?.grasa,
-                                      leanMassKg: draft.metricas?.masaMagra,
-                                      activityFactor: dayTypeConfig.factor,
-                                      proteinGkg: dayTypeConfig.proteinGkg,
-                                      carbsGkg: dayTypeConfig.carbsGkg,
-                                      fatGkg: dayTypeConfig.fatGkg,
-                                    });
+                                    let kcal, protein, cho, fat;
 
-                                    draft.dias[dayKey].kcal = Math.round(cPlan.kcal);
-                                    draft.dias[dayKey].proteina = Math.round(cPlan.protein);
-                                    draft.dias[dayKey].hidratos = Math.round(cPlan.cho);
-                                    draft.dias[dayKey].grasa = Math.round(cPlan.fat);
+                                    if (objectiveKey) {
+                                      const result = calculateByObjective({ weightKg: weight, objectiveKey, dayTypeKey: value });
+                                      if (result) {
+                                        kcal = result.kcal;
+                                        protein = result.protein;
+                                        cho = result.cho;
+                                        fat = result.fat;
+                                      }
+                                    }
+
+                                    if (kcal === undefined) {
+                                      const cPlan = cunninghamPlan({
+                                        weightKg: weight,
+                                        bodyFatPct: draft.metricas?.grasa,
+                                        bodyFat: draft.metricas?.grasa,
+                                        leanMassKg: draft.metricas?.masaMagra,
+                                        activityFactor: dayTypeConfig.factor,
+                                        proteinGkg: dayTypeConfig.proteinGkg,
+                                        carbsGkg: dayTypeConfig.carbsGkg,
+                                        fatGkg: dayTypeConfig.fatGkg,
+                                      });
+                                      kcal = cPlan.kcal;
+                                      protein = cPlan.protein;
+                                      cho = cPlan.cho;
+                                      fat = cPlan.fat;
+                                    }
+
+                                    draft.dias[dayKey].kcal = Math.round(kcal);
+                                    draft.dias[dayKey].proteina = Math.round(protein);
+                                    draft.dias[dayKey].hidratos = Math.round(cho);
+                                    draft.dias[dayKey].grasa = Math.round(fat);
                                   }
 
                                   const existingMeals = draft.dias[dayKey].ingestas || [];
