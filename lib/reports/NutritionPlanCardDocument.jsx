@@ -239,7 +239,7 @@ export function PlanCardPage({ plan }) {
         </View>
         <View style={styles.metricBox}>
           <Text style={styles.metricLabel}>Masa magra</Text>
-          <Text style={[styles.metricValue, { color: COLORS.green }]}>{formatGrasa(plan?.metricas?.masaMagra)}</Text>
+          <Text style={[styles.metricValue, { color: COLORS.green }]}>{formatWeight(plan?.metricas?.masaMagra)}</Text>
         </View>
       </View>
 

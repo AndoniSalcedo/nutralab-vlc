@@ -430,7 +430,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
             <TextInput label="Altura (cm)" type="number" value={form.altura_cm} onChange={(e) => updateFormField('altura_cm', e.target.value)} />
             <TextInput label="Peso (kg)" type="number" value={form.peso_kg} onChange={(e) => updateFormField('peso_kg', e.target.value)} />
             <TextInput label="% Grasa" type="number" value={form.porcentaje_grasa} onChange={(e) => updateFormField('porcentaje_grasa', e.target.value)} />
-            <TextInput label="Masa magra (%)" type="number" value={form.masa_magra_kg} onChange={(e) => updateFormField('masa_magra_kg', e.target.value)} />
+            <TextInput label="Masa magra (kg)" type="number" value={form.masa_magra_kg} onChange={(e) => updateFormField('masa_magra_kg', e.target.value)} />
             <TextInput label="Σ6 pliegues (mm)" type="number" value={form.suma_6_pliegues} onChange={(e) => updateFormField('suma_6_pliegues', e.target.value)} />
           </SimpleGrid>
 
