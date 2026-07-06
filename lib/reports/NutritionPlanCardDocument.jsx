@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
-import { sanitizePlanData, PLAN_DAY_TYPES } from '@/lib/nutrition-plan-card';
+import { sanitizePlanData } from '@/lib/nutrition-plan-card';
+import { getDayTypeColor, getDayTypeLabel } from '@/lib/calculations';
 
 const COLORS = {
   top: '#10142f',
@@ -16,22 +17,6 @@ const COLORS = {
   blue: '#3b82f6',
   red: '#ef4444',
   line: '#2d335a',
-};
-
-const DAY_TYPE_COLORS = {
-  descanso: COLORS.blue,
-  recuperacion: COLORS.teal,
-  entreno: COLORS.green,
-  doble: COLORS.orange,
-  partido: COLORS.red,
-};
-
-const DAY_TYPE_LABELS = {
-  descanso: 'Descanso',
-  recuperacion: 'Recuperación',
-  entreno: 'Entrenamiento',
-  doble: 'Doble sesión',
-  partido: 'Partido',
 };
 
 const styles = StyleSheet.create({
@@ -262,8 +247,8 @@ export function PlanCardPage({ plan }) {
         <View style={styles.column}>
           {leftDays.map((dayKey) => {
             const dayData = plan.dias[dayKey];
-            const color = DAY_TYPE_COLORS[dayData.tipoDia] || COLORS.green;
-            const label = DAY_TYPE_LABELS[dayData.tipoDia] || dayData.tipoDia;
+            const color = COLORS[getDayTypeColor(dayData.tipoDia)] || COLORS.green;
+            const label = getDayTypeLabel(dayData.tipoDia);
             return (
               <View key={dayKey} style={styles.dayBox}>
                 <View style={styles.dayHeader}>
@@ -289,8 +274,8 @@ export function PlanCardPage({ plan }) {
         <View style={styles.column}>
           {rightDays.map((dayKey) => {
             const dayData = plan.dias[dayKey];
-            const color = DAY_TYPE_COLORS[dayData.tipoDia] || COLORS.green;
-            const label = DAY_TYPE_LABELS[dayData.tipoDia] || dayData.tipoDia;
+            const color = COLORS[getDayTypeColor(dayData.tipoDia)] || COLORS.green;
+            const label = getDayTypeLabel(dayData.tipoDia);
             return (
               <View key={dayKey} style={styles.dayBox}>
                 <View style={styles.dayHeader}>

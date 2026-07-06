@@ -11,8 +11,7 @@ import {
   ThemeIcon,
   Title,
   SegmentedControl,
-  Badge,
-  ScrollArea
+  Badge
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 

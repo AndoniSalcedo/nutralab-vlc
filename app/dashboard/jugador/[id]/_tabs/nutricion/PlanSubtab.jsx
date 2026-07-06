@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { marked } from 'marked';
 import {
-  ActionIcon,
   Badge,
   Box,
   Button,
@@ -18,7 +17,6 @@ import {
   Textarea,
   TextInput,
   Title,
-  Tooltip,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -34,21 +32,13 @@ import {
   IconSparkles,
   IconTrash,
 } from '@tabler/icons-react';
-import NothingFound from '@/components/NothingFound/NothingFound';
 import { buildBasePlanData, PLAN_DAY_TYPES, sanitizePlanData } from '@/lib/nutrition-plan-card';
-import { cunninghamPlan } from '@/lib/calculations';
+import { cunninghamPlan, getDayTypeColor, getDayTypeLabel, PLAN_CONTEXTS } from '@/lib/calculations';
 import { getUserMeals } from '@/lib/nutrition-day-types';
 import IntercambiosModal from './IntercambiosModal';
+import NothingFound from '@/components/NothingFound/NothingFound';
 
-const CONTEXTOS = [
-  { value: 'semana_normal', label: 'Semana normal de entrenamiento' },
-  { value: 'semana_partido', label: 'Semana con partido oficial' },
-  { value: 'dia_partido', label: 'Día de partido' },
-  { value: 'viaje', label: 'Viaje / desplazamiento' },
-  { value: 'lesion', label: 'Lesión / inactividad' },
-  { value: 'vacaciones', label: 'Vacaciones / fuera de temporada' },
-  { value: 'pretemporada', label: 'Pretemporada (alta carga)' },
-];
+
 
 function planLabel(plan) {
   const date = plan.updated_at || plan.created_at;
@@ -103,34 +93,18 @@ function MetricCard({ label, value, color = 'orange' }) {
   );
 }
 
-function PlanFicha({ data, jugador }) {
+function PlanFicha({ data }) {
   const plan = sanitizePlanData(data);
   if (!plan) return null;
 
   const leftDays = ['lunes', 'martes', 'miercoles', 'jueves'];
   const rightDays = ['viernes', 'sabado', 'domingo'];
 
-  const dayTypeLabels = {
-    descanso: 'Descanso',
-    recuperacion: 'Recuperación',
-    entreno: 'Entrenamiento',
-    doble: 'Doble sesión',
-    partido: 'Partido',
-  };
-
-  const dayTypeColors = {
-    descanso: 'blue',
-    recuperacion: 'teal',
-    entreno: 'green',
-    doble: 'orange',
-    partido: 'red',
-  };
-
   const renderDayBox = (dayKey) => {
     const dayData = plan.dias[dayKey];
     if (!dayData) return null;
-    const color = dayTypeColors[dayData.tipoDia] || 'green';
-    const label = dayTypeLabels[dayData.tipoDia] || dayData.tipoDia;
+    const color = getDayTypeColor(dayData.tipoDia);
+    const label = getDayTypeLabel(dayData.tipoDia);
     return (
       <Paper key={dayKey} p="md" radius="md" style={{ backgroundColor: '#151932', border: '1px solid #2d335a' }} mb="sm">
         <Group justify="space-between" align="center" mb="xs">
@@ -768,7 +742,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                 <Select
                   label="Contexto actual"
                   placeholder="Selecciona el contexto"
-                  data={CONTEXTOS}
+                  data={PLAN_CONTEXTS}
                   value={contexto}
                   onChange={(value) => setContexto(value || 'semana_normal')}
                 />
@@ -786,7 +760,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                 <>
                   <Paper p="md" radius="md" withBorder bg="gray.0">
                     <Title order={4} mb="md">Métricas de la ficha</Title>
-                     <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
+                    <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
                       {[
                         ['peso', 'Peso (kg)'],
                         ['grasa', 'Grasa (%)'],

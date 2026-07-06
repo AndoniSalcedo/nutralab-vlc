@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Group, Modal, Text, Anchor } from '@mantine/core';
-import { IconPlus, IconFileSpreadsheet, IconMail, IconBottle, IconUserPlus } from '@tabler/icons-react';
+import { Button, Group, Modal, Text } from '@mantine/core';
+import { IconPlus, IconFileSpreadsheet, IconMail, IconUserPlus } from '@tabler/icons-react';
 import PlayerForm from './PlayerForm';
 import PlayerExcelImporter from './PlayerExcelImporter';
 import MessageComposer from './MessageComposer';

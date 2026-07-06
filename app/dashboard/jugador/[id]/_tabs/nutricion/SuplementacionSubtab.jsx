@@ -7,7 +7,6 @@ import {
   Badge,
   Box,
   Button,
-  Divider,
   Group,
   LoadingOverlay,
   Modal,

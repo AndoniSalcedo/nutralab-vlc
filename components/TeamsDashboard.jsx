@@ -195,13 +195,13 @@ export default function TeamsDashboard({ teams = [] }) {
     }
   }
 
-  async function deleteTeam(team) {
+  async function handleDeleteTeam(team) {
     const ok = window.confirm(`¿Eliminar ${team.nombre} (${team.temporada}) y todos sus jugadores?`);
     if (!ok) return;
 
     setSaving(true);
     try {
-      const data = await deleteTeam(team.id);
+      await deleteTeam(team.id);
       setTeamsState((current) => current.filter((item) => String(item.id) !== String(team.id)));
       notifications.show({ color: 'green', title: 'Equipo eliminado', message: team.nombre });
       router.refresh();
@@ -293,7 +293,7 @@ export default function TeamsDashboard({ teams = [] }) {
                         Copiar a temporada
                       </Menu.Item>
                       <Menu.Divider />
-                      <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => deleteTeam(team)}>
+                      <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeleteTeam(team)}>
                         Eliminar
                       </Menu.Item>
                     </Menu.Dropdown>

@@ -11,7 +11,7 @@ import DashboardActions from '@/components/DashboardActions';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import PlayerForm from '@/components/PlayerForm';
-import { cunninghamPlan, resolveNutritionDayType } from '@/lib/calculations';
+import { cunninghamPlan, resolveNutritionDayType, NUTRITION_DAY_TYPES, PLAN_CONTEXTS } from '@/lib/calculations';
 import { useRouter } from 'next/navigation';
 
 const PAGE_SIZE = 8;
@@ -195,23 +195,18 @@ const DAYS_OF_WEEK = [
   { key: 'domingo', label: 'Domingo' },
 ];
 
-const DAY_TYPE_OPTIONS = [
-  { value: 'descanso', label: '💤 Descanso' },
-  { value: 'recuperacion', label: '🟢 Recuperación' },
-  { value: 'entreno', label: '⚡ Entrenamiento' },
-  { value: 'doble', label: '🔥 Doble sesión' },
-  { value: 'partido', label: '⚽ Partido' },
-];
+const DAY_TYPE_EMOJIS = {
+  descanso: '💤',
+  recuperacion: '🟢',
+  entreno: '⚡',
+  doble: '🔥',
+  partido: '⚽',
+};
 
-const CONTEXTOS = [
-  { value: 'semana_normal', label: 'Semana normal de entrenamiento' },
-  { value: 'semana_partido', label: 'Semana con partido oficial' },
-  { value: 'dia_partido', label: 'Día de partido' },
-  { value: 'viaje', label: 'Viaje / desplazamiento' },
-  { value: 'lesion', label: 'Lesión / inactividad' },
-  { value: 'vacaciones', label: 'Vacaciones / fuera de temporada' },
-  { value: 'pretemporada', label: 'Pretemporada (alta carga)' },
-];
+const DAY_TYPE_OPTIONS = NUTRITION_DAY_TYPES.map((d) => ({
+  value: d.key,
+  label: `${DAY_TYPE_EMOJIS[d.key] || ''} ${d.label}`.trim(),
+}));
 
 function getWeekRangeLabel(mondayInput) {
   const monday = mondayInput instanceof Date ? mondayInput : new Date(`${mondayInput}T00:00:00`);
@@ -366,7 +361,7 @@ export default function DashboardContent({ players = [], team }) {
     )));
   }
 
-  async function deletePlayer(player) {
+  async function handleDeletePlayer(player) {
     const ok = window.confirm(`¿Eliminar a ${player.nombre} ${player.apellidos || ''}?`);
     if (!ok) return;
 
@@ -739,7 +734,7 @@ export default function DashboardContent({ players = [], team }) {
                                 onSaved={(credentials) => updateCredentials(player.id, credentials)}
                               />
                               <Menu.Divider />
-                              <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => deletePlayer(player)}>
+                              <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeletePlayer(player)}>
                                 Eliminar
                               </Menu.Item>
                             </Menu.Dropdown>
@@ -846,7 +841,7 @@ export default function DashboardContent({ players = [], team }) {
                   <Select
                     label="Contexto general"
                     placeholder="Selecciona el contexto"
-                    data={CONTEXTOS}
+                    data={PLAN_CONTEXTS}
                     value={reportForm.contexto || 'semana_partido'}
                     onChange={(val) => updateReportField('contexto', val || 'semana_partido')}
                     allowDeselect={false}

@@ -11,12 +11,10 @@ import {
   Box,
   Button,
   Select,
-  Container,
   SimpleGrid,
   Title,
   Paper,
-  Skeleton,
-  Center
+  Skeleton
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { DatePickerInput } from '@mantine/dates';

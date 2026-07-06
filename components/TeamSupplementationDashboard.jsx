@@ -12,7 +12,6 @@ import {
   Modal,
   Paper,
   ScrollArea,
-  SimpleGrid,
   Stack,
   Table,
   Text,
@@ -213,7 +212,7 @@ export default function TeamSupplementationDashboard({
 
           {historyModal.historyEvents.length > 0 ? (
             <Timeline active={0} bulletSize={24} lineWidth={2} color="grape">
-              {historyModal.historyEvents.map((event, index) => {
+              {historyModal.historyEvents.map((event) => {
                 const catalog = catalogsById.get(String(event.lista_id));
                 return (
                   <Timeline.Item 

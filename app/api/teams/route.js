@@ -157,10 +157,12 @@ export async function POST(request) {
 
         if (evolutionsError) throw evolutionsError;
 
-        const evolutionPayloads = (evolutions || []).map(({ id, jugador_id, created_at, ...evolution }) => ({
-          ...evolution,
-          jugador_id: newPlayer.id,
-        }));
+        const evolutionPayloads = (evolutions || []).map((evo) => {
+          const clean = { ...evo, jugador_id: newPlayer.id };
+          delete clean.id;
+          delete clean.created_at;
+          return clean;
+        });
 
         if (evolutionPayloads.length) {
           const { error: insertEvolutionsError } = await supabase

@@ -9,7 +9,6 @@ import {
   Group, 
   Stack, 
   SimpleGrid, 
-  Paper, 
   Title, 
   Text, 
   Box,

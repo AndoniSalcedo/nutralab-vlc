@@ -1,6 +1,5 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
-import { cunninghamPlan, resolveNutritionDayType } from '@/lib/calculations';
 import { PlanCardPage } from './NutritionPlanCardDocument';
 
 const COLORS = {
@@ -217,89 +216,6 @@ function formatDate(date = new Date()) {
     month: '2-digit',
     year: 'numeric',
   }).format(date);
-}
-
-function numberOrDash(value, suffix = '') {
-  const n = Number(value);
-  if (!Number.isFinite(n) || n <= 0) return '-';
-  return `${Math.round(n).toLocaleString('es-ES')}${suffix}`;
-}
-
-function decimalOrDash(value, suffix = '') {
-  const n = Number(value);
-  if (!Number.isFinite(n) || n <= 0) return '-';
-  return `${String(Math.round(n * 10) / 10).replace('.', ',')}${suffix}`;
-}
-
-function ageFromBirthDate(value) {
-  if (!value) return null;
-  const birth = new Date(value);
-  if (Number.isNaN(birth.getTime())) return null;
-  const now = new Date();
-  let age = now.getFullYear() - birth.getFullYear();
-  const monthDiff = now.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) age -= 1;
-  return age > 0 ? age : null;
-}
-
-function playerTargets(player) {
-  const weightKg = Number(player.peso_kg || 0);
-  const dayType = resolveNutritionDayType(player.factor_actividad || 1.55);
-  const calc = weightKg
-    ? cunninghamPlan({
-        weightKg,
-        bodyFatPct: player.porcentaje_grasa ? Number(player.porcentaje_grasa) : null,
-        leanMassKg: player.masa_magra_kg ? Number(player.masa_magra_kg) : null,
-        activityFactor: dayType.factor,
-        proteinGkg: dayType.proteinGkg,
-        carbsGkg: dayType.carbsGkg,
-        fatGkg: dayType.fatGkg,
-      })
-    : null;
-
-  return {
-    kcal: player.kcal_objetivo || calc?.kcal,
-    cho: player.cho_objetivo_g || calc?.cho,
-    protein: player.proteina_objetivo_g || calc?.protein,
-    fat: player.grasa_objetivo_g || calc?.fat,
-  };
-}
-
-function buildDayType(player, targets) {
-  const preferences = player.gustos_preferencias ? ` Ajustar a preferencias: ${player.gustos_preferencias}.` : '';
-  const avoid = [player.alergias && `Alergias: ${player.alergias}`, player.intolerancias && `Intolerancias: ${player.intolerancias}`, player.aversiones && `Aversiones: ${player.aversiones}`]
-    .filter(Boolean)
-    .join(' · ');
-
-  return [
-    `Desayuno: porridge o tostadas + fruta + fuente proteica.${preferences}`,
-    `Post-entreno: whey 30 g + fruta o bebida con HC. Objetivo diario aprox.: ${numberOrDash(targets.cho, ' g')} HC.`,
-    'Comida: arroz/pasta/patata + proteina magra + verdura + AOVE + fruta.',
-    'Merienda: yogur de proteina o bocadillo sencillo + fruta + frutos secos.',
-    'Cena: pescado/huevos/carne magra + hidrato segun carga + verdura cocida.',
-    avoid ? `Evitar/ajustar: ${avoid}.` : 'Evitar novedades el dia de partido y mantener alimentos ya tolerados.',
-  ];
-}
-
-function defaultHydration(player) {
-  const peso = Number(player.peso_kg || 0);
-  if (!peso) return ['Objetivo: hidratacion individual pendiente de peso actualizado.', 'Pre: 500 ml a -60 min. Durante: 150-200 ml cada 15 min. Post: reponer 1,5 L por kg perdido.'];
-  return [
-    `Objetivo: ${Math.round(peso * 40)} ml/dia (+500-750 ml en entreno).`,
-    'Pre: 500 ml a -60 min. Durante: 150-200 ml cada 15 min.',
-    `Post: 1,5 L por kg perdido en las 4-6 h posteriores.`,
-  ];
-}
-
-function previewLines(value, fallback, limit = 4) {
-  const lines = toLines(value);
-  return (lines.length ? lines : fallback).slice(0, limit).map((line) => truncate(line, 132));
-}
-
-function truncate(value, max = 150) {
-  const text = String(value || '').replace(/\s+/g, ' ').trim();
-  if (text.length <= max) return text;
-  return `${text.slice(0, max - 1).trim()}…`;
 }
 
 function Footer({ meta }) {

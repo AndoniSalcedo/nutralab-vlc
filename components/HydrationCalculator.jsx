@@ -1,25 +1,25 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  Paper, 
-  Group, 
-  Stack, 
-  Text, 
-  Title, 
-  ThemeIcon, 
-  RingProgress, 
-  Center, 
+import {
+  Group,
+  Stack,
+  Text,
+  Title,
+  ThemeIcon,
+  RingProgress,
+  Center,
   ActionIcon,
   Button,
   SegmentedControl,
   Box,
-  Badge,
-  ScrollArea
+  Badge
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconDroplet, IconBottle, IconCup, IconCheck, IconRotate } from '@tabler/icons-react';
 import { BentoCard } from './Bento/BentoItem';
+import { calculateHydration } from '@/lib/calculations';
+
 
 export default function HydrationCalculator({ jugador }) {
   const isMobile = useMediaQuery('(max-width: 48em)');
@@ -29,14 +29,10 @@ export default function HydrationCalculator({ jugador }) {
 
   // Calcular objetivos
   const peso = Number(jugador?.peso_kg || 75);
-  const aguaBase = Math.round(peso * 40); // ml
-  const aguaEntreno = Math.round(peso * 6); // ml extra
-  const aguaPartido = Math.round(peso * 10); // ml extra
-
   const targets = {
-    descanso: aguaBase,
-    entreno: aguaBase + aguaEntreno,
-    partido: aguaBase + aguaPartido
+    descanso: calculateHydration(peso, 'descanso'),
+    entreno: calculateHydration(peso, 'entreno'),
+    partido: calculateHydration(peso, 'partido')
   };
 
   const currentTarget = targets[targetType];
@@ -44,24 +40,30 @@ export default function HydrationCalculator({ jugador }) {
   const isGoalReached = percentage >= 100;
 
   const targetOptions = [
-    { value: 'descanso', label: isMobile ? (
-      <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
-        <Text size="xs" fw={700} style={{ fontSize: '11px' }}>Descanso</Text>
-        <Text size="xxs" c={targetType === 'descanso' ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets.descanso} ml</Text>
-      </Stack>
-    ) : `Descanso · ${targets.descanso} ml` },
-    { value: 'entreno', label: isMobile ? (
-      <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
-        <Text size="xs" fw={700} style={{ fontSize: '11px' }}>Entreno</Text>
-        <Text size="xxs" c={targetType === 'entreno' ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets.entreno} ml</Text>
-      </Stack>
-    ) : `Entreno · ${targets.entreno} ml` },
-    { value: 'partido', label: isMobile ? (
-      <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
-        <Text size="xs" fw={700} style={{ fontSize: '11px' }}>Partido</Text>
-        <Text size="xxs" c={targetType === 'partido' ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets.partido} ml</Text>
-      </Stack>
-    ) : `Partido · ${targets.partido} ml` },
+    {
+      value: 'descanso', label: isMobile ? (
+        <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
+          <Text size="xs" fw={700} style={{ fontSize: '11px' }}>Descanso</Text>
+          <Text size="xxs" c={targetType === 'descanso' ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets.descanso} ml</Text>
+        </Stack>
+      ) : `Descanso · ${targets.descanso} ml`
+    },
+    {
+      value: 'entreno', label: isMobile ? (
+        <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
+          <Text size="xs" fw={700} style={{ fontSize: '11px' }}>Entreno</Text>
+          <Text size="xxs" c={targetType === 'entreno' ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets.entreno} ml</Text>
+        </Stack>
+      ) : `Entreno · ${targets.entreno} ml`
+    },
+    {
+      value: 'partido', label: isMobile ? (
+        <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
+          <Text size="xs" fw={700} style={{ fontSize: '11px' }}>Partido</Text>
+          <Text size="xxs" c={targetType === 'partido' ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets.partido} ml</Text>
+        </Stack>
+      ) : `Partido · ${targets.partido} ml`
+    },
   ];
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export default function HydrationCalculator({ jugador }) {
     const today = new Date().toISOString().split('T')[0];
     const key = `hydration_${jugador?.id}_${today}`;
     const saved = localStorage.getItem(key);
-    
+
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -115,7 +117,7 @@ export default function HydrationCalculator({ jugador }) {
   return (
     <BentoCard title="Control de Hidratación" icon={IconDroplet} color="blue">
       <Stack gap="lg" mt="sm">
-        
+
         <SegmentedControl
           value={targetType}
           onChange={handleTargetChange}
@@ -156,7 +158,7 @@ export default function HydrationCalculator({ jugador }) {
             <Text size="sm" c="dimmed" fw={500} lh={1}>
               de {(currentTarget / 1000).toFixed(2)} L objetivo
             </Text>
-            
+
             {isGoalReached && (
               <Badge color="green" variant="light" mt="xs">¡Objetivo Diario Cumplido!</Badge>
             )}
@@ -170,11 +172,11 @@ export default function HydrationCalculator({ jugador }) {
               <IconRotate size={16} />
             </ActionIcon>
           </Group>
-          
+
           <Group gap="sm" grow>
-            <Button 
-              variant="white" 
-              color="blue" 
+            <Button
+              variant="white"
+              color="blue"
               size="xs"
               radius="xl"
               onClick={() => addWater(250)}
@@ -183,9 +185,9 @@ export default function HydrationCalculator({ jugador }) {
             >
               +250 ml
             </Button>
-            <Button 
-              variant="white" 
-              color="blue" 
+            <Button
+              variant="white"
+              color="blue"
               size="xs"
               radius="xl"
               onClick={() => addWater(500)}
@@ -194,9 +196,9 @@ export default function HydrationCalculator({ jugador }) {
             >
               +500 ml
             </Button>
-            <Button 
-              variant="white" 
-              color="blue" 
+            <Button
+              variant="white"
+              color="blue"
               size="xs"
               radius="xl"
               onClick={() => addWater(1000)}
