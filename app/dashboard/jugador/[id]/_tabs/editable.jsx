@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -12,22 +12,32 @@ import {
   Textarea,
   TextInput,
   Title,
+  MultiSelect,
+  Checkbox,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconEdit } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
 import { updatePlayerField } from '@/services/player';
+import { useRouter } from 'next/navigation';
+import { AVAILABLE_MEALS, STANDARD_MEALS } from '@/lib/nutrition-day-types';
 
 export function CampoEditable({ label, campo, valor, jugadorId, tipo = 'textarea', opciones, readOnly = false }) {
+  const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(valor || '');
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setVal(valor || '');
+  }, [valor]);
 
   async function save() {
     setSaving(true);
     try {
       await updatePlayerField(jugadorId, campo, val);
       setEditing(false);
+      router.refresh();
       notifications.show({
         color: 'green',
         title: 'Campo guardado',
@@ -73,6 +83,124 @@ export function CampoEditable({ label, campo, valor, jugadorId, tipo = 'textarea
               ) : (
                 <>
                   <Button variant="subtle" color="gray" size="xs" radius="xl" onClick={() => setEditing(false)}>
+                    Cancelar
+                  </Button>
+                  <Button variant="filled" size="xs" radius="xl" onClick={save} loading={saving}>
+                    Guardar
+                  </Button>
+                </>
+              )}
+            </Group>
+          )}
+        </Group>
+      </Stack>
+    </BentoCard>
+  );
+}
+
+function parseMeals(val) {
+  if (!val) return [];
+  if (!isNaN(Number(val))) {
+    const count = Number(val);
+    return STANDARD_MEALS.slice(0, Math.min(count, 5));
+  }
+  return val.split(',').map((s) => s.trim()).filter(Boolean);
+}
+
+export function ComidasEditable({ label, numComidas, postentreno, jugadorId, readOnly = false }) {
+  const router = useRouter();
+  const [editing, setEditing] = useState(false);
+  const [meals, setMeals] = useState(() => parseMeals(numComidas));
+  const [hasPost, setHasPost] = useState(Boolean(postentreno));
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setMeals(parseMeals(numComidas));
+    setHasPost(Boolean(postentreno));
+  }, [numComidas, postentreno]);
+
+  const MEAL_OPTIONS = AVAILABLE_MEALS;
+
+  async function save() {
+    setSaving(true);
+    try {
+      const mealsValue = meals.join(', ');
+      await updatePlayerField(jugadorId, 'num_comidas', mealsValue);
+      await updatePlayerField(jugadorId, 'postentreno', hasPost);
+      setEditing(false);
+      router.refresh();
+      notifications.show({
+        color: 'green',
+        title: 'Comidas guardadas',
+        message: 'Las comidas y la opción de post-entreno se han actualizado correctamente.',
+      });
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'No se pudo guardar',
+        message: e.message,
+      });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleCancel() {
+    setMeals(parseMeals(numComidas));
+    setHasPost(Boolean(postentreno));
+    setEditing(false);
+  }
+
+  const displayMeals = meals.length > 0 ? meals.join(', ') : 'Ninguna seleccionada';
+
+  return (
+    <BentoCard title={label} icon={IconEdit} color="gray" style={{ height: 'auto' }}>
+      <Stack gap="xs">
+        <Group justify="space-between" align="center">
+          <Box style={{ flex: 1 }}>
+            {editing ? (
+              <Stack gap="xs">
+                <MultiSelect
+                  label="Distribución de comidas"
+                  placeholder="Ej. Desayuno, Merienda, Cena"
+                  data={MEAL_OPTIONS}
+                  value={meals}
+                  onChange={setMeals}
+                  size="sm"
+                  searchable
+                  clearable
+                />
+                <Checkbox
+                  label="Post-entreno"
+                  checked={hasPost}
+                  onChange={(event) => setHasPost(event.currentTarget.checked)}
+                  mt="xs"
+                  size="sm"
+                />
+              </Stack>
+            ) : (
+              <Stack gap="xs">
+                <Text size="sm">
+                  <Text span fw={600} c="dimmed">Comidas: </Text>
+                  {displayMeals}
+                </Text>
+                <Text size="sm">
+                  <Text span fw={600} c="dimmed">Post-entreno: </Text>
+                  {hasPost ? 'Sí' : 'No'}
+                </Text>
+              </Stack>
+            )}
+          </Box>
+
+          {!readOnly && (
+            <Group gap={6} align="flex-start" style={{ alignSelf: editing ? 'flex-start' : 'center', marginTop: editing ? '24px' : '0' }}>
+              {!editing ? (
+                <Button variant="subtle" size="xs" radius="xl" onClick={() => setEditing(true)}>
+                  Editar
+                </Button>
+              ) : (
+                <>
+                  <Button variant="subtle" color="gray" size="xs" radius="xl" onClick={handleCancel}>
                     Cancelar
                   </Button>
                   <Button variant="filled" size="xs" radius="xl" onClick={save} loading={saving}>

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer, getOwnedTeam } from '@/lib/team-access';
+import { DEFAULT_PLAYER_MEALS_STRING } from '@/lib/nutrition-day-types';
 
 function toNumber(value) {
   const n = Number(value);
@@ -69,7 +70,12 @@ export async function POST(request) {
   if (id) {
     await supabase.from('jugadores').update(payload).eq('id', id);
   } else {
-    await supabase.from('jugadores').insert(payload);
+    const insertPayload = {
+      ...payload,
+      num_comidas: DEFAULT_PLAYER_MEALS_STRING,
+      postentreno: false,
+    };
+    await supabase.from('jugadores').insert(insertPayload);
   }
 
   return NextResponse.redirect(new URL(`/dashboard/equipo/${targetTeam.id}`, request.url), 303);

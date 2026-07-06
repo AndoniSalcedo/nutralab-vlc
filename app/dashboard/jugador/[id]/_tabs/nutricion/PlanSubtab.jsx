@@ -37,6 +37,7 @@ import {
 import NothingFound from '@/components/NothingFound/NothingFound';
 import { buildBasePlanData, PLAN_DAY_TYPES, sanitizePlanData } from '@/lib/nutrition-plan-card';
 import { cunninghamPlan } from '@/lib/calculations';
+import { getUserMeals } from '@/lib/nutrition-day-types';
 import IntercambiosModal from './IntercambiosModal';
 
 const CONTEXTOS = [
@@ -589,8 +590,18 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     }
   }
 
+  const getComidasResumen = () => {
+    if (!jugador.num_comidas) {
+      return jugador.postentreno ? 'Post-entreno' : null;
+    }
+    const label = !isNaN(Number(jugador.num_comidas))
+      ? `${jugador.num_comidas} comidas/día`
+      : jugador.num_comidas;
+    return jugador.postentreno ? `${label} + Post-entreno` : label;
+  };
+
   const perfilResumen = [
-    jugador.num_comidas ? `${jugador.num_comidas} comidas/día` : null,
+    getComidasResumen(),
     jugador.objetivo || null,
     jugador.alergias ? `Alergias: ${jugador.alergias.slice(0, 30)}` : null,
     jugador.intolerancias ? `Intol: ${jugador.intolerancias.slice(0, 30)}` : null,
@@ -840,7 +851,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                                   }
 
                                   const existingMeals = draft.dias[dayKey].ingestas || [];
-                                  const fallbackMeals = dayTypeConfig.meals.map((name) => {
+                                  const fallbackMeals = getUserMeals(jugador).map((name) => {
                                     const existing = existingMeals.find(m => m.nombre.toLowerCase() === name.toLowerCase());
                                     return {
                                       nombre: name,

@@ -31,6 +31,7 @@ const PLAYER_COPY_FIELDS = [
   'intolerancias',
   'alergias',
   'contexto_clinico',
+  'postentreno',
   'factor_actividad',
   'kcal_objetivo',
   'cho_objetivo_g',

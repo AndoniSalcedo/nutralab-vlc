@@ -18,7 +18,7 @@ import { useMediaQuery } from '@mantine/hooks';
 
 import { IconClipboardList, IconTargetArrow, IconUser, IconInfoCircle } from '@tabler/icons-react';
 import { cunninghamPlan, NUTRITION_DAY_TYPES, resolveNutritionDayType } from '@/lib/calculations';
-import { CampoEditable } from '../editable';
+import { CampoEditable, ComidasEditable } from '../editable';
 import { latestMetricValue } from '@/lib/player-metrics';
 
 function StatCard({ label, value, order = 2, subtext }) {
@@ -30,14 +30,6 @@ function StatCard({ label, value, order = 2, subtext }) {
     </Paper>
   );
 }
-
-const NUM_COMIDAS = [
-  { value: '3', label: '3 comidas' },
-  { value: '4', label: '4 comidas' },
-  { value: '5', label: '5 comidas' },
-  { value: '6', label: '6 comidas' },
-  { value: '7', label: '7 comidas' },
-];
 
 const DAY_TYPES = NUTRITION_DAY_TYPES.map((dayType) => ({
   value: dayType.key,
@@ -219,7 +211,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
               </Group>
 
               <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                <CampoEditable label="Número de comidas diarias" campo="num_comidas" valor={String(jugador.num_comidas || '5')} jugadorId={jugador.id} tipo="select" opciones={NUM_COMIDAS} readOnly={readOnly} />
+                <ComidasEditable label="Comidas diarias" numComidas={jugador.num_comidas} postentreno={jugador.postentreno} jugadorId={jugador.id} readOnly={readOnly} />
                 <CampoEditable label="Objetivo nutricional" campo="objetivo" valor={jugador.objetivo || ''} jugadorId={jugador.id} tipo="text" readOnly={readOnly} />
                 <CampoEditable label="Gustos y preferencias" campo="gustos_preferencias" valor={jugador.gustos_preferencias || ''} jugadorId={jugador.id} readOnly={readOnly} />
                 <CampoEditable label="Aversiones" campo="aversiones" valor={jugador.aversiones || ''} jugadorId={jugador.id} readOnly={readOnly} />

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedTeam } from '@/lib/team-access';
+import { DEFAULT_PLAYER_MEALS_STRING } from '@/lib/nutrition-day-types';
 import {
   TYPED_MEASUREMENT_FIELDS,
   buildImportPlan,
@@ -50,6 +51,8 @@ async function createPlayer(supabase, teamId, group) {
       apellidos: cleanText(group.apellidos),
       fecha_nacimiento: group.fechaNacimiento || null,
       factor_actividad: 1.55,
+      num_comidas: DEFAULT_PLAYER_MEALS_STRING,
+      postentreno: false,
     })
     .select('id,nombre,apellidos,fecha_nacimiento')
     .single();
