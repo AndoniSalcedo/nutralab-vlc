@@ -145,25 +145,47 @@ export default function LoginForm() {
               }}
             >
               <Paper
-                withBorder
-                radius={20}
-                p={{ base: 22, sm: 30 }}
+                withBorder={!isMobile}
+                radius={{ base: 0, md: 20 }}
+                p={{ base: 0, sm: 30 }}
                 w="100%"
+                maw={450}
+                mx="auto"
+                bg={{ base: 'transparent', md: 'white' }}
                 style={{
                   borderColor: 'rgba(108,112,90,0.2)',
-                  boxShadow: '0 18px 60px rgba(36,41,31,0.12)',
+                  boxShadow: isMobile ? 'none' : '0 18px 60px rgba(36,41,31,0.12)',
                 }}
               >
-                <Group justify="space-between" align="flex-start" mb="xl">
+                {/* Cabecera móvil */}
+                <Stack align="center" gap="xs" mb="lg" hiddenFrom="md">
+                  <Image
+                    src="/logo.png"
+                    alt="Nutralab"
+                    w={170}
+                    fit="contain"
+                    mb="xs"
+                  />
+                  <Badge
+                    variant="light"
+                    color="nutralabColor"
+                    radius="sm"
+                    leftSection={<IconShieldCheck size={14} />}
+                    mb="xs"
+                  >
+                    Acceso privado
+                  </Badge>
+                  <Title order={2} fw={850} c="#24291f" ta="center">
+                    Portal del jugador
+                  </Title>
+                  <Text c="dimmed" size="sm" ta="center" px="xs" mb="sm">
+                    Entra con las credenciales de tu nutricionista para revisar tu seguimiento.
+                  </Text>
+                </Stack>
+
+                {/* Cabecera desktop */}
+                <Group justify="space-between" align="flex-start" mb="xl" visibleFrom="md">
                   <Box>
-                    <Image
-                      src="/logo.png"
-                      alt="Nutralab"
-                      w={140}
-                      fit="contain"
-                      mb="md"
-                      hiddenFrom="md"
-                    />
                     <Title order={2} fw={800} c="#24291f">
                       Iniciar sesión
                     </Title>
@@ -219,7 +241,7 @@ export default function LoginForm() {
 
                 <Divider my="xl" />
 
-                <Text size="sm" c="dimmed">
+                <Text size="sm" c="dimmed" ta={{ base: 'center', sm: 'left' }}>
                   ¿Eres nutricionista?{' '}
                   <Anchor href={`${frontendUrl}/login`} fw={700} c="#5c6049">
                     Accede al portal principal
