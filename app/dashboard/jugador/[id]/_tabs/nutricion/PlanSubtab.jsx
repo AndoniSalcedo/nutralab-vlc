@@ -21,6 +21,7 @@ import {
 import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPlanPdf, deleteAiPlan } from '@/services/plan';
+import { getWeeklyMenus } from '@/services/menu';
 import {
   IconArrowsLeftRight,
   IconBrain,
@@ -288,6 +289,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const isDocumentMode = mode === 'create' || mode === 'edit';
   const loadingAction = Boolean(actionType);
   const [deleting, setDeleting] = useState(false);
+  const [latestMenu, setLatestMenu] = useState(null);
 
   const currentPlan = useMemo(
     () => planes.find((plan) => String(plan.id) === String(currentId)) || null,
@@ -307,12 +309,17 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     async function loadPlanes() {
       setLoadingList(true);
       try {
-        const data = await getAiPlans(jugador.id);
+        const [plansData, menuData] = await Promise.all([
+          getAiPlans(jugador.id),
+          jugador.equipo_id ? getWeeklyMenus(jugador.equipo_id).catch(() => ({ menus: [] })) : { menus: [] },
+        ]);
         if (!active) return;
-        const list = data.planes || [];
+        const list = plansData.planes || [];
         setPlanes(list);
         setCurrentId(list.length ? String(list[0].id) : null);
         setMode('view');
+        const menus = menuData.menus || [];
+        setLatestMenu(menus.length > 0 ? menus[0] : null);
       } catch (e) {
         if (active) {
           notifications.show({
@@ -329,7 +336,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     return () => {
       active = false;
     };
-  }, [jugador.id]);
+  }, [jugador.id, jugador.equipo_id]);
 
   function startCreate() {
     const now = new Date();
@@ -339,7 +346,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setContexto('semana_normal');
     setContextoAdicional('');
     setContenido('');
-    setDatos(buildBasePlanData({ jugador, nombre: nextNombre, contexto: 'semana_normal', contextoAdicional: '' }));
+    setDatos(buildBasePlanData({ jugador, nombre: nextNombre, contexto: 'semana_normal', contextoAdicional: '', menu: latestMenu }));
     setHasGeneratedAi(false);
   }
 
@@ -859,9 +866,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                               style={{ width: isMobile ? '100%' : 150 }}
                             />
                           </Group>
-                          <Badge variant="light" color={item.tipoDia === 'partido' ? 'orange' : 'teal'} style={{ alignSelf: isMobile ? 'stretch' : 'center', height: '24px' }}>
-                            {formatInt(item.kcal)} kcal
-                          </Badge>
                         </Group>
                         <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md" mb="md">
                           {[
