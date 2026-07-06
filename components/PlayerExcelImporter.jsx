@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Dropzone } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
 import { importPlayerExcel } from '@/services/player';
+import * as XLSX from 'xlsx';
 import {
   Alert,
   Badge,
@@ -196,6 +197,89 @@ export default function PlayerExcelImporter({ team }) {
     setResults(null);
   }
 
+  function downloadTemplate(e) {
+    e.stopPropagation();
+    try {
+      const headers = [
+        'Nombre',
+        'Fecha nacimiento',
+        'Fecha medicion',
+        'Estatura (cm)',
+        'Peso (Kg)',
+        '% grasa FAULKNER',
+        '% grasa YUHASZ',
+        'Pliegue Bíceps',
+        'Pliegue Tríceps',
+        'Pliegue Subescapular',
+        'Pliegue Cresta ilíaca',
+        'Pliegue Suprailíaco',
+        'Pliegue Abdominal',
+        'Pliegue Pantorrilla',
+        'Pliegue Muslo',
+        'Suma 6 Pliegues',
+        'Suma 8 Pliegues',
+        'Peso Óseo',
+        'Peso Residual',
+        'Peso Graso',
+        'Peso Muscular Lee&cols',
+        'Peso Magro',
+        'Peso deseable',
+        'ENDO',
+        'MESO',
+        'ECTO',
+        'Perímetro Brazo Contraído Derecho',
+        'Perímetro Pantorrilla Derecha',
+        'Perímetro Pantorrilla Izquierda',
+        'Perímetro Muslo Derecho',
+        'Perímetro Muslo Izquierdo'
+      ];
+      const sampleRow = [
+        'Thierry Rendall',
+        '03/06/1999',
+        '04/04/2026',
+        '178',
+        '74.2',
+        '10.5',
+        '11.2',
+        '4',
+        '6',
+        '8',
+        '12',
+        '10',
+        '15',
+        '7',
+        '11',
+        '62',
+        '83',
+        '12.4',
+        '8.9',
+        '7.8',
+        '35.1',
+        '66.4',
+        '73.5',
+        '2.5',
+        '4.8',
+        '2.1',
+        '32.5',
+        '36.2',
+        '36.1',
+        '54.5',
+        '54.3'
+      ];
+      const data = [headers, sampleRow];
+      const worksheet = XLSX.utils.aoa_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Mediciones');
+      XLSX.writeFile(workbook, 'plantilla_jugadores_metricas.xlsx');
+    } catch (err) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al generar plantilla',
+        message: err.message
+      });
+    }
+  }
+
   async function requestPreview(nextFile) {
     setFile(nextFile);
     setState('loading');
@@ -377,15 +461,28 @@ export default function PlayerExcelImporter({ team }) {
                 </Text>
               </div>
 
-              <Button
-                size="xs"
-                radius="xl"
-                style={{ pointerEvents: 'all', marginTop: 20 }}
-                onClick={() => openRef.current?.()}
-                variant="light"
-              >
-                Seleccionar archivo
-              </Button>
+              <Group justify="center" mt="md" gap="sm">
+                <Button
+                  size="xs"
+                  radius="xl"
+                  style={{ pointerEvents: 'all' }}
+                  onClick={() => openRef.current?.()}
+                  variant="light"
+                >
+                  Seleccionar archivo
+                </Button>
+                <Button
+                  size="xs"
+                  radius="xl"
+                  style={{ pointerEvents: 'all' }}
+                  onClick={downloadTemplate}
+                  variant="outline"
+                  color="teal"
+                  leftSection={<IconDownload size={14} />}
+                >
+                  Descargar plantilla
+                </Button>
+              </Group>
             </Dropzone>
           </Box>
         ) : null}

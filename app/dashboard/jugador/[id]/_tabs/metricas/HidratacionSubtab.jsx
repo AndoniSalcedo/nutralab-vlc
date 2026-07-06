@@ -36,7 +36,8 @@ import {
   IconClock,
   IconAlertCircle,
   IconEdit,
-  IconFlame
+  IconFlame,
+  IconDownload
 } from '@tabler/icons-react';
 import {
   ComposedChart,
@@ -150,6 +151,36 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
   const aguaBase = peso ? Math.round(peso * 40) : 0;
   const aguaEntreno = peso ? Math.round(peso * 6) : 0;
   const aguaPartido = peso ? Math.round(peso * 10) : 0;
+
+  const downloadTemplate = (kind) => {
+    try {
+      const headers = ['Date', 'Time', 'Type', 'Value', 'Unit', 'Status', 'Notes'];
+      const sampleRow = kind === 'sweat'
+        ? ['4/4/2026', '09:15', 'sweat', '650', 'mg/L', 'Moderate', 'Pérdida moderada de sodio']
+        : ['4/4/2026', '12:51', 'sosm', '76', 'mOsm', 'Mildly Dehydrated', 'Falta reponer sales'];
+      
+      const csvContent = [
+        headers.join(','),
+        sampleRow.join(',')
+      ].join('\n');
+
+      const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `plantilla_${kind === 'sweat' ? 'sudoracion' : 'hidratacion'}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al generar plantilla',
+        message: err.message
+      });
+    }
+  };
 
   // Local state for hydration records
   const [registros, setRegistros] = useState(registrosHidratacion);
@@ -777,26 +808,50 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
             <Tabs.Panel value="hydration" pt="md">
               <Group justify="space-between" align="center" wrap="wrap">
                 <Text size="sm" c="dimmed">Carga un CSV de osmolaridad salival.</Text>
-                <FileButton onChange={(file) => handleFileChange(file, 'hydration')} accept=".csv">
-                  {(props) => (
-                    <Button {...props} leftSection={<IconDatabaseImport size={16} />} color="blue" radius="xl" size="xs">
-                      Seleccionar CSV
-                    </Button>
-                  )}
-                </FileButton>
+                <Group gap="xs">
+                  <Button
+                    onClick={() => downloadTemplate('hydration')}
+                    leftSection={<IconDownload size={14} />}
+                    variant="outline"
+                    color="blue"
+                    radius="xl"
+                    size="xs"
+                  >
+                    Descargar plantilla
+                  </Button>
+                  <FileButton onChange={(file) => handleFileChange(file, 'hydration')} accept=".csv">
+                    {(props) => (
+                      <Button {...props} leftSection={<IconDatabaseImport size={16} />} color="blue" radius="xl" size="xs">
+                        Seleccionar CSV
+                      </Button>
+                    )}
+                  </FileButton>
+                </Group>
               </Group>
             </Tabs.Panel>
 
             <Tabs.Panel value="sweat" pt="md">
               <Group justify="space-between" align="center" wrap="wrap">
                 <Text size="sm" c="dimmed">Carga un CSV de sodio en sudor.</Text>
-                <FileButton onChange={(file) => handleFileChange(file, 'sweat')} accept=".csv">
-                  {(props) => (
-                    <Button {...props} leftSection={<IconDatabaseImport size={16} />} color="orange" radius="xl" size="xs">
-                      Seleccionar CSV
-                    </Button>
-                  )}
-                </FileButton>
+                <Group gap="xs">
+                  <Button
+                    onClick={() => downloadTemplate('sweat')}
+                    leftSection={<IconDownload size={14} />}
+                    variant="outline"
+                    color="orange"
+                    radius="xl"
+                    size="xs"
+                  >
+                    Descargar plantilla
+                  </Button>
+                  <FileButton onChange={(file) => handleFileChange(file, 'sweat')} accept=".csv">
+                    {(props) => (
+                      <Button {...props} leftSection={<IconDatabaseImport size={16} />} color="orange" radius="xl" size="xs">
+                        Seleccionar CSV
+                      </Button>
+                    )}
+                  </FileButton>
+                </Group>
               </Group>
             </Tabs.Panel>
           </Tabs>

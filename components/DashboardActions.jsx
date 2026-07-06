@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Group, Modal, Text } from '@mantine/core';
-import { IconPlus, IconFileSpreadsheet, IconMail, IconUserPlus } from '@tabler/icons-react';
+import { Button, Group, Modal, Text, Tabs } from '@mantine/core';
+import { IconPlus, IconFileSpreadsheet, IconMail, IconUserPlus, IconDroplet } from '@tabler/icons-react';
 import PlayerForm from './PlayerForm';
 import PlayerExcelImporter from './PlayerExcelImporter';
+import TeamOsmolarityImporter from './TeamOsmolarityImporter';
 import MessageComposer from './MessageComposer';
 
 export default function DashboardActions({ players = [], team }) {
@@ -78,8 +79,26 @@ export default function DashboardActions({ players = [], team }) {
         radius="lg"
         overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
       >
-        <PlayerExcelImporter team={team} />
+        <Tabs defaultValue="metrics" variant="outline" radius="md">
+          <Tabs.List grow mb="md">
+            <Tabs.Tab value="metrics" leftSection={<IconFileSpreadsheet size={16} />}>
+              Métricas (Excel de jugadores)
+            </Tabs.Tab>
+            <Tabs.Tab value="osmolarity" leftSection={<IconDroplet size={16} />}>
+              Osmolaridad (CSV de equipo)
+            </Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="metrics">
+            <PlayerExcelImporter team={team} />
+          </Tabs.Panel>
+
+          <Tabs.Panel value="osmolarity">
+            <TeamOsmolarityImporter team={team} />
+          </Tabs.Panel>
+        </Tabs>
       </Modal>
+
 
       <Modal
         opened={openedModal === 'message'}

@@ -33,3 +33,35 @@ export async function saveHydrationRecord(payload) {
   if (!res.ok) throw new Error(data.error || 'Error al guardar la toma');
   return data;
 }
+
+export async function previewTeamOsmolarity(file, teamId) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('team_id', teamId);
+  formData.append('mode', 'preview');
+
+  const res = await fetch('/api/importar-osmolaridad', {
+    method: 'POST',
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al procesar la vista previa');
+  return data;
+}
+
+export async function importTeamOsmolarity(file, teamId, decisiones) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('team_id', teamId);
+  formData.append('mode', 'importar');
+  formData.append('decisiones', JSON.stringify(decisiones));
+
+  const res = await fetch('/api/importar-osmolaridad', {
+    method: 'POST',
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al importar los datos');
+  return data;
+}
+
