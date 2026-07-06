@@ -32,6 +32,7 @@ import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 import { login } from '@/services/auth';
 import { env } from '@/lib/env';
+import { useMediaQuery } from '@mantine/hooks';
 
 const highlights = [
   { icon: IconSalad, label: 'Plan nutricional', value: 'seguimiento diario' },
@@ -40,6 +41,7 @@ const highlights = [
 ];
 
 export default function LoginForm() {
+  const isMobile = useMediaQuery('(max-width: 62em)');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -79,18 +81,19 @@ export default function LoginForm() {
     >
       <Container size="lg" px={{ base: 'md', sm: 'xl' }}>
         <Paper
-          shadow="xl"
-          radius={28}
-          p={{ base: 18, sm: 26 }}
+          shadow={{ base: 'none', md: 'xl' }}
+          radius={{ base: 0, md: 28 }}
+          p={{ base: 0, md: 26 }}
+          bg={{ base: 'transparent', md: 'rgba(255,255,255,0.82)' }}
+          bd={{ base: 'none', md: '1px solid rgba(108,112,90,0.18)' }}
           style={{
             overflow: 'hidden',
-            border: '1px solid rgba(108,112,90,0.18)',
-            background: 'rgba(255,255,255,0.82)',
-            backdropFilter: 'blur(18px)',
+            backdropFilter: isMobile ? 'none' : 'blur(18px)',
           }}
         >
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing={0}>
             <Box
+              visibleFrom="md"
               p={{ base: 10, sm: 22, md: 34 }}
               style={{
                 display: 'flex',
@@ -135,7 +138,7 @@ export default function LoginForm() {
             </Box>
 
             <Box
-              p={{ base: 10, sm: 22, md: 34 }}
+              p={{ base: 0, md: 34 }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -153,6 +156,14 @@ export default function LoginForm() {
               >
                 <Group justify="space-between" align="flex-start" mb="xl">
                   <Box>
+                    <Image
+                      src="/logo.png"
+                      alt="Nutralab"
+                      w={140}
+                      fit="contain"
+                      mb="md"
+                      hiddenFrom="md"
+                    />
                     <Title order={2} fw={800} c="#24291f">
                       Iniciar sesión
                     </Title>

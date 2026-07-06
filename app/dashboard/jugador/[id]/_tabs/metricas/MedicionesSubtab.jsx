@@ -134,7 +134,10 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   const jugadorId = jugador.id;
   const [evoluciones, setEvoluciones] = useState(evolucionesIniciales || []);
   const [currentId, setCurrentId] = useState(evolucionesIniciales.length ? String(evolucionesIniciales[evolucionesIniciales.length - 1].id) : null);
-  const [selectedSeason, setSelectedSeason] = useState('Todas');
+  const [selectedSeason, setSelectedSeason] = useState(() => {
+    const list = Array.from(new Set((evolucionesIniciales || []).map(e => getSeason(e.fecha)).filter(Boolean))).sort().reverse();
+    return list[0] || 'Todas';
+  });
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [modalMode, setModalMode] = useState(null);
@@ -348,7 +351,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
             )}
           </Group>
 
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="sm">
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="sm">
             <Select
               placeholder="Temporada"
               leftSection={<IconCalendarStats size={16} />}
@@ -360,26 +363,28 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
               allowDeselect={false}
               disabled={seasons.length === 0}
             />
-            <DateInput
-              placeholder="Fecha de inicio"
-              leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
-              value={dateValue(dateFrom)}
-              onChange={(value) => setDateFrom(dateInputToIso(value))}
-              variant="filled"
-              radius="md"
-              valueFormat="DD/MM/YYYY"
-              clearable
-            />
-            <DateInput
-              placeholder="Fecha de fin"
-              leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
-              value={dateValue(dateTo)}
-              onChange={(value) => setDateTo(dateInputToIso(value))}
-              variant="filled"
-              radius="md"
-              valueFormat="DD/MM/YYYY"
-              clearable
-            />
+            <Group gap="xs" grow style={{ minWidth: 260 }}>
+              <DateInput
+                placeholder="Fecha de inicio"
+                leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+                value={dateValue(dateFrom)}
+                onChange={(value) => setDateFrom(dateInputToIso(value))}
+                variant="filled"
+                radius="md"
+                valueFormat="DD/MM/YYYY"
+                clearable
+              />
+              <DateInput
+                placeholder="Fecha de fin"
+                leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+                value={dateValue(dateTo)}
+                onChange={(value) => setDateTo(dateInputToIso(value))}
+                variant="filled"
+                radius="md"
+                valueFormat="DD/MM/YYYY"
+                clearable
+              />
+            </Group>
             <Select
               placeholder="Selecciona fecha"
               leftSection={<IconCalendarStats size={16} />}

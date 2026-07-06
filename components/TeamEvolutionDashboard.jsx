@@ -263,7 +263,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   const router = useRouter();
   const [viewMode, setViewMode] = useState('trends');
   const [position, setPosition] = useState('');
-  const [selectedSeason, setSelectedSeason] = useState('');
+  const [selectedSeason, setSelectedSeason] = useState(() => {
+    const seasons = Array.from(new Set((evolutions || []).map((e) => getSeason(e.fecha)).filter(Boolean))).sort().reverse();
+    return seasons[0] || '';
+  });
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
