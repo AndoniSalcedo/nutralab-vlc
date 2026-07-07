@@ -57,9 +57,11 @@ export async function GET(_request, { params }) {
     let weeklyReportMeta = null;
     const { data: jugador } = await supabase
       .from('jugadores')
-      .select('equipo_id')
+      .select('equipo_id, equipos(configuracion_nutricional)')
       .eq('id', plan.jugador_id)
       .single();
+
+    const teamConfig = jugador?.equipos?.configuracion_nutricional;
 
     let semana = plan.datos?.meta?.semanaMenu;
     if (!semana && plan.datos?.meta?.fecha) {
@@ -86,7 +88,7 @@ export async function GET(_request, { params }) {
     }
 
     const stream = await renderToStream(
-      <NutritionPlanCardDocument data={plan.datos} weeklyReportMeta={weeklyReportMeta} />
+      <NutritionPlanCardDocument data={plan.datos} weeklyReportMeta={weeklyReportMeta} teamConfig={teamConfig} />
     );
     const chunks = [];
     for await (const chunk of stream) {

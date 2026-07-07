@@ -33,8 +33,8 @@ import {
   IconSparkles,
   IconTrash,
 } from '@tabler/icons-react';
-import { buildBasePlanData, PLAN_DAY_TYPES, sanitizePlanData } from '@/lib/nutrition-plan-card';
-import { cunninghamPlan, calculateByObjective, getDayTypeColor, getDayTypeLabel, getObjectiveLabel, PLAN_CONTEXTS } from '@/lib/calculations';
+import { buildBasePlanData, sanitizePlanData } from '@/lib/nutrition-plan-card';
+import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getObjectiveLabel, PLAN_CONTEXTS, getTeamNutritionDayTypes } from '@/lib/calculations';
 import { getUserMeals } from '@/lib/nutrition-day-types';
 import IntercambiosModal from './IntercambiosModal';
 import NothingFound from '@/components/NothingFound/NothingFound';
@@ -173,7 +173,7 @@ function PlanFicha({ data }) {
 
 const INDIVIDUAL_GENERATION_MESSAGES = [
   "Analizando métricas corporales...",
-  "Calculando tasas de metabolismo basal (Cunningham)...",
+  "Calculando requerimientos energéticos y objetivos...",
   "Sincronizando con el menú del buffet...",
   "IA: Diseñando distribución de macronutrientes...",
   "IA: Optimizando ingestas para los días de entrenamiento...",
@@ -287,6 +287,15 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [datos, setDatos] = useState(null);
   const [loadingList, setLoadingList] = useState(true);
   const [actionType, setActionType] = useState(null);
+
+  const teamConfig = jugador?.equipos?.configuracion_nutricional;
+
+  const dayTypeOptions = useMemo(() => {
+    return getTeamNutritionDayTypes(teamConfig).map((d) => ({
+      value: d.key,
+      label: d.label,
+    }));
+  }, [teamConfig]);
   const [hasGeneratedAi, setHasGeneratedAi] = useState(false);
   const isDocumentMode = mode === 'create' || mode === 'edit';
   const loadingAction = Boolean(actionType);
@@ -800,57 +809,33 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                             <Title order={4} style={{ textAlign: isMobile ? 'center' : 'left' }}>{item.label}</Title>
                             <Select
                               placeholder="Tipo de día"
-                              data={[
-                                { value: 'descanso', label: 'Descanso' },
-                                { value: 'recuperacion', label: 'Recuperación' },
-                                { value: 'entreno', label: 'Entrenamiento' },
-                                { value: 'doble', label: 'Doble sesión' },
-                                { value: 'partido', label: 'Partido' },
-                              ]}
+                              data={dayTypeOptions}
                               value={item.tipoDia}
                               onChange={(value) => {
                                 if (!value) return;
                                 updateDatos((draft) => {
                                   draft.dias[dayKey].tipoDia = value;
 
-                                  const dayTypeConfig = PLAN_DAY_TYPES.find((t) => t.key === value) || PLAN_DAY_TYPES[0];
                                   const weight = Number(draft.metricas?.peso || jugador?.peso_kg || 0);
-                                  const objectiveKey = jugador?.objetivo || null;
+                                  const objectiveKey = jugador?.objetivo || 'mejora_rendimiento';
 
                                   if (weight) {
                                     let kcal, protein, cho, fat;
 
-                                    if (objectiveKey) {
-                                      const result = calculateByObjective({ weightKg: weight, objectiveKey, dayTypeKey: value });
-                                      if (result) {
-                                        kcal = result.kcal;
-                                        protein = result.protein;
-                                        cho = result.cho;
-                                        fat = result.fat;
-                                      }
+                                    const result = calculateByObjective({ weightKg: weight, objectiveKey, dayTypeKey: value, teamConfig });
+                                    if (result) {
+                                      kcal = result.kcal;
+                                      protein = result.protein;
+                                      cho = result.cho;
+                                      fat = result.fat;
                                     }
 
-                                    if (kcal === undefined) {
-                                      const cPlan = cunninghamPlan({
-                                        weightKg: weight,
-                                        bodyFatPct: draft.metricas?.grasa,
-                                        bodyFat: draft.metricas?.grasa,
-                                        leanMassKg: draft.metricas?.masaMagra,
-                                        activityFactor: dayTypeConfig.factor,
-                                        proteinGkg: dayTypeConfig.proteinGkg,
-                                        carbsGkg: dayTypeConfig.carbsGkg,
-                                        fatGkg: dayTypeConfig.fatGkg,
-                                      });
-                                      kcal = cPlan.kcal;
-                                      protein = cPlan.protein;
-                                      cho = cPlan.cho;
-                                      fat = cPlan.fat;
+                                    if (kcal !== undefined) {
+                                      draft.dias[dayKey].kcal = Math.round(kcal);
+                                      draft.dias[dayKey].proteina = Math.round(protein);
+                                      draft.dias[dayKey].hidratos = Math.round(cho);
+                                      draft.dias[dayKey].grasa = Math.round(fat);
                                     }
-
-                                    draft.dias[dayKey].kcal = Math.round(kcal);
-                                    draft.dias[dayKey].proteina = Math.round(protein);
-                                    draft.dias[dayKey].hidratos = Math.round(cho);
-                                    draft.dias[dayKey].grasa = Math.round(fat);
                                   }
 
                                   const existingMeals = draft.dias[dayKey].ingestas || [];

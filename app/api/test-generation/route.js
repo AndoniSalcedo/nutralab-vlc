@@ -8,7 +8,7 @@ export async function GET(req) {
   const teamId = Number(searchParams.get('teamId'));
   
   const supabase = getSupabaseAdmin();
-  const { data: jug } = await supabase.from('jugadores').select('*').eq('equipo_id', teamId).limit(1);
+  const { data: jug } = await supabase.from('jugadores').select('*, equipos(configuracion_nutricional)').eq('equipo_id', teamId).limit(1);
   if (!jug || !jug.length) return NextResponse.json({ error: 'No players found' });
   
   const rawPlayer = jug[0];
@@ -20,6 +20,7 @@ export async function GET(req) {
       jugador: player,
       nombre: 'Test Plan',
       contexto: 'semana_normal',
+      teamConfig: rawPlayer.equipos?.configuracion_nutricional
     });
     return NextResponse.json({
       player: player.nombre,

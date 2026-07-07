@@ -282,7 +282,7 @@ function CoverPage({ meta, playersCount }) {
   );
 }
 
-export default function WeeklySquadReportDocument({ meta, players }) {
+export default function WeeklySquadReportDocument({ meta, players, teamConfig }) {
   const includeCover = players.length !== 1;
 
   return (
@@ -293,7 +293,7 @@ export default function WeeklySquadReportDocument({ meta, players }) {
     >
       {includeCover ? <CoverPage meta={meta} playersCount={players.length} /> : null}
       {players.map((player) => (
-        <PlanCardPage key={player.id} plan={player.plan} />
+        <PlanCardPage key={player.id} plan={player.plan} teamConfig={teamConfig} />
       ))}
     </Document>
   );

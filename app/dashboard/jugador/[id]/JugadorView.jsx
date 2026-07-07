@@ -31,7 +31,7 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
   let registrosHidratacion = [];
 
   try {
-    const { data: rawJugador, error: jugadorErr } = await supabase.from('jugadores').select('*').eq('id', id).single();
+    const { data: rawJugador, error: jugadorErr } = await supabase.from('jugadores').select('*, equipos(configuracion_nutricional)').eq('id', id).single();
     if (jugadorErr) throw jugadorErr;
 
     let menuQuery = supabase.from('menu_semanal').select('*').order('semana', { ascending: false }).limit(10);

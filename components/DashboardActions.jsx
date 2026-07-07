@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import { Button, Group, Modal, Text, Tabs } from '@mantine/core';
-import { IconPlus, IconFileSpreadsheet, IconMail, IconUserPlus, IconDroplet } from '@tabler/icons-react';
+import { IconPlus, IconFileSpreadsheet, IconMail, IconUserPlus, IconDroplet, IconSettings } from '@tabler/icons-react';
 import PlayerForm from './PlayerForm';
 import PlayerExcelImporter from './PlayerExcelImporter';
 import TeamOsmolarityImporter from './TeamOsmolarityImporter';
 import MessageComposer from './MessageComposer';
+
+import Link from 'next/link';
 
 export default function DashboardActions({ players = [], team }) {
   const [openedModal, setOpenedModal] = useState(null);
@@ -16,6 +18,20 @@ export default function DashboardActions({ players = [], team }) {
   return (
     <>
       <Group gap="xs">
+        {team?.id && (
+          <Button
+            component={Link}
+            href={`/dashboard/equipo/${team.id}/configuracion`}
+            radius="xl"
+            size="xs"
+            variant="light"
+            color="gray"
+            leftSection={<IconSettings size={14} />}
+          >
+            Configuración
+          </Button>
+        )}
+
         <Button
           radius="xl"
           size="xs"

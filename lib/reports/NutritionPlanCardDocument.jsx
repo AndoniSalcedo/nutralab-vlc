@@ -1,7 +1,7 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { sanitizePlanData } from '@/lib/nutrition-plan-card';
-import { getDayTypeColor, getDayTypeLabel } from '@/lib/calculations';
+import { getTeamDayTypeColor, getTeamDayTypeLabel } from '@/lib/calculations';
 
 const COLORS = {
   top: '#10142f',
@@ -214,7 +214,7 @@ function formatNumber(value, unit = '') {
   return `${Math.round(n)}${unit}`;
 }
 
-export function PlanCardPage({ plan }) {
+export function PlanCardPage({ plan, teamConfig }) {
   const notes = plan?.notas?.length ? plan.notas : [];
 
   const leftDays = ['lunes', 'martes', 'miercoles', 'jueves'];
@@ -252,8 +252,8 @@ export function PlanCardPage({ plan }) {
         <View style={styles.column}>
           {leftDays.map((dayKey) => {
             const dayData = plan.dias[dayKey];
-            const color = COLORS[getDayTypeColor(dayData.tipoDia)] || COLORS.green;
-            const label = getDayTypeLabel(dayData.tipoDia);
+            const color = COLORS[getTeamDayTypeColor(dayData.tipoDia, teamConfig)] || COLORS.green;
+            const label = getTeamDayTypeLabel(dayData.tipoDia, teamConfig);
             return (
               <View key={dayKey} style={styles.dayBox}>
                 <View style={styles.dayHeader}>
@@ -279,8 +279,8 @@ export function PlanCardPage({ plan }) {
         <View style={styles.column}>
           {rightDays.map((dayKey) => {
             const dayData = plan.dias[dayKey];
-            const color = COLORS[getDayTypeColor(dayData.tipoDia)] || COLORS.green;
-            const label = getDayTypeLabel(dayData.tipoDia);
+            const color = COLORS[getTeamDayTypeColor(dayData.tipoDia, teamConfig)] || COLORS.green;
+            const label = getTeamDayTypeLabel(dayData.tipoDia, teamConfig);
             return (
               <View key={dayKey} style={styles.dayBox}>
                 <View style={styles.dayHeader}>
@@ -489,15 +489,15 @@ function CoverPage({ meta, playerName }) {
   );
 }
 
-export default function NutritionPlanCardDocument({ data, weeklyReportMeta }) {
-  const plan = sanitizePlanData(data);
+export default function NutritionPlanCardDocument({ data, weeklyReportMeta, teamConfig }) {
+  const plan = sanitizePlanData(data, teamConfig);
   if (!plan) return null;
   return (
     <Document title={plan.meta?.nombre || 'Ficha nutricional'} author="Nutralab" subject="Ficha nutricional">
       {weeklyReportMeta && (
         <CoverPage meta={weeklyReportMeta} playerName={plan.jugador?.nombre || 'Jugador'} />
       )}
-      <PlanCardPage plan={plan} />
+      <PlanCardPage plan={plan} teamConfig={teamConfig} />
     </Document>
   );
 }

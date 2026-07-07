@@ -16,7 +16,7 @@ import {
 import { useMediaQuery } from '@mantine/hooks';
 
 import { IconClipboardList, IconTargetArrow, IconUser, IconInfoCircle } from '@tabler/icons-react';
-import { cunninghamPlan, calculateByObjective, NUTRITION_DAY_TYPES, resolveNutritionDayType, PLAYER_OBJECTIVES, getObjectiveLabel } from '@/lib/calculations';
+import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES, getObjectiveLabel } from '@/lib/calculations';
 import { CampoEditable, ComidasEditable } from '../editable';
 import { latestMetricValue } from '@/lib/player-metrics';
 
@@ -30,31 +30,29 @@ function StatCard({ label, value, order = 2, subtext }) {
   );
 }
 
-const DAY_TYPES = NUTRITION_DAY_TYPES.map((dayType) => ({
-  value: dayType.key,
-  label: dayType.label,
-  factor: dayType.factor,
-  proteinGkg: dayType.proteinGkg,
-  carbsGkg: dayType.carbsGkg,
-  fatGkg: dayType.fatGkg,
-  color: dayType.color,
-}));
-
 export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = false }) {
   const isMobile = useMediaQuery('(max-width: 48em)');
   const pesoActual = latestMetricValue(evoluciones, 'peso_kg', jugador?.peso_kg);
-  const grasaActual = latestMetricValue(evoluciones, 'porcentaje_grasa', jugador?.porcentaje_grasa);
-  const masaMagraActual = latestMetricValue(evoluciones, 'masa_magra_kg', jugador?.masa_magra_kg);
   const weightKg = Number(pesoActual || 0);
 
-  // Map configured factor_actividad to nearest dayType segment
-  const defaultDiaType = useMemo(() => {
-    return resolveNutritionDayType(jugador.factor_actividad || 1.55).key;
-  }, [jugador.factor_actividad]);
+  const teamConfig = jugador?.equipos?.configuracion_nutricional;
 
+  const DAY_TYPES = useMemo(() => {
+    return getTeamNutritionDayTypes(teamConfig).map((dayType) => ({
+      value: dayType.key,
+      label: dayType.label,
+      factor: dayType.factor,
+      proteinGkg: dayType.proteinGkg,
+      carbsGkg: dayType.carbsGkg,
+      fatGkg: dayType.fatGkg,
+      color: dayType.color,
+    }));
+  }, [teamConfig]);
+
+  const defaultDiaType = 'entreno';
   const [activeDayType, setActiveDayType] = useState(defaultDiaType);
 
-  const playerObjective = jugador?.objetivo || null;
+  const playerObjective = jugador?.objetivo || 'mejora_rendimiento';
 
   // Pre-calculate plans for all day types
   const plans = useMemo(() => {
@@ -64,27 +62,16 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
         out[dt.value] = null;
         return;
       }
-      // Use objective-based calculation if objective is valid
-      if (playerObjective) {
-        const result = calculateByObjective({ weightKg, objectiveKey: playerObjective, dayTypeKey: dt.value });
-        if (result) {
-          out[dt.value] = result;
-          return;
-        }
+      
+      const result = calculateByObjective({ weightKg, objectiveKey: playerObjective, dayTypeKey: dt.value, teamConfig });
+      if (result) {
+        out[dt.value] = result;
+      } else {
+        out[dt.value] = null;
       }
-      // Fallback to Cunningham
-      out[dt.value] = cunninghamPlan({
-        weightKg,
-        bodyFatPct: grasaActual ? Number(grasaActual) : null,
-        leanMassKg: masaMagraActual ? Number(masaMagraActual) : null,
-        activityFactor: dt.factor,
-        proteinGkg: dt.proteinGkg,
-        carbsGkg: dt.carbsGkg,
-        fatGkg: dt.fatGkg,
-      });
     });
     return out;
-  }, [weightKg, grasaActual, masaMagraActual, playerObjective]);
+  }, [weightKg, playerObjective, DAY_TYPES, teamConfig]);
 
   const currentPlan = plans[activeDayType];
   const isDefaultFactorType = activeDayType === defaultDiaType;
@@ -145,16 +132,9 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
               </Group>
 
               <Group gap="xs">
-                {playerObjective && (
-                  <Badge color="green" variant="light" size="md" leftSection={<IconTargetArrow size={14} />}>
-                    {getObjectiveLabel(playerObjective)}
-                  </Badge>
-                )}
-                {!playerObjective && (
-                  <Badge color="gray" variant="light" size="md">
-                    Sin objetivo · Fórmula Cunningham
-                  </Badge>
-                )}
+                <Badge color="green" variant="light" size="md" leftSection={<IconTargetArrow size={14} />}>
+                  {getObjectiveLabel(playerObjective)}
+                </Badge>
                 {hasManualOverride && (
                   <Badge color="yellow" variant="light" size="md" leftSection={<IconInfoCircle size={14} />}>
                     Objetivo manual activo para este día
@@ -196,22 +176,22 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
               <StatCard
                 label="Kcal objetivo"
                 value={kcal ? `${kcal} kcal` : '-'}
-                subtext={hasManualOverride ? 'Fijado manualmente' : playerObjective ? getObjectiveLabel(playerObjective) : 'Fórmula Cunningham'}
+                subtext={hasManualOverride ? 'Fijado manualmente' : getObjectiveLabel(playerObjective)}
               />
               <StatCard
                 label="Proteína"
                 value={protein ? `${protein}g` : '-'}
-                subtext={hasManualOverride ? 'Fijado manualmente' : playerObjective ? getObjectiveLabel(playerObjective) : 'Fórmula Cunningham'}
+                subtext={hasManualOverride ? 'Fijado manualmente' : getObjectiveLabel(playerObjective)}
               />
               <StatCard
                 label="Carbohidratos (CHO)"
                 value={cho ? `${cho}g` : '-'}
-                subtext={hasManualOverride ? 'Fijado manualmente' : playerObjective ? getObjectiveLabel(playerObjective) : 'Fórmula Cunningham'}
+                subtext={hasManualOverride ? 'Fijado manualmente' : getObjectiveLabel(playerObjective)}
               />
               <StatCard
                 label="Grasa"
                 value={fat ? `${fat}g` : '-'}
-                subtext={hasManualOverride ? 'Fijado manualmente' : playerObjective ? getObjectiveLabel(playerObjective) : 'Fórmula Cunningham'}
+                subtext={hasManualOverride ? 'Fijado manualmente' : getObjectiveLabel(playerObjective)}
               />
             </SimpleGrid>
           </Paper>

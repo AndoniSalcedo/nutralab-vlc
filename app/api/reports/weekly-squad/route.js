@@ -141,8 +141,8 @@ async function persistWeeklyReport(supabase, teamId, meta, semana) {
   return semanaVal;
 }
 
-async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds, semana, calendario, semanaMenu, contexto, forceRegenerate = false) {
-  let playersQuery = supabase.from('jugadores').select('*').eq('equipo_id', teamId).order('nombre');
+async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, calendario, semanaMenu, contexto, forceRegenerate = false) {
+  let playersQuery = supabase.from('jugadores').select('*').eq('equipo_id', team.id).order('nombre');
   if (jugadorIds.length) {
     playersQuery = playersQuery.in('id', jugadorIds);
   }
@@ -170,7 +170,7 @@ async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds, semana,
     .from('menu_semanal')
     .select('*')
     .eq('semana', menuWeekKey)
-    .eq('equipo_id', teamId)
+    .eq('equipo_id', team.id)
     .maybeSingle();
 
   // Load all plans for these players
@@ -198,8 +198,9 @@ async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds, semana,
         contexto: contexto || 'semana_partido',
         menu,
         calendario,
+        teamConfig: team.configuracion_nutricional
       });
-      const finalContenido = planDataToLegacyContent(baseData);
+      const finalContenido = planDataToLegacyContent(baseData, team.configuracion_nutricional);
 
       if (activePlan) {
         // Overwrite existing plan
@@ -247,8 +248,8 @@ async function loadPlayersWithMeasurements(supabase, teamId, jugadorIds, semana,
   return resolvedPlayers;
 }
 
-async function renderReportResponse(meta, players, semana) {
-  const stream = await renderToStream(<WeeklySquadReportDocument meta={{ ...meta, semana }} players={players} />);
+async function renderReportResponse(meta, players, semana, teamConfig) {
+  const stream = await renderToStream(<WeeklySquadReportDocument meta={{ ...meta, semana }} players={players} teamConfig={teamConfig} />);
   const chunks = [];
   for await (const chunk of stream) {
     chunks.push(chunk);
@@ -291,8 +292,8 @@ export async function POST(request) {
     let semana = body?.meta?.semana;
 
     semana = await persistWeeklyReport(supabase, team.id, { ...meta, semanaMenu }, semana);
-    const players = await loadPlayersWithMeasurements(supabase, team.id, jugadorIds, semana, calendario, semanaMenu, meta.contexto, true);
-    return renderReportResponse(meta, players, semana);
+    const players = await loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, calendario, semanaMenu, meta.contexto, true);
+    return renderReportResponse(meta, players, semana, team.configuracion_nutricional);
   } catch (error) {
     console.error('Error generating weekly squad report:', error);
     return jsonError(error);
@@ -322,9 +323,9 @@ export async function GET(request) {
 
     const team = await resolveTeam(supabase, user, paramTeamId);
     const meta = await loadStoredMeta(supabase, team.id, semanaParam);
-    const players = await loadPlayersWithMeasurements(supabase, team.id, jugadorIds, semanaParam, meta?.calendario, meta?.semanaMenu, meta?.contexto);
+    const players = await loadPlayersWithMeasurements(supabase, team, jugadorIds, semanaParam, meta?.calendario, meta?.semanaMenu, meta?.contexto);
 
-    return renderReportResponse(meta, players, semanaParam);
+    return renderReportResponse(meta, players, semanaParam, team.configuracion_nutricional);
   } catch (error) {
     console.error('Error generating weekly squad report (GET):', error);
     return jsonError(error);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Group,
   Stack,
@@ -18,53 +18,50 @@ import {
 import { useMediaQuery } from '@mantine/hooks';
 import { IconDroplet, IconBottle, IconCup, IconCheck, IconRotate } from '@tabler/icons-react';
 import { BentoCard } from './Bento/BentoItem';
-import { calculateHydration } from '@/lib/calculations';
+import { calculateHydration, getTeamNutritionDayTypes } from '@/lib/calculations';
 
 
 export default function HydrationCalculator({ jugador }) {
   const isMobile = useMediaQuery('(max-width: 48em)');
+  const teamConfig = jugador?.equipos?.configuracion_nutricional;
+  const dayTypes = useMemo(() => getTeamNutritionDayTypes(teamConfig), [teamConfig]);
+
   const [targetType, setTargetType] = useState('descanso');
   const [consumed, setConsumed] = useState(0);
   const [isClient, setIsClient] = useState(false);
 
+  // If targetType is not in dayTypes, reset it to the first valid one when dayTypes changes
+  useEffect(() => {
+    if (dayTypes.length && !dayTypes.some(d => d.key === targetType)) {
+      setTargetType(dayTypes[0].key);
+    }
+  }, [dayTypes]);
+
   // Calcular objetivos
   const peso = Number(jugador?.peso_kg || 75);
-  const targets = {
-    descanso: calculateHydration(peso, 'descanso'),
-    entreno: calculateHydration(peso, 'entreno'),
-    partido: calculateHydration(peso, 'partido')
-  };
+  const targets = useMemo(() => {
+    const out = {};
+    dayTypes.forEach(d => {
+      out[d.key] = calculateHydration(peso, d.key);
+    });
+    return out;
+  }, [peso, dayTypes]);
 
-  const currentTarget = targets[targetType];
+  const currentTarget = targets[targetType] || 3000;
   const percentage = Math.min(100, Math.round((consumed / currentTarget) * 100));
   const isGoalReached = percentage >= 100;
 
-  const targetOptions = [
-    {
-      value: 'descanso', label: isMobile ? (
+  const targetOptions = useMemo(() => {
+    return dayTypes.map(d => ({
+      value: d.key,
+      label: isMobile ? (
         <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
-          <Text size="xs" fw={700} style={{ fontSize: '11px' }}>Descanso</Text>
-          <Text size="xxs" c={targetType === 'descanso' ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets.descanso} ml</Text>
+          <Text size="xs" fw={700} style={{ fontSize: '11px' }}>{d.label}</Text>
+          <Text size="xxs" c={targetType === d.key ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets[d.key]} ml</Text>
         </Stack>
-      ) : `Descanso · ${targets.descanso} ml`
-    },
-    {
-      value: 'entreno', label: isMobile ? (
-        <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
-          <Text size="xs" fw={700} style={{ fontSize: '11px' }}>Entreno</Text>
-          <Text size="xxs" c={targetType === 'entreno' ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets.entreno} ml</Text>
-        </Stack>
-      ) : `Entreno · ${targets.entreno} ml`
-    },
-    {
-      value: 'partido', label: isMobile ? (
-        <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
-          <Text size="xs" fw={700} style={{ fontSize: '11px' }}>Partido</Text>
-          <Text size="xxs" c={targetType === 'partido' ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets.partido} ml</Text>
-        </Stack>
-      ) : `Partido · ${targets.partido} ml`
-    },
-  ];
+      ) : `${d.label} · ${targets[d.key]} ml`
+    }));
+  }, [dayTypes, targets, targetType, isMobile]);
 
   useEffect(() => {
     setIsClient(true);

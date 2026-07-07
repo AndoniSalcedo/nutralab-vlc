@@ -8,7 +8,7 @@ import { generarDatosPlan } from '@/lib/ai-plan-generator';
 
 async function loadPlayerWithLatestMetrics(supabase, jugadorId) {
   const [{ data: jugador, error: jugadorError }, { data: evoluciones, error: evolucionesError }] = await Promise.all([
-    supabase.from('jugadores').select('*').eq('id', jugadorId).single(),
+    supabase.from('jugadores').select('*, equipos(configuracion_nutricional)').eq('id', jugadorId).single(),
     supabase.from('evoluciones').select('*').eq('jugador_id', jugadorId).order('fecha', { ascending: true }),
   ]);
 
@@ -58,16 +58,17 @@ export async function POST(req) {
     const ownedPlayer = await getOwnedPlayer(supabase, user, jugador.id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
     const jugadorConMetricas = await loadPlayerWithLatestMetrics(supabase, jugador.id);
+    const teamConfig = jugadorConMetricas?.equipos?.configuracion_nutricional;
 
     const generatedDatos = draftOnly || (!datos && (contenido === undefined || contenido === ''))
-      ? await generarDatosPlan({ jugador: jugadorConMetricas, nombre: planNombre, contexto, contextoAdicional, calendario })
-      : sanitizePlanData(datos);
+      ? await generarDatosPlan({ jugador: jugadorConMetricas, nombre: planNombre, contexto, contextoAdicional, calendario, teamConfig })
+      : sanitizePlanData(datos, teamConfig);
 
     if (draftOnly) {
       return NextResponse.json({ datos: generatedDatos });
     }
 
-    const finalContenido = generatedDatos ? planDataToLegacyContent(generatedDatos) : String(contenido || '');
+    const finalContenido = generatedDatos ? planDataToLegacyContent(generatedDatos, teamConfig) : String(contenido || '');
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('planes_ia')
@@ -111,9 +112,12 @@ export async function PATCH(req) {
     if (currentPlanError) throw currentPlanError;
     const ownedPlayer = await getOwnedPlayer(supabase, user, currentPlan.jugador_id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+    
+    const jugadorConMetricas = await loadPlayerWithLatestMetrics(supabase, currentPlan.jugador_id);
+    const teamConfig = jugadorConMetricas?.equipos?.configuracion_nutricional;
 
-    const sanitizedDatos = sanitizePlanData(datos);
-    const finalContenido = sanitizedDatos ? planDataToLegacyContent(sanitizedDatos) : String(contenido || '');
+    const sanitizedDatos = sanitizePlanData(datos, teamConfig);
+    const finalContenido = sanitizedDatos ? planDataToLegacyContent(sanitizedDatos, teamConfig) : String(contenido || '');
 
     const { data, error } = await supabase
       .from('planes_ia')

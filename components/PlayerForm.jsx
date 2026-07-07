@@ -14,10 +14,10 @@ import {
   Box,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconUser, IconActivity, IconCheck } from '@tabler/icons-react';
+import { IconUser, IconCheck } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { deletePlayer, savePlayer } from '@/services/player';
-import { NUTRITION_DAY_TYPES, resolveNutritionDayType, PLAYER_OBJECTIVES } from '@/lib/calculations';
+import { PLAYER_OBJECTIVES } from '@/lib/calculations';
 
 export default function PlayerForm({ initial, team }) {
   const router = useRouter();
@@ -27,10 +27,9 @@ export default function PlayerForm({ initial, team }) {
   const [nombre, setNombre] = useState(initial?.nombre ?? '');
   const [apellidos, setApellidos] = useState(initial?.apellidos ?? '');
   const [posicion, setPosicion] = useState(initial?.posicion ?? '');
-  const [activityFactor, setActivityFactor] = useState(String(resolveNutritionDayType(initial?.factor_actividad ?? 1.55).factor));
   const [gustos, setGustos] = useState(initial?.gustos_preferencias ?? '');
   const [contexto, setContexto] = useState(initial?.contexto_clinico ?? '');
-  const [objetivo, setObjetivo] = useState(initial?.objetivo ?? '');
+  const [objetivo, setObjetivo] = useState(initial?.objetivo || 'mejora_rendimiento');
 
   async function handleSubmit(e, isDelete = false) {
     if (e) e.preventDefault();
@@ -51,7 +50,6 @@ export default function PlayerForm({ initial, team }) {
         formData.append('nombre', nombre);
         formData.append('apellidos', apellidos);
         formData.append('posicion', posicion);
-        formData.append('factor_actividad', activityFactor);
         formData.append('gustos_preferencias', gustos);
         formData.append('contexto_clinico', contexto);
         formData.append('objetivo', objetivo);
@@ -115,16 +113,7 @@ export default function PlayerForm({ initial, team }) {
               />
             </SimpleGrid>
 
-            <Select 
-              label="Factor de Actividad Diario"
-              value={activityFactor}
-              onChange={setActivityFactor}
-              leftSection={<IconActivity size={16} />}
-              data={NUTRITION_DAY_TYPES.map((dayType) => ({
-                label: `${dayType.label} (${dayType.factor})`,
-                value: String(dayType.factor),
-              }))}
-            />
+
 
             {/* Contexto y Preferencias */}
             <Title order={5} c="blue" mb={-10}>Contexto Nutricional y Clínico</Title>

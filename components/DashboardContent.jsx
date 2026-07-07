@@ -11,7 +11,7 @@ import DashboardActions from '@/components/DashboardActions';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import PlayerForm from '@/components/PlayerForm';
-import { cunninghamPlan, calculateByObjective, resolveNutritionDayType, NUTRITION_DAY_TYPES, PLAN_CONTEXTS } from '@/lib/calculations';
+import { calculateByObjective, getTeamNutritionDayTypes, PLAN_CONTEXTS } from '@/lib/calculations';
 import { useRouter } from 'next/navigation';
 
 const PAGE_SIZE = 8;
@@ -195,18 +195,7 @@ const DAYS_OF_WEEK = [
   { key: 'domingo', label: 'Domingo' },
 ];
 
-const DAY_TYPE_EMOJIS = {
-  descanso: '💤',
-  recuperacion: '🟢',
-  entreno: '⚡',
-  doble: '🔥',
-  partido: '⚽',
-};
 
-const DAY_TYPE_OPTIONS = NUTRITION_DAY_TYPES.map((d) => ({
-  value: d.key,
-  label: `${DAY_TYPE_EMOJIS[d.key] || ''} ${d.label}`.trim(),
-}));
 
 function getWeekRangeLabel(mondayInput) {
   const monday = mondayInput instanceof Date ? mondayInput : new Date(`${mondayInput}T00:00:00`);
@@ -276,7 +265,7 @@ function filenameFromResponse(response, fallback) {
   return match?.[1] || fallback;
 }
 
-function getPlayerPlan(player) {
+function getPlayerPlan(player, teamConfig) {
   if (player.kcal_objetivo) {
     return { kcal: Number(player.kcal_objetivo), calculated: false };
   }
@@ -284,29 +273,15 @@ function getPlayerPlan(player) {
   const weightKg = Number(player.peso_kg || 0);
   if (!weightKg) return { kcal: null, calculated: false };
 
-  const objectiveKey = player.objetivo || null;
-  const dayType = resolveNutritionDayType(player.factor_actividad || 1.55);
+  const objectiveKey = player.objetivo || 'mejora_rendimiento';
+  const dayTypeKey = 'entreno';
 
-  // Use objective-based calculation if objective is valid
-  if (objectiveKey) {
-    const result = calculateByObjective({ weightKg, objectiveKey, dayTypeKey: dayType.key });
-    if (result) {
-      return { kcal: result.kcal, calculated: true };
-    }
+  const result = calculateByObjective({ weightKg, objectiveKey, dayTypeKey, teamConfig });
+  if (result) {
+    return { kcal: result.kcal, calculated: true };
   }
 
-  // Fallback to Cunningham
-  const calc = cunninghamPlan({
-    weightKg,
-    bodyFatPct: player.porcentaje_grasa ? Number(player.porcentaje_grasa) : null,
-    leanMassKg: player.masa_magra_kg ? Number(player.masa_magra_kg) : null,
-    activityFactor: dayType.factor,
-    proteinGkg: dayType.proteinGkg,
-    carbsGkg: dayType.carbsGkg,
-    fatGkg: dayType.fatGkg,
-  });
-
-  return { kcal: calc.kcal, calculated: true };
+  return { kcal: null, calculated: false };
 }
 
 export default function DashboardContent({ players = [], team }) {
@@ -318,6 +293,15 @@ export default function DashboardContent({ players = [], team }) {
   const [reportForm, setReportForm] = useState(defaultReportForm);
   const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
 
+  const teamConfig = team?.configuracion_nutricional;
+  
+  const dayTypeOptions = useMemo(() => {
+    return getTeamNutritionDayTypes(teamConfig).map((d) => ({
+      value: d.key,
+      label: d.label,
+    }));
+  }, [teamConfig]);
+
   const [generatingReport, setGeneratingReport] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [availableMenus, setAvailableMenus] = useState([]);
@@ -325,7 +309,7 @@ export default function DashboardContent({ players = [], team }) {
   const [filters, setFilters] = useState({ name: '', email: '', position: '' });
   const [page, setPage] = useState(1);
   const totalPlayers = playersState.length;
-  const playersWithPlan = playersState.map((player) => ({ ...player, plan: getPlayerPlan(player) }));
+  const playersWithPlan = playersState.map((player) => ({ ...player, plan: getPlayerPlan(player, team?.configuracion_nutricional) }));
   const positionOptions = useMemo(() => {
     const positions = Array.from(new Set(playersState.map((player) => player.posicion).filter(Boolean))).sort();
     return [
@@ -943,7 +927,7 @@ export default function DashboardContent({ players = [], team }) {
                     label={day.label}
                     value={reportForm.calendario?.[day.key] || 'entreno'}
                     onChange={(val) => updateCalendarioDay(day.key, val)}
-                    data={DAY_TYPE_OPTIONS}
+                    data={dayTypeOptions}
                     size="sm"
                   />
                 ))}
