@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Stack, Text, useMantineTheme, useComputedColorScheme } from "@mantine/core";
 
 const MEAL_META = {

@@ -1,6 +1,6 @@
 import { AspectRatio, Badge, Box, Button, Group, Image, Paper, Stack, Text } from "@mantine/core";
 import { IconClock, IconEdit, IconFlame, IconNotes, IconTrash } from "@tabler/icons-react";
-import MealCardSkeleton from "./MealCardSkeleton";
+import MealCardSkeleton from "@/components/skeletons/MealCardSkeleton";
 
 const MEAL_META = {
   breakfast: { label: 'Desayuno', emoji: '🍳', color: 'blue' },
