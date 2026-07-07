@@ -1,16 +1,18 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Anchor, Button, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination, Textarea, Checkbox } from '@mantine/core';
+import { Anchor, Button, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination, Textarea, Checkbox, Grid, Tabs } from '@mantine/core';
 import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconDownload, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconFileText, IconChefHat, IconBook, IconCalendar, IconSettings, IconSparkles, IconBottle } from '@tabler/icons-react';
-import DashboardActions from '@/components/DashboardActions';
+import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconDownload, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconFileText, IconChefHat, IconBook, IconCalendar, IconSettings, IconSparkles, IconBottle, IconPlus, IconFileSpreadsheet, IconDroplet } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import PlayerForm from '@/components/PlayerForm';
+import PlayerExcelImporter from './PlayerExcelImporter';
+import TeamOsmolarityImporter from './TeamOsmolarityImporter';
+import MessageComposer from './MessageComposer';
 import { calculateByObjective, getTeamNutritionDayTypes, PLAN_CONTEXTS } from '@/lib/calculations';
 import { useRouter } from 'next/navigation';
 
@@ -136,40 +138,42 @@ function DashboardStat({ title, icon: Icon, color = 'blue', value, description, 
       type={onClick ? 'button' : undefined}
       onClick={onClick}
       px={{ base: 'sm', sm: 'md' }}
-      py="xs"
+      py={6}
       style={{
+        display: 'flex',
+        alignItems: 'center',
         width: '100%',
         textAlign: 'left',
         cursor: isClickable ? 'pointer' : 'default',
         font: 'inherit',
         height: '100%',
-        minHeight: 62,
+        minHeight: 56,
         borderRadius: 'var(--mantine-radius-xl)',
         background: 'rgba(248,249,245,0.82)',
         border: '1px solid rgba(222,226,230,0.9)',
         transition: 'border-color 120ms ease, transform 120ms ease',
       }}
     >
-      <Group gap="sm" wrap="nowrap" align="center">
-        <ThemeIcon color={color} variant="light" radius="md" size={34} style={{ flex: '0 0 auto' }}>
-          <Icon size={18} stroke={1.6} />
+      <Group gap="xs" wrap="nowrap" align="center" style={{ width: '100%' }}>
+        <ThemeIcon color={color} variant="light" radius="md" size={32} style={{ flex: '0 0 auto' }}>
+          <Icon size={16} stroke={1.6} />
         </ThemeIcon>
         <Box style={{ minWidth: 0, flex: 1 }}>
-          <Text fw={400} c="dimmed" fz={11} tt="uppercase" lts={0.6} truncate>
+          <Text fw={400} c="dimmed" fz={10} tt="uppercase" lts={0.6} truncate style={{ whiteSpace: 'nowrap' }}>
             {title}
           </Text>
-          <Group gap={6} align="baseline">
-            <Text fw={700} size="sm" c="#24291f" lh={1.1}>
+          <Group gap={6} align="baseline" wrap="nowrap">
+            <Text fw={700} size="sm" c="#24291f" lh={1.1} style={{ whiteSpace: 'nowrap' }}>
               {value}
             </Text>
-            <Text size="xs" c="dimmed" truncate visibleFrom="sm">
+            <Text size="xs" c="dimmed" truncate visibleFrom="sm" style={{ whiteSpace: 'nowrap' }}>
               {description}
             </Text>
           </Group>
         </Box>
         {isClickable && (
-          <ThemeIcon color={color} variant="subtle" radius="xl" size={28} style={{ flex: '0 0 auto' }}>
-            <IconArrowRight size={16} stroke={1.8} />
+          <ThemeIcon color={color} variant="subtle" radius="xl" size={24} style={{ flex: '0 0 auto' }}>
+            <IconArrowRight size={14} stroke={1.8} />
           </ThemeIcon>
         )}
       </Group>
@@ -292,6 +296,8 @@ export default function DashboardContent({ players = [], team }) {
   const [reportModal, setReportModal] = useState({ opened: false, player: null });
   const [reportForm, setReportForm] = useState(defaultReportForm);
   const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
+  const [activeModal, setActiveModal] = useState(null);
+  const closeModal = () => setActiveModal(null);
 
   const teamConfig = team?.configuracion_nutricional;
   
@@ -512,59 +518,97 @@ export default function DashboardContent({ players = [], team }) {
         }}
       >
         <Stack gap="sm">
-          <Group justify="space-between" align="center" wrap="wrap" gap="md">
-            <Group gap="sm">
-              <Tooltip label="Volver a equipos" withArrow>
-                <ActionIcon component={Anchor} href="/dashboard" variant="light" color="gray" radius="xl" size={42}>
-                  <IconArrowLeft size={20} />
-                </ActionIcon>
-              </Tooltip>
-              <ThemeIcon color="dark" variant="light" radius="xl" size={42}>
-                <IconUsers size={21} />
-              </ThemeIcon>
-              <Box>
-                <Title order={3} fw={850} c="#24291f" lh={1.1}>
-                  {team?.nombre || 'Equipo'}
-                </Title>
-                <Text size="xs" c="dimmed" mt={2}>
-                  {team?.temporada ? `${team.temporada}` : ''}
-                </Text>
-              </Box>
-            </Group>
+          <Grid align="center" gutter="md">
+            {/* Left part: Back arrow and Team Stack */}
+            <Grid.Col span={{ base: 12, md: 'content' }}>
+              <Group gap="md" justify="center" align="center" wrap="nowrap" style={{ height: '100%' }}>
+                <Tooltip label="Volver a equipos" withArrow>
+                  <ActionIcon component={Anchor} href="/dashboard" variant="light" color="gray" radius="xl" size={42}>
+                    <IconArrowLeft size={20} />
+                  </ActionIcon>
+                </Tooltip>
+                
+                <Stack gap="xs" align="center" style={{ flex: 1 }}>
+                  <ThemeIcon color="dark" variant="light" radius="xl" size={54}>
+                    <IconUsers size={28} />
+                  </ThemeIcon>
+                  <Stack gap={2} align="center">
+                    <Title order={3} fw={850} c="#24291f" lh={1.1} style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      {team?.nombre || 'Equipo'}
+                    </Title>
+                    <Text size="xs" c="dimmed" style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      {team?.temporada ? `${team.temporada}` : ''}
+                    </Text>
+                  </Stack>
+                </Stack>
+              </Group>
+            </Grid.Col>
 
-            <DashboardActions players={playersState} team={team} />
-          </Group>
+            {/* Right part: Grid of 8 buttons */}
+            <Grid.Col span={{ base: 12, md: 'auto' }}>
+              <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="xs">
+                {/* Row 1: Modals */}
+                <DashboardStat
+                  title="Plantilla"
+                  icon={IconUsers}
+                  color="blue"
+                  value={`${totalPlayers} jugadores`}
+                  onClick={() => openReportModal()}
+                />
+                <DashboardStat
+                  title="Importar datos"
+                  icon={IconFileSpreadsheet}
+                  color="teal"
+                  value="Excel / CSV"
+                  onClick={() => setActiveModal('import')}
+                />
+                <DashboardStat
+                  title="Mensaje"
+                  icon={IconMail}
+                  color="blue"
+                  value="Enviar mensaje"
+                  onClick={() => setActiveModal('message')}
+                />
+                <DashboardStat
+                  title="Nuevo jugador"
+                  icon={IconPlus}
+                  color="blue"
+                  value="Añadir jugador"
+                  onClick={() => setActiveModal('new-player')}
+                />
 
-          <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="xs">
-            <DashboardStat
-              title="Plantilla"
-              icon={IconUsers}
-              color="blue"
-              value={`${totalPlayers} jugadores`}
-              onClick={() => openReportModal()}
-            />
-            <DashboardStat
-              title="Suplementación"
-              icon={IconBottle}
-              color="grape"
-              value="Gestionar suplementos"
-              href={team?.id ? `/dashboard/equipo/${team.id}/suplementacion` : '#'}
-            />
-            <DashboardStat
-              title="Evolución equipo"
-              icon={IconChartLine}
-              color="blue"
-              value="Ver análisis"
-              href={team?.id ? `/dashboard/equipo/${team.id}/evolucion` : '#'}
-            />
-            <DashboardStat
-              title="Menú esta semana"
-              icon={IconCalendarEvent}
-              color="teal"
-              value="Ver menú"
-              href={team?.id ? `/dashboard/equipo/${team.id}/menu` : '#'}
-            />
-          </SimpleGrid>
+                {/* Row 2: Redirects */}
+                <DashboardStat
+                  title="Suplementación"
+                  icon={IconBottle}
+                  color="grape"
+                  value="Ver suplementos"
+                  href={team?.id ? `/dashboard/equipo/${team.id}/suplementacion` : '#'}
+                />
+                <DashboardStat
+                  title="Evolución equipo"
+                  icon={IconChartLine}
+                  color="blue"
+                  value="Ver análisis"
+                  href={team?.id ? `/dashboard/equipo/${team.id}/evolucion` : '#'}
+                />
+                <DashboardStat
+                  title="Menú esta semana"
+                  icon={IconCalendarEvent}
+                  color="teal"
+                  value="Ver menú"
+                  href={team?.id ? `/dashboard/equipo/${team.id}/menu` : '#'}
+                />
+                <DashboardStat
+                  title="Configuración"
+                  icon={IconSettings}
+                  color="gray"
+                  value="Ajustes de equipo"
+                  href={team?.id ? `/dashboard/equipo/${team.id}/configuracion` : '#'}
+                />
+              </SimpleGrid>
+            </Grid.Col>
+          </Grid>
 
           <Paper p={6} radius="xl" shadow="xs" withBorder bg="white" w="100%">
             <Group gap={8} w="100%" wrap="wrap" align="center">
@@ -1046,6 +1090,71 @@ export default function DashboardContent({ players = [], team }) {
             </Group>
           </Stack>
         </Box>
+      </Modal>
+
+      <Modal
+        opened={activeModal === 'new-player'}
+        onClose={closeModal}
+        title={
+          <Group gap="xs">
+            <IconUserPlus size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Text fw={700}>Añadir jugador</Text>
+          </Group>
+        }
+        size="xl"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
+      >
+        <PlayerForm initial={null} team={team} />
+      </Modal>
+
+      <Modal
+        opened={activeModal === 'import'}
+        onClose={closeModal}
+        title={
+          <Group gap="xs">
+            <IconFileSpreadsheet size={20} style={{ color: 'var(--mantine-color-teal-6)' }} />
+            <Text fw={700}>Importar datos</Text>
+          </Group>
+        }
+        size="1200px"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
+      >
+        <Tabs defaultValue="metrics" variant="outline" radius="md">
+          <Tabs.List grow mb="md">
+            <Tabs.Tab value="metrics" leftSection={<IconFileSpreadsheet size={16} />}>
+              Métricas (Excel de jugadores)
+            </Tabs.Tab>
+            <Tabs.Tab value="osmolarity" leftSection={<IconDroplet size={16} />}>
+              Osmolaridad (CSV de equipo)
+            </Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="metrics">
+            <PlayerExcelImporter team={team} />
+          </Tabs.Panel>
+
+          <Tabs.Panel value="osmolarity">
+            <TeamOsmolarityImporter team={team} />
+          </Tabs.Panel>
+        </Tabs>
+      </Modal>
+
+      <Modal
+        opened={activeModal === 'message'}
+        onClose={closeModal}
+        title={
+          <Group gap="xs">
+            <IconMail size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Text fw={700}>Enviar mensaje</Text>
+          </Group>
+        }
+        size="lg"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
+      >
+        <MessageComposer players={playersState} team={team} onSent={closeModal} />
       </Modal>
     </Stack>
   );
