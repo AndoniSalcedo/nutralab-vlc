@@ -238,8 +238,8 @@ export function PlanCardPage({ plan }) {
           <Text style={styles.metricValue}>{formatGrasa(plan?.metricas?.grasa)}</Text>
         </View>
         <View style={styles.metricBox}>
-          <Text style={styles.metricLabel}>Masa magra</Text>
-          <Text style={[styles.metricValue, { color: COLORS.green }]}>{formatWeight(plan?.metricas?.masaMagra)}</Text>
+          <Text style={styles.metricLabel}>% P. Muscular Lee&cols</Text>
+          <Text style={[styles.metricValue, { color: COLORS.green }]}>{formatGrasa(plan?.metricas?.pesoMuscular)}</Text>
         </View>
       </View>
 
