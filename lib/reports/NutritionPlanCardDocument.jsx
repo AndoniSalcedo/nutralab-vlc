@@ -194,17 +194,22 @@ const styles = StyleSheet.create({
 });
 
 function formatWeight(value) {
-  if (!value) return '-';
-  return `${Number(value).toFixed(1)} kg`;
+  if (value === null || value === undefined || value === '') return '-';
+  const n = Number(String(value).replace(',', '.'));
+  if (!Number.isFinite(n)) return '-';
+  return `${n.toFixed(1)} kg`;
 }
 
 function formatGrasa(value) {
-  if (!value) return '-';
-  return `${Number(value).toFixed(1)} %`;
+  if (value === null || value === undefined || value === '') return '-';
+  const n = Number(String(value).replace(',', '.'));
+  if (!Number.isFinite(n)) return '-';
+  return `${n.toFixed(1)} %`;
 }
 
 function formatNumber(value, unit = '') {
-  const n = Number(value);
+  if (value === null || value === undefined || value === '') return '-';
+  const n = Number(String(value).replace(',', '.'));
   if (!Number.isFinite(n) || n <= 0) return '-';
   return `${Math.round(n)}${unit}`;
 }

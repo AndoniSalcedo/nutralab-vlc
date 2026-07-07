@@ -56,15 +56,17 @@ function filenameFromResponse(response, fallback) {
 }
 
 function formatNumber(value, suffix = '') {
-  const n = Number(value);
+  if (value === null || value === undefined || value === '') return '-';
+  const n = Number(String(value).replace(',', '.'));
   if (!Number.isFinite(n) || n <= 0) return '-';
   return `${String(Math.round(n * 10) / 10).replace('.', ',')}${suffix}`;
 }
 
 function formatInt(value) {
-  const n = Number(value);
+  if (value === null || value === undefined || value === '') return '-';
+  const n = Number(String(value).replace(',', '.'));
   if (!Number.isFinite(n) || n <= 0) return '-';
-  return Math.round(n).toLocaleString('es-ES');
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
 function planWithMeta(data, { nombre, contexto, contextoAdicional }) {
