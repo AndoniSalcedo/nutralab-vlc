@@ -2,15 +2,8 @@ import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getOwnedPlayer } from '@/lib/team-access';
+import { cleanText, toPositiveNumber } from '@/lib/utils';
 
-function toPositiveNumber(value) {
-  const n = Number(value);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
-
-function cleanText(value) {
-  return String(value || '').trim();
-}
 
 function canManage(user) {
   return user && user.role !== 'jugador';

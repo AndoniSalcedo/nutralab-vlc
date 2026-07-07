@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { initials, filenameFromResponse } from '@/lib/utils';
 import { Anchor, Button, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination, Textarea, Checkbox, Grid, Tabs } from '@mantine/core';
 import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
@@ -120,10 +121,6 @@ function AiGenerationOverlay({ opened, messages = [] }) {
       ` }} />
     </div>
   );
-}
-
-function initials(name = '') {
-  return name.trim().split(/\s+/).slice(0, 2).map((s) => s[0]?.toUpperCase() || '').join('');
 }
 
 function normalize(value) {
@@ -258,16 +255,7 @@ function defaultReportForm() {
   };
 }
 
-function filenameFromResponse(response, fallback) {
-  const header = response.headers.get('Content-Disposition') || '';
-  const encodedMatch = header.match(/filename\*=UTF-8''([^;]+)/i);
-  if (encodedMatch?.[1]) {
-    return decodeURIComponent(encodedMatch[1]);
-  }
 
-  const match = header.match(/filename="?([^";]+)"?/i);
-  return match?.[1] || fallback;
-}
 
 function getPlayerPlan(player, teamConfig) {
   if (player.kcal_objetivo) {
@@ -300,7 +288,7 @@ export default function DashboardContent({ players = [], team }) {
   const closeModal = () => setActiveModal(null);
 
   const teamConfig = team?.configuracion_nutricional;
-  
+
   const dayTypeOptions = useMemo(() => {
     return getTeamNutritionDayTypes(teamConfig).map((d) => ({
       value: d.key,
@@ -521,13 +509,13 @@ export default function DashboardContent({ players = [], team }) {
           <Grid align="center" gutter="md">
             {/* Left part: Back arrow and Team Stack */}
             <Grid.Col span={{ base: 12, md: 'content' }}>
-              <Group gap="md" justify="center" align="center" wrap="nowrap" style={{ height: '100%' }}>
+              <Group gap={0} justify="center" align="center" wrap="nowrap" style={{ height: '100%' }}>
                 <Tooltip label="Volver a equipos" withArrow>
                   <ActionIcon component={Anchor} href="/dashboard" variant="light" color="gray" radius="xl" size={42}>
                     <IconArrowLeft size={20} />
                   </ActionIcon>
                 </Tooltip>
-                
+
                 <Stack gap="xs" align="center" style={{ flex: 1 }}>
                   <ThemeIcon color="dark" variant="light" radius="xl" size={54}>
                     <IconUsers size={28} />

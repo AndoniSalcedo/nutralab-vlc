@@ -3,11 +3,8 @@ import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer, getOwnedTeam } from '@/lib/team-access';
 import { DEFAULT_PLAYER_MEALS_STRING } from '@/lib/nutrition-day-types';
+import { toPositiveNumber as toNumber } from '@/lib/utils';
 
-function toNumber(value) {
-  const n = Number(value);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
 
 export async function POST(request) {
   const url = new URL(request.url);

@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedTeam } from '@/lib/team-access';
 import { DEFAULT_PLAYER_MEALS_STRING } from '@/lib/nutrition-day-types';
+import { cleanText } from '@/lib/utils';
 import {
   TYPED_MEASUREMENT_FIELDS,
   buildImportPlan,
@@ -19,9 +20,6 @@ function parseJson(value, fallback) {
   }
 }
 
-function cleanText(value) {
-  return String(value || '').trim();
-}
 
 function playerUpdatePayload(group, existingPlayer) {
   const payload = {};

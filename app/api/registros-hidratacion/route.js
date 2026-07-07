@@ -2,104 +2,14 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
+import { toNumber as parseCsvNumber, parseDate as parseCsvDate, normalizeKey } from '@/lib/utils';
 
-function parseCsvDate(dateStr) {
-  if (!dateStr) return null;
-  const cleaned = String(dateStr).replace(/^\uFEFF/, '').trim();
-  if (!cleaned) return null;
-
-  const isoMatch = cleaned.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s].*)?$/);
-  if (isoMatch) {
-    return buildDate(isoMatch[1], isoMatch[2], isoMatch[3]);
-  }
-
-  const numericMatch = cleaned.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/);
-  if (numericMatch) {
-    const first = Number(numericMatch[1]);
-    const second = Number(numericMatch[2]);
-    const year = normalizeYear(numericMatch[3]);
-    if (first > 12) return buildDate(year, second, first);
-    if (second > 12) return buildDate(year, first, second);
-    return buildDate(year, second, first);
-  }
-
-  // Try split parts: e.g. "22 May 2026" or "22 de Mayo de 2026" or "22-May-2026"
-  const cleanedSplit = cleaned.replace(/\bde\b/gi, '').replace(/[-/]/g, ' ');
-  const parts = cleanedSplit.split(/\s+/).filter(Boolean);
-  if (parts.length === 3) {
-    const day = parseInt(parts[0], 10);
-    const monthStr = parts[1].toLowerCase();
-    const year = parseInt(parts[2], 10);
-    const months = {
-      jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
-      jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12',
-      ene: '01', abr: '04', ago: '08', dic: '12',
-      mayo: '05', junio: '06', julio: '07', agosto: '08', septiembre: '09', 
-      octubre: '10', noviembre: '11', diciembre: '12', enero: '01',
-      febrero: '02', marzo: '03'
-    };
-    const prefix = monthStr.slice(0, 3);
-    let month = months[prefix] || months[monthStr];
-    if (month && !isNaN(day) && !isNaN(year)) {
-      return buildDate(year, month, day);
-    }
-  }
-
-  const d = new Date(cleaned);
-  if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
-
-  return null;
-}
-
-function normalizeYear(year) {
-  const parsed = Number(year);
-  if (String(year).length === 2) return parsed >= 70 ? 1900 + parsed : 2000 + parsed;
-  return parsed;
-}
-
-function buildDate(year, month, day) {
-  const y = Number(year);
-  const m = Number(month);
-  const d = Number(day);
-  if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) return null;
-  if (y < 1900 || y > 2100 || m < 1 || m > 12 || d < 1 || d > 31) return null;
-  const date = new Date(Date.UTC(y, m - 1, d));
-  if (date.getUTCFullYear() !== y || date.getUTCMonth() !== m - 1 || date.getUTCDate() !== d) return null;
-  return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-}
-
-function normalizeKey(key) {
-  return String(key || '')
-    .replace(/^\uFEFF/, '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '');
-}
-
-function parseCsvNumber(value) {
-  if (value === null || value === undefined || String(value).trim() === '') return null;
-  const cleaned = String(value).trim().replace(/\s/g, '');
-  const lastComma = cleaned.lastIndexOf(',');
-  const lastDot = cleaned.lastIndexOf('.');
-  let normalized = cleaned;
-
-  if (lastComma > -1 && lastDot > -1) {
-    normalized = lastComma > lastDot
-      ? cleaned.replace(/\./g, '').replace(',', '.')
-      : cleaned.replace(/,/g, '');
-  } else if (lastComma > -1) {
-    normalized = cleaned.replace(',', '.');
-  }
-
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) ? parsed : null;
-}
 
 function normalizeRecordType(type) {
   const normalized = String(type || '').trim().toLowerCase();
   return normalized || 'sosm';
 }
+
 
 export async function POST(req) {
   try {

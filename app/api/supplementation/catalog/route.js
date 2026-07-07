@@ -2,29 +2,14 @@ import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getOwnedTeam } from '@/lib/team-access';
+import { cleanText, toPositiveNumber, slugify as sharedSlugify } from '@/lib/utils';
 
 function canManage(user) {
   return user && user.role !== 'jugador';
 }
 
-function cleanText(value) {
-  return String(value || '').trim();
-}
+const slugify = (value) => sharedSlugify(value).slice(0, 80);
 
-function toPositiveNumber(value) {
-  const n = Number(value);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
-
-function slugify(value) {
-  return cleanText(value)
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 80);
-}
 
 async function nextListOrder(supabase) {
   const { data } = await supabase

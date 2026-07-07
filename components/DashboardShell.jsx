@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { initials } from '@/lib/utils';
 import { env } from '@/lib/env';
 import {
   IconChevronDown,
@@ -31,11 +32,6 @@ export default function DashboardShell({ children, user }) {
   const router = useRouter();
   const frontendUrl = env.NEXT_PUBLIC_FRONTEND_URL;
 
-  const initials = (name) => {
-    if (!name) return '';
-    const parts = name.split(' ');
-    return parts.slice(0, 2).map((n) => n[0]).join('').toUpperCase();
-  };
 
   return (
     <div className={classes.header}>

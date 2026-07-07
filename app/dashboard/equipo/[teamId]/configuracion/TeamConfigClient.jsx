@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { slugify } from '@/lib/utils';
 import { Button, Group, Stack, TextInput, NumberInput, Select, Accordion, Paper, Title, ActionIcon, Table, Modal } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil } from '@tabler/icons-react';
@@ -26,7 +27,7 @@ export default function TeamConfigClient({ team }) {
   const handleSaveDayType = () => {
     let finalKey = editingDayType.key;
     if (!finalKey) {
-      finalKey = editingDayType.label.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '_');
+      finalKey = slugify(editingDayType.label, '_');
     }
     if (!finalKey || !editingDayType.label) return;
     

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { normalizeKey } from '@/lib/utils';
 import {
   Badge,
   Box,
@@ -131,12 +132,7 @@ function getSweatAxisDomain(dataMin, dataMax) {
 }
 
 function normalizeCsvKey(key) {
-  return String(key || '')
-    .replace(/^\uFEFF/, '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '');
+  return normalizeKey(key);
 }
 
 function getCsvVal(row, keys) {

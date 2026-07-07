@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { filenameFromResponse, formatNumberDecimal, formatInteger as formatInt } from '@/lib/utils';
 import { marked } from 'marked';
 import {
   Badge,
@@ -47,26 +48,8 @@ function planLabel(plan) {
   return `${plan.nombre}${suffix}`;
 }
 
-function filenameFromResponse(response, fallback) {
-  const header = response.headers.get('Content-Disposition') || '';
-  const encodedMatch = header.match(/filename\*=UTF-8''([^;]+)/i);
-  if (encodedMatch?.[1]) return decodeURIComponent(encodedMatch[1]);
-  const match = header.match(/filename="?([^";]+)"?/i);
-  return match?.[1] || fallback;
-}
-
 function formatNumber(value, suffix = '') {
-  if (value === null || value === undefined || value === '') return '-';
-  const n = Number(String(value).replace(',', '.'));
-  if (!Number.isFinite(n) || n <= 0) return '-';
-  return `${String(Math.round(n * 10) / 10).replace('.', ',')}${suffix}`;
-}
-
-function formatInt(value) {
-  if (value === null || value === undefined || value === '') return '-';
-  const n = Number(String(value).replace(',', '.'));
-  if (!Number.isFinite(n) || n <= 0) return '-';
-  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return formatNumberDecimal(value, suffix, 1);
 }
 
 function planWithMeta(data, { nombre, contexto, contextoAdicional }) {

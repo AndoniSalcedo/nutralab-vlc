@@ -8,20 +8,11 @@ import { withLatestMeasurement } from '@/lib/player-metrics';
 import WeeklySquadReportDocument from '@/lib/reports/WeeklySquadReportDocument';
 import { planDataToLegacyContent } from '@/lib/nutrition-plan-card';
 import { generarDatosPlan } from '@/lib/ai-plan-generator';
+import { sanitizeFilename, pdfHeaders as getPdfHeaders } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-function sanitizeFilename(value) {
-  const filename = String(value || 'Informe_Semanal')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9_-]+/g, '_')
-    .replace(/^_+|_+$/g, '')
-    .slice(0, 80);
-
-  return filename || 'Informe_Semanal';
-}
 
 function normalizeIds(value) {
   if (!Array.isArray(value)) return [];
@@ -59,14 +50,6 @@ function httpError(message, status = 400) {
   return error;
 }
 
-function getPdfHeaders(filename, length) {
-  return {
-    'Content-Type': 'application/pdf',
-    'Content-Length': String(length),
-    'Content-Disposition': `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
-    'Cache-Control': 'no-store',
-  };
-}
 
 async function resolveTeam(supabase, user, teamId) {
   if (user.role === 'jugador') {
@@ -258,7 +241,7 @@ async function renderReportResponse(meta, players, semana, teamConfig) {
   const buffer = Buffer.concat(chunks);
   const uint8Array = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
   const scope = players.length === 1 ? `${players[0].nombre || 'Jugador'}_${players[0].apellidos || ''}` : 'Plantilla';
-  const filename = `${sanitizeFilename(`Informe_${meta.title}_${scope}`)}.pdf`;
+  const filename = `${sanitizeFilename(`Informe_${meta.title}_${scope}`, 'Informe_Semanal')}.pdf`;
 
   return new NextResponse(uint8Array, {
     status: 200,

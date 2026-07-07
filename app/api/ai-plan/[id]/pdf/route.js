@@ -5,29 +5,11 @@ import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
 import NutritionPlanCardDocument from '@/lib/reports/NutritionPlanCardDocument';
+import { sanitizeFilename, pdfHeaders } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-function sanitizeFilename(value) {
-  const filename = String(value || 'Ficha_Nutricional')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9_-]+/g, '_')
-    .replace(/^_+|_+$/g, '')
-    .slice(0, 80);
-
-  return filename || 'Ficha_Nutricional';
-}
-
-function pdfHeaders(filename, length) {
-  return {
-    'Content-Type': 'application/pdf',
-    'Content-Length': String(length),
-    'Content-Disposition': `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
-    'Cache-Control': 'no-store',
-  };
-}
 
 export async function GET(_request, { params }) {
   try {
@@ -97,7 +79,7 @@ export async function GET(_request, { params }) {
 
     const buffer = Buffer.concat(chunks);
     const uint8Array = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-    const filename = `${sanitizeFilename(`Ficha_${plan.nombre}`)}.pdf`;
+    const filename = `${sanitizeFilename(`Ficha_${plan.nombre}`, 'Ficha_Nutricional')}.pdf`;
 
     return new NextResponse(uint8Array, {
       status: 200,

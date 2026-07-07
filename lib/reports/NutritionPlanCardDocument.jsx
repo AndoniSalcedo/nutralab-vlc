@@ -2,6 +2,7 @@ import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { sanitizePlanData } from '@/lib/nutrition-plan-card';
 import { getTeamDayTypeColor, getTeamDayTypeLabel } from '@/lib/calculations';
+import { formatNumberDecimal } from '@/lib/utils';
 
 const COLORS = {
   top: '#10142f',
@@ -194,24 +195,15 @@ const styles = StyleSheet.create({
 });
 
 function formatWeight(value) {
-  if (value === null || value === undefined || value === '') return '-';
-  const n = Number(String(value).replace(',', '.'));
-  if (!Number.isFinite(n)) return '-';
-  return `${n.toFixed(1)} kg`;
+  return formatNumberDecimal(value, ' kg', 1);
 }
 
 function formatGrasa(value) {
-  if (value === null || value === undefined || value === '') return '-';
-  const n = Number(String(value).replace(',', '.'));
-  if (!Number.isFinite(n)) return '-';
-  return `${n.toFixed(1)} %`;
+  return formatNumberDecimal(value, ' %', 1);
 }
 
 function formatNumber(value, unit = '') {
-  if (value === null || value === undefined || value === '') return '-';
-  const n = Number(String(value).replace(',', '.'));
-  if (!Number.isFinite(n) || n <= 0) return '-';
-  return `${Math.round(n)}${unit}`;
+  return formatNumberDecimal(value, unit, 0);
 }
 
 export function PlanCardPage({ plan, teamConfig }) {

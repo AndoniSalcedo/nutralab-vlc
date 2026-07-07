@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { slugify } from '@/lib/utils';
 import { Alert, Button, Group, Menu, Modal, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconKey, IconRefresh, IconShieldCheck } from '@tabler/icons-react';
@@ -26,12 +27,7 @@ export default function PlayerCredentialsButton({ jugador, compact = false, menu
   const buttonLabel = hasCredentials ? 'Actualizar acceso' : 'Crear acceso';
 
   const suggestedEmail = useMemo(() => {
-    const base = `${jugador.nombre || ''}.${jugador.apellidos || ''}`
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '.')
-      .replace(/^\.+|\.+$/g, '');
+    const base = slugify(`${jugador.nombre || ''}.${jugador.apellidos || ''}`, '.');
     return base ? `${base}@nutralab.local` : '';
   }, [jugador.apellidos, jugador.nombre]);
 

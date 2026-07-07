@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { playerFullName } from '@/lib/utils';
 import {
   ActionIcon,
   Badge,
@@ -42,9 +43,6 @@ function nextSeasonLabel() {
   return `${year}/${String(year + 1).slice(-2)}`;
 }
 
-function playerName(player) {
-  return `${player?.nombre || ''} ${player?.apellidos || ''}`.trim() || 'Jugador sin nombre';
-}
 
 function playerCountLabel(count) {
   return `${count} jugador${Number(count) === 1 ? '' : 'es'}`;
@@ -451,7 +449,7 @@ export default function TeamsDashboard({ teams = [] }) {
                                     label={
                                       <Box>
                                         <Text size="sm" fw={650} c="#24291f">
-                                          {playerName(player)}
+                                          {playerFullName(player, 'Jugador sin nombre')}
                                         </Text>
                                         {player.posicion ? (
                                           <Text size="xs" c="dimmed">

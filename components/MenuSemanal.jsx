@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { normalizeKey } from '@/lib/utils';
 import {
   Paper,
   Stack,
@@ -47,8 +48,7 @@ export function getDayDate(weekStr, dayName) {
 function isToday(dayName) {
   try {
     const todayName = new Intl.DateTimeFormat('es-ES', { weekday: 'long' }).format(new Date());
-    const cleanStr = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    return cleanStr(dayName) === cleanStr(todayName);
+    return normalizeKey(dayName) === normalizeKey(todayName);
   } catch (e) {
     return false;
   }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { playerFullName as playerName } from '@/lib/utils';
 import {
   ActionIcon,
   Anchor,
@@ -90,9 +91,6 @@ function metricDisplay(value, unit) {
   return formatMetricValue(value, unit);
 }
 
-function playerName(player) {
-  return `${player?.nombre || ''} ${player?.apellidos || ''}`.trim() || 'Jugador';
-}
 
 function metricRecord(records = [], metric, offset = 0) {
   return [...records]

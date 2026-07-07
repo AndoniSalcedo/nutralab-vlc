@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { initials } from '@/lib/utils';
 import {
   ActionIcon,
   Anchor,
@@ -27,9 +28,6 @@ import SupplementCatalogManager from './SupplementCatalogManager';
 
 dayjs.locale('es');
 
-function initials(name = '') {
-  return name.trim().split(/\s+/).slice(0, 2).map((s) => s[0]?.toUpperCase() || '').join('');
-}
 
 export default function TeamSupplementationDashboard({
   players = [],
