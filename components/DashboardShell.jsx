@@ -15,15 +15,16 @@ import {
 } from '@tabler/icons-react';
 import {
   Avatar,
+  Box,
   Container,
   Group,
   Menu,
   Text,
   UnstyledButton,
 } from '@mantine/core';
+import { useHover } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
 
-import classes from './DashboardShell.module.css';
 import Logo from './Logo';
 
 
@@ -31,10 +32,16 @@ export default function DashboardShell({ children, user }) {
   const [opened, setOpened] = useState(false);
   const router = useRouter();
   const frontendUrl = env.NEXT_PUBLIC_FRONTEND_URL;
+  const { hovered, ref } = useHover();
+  const isActive = opened || hovered;
 
 
   return (
-    <div className={classes.header}>
+    <Box
+      minHeight="100vh"
+      pt="sm"
+      bg="light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6))"
+    >
       <Container size="lg" px={{ base: 'xs', sm: 'md' }}>
         <Group justify="space-between">
           <Logo />
@@ -50,7 +57,17 @@ export default function DashboardShell({ children, user }) {
           >
             <Menu.Target>
               <UnstyledButton
-                className={`${classes.user} ${opened ? classes.userActive : ''}`}
+                ref={ref}
+                c="light-dark(black, dark.0)"
+                px={{ base: 'xs', xs: 'sm' }}
+                py="xs"
+                style={{
+                  borderRadius: 'var(--mantine-radius-xl)',
+                  transition: 'background-color 100ms ease',
+                  backgroundColor: isActive
+                    ? 'light-dark(var(--mantine-color-white), var(--mantine-color-dark-8))'
+                    : undefined,
+                }}
               >
                 <Group gap={2}>
                   <Avatar
@@ -60,7 +77,7 @@ export default function DashboardShell({ children, user }) {
                     size={42} >
                     {initials(user?.name || user?.username)}
                   </Avatar>
-                  <Text fw={500} size="sm" lh={1} mr={2}>
+                  <Text fw={500} size="sm" lh={1} mr={2} visibleFrom="xs">
                     {user?.name || user?.username || ""}
                   </Text>
                   <IconChevronDown size={16} stroke={1.5} />
@@ -150,6 +167,6 @@ export default function DashboardShell({ children, user }) {
       <Container size="xl" px={{ base: 0, sm: 'md' }} pt={{ base: 'xs', sm: 'md' }} pb="md">
         {children}
       </Container>
-    </div>
+    </Box>
   );
 }
