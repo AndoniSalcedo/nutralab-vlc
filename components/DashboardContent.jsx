@@ -7,7 +7,7 @@ import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconDownload, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconFileText, IconChefHat, IconBook, IconCalendar, IconSettings, IconSparkles, IconBottle, IconPlus, IconFileSpreadsheet, IconDroplet } from '@tabler/icons-react';
+import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconDownload, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconFileText, IconChefHat, IconBook, IconCalendar, IconSettings, IconSparkles, IconBottle, IconPlus, IconFileSpreadsheet, IconDroplet, IconReportMedical } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import PlayerForm from '@/components/PlayerForm';
@@ -534,7 +534,7 @@ export default function DashboardContent({ players = [], team }) {
 
             {/* Right part: Grid of 8 buttons */}
             <Grid.Col span={{ base: 12, md: 'auto' }}>
-              <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="xs">
+              <SimpleGrid cols={{ base: 2, lg: 3 }} spacing="xs">
                 {/* Row 1: Modals */}
                 <DashboardStat
                   title="Plantilla"
@@ -565,7 +565,7 @@ export default function DashboardContent({ players = [], team }) {
                   onClick={() => setActiveModal('new-player')}
                 />
 
-                {/* Row 2: Redirects */}
+                {/* Row 2 & 3: Redirects */}
                 <DashboardStat
                   title="Suplementación"
                   icon={IconBottle}
@@ -579,6 +579,13 @@ export default function DashboardContent({ players = [], team }) {
                   color="blue"
                   value="Ver análisis"
                   href={team?.id ? `/dashboard/equipo/${team.id}/evolucion` : '#'}
+                />
+                <DashboardStat
+                  title="Analíticas equipo"
+                  icon={IconReportMedical}
+                  color="red"
+                  value="Ver analíticas"
+                  href={team?.id ? `/dashboard/equipo/${team.id}/analiticas` : '#'}
                 />
                 <DashboardStat
                   title="Menú esta semana"
@@ -654,7 +661,7 @@ export default function DashboardContent({ players = [], team }) {
                     <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
                     <Table.Th visibleFrom="xs">Métricas</Table.Th>
                     <Table.Th visibleFrom="sm">Plan</Table.Th>
-                    <Table.Th>Posición</Table.Th>
+                    <Table.Th>Credenciales</Table.Th>
                     <Table.Th w={70} />
                   </Table.Tr>
                 </Table.Thead>
@@ -686,7 +693,7 @@ export default function DashboardContent({ players = [], team }) {
                               )}
                             </Group>
                             <Text c="dimmed" fz="xs" style={{ lineHeight: 1 }} truncate>
-                              {player.auth_email || 'Sin credenciales de acceso'}
+                              {player.posicion || 'Sin posición'}
                             </Text>
                           </Box>
                         </Group>
@@ -698,9 +705,7 @@ export default function DashboardContent({ players = [], team }) {
                           <>
                             <Text fz="sm" fw={500} c="dark.4">
                               {player.peso_kg ? `${player.peso_kg} kg` : '—'}
-                              {player.porcentaje_grasa ? ` · ${player.porcentaje_grasa}% GC` : ''}
                             </Text>
-                            <Text fz="xs" c="dimmed">Composición</Text>
                           </>
                         ) : (
                           <Text fz="sm" c="dimmed">—</Text>
@@ -728,9 +733,9 @@ export default function DashboardContent({ players = [], team }) {
 
                       {/* COLUMNA 4: POSICIÓN */}
                       <Table.Td>
-                        <Badge variant="light" color="gray" radius="sm">
-                          {player.posicion || 'Sin posición'}
-                        </Badge>
+                        <Text fz="sm" c="dimmed">
+                          {player.auth_email || 'Sin credenciales de acceso'}
+                        </Text>
                       </Table.Td>
 
                       {/* COLUMNA 5: ACCIONES */}
