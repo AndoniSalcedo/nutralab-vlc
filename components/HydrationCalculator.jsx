@@ -11,12 +11,12 @@ import {
   Center,
   ActionIcon,
   Button,
-  SegmentedControl,
   Box,
-  Badge
+  Badge,
+  Paper
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconDroplet, IconBottle, IconCup, IconCheck, IconRotate } from '@tabler/icons-react';
+import { IconDroplet, IconBottle, IconCup, IconCheck, IconRotate, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { BentoCard } from './Bento/BentoItem';
 import { calculateHydration, getTeamNutritionDayTypes } from '@/lib/calculations';
 
@@ -51,17 +51,10 @@ export default function HydrationCalculator({ jugador }) {
   const percentage = Math.min(100, Math.round((consumed / currentTarget) * 100));
   const isGoalReached = percentage >= 100;
 
-  const targetOptions = useMemo(() => {
-    return dayTypes.map(d => ({
-      value: d.key,
-      label: isMobile ? (
-        <Stack gap={0} align="center" style={{ lineHeight: 1.1 }}>
-          <Text size="xs" fw={700} style={{ fontSize: '11px' }}>{d.label}</Text>
-          <Text size="xxs" c={targetType === d.key ? 'blue.1' : 'dimmed'} style={{ fontSize: '9px' }}>{targets[d.key]} ml</Text>
-        </Stack>
-      ) : `${d.label} · ${targets[d.key]} ml`
-    }));
-  }, [dayTypes, targets, targetType, isMobile]);
+  const activeIdx = Math.max(0, dayTypes.findIndex(d => d.key === targetType));
+  const activeDay = dayTypes[activeIdx] || { label: '', color: 'blue' };
+
+
 
   useEffect(() => {
     setIsClient(true);
@@ -115,14 +108,85 @@ export default function HydrationCalculator({ jugador }) {
     <BentoCard title="Control de Hidratación" icon={IconDroplet} color="blue">
       <Stack gap="lg" mt="sm">
 
-        <SegmentedControl
-          value={targetType}
-          onChange={handleTargetChange}
-          data={targetOptions}
-          fullWidth
-          radius="md"
-          color="blue"
-        />
+        <Paper withBorder p="md" radius="xl" bg="var(--mantine-color-white)">
+          <Group justify="space-between" align="center" wrap="nowrap">
+            {/* Left arrow */}
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              radius="xl"
+              size="lg"
+              onClick={() => {
+                const prevIdx = (activeIdx - 1 + dayTypes.length) % dayTypes.length;
+                handleTargetChange(dayTypes[prevIdx].key);
+              }}
+              style={{ transition: 'transform 0.1s ease' }}
+              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
+              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              <IconChevronLeft size={22} stroke={2} />
+            </ActionIcon>
+
+            {/* Active Day Type & Indicator Dots Wrapper */}
+            <Stack gap="xs" style={{ flex: 1 }} align="center">
+              <Badge
+                variant="light"
+                color={activeDay.color || 'blue'}
+                size="lg"
+                radius="xl"
+                py="md"
+                px="xl"
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  textTransform: 'none',
+                }}
+              >
+                {activeDay.label} · {(currentTarget / 1000).toFixed(2)} L
+              </Badge>
+
+              {/* Indicator Dots */}
+              <Group gap={6} justify="center" mt={4}>
+                {dayTypes.map((dt, idx) => {
+                  const isActive = idx === activeIdx;
+                  return (
+                    <Box
+                      key={dt.key}
+                      onClick={() => handleTargetChange(dt.key)}
+                      style={{
+                        width: isActive ? '20px' : '6px',
+                        height: '6px',
+                        borderRadius: '3px',
+                        backgroundColor: isActive
+                          ? `var(--mantine-color-${activeDay.color || 'blue'}-6)`
+                          : 'var(--mantine-color-gray-3)',
+                        cursor: 'pointer',
+                        transition: 'width 0.2s ease, background-color 0.2s ease',
+                      }}
+                    />
+                  );
+                })}
+              </Group>
+            </Stack>
+
+            {/* Right arrow */}
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              radius="xl"
+              size="lg"
+              onClick={() => {
+                const nextIdx = (activeIdx + 1) % dayTypes.length;
+                handleTargetChange(dayTypes[nextIdx].key);
+              }}
+              style={{ transition: 'transform 0.1s ease' }}
+              onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
+              onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              <IconChevronRight size={22} stroke={2} />
+            </ActionIcon>
+          </Group>
+        </Paper>
 
         <Group justify="center" wrap={isMobile ? 'wrap' : 'nowrap'} align="center">
           <RingProgress
