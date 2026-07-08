@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { initials, filenameFromResponse } from '@/lib/utils';
-import { Anchor, Button, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination, Textarea, Checkbox, Grid, Tabs } from '@mantine/core';
+import { Anchor, Button, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination, Textarea, Checkbox, Grid, Tabs } from '@mantine/core';
 import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';

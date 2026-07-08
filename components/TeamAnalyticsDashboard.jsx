@@ -51,7 +51,6 @@ import {
   IconChartLine,
 } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
-import { BentoCard } from '@/components/Bento/BentoItem';
 import { initials } from '@/lib/utils';
 
 function formatDate(dateStr) {
@@ -217,31 +216,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
     return list;
   }, [playersWithAnaliticas, filterName, filterPosition, filterSeverity, sortBy]);
 
-  // --- Lista de jugadores con alertas clínicas actuales ---
-  const alertPlayers = useMemo(() => {
-    return playersWithAnaliticas
-      .filter((p) => p.latest && (p.latest.parametros || []).some((param) => param.fuera_rango))
-      .map((p) => {
-        const outOfRangeParams = (p.latest.parametros || [])
-          .filter((param) => param.fuera_rango)
-          .map((param) => {
-            const status = parameterStatus(param);
-            return {
-              nombre: param.nombre,
-              valor: param.valor,
-              unidad: param.unidad,
-              rango_min: param.rango_min,
-              rango_max: param.rango_max,
-              status,
-            };
-          });
-        return {
-          ...p,
-          outOfRangeParams,
-        };
-      })
-      .sort((a, b) => b.outOfRangeParams.length - a.outOfRangeParams.length);
-  }, [playersWithAnaliticas]);
+
 
   // --- Datos para el gráfico comparativo del parámetro seleccionado ---
   const chartData = useMemo(() => {
