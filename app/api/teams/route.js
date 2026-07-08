@@ -90,7 +90,6 @@ export async function POST(request) {
 
       const team = await getOwnedTeam(supabase, user, teamId);
       if (!team) return forbidden('No tienes acceso a este equipo');
-
       const data = await updateTeam(supabase, team.id, { nombre, temporada, descripcion });
       return NextResponse.json({ equipo: data }, { status: 200 });
     }

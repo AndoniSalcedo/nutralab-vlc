@@ -18,7 +18,6 @@ import {
   Container,
   Group,
   Menu,
-  Text,
   UnstyledButton,
 } from '@mantine/core';
 import { useRouter } from 'next/navigation';
@@ -58,11 +57,8 @@ export default function DashboardShell({ children, user }) {
                     alt={user?.name || "Avatar"}
                     radius="xl"
                     size={42} >
-                    {initials(user?.name || user?.username)}
+                    {initials(user?.name || user?.username || user?.email || "Usuario")}
                   </Avatar>
-                  <Text fw={500} size="sm" lh={1} mr={2}>
-                    {user?.name || user?.username || ""}
-                  </Text>
                   <IconChevronDown size={16} stroke={1.5} />
                 </Group>
               </UnstyledButton>
@@ -79,56 +75,76 @@ export default function DashboardShell({ children, user }) {
                 Gestión de equipos
               </Menu.Item>
 
-              <Menu.Item
-                leftSection={<IconUserStar size={16} stroke={1.5} />}
-                onClick={() => {
-                  window.location.href = `${frontendUrl}/admin/nutritionists`;
-                  setOpened(false);
-                }}
-              >
-                Gestionar nutricionistas
-              </Menu.Item>
+              {user?.role === 'admin' && (
+                <>
+                  <Menu.Item
+                    leftSection={<IconUserCog size={16} stroke={1.5} />}
+                    onClick={() => {
+                      router.push('/dashboard/tecnicos');
+                      setOpened(false);
+                    }}
+                  >
+                    Gestión de técnicos
+                  </Menu.Item>
 
-              <Menu.Item
-                leftSection={<IconUserCog size={16} stroke={1.5} />}
-                onClick={() => {
-                  window.location.href = `${frontendUrl}/users`;
-                  setOpened(false);
-                }}
-              >
-                Gestionar usuarios
-              </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconUserStar size={16} stroke={1.5} />}
+                    onClick={() => {
+                      window.location.href = `${frontendUrl}/admin/nutritionists`;
+                      setOpened(false);
+                    }}
+                  >
+                    Gestionar nutricionistas
+                  </Menu.Item>
 
-              <Menu.Item
-                leftSection={<IconReceipt size={16} stroke={1.5} />}
-                onClick={() => {
-                  window.location.href = `${frontendUrl}/recipes`;
-                  setOpened(false);
-                }}
-              >
-                Recetario
-              </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconUserCog size={16} stroke={1.5} />}
+                    onClick={() => {
+                      window.location.href = `${frontendUrl}/users`;
+                      setOpened(false);
+                    }}
+                  >
+                    Gestionar usuarios
+                  </Menu.Item>
+                </>
+              )}
 
-              <Menu.Item
-                leftSection={<IconBook size={16} stroke={1.5} />}
-                onClick={() => {
-                  window.location.href = `${frontendUrl}/catalogs`;
-                  setOpened(false);
-                }}
-              >
-                Catálogos
-              </Menu.Item>
+              {user?.role !== 'tecnico' && (
+                <>
+                  <Menu.Item
+                    leftSection={<IconReceipt size={16} stroke={1.5} />}
+                    onClick={() => {
+                      window.location.href = `${frontendUrl}/recipes`;
+                      setOpened(false);
+                    }}
+                  >
+                    Recetario
+                  </Menu.Item>
+
+                  <Menu.Item
+                    leftSection={<IconBook size={16} stroke={1.5} />}
+                    onClick={() => {
+                      window.location.href = `${frontendUrl}/catalogs`;
+                      setOpened(false);
+                    }}
+                  >
+                    Catálogos
+                  </Menu.Item>
+                </>
+              )}
 
               <Menu.Divider />
-              <Menu.Item
-                leftSection={<IconSettings size={16} stroke={1.5} />}
-                onClick={() => {
-                  window.location.href = `${frontendUrl}/settings`;
-                  setOpened(false);
-                }}
-              >
-                Configuración
-              </Menu.Item>
+              {user?.role !== 'tecnico' && (
+                <Menu.Item
+                  leftSection={<IconSettings size={16} stroke={1.5} />}
+                  onClick={() => {
+                    window.location.href = `${frontendUrl}/settings`;
+                    setOpened(false);
+                  }}
+                >
+                  Configuración
+                </Menu.Item>
+              )}
               <Menu.Item
                 leftSection={<IconLogout size={16} stroke={1.5} />}
                 onClick={() => {

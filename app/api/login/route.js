@@ -37,10 +37,38 @@ export async function POST(request) {
     const jugador = await getPlayerByAuthUserIdSingle(supabaseAdmin, supabaseUser.id);
 
     if (!jugador) {
-      return NextResponse.json(
-        { error: 'No se ha encontrado un perfil de jugador asociado a este email. Contacta con tu nutricionista.' },
-        { status: 403 }
-      );
+      const { data: tecnico } = await supabaseAdmin
+        .from('tecnicos')
+        .select('id, nombre, apellidos')
+        .eq('auth_user_id', supabaseUser.id)
+        .maybeSingle();
+
+      if (!tecnico) {
+        return NextResponse.json(
+          { error: 'No se ha encontrado un perfil asociado a este email. Contacta con tu nutricionista.' },
+          { status: 403 }
+        );
+      }
+
+      // Crear la cookie de sesión con el rol de técnico
+      const sessionObj = {
+        id: tecnico.id,
+        name: `${tecnico.nombre} ${tecnico.apellidos || ''}`.trim(),
+        role: 'tecnico',
+        supabase_uid: supabaseUser.id,
+      };
+
+      const response = NextResponse.json({ ok: true });
+
+      response.cookies.set(COOKIE_NAME, buildSessionValue(sessionObj), {
+        httpOnly: true,
+        secure: env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7, // 7 días para técnicos
+      });
+
+      return response;
     }
 
     // Crear la cookie de sesión con el rol de jugador

@@ -1,7 +1,7 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { withLatestMeasurement } from '@/lib/player-metrics';
-import { getOwnedPlayer } from '@/lib/team-access';
+import { getAccessiblePlayer } from '@/lib/team-access';
 import JugadorHeader from '@/components/JugadorHeader';
 import { Anchor, Stack, Text } from '@mantine/core';
 import PlayerTabs from './_tabs/PlayerTabs';
@@ -19,8 +19,8 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
   const isPlayer = user?.role === 'jugador';
 
   if (!isPlayer) {
-    const ownedPlayer = await getOwnedPlayer(supabase, user, id);
-    if (!ownedPlayer) {
+    const accessiblePlayer = await getAccessiblePlayer(supabase, user, id);
+    if (!accessiblePlayer) {
       return (
         <Stack gap="lg" mt="md">
           <Text c="red">No tienes acceso a este jugador.</Text>
@@ -91,7 +91,8 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
         menus={menus}
         activeTab={activeTab}
         activeSubtab={activeSubtab}
-        readOnly={isPlayer}
+        readOnly={isPlayer || user?.role === 'tecnico'}
+        isPlayer={isPlayer}
       />
     </BoneyardSkeleton>
   );

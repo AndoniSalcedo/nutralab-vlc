@@ -1,6 +1,6 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
-import { getOwnedTeam } from '@/lib/team-access';
+import { getAccessibleTeam } from '@/lib/team-access';
 import { Anchor, Stack, Text } from '@mantine/core';
 import TeamSupplementationDashboard from '@/components/TeamSupplementationDashboard';
 import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
@@ -17,7 +17,7 @@ export const revalidate = 0;
 export default async function TeamSupplementationPage({ params, searchParams }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
-  const team = await getOwnedTeam(supabase, user, params.teamId);
+  const team = await getAccessibleTeam(supabase, user, params.teamId);
 
   if (!team) {
     return (
@@ -56,7 +56,6 @@ export default async function TeamSupplementationPage({ params, searchParams }) 
     console.error('Error fetching team supplementation:', error);
   }
 
-
   const playersParam = searchParams?.players || searchParams?.jugadores || searchParams?.playerIds;
   const initialSelectedPlayerIds = playersParam
     ? String(playersParam).split(',').map(Number).filter(Number.isFinite)
@@ -70,6 +69,7 @@ export default async function TeamSupplementationPage({ params, searchParams }) 
       initialExtras={extras}
       history={history}
       catalogs={catalogs}
+      readOnly={user?.role === 'tecnico'}
       initialSelectedPlayerIds={initialSelectedPlayerIds}
     />
   );

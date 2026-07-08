@@ -1,6 +1,6 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
-import { getOwnedTeam } from '@/lib/team-access';
+import { getAccessibleTeam } from '@/lib/team-access';
 import { Anchor, Stack, Text } from '@mantine/core';
 import TeamMenuDashboard from '@/components/TeamMenuDashboard';
 import { getMenusByTeam } from '@/repositories/menuRepository';
@@ -11,7 +11,7 @@ export const revalidate = 0;
 export default async function TeamMenuPage({ params }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
-  const team = await getOwnedTeam(supabase, user, params.teamId);
+  const team = await getAccessibleTeam(supabase, user, params.teamId);
 
   if (!team) {
     return (
@@ -32,8 +32,8 @@ export default async function TeamMenuPage({ params }) {
   return (
     <TeamMenuDashboard 
       initialMenus={menus} 
-      teamId={team.id}
+      teamId={team.id} 
+      readOnly={user?.role === 'tecnico'}
     />
   );
 }
-

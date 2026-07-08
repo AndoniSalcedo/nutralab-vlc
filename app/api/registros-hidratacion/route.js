@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedPlayer } from '@/lib/team-access';
+import { forbidden, getOwnedPlayer, getAccessiblePlayer } from '@/lib/team-access';
 import { toNumber as parseCsvNumber, parseDate as parseCsvDate, normalizeKey } from '@/lib/utils';
 import {
   getHydrationRecordsByPlayerId,
@@ -27,7 +27,7 @@ export async function POST(req) {
     
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     const ownedPlayer = await getOwnedPlayer(supabase, user, jugador_id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
@@ -147,8 +147,8 @@ export async function GET(req) {
     const user = await getUser();
     if (!user) return forbidden('No autorizado');
 
-    const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
-    if (!ownedPlayer && String(user.id) !== String(jugadorId)) {
+    const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+    if (!accessiblePlayer && String(user.id) !== String(jugadorId)) {
       return forbidden('No tienes acceso a este jugador');
     }
 
@@ -168,7 +168,7 @@ export async function DELETE(req) {
     
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     // Verify record exists and user owns the player
     const record = await getHydrationRecordById(supabase, id);

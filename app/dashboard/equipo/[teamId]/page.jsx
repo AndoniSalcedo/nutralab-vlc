@@ -2,7 +2,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-server';
 import DashboardContent from '@/components/DashboardContent';
 import { getUser } from '@/lib/auth';
 import { withLatestMeasurement } from '@/lib/player-metrics';
-import { getOwnedTeam } from '@/lib/team-access';
+import { getAccessibleTeam } from '@/lib/team-access';
 import { Anchor, Stack, Text } from '@mantine/core';
 import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIdsSimple } from '@/repositories/evolutionRepository';
@@ -13,7 +13,7 @@ export const revalidate = 0;
 export default async function TeamDashboard({ params }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
-  const team = await getOwnedTeam(supabase, user, params.teamId);
+  const team = await getAccessibleTeam(supabase, user, params.teamId);
 
   if (!team) {
     return (
@@ -45,6 +45,6 @@ export default async function TeamDashboard({ params }) {
     console.error('Error fetching team players/evolutions:', err);
   }
 
-  return <DashboardContent players={players} team={team} />;
+  return <DashboardContent players={players} team={team} readOnly={user?.role === 'tecnico'} />;
 }
 

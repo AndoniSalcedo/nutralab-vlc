@@ -172,7 +172,7 @@ function JugadorHeaderDesktop({ jugador, isAdmin, isPlayer, hasCredentials, onEd
     >
       <Group justify="space-between" align="center" wrap="wrap" gap="md">
         <Group gap="md">
-          {isAdmin && <BackButton equipoId={jugador.equipo_id} />}
+          {!isPlayer && <BackButton equipoId={jugador.equipo_id} />}
           <PlayerIdentity jugador={jugador} isAdmin={isAdmin} hasCredentials={hasCredentials} />
         </Group>
 
@@ -193,7 +193,7 @@ function JugadorHeaderMobile({ jugador, isAdmin, isPlayer, hasCredentials, onEdi
       mb="xs"
       style={{ position: 'relative' }}
     >
-      {isAdmin && (
+      {!isPlayer && (
         <Box style={{ position: 'absolute', top: 14, left: 14, zIndex: 2 }}>
           <BackButton size={50} iconSize={28} equipoId={jugador.equipo_id} />
         </Box>

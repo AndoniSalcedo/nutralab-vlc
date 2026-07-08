@@ -45,7 +45,7 @@ function playerCountLabel(count) {
   return `${count} jugador${Number(count) === 1 ? '' : 'es'}`;
 }
 
-export default function TeamsDashboard({ teams = [] }) {
+export default function TeamsDashboard({ teams = [], readOnly = false }) {
   const router = useRouter();
   const [teamsState, setTeamsState] = useState(teams);
   const [season, setSeason] = useState('');
@@ -229,9 +229,11 @@ export default function TeamsDashboard({ teams = [] }) {
                 </Text>
               </Box>
             </Group>
-            <Button radius="xl" size="xs" leftSection={<IconPlus size={14} />} onClick={openCreate}>
-              Nuevo equipo
-            </Button>
+            {!readOnly && (
+              <Button radius="xl" size="xs" leftSection={<IconPlus size={14} />} onClick={openCreate}>
+                Nuevo equipo
+              </Button>
+            )}
           </Group>
 
           <Group gap="xs" mt="md" wrap="wrap">
@@ -276,28 +278,30 @@ export default function TeamsDashboard({ teams = [] }) {
                     <ThemeIcon color="blue" variant="light" radius="md" size={40}>
                       <IconUsersGroup size={20} />
                     </ThemeIcon>
-                    <Menu shadow="md" width={220} position="bottom-end" withArrow>
-                      <Menu.Target>
-                        <ActionIcon
-                          variant="subtle"
-                          color="gray"
-                          radius="xl"
-                          loading={saving}
-                          onClick={(event) => event.stopPropagation()}
-                        >
-                          <IconDots size={18} />
-                        </ActionIcon>
-                      </Menu.Target>
-                      <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
-                        <Menu.Item leftSection={<IconCopy size={14} />} onClick={() => openCopy(team)}>
-                          Copiar a temporada
-                        </Menu.Item>
-                        <Menu.Divider />
-                        <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeleteTeam(team)}>
-                          Eliminar
-                        </Menu.Item>
-                      </Menu.Dropdown>
-                    </Menu>
+                    {!readOnly && (
+                      <Menu shadow="md" width={220} position="bottom-end" withArrow>
+                        <Menu.Target>
+                          <ActionIcon
+                            variant="subtle"
+                            color="gray"
+                            radius="xl"
+                            loading={saving}
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            <IconDots size={18} />
+                          </ActionIcon>
+                        </Menu.Target>
+                        <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
+                          <Menu.Item leftSection={<IconCopy size={14} />} onClick={() => openCopy(team)}>
+                            Copiar a temporada
+                          </Menu.Item>
+                          <Menu.Divider />
+                          <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeleteTeam(team)}>
+                            Eliminar
+                          </Menu.Item>
+                        </Menu.Dropdown>
+                      </Menu>
+                    )}
                   </Group>
 
                   <Box>

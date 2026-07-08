@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { renderToStream } from '@react-pdf/renderer';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getOwnedTeam } from '@/lib/team-access';
+import { getAccessibleTeam } from '@/lib/team-access';
 import { withLatestMeasurement } from '@/lib/player-metrics';
 import WeeklySquadReportDocument from '@/lib/reports/WeeklySquadReportDocument';
 import { planDataToLegacyContent } from '@/lib/nutrition-plan-card';
@@ -73,7 +73,7 @@ async function resolveTeam(supabase, user, teamId) {
     return team;
   }
 
-  const team = await getOwnedTeam(supabase, user, teamId);
+  const team = await getAccessibleTeam(supabase, user, teamId);
   if (!team) {
     throw httpError('No tienes acceso a este equipo', 403);
   }
@@ -224,7 +224,7 @@ function jsonError(error, fallback = 'Error generando informe') {
 
 export async function POST(request) {
   const user = await getUser();
-  if (!user || user.role === 'jugador') {
+  if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   }
 

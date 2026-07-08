@@ -166,7 +166,7 @@ function getPlayerPlan(player, teamConfig) {
   return { kcal: null, calculated: false };
 }
 
-export default function DashboardContent({ players = [], team }) {
+export default function DashboardContent({ players = [], team, readOnly = false }) {
   const router = useRouter();
   const [playersState, setPlayersState] = useState(players);
   const [editingPlayer, setEditingPlayer] = useState(null);
@@ -442,34 +442,39 @@ export default function DashboardContent({ players = [], team }) {
             <Grid.Col span={{ base: 12, md: 'auto' }}>
               <SimpleGrid cols={{ base: 2, lg: 3 }} spacing="xs">
                 {/* Row 1: Modals */}
-                <DashboardStat
-                  title="Plantilla"
-                  icon={IconUsers}
-                  color="blue"
-                  value={`${totalPlayers} jugadores`}
-                  onClick={() => openReportModal()}
-                />
-                <DashboardStat
-                  title="Importar datos"
-                  icon={IconFileSpreadsheet}
-                  color="teal"
-                  value="Excel / CSV"
-                  onClick={() => setActiveModal('import')}
-                />
-                <DashboardStat
-                  title="Mensaje"
-                  icon={IconMail}
-                  color="blue"
-                  value="Enviar mensaje"
-                  onClick={() => setActiveModal('message')}
-                />
-                <DashboardStat
-                  title="Nuevo jugador"
-                  icon={IconPlus}
-                  color="blue"
-                  value="Añadir jugador"
-                  onClick={() => setActiveModal('new-player')}
-                />
+                {!readOnly && (
+                  <>
+                    <DashboardStat
+                      title="Plantilla"
+                      icon={IconUsers}
+                      color="blue"
+                      value={`${totalPlayers} jugadores`}
+                      onClick={() => openReportModal()}
+                    />
+
+                    <DashboardStat
+                      title="Importar datos"
+                      icon={IconFileSpreadsheet}
+                      color="teal"
+                      value="Excel / CSV"
+                      onClick={() => setActiveModal('import')}
+                    />
+                    <DashboardStat
+                      title="Mensaje"
+                      icon={IconMail}
+                      color="blue"
+                      value="Enviar mensaje"
+                      onClick={() => setActiveModal('message')}
+                    />
+                    <DashboardStat
+                      title="Nuevo jugador"
+                      icon={IconPlus}
+                      color="blue"
+                      value="Añadir jugador"
+                      onClick={() => setActiveModal('new-player')}
+                    />
+                  </>
+                )}
 
                 {/* Row 2 & 3: Redirects */}
                 <DashboardStat
@@ -662,21 +667,27 @@ export default function DashboardContent({ players = [], team }) {
                               </ActionIcon>
                             </Menu.Target>
                             <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
-                              <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => setEditingPlayer(player)}>
-                                Editar
-                              </Menu.Item>
+                              {!readOnly && (
+                                <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => setEditingPlayer(player)}>
+                                  Editar
+                                </Menu.Item>
+                              )}
                               <Menu.Item leftSection={<IconFileTypePdf size={14} />} onClick={() => openReportModal(player)}>
                                 Generar informe
                               </Menu.Item>
-                              <PlayerCredentialsButton
-                                jugador={player}
-                                menuItem
-                                onSaved={(credentials) => updateCredentials(player.id, credentials)}
-                              />
-                              <Menu.Divider />
-                              <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeletePlayer(player)}>
-                                Eliminar
-                              </Menu.Item>
+                              {!readOnly && (
+                                <>
+                                  <PlayerCredentialsButton
+                                    jugador={player}
+                                    menuItem
+                                    onSaved={(credentials) => updateCredentials(player.id, credentials)}
+                                  />
+                                  <Menu.Divider />
+                                  <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeletePlayer(player)}>
+                                    Eliminar
+                                  </Menu.Item>
+                                </>
+                              )}
                             </Menu.Dropdown>
                           </Menu>
                         </Group>
