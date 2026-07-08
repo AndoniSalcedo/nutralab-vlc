@@ -10,12 +10,11 @@ import {
   Text,
   ThemeIcon,
   Title,
-  SegmentedControl,
-  Badge
+  Badge,
+  ActionIcon
 } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 
-import { IconClipboardList, IconTargetArrow, IconUser, IconInfoCircle } from '@tabler/icons-react';
+import { IconClipboardList, IconTargetArrow, IconUser, IconInfoCircle, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES, getObjectiveLabel } from '@/lib/calculations';
 import { CampoEditable, ComidasEditable } from '../editable';
 import { latestMetricValue } from '@/lib/player-metrics';
@@ -31,7 +30,6 @@ function StatCard({ label, value, order = 2, subtext }) {
 }
 
 export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = false }) {
-  const isMobile = useMediaQuery('(max-width: 48em)');
   const pesoActual = latestMetricValue(evoluciones, 'peso_kg', jugador?.peso_kg);
   const weightKg = Number(pesoActual || 0);
 
@@ -62,7 +60,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
         out[dt.value] = null;
         return;
       }
-      
+
       const result = calculateByObjective({ weightKg, objectiveKey: playerObjective, dayTypeKey: dt.value, teamConfig });
       if (result) {
         out[dt.value] = result;
@@ -86,6 +84,9 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
   const protein = (isDefaultFactorType && jugador.proteina_objetivo_g) || currentPlan?.protein || null;
   const cho = (isDefaultFactorType && jugador.cho_objetivo_g) || currentPlan?.cho || null;
   const fat = (isDefaultFactorType && jugador.grasa_objetivo_g) || currentPlan?.fat || null;
+
+  const activeIdx = DAY_TYPES.findIndex(d => d.value === activeDayType);
+  const activeDay = DAY_TYPES[activeIdx !== -1 ? activeIdx : 0] || {};
 
   return (
     <Stack gap={0}>
@@ -143,32 +144,91 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
               </Group>
             </Group>
 
-            {/* Day Type selector Segmented Control */}
-            <Box mb="md" bg="gray.0" p="xs" style={{ borderRadius: '12px' }}>
-              <Text size="xs" fw={700} c="dimmed" mb="xs" tt="uppercase">Tipo de Día</Text>
-              <SegmentedControl
-                value={activeDayType}
-                onChange={setActiveDayType}
-                data={DAY_TYPES.map(dt => {
-                  let shortLabel = dt.label;
-                  if (dt.label === 'Doble sesión') shortLabel = 'Doble';
-                  if (dt.label === 'Entrenamiento') shortLabel = 'Entreno';
-                  if (dt.label === 'Recuperación') shortLabel = 'Recup.';
+            {/* Day Type selector carousel switcher */}
+            <Box mb="lg">
+              <Text size="xs" fw={700} c="dimmed" mb="xs" tt="uppercase" style={{ letterSpacing: '0.5px' }}>
+                Tipo de Día
+              </Text>
 
-                  return {
-                    value: dt.value,
-                    label: isMobile ? (
-                      <Text size="xs" fw={700} style={{ fontSize: '11px' }}>{shortLabel}</Text>
-                    ) : dt.label
-                  };
-                })}
-                fullWidth
-                radius="md"
-                color="blue"
-                styles={{
-                  root: { backgroundColor: 'var(--mantine-color-gray-1)' }
-                }}
-              />
+              <Paper withBorder p="md" radius="xl" bg="var(--mantine-color-white)">
+                <Group justify="space-between" align="center" wrap="nowrap">
+                  {/* Left arrow */}
+                  <ActionIcon
+                    variant="subtle"
+                    color="gray"
+                    radius="xl"
+                    size="lg"
+                    onClick={() => {
+                      const prevIdx = (activeIdx - 1 + DAY_TYPES.length) % DAY_TYPES.length;
+                      setActiveDayType(DAY_TYPES[prevIdx].value);
+                    }}
+                    style={{ transition: 'transform 0.1s ease' }}
+                    onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
+                    onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    <IconChevronLeft size={22} stroke={2} />
+                  </ActionIcon>
+
+                  {/* Active Day Type & Indicator Dots Wrapper */}
+                  <Stack gap="xs" style={{ flex: 1 }} align="center">
+                    <Badge
+                      variant="light"
+                      color={activeDay.color || 'blue'}
+                      size="lg"
+                      radius="xl"
+                      py="md"
+                      px="xl"
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 800,
+                        textTransform: 'none',
+                      }}
+                    >
+                      {activeDay.label}
+                    </Badge>
+
+                    {/* Indicator Dots */}
+                    <Group gap={6} justify="center" mt={4}>
+                      {DAY_TYPES.map((dt, idx) => {
+                        const isActive = idx === activeIdx;
+                        return (
+                          <Box
+                            key={dt.value}
+                            onClick={() => setActiveDayType(dt.value)}
+                            style={{
+                              width: isActive ? '20px' : '6px',
+                              height: '6px',
+                              borderRadius: '3px',
+                              backgroundColor: isActive
+                                ? `var(--mantine-color-${activeDay.color || 'blue'}-6)`
+                                : 'var(--mantine-color-gray-3)',
+                              cursor: 'pointer',
+                              transition: 'width 0.2s ease, background-color 0.2s ease',
+                            }}
+                          />
+                        );
+                      })}
+                    </Group>
+                  </Stack>
+
+                  {/* Right arrow */}
+                  <ActionIcon
+                    variant="subtle"
+                    color="gray"
+                    radius="xl"
+                    size="lg"
+                    onClick={() => {
+                      const nextIdx = (activeIdx + 1) % DAY_TYPES.length;
+                      setActiveDayType(DAY_TYPES[nextIdx].value);
+                    }}
+                    style={{ transition: 'transform 0.1s ease' }}
+                    onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.9)'}
+                    onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    <IconChevronRight size={22} stroke={2} />
+                  </ActionIcon>
+                </Group>
+              </Paper>
             </Box>
 
             {/* Macro Objectives Cards */}
