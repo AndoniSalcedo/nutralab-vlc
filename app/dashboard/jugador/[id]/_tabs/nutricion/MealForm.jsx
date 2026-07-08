@@ -137,8 +137,30 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
     setNotes(meal?.notes || '');
     setFoodValue(null);
     setFoodGrams(100);
-    setCalculatedFoods([]);
     setFile(null);
+
+    // Parse ingredients to restore calculatedFoods
+    const initialCalculated = [];
+    let nextId = 1;
+    if (Array.isArray(meal?.ingredients)) {
+      for (const ingredientStr of meal.ingredients) {
+        const match = ingredientStr.match(/^(.+?)\s*\((\d+(?:\.\d+)?)\s*g\)$/i);
+        if (match) {
+          const foodName = match[1].trim();
+          const grams = parseFloat(match[2]);
+          const foundFood = foods.find(f => f.name.toLowerCase() === foodName.toLowerCase());
+          if (foundFood && !isNaN(grams)) {
+            initialCalculated.push({
+              id: nextId++,
+              food: foundFood,
+              grams: roundMacro(grams)
+            });
+          }
+        }
+      }
+    }
+    calcIdRef.current = nextId;
+    setCalculatedFoods(initialCalculated);
   }, [meal]);
 
   const foodOptions = useMemo(

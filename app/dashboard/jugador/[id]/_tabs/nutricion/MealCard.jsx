@@ -1,6 +1,17 @@
+import { useMemo } from 'react';
 import { AspectRatio, Badge, Box, Button, Group, Image, Paper, Stack, Text } from "@mantine/core";
 import { IconClock, IconEdit, IconFlame, IconNotes, IconTrash } from "@tabler/icons-react";
 import MealCardSkeleton from "@/components/skeletons/MealCardSkeleton";
+import foods from "@/data/foods";
+
+const calcNutrient = (food, grams, key) => {
+  const value = Number(food?.[key]);
+  const qty = Number(grams);
+  if (!Number.isFinite(value) || !Number.isFinite(qty)) return 0;
+  return (value * qty) / 100;
+};
+
+const roundMacro = (value) => Math.round(value * 10) / 10;
 
 const MEAL_META = {
   breakfast: { label: 'Desayuno', emoji: '🍳', color: 'blue' },
@@ -24,6 +35,37 @@ export default function MealCard({ m, onOpen, onEdit, onDelete }) {
   const ingredientsText = displayIngredients.length > 0 
     ? displayIngredients.join(', ') 
     : null;
+
+  const calculatedMacros = useMemo(() => {
+    let pro = 0;
+    let cho = 0;
+    let fat = 0;
+    let parsedCount = 0;
+
+    const displayIngredients = Array.isArray(m.ingredients) ? m.ingredients : [];
+
+    for (const ingredientStr of displayIngredients) {
+      const match = ingredientStr.match(/^(.+?)\s*\((\d+(?:\.\d+)?)\s*g\)$/i);
+      if (match) {
+        const foodName = match[1].trim();
+        const grams = parseFloat(match[2]);
+        const foundFood = foods.find(f => f.name.toLowerCase() === foodName.toLowerCase());
+        if (foundFood && !isNaN(grams)) {
+          pro += calcNutrient(foundFood, grams, 'pro');
+          cho += calcNutrient(foundFood, grams, 'cho');
+          fat += calcNutrient(foundFood, grams, 'fat');
+          parsedCount++;
+        }
+      }
+    }
+
+    if (parsedCount === 0) return null;
+    return {
+      pro: roundMacro(pro),
+      cho: roundMacro(cho),
+      fat: roundMacro(fat),
+    };
+  }, [m.ingredients]);
 
   return (
     <Paper
@@ -102,6 +144,19 @@ export default function MealCard({ m, onOpen, onEdit, onDelete }) {
                 >
                   {m.calories} kcal
                 </Badge>
+              )}
+              {calculatedMacros && (
+                <>
+                  <Badge size="sm" variant="light" color="blue" radius="xl">
+                    P {calculatedMacros.pro} g
+                  </Badge>
+                  <Badge size="sm" variant="light" color="orange" radius="xl">
+                    HC {calculatedMacros.cho} g
+                  </Badge>
+                  <Badge size="sm" variant="light" color="yellow" radius="xl">
+                    G {calculatedMacros.fat} g
+                  </Badge>
+                </>
               )}
               <Badge size="sm" variant="light" color={color} radius="xl">
                 {emoji} {label}
