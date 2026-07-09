@@ -1,8 +1,14 @@
 'use client';
 
-import { Stack, Group, Paper, Skeleton, Grid, Box } from '@mantine/core';
+import { Stack, Group, Paper, Skeleton, Grid, Box, ActionIcon, ThemeIcon, Title, Text } from '@mantine/core';
+import { IconArrowLeft, IconChefHat } from '@tabler/icons-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function TeamMenuSkeleton() {
+  const params = useParams();
+  const teamId = params?.teamId;
+
   return (
     <Stack gap={0}>
       {/* Header Paper */}
@@ -20,11 +26,24 @@ export default function TeamMenuSkeleton() {
         <Stack gap="md">
           <Group justify="space-between" align="center" wrap="wrap" gap="md">
             <Group gap="sm" wrap="nowrap">
-              <Skeleton height={42} width={42} radius="xl" />
-              <Skeleton height={32} width={32} radius="xl" /> {/* ThemeIcon size="lg" (32px) */}
+              <ActionIcon 
+                component={Link} 
+                href={teamId ? `/dashboard/equipo/${teamId}` : '/dashboard'} 
+                variant="light" 
+                color="gray" 
+                radius="xl" 
+                size={42}
+              >
+                <IconArrowLeft size={20} />
+              </ActionIcon>
+              <ThemeIcon color="teal" variant="light" radius="xl" size="lg">
+                <IconChefHat size={20} />
+              </ThemeIcon>
               <Stack gap={2}>
-                <Skeleton height={20} width={140} radius="md" />
-                <Skeleton height={14} width={240} radius="sm" />
+                <Title order={3} fw={800} c="dark.4">Menú comedor</Title>
+                <Text size="sm" c="dimmed">
+                  Comedor del equipo, comida y cena.
+                </Text>
               </Stack>
             </Group>
             {/* Switcher button group layout mockup */}

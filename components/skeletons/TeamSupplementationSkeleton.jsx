@@ -1,11 +1,17 @@
 'use client';
 
-import { Stack, Group, Skeleton, Paper, Table, ScrollArea, Box } from '@mantine/core';
+import { Stack, Group, Skeleton, Paper, Table, ScrollArea, Box, ActionIcon, ThemeIcon, Title, Text } from '@mantine/core';
+import { IconArrowLeft, IconBottle } from '@tabler/icons-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function TeamSupplementationSkeleton() {
+  const params = useParams();
+  const teamId = params?.teamId;
+
   return (
     <Stack gap="lg">
-      {/* Header Paper Skeleton */}
+      {/* Header Paper with REAL static elements */}
       <Paper
         p={{ base: 'sm', sm: 'md' }}
         shadow="sm"
@@ -17,13 +23,29 @@ export default function TeamSupplementationSkeleton() {
       >
         <Group justify="space-between" align="center" wrap="wrap" gap="md">
           <Group gap="sm" wrap="nowrap">
-            <Skeleton height={42} width={42} radius="xl" />
-            <Skeleton height={42} width={42} radius="xl" />
+            <ActionIcon 
+              component={Link} 
+              href={teamId ? `/dashboard/equipo/${teamId}` : '/dashboard'} 
+              variant="light" 
+              color="gray" 
+              radius="xl" 
+              size={42}
+            >
+              <IconArrowLeft size={20} />
+            </ActionIcon>
+            <ThemeIcon color="grape" variant="light" radius="xl" size={42}>
+              <IconBottle size={21} />
+            </ThemeIcon>
             <Box>
-              <Skeleton height={22} width={150} radius="md" />
-              <Skeleton height={12} width={100} radius="sm" mt={4} />
+              <Title order={3} fw={850} c="#24291f" lh={1.1}>
+                Suplementación
+              </Title>
+              <Text size="xs" c="dimmed" mt={2}>
+                Cargando datos de suplementación del equipo...
+              </Text>
             </Box>
           </Group>
+          {/* Static buttons mockup */}
           <Group gap="xs">
             <Skeleton height={30} width={110} radius="xl" />
             <Skeleton height={30} width={90} radius="xl" />
@@ -38,9 +60,9 @@ export default function TeamSupplementationSkeleton() {
           <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 600 }}>
             <Table.Thead bg="gray.0">
               <Table.Tr>
-                <Table.Th style={{ paddingLeft: 24 }}><Skeleton height={14} width={80} /></Table.Th>
-                <Table.Th><Skeleton height={14} width={150} /></Table.Th>
-                <Table.Th><Skeleton height={14} width={80} /></Table.Th>
+                <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
+                <Table.Th>Catálogo Activo (Fase)</Table.Th>
+                <Table.Th>Extras</Table.Th>
                 <Table.Th w={120} />
               </Table.Tr>
             </Table.Thead>

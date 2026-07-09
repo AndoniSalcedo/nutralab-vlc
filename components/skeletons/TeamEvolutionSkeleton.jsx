@@ -1,8 +1,14 @@
 'use client';
 
-import { Stack, Group, Skeleton, Paper, Table, ScrollArea, Box } from '@mantine/core';
+import { Stack, Group, Skeleton, Paper, Table, ScrollArea, Box, ActionIcon, ThemeIcon, Title, Text } from '@mantine/core';
+import { IconArrowLeft, IconChartLine } from '@tabler/icons-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function TeamEvolutionSkeleton() {
+  const params = useParams();
+  const teamId = params?.teamId;
+
   return (
     <Stack gap="lg">
       {/* Header & Filters Paper */}
@@ -20,11 +26,26 @@ export default function TeamEvolutionSkeleton() {
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="wrap" gap="md">
             <Group gap="sm" wrap="nowrap">
-              <Skeleton height={42} width={42} radius="xl" />
-              <Skeleton height={42} width={42} radius="xl" />
+              <ActionIcon 
+                component={Link} 
+                href={teamId ? `/dashboard/equipo/${teamId}` : '/dashboard'} 
+                variant="light" 
+                color="gray" 
+                radius="xl" 
+                size={42}
+              >
+                <IconArrowLeft size={20} />
+              </ActionIcon>
+              <ThemeIcon color="blue" variant="light" radius="xl" size={42}>
+                <IconChartLine size={21} />
+              </ThemeIcon>
               <Box>
-                <Skeleton height={22} width={180} radius="md" />
-                <Skeleton height={12} width={150} radius="sm" mt={4} />
+                <Title order={3} fw={850} c="#24291f" lh={1.1}>
+                  Evolución de equipo
+                </Title>
+                <Text size="xs" c="dimmed" mt={2}>
+                  Cargando tendencias corporales y cambios recientes...
+                </Text>
               </Box>
             </Group>
             <Group gap="xs" wrap="wrap" justify="flex-end">
@@ -62,11 +83,11 @@ export default function TeamEvolutionSkeleton() {
           <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 800 }}>
             <Table.Thead bg="gray.0">
               <Table.Tr>
-                <Table.Th style={{ paddingLeft: 24 }}><Skeleton height={14} width={80} /></Table.Th>
-                <Table.Th><Skeleton height={14} width={60} /></Table.Th>
-                <Table.Th><Skeleton height={14} width={60} /></Table.Th>
-                <Table.Th><Skeleton height={14} width={60} /></Table.Th>
-                <Table.Th><Skeleton height={14} width={100} /></Table.Th>
+                <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
+                <Table.Th>Peso</Table.Th>
+                <Table.Th>Masa Muscular</Table.Th>
+                <Table.Th>% Grasa</Table.Th>
+                <Table.Th>Último Registro</Table.Th>
                 <Table.Th w={80} />
               </Table.Tr>
             </Table.Thead>

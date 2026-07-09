@@ -1,18 +1,35 @@
 'use client';
 
-import { Stack, Group, Paper, Skeleton, Table, Accordion } from '@mantine/core';
+import { Stack, Group, Paper, Skeleton, Table, Accordion, ActionIcon, Title, Text } from '@mantine/core';
+import { IconArrowLeft } from '@tabler/icons-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function TeamConfigSkeleton() {
+  const params = useParams();
+  const teamId = params?.teamId;
+
   return (
     <Stack gap="lg">
-      {/* Page Header Paper matching TeamConfigPage server layout */}
+      {/* Page Header Paper with REAL static elements */}
       <Paper p="md" radius="lg" shadow="sm" withBorder>
         <Group gap="md" align="center">
-          <Skeleton height={42} width={42} radius="xl" />
-          <Stack gap={4} style={{ flex: 1 }}>
-            <Skeleton height={24} width={300} radius="md" />
-            <Skeleton height={14} width={450} radius="sm" />
-          </Stack>
+          <ActionIcon 
+            component={Link} 
+            href={teamId ? `/dashboard/equipo/${teamId}` : '/dashboard'} 
+            variant="light" 
+            color="gray" 
+            radius="xl" 
+            size={42}
+          >
+            <IconArrowLeft size={20} />
+          </ActionIcon>
+          <div>
+            <Title order={3} fw={700} c="#24291f">Configuración Nutricional</Title>
+            <Text c="dimmed" size="sm" mt={2}>
+              Personaliza los tipos de día y multiplicadores de macros que se usarán en este equipo.
+            </Text>
+          </div>
         </Group>
       </Paper>
 
@@ -21,15 +38,15 @@ export default function TeamConfigSkeleton() {
         {/* Tipos de Dia card */}
         <Paper p="md" radius="lg" shadow="sm" withBorder>
           <Group justify="space-between" mb="md">
-            <Skeleton height={18} width={120} radius="md" />
+            <Title order={4}>Tipos de Día</Title>
             <Skeleton height={30} width={80} radius="xl" />
           </Group>
 
           <Table striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th><Skeleton height={12} width={100} radius="sm" /></Table.Th>
-                <Table.Th><Skeleton height={12} width={60} radius="sm" /></Table.Th>
+                <Table.Th>Tipo de Día</Table.Th>
+                <Table.Th>Color</Table.Th>
                 <Table.Th />
               </Table.Tr>
             </Table.Thead>
@@ -52,7 +69,7 @@ export default function TeamConfigSkeleton() {
 
         {/* Accordion Card */}
         <Paper p="md" radius="lg" shadow="sm" withBorder>
-          <Skeleton height={18} width={200} radius="md" mb="md" />
+          <Title order={4} mb="md">Multiplicadores por Objetivo</Title>
           
           <Accordion variant="separated">
             {Array.from({ length: 3 }).map((_, i) => (
