@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { initials } from '@/lib/utils';
 import {
   ActionIcon,
@@ -35,8 +36,10 @@ export default function TeamSupplementationDashboard({
   initialAssignments = [],
   initialExtras = [],
   history = [],
-  catalogs = []
+  catalogs = [],
+  initialSelectedPlayerIds = null
 }) {
+  const router = useRouter();
   const [historyModal, setHistoryModal] = useState({ opened: false, player: null, historyEvents: [] });
   const [managerModal, setManagerModal] = useState(null); // 'assign', 'catalogs', 'supplements' or null
 
@@ -168,7 +171,10 @@ export default function TeamSupplementationDashboard({
 
       <Modal
         opened={!!managerModal}
-        onClose={() => setManagerModal(null)}
+        onClose={() => {
+          setManagerModal(null);
+          router.refresh();
+        }}
         title={
           <Group gap="xs">
             <IconBottle size={20} style={{ color: 'var(--mantine-color-grape-6)' }} />
@@ -187,6 +193,7 @@ export default function TeamSupplementationDashboard({
           team={team} 
           activeTab={managerModal || 'assign'} 
           onTabChange={setManagerModal}
+          initialSelectedPlayerIds={initialSelectedPlayerIds}
         />
       </Modal>
 

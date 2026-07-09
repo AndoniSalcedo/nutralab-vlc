@@ -306,5 +306,55 @@ export async function POST(request) {
     return NextResponse.json({ ok: true, assigned: rows.length });
   }
 
+  if (action === 'assign_extra_to_players') {
+    const suplementoIds = Array.isArray(body.suplementoIds)
+      ? body.suplementoIds.map(Number).filter(Number.isFinite)
+      : [];
+    const jugadorIds = Array.isArray(body.jugadorIds)
+      ? body.jugadorIds.map(Number).filter(Number.isFinite)
+      : [];
+
+    if (!suplementoIds.length) {
+      return NextResponse.json({ error: 'Selecciona al menos un suplemento' }, { status: 400 });
+    }
+    if (!jugadorIds.length) {
+      return NextResponse.json({ error: 'Debes seleccionar al menos un jugador' }, { status: 400 });
+    }
+
+    const team = await getOwnedTeam(supabase, user, body.team_id);
+    if (!team) {
+      return NextResponse.json({ error: 'No tienes acceso a este equipo' }, { status: 403 });
+    }
+
+    const { data: teamPlayers, error: playersError } = await supabase
+      .from('jugadores')
+      .select('id')
+      .eq('equipo_id', team.id)
+      .in('id', jugadorIds);
+
+    if (playersError) return NextResponse.json({ error: playersError.message }, { status: 500 });
+
+    const rows = [];
+    (teamPlayers || []).forEach((player) => {
+      suplementoIds.forEach((supId) => {
+        rows.push({
+          jugador_id: player.id,
+          suplemento_id: supId,
+          updated_at: new Date().toISOString(),
+        });
+      });
+    });
+
+    if (rows.length) {
+      const { error } = await supabase
+        .from('jugador_suplementos_extra')
+        .upsert(rows, { onConflict: 'jugador_id,suplemento_id' });
+
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true, assigned: rows.length });
+  }
+
   return NextResponse.json({ error: 'Acción no soportada' }, { status: 400 });
 }

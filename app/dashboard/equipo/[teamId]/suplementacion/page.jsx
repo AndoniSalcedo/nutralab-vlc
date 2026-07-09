@@ -7,7 +7,7 @@ import TeamSupplementationDashboard from '@/components/TeamSupplementationDashbo
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export default async function TeamSupplementationPage({ params }) {
+export default async function TeamSupplementationPage({ params, searchParams }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
   const team = await getOwnedTeam(supabase, user, params.teamId);
@@ -64,6 +64,11 @@ export default async function TeamSupplementationPage({ params }) {
     console.error('Error fetching team supplementation:', error);
   }
 
+  const playersParam = searchParams?.players || searchParams?.jugadores || searchParams?.playerIds;
+  const initialSelectedPlayerIds = playersParam
+    ? String(playersParam).split(',').map(Number).filter(Number.isFinite)
+    : null;
+
   return (
     <TeamSupplementationDashboard 
       players={players} 
@@ -72,6 +77,7 @@ export default async function TeamSupplementationPage({ params }) {
       initialExtras={extras}
       history={history}
       catalogs={catalogs}
+      initialSelectedPlayerIds={initialSelectedPlayerIds}
     />
   );
 }
