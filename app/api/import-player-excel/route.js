@@ -140,7 +140,7 @@ function resolveDecision(group, decisions) {
   else if (decision.action === 'create') actionObj = { action: 'create' };
   else if (decision.action === 'update' && decision.jugador_id) {
     actionObj = { action: 'update', jugadorId: decision.jugador_id };
-  } else if (group.accion === 'actualizar' && group.jugadorId) {
+  } else if (group.jugadorId) {
     actionObj = { action: 'update', jugadorId: group.jugadorId };
   } else if (group.accion === 'crear') {
     actionObj = { action: 'create' };

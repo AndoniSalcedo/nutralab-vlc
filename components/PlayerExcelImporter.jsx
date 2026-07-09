@@ -5,6 +5,7 @@ import { Dropzone } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
 import { importPlayerExcel } from '@/services/player';
 import * as XLSX from 'xlsx';
+import { DateInput } from '@mantine/dates';
 import {
   Alert,
   Badge,
@@ -19,7 +20,6 @@ import {
   Stack,
   Table,
   Text,
-  TextInput,
   ThemeIcon,
   Title,
   useMantineTheme,
@@ -46,7 +46,7 @@ function actionColor(action) {
   if (action === 'actualizar') return 'green';
   if (action === 'crear') return 'blue';
   if (action === 'revision') return 'yellow';
-  if (action === 'omitido') return 'gray';
+  if (action === 'omitido' || action === 'skip') return 'gray';
   if (action === 'error') return 'red';
   return 'dark';
 }
@@ -57,7 +57,7 @@ function actionLabel(action) {
   if (action === 'revision') return 'Revisión';
   if (action === 'creado') return 'Creado';
   if (action === 'actualizado') return 'Actualizado';
-  if (action === 'omitido') return 'Omitido';
+  if (action === 'omitido' || action === 'skip') return 'Omitido';
   if (action === 'error') return 'Error';
   return action || '-';
 }
@@ -69,6 +69,20 @@ function formatDate(value) {
     month: 'short',
     year: 'numeric',
   });
+}
+
+function dateValue(value) {
+  return value ? new Date(`${value}T00:00:00`) : null;
+}
+
+function dateInputToIso(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function initialDecisions(players) {
@@ -339,7 +353,10 @@ export default function PlayerExcelImporter({ team }) {
 
   function decisionValue(player) {
     const decision = decisions[player.key];
-    if (!decision) return 'skip';
+    if (!decision) {
+      if (player.jugadorId) return `update:${player.jugadorId}`;
+      return 'skip';
+    }
     if (decision.action === 'update') return `update:${decision.jugador_id}`;
     return decision.action || 'skip';
   }
@@ -353,6 +370,19 @@ export default function PlayerExcelImporter({ team }) {
       { value: 'create', label: `Crear: ${player.nombreCompleto}` },
       { value: 'skip', label: 'Omitir' },
     ];
+  }
+
+  function getEffectiveAction(player) {
+    const decision = decisions[player.key];
+    if (decision) {
+      if (decision.action === 'update') return 'actualizar';
+      return decision.action; // 'create' or 'skip'
+    }
+    if (player.accion === 'revision') {
+      if (player.jugadorId) return 'actualizar';
+      return 'skip';
+    }
+    return player.accion;
   }
 
   async function importFile() {
@@ -528,12 +558,19 @@ export default function PlayerExcelImporter({ team }) {
                         </Text>
                       </Table.Td>
                       <Table.Td>
-                        <Badge color={actionColor(player.accion)} variant="light">
-                          {actionLabel(player.accion)}
+                        <Badge color={actionColor(getEffectiveAction(player))} variant="light">
+                          {actionLabel(getEffectiveAction(player))}
                         </Badge>
-                        {player.matchReason ? (
-                          <Text size="xs" c="dimmed" mt={4}>{player.matchReason}</Text>
-                        ) : null}
+                        {player.matchReason ? (() => {
+                          const allFilled = player.missingMeasurements?.length > 0 && player.missingMeasurements.every(
+                            (m) => decisions[player.key]?.fallbackDates?.[m.id]
+                          );
+                          return (
+                            <Text size="xs" c={allFilled ? 'green.6' : 'dimmed'} fw={allFilled ? 600 : 400} mt={4}>
+                              {allFilled ? 'Fechas asignadas correctamente' : player.matchReason}
+                            </Text>
+                          );
+                        })() : null}
                       </Table.Td>
                       <Table.Td ta="center" fw={700}>{player.medicionesCount}</Table.Td>
                       <Table.Td ta="center">{formatDate(player.ultimaFecha)}</Table.Td>
@@ -557,23 +594,37 @@ export default function PlayerExcelImporter({ team }) {
                             <Text size="xs" c="dimmed">Sin avisos</Text>
                           )}
                           
-                          {player.missingMeasurements?.length > 0 && (
-                            <Stack gap={4} mt="xs">
-                              <Text size="xs" fw={600} c="dark.3">Fechas faltantes:</Text>
-                              {player.missingMeasurements.map((m) => (
-                                <TextInput
-                                  key={m.id}
-                                  type="date"
-                                  size="xs"
-                                  radius="md"
-                                  label={`${m.sheet} (Fila ${m.row})`}
-                                  placeholder="Selecciona una fecha"
-                                  value={decisions[player.key]?.fallbackDates?.[m.id] || ''}
-                                  onChange={(e) => setFallbackDate(player.key, m.id, e.target.value)}
-                                />
-                              ))}
-                            </Stack>
-                          )}
+                          {player.missingMeasurements?.length > 0 && (() => {
+                            const filledCount = player.missingMeasurements.filter(
+                              (m) => decisions[player.key]?.fallbackDates?.[m.id]
+                            ).length;
+                            const totalCount = player.missingMeasurements.length;
+                            const allFilled = filledCount === totalCount;
+                            
+                            return (
+                              <Stack gap={4} mt="xs">
+                                <Group justify="space-between" align="center">
+                                  <Text size="xs" fw={600} c="dark.3">Fechas de medición faltantes:</Text>
+                                  <Badge size="xs" color={allFilled ? 'green' : 'orange'} variant="light">
+                                    {allFilled ? 'Resuelto' : `${filledCount} de ${totalCount} asignadas`}
+                                  </Badge>
+                                </Group>
+                                {player.missingMeasurements.map((m) => (
+                                  <DateInput
+                                    key={m.id}
+                                    size="xs"
+                                    radius="md"
+                                    label={`${m.sheet} (Fila ${m.row})`}
+                                    placeholder="Selecciona una fecha"
+                                    value={dateValue(decisions[player.key]?.fallbackDates?.[m.id])}
+                                    onChange={(dateVal) => setFallbackDate(player.key, m.id, dateInputToIso(dateVal))}
+                                    valueFormat="DD/MM/YYYY"
+                                    clearable
+                                  />
+                                ))}
+                              </Stack>
+                            );
+                          })()}
                         </Stack>
                       </Table.Td>
                     </Table.Tr>
