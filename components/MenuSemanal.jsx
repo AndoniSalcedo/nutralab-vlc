@@ -12,6 +12,7 @@ import {
   Divider,
   ThemeIcon,
   Grid,
+  Textarea,
 } from '@mantine/core';
 import {
   IconFlame,
@@ -259,12 +260,20 @@ function DaySelectorButton({ dayName, isSelected, isHoy, dateStr, onClick }) {
   );
 }
 
-export default function MenuSemanal({ selectedMenu = null, viewMode = 'diaria' }) {
+export default function MenuSemanal({
+  selectedMenu = null,
+  viewMode = 'diaria',
+  isEditing = false,
+  editedDias = [],
+  onChangeDayData = null,
+}) {
   const [activeDay, setActiveDay] = useState('');
 
-  const orderedDays = selectedMenu
-    ? [...selectedMenu.dias].sort((a, b) => WEEKDAY_ORDER.indexOf(a.dia) - WEEKDAY_ORDER.indexOf(b.dia))
-    : [];
+  const orderedDays = isEditing
+    ? [...editedDias].sort((a, b) => WEEKDAY_ORDER.indexOf(a.dia) - WEEKDAY_ORDER.indexOf(b.dia))
+    : (selectedMenu
+        ? [...selectedMenu.dias].sort((a, b) => WEEKDAY_ORDER.indexOf(a.dia) - WEEKDAY_ORDER.indexOf(b.dia))
+        : []);
 
   useEffect(() => {
     if (orderedDays.length > 0) {
@@ -283,6 +292,97 @@ export default function MenuSemanal({ selectedMenu = null, viewMode = 'diaria' }
 
   const renderHeroDay = (dayData) => {
     if (!dayData) return null;
+
+    if (isEditing) {
+      const comida = dayData.comida || { primero: '', segundo: '', postre: '' };
+      const cena = dayData.cena || { primero: '', segundo: '', postre: '' };
+
+      return (
+        <Grid gutter="md" align="stretch" mt="xs">
+          {/* Comida Bento Card */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <BentoCard title="Almuerzo / Comida" icon={IconToolsKitchen} color="orange">
+              <Stack gap="sm" mt="xs">
+                <Textarea
+                  label="Primer Plato"
+                  placeholder="Ej. Crema de calabacín"
+                  value={comida.primero || ''}
+                  onChange={(e) => onChangeDayData && onChangeDayData(activeDay, 'comida', 'primero', e.target.value)}
+                  autosize
+                  minRows={1}
+                  variant="filled"
+                  radius="md"
+                  size="sm"
+                />
+                <Textarea
+                  label="Segundo Plato"
+                  placeholder="Ej. Pollo a la plancha con puré"
+                  value={comida.segundo || ''}
+                  onChange={(e) => onChangeDayData && onChangeDayData(activeDay, 'comida', 'segundo', e.target.value)}
+                  autosize
+                  minRows={1}
+                  variant="filled"
+                  radius="md"
+                  size="sm"
+                />
+                <Textarea
+                  label="Postre / Fruta"
+                  placeholder="Ej. Fruta de temporada / Yogur"
+                  value={comida.postre || ''}
+                  onChange={(e) => onChangeDayData && onChangeDayData(activeDay, 'comida', 'postre', e.target.value)}
+                  autosize
+                  minRows={1}
+                  variant="filled"
+                  radius="md"
+                  size="sm"
+                />
+              </Stack>
+            </BentoCard>
+          </Grid.Col>
+
+          {/* Cena Bento Card */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <BentoCard title="Cena del Equipo" icon={IconFlame} color="blue">
+              <Stack gap="sm" mt="xs">
+                <Textarea
+                  label="Primer Plato"
+                  placeholder="Ej. Sopa de fideos"
+                  value={cena.primero || ''}
+                  onChange={(e) => onChangeDayData && onChangeDayData(activeDay, 'cena', 'primero', e.target.value)}
+                  autosize
+                  minRows={1}
+                  variant="filled"
+                  radius="md"
+                  size="sm"
+                />
+                <Textarea
+                  label="Segundo Plato"
+                  placeholder="Ej. Pescado al horno con ensalada"
+                  value={cena.segundo || ''}
+                  onChange={(e) => onChangeDayData && onChangeDayData(activeDay, 'cena', 'segundo', e.target.value)}
+                  autosize
+                  minRows={1}
+                  variant="filled"
+                  radius="md"
+                  size="sm"
+                />
+                <Textarea
+                  label="Postre / Fruta"
+                  placeholder="Ej. Yogur bífidus / Infusión"
+                  value={cena.postre || ''}
+                  onChange={(e) => onChangeDayData && onChangeDayData(activeDay, 'cena', 'postre', e.target.value)}
+                  autosize
+                  minRows={1}
+                  variant="filled"
+                  radius="md"
+                  size="sm"
+                />
+              </Stack>
+            </BentoCard>
+          </Grid.Col>
+        </Grid>
+      );
+    }
 
     return (
       <Grid gutter="md" align="stretch" mt="xs">

@@ -9,11 +9,38 @@ const client = new Anthropic({ apiKey: env.AI_API_KEY });
 
 export async function POST(req) {
   try {
+    const user = await getUser();
+    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+
+    const contentType = req.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const body = await req.json();
+      const { semana, equipo_id, dias } = body;
+      if (!semana || !equipo_id) return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
+
+      const supabase = getSupabaseAdmin();
+      const team = await getOwnedTeam(supabase, user, equipo_id);
+      if (!team) return forbidden('No tienes acceso a este equipo');
+
+      const { data, error } = await supabase
+        .from('menu_semanal')
+        .upsert({ semana, equipo_id, dias: dias || [], updated_at: new Date().toISOString() }, { onConflict: 'semana,equipo_id' })
+        .select().single();
+
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: true, menu: data });
+    }
+
+    // Otherwise, handle form data (uploading file via AI)
     const formData = await req.formData();
     const archivo = formData.get('file');
     const semana = formData.get('semana');
     const equipoId = formData.get('equipo_id');
     if (!archivo || !semana || !equipoId) return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
+
+    const supabase = getSupabaseAdmin();
+    const team = await getOwnedTeam(supabase, user, equipoId);
+    if (!team) return forbidden('No tienes acceso a este equipo');
 
     const buffer = Buffer.from(await archivo.arrayBuffer());
     const base64 = buffer.toString('base64');
@@ -50,13 +77,48 @@ export async function POST(req) {
     const clean = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
 
-    const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
       .from('menu_semanal')
       .upsert({ semana, equipo_id: equipoId, dias: parsed.dias, updated_at: new Date().toISOString() }, { onConflict: 'semana,equipo_id' })
       .select().single();
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true, menu: data });
+  } catch (e) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}
+
+export async function PUT(req) {
+  try {
+    const user = await getUser();
+    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+
+    const body = await req.json();
+    const { id, dias } = body;
+    if (!id || !dias) return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
+
+    const supabase = getSupabaseAdmin();
+    const { data: menu, error: fetchError } = await supabase
+      .from('menu_semanal')
+      .select('id, equipo_id')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (fetchError) throw fetchError;
+    if (!menu) return NextResponse.json({ error: 'Menú no encontrado' }, { status: 404 });
+
+    const team = await getOwnedTeam(supabase, user, menu.equipo_id);
+    if (!team) return forbidden('No tienes acceso a este equipo');
+
+    const { data, error } = await supabase
+      .from('menu_semanal')
+      .update({ dias, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
     return NextResponse.json({ ok: true, menu: data });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });

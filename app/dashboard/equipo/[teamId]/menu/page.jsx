@@ -16,6 +16,9 @@ import {
   Tooltip,
   Box,
   Select,
+  Modal,
+  Divider,
+  Grid,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import {
@@ -25,9 +28,13 @@ import {
   IconUpload,
   IconList,
   IconTrash,
+  IconEdit,
+  IconCheck,
+  IconX,
+  IconPlus,
 } from '@tabler/icons-react';
-import MenuSemanal, { formatWeek } from '@/components/MenuSemanal';
-import { getWeeklyMenus, uploadWeeklyMenu, deleteWeeklyMenu } from '@/services/menu';
+import MenuSemanal, { formatWeek, WEEKDAY_ORDER } from '@/components/MenuSemanal';
+import { getWeeklyMenus, uploadWeeklyMenu, deleteWeeklyMenu, updateWeeklyMenu } from '@/services/menu';
 
 export default function MenuPage({ params }) {
   const teamId = params?.teamId;
@@ -42,6 +49,124 @@ export default function MenuPage({ params }) {
     monday.setDate(today.getDate() - today.getDay() + 1);
     return monday.toISOString().split('T')[0];
   });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedDias, setEditedDias] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [creatingEmpty, setCreatingEmpty] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+
+  function handleStartEdit() {
+    if (!selectedMenu) return;
+    const existingDias = selectedMenu.dias || [];
+    const fullDias = WEEKDAY_ORDER.map(diaName => {
+      const match = existingDias.find(d => d.dia === diaName);
+      if (match) {
+        return JSON.parse(JSON.stringify(match));
+      }
+      return {
+        dia: diaName,
+        comida: { primero: '', segundo: '', postre: '' },
+        cena: { primero: '', segundo: '', postre: '' }
+      };
+    });
+    setEditedDias(fullDias);
+    setIsEditing(true);
+    setViewMode('diaria');
+  }
+
+  function handleCancelEdit() {
+    setIsEditing(false);
+  }
+
+  const handleUpdateDayData = (dayName, mealType, field, value) => {
+    setEditedDias((prev) =>
+      prev.map((d) => {
+        if (d.dia === dayName) {
+          return {
+            ...d,
+            [mealType]: {
+              ...d[mealType],
+              [field]: value,
+            },
+          };
+        }
+        return d;
+      })
+    );
+  };
+
+  async function handleSaveMenu() {
+    if (!selectedMenu) return;
+    setSaving(true);
+    try {
+      const data = await updateWeeklyMenu(selectedMenu.id, editedDias);
+      setMenus((prev) => prev.map((m) => (m.id === selectedMenu.id ? data.menu : m)));
+      setSelectedMenu(data.menu);
+      setIsEditing(false);
+      notifications.show({
+        color: 'green',
+        title: 'Menú guardado',
+        message: 'El menú se ha guardado correctamente.',
+      });
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al guardar menú',
+        message: e.message,
+      });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleCreateEmptyMenu() {
+    if (!weekDate || !teamId) return;
+    setCreatingEmpty(true);
+    try {
+      const defaultDias = WEEKDAY_ORDER.map((dia) => ({
+        dia,
+        comida: { primero: '', segundo: '', postre: '' },
+        cena: { primero: '', segundo: '', postre: '' },
+      }));
+
+      const res = await fetch('/api/menu-semanal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          semana: weekDate,
+          equipo_id: teamId,
+          dias: defaultDias,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al crear el menú');
+
+      setMenus((prev) => {
+        const filtered = prev.filter((m) => m.semana !== data.menu.semana);
+        const sorted = [data.menu, ...filtered].sort((a, b) => b.semana.localeCompare(a.semana));
+        return sorted;
+      });
+      setSelectedMenu(data.menu);
+      setEditedDias(defaultDias);
+      setIsEditing(true);
+      setViewMode('diaria');
+
+      notifications.show({
+        color: 'green',
+        title: 'Menú creado',
+        message: 'Se ha creado un menú vacío para la semana seleccionada. Ahora puedes rellenarlo.',
+      });
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al crear menú',
+        message: e.message,
+      });
+    } finally {
+      setCreatingEmpty(false);
+    }
+  }
 
   useEffect(() => {
     let active = true;
@@ -156,8 +281,8 @@ export default function MenuPage({ params }) {
           position: 'relative',
         }}
       >
-        <Stack gap="sm">
-          <Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
+        <Stack gap="md">
+          <Group justify="space-between" align="center" wrap="wrap" gap="md">
             <Group gap="sm" wrap="nowrap">
               <Tooltip label="Volver al panel" withArrow>
                 <ActionIcon
@@ -182,114 +307,272 @@ export default function MenuPage({ params }) {
               </Stack>
             </Group>
 
-            <Group align="center" gap="xs" wrap="wrap">
-              <Select
-                placeholder="Selecciona una semana"
-                leftSection={<IconCalendar size={14} style={{ opacity: 0.7 }} />}
-                data={weekOptions}
-                value={selectedMenu?.semana || null}
-                onChange={(value) => {
-                  const next = menus.find((menu) => menu.semana === value);
-                  if (next) setSelectedMenu(next);
-                }}
-                disabled={menus.length === 0}
-                variant="filled"
-                radius="xl"
-                size="xs"
-                allowDeselect={false}
-                style={{ width: 180 }}
-              />
-
-              {selectedMenu && (
-                <Tooltip label="Eliminar menú seleccionado" withArrow>
-                  <ActionIcon
-                    onClick={() => handleDeleteMenu(selectedMenu.id)}
+            <Group align="center" gap="xs">
+              {isEditing ? (
+                <Group gap="xs">
+                  <Button
+                    color="green"
+                    radius="xl"
+                    size="sm"
+                    onClick={handleSaveMenu}
+                    loading={saving}
+                    leftSection={<IconCheck size={16} />}
+                  >
+                    Guardar
+                  </Button>
+                  <Button
                     variant="light"
-                    color="red"
+                    color="gray"
                     radius="xl"
-                    size="md"
-                    loading={deleting}
-                    style={{ width: 30, height: 30 }}
+                    size="sm"
+                    onClick={handleCancelEdit}
+                    disabled={saving}
+                    leftSection={<IconX size={16} />}
                   >
-                    <IconTrash size={16} />
-                  </ActionIcon>
-                </Tooltip>
+                    Cancelar
+                  </Button>
+                </Group>
+              ) : (
+                /* Premium Micro-segmented Pill Switcher */
+                <Group gap={4} p={3} bg="gray.1" style={{ borderRadius: 'var(--mantine-radius-xl)', border: '1px solid var(--mantine-color-gray-2)' }}>
+                  <Tooltip label="Día a Día (Vista diaria)" withArrow>
+                    <ActionIcon
+                      onClick={() => setViewMode('diaria')}
+                      variant={viewMode === 'diaria' ? 'filled' : 'transparent'}
+                      color={viewMode === 'diaria' ? 'dark' : 'gray'}
+                      radius="xl"
+                      size="md"
+                      style={{ width: 32, height: 32 }}
+                    >
+                      <IconCalendar size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+
+                  <Tooltip label="Semana completa (Vista general)" withArrow>
+                    <ActionIcon
+                      onClick={() => setViewMode('semanal')}
+                      variant={viewMode === 'semanal' ? 'filled' : 'transparent'}
+                      color={viewMode === 'semanal' ? 'dark' : 'gray'}
+                      radius="xl"
+                      size="md"
+                      style={{ width: 32, height: 32 }}
+                    >
+                      <IconList size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+                </Group>
               )}
-
-              {/* Premium Micro-segmented Pill Switcher */}
-              <Group gap={4} p={3} bg="gray.1" style={{ borderRadius: 'var(--mantine-radius-xl)', border: '1px solid var(--mantine-color-gray-2)' }}>
-                <Tooltip label="Día a Día (Vista diaria)" withArrow>
-                  <ActionIcon
-                    onClick={() => setViewMode('diaria')}
-                    variant={viewMode === 'diaria' ? 'filled' : 'transparent'}
-                    color={viewMode === 'diaria' ? 'dark' : 'gray'}
-                    radius="xl"
-                    size="sm"
-                    style={{ width: 28, height: 28 }}
-                  >
-                    <IconCalendar size={14} />
-                  </ActionIcon>
-                </Tooltip>
-
-                <Tooltip label="Semana completa (Vista general)" withArrow>
-                  <ActionIcon
-                    onClick={() => setViewMode('semanal')}
-                    variant={viewMode === 'semanal' ? 'filled' : 'transparent'}
-                    color={viewMode === 'semanal' ? 'dark' : 'gray'}
-                    radius="xl"
-                    size="sm"
-                    style={{ width: 28, height: 28 }}
-                  >
-                    <IconList size={14} />
-                  </ActionIcon>
-                </Tooltip>
-              </Group>
             </Group>
           </Group>
+
+          {!isEditing && (
+            <Paper p={6} radius="xl" shadow="xs" withBorder bg="white" w="100%">
+              <Group gap={8} w="100%" wrap="wrap" align="center">
+                <Select
+                  placeholder="Selecciona una semana"
+                  leftSection={<IconCalendar size={16} style={{ opacity: 0.7 }} />}
+                  data={weekOptions}
+                  value={selectedMenu?.semana || null}
+                  onChange={(value) => {
+                    const next = menus.find((menu) => menu.semana === value);
+                    if (next) setSelectedMenu(next);
+                  }}
+                  disabled={menus.length === 0}
+                  variant="filled"
+                  radius="xl"
+                  size="sm"
+                  allowDeselect={false}
+                  style={{ flex: 1, minWidth: 260 }}
+                />
+
+                <Group gap={8}>
+                  <Button
+                    color="blue"
+                    radius="xl"
+                    size="sm"
+                    onClick={() => setCreateModalOpen(true)}
+                    leftSection={<IconPlus size={16} />}
+                  >
+                    Nuevo Menú
+                  </Button>
+
+                  {selectedMenu && (
+                    <>
+                      <Button
+                        variant="light"
+                        color="teal"
+                        radius="xl"
+                        size="sm"
+                        onClick={handleStartEdit}
+                        leftSection={<IconEdit size={16} />}
+                      >
+                        Editar Menú
+                      </Button>
+
+                      <Button
+                        variant="light"
+                        color="red"
+                        radius="xl"
+                        size="sm"
+                        onClick={() => handleDeleteMenu(selectedMenu.id)}
+                        loading={deleting}
+                        leftSection={<IconTrash size={16} />}
+                      >
+                        Eliminar Menú
+                      </Button>
+                    </>
+                  )}
+                </Group>
+              </Group>
+            </Paper>
+          )}
         </Stack>
       </Paper>
 
       <Box py={{ base: 'sm', sm: 'md' }}>
         <Stack gap="md">
-          {/* Admin Coach Upload Bar */}
-          <Paper p="sm" radius="md" bg="gray.0" withBorder style={{ borderStyle: 'dashed' }}>
-            <Group justify="space-between" align="center" gap="xs" wrap="wrap">
-              <Text size="xs" fw={700} c="dimmed">
-                SUBIR O ACTUALIZAR PLANIFICACIÓN DE MENÚ:
-              </Text>
-              <Group gap="xs">
-                <TextInput
-                  type="date"
-                  value={weekDate}
-                  onChange={(e) => setWeekDate(e.target.value)}
-                  leftSection={<IconCalendar size={14} />}
-                  size="xs"
-                  radius="xl"
-                  variant="filled"
-                  style={{ width: 135 }}
-                />
-                <FileButton onChange={handleUploadFile} accept="image/*,.pdf" disabled={uploading}>
+          {/* Core MenuSemanal viewer */}
+          <MenuSemanal
+            selectedMenu={selectedMenu}
+            viewMode={viewMode}
+            isEditing={isEditing}
+            editedDias={editedDias}
+            onChangeDayData={handleUpdateDayData}
+          />
+        </Stack>
+      </Box>
+
+      <Modal
+        opened={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        title={
+          <Text fw={850} size="lg" c="dark.4">
+            Nuevo Menú Semanal
+          </Text>
+        }
+        centered
+        radius="lg"
+        size="lg"
+        styles={{
+          header: {
+            borderBottom: '1px solid var(--mantine-color-gray-1)',
+            paddingBottom: 'var(--mantine-spacing-sm)',
+            marginBottom: 'var(--mantine-spacing-md)',
+          }
+        }}
+      >
+        <Stack gap="md">
+          <Text size="xs" c="dimmed" lh={1.3}>
+            Selecciona la fecha del lunes de la semana correspondiente. Después, puedes subir una imagen/PDF para que la IA extraiga los platos, o bien crear una plantilla vacía.
+          </Text>
+
+          <TextInput
+            label="Lunes de la semana"
+            type="date"
+            value={weekDate}
+            onChange={(e) => setWeekDate(e.target.value)}
+            leftSection={<IconCalendar size={14} style={{ opacity: 0.7 }} />}
+            radius="xl"
+            size="sm"
+            variant="filled"
+          />
+
+          <Divider my="xs" label="Elige el método de creación" labelPosition="center" />
+
+          <Grid gutter="md" align="stretch">
+            <Grid.Col span={{ base: 12, xs: 6 }}>
+              <Paper
+                p="md"
+                radius="md"
+                bg="gray.0"
+                withBorder
+                style={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: 'var(--mantine-spacing-sm)',
+                }}
+              >
+                <Stack gap={4} style={{ flexGrow: 1 }}>
+                  <ThemeIcon color="blue" variant="light" radius="md">
+                    <IconUpload size={16} />
+                  </ThemeIcon>
+                  <Text fw={700} size="sm" mt="xs">
+                    Subir con IA
+                  </Text>
+                  <Text size="xs" c="dimmed" style={{ lineHeight: 1.3 }}>
+                    Sube un PDF o imagen del menú semanal. La IA leerá e indexará los platos automáticamente.
+                  </Text>
+                </Stack>
+                <FileButton
+                  onChange={(file) => {
+                    setCreateModalOpen(false);
+                    handleUploadFile(file);
+                  }}
+                  accept="image/*,.pdf"
+                  disabled={uploading}
+                >
                   {(props) => (
                     <Button
                       {...props}
                       loading={uploading}
                       radius="xl"
-                      leftSection={<IconUpload size={12} />}
-                      color="blue"
                       size="xs"
+                      color="blue"
+                      fullWidth
                     >
-                      Subir PDF / Imagen
+                      Subir Archivo
                     </Button>
                   )}
                 </FileButton>
-              </Group>
-            </Group>
-          </Paper>
+              </Paper>
+            </Grid.Col>
 
-          {/* Core MenuSemanal viewer */}
-          <MenuSemanal selectedMenu={selectedMenu} viewMode={viewMode} />
+            <Grid.Col span={{ base: 12, xs: 6 }}>
+              <Paper
+                p="md"
+                radius="md"
+                bg="gray.0"
+                withBorder
+                style={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: 'var(--mantine-spacing-sm)',
+                }}
+              >
+                <Stack gap={4} style={{ flexGrow: 1 }}>
+                  <ThemeIcon color="teal" variant="light" radius="md">
+                    <IconEdit size={16} />
+                  </ThemeIcon>
+                  <Text fw={700} size="sm" mt="xs">
+                    Crear Vacío
+                  </Text>
+                  <Text size="xs" c="dimmed" style={{ lineHeight: 1.3 }}>
+                    Inicializa una plantilla vacía y rellenala de manera manual día a día.
+                  </Text>
+                </Stack>
+                <Button
+                  onClick={() => {
+                    setCreateModalOpen(false);
+                    handleCreateEmptyMenu();
+                  }}
+                  loading={creatingEmpty}
+                  radius="xl"
+                  size="xs"
+                  color="teal"
+                  variant="light"
+                  fullWidth
+                >
+                  Crear Manual
+                </Button>
+              </Paper>
+            </Grid.Col>
+          </Grid>
         </Stack>
-      </Box>
+      </Modal>
     </Stack>
   );
 }

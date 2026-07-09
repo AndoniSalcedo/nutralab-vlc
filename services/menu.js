@@ -24,3 +24,14 @@ export async function deleteWeeklyMenu(id) {
   if (!res.ok) throw new Error(data.error || 'Error al eliminar el menú');
   return data;
 }
+
+export async function updateWeeklyMenu(id, dias) {
+  const res = await fetch('/api/menu-semanal', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, dias }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al guardar el menú');
+  return data;
+}
