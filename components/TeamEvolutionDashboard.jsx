@@ -451,21 +451,19 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   }, [activeFilters, ALL_METRICS_MAP]);
 
   const filteredPlayersTableData = useMemo(() => {
-    return dayRows.map((row) => {
+    return measuredDayRows.map((row) => {
       const alertMatches = {};
       let totalAlerts = 0;
 
-      if (row.measuredOnDay) {
-        activeFilters.forEach((filter) => {
-          const config = ALL_METRICS_MAP.get(filter.metric);
-          const val = config ? metricValue(row.measurement, config) : null;
-          const matches = checkFilterMatch(val, filter.operator, filter.value);
-          if (matches) {
-            alertMatches[filter.metric] = true;
-            totalAlerts += 1;
-          }
-        });
-      }
+      activeFilters.forEach((filter) => {
+        const config = ALL_METRICS_MAP.get(filter.metric);
+        const val = config ? metricValue(row.measurement, config) : null;
+        const matches = checkFilterMatch(val, filter.operator, filter.value);
+        if (matches) {
+          alertMatches[filter.metric] = true;
+          totalAlerts += 1;
+        }
+      });
 
       return {
         ...row,
@@ -473,7 +471,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
         totalAlerts,
       };
     });
-  }, [dayRows, activeFilters, ALL_METRICS_MAP]);
+  }, [measuredDayRows, activeFilters, ALL_METRICS_MAP]);
 
   const sortedTableData = useMemo(() => {
     const data = [...filteredPlayersTableData];
@@ -1356,7 +1354,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                         </Text>
                       </Table.Th>
 
-                      <Table.Th w={100}>
+                      <Table.Th w={100} style={{ textAlign: 'center' }}>
                         <Text fz="xs" fw={700} c="dark.4">
                           Alertas
                         </Text>
@@ -1393,7 +1391,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                         );
                       })}
 
-                      <Table.Th w={80}>Acción</Table.Th>
+                      <Table.Th w={80} style={{ textAlign: 'center' }}>Acción</Table.Th>
                     </Table.Tr>
                   </Table.Thead>
 
@@ -1411,14 +1409,9 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                           <Text fz="xs" c="dimmed">
                             {row.posicion || 'Sin posición'}
                           </Text>
-                          {!row.measuredOnDay && (
-                            <Text fz="10px" c="gray.5" fs="italic" mt={2}>
-                              Sin medición
-                            </Text>
-                          )}
                         </Table.Td>
 
-                        <Table.Td>
+                        <Table.Td style={{ textAlign: 'center' }}>
                           {row.totalAlerts > 0 ? (
                             <Badge color="red" variant="filled" size="sm" radius="xl">
                               {row.totalAlerts}
@@ -1456,7 +1449,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                           );
                         })}
 
-                        <Table.Td onClick={(e) => e.stopPropagation()}>
+                        <Table.Td onClick={(e) => e.stopPropagation()} style={{ textAlign: 'center' }}>
                           <Tooltip label="Abrir ficha" withArrow>
                             <ActionIcon
                               component={Anchor}
