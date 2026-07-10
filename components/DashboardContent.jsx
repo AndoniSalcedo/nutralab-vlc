@@ -16,6 +16,7 @@ import TeamOsmolarityImporter from './TeamOsmolarityImporter';
 import MessageComposer from './MessageComposer';
 import { calculateByObjective, getTeamNutritionDayTypes, PLAN_CONTEXTS } from '@/lib/calculations';
 import { useRouter } from 'next/navigation';
+import ConfirmModal from '@/components/ConfirmModal';
 
 const PAGE_SIZE = 8;
 
@@ -281,6 +282,7 @@ export default function DashboardContent({ players = [], team }) {
   const [playersState, setPlayersState] = useState(players);
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [deletePlayerData, setDeletePlayerData] = useState(null);
   const [reportModal, setReportModal] = useState({ opened: false, player: null });
   const [reportForm, setReportForm] = useState(defaultReportForm);
   const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
@@ -350,19 +352,22 @@ export default function DashboardContent({ players = [], team }) {
     )));
   }
 
-  async function handleDeletePlayer(player) {
-    const ok = window.confirm(`¿Eliminar a ${player.nombre} ${player.apellidos || ''}?`);
-    if (!ok) return;
+  function handleDeletePlayer(player) {
+    setDeletePlayerData(player);
+  }
 
-    setDeletingId(player.id);
+  async function confirmDeletePlayer() {
+    if (!deletePlayerData) return;
+    setDeletingId(deletePlayerData.id);
     try {
-      await deletePlayer(player.id);
-      setPlayersState((prev) => prev.filter((item) => String(item.id) !== String(player.id)));
+      await deletePlayer(deletePlayerData.id);
+      setPlayersState((prev) => prev.filter((item) => String(item.id) !== String(deletePlayerData.id)));
       notifications.show({
         color: 'green',
         title: 'Jugador eliminado',
-        message: `${player.nombre} ${player.apellidos || ''}`.trim(),
+        message: `${deletePlayerData.nombre} ${deletePlayerData.apellidos || ''}`.trim(),
       });
+      setDeletePlayerData(null);
     } catch (e) {
       notifications.show({
         color: 'red',
@@ -1159,6 +1164,15 @@ export default function DashboardContent({ players = [], team }) {
       >
         <MessageComposer players={playersState} team={team} onSent={closeModal} />
       </Modal>
+      <ConfirmModal
+        opened={!!deletePlayerData}
+        onClose={() => setDeletePlayerData(null)}
+        onConfirm={confirmDeletePlayer}
+        title="Eliminar jugador"
+        message={deletePlayerData ? `¿Seguro que deseas eliminar a ${deletePlayerData.nombre} ${deletePlayerData.apellidos || ''}?` : ''}
+        confirmLabel="Eliminar"
+        loading={deletingId !== null}
+      />
     </Stack>
   );
 }

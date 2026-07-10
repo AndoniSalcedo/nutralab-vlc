@@ -40,6 +40,7 @@ import {
   IconFlame,
   IconDownload
 } from '@tabler/icons-react';
+import ConfirmModal from '@/components/ConfirmModal';
 import {
   ComposedChart,
   Area,
@@ -188,6 +189,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
   const [previewRows, setPreviewRows] = useState([]);
   const [importing, setImporting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [deleteRecordId, setDeleteRecordId] = useState(null);
 
   // Edit Record States
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -439,11 +441,15 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
   };
 
   // Delete individual hydration/sweat record
-  const handleDelete = async (id) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar este registro?')) return;
-    setDeletingId(id);
+  const handleDelete = (id) => {
+    setDeleteRecordId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteRecordId) return;
+    setDeletingId(deleteRecordId);
     try {
-      await deleteHydrationRecord(id);
+      await deleteHydrationRecord(deleteRecordId);
 
       notifications.show({
         color: 'green',
@@ -453,7 +459,8 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       });
 
       // Update state locally
-      setRegistros(prev => prev.filter(r => r.id !== id));
+      setRegistros(prev => prev.filter(r => r.id !== deleteRecordId));
+      setDeleteRecordId(null);
     } catch (e) {
       notifications.show({
         color: 'red',
@@ -1024,6 +1031,15 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
           </Group>
         </Stack>
       </Modal>
+      <ConfirmModal
+        opened={!!deleteRecordId}
+        onClose={() => setDeleteRecordId(null)}
+        onConfirm={confirmDelete}
+        title="Eliminar registro"
+        message="¿Estás seguro de que deseas eliminar este registro?"
+        confirmLabel="Eliminar"
+        loading={deletingId !== null}
+      />
     </Stack>
   );
 }

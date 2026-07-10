@@ -6,6 +6,7 @@ import { Button, Group, Stack, TextInput, NumberInput, Select, Accordion, Paper,
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil } from '@tabler/icons-react';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
+import ConfirmModal from '@/components/ConfirmModal';
 
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
 
@@ -23,6 +24,7 @@ export default function TeamConfigClient({ team }) {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingDayType, setEditingDayType] = useState(null);
+  const [deleteDayTypeKey, setDeleteDayTypeKey] = useState(null);
 
   const handleSaveDayType = () => {
     let finalKey = editingDayType.key;
@@ -60,8 +62,13 @@ export default function TeamConfigClient({ team }) {
   };
 
   const removeDayType = (key) => {
-    if (!confirm('¿Seguro que quieres eliminar este tipo de día?')) return;
-    setDayTypes(current => current.filter(d => d.key !== key));
+    setDeleteDayTypeKey(key);
+  };
+
+  const confirmRemoveDayType = () => {
+    if (!deleteDayTypeKey) return;
+    setDayTypes(current => current.filter(d => d.key !== deleteDayTypeKey));
+    setDeleteDayTypeKey(null);
   };
 
   const updateMacro = (objective, dayTypeKey, field, value) => {
@@ -211,6 +218,14 @@ export default function TeamConfigClient({ team }) {
           </Stack>
         )}
       </Modal>
+      <ConfirmModal
+        opened={!!deleteDayTypeKey}
+        onClose={() => setDeleteDayTypeKey(null)}
+        onConfirm={confirmRemoveDayType}
+        title="Eliminar tipo de día"
+        message="¿Seguro que quieres eliminar este tipo de día?"
+        confirmLabel="Eliminar"
+      />
     </Stack>
   );
 }

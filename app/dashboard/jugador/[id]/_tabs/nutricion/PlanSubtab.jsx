@@ -39,6 +39,7 @@ import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getObjectiveLab
 import { getUserMeals } from '@/lib/nutrition-day-types';
 import IntercambiosModal from './IntercambiosModal';
 import NothingFound from '@/components/NothingFound/NothingFound';
+import ConfirmModal from '@/components/ConfirmModal';
 
 
 
@@ -285,7 +286,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const isDocumentMode = mode === 'create' || mode === 'edit';
   const loadingAction = Boolean(actionType);
   const [deleting, setDeleting] = useState(false);
-  const [latestMenu, setLatestMenu] = useState(null);
+  const [deletePlanId, setDeletePlanId] = useState(null);
 
   const currentPlan = useMemo(
     () => planes.find((plan) => String(plan.id) === String(currentId)) || null,
@@ -570,22 +571,27 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     }
   }
 
-  async function handleDeletePlan(id) {
+  function handleDeletePlan(id) {
     if (!id) return;
-    if (!confirm('¿Estás seguro de que deseas eliminar este plan nutricional? Esta acción no se puede deshacer.')) return;
+    setDeletePlanId(id);
+  }
+
+  async function confirmDeletePlan() {
+    if (!deletePlanId) return;
     setDeleting(true);
     try {
-      await deleteAiPlan(id);
+      await deleteAiPlan(deletePlanId);
       notifications.show({
         color: 'green',
         title: 'Plan eliminado',
         message: 'El plan nutricional se ha eliminado correctamente.',
       });
       setPlanes((prev) => {
-        const filtered = prev.filter((p) => p.id !== id);
+        const filtered = prev.filter((p) => p.id !== deletePlanId);
         setCurrentId(filtered.length ? String(filtered[0].id) : null);
         return filtered;
       });
+      setDeletePlanId(null);
     } catch (e) {
       notifications.show({
         color: 'red',
@@ -1022,6 +1028,15 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         .plan-md th { background: var(--mantine-color-gray-0); color: var(--mantine-color-blue-filled); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px; border: 1px solid var(--mantine-color-gray-2); text-align: left; }
         .plan-md td { padding: 12px; border: 1px solid var(--mantine-color-gray-2); color: var(--mantine-color-gray-7); }
       `}</style>
+      <ConfirmModal
+        opened={!!deletePlanId}
+        onClose={() => setDeletePlanId(null)}
+        onConfirm={confirmDeletePlan}
+        title="Eliminar plan nutricional"
+        message="¿Estás seguro de que deseas eliminar este plan nutricional? Esta acción no se puede deshacer."
+        confirmLabel="Eliminar"
+        loading={deleting}
+      />
     </Stack>
   );
 }

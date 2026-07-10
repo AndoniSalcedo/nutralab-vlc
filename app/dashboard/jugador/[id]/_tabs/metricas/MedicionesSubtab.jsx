@@ -36,6 +36,7 @@ import { saveEvolution, deleteEvolution } from '@/services/evolution';
 import { IconCalendarStats, IconCheck, IconEdit, IconPlus, IconRuler2, IconTrash, IconFilter } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
 import NothingFound from '@/components/NothingFound/NothingFound';
+import ConfirmModal from '@/components/ConfirmModal';
 import {
   MEASUREMENT_DETAIL_SECTIONS,
   TREND_MEASUREMENT_METRICS,
@@ -143,6 +144,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   const [modalMode, setModalMode] = useState(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
 
   const seasons = useMemo(() => {
@@ -267,11 +269,13 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
     }
   }
 
-  async function handleDelete() {
+  function handleDelete() {
     if (readOnly || !selected) return;
-    const confirmed = window.confirm(`¿Seguro que quieres borrar la medición del ${fechaLabel(selected.fecha)}?`);
-    if (!confirmed) return;
+    setDeleteConfirmOpen(true);
+  }
 
+  async function confirmDelete() {
+    if (readOnly || !selected) return;
     setDeleting(true);
     try {
       await deleteEvolution(selected.id);
@@ -299,6 +303,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         title: 'Medición borrada',
         message: 'La medición se ha eliminado correctamente.',
       });
+      setDeleteConfirmOpen(false);
     } catch (e) {
       notifications.show({
         color: 'red',
@@ -698,6 +703,15 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
           </Box>
         )}
       </Box>
+      <ConfirmModal
+        opened={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="Eliminar medición"
+        message={selected ? `¿Seguro que quieres borrar la medición del ${fechaLabel(selected.fecha)}?` : ''}
+        confirmLabel="Eliminar"
+        loading={deleting}
+      />
     </Stack>
   );
 }

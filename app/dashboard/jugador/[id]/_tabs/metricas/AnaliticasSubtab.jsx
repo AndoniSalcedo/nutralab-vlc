@@ -39,6 +39,7 @@ import {
 } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
 import NothingFound from '@/components/NothingFound/NothingFound';
+import ConfirmModal from '@/components/ConfirmModal';
 
 function fechaLabel(fecha) {
   if (!fecha) return 'Sin fecha';
@@ -127,6 +128,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fecha, setFecha] = useState(null);
   const theme = useMantineTheme();
 
@@ -221,11 +223,13 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
     }
   }
 
-  async function handleDelete() {
+  function handleDelete() {
     if (readOnly || !selected) return;
-    const confirmed = window.confirm(`¿Seguro que quieres borrar la analítica "${selected.pdf_nombre || fechaLabel(selected.fecha_extraccion)}"?`);
-    if (!confirmed) return;
+    setDeleteConfirmOpen(true);
+  }
 
+  async function confirmDelete() {
+    if (readOnly || !selected) return;
     setDeleting(true);
     try {
       await deleteAnalitica(selected.id);
@@ -240,6 +244,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
         title: 'Analítica borrada',
         message: 'La analítica se ha eliminado correctamente.',
       });
+      setDeleteConfirmOpen(false);
     } catch (e) {
       notifications.show({
         color: 'red',
@@ -460,6 +465,15 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
           </Box>
         )}
       </Box>
+      <ConfirmModal
+        opened={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="Eliminar analítica"
+        message={selected ? `¿Seguro que quieres borrar la analítica "${selected.pdf_nombre || fechaLabel(selected.fecha_extraccion)}"?` : ''}
+        confirmLabel="Eliminar"
+        loading={deleting}
+      />
     </Stack>
   );
 }

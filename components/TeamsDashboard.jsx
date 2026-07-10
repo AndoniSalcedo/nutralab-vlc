@@ -36,6 +36,7 @@ import {
 } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import NothingFound from './NothingFound/NothingFound';
+import ConfirmModal from './ConfirmModal';
 
 function nextSeasonLabel() {
   const now = new Date();
@@ -55,6 +56,7 @@ export default function TeamsDashboard({ teams = [] }) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState({ type: null, team: null });
   const [saving, setSaving] = useState(false);
+  const [deleteTeamData, setDeleteTeamData] = useState(null);
   const [form, setForm] = useState({
     nombre: '',
     temporada: '',
@@ -194,15 +196,18 @@ export default function TeamsDashboard({ teams = [] }) {
   }
 
   async function handleDeleteTeam(team) {
-    const ok = window.confirm(`¿Eliminar ${team.nombre} (${team.temporada}) y todos sus jugadores?`);
-    if (!ok) return;
+    setDeleteTeamData(team);
+  }
 
+  async function confirmDeleteTeam() {
+    if (!deleteTeamData) return;
     setSaving(true);
     try {
-      await deleteTeam(team.id);
-      setTeamsState((current) => current.filter((item) => String(item.id) !== String(team.id)));
-      notifications.show({ color: 'green', title: 'Equipo eliminado', message: team.nombre });
+      await deleteTeam(deleteTeamData.id);
+      setTeamsState((current) => current.filter((item) => String(item.id) !== String(deleteTeamData.id)));
+      notifications.show({ color: 'green', title: 'Equipo eliminado', message: deleteTeamData.nombre });
       router.refresh();
+      setDeleteTeamData(null);
     } catch (error) {
       notifications.show({ color: 'red', title: 'No se pudo eliminar', message: error.message });
     } finally {
@@ -486,6 +491,15 @@ export default function TeamsDashboard({ teams = [] }) {
           </Stack>
         </form>
       </Modal>
+      <ConfirmModal
+        opened={!!deleteTeamData}
+        onClose={() => setDeleteTeamData(null)}
+        onConfirm={confirmDeleteTeam}
+        title="Eliminar equipo"
+        message={deleteTeamData ? `¿Eliminar ${deleteTeamData.nombre} (${deleteTeamData.temporada}) y todos sus jugadores?` : ''}
+        confirmLabel="Eliminar"
+        loading={saving}
+      />
     </Stack>
   );
 }

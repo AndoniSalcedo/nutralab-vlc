@@ -35,6 +35,7 @@ import {
 import MenuSemanal, { formatWeek, WEEKDAY_ORDER } from '@/components/MenuSemanal';
 import { uploadWeeklyMenu, deleteWeeklyMenu, updateWeeklyMenu } from '@/services/menu';
 import Link from 'next/link';
+import ConfirmModal from './ConfirmModal';
 
 export default function TeamMenuDashboard({ initialMenus = [], teamId }) {
   const [menus, setMenus] = useState(initialMenus);
@@ -42,6 +43,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId }) {
   const [viewMode, setViewMode] = useState('diaria'); // 'diaria' or 'semanal'
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteMenuId, setDeleteMenuId] = useState(null);
   const [weekDate, setWeekDate] = useState(() => {
     const today = new Date();
     const monday = new Date(today);
@@ -227,18 +229,29 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId }) {
     }
   }
 
-  async function handleDeleteMenu(id) {
+  function handleDeleteMenu(id) {
     if (!id) return;
-    if (!confirm('¿Estás seguro de que deseas eliminar este menú comedor? Esta acción no se puede deshacer.')) return;
+    setDeleteMenuId(id);
+  }
+
+  async function confirmDeleteMenu() {
+    if (!deleteMenuId) return;
     setDeleting(true);
     try {
-      await deleteWeeklyMenu(id);
+      await deleteWeeklyMenu(deleteMenuId);
       notifications.show({
         color: 'green',
         title: 'Menú eliminado',
         message: 'El menú comedor se ha eliminado correctamente.',
       });
-      setMenus((prev) => prev.filter((m) => m.id !== id));
+      setMenus((prev) => {
+        const filtered = prev.filter((m) => m.id !== deleteMenuId);
+        if (selectedMenu?.id === deleteMenuId) {
+          setSelectedMenu(filtered[0] || null);
+        }
+        return filtered;
+      });
+      setDeleteMenuId(null);
     } catch (e) {
       notifications.show({
         color: 'red',
@@ -555,6 +568,15 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId }) {
           </Grid>
         </Stack>
       </Modal>
+      <ConfirmModal
+        opened={!!deleteMenuId}
+        onClose={() => setDeleteMenuId(null)}
+        onConfirm={confirmDeleteMenu}
+        title="Eliminar menú"
+        message="¿Estás seguro de que deseas eliminar este menú comedor? Esta acción no se puede deshacer."
+        confirmLabel="Eliminar"
+        loading={deleting}
+      />
     </Stack>
   );
 }
