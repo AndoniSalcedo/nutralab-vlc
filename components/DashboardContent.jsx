@@ -388,6 +388,9 @@ export default function DashboardContent({ players = [], team }) {
       } else if (menusList.length > 0) {
         setSelectedMenuWeek(menusList[0].semana);
         updateReportField('semanaMenu', menusList[0].semana);
+      } else {
+        setSelectedMenuWeek('none');
+        updateReportField('semanaMenu', 'none');
       }
     } catch (e) {
       console.error('Error loading menus list:', e);
@@ -443,9 +446,17 @@ export default function DashboardContent({ players = [], team }) {
       notifications.show({
         color: 'red',
         title: 'Error al generar informe',
-        message: 'Debes seleccionar un menú del buffet comedor para poder generar el informe.',
+        message: 'Debes seleccionar un menú del buffet comedor o elegir "Sin menú" para poder generar el informe.',
       });
       return;
+    }
+
+    if (selectedMenuWeek === 'none') {
+      notifications.show({
+        color: 'yellow',
+        title: 'Generando sin menú',
+        message: 'La IA tendrá libertad total para crear los platos ya que no se ha seleccionado menú comedor.',
+      });
     }
 
     setGeneratingReport(true);
@@ -935,10 +946,14 @@ export default function DashboardContent({ players = [], team }) {
                     setSelectedMenuWeek(val || '');
                     updateReportField('semanaMenu', val || '');
                   }}
-                  data={availableMenus.map((m) => ({
-                    value: m.semana,
-                    label: `Menú de la semana del ${m.semana}`,
-                  }))}
+                  data={[
+                    { value: 'none', label: 'Sin menú comedor (Libertad total para la IA)' },
+                    ...availableMenus.map((m) => ({
+                      value: m.semana,
+                      label: `Menú de la semana del ${m.semana}`,
+                    }))
+                  ]}
+                  allowDeselect={false}
                 />
               </Box>
             </Paper>

@@ -34,7 +34,7 @@ import {
   IconSparkles,
   IconTrash,
 } from '@tabler/icons-react';
-import { buildBasePlanData, sanitizePlanData } from '@/lib/nutrition-plan-card';
+import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/nutrition-plan-card';
 import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getObjectiveLabel, PLAN_CONTEXTS, getTeamNutritionDayTypes } from '@/lib/calculations';
 import { getUserMeals } from '@/lib/nutrition-day-types';
 import IntercambiosModal from './IntercambiosModal';
@@ -270,6 +270,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [datos, setDatos] = useState(null);
   const [loadingList, setLoadingList] = useState(true);
   const [actionType, setActionType] = useState(null);
+  const [availableMenus, setAvailableMenus] = useState([]);
+  const [selectedMenuWeek, setSelectedMenuWeek] = useState(null);
 
   const teamConfig = jugador?.equipos?.configuracion_nutricional;
 
@@ -313,7 +315,12 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         setCurrentId(list.length ? String(list[0].id) : null);
         setMode('view');
         const menus = menuData.menus || [];
-        setLatestMenu(menus.length > 0 ? menus[0] : null);
+        setAvailableMenus(menus);
+        if (menus.length > 0) {
+          setSelectedMenuWeek(menus[0].semana);
+        } else {
+          setSelectedMenuWeek('none');
+        }
       } catch (e) {
         if (active) {
           notifications.show({
@@ -340,7 +347,16 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setContexto('semana_normal');
     setContextoAdicional('');
     setContenido('');
-    setDatos(buildBasePlanData({ jugador, nombre: nextNombre, contexto: 'semana_normal', contextoAdicional: '', menu: latestMenu }));
+    const initialCalendar = getDefaultCalendar();
+    
+    let resolvedMenu = undefined;
+    if (selectedMenuWeek === 'none' || !selectedMenuWeek) {
+      resolvedMenu = null;
+    } else {
+      resolvedMenu = availableMenus.find(m => m.semana === selectedMenuWeek) || null;
+    }
+
+    setDatos(buildBasePlanData({ jugador, nombre: nextNombre, contexto: 'semana_normal', contextoAdicional: '', menu: resolvedMenu, calendario: initialCalendar }));
     setHasGeneratedAi(false);
   }
 
@@ -381,7 +397,23 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       withCloseButton: false,
     });
     try {
-      const data = await generateAiPlanDraft({ jugador, nombre, contexto, contextoAdicional });
+      let currentCalendar = undefined;
+      if (datos && datos.dias) {
+        currentCalendar = {};
+        for (const [dayKey, dayData] of Object.entries(datos.dias)) {
+          currentCalendar[dayKey] = dayData.tipoDia;
+        }
+      }
+
+      if (selectedMenuWeek === 'none') {
+        notifications.show({
+          color: 'yellow',
+          title: 'Generando sin menú',
+          message: 'La IA tendrá libertad total para crear los platos ya que no se ha seleccionado menú comedor.',
+        });
+      }
+
+      const data = await generateAiPlanDraft({ jugador, nombre, contexto, contextoAdicional, calendario: currentCalendar, semanaMenu: selectedMenuWeek });
       setDatos(data.datos || null);
       setContenido('');
       setHasGeneratedAi(true);
@@ -735,11 +767,28 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
               <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
                 <TextInput
                   label="Nombre del plan"
-                  placeholder="Ej: Semana partido vs Real Sociedad"
+                  placeholder="Ej: Semana de 3 partidos"
                   value={nombre}
                   onChange={(e) => setNombre(e.target.value)}
                   required
                 />
+                
+                <Select
+                  label="Menú a utilizar"
+                  placeholder="Selecciona una semana o Sin Menú..."
+                  value={selectedMenuWeek}
+                  onChange={(val) => setSelectedMenuWeek(val || '')}
+                  data={[
+                    { value: 'none', label: 'Sin menú comedor (Libertad total para la IA)' },
+                    ...availableMenus.map((m) => ({
+                      value: m.semana,
+                      label: `Menú de la semana del ${m.semana}`,
+                    }))
+                  ]}
+                  size="sm"
+                  allowDeselect={false}
+                />
+
                 <Select
                   label="Contexto actual"
                   placeholder="Selecciona el contexto"

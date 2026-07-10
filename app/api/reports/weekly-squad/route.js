@@ -141,20 +141,24 @@ async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, c
   const playerIds = players.map((player) => player.id);
   const { data: evoluciones, error: evolucionesError } = await supabase
     .from('evoluciones')
-    .select('jugador_id,fecha,altura_cm,peso_kg,porcentaje_grasa,masa_magra_kg,suma_6_pliegues')
+    .select('jugador_id,fecha,altura_cm,peso_kg,porcentaje_grasa,masa_magra_kg,peso_muscular,suma_6_pliegues,suma_8_pliegues,metricas_excel')
     .in('jugador_id', playerIds)
     .order('fecha', { ascending: true });
 
   if (evolucionesError) throw evolucionesError;
 
   // Load menu
-  const menuWeekKey = semanaMenu || semana;
-  const { data: menu } = await supabase
-    .from('menu_semanal')
-    .select('*')
-    .eq('semana', menuWeekKey)
-    .eq('equipo_id', team.id)
-    .maybeSingle();
+  let menu = null;
+  if (semanaMenu !== 'none') {
+    const menuWeekKey = semanaMenu || semana;
+    const { data: menuData } = await supabase
+      .from('menu_semanal')
+      .select('*')
+      .eq('semana', menuWeekKey)
+      .eq('equipo_id', team.id)
+      .maybeSingle();
+    menu = menuData || null;
+  }
 
   // Load all plans for these players
   const { data: allPlans, error: plansError } = await supabase
