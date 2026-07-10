@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import {
   ActionIcon,
-  Anchor,
   Paper,
   Stack,
   Group,

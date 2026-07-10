@@ -1419,3 +1419,6 @@ const foods = [
   { name: 'eco Queso de cabra', kcal: 364.0, cho: 0.1, pro: 21.6, fat: 30.0 },
   { name: 'convencional Queso de cabra', kcal: 364.0, cho: 0.1, pro: 21.6, fat: 30.0 },
 ];
+
+export default foods;
+
