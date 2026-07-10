@@ -1450,14 +1450,14 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                         })}
 
                         <Table.Td onClick={(e) => e.stopPropagation()} style={{ textAlign: 'center' }}>
-                          <Tooltip label="Abrir ficha" withArrow>
+                          <Tooltip label="Ver mediciones" withArrow>
                             <ActionIcon
                               component={Anchor}
-                              href={`/dashboard/jugador/${row.id}`}
+                              href={`/dashboard/jugador/${row.id}/metricas/mediciones`}
                               variant="subtle"
                               color="gray"
                               radius="xl"
-                              aria-label="Abrir ficha"
+                              aria-label="Ver mediciones"
                             >
                               <IconExternalLink size={17} />
                             </ActionIcon>
