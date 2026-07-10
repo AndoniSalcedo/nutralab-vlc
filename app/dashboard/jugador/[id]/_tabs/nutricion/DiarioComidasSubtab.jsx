@@ -188,11 +188,11 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
       {/* 2. LISTA DE COMIDAS */}
       <Stack p="md" gap="lg">
         {loading ? (
-           <Stack gap="md">
-             <Skeleton h={120} radius="xl" animate /> 
-             <Skeleton h={120} radius="xl" animate />
-             <Skeleton h={120} radius="xl" animate />
-           </Stack>
+           <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+             <Skeleton h={280} radius="xl" animate /> 
+             <Skeleton h={280} radius="xl" animate />
+             <Skeleton h={280} radius="xl" animate />
+           </SimpleGrid>
         ) : meals.length === 0 ? (
           <Box mt="xl">
             <NothingFound
@@ -214,7 +214,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
                 {g.label}
               </Text>
               
-              <Stack gap="md">
+              <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
                 {g.items.map((m) => (
                   <MealCard
                     key={m.id}
@@ -234,7 +234,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
                     }
                   />
                 ))}
-              </Stack>
+              </SimpleGrid>
             </Stack>
           ))
         )}
