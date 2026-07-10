@@ -34,8 +34,6 @@ import {
   CartesianGrid,
   Tooltip as ChartTooltip,
   ResponsiveContainer,
-  ReferenceLine,
-  Cell,
 } from 'recharts';
 import {
   IconArrowLeft,
@@ -46,6 +44,8 @@ import {
   IconEye,
   IconFilter,
   IconUsers,
+  IconPlus,
+  IconX,
 } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound/NothingFound';
 import {
@@ -261,6 +261,21 @@ function sourceRows(medicion) {
   ].filter(([, value]) => hasMetricValue(value));
 }
 
+function checkFilterMatch(val, operator, filterVal) {
+  if (val === null || val === undefined || val === '') return false;
+  const numVal = Number(val);
+  const targetVal = Number(filterVal);
+  if (Number.isNaN(numVal) || Number.isNaN(targetVal)) return false;
+  switch (operator) {
+    case '>': return numVal > targetVal;
+    case '<': return numVal < targetVal;
+    case '>=': return numVal >= targetVal;
+    case '<=': return numVal <= targetVal;
+    case '=': return numVal === targetVal;
+    default: return false;
+  }
+}
+
 export default function TeamEvolutionDashboard({ players = [], evolutions = [], team }) {
   const router = useRouter();
   const [viewMode, setViewMode] = useState('trends');
@@ -274,9 +289,15 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   const [selectedDate, setSelectedDate] = useState('');
   const [detailRow, setDetailRow] = useState(null);
 
-  const [filterMetric, setFilterMetric] = useState('');
-  const [filterOperator, setFilterOperator] = useState('>');
-  const [filterValue, setFilterValue] = useState('');
+  // States for multi-metric filters
+  const [activeFilters, setActiveFilters] = useState([]);
+  const [newFilterMetric, setNewFilterMetric] = useState('porcentaje_grasa');
+  const [newFilterOperator, setNewFilterOperator] = useState('>');
+  const [newFilterValue, setNewFilterValue] = useState('');
+
+  // States for sorting the table
+  const [sortField, setSortField] = useState('alerts');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   const ALL_METRICS_MAP = useMemo(() => {
     const map = new Map();
@@ -309,17 +330,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
     return list;
   }, []);
 
-  const selectedMetricConfig = useMemo(() => {
-    return ALL_METRICS_MAP.get(filterMetric) || null;
-  }, [filterMetric, ALL_METRICS_MAP]);
-
   const handleViewModeChange = (newMode) => {
     setViewMode(newMode);
-    if (newMode === 'ranking' && !filterMetric) {
-      setFilterMetric('porcentaje_grasa');
-      setFilterOperator('>');
-      setFilterValue('10');
-    }
   };
 
   const positionOptions = useMemo(() => {
@@ -425,49 +437,148 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
     };
   });
 
-  const rankingData = useMemo(() => {
-    if (!filterMetric) return [];
-    const selectedMetricConfig = ALL_METRICS_MAP.get(filterMetric);
-    if (!selectedMetricConfig) return [];
-
-    return dayRows
-      .filter((row) => row.measuredOnDay)
-      .map((row) => {
-        const val = selectedMetricConfig ? metricValue(row.measurement, selectedMetricConfig) : null;
-        return {
-          id: row.id,
-          name: playerName(row),
-          posicion: row.posicion,
-          val: val !== null && val !== undefined ? Number(val) : null,
-        };
-      })
-      .filter((item) => item.val !== null)
-      .map((item) => {
-        const numVal = Number(item.val);
-        const targetVal = Number(filterValue);
-        let matches = false;
-        if (!Number.isNaN(numVal) && !Number.isNaN(targetVal) && filterValue !== '') {
-          switch (filterOperator) {
-            case '>': matches = numVal > targetVal; break;
-            case '<': matches = numVal < targetVal; break;
-            case '>=': matches = numVal >= targetVal; break;
-            case '<=': matches = numVal <= targetVal; break;
-            case '=': matches = numVal === targetVal; break;
-            default: matches = false;
-          }
+  const displayedMetrics = useMemo(() => {
+    const base = [...METRICS];
+    activeFilters.forEach((filter) => {
+      if (!base.some((m) => m.key === filter.metric)) {
+        const extraConfig = ALL_METRICS_MAP.get(filter.metric);
+        if (extraConfig) {
+          base.push(extraConfig);
         }
-        return { ...item, matches };
-      })
-      .sort((a, b) => b.val - a.val);
-  }, [dayRows, filterMetric, filterOperator, filterValue, ALL_METRICS_MAP]);
+      }
+    });
+    return base;
+  }, [activeFilters, ALL_METRICS_MAP]);
+
+  const filteredPlayersTableData = useMemo(() => {
+    return dayRows.map((row) => {
+      const alertMatches = {};
+      let totalAlerts = 0;
+
+      if (row.measuredOnDay) {
+        activeFilters.forEach((filter) => {
+          const config = ALL_METRICS_MAP.get(filter.metric);
+          const val = config ? metricValue(row.measurement, config) : null;
+          const matches = checkFilterMatch(val, filter.operator, filter.value);
+          if (matches) {
+            alertMatches[filter.metric] = true;
+            totalAlerts += 1;
+          }
+        });
+      }
+
+      return {
+        ...row,
+        alertMatches,
+        totalAlerts,
+      };
+    });
+  }, [dayRows, activeFilters, ALL_METRICS_MAP]);
+
+  const sortedTableData = useMemo(() => {
+    const data = [...filteredPlayersTableData];
+    data.sort((a, b) => {
+      let valA, valB;
+
+      if (sortField === 'name') {
+        valA = playerName(a).toLowerCase();
+        valB = playerName(b).toLowerCase();
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      }
+
+      if (sortField === 'posicion') {
+        valA = (a.posicion || '').toLowerCase();
+        valB = (b.posicion || '').toLowerCase();
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      }
+
+      if (sortField === 'alerts') {
+        valA = a.totalAlerts;
+        valB = b.totalAlerts;
+        if (valA !== valB) {
+          return sortDirection === 'asc' ? valA - valB : valB - valA;
+        }
+        return playerName(a).localeCompare(playerName(b));
+      }
+
+      // Sort by metric
+      const metricConfig = ALL_METRICS_MAP.get(sortField);
+      valA = a.measuredOnDay ? metricNumber(a.measurement, metricConfig) : null;
+      valB = b.measuredOnDay ? metricNumber(b.measurement, metricConfig) : null;
+
+      if (valA === null && valB === null) return 0;
+      if (valA === null) return 1;
+      if (valB === null) return -1;
+
+      return sortDirection === 'asc' ? valA - valB : valB - valA;
+    });
+    return data;
+  }, [filteredPlayersTableData, sortField, sortDirection, ALL_METRICS_MAP]);
+
+
+  const sortOptions = useMemo(() => {
+    const options = [
+      { value: 'alerts_desc', label: 'Más Alertas' },
+      { value: 'alerts_asc', label: 'Menos Alertas' },
+      { value: 'name_asc', label: 'Jugador (A-Z)' },
+      { value: 'name_desc', label: 'Jugador (Z-A)' },
+      { value: 'posicion_asc', label: 'Posición (A-Z)' },
+      { value: 'posicion_desc', label: 'Posición (Z-A)' },
+    ];
+    displayedMetrics.forEach((m) => {
+      options.push({ value: `${m.key}_desc`, label: `${m.label} (mayor primero)` });
+      options.push({ value: `${m.key}_asc`, label: `${m.label} (menor primero)` });
+    });
+    return options;
+  }, [displayedMetrics]);
+
+  const handleSortOptionChange = (value) => {
+    if (!value) return;
+    const underscoreIndex = value.lastIndexOf('_');
+    if (underscoreIndex === -1) return;
+    const field = value.substring(0, underscoreIndex);
+    const direction = value.substring(underscoreIndex + 1);
+    setSortField(field);
+    setSortDirection(direction);
+  };
 
   const detailMeasurement = detailRow?.measurement || null;
   const detailPrevious = detailRow?.previous || null;
   const detailRawEntries = rawMetricEntries(detailMeasurement);
 
+  function buildFiltersCsv(data, metricsList) {
+    const headers = [
+      'Jugador',
+      'Posicion',
+      'Alertas',
+      ...metricsList.map((m) => `${m.label} (${m.unit || ''})`),
+    ];
+    const csvRows = data.map((row) => {
+      const line = [
+        playerName(row),
+        row.posicion || '',
+        row.totalAlerts,
+        ...metricsList.map((m) => {
+          const val = row.measuredOnDay ? metricValue(row.measurement, m) : null;
+          return val !== null && val !== undefined ? val : '';
+        }),
+      ];
+      return line.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(',');
+    });
+    return [headers.join(','), ...csvRows].join('\n');
+  }
+
   function handleDownloadCsv() {
     if (viewMode === 'day') {
       downloadCsv(`mediciones-${currentDay || 'dia'}.csv`, buildDayCsv(measuredDayRows, currentDay));
+      return;
+    }
+    if (viewMode === 'ranking') {
+      downloadCsv(`filtros-equipo-${currentDay || 'dia'}.csv`, buildFiltersCsv(sortedTableData, displayedMetrics));
       return;
     }
     downloadCsv('evolucion-equipo.csv', buildTrendCsv(rows));
@@ -540,7 +651,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     label: (
                       <Group component="span" gap={6} justify="center" wrap="nowrap">
                         <IconFilter size={16} />
-                        <Text component="span" size="sm" fw={700}>Ranking</Text>
+                        <Text component="span" size="sm" fw={700}>Filtros</Text>
                       </Group>
                     ),
                   },
@@ -1045,271 +1156,326 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
       {viewMode === 'ranking' && (
         <Stack gap="lg">
           <Paper p="md" radius="lg" withBorder bg="white">
-            <Group gap="md" align="flex-end" wrap="wrap">
-              <Box style={{ flex: 1, minWidth: 200 }}>
-                <Text size="xs" fw={700} c="dimmed" mb={5}>MÉTRICA A ANALIZAR</Text>
-                <Select
-                  placeholder="Selecciona una métrica..."
-                  leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
-                  data={filterMetricOptions}
-                  value={filterMetric}
-                  onChange={(value) => {
-                    setFilterMetric(value || '');
-                    setFilterValue('');
+            <Stack gap="md">
+              <Text size="sm" fw={800} c="dark.4" tt="uppercase">
+                Configurar Filtros de Alerta
+              </Text>
+              
+              <Group gap="md" align="flex-end" wrap="wrap">
+                <Box style={{ flex: 1, minWidth: 200 }}>
+                  <Text size="xs" fw={700} c="dimmed" mb={5}>MÉTRICA</Text>
+                  <Select
+                    placeholder="Selecciona una métrica..."
+                    leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+                    data={filterMetricOptions}
+                    value={newFilterMetric}
+                    onChange={(value) => {
+                      setNewFilterMetric(value || '');
+                      setNewFilterValue('');
+                    }}
+                    variant="filled"
+                    radius="xl"
+                    size="sm"
+                    searchable
+                    allowDeselect={false}
+                  />
+                </Box>
+
+                <Box style={{ width: 150 }}>
+                  <Text size="xs" fw={700} c="dimmed" mb={5}>CONDICIÓN</Text>
+                  <Select
+                    placeholder="Condición"
+                    data={[
+                      { value: '>', label: 'Mayor que (>)' },
+                      { value: '<', label: 'Menor que (<)' },
+                      { value: '>=', label: 'Mayor o igual (>=)' },
+                      { value: '<=', label: 'Menor o igual (<=)' },
+                      { value: '=', label: 'Igual a (=)' },
+                    ]}
+                    value={newFilterOperator}
+                    onChange={(value) => setNewFilterOperator(value || '>')}
+                    disabled={!newFilterMetric}
+                    variant="filled"
+                    radius="xl"
+                    size="sm"
+                    allowDeselect={false}
+                  />
+                </Box>
+
+                <Box style={{ width: 130 }}>
+                  <Text size="xs" fw={700} c="dimmed" mb={5}>UMBRAL</Text>
+                  <TextInput
+                    placeholder={
+                      ALL_METRICS_MAP.get(newFilterMetric)?.unit
+                        ? `Ej: 10`
+                        : 'Valor'
+                    }
+                    rightSection={
+                      ALL_METRICS_MAP.get(newFilterMetric)?.unit ? (
+                        <Text size="xs" c="dimmed" pr="xs">
+                          {ALL_METRICS_MAP.get(newFilterMetric).unit}
+                        </Text>
+                      ) : null
+                    }
+                    value={newFilterValue}
+                    onChange={(event) => setNewFilterValue(event.currentTarget.value)}
+                    disabled={!newFilterMetric}
+                    type="number"
+                    step="any"
+                    variant="filled"
+                    radius="xl"
+                    size="sm"
+                  />
+                </Box>
+
+                <Button
+                  color="grape"
+                  radius="xl"
+                  size="sm"
+                  leftSection={<IconPlus size={16} />}
+                  onClick={() => {
+                    if (!newFilterMetric || newFilterValue === '') return;
+                    const id = Date.now().toString();
+                    setActiveFilters([
+                      ...activeFilters,
+                      {
+                        id,
+                        metric: newFilterMetric,
+                        operator: newFilterOperator,
+                        value: newFilterValue,
+                      },
+                    ]);
+                    setNewFilterValue('');
                   }}
-                  variant="filled"
-                  radius="xl"
-                  size="sm"
-                  searchable
-                  allowDeselect={false}
-                />
-              </Box>
+                  disabled={!newFilterMetric || newFilterValue === ''}
+                >
+                  Añadir Filtro
+                </Button>
 
-              <Box style={{ width: 150 }}>
-                <Text size="xs" fw={700} c="dimmed" mb={5}>CONDICIÓN</Text>
-                <Select
-                  placeholder="Condición"
-                  data={[
-                    { value: '>', label: 'Mayor que (>)' },
-                    { value: '<', label: 'Menor que (<)' },
-                    { value: '>=', label: 'Mayor o igual (>=)' },
-                    { value: '<=', label: 'Menor o igual (<=)' },
-                    { value: '=', label: 'Igual a (=)' },
-                  ]}
-                  value={filterOperator}
-                  onChange={(value) => setFilterOperator(value || '>')}
-                  disabled={!filterMetric}
-                  variant="filled"
-                  radius="xl"
-                  size="sm"
-                  allowDeselect={false}
-                />
-              </Box>
+                <Box style={{ width: 220 }}>
+                  <Text size="xs" fw={700} c="dimmed" mb={5}>ORDENAR POR</Text>
+                  <Select
+                    placeholder="Ordenar por..."
+                    data={sortOptions}
+                    value={`${sortField}_${sortDirection}`}
+                    onChange={handleSortOptionChange}
+                    variant="filled"
+                    radius="xl"
+                    size="sm"
+                    allowDeselect={false}
+                  />
+                </Box>
+              </Group>
 
-              <Box style={{ width: 130 }}>
-                <Text size="xs" fw={700} c="dimmed" mb={5}>UMBRAL</Text>
-                <TextInput
-                  placeholder={selectedMetricConfig?.unit ? `Ej: 10` : "Valor"}
-                  rightSection={selectedMetricConfig?.unit ? <Text size="xs" c="dimmed" pr="xs">{selectedMetricConfig.unit}</Text> : null}
-                  value={filterValue}
-                  onChange={(event) => setFilterValue(event.currentTarget.value)}
-                  disabled={!filterMetric}
-                  type="number"
-                  step="any"
-                  variant="filled"
-                  radius="xl"
-                  size="sm"
-                />
+              <Box mt="xs">
+                <Text size="xs" fw={700} c="dimmed" mb={8}>
+                  FILTROS ACTIVOS ({activeFilters.length})
+                </Text>
+                {activeFilters.length > 0 ? (
+                  <Group gap="xs" wrap="wrap">
+                    {activeFilters.map((filter) => {
+                      const config = ALL_METRICS_MAP.get(filter.metric);
+                      const label = config ? config.label : filter.metric;
+                      const unit = config?.unit ? ` ${config.unit}` : '';
+                      return (
+                        <Badge
+                          key={filter.id}
+                          variant="light"
+                          color="red"
+                          size="lg"
+                          radius="xl"
+                          pr={3}
+                          rightSection={
+                            <ActionIcon
+                              size="xs"
+                              color="red"
+                              radius="xl"
+                              variant="subtle"
+                              onClick={() =>
+                                setActiveFilters(
+                                  activeFilters.filter((f) => f.id !== filter.id)
+                                )
+                              }
+                            >
+                              <IconX size={10} />
+                            </ActionIcon>
+                          }
+                        >
+                          {`${label} ${filter.operator} ${filter.value}${unit}`}
+                        </Badge>
+                      );
+                    })}
+                  </Group>
+                ) : (
+                  <Text size="xs" c="dimmed" fs="italic">
+                    No hay filtros activos. Las métricas de los jugadores se compararán con los filtros que agregues arriba.
+                  </Text>
+                )}
               </Box>
-            </Group>
+            </Stack>
           </Paper>
 
-          {rankingData.length > 0 ? (
-            <>
-              <Paper p="md" radius="lg" withBorder bg="white">
-                <Group justify="space-between" align="center" mb="md">
-                  <Box>
-                    <Title order={4} fw={800} c="dark.4">
-                      Comparativa de Plantilla: {selectedMetricConfig?.label || ''}
-                    </Title>
-                    <Text size="xs" c="dimmed">
-                      {filterValue !== ''
-                        ? `Línea de referencia en ${filterValue} ${selectedMetricConfig?.unit || ''}. En rojo los que cumplen: ${selectedMetricConfig?.label || ''} ${filterOperator} ${filterValue}`
-                        : 'Introduce un umbral para destacar a los jugadores en la gráfica.'}
+          {sortedTableData.length > 0 ? (
+            <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
+              <Group justify="space-between" p="md" pb="xs" align="center">
+                <Box>
+                  <Title order={4} fw={800} c="dark.4">
+                    Tabla de Filtros de Plantilla
+                  </Title>
+                  <Text size="xs" c="dimmed">
+                    {formatDate(currentDay)} · {sortedTableData.length} jugadores · Ordenado por:{' '}
+                    <Text span fw={700} c="grape.7">
+                      {sortField === 'alerts'
+                        ? 'Alertas'
+                        : sortField === 'name'
+                        ? 'Nombre'
+                        : sortField === 'posicion'
+                        ? 'Posición'
+                        : ALL_METRICS_MAP.get(sortField)?.label || sortField} ({sortDirection === 'asc' ? 'ascendente' : 'descendente'})
                     </Text>
-                  </Box>
-                  <Badge color="red" variant="light" size="lg">
-                    {rankingData.filter(d => d.matches).length} de {rankingData.length} jugadores
-                  </Badge>
-                </Group>
-
-                <Box h={320}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={rankingData} margin={{ top: 10, right: 10, left: -20, bottom: 60 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
-                      <XAxis
-                        dataKey="name"
-                        tick={{ fontSize: 9, fontWeight: 500 }}
-                        angle={-45}
-                        textAnchor="end"
-                        interval={0}
-                        stroke="var(--mantine-color-gray-5)"
-                      />
-                      <YAxis
-                        tick={{ fontSize: 9 }}
-                        domain={[0, 'auto']}
-                        stroke="var(--mantine-color-gray-5)"
-                      />
-                      <ChartTooltip
-                        formatter={(value) => [`${value} ${selectedMetricConfig?.unit || ''}`, selectedMetricConfig?.label]}
-                        labelStyle={{ fontWeight: 700, color: 'var(--mantine-color-dark-4)', fontSize: 10 }}
-                        contentStyle={{ borderRadius: '12px', border: '1px solid var(--mantine-color-gray-2)', padding: '6px 10px', fontSize: 10 }}
-                      />
-                      <Bar dataKey="val" radius={[4, 4, 0, 0]} maxBarSize={35}>
-                        {rankingData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={entry.matches ? 'var(--mantine-color-red-6)' : 'var(--mantine-color-gray-3)'}
-                          />
-                        ))}
-                      </Bar>
-                      {filterValue !== '' && !Number.isNaN(Number(filterValue)) && (
-                        <ReferenceLine
-                          y={Number(filterValue)}
-                          isFront={true}
-                          stroke="var(--mantine-color-dark-4)"
-                          strokeDasharray="4 4"
-                          strokeWidth={2}
-                          label={{
-                            value: `Umbral: ${filterValue} ${selectedMetricConfig?.unit || ''}`,
-                            position: 'top',
-                            fill: 'var(--mantine-color-dark-4)',
-                            fontSize: 10,
-                            fontWeight: 700
-                          }}
-                        />
-                      )}
-                    </ComposedChart>
-                  </ResponsiveContainer>
+                  </Text>
                 </Box>
-              </Paper>
+                {activeFilters.length > 0 && (
+                  <Badge variant="light" color="red" size="lg">
+                    {sortedTableData.filter((r) => r.totalAlerts > 0).length} de {sortedTableData.length} con alertas
+                  </Badge>
+                )}
+              </Group>
 
-              <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
-                <Paper p="md" radius="lg" withBorder bg="white" style={{ borderColor: 'var(--mantine-color-red-2)', borderWidth: 1.5 }}>
-                  <Group justify="space-between" mb="sm">
-                    <Text fw={750} size="sm" c="red.7" tt="uppercase">
-                      Cumplen Criterio ({rankingData.filter(d => d.matches).length})
-                    </Text>
-                    <Badge color="red" variant="light">
-                      {selectedMetricConfig?.label} {filterOperator} {filterValue}
-                    </Badge>
-                  </Group>
-                  <ScrollArea h={240}>
-                    <Table verticalSpacing="xs" striped highlightOnHover>
-                      <Table.Thead bg="red.0">
-                        <Table.Tr>
-                          <Table.Th style={{ color: 'var(--mantine-color-red-8)' }}>Jugador</Table.Th>
-                          <Table.Th style={{ color: 'var(--mantine-color-red-8)' }}>Posición</Table.Th>
-                          <Table.Th style={{ color: 'var(--mantine-color-red-8)', textAlign: 'right' }}>Valor</Table.Th>
-                        </Table.Tr>
-                      </Table.Thead>
-                      <Table.Tbody>
-                        {rankingData.filter(d => d.matches).map((row) => (
-                          <Table.Tr key={row.id}>
-                            <Table.Td>
-                              <Text fz="xs" fw={700}>{row.name}</Text>
-                            </Table.Td>
-                            <Table.Td>
-                              <Text fz="xs" c="dimmed">{row.posicion || '—'}</Text>
-                            </Table.Td>
-                            <Table.Td ta="right">
-                              <Text fz="xs" fw={700} c="red.6">
-                                {row.val} {selectedMetricConfig?.unit || ''}
+              <ScrollArea>
+                <Table
+                  verticalSpacing="sm"
+                  highlightOnHover
+                  style={{ minWidth: 400 + displayedMetrics.length * 110 }}
+                >
+                  <Table.Thead bg="gray.0">
+                    <Table.Tr>
+                      <Table.Th style={{ paddingLeft: 24 }}>
+                        <Text fz="xs" fw={700} c="dark.4">
+                          Jugador
+                        </Text>
+                      </Table.Th>
+
+                      <Table.Th w={100}>
+                        <Text fz="xs" fw={700} c="dark.4">
+                          Alertas
+                        </Text>
+                      </Table.Th>
+
+                      {displayedMetrics.map((item) => {
+                        return (
+                          <Table.Th
+                            key={item.key}
+                            style={{ whiteSpace: 'nowrap' }}
+                          >
+                            <Group gap={6} wrap="nowrap">
+                              <Box
+                                style={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: '50%',
+                                  backgroundColor: item.color || '#adb5bd',
+                                  flexShrink: 0,
+                                }}
+                              />
+                              <Stack gap={0}>
+                                <Text fz="xs" fw={700} c="dark.4">
+                                  {item.label}
+                                </Text>
+                                {item.unit && (
+                                  <Text fz="10px" c="dimmed" fw={500}>
+                                    ({item.unit})
+                                  </Text>
+                                )}
+                              </Stack>
+                            </Group>
+                          </Table.Th>
+                        );
+                      })}
+
+                      <Table.Th w={80}>Acción</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+
+                  <Table.Tbody>
+                    {sortedTableData.map((row) => (
+                      <Table.Tr
+                        key={`${row.id}-${currentDay}`}
+                        onClick={() => router.push(`/dashboard/jugador/${row.id}`)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <Table.Td style={{ paddingLeft: 24 }}>
+                          <Text fz="sm" fw={650} c="dark.4">
+                            {playerName(row)}
+                          </Text>
+                          <Text fz="xs" c="dimmed">
+                            {row.posicion || 'Sin posición'}
+                          </Text>
+                          {!row.measuredOnDay && (
+                            <Text fz="10px" c="gray.5" fs="italic" mt={2}>
+                              Sin medición
+                            </Text>
+                          )}
+                        </Table.Td>
+
+                        <Table.Td>
+                          {row.totalAlerts > 0 ? (
+                            <Badge color="red" variant="filled" size="sm" radius="xl">
+                              {row.totalAlerts}
+                            </Badge>
+                          ) : (
+                            <Badge color="gray" variant="light" size="sm" radius="xl">
+                              0
+                            </Badge>
+                          )}
+                        </Table.Td>
+
+                        {displayedMetrics.map((item) => {
+                          const hasVal = row.measuredOnDay;
+                          const value = hasVal ? metricValue(row.measurement, item) : null;
+                          const matches = row.alertMatches[item.key];
+
+                          return (
+                            <Table.Td
+                              key={item.key}
+                              style={
+                                matches
+                                  ? {
+                                      backgroundColor: 'var(--mantine-color-red-0)',
+                                      color: 'var(--mantine-color-red-8)',
+                                      fontWeight: 700,
+                                      transition: 'background-color 0.2s ease',
+                                    }
+                                  : undefined
+                              }
+                            >
+                              <Text fz="sm" fw={matches ? 700 : 500}>
+                                {metricDisplay(value, '')}
                               </Text>
                             </Table.Td>
-                          </Table.Tr>
-                        ))}
-                        {rankingData.filter(d => d.matches).length === 0 && (
-                          <Table.Tr>
-                            <Table.Td colSpan={3} style={{ textAlign: 'center', color: 'var(--mantine-color-gray-4)', fontSize: 11, padding: 16 }}>
-                              Ningún jugador cumple con este criterio.
-                            </Table.Td>
-                          </Table.Tr>
-                        )}
-                      </Table.Tbody>
-                    </Table>
-                  </ScrollArea>
-                </Paper>
+                          );
+                        })}
 
-                <Paper p="md" radius="lg" withBorder bg="white">
-                  <Group justify="space-between" mb="sm">
-                    <Text fw={750} size="sm" c="gray.7" tt="uppercase">
-                      Resto de Plantilla ({rankingData.filter(d => !d.matches).length})
-                    </Text>
-                    <Badge color="gray" variant="light">Otros</Badge>
-                  </Group>
-                  <ScrollArea h={240}>
-                    <Table verticalSpacing="xs" striped highlightOnHover>
-                      <Table.Thead bg="gray.0">
-                        <Table.Tr>
-                          <Table.Th>Jugador</Table.Th>
-                          <Table.Th>Posición</Table.Th>
-                          <Table.Th style={{ textAlign: 'right' }}>Valor</Table.Th>
-                        </Table.Tr>
-                      </Table.Thead>
-                      <Table.Tbody>
-                        {rankingData.filter(d => !d.matches).map((row) => (
-                          <Table.Tr key={row.id}>
-                            <Table.Td>
-                              <Text fz="xs" fw={600}>{row.name}</Text>
-                            </Table.Td>
-                            <Table.Td>
-                              <Text fz="xs" c="dimmed">{row.posicion || '—'}</Text>
-                            </Table.Td>
-                            <Table.Td ta="right">
-                              <Text fz="xs" fw={600} c="dark.3">
-                                {row.val} {selectedMetricConfig?.unit || ''}
-                              </Text>
-                            </Table.Td>
-                          </Table.Tr>
-                        ))}
-                        {rankingData.filter(d => !d.matches).length === 0 && (
-                          <Table.Tr>
-                            <Table.Td colSpan={3} style={{ textAlign: 'center', color: 'var(--mantine-color-gray-4)', fontSize: 11, padding: 16 }}>
-                              Todos los jugadores cumplen con el criterio.
-                            </Table.Td>
-                          </Table.Tr>
-                        )}
-                      </Table.Tbody>
-                    </Table>
-                  </ScrollArea>
-                </Paper>
-
-                <Paper p="md" radius="lg" withBorder bg="white" style={{ borderStyle: 'dashed' }}>
-                  <Group justify="space-between" mb="sm">
-                    <Text fw={750} size="sm" c="dimmed" tt="uppercase">
-                      Sin Medición ({missingDayRows.length})
-                    </Text>
-                    <Badge color="gray" variant="light">Sin registro</Badge>
-                  </Group>
-                  <ScrollArea h={240}>
-                    <Table verticalSpacing="xs" striped highlightOnHover>
-                      <Table.Thead bg="gray.0">
-                        <Table.Tr>
-                          <Table.Th>Jugador</Table.Th>
-                          <Table.Th>Posición</Table.Th>
-                          <Table.Th style={{ textAlign: 'right' }}>Última medición</Table.Th>
-                        </Table.Tr>
-                      </Table.Thead>
-                      <Table.Tbody>
-                        {missingDayRows.map((row) => (
-                          <Table.Tr key={row.id}>
-                            <Table.Td>
-                              <Text fz="xs" fw={600}>{playerName(row)}</Text>
-                            </Table.Td>
-                            <Table.Td>
-                              <Text fz="xs" c="dimmed">{row.posicion || '—'}</Text>
-                            </Table.Td>
-                            <Table.Td ta="right">
-                              <Text fz="xs" c="dimmed">
-                                {row.latest?.fecha ? formatDate(row.latest.fecha) : 'Nunca'}
-                              </Text>
-                            </Table.Td>
-                          </Table.Tr>
-                        ))}
-                        {missingDayRows.length === 0 && (
-                          <Table.Tr>
-                            <Table.Td colSpan={3} style={{ textAlign: 'center', color: 'var(--mantine-color-gray-4)', fontSize: 11, padding: 16 }}>
-                              Todos los jugadores han sido medidos.
-                            </Table.Td>
-                          </Table.Tr>
-                        )}
-                      </Table.Tbody>
-                    </Table>
-                  </ScrollArea>
-                </Paper>
-              </SimpleGrid>
-            </>
+                        <Table.Td onClick={(e) => e.stopPropagation()}>
+                          <Tooltip label="Abrir ficha" withArrow>
+                            <ActionIcon
+                              component={Anchor}
+                              href={`/dashboard/jugador/${row.id}`}
+                              variant="subtle"
+                              color="gray"
+                              radius="xl"
+                              aria-label="Abrir ficha"
+                            >
+                              <IconExternalLink size={17} />
+                            </ActionIcon>
+                          </Tooltip>
+                        </Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              </ScrollArea>
+            </Paper>
           ) : (
             <NothingFound
               withPaper
