@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { initials, filenameFromResponse } from '@/lib/utils';
-import { Anchor, Button, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination, Textarea, Checkbox, Grid, Tabs } from '@mantine/core';
+import { Anchor, Button, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Modal, Tooltip, TextInput, Select, Pagination, Textarea, Checkbox, Grid, Tabs } from '@mantine/core';
 import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
@@ -677,7 +677,7 @@ export default function DashboardContent({ players = [], team }) {
                     <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
                     <Table.Th visibleFrom="xs">Métricas</Table.Th>
                     <Table.Th visibleFrom="sm">Plan</Table.Th>
-                    <Table.Th>Credenciales</Table.Th>
+                    <Table.Th>Posición</Table.Th>
                     <Table.Th w={70} />
                   </Table.Tr>
                 </Table.Thead>
@@ -709,7 +709,7 @@ export default function DashboardContent({ players = [], team }) {
                               )}
                             </Group>
                             <Text c="dimmed" fz="xs" style={{ lineHeight: 1 }} truncate>
-                              {player.posicion || 'Sin posición'}
+                              {player.auth_email || 'Sin credenciales de acceso'}
                             </Text>
                           </Box>
                         </Group>
@@ -721,7 +721,9 @@ export default function DashboardContent({ players = [], team }) {
                           <>
                             <Text fz="sm" fw={500} c="dark.4">
                               {player.peso_kg ? `${player.peso_kg} kg` : '—'}
+                              {player.porcentaje_grasa ? ` · ${player.porcentaje_grasa}% GC` : ''}
                             </Text>
+                            <Text fz="xs" c="dimmed">Composición</Text>
                           </>
                         ) : (
                           <Text fz="sm" c="dimmed">—</Text>
@@ -749,9 +751,9 @@ export default function DashboardContent({ players = [], team }) {
 
                       {/* COLUMNA 4: POSICIÓN */}
                       <Table.Td>
-                        <Text fz="sm" c="dimmed">
-                          {player.auth_email || 'Sin credenciales de acceso'}
-                        </Text>
+                        <Badge variant="light" color="gray" radius="sm">
+                          {player.posicion || 'Sin posición'}
+                        </Badge>
                       </Table.Td>
 
                       {/* COLUMNA 5: ACCIONES */}
