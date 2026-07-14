@@ -124,6 +124,22 @@ async function persistWeeklyReport(supabase, teamId, meta, semana) {
   return semanaVal;
 }
 
+async function runWithConcurrency(items, limit, fn) {
+  const results = [];
+  const index = { current: 0 };
+
+  async function worker() {
+    while (index.current < items.length) {
+      const curIndex = index.current++;
+      results[curIndex] = await fn(items[curIndex]);
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(limit, items.length) }, worker);
+  await Promise.all(workers);
+  return results;
+}
+
 async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, calendario, semanaMenu, contexto, forceRegenerate = false) {
   let playersQuery = supabase.from('jugadores').select('*').eq('equipo_id', team.id).order('nombre');
   if (jugadorIds.length) {
@@ -168,8 +184,7 @@ async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, c
 
   if (plansError) throw plansError;
 
-  const resolvedPlayers = [];
-  for (const rawPlayer of players) {
+  const resolvedPlayers = await runWithConcurrency(players, 5, async (rawPlayer) => {
     const playerEvoluciones = (evoluciones || []).filter((item) => String(item.jugador_id) === String(rawPlayer.id));
     const player = withLatestMeasurement(rawPlayer, playerEvoluciones);
 
@@ -226,11 +241,12 @@ async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, c
       }
     }
 
-    resolvedPlayers.push({
+    return {
       ...player,
       plan: activePlan.datos,
-    });
-  }
+    };
+  });
+
 
   return resolvedPlayers;
 }
