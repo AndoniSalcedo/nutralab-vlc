@@ -4,6 +4,12 @@ import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
 import Anthropic from '@anthropic-ai/sdk';
 import { env } from '@/lib/env';
+import {
+  insertAnalytics,
+  getAnalyticsById,
+  deleteAnalytics,
+  updateAnalyticsVisibility
+} from '@/repositories/analyticsRepository';
 
 const client = new Anthropic({ apiKey: env.AI_API_KEY });
 const ANALITICA_TOOL_NAME = 'guardar_analitica';
@@ -83,14 +89,13 @@ export async function POST(req) {
 
     const parametros = extractAnalitica(message);
 
-    const { data, error } = await supabase.from('analiticas').insert({
+    const data = await insertAnalytics(supabase, {
       jugador_id: parseInt(jugadorId),
       fecha_extraccion: fechaExtraccion || null,
       parametros,
       pdf_nombre: archivo.name,
-    }).select().single();
+    });
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ ok: true, analitica: data });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -107,20 +112,13 @@ export async function DELETE(req) {
     const user = await getUser();
     if (!user || user.role === 'jugador') return forbidden('No autorizado');
 
-    const { data: analitica, error: fetchError } = await supabase
-      .from('analiticas')
-      .select('id,jugador_id')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (fetchError) throw fetchError;
+    const analitica = await getAnalyticsById(supabase, id);
     if (!analitica) return NextResponse.json({ error: 'Analítica no encontrada' }, { status: 404 });
 
     const ownedPlayer = await getOwnedPlayer(supabase, user, analitica.jugador_id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
-    const { error } = await supabase.from('analiticas').delete().eq('id', id);
-    if (error) throw error;
+    await deleteAnalytics(supabase, id);
 
     return NextResponse.json({ ok: true });
   } catch (e) {
@@ -139,28 +137,17 @@ export async function PATCH(req) {
     const user = await getUser();
     if (!user || user.role === 'jugador') return forbidden('No autorizado');
 
-    const { data: analitica, error: fetchError } = await supabase
-      .from('analiticas')
-      .select('id,jugador_id')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (fetchError) throw fetchError;
+    const analitica = await getAnalyticsById(supabase, id);
     if (!analitica) return NextResponse.json({ error: 'Analítica no encontrada' }, { status: 404 });
 
     const ownedPlayer = await getOwnedPlayer(supabase, user, analitica.jugador_id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
-    const { error, data } = await supabase
-      .from('analiticas')
-      .update({ visible_para_jugador })
-      .eq('id', id)
-      .select()
-      .single();
+    const data = await updateAnalyticsVisibility(supabase, id, visible_para_jugador);
       
-    if (error) throw error;
     return NextResponse.json({ ok: true, analitica: data });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

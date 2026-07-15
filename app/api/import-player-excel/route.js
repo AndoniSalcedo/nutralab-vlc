@@ -10,6 +10,12 @@ import {
   parsePlayerExcel,
   toPreviewResponse,
 } from '@/lib/player-excel-import';
+import { getPlayersByTeamSelect, insertPlayer, updatePlayer } from '@/repositories/playerRepository';
+import {
+  getEvolutionByPlayerAndDate,
+  updateEvolution,
+  insertEvolution
+} from '@/repositories/evolutionRepository';
 
 function parseJson(value, fallback) {
   if (!value) return fallback;
@@ -30,48 +36,25 @@ function playerUpdatePayload(group, existingPlayer) {
 }
 
 async function loadTeamPlayers(supabase, teamId) {
-  const { data, error } = await supabase
-    .from('jugadores')
-    .select('id,nombre,apellidos,fecha_nacimiento')
-    .eq('equipo_id', teamId)
-    .order('nombre');
-
-  if (error) throw error;
-  return data || [];
+  return getPlayersByTeamSelect(supabase, teamId, 'id,nombre,apellidos,fecha_nacimiento');
 }
 
 async function createPlayer(supabase, teamId, group) {
-  const { data, error } = await supabase
-    .from('jugadores')
-    .insert({
-      equipo_id: teamId,
-      nombre: cleanText(group.nombre || group.nombreCompleto),
-      apellidos: cleanText(group.apellidos),
-      fecha_nacimiento: group.fechaNacimiento || null,
-      factor_actividad: 1.55,
-      num_comidas: DEFAULT_PLAYER_MEALS_STRING,
-      postentreno: false,
-    })
-    .select('id,nombre,apellidos,fecha_nacimiento')
-    .single();
-
-  if (error) throw error;
-  return data;
+  return insertPlayer(supabase, {
+    equipo_id: teamId,
+    nombre: cleanText(group.nombre || group.nombreCompleto),
+    apellidos: cleanText(group.apellidos),
+    fecha_nacimiento: group.fechaNacimiento || null,
+    factor_actividad: 1.55,
+    num_comidas: DEFAULT_PLAYER_MEALS_STRING,
+    postentreno: false,
+  });
 }
 
 async function updatePlayerIfNeeded(supabase, player, group) {
   const payload = playerUpdatePayload(group, player);
   if (!Object.keys(payload).length) return player;
-
-  const { data, error } = await supabase
-    .from('jugadores')
-    .update(payload)
-    .eq('id', player.id)
-    .select('id,nombre,apellidos,fecha_nacimiento')
-    .single();
-
-  if (error) throw error;
-  return data || { ...player, ...payload };
+  return updatePlayer(supabase, player.id, payload);
 }
 
 function measurementPayload(jugadorId, measurement, existing = null) {
@@ -105,32 +88,18 @@ function measurementPayload(jugadorId, measurement, existing = null) {
 }
 
 async function saveMeasurement(supabase, jugadorId, measurement) {
-  const { data: existing, error: existingError } = await supabase
-    .from('evoluciones')
-    .select('*')
-    .eq('jugador_id', jugadorId)
-    .eq('fecha', measurement.fecha)
-    .maybeSingle();
-
-  if (existingError) throw existingError;
-
+  const existing = await getEvolutionByPlayerAndDate(supabase, jugadorId, measurement.fecha);
   const payload = measurementPayload(jugadorId, measurement, existing);
 
   if (existing) {
-    const { error } = await supabase
-      .from('evoluciones')
-      .update(payload)
-      .eq('id', existing.id);
-    if (error) throw error;
+    await updateEvolution(supabase, existing.id, payload);
     return 'actualizada';
   }
 
-  const { error } = await supabase
-    .from('evoluciones')
-    .insert(payload);
-  if (error) throw error;
+  await insertEvolution(supabase, payload);
   return 'creada';
 }
+
 
 function resolveDecision(group, decisions) {
   const decision = decisions?.[group.key] || {};

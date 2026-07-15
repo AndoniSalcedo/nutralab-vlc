@@ -1,5 +1,4 @@
 - sync ajustes de la rama de tecnicos con la main branch de la app
-- poner en 3º persona la parte de indicaciones de la semana
 - prepartido que carlos pueda indicar las comidas que hacer las 24 horas antes del partido
 - poner dia de prepartido editable para la configuracion (esto es necesario hacer ToDo 1 primero)
 - carpeta repositories

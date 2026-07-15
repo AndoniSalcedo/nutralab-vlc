@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getOwnedPlayer } from '@/lib/team-access';
+import { getPlayerById, updatePlayer } from '@/repositories/playerRepository';
 
 function isValidPassword(password) {
   return typeof password === 'string' && password.length >= 8;
@@ -56,13 +57,9 @@ export async function POST(request) {
       return NextResponse.json({ error: 'No tienes acceso a este jugador' }, { status: 403 });
     }
 
-    const { data: jugador, error: jugadorError } = await supabase
-      .from('jugadores')
-      .select('id,nombre,apellidos,auth_user_id')
-      .eq('id', jugadorId)
-      .single();
+    const jugador = await getPlayerById(supabase, jugadorId);
 
-    if (jugadorError || !jugador) {
+    if (!jugador) {
       return NextResponse.json({ error: 'Jugador no encontrado' }, { status: 404 });
     }
 
@@ -103,21 +100,15 @@ export async function POST(request) {
       }
     }
 
-    const { data: updated, error: updateError } = await supabase
-      .from('jugadores')
-      .update({
-        auth_user_id: authUserId,
-        auth_email: cleanEmail,
-        credentials_created_at: new Date().toISOString(),
-      })
-      .eq('id', jugador.id)
-      .select('id,auth_user_id,auth_email,credentials_created_at')
-      .single();
-
-    if (updateError) throw updateError;
+    const updated = await updatePlayer(supabase, jugador.id, {
+      auth_user_id: authUserId,
+      auth_email: cleanEmail,
+      credentials_created_at: new Date().toISOString(),
+    });
 
     return NextResponse.json({ credentials: updated });
   } catch (e) {
     return NextResponse.json({ error: e.message || 'Error creando credenciales' }, { status: 500 });
   }
 }
+

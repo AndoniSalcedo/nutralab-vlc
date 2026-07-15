@@ -6,6 +6,12 @@ import JugadorHeader from '@/components/JugadorHeader';
 import { Anchor, Stack, Text } from '@mantine/core';
 import PlayerTabs from './_tabs/PlayerTabs';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
+import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
+import { getAnalyticsByPlayerId } from '@/repositories/analyticsRepository';
+import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
+import { getMenusByTeam } from '@/repositories/menuRepository';
+import { getHydrationRecordsByPlayerId } from '@/repositories/hydrationRepository';
+import { getMessages } from '@/repositories/messagesRepository';
 
 export default async function JugadorView({ id, activeTab = 'resumen', activeSubtab }) {
   const supabase = getSupabaseAdmin();
@@ -32,46 +38,28 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
   let registrosHidratacion = [];
 
   try {
-    const { data: rawJugador, error: jugadorErr } = await supabase.from('jugadores').select('*, equipos(configuracion_nutricional)').eq('id', id).single();
-    if (jugadorErr) throw jugadorErr;
-
-    let menuQuery = supabase.from('menu_semanal').select('*').order('semana', { ascending: false }).limit(10);
-    if (rawJugador?.equipo_id) {
-      menuQuery = menuQuery.eq('equipo_id', rawJugador.equipo_id);
-    } else {
-      menuQuery = menuQuery.eq('id', -1);
-    }
-
-    let analiticasQuery = supabase.from('analiticas').select('*').eq('jugador_id', id).order('fecha_extraccion', { ascending: false });
-    if (isPlayer) {
-      analiticasQuery = analiticasQuery.eq('visible_para_jugador', true);
-    }
+    const rawJugador = await getPlayerWithTeamConfig(supabase, id);
 
     const [resAnaliticas, resEvoluciones, resMenus, resHidratacion] = await Promise.all([
-      analiticasQuery,
-      supabase.from('evoluciones').select('*').eq('jugador_id', id).order('fecha', { ascending: true }),
-      menuQuery,
-      supabase.from('registros_hidratacion').select('*').eq('jugador_id', id).order('fecha', { ascending: true }),
+      getAnalyticsByPlayerId(supabase, id),
+      getEvolutionsByPlayerId(supabase, id),
+      rawJugador?.equipo_id ? getMenusByTeam(supabase, rawJugador.equipo_id) : Promise.resolve([]),
+      getHydrationRecordsByPlayerId(supabase, id),
     ]);
 
-    analiticas = resAnaliticas.data || [];
-    evoluciones = resEvoluciones.data || [];
+    analiticas = isPlayer ? resAnaliticas.filter(a => a.visible_para_jugador === true) : resAnaliticas;
+    evoluciones = resEvoluciones;
     jugador = withLatestMeasurement(rawJugador, evoluciones);
-    menus = resMenus.data || [];
-    registrosHidratacion = resHidratacion.data || [];
+    menus = resMenus.slice(0, 10);
+    registrosHidratacion = resHidratacion;
 
     if (jugador?.equipo_id) {
-      const { data: resMessages } = await supabase
-        .from('mensajes')
-        .select('id,jugador_id,titulo,contenido,created_by_name,created_at')
-        .eq('equipo_id', jugador.equipo_id)
-        .or(`jugador_id.is.null,jugador_id.eq.${id}`)
-        .order('created_at', { ascending: false });
-      messages = resMessages || [];
+      messages = await getMessages(supabase, jugador.equipo_id, id);
     }
   } catch (err) {
     console.error('Error fetching jugador details:', err);
   }
+
 
   if (!jugador) {
     return (

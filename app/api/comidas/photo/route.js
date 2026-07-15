@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
+import { getMealPhotoWithMeta } from '@/repositories/mealsRepository';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,13 +18,8 @@ export async function GET(req) {
     const user = await getUser();
     if (!user) return forbidden('No autorizado');
 
-    const { data: meal, error: fetchErr } = await supabase
-      .from('comidas')
-      .select('jugador_id, photo, photo_mime, photo_size')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (fetchErr || !meal) return NextResponse.json({ error: 'Comida no encontrada' }, { status: 404 });
+    const meal = await getMealPhotoWithMeta(supabase, id);
+    if (!meal) return NextResponse.json({ error: 'Comida no encontrada' }, { status: 404 });
 
     const isPlayer = user.role === 'jugador';
     if (!isPlayer) {
@@ -64,3 +60,4 @@ export async function GET(req) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

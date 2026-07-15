@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
+import {
+  getMealsFiltered,
+  getMealById,
+  insertMeal,
+  updateMeal,
+  deleteMeal
+} from '@/repositories/mealsRepository';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,15 +41,7 @@ export async function GET(req) {
       }
     }
 
-    let query = supabase
-      .from('comidas')
-      .select('id, jugador_id, taken_at, dish_name, meal_type, ingredients, calories, notes, photo_size, photo_mime, created_at')
-      .eq('jugador_id', jugadorId);
-
-    if (mealType) {
-      query = query.eq('meal_type', mealType);
-    }
-    
+    let resultMeals = [];
     if (day) {
       // Fetch a wider UTC range to cover the Madrid timezone and filter exactly below
       const fromUTC = new Date(`${day}T00:00:00Z`);
@@ -50,17 +49,10 @@ export async function GET(req) {
       const toUTC = new Date(`${day}T23:59:59Z`);
       toUTC.setHours(toUTC.getHours() + 3);
       
-      query = query.gte('taken_at', fromUTC.toISOString()).lte('taken_at', toUTC.toISOString());
-    }
-
-    query = query.order('taken_at', { ascending: false });
-
-    const { data: meals, error } = await query;
-    if (error) throw error;
-
-    let resultMeals = meals || [];
-    if (day) {
+      resultMeals = await getMealsFiltered(supabase, jugadorId, mealType, fromUTC.toISOString(), toUTC.toISOString());
       resultMeals = resultMeals.filter(m => getDateStr(m.taken_at) === day);
+    } else {
+      resultMeals = await getMealsFiltered(supabase, jugadorId, mealType, null, null);
     }
 
     return NextResponse.json({ meals: resultMeals });
@@ -129,26 +121,14 @@ export async function POST(req) {
       payload.photo_size = photoFile.size;
     }
 
-    let resultQuery;
+    let resultMeal;
     if (id) {
-      resultQuery = supabase
-        .from('comidas')
-        .update(payload)
-        .eq('id', id)
-        .select('id, jugador_id, taken_at, dish_name, meal_type, ingredients, calories, notes, photo_size, photo_mime, created_at')
-        .single();
+      resultMeal = await updateMeal(supabase, id, payload);
     } else {
-      resultQuery = supabase
-        .from('comidas')
-        .insert(payload)
-        .select('id, jugador_id, taken_at, dish_name, meal_type, ingredients, calories, notes, photo_size, photo_mime, created_at')
-        .single();
+      resultMeal = await insertMeal(supabase, payload);
     }
 
-    const { data, error } = await resultQuery;
-    if (error) throw error;
-
-    return NextResponse.json({ success: true, meal: data });
+    return NextResponse.json({ success: true, meal: resultMeal });
   } catch (e) {
     console.error('Error in comidas POST:', e);
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -165,13 +145,8 @@ export async function DELETE(req) {
     const user = await getUser();
     if (!user) return forbidden('No autorizado');
 
-    const { data: meal, error: fetchErr } = await supabase
-      .from('comidas')
-      .select('jugador_id')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (fetchErr || !meal) return NextResponse.json({ error: 'Comida no encontrada' }, { status: 404 });
+    const meal = await getMealById(supabase, id);
+    if (!meal) return NextResponse.json({ error: 'Comida no encontrada' }, { status: 404 });
 
     const isPlayer = user.role === 'jugador';
     if (!isPlayer) {
@@ -183,12 +158,11 @@ export async function DELETE(req) {
       }
     }
 
-    const { error } = await supabase.from('comidas').delete().eq('id', id);
-    if (error) throw error;
-
+    await deleteMeal(supabase, id);
     return NextResponse.json({ success: true });
   } catch (e) {
     console.error('Error in comidas DELETE:', e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

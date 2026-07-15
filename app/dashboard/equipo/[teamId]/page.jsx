@@ -4,6 +4,8 @@ import { getUser } from '@/lib/auth';
 import { withLatestMeasurement } from '@/lib/player-metrics';
 import { getOwnedTeam } from '@/lib/team-access';
 import { Anchor, Stack, Text } from '@mantine/core';
+import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
+import { getEvolutionsByPlayerIdsSimple } from '@/repositories/evolutionRepository';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -24,26 +26,19 @@ export default async function TeamDashboard({ params }) {
 
   let players = [];
   try {
-    const resJugadores = await supabase
-      .from('jugadores')
-      .select('id,nombre,apellidos,posicion,kcal_objetivo,factor_actividad,objetivo,auth_user_id,auth_email,credentials_created_at,equipo_id')
-      .eq('equipo_id', team.id)
-      .order('nombre');
+    const resJugadores = await getPlayersByTeamSelect(
+      supabase,
+      team.id,
+      'id,nombre,apellidos,posicion,kcal_objetivo,factor_actividad,objetivo,auth_user_id,auth_email,credentials_created_at,equipo_id'
+    );
 
-    if (resJugadores.error) throw resJugadores.error;
-
-    const playerIds = (resJugadores.data || []).map((player) => player.id);
+    const playerIds = (resJugadores || []).map((player) => player.id);
     let evoluciones = [];
     if (playerIds.length) {
-      const res = await supabase
-        .from('evoluciones')
-        .select('jugador_id,fecha,peso_kg,porcentaje_grasa,masa_magra_kg')
-        .in('jugador_id', playerIds);
-      if (res.error) throw res.error;
-      evoluciones = res.data || [];
+      evoluciones = await getEvolutionsByPlayerIdsSimple(supabase, playerIds);
     }
 
-    players = (resJugadores.data || []).map((player) => (
+    players = (resJugadores || []).map((player) => (
       withLatestMeasurement(player, evoluciones.filter((item) => String(item.jugador_id) === String(player.id)))
     ));
   } catch (err) {
@@ -52,3 +47,4 @@ export default async function TeamDashboard({ params }) {
 
   return <DashboardContent players={players} team={team} />;
 }
+

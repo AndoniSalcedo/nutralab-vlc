@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { getOwnerId } from '@/lib/team-access';
+import { getTeamByIdAndOwner, updateTeamConfig } from '@/repositories/teamRepository';
 
 export async function POST(request, { params }) {
   try {
@@ -18,24 +19,14 @@ export async function POST(request, { params }) {
     const supabase = getSupabaseAdmin();
     
     // Verificar que el equipo pertenece al usuario
-    const { data: team, error: checkError } = await supabase
-      .from('equipos')
-      .select('id')
-      .eq('id', teamId)
-      .eq('owner_id', ownerId)
-      .single();
+    const team = await getTeamByIdAndOwner(supabase, teamId, ownerId);
 
-    if (checkError || !team) {
+    if (!team) {
       return NextResponse.json({ error: 'Equipo no encontrado o sin permisos' }, { status: 404 });
     }
 
     // Actualizar configuración
-    const { error: updateError } = await supabase
-      .from('equipos')
-      .update({ configuracion_nutricional })
-      .eq('id', teamId);
-
-    if (updateError) throw updateError;
+    await updateTeamConfig(supabase, teamId, configuracion_nutricional);
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -43,3 +34,4 @@ export async function POST(request, { params }) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

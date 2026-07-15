@@ -3,6 +3,8 @@ import TeamAnalyticsDashboard from '@/components/TeamAnalyticsDashboard';
 import { getUser } from '@/lib/auth';
 import { getOwnedTeam } from '@/lib/team-access';
 import { Anchor, Stack, Text } from '@mantine/core';
+import { getPlayersByTeamSelectSimple } from '@/repositories/playerRepository';
+import { getAnalyticsByPlayerIds } from '@/repositories/analyticsRepository';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -25,25 +27,11 @@ export default async function TeamAnalyticsPage({ params }) {
   let analiticas = [];
 
   try {
-    const resPlayers = await supabase
-      .from('jugadores')
-      .select('id,nombre,apellidos,posicion')
-      .eq('equipo_id', team.id)
-      .order('nombre');
-
-    if (resPlayers.error) throw resPlayers.error;
-    players = resPlayers.data || [];
+    players = await getPlayersByTeamSelectSimple(supabase, team.id);
 
     const playerIds = players.map((player) => player.id);
     if (playerIds.length) {
-      const resAnaliticas = await supabase
-        .from('analiticas')
-        .select('*')
-        .in('jugador_id', playerIds)
-        .order('fecha_extraccion', { ascending: false });
-
-      if (resAnaliticas.error) throw resAnaliticas.error;
-      analiticas = resAnaliticas.data || [];
+      analiticas = await getAnalyticsByPlayerIds(supabase, playerIds);
     }
   } catch (error) {
     console.error('Error fetching team analytics:', error);
@@ -51,3 +39,4 @@ export default async function TeamAnalyticsPage({ params }) {
 
   return <TeamAnalyticsDashboard players={players} analiticas={analiticas} team={team} />;
 }
+

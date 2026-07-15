@@ -5,15 +5,23 @@ import { forbidden, getOwnedPlayer } from '@/lib/team-access';
 import { planDataToLegacyContent, sanitizePlanData } from '@/lib/nutrition-plan-card';
 import { withLatestMeasurement } from '@/lib/player-metrics';
 import { generarDatosPlan } from '@/lib/ai-plan-generator';
+import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
+import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
+import {
+  getAiPlansByPlayerId,
+  getAiPlanById,
+  insertAiPlan,
+  updateAiPlan,
+  deleteAiPlan
+} from '@/repositories/aiPlanRepository';
+import { getMenuByWeekAndTeam } from '@/repositories/menuRepository';
 
 async function loadPlayerWithLatestMetrics(supabase, jugadorId) {
-  const [{ data: jugador, error: jugadorError }, { data: evoluciones, error: evolucionesError }] = await Promise.all([
-    supabase.from('jugadores').select('*, equipos(configuracion_nutricional)').eq('id', jugadorId).single(),
-    supabase.from('evoluciones').select('*').eq('jugador_id', jugadorId).order('fecha', { ascending: true }),
+  const [jugador, evoluciones] = await Promise.all([
+    getPlayerWithTeamConfig(supabase, jugadorId),
+    getEvolutionsByPlayerId(supabase, jugadorId),
   ]);
 
-  if (jugadorError) throw jugadorError;
-  if (evolucionesError) throw evolucionesError;
   return withLatestMeasurement(jugador, evoluciones || []);
 }
 
@@ -32,14 +40,8 @@ export async function GET(req) {
       if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
     }
 
-    const { data, error } = await supabase
-      .from('planes_ia')
-      .select('id,jugador_id,nombre,contexto,contexto_adicional,contenido,datos,created_at,updated_at')
-      .eq('jugador_id', jugadorId)
-      .order('updated_at', { ascending: false });
-
-    if (error) throw error;
-    return NextResponse.json({ planes: data || [] });
+    const planes = await getAiPlansByPlayerId(supabase, jugadorId);
+    return NextResponse.json({ planes: planes || [] });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -64,13 +66,7 @@ export async function POST(req) {
     if (semanaMenu === 'none' || semanaMenu === null) {
       resolvedMenu = null;
     } else if (semanaMenu) {
-      const { data: menuData } = await supabase
-        .from('menu_semanal')
-        .select('*')
-        .eq('semana', semanaMenu)
-        .eq('equipo_id', teamConfig?.equipo_id || jugadorConMetricas?.equipo_id)
-        .maybeSingle();
-      resolvedMenu = menuData || null;
+      resolvedMenu = await getMenuByWeekAndTeam(supabase, semanaMenu, teamConfig?.equipo_id || jugadorConMetricas?.equipo_id);
     }
 
     const generatedDatos = draftOnly || (!datos && (contenido === undefined || contenido === ''))
@@ -92,23 +88,18 @@ export async function POST(req) {
 
     const finalContenido = generatedDatos ? planDataToLegacyContent(generatedDatos, teamConfig) : String(contenido || '');
     const now = new Date().toISOString();
-    const { data, error } = await supabase
-      .from('planes_ia')
-      .insert({
-        jugador_id: jugador.id,
-        nombre: planNombre,
-        contexto,
-        contexto_adicional: contextoAdicional || '',
-        contenido: finalContenido,
-        datos: generatedDatos,
-        created_at: now,
-        updated_at: now,
-      })
-      .select()
-      .single();
+    const plan = await insertAiPlan(supabase, {
+      jugador_id: jugador.id,
+      nombre: planNombre,
+      contexto,
+      contexto_adicional: contextoAdicional || '',
+      contenido: finalContenido,
+      datos: generatedDatos,
+      created_at: now,
+      updated_at: now,
+    });
 
-    if (error) throw error;
-    return NextResponse.json({ plan: data });
+    return NextResponse.json({ plan });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -125,13 +116,8 @@ export async function PATCH(req) {
     const user = await getUser();
     if (!user || user.role === 'jugador') return forbidden('No autorizado');
 
-    const { data: currentPlan, error: currentPlanError } = await supabase
-      .from('planes_ia')
-      .select('jugador_id')
-      .eq('id', id)
-      .single();
-
-    if (currentPlanError) throw currentPlanError;
+    const currentPlan = await getAiPlanById(supabase, id);
+    if (!currentPlan) return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 });
     const ownedPlayer = await getOwnedPlayer(supabase, user, currentPlan.jugador_id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
     
@@ -141,22 +127,16 @@ export async function PATCH(req) {
     const sanitizedDatos = sanitizePlanData(datos, teamConfig);
     const finalContenido = sanitizedDatos ? planDataToLegacyContent(sanitizedDatos, teamConfig) : String(contenido || '');
 
-    const { data, error } = await supabase
-      .from('planes_ia')
-      .update({
-        nombre: planNombre,
-        contenido: finalContenido,
-        datos: sanitizedDatos,
-        contexto,
-        contexto_adicional: contextoAdicional || '',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-      .select()
-      .single();
+    const plan = await updateAiPlan(supabase, id, {
+      nombre: planNombre,
+      contenido: finalContenido,
+      datos: sanitizedDatos,
+      contexto,
+      contexto_adicional: contextoAdicional || '',
+      updated_at: new Date().toISOString(),
+    });
 
-    if (error) throw error;
-    return NextResponse.json({ plan: data });
+    return NextResponse.json({ plan });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
@@ -172,23 +152,16 @@ export async function DELETE(req) {
     const user = await getUser();
     if (!user || user.role === 'jugador') return forbidden('No autorizado');
 
-    const { data: plan, error: fetchError } = await supabase
-      .from('planes_ia')
-      .select('id, jugador_id')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (fetchError) throw fetchError;
+    const plan = await getAiPlanById(supabase, id);
     if (!plan) return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 });
 
     const ownedPlayer = await getOwnedPlayer(supabase, user, plan.jugador_id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
-    const { error } = await supabase.from('planes_ia').delete().eq('id', id);
-    if (error) throw error;
-
+    await deleteAiPlan(supabase, id);
     return NextResponse.json({ ok: true });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

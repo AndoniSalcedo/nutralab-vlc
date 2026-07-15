@@ -3,6 +3,7 @@ import { getUser } from '@/lib/auth';
 import { getOwnedTeam } from '@/lib/team-access';
 import { Anchor, Stack, Text } from '@mantine/core';
 import TeamMenuDashboard from '@/components/TeamMenuDashboard';
+import { getMenusByTeam } from '@/repositories/menuRepository';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -23,14 +24,7 @@ export default async function TeamMenuPage({ params }) {
 
   let menus = [];
   try {
-    const { data, error } = await supabase
-      .from('menu_semanal')
-      .select('*')
-      .eq('equipo_id', team.id)
-      .order('semana', { ascending: false });
-
-    if (error) throw error;
-    menus = data || [];
+    menus = await getMenusByTeam(supabase, team.id);
   } catch (error) {
     console.error('Error fetching weekly menus:', error);
   }
@@ -42,3 +36,4 @@ export default async function TeamMenuPage({ params }) {
     />
   );
 }
+

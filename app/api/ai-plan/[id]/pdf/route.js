@@ -6,6 +6,9 @@ import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
 import NutritionPlanCardDocument from '@/lib/reports/NutritionPlanCardDocument';
 import { sanitizeFilename, pdfHeaders } from '@/lib/utils';
+import { getAiPlanById } from '@/repositories/aiPlanRepository';
+import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
+import { getWeeklyReport } from '@/repositories/weeklyReportsRepository';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -20,14 +23,9 @@ export async function GET(_request, { params }) {
     const user = await getUser();
     if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
 
-    const { data: plan, error } = await supabase
-      .from('planes_ia')
-      .select('id,jugador_id,nombre,datos')
-      .eq('id', planId)
-      .single();
-
-    if (error) throw error;
-    if (!plan?.datos) return NextResponse.json({ error: 'Este plan no tiene datos de ficha para PDF' }, { status: 400 });
+    const plan = await getAiPlanById(supabase, planId);
+    if (!plan) return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 });
+    if (!plan.datos) return NextResponse.json({ error: 'Este plan no tiene datos de ficha para PDF' }, { status: 400 });
 
     if (user.role === 'jugador') {
       if (String(user.id) !== String(plan.jugador_id)) return forbidden();
@@ -37,11 +35,7 @@ export async function GET(_request, { params }) {
     }
 
     let weeklyReportMeta = null;
-    const { data: jugador } = await supabase
-      .from('jugadores')
-      .select('equipo_id, equipos(configuracion_nutricional)')
-      .eq('id', plan.jugador_id)
-      .single();
+    const jugador = await getPlayerWithTeamConfig(supabase, plan.jugador_id);
 
     const teamConfig = jugador?.equipos?.configuracion_nutricional;
 
@@ -58,12 +52,7 @@ export async function GET(_request, { params }) {
     }
 
     if (jugador?.equipo_id && semana) {
-      const { data: report } = await supabase
-        .from('informes_semanales')
-        .select('meta')
-        .eq('equipo_id', jugador.equipo_id)
-        .eq('semana', semana)
-        .maybeSingle();
+      const report = await getWeeklyReport(supabase, jugador.equipo_id, semana);
       if (report) {
         weeklyReportMeta = report.meta;
       }
@@ -89,3 +78,4 @@ export async function GET(_request, { params }) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

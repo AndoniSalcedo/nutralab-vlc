@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
+import { updatePlayer } from '@/repositories/playerRepository';
 
 const CAMPOS_PERMITIDOS = [
   'notas_hidratacion', 'notas_suplementacion', 'notas_protocolos',
@@ -22,10 +23,10 @@ export async function POST(req) {
     const ownedPlayer = await getOwnedPlayer(supabase, user, id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
-    const { error } = await supabase.from('jugadores').update({ [field]: value }).eq('id', id);
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    await updatePlayer(supabase, id, { [field]: value });
     return NextResponse.json({ ok: true });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

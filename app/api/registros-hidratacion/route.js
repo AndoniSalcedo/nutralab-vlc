@@ -3,7 +3,14 @@ import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
 import { toNumber as parseCsvNumber, parseDate as parseCsvDate, normalizeKey } from '@/lib/utils';
-
+import {
+  getHydrationRecordsByPlayerId,
+  upsertHydrationRecords,
+  updateHydrationRecord,
+  upsertHydrationRecord,
+  getHydrationRecordById,
+  deleteHydrationRecord
+} from '@/repositories/hydrationRepository';
 
 function normalizeRecordType(type) {
   const normalized = String(type || '').trim().toLowerCase();
@@ -90,11 +97,7 @@ export async function POST(req) {
       }
 
       // Upsert bulk
-      const { error } = await supabase
-        .from('registros_hidratacion')
-        .upsert(recordsToUpsert, { onConflict: 'jugador_id,fecha,tipo' });
-
-      if (error) throw error;
+      await upsertHydrationRecords(supabase, recordsToUpsert);
 
       return NextResponse.json({
         success: true,
@@ -119,26 +122,12 @@ export async function POST(req) {
         cuestionario
       };
 
-      let query;
+      let resData;
       if (id) {
-        query = supabase
-          .from('registros_hidratacion')
-          .update(payload)
-          .eq('id', id)
-          .eq('jugador_id', Number(jugador_id))
-          .select()
-          .single();
+        resData = await updateHydrationRecord(supabase, id, Number(jugador_id), payload);
       } else {
-        query = supabase
-          .from('registros_hidratacion')
-          .upsert(payload, { onConflict: 'jugador_id,fecha,tipo' })
-          .select()
-          .single();
+        resData = await upsertHydrationRecord(supabase, payload);
       }
-
-      const { data: resData, error } = await query;
-
-      if (error) throw error;
 
       return NextResponse.json({ success: true, record: resData });
     }
@@ -163,14 +152,7 @@ export async function GET(req) {
       return forbidden('No tienes acceso a este jugador');
     }
 
-    const { data, error } = await supabase
-      .from('registros_hidratacion')
-      .select('*')
-      .eq('jugador_id', jugadorId)
-      .order('fecha', { ascending: true });
-
-    if (error) throw error;
-
+    const data = await getHydrationRecordsByPlayerId(supabase, jugadorId);
     return NextResponse.json({ records: data || [] });
   } catch (e) {
     console.error('Error in registros-hidratacion GET:', e);
@@ -189,18 +171,13 @@ export async function DELETE(req) {
     if (!user || user.role === 'jugador') return forbidden('No autorizado');
 
     // Verify record exists and user owns the player
-    const { data: record, error: fetchErr } = await supabase
-      .from('registros_hidratacion')
-      .select('jugador_id')
-      .eq('id', id)
-      .single();
-    if (fetchErr || !record) return NextResponse.json({ error: 'Registro no encontrado' }, { status: 404 });
+    const record = await getHydrationRecordById(supabase, id);
+    if (!record) return NextResponse.json({ error: 'Registro no encontrado' }, { status: 404 });
 
     const ownedPlayer = await getOwnedPlayer(supabase, user, record.jugador_id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
-    const { error } = await supabase.from('registros_hidratacion').delete().eq('id', id);
-    if (error) throw error;
+    await deleteHydrationRecord(supabase, id);
 
     return NextResponse.json({ success: true });
   } catch (e) {
@@ -208,3 +185,4 @@ export async function DELETE(req) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

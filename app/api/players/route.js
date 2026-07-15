@@ -4,6 +4,12 @@ import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer, getOwnedTeam } from '@/lib/team-access';
 import { DEFAULT_PLAYER_MEALS_STRING } from '@/lib/nutrition-day-types';
 import { toPositiveNumber as toNumber } from '@/lib/utils';
+import {
+  getPlayerAuthUserId,
+  deletePlayer,
+  updatePlayer,
+  insertPlayer
+} from '@/repositories/playerRepository';
 
 
 export async function POST(request) {
@@ -23,13 +29,9 @@ export async function POST(request) {
     const ownedPlayer = await getOwnedPlayer(supabase, user, id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
-    const { data: jugador } = await supabase
-      .from('jugadores')
-      .select('auth_user_id')
-      .eq('id', id)
-      .single();
+    const jugador = await getPlayerAuthUserId(supabase, id);
 
-    await supabase.from('jugadores').delete().eq('id', id);
+    await deletePlayer(supabase, id);
     if (jugador?.auth_user_id) {
       await supabase.auth.admin.deleteUser(jugador.auth_user_id);
     }
@@ -65,15 +67,16 @@ export async function POST(request) {
   };
 
   if (id) {
-    await supabase.from('jugadores').update(payload).eq('id', id);
+    await updatePlayer(supabase, id, payload);
   } else {
     const insertPayload = {
       ...payload,
       num_comidas: DEFAULT_PLAYER_MEALS_STRING,
       postentreno: false,
     };
-    await supabase.from('jugadores').insert(insertPayload);
+    await insertPlayer(supabase, insertPayload);
   }
 
   return NextResponse.redirect(new URL(`/dashboard/equipo/${targetTeam.id}`, request.url), 303);
 }
+

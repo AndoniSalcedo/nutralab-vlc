@@ -3,6 +3,13 @@ import { getUser } from '@/lib/auth';
 import { getOwnedTeam } from '@/lib/team-access';
 import { Anchor, Stack, Text } from '@mantine/core';
 import TeamSupplementationDashboard from '@/components/TeamSupplementationDashboard';
+import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
+import {
+  getJugadorSuplementacionByPlayers,
+  getJugadorSuplementosExtraByPlayers,
+  getSuplementacionHistorialByPlayers,
+  getAllSuplementacionListas
+} from '@/repositories/supplementationRepository';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -28,41 +35,27 @@ export default async function TeamSupplementationPage({ params, searchParams }) 
   let catalogs = [];
 
   try {
-    const resPlayers = await supabase
-      .from('jugadores')
-      .select('id,nombre,apellidos,posicion,auth_email')
-      .eq('equipo_id', team.id)
-      .order('nombre');
-
-    if (resPlayers.error) throw resPlayers.error;
-    players = resPlayers.data || [];
+    players = await getPlayersByTeamSelect(supabase, team.id, 'id,nombre,apellidos,posicion,auth_email');
 
     const playerIds = players.map((player) => player.id);
     
     if (playerIds.length) {
       const [resAssignments, resExtras, resHistory, resCatalogs] = await Promise.all([
-        supabase.from('jugador_suplementacion').select('*').in('jugador_id', playerIds),
-        supabase.from('jugador_suplementos_extra').select('*').in('jugador_id', playerIds),
-        supabase.from('jugador_suplementacion_historial')
-          .select('id, jugador_id, lista_id, created_at')
-          .in('jugador_id', playerIds)
-          .order('created_at', { ascending: false }),
-        supabase.from('suplementacion_listas').select('*').order('orden', { ascending: true })
+        getJugadorSuplementacionByPlayers(supabase, playerIds),
+        getJugadorSuplementosExtraByPlayers(supabase, playerIds),
+        getSuplementacionHistorialByPlayers(supabase, playerIds),
+        getAllSuplementacionListas(supabase)
       ]);
 
-      if (resAssignments.error) throw resAssignments.error;
-      if (resExtras.error) throw resExtras.error;
-      if (resHistory.error) throw resHistory.error;
-      if (resCatalogs.error) throw resCatalogs.error;
-
-      assignments = resAssignments.data || [];
-      extras = resExtras.data || [];
-      history = resHistory.data || [];
-      catalogs = resCatalogs.data || [];
+      assignments = resAssignments;
+      extras = resExtras;
+      history = resHistory;
+      catalogs = resCatalogs;
     }
   } catch (error) {
     console.error('Error fetching team supplementation:', error);
   }
+
 
   const playersParam = searchParams?.players || searchParams?.jugadores || searchParams?.playerIds;
   const initialSelectedPlayerIds = playersParam

@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { forbidden, getOwnedTeam, getOwnerId } from '@/lib/team-access';
+import { insertTeam, deleteTeam } from '@/repositories/teamRepository';
+import { getPlayersByTeam, insertPlayer } from '@/repositories/playerRepository';
+import { getEvolutionsByPlayerIdOrdered, insertEvolutionsBulk } from '@/repositories/evolutionRepository';
 
 function clean(value) {
   return String(value || '').trim();
@@ -62,13 +65,7 @@ export async function POST(request) {
         return NextResponse.json({ error: 'El nombre del equipo es obligatorio' }, { status: 400 });
       }
 
-      const { data, error } = await supabase
-        .from('equipos')
-        .insert({ owner_id: ownerId, nombre, temporada, descripcion })
-        .select('*')
-        .single();
-
-      if (error) throw error;
+      const data = await insertTeam(supabase, { owner_id: ownerId, nombre, temporada, descripcion });
       return NextResponse.json({ equipo: data }, { status: 201 });
     }
 
@@ -77,8 +74,7 @@ export async function POST(request) {
       const team = await getOwnedTeam(supabase, user, teamId);
       if (!team) return forbidden('No tienes acceso a este equipo');
 
-      const { error } = await supabase.from('equipos').delete().eq('id', team.id);
-      if (error) throw error;
+      await deleteTeam(supabase, team.id);
       return NextResponse.json({ ok: true });
     }
 
@@ -97,39 +93,26 @@ export async function POST(request) {
 
       let players = [];
       if (selectedPlayerIds?.length !== 0) {
-        let playersQuery = supabase
-          .from('jugadores')
-          .select(`id,${PLAYER_COPY_FIELDS.join(',')}`)
-          .eq('equipo_id', sourceTeam.id)
-          .order('nombre');
-
+        const teamPlayers = await getPlayersByTeam(supabase, sourceTeam.id);
+        
         if (selectedPlayerIds) {
-          playersQuery = playersQuery.in('id', selectedPlayerIds);
-        }
-
-        const { data, error: playersError } = await playersQuery;
-        if (playersError) throw playersError;
-        players = data || [];
-
-        if (selectedPlayerIds) {
+          const idsSet = new Set(selectedPlayerIds.map(String));
+          players = teamPlayers.filter(p => idsSet.has(String(p.id)));
+          
           const foundIds = new Set(players.map((player) => String(player.id)));
           const missingIds = selectedPlayerIds.filter((playerId) => !foundIds.has(playerId));
           if (missingIds.length) return forbidden('Algún jugador seleccionado no pertenece a este equipo');
+        } else {
+          players = teamPlayers;
         }
       }
 
-      const { data: newTeam, error: teamError } = await supabase
-        .from('equipos')
-        .insert({
-          owner_id: ownerId,
-          nombre: nombre || sourceTeam.nombre,
-          temporada,
-          descripcion: hasDescripcion ? descripcion : sourceTeam.descripcion,
-        })
-        .select('*')
-        .single();
-
-      if (teamError) throw teamError;
+      const newTeam = await insertTeam(supabase, {
+        owner_id: ownerId,
+        nombre: nombre || sourceTeam.nombre,
+        temporada,
+        descripcion: hasDescripcion ? descripcion : sourceTeam.descripcion,
+      });
 
       let copiedPlayers = 0;
       const copiedPlayerSummaries = [];
@@ -139,36 +122,26 @@ export async function POST(request) {
           PLAYER_COPY_FIELDS.map((field) => [field, player[field] ?? null])
         );
 
-        const { data: newPlayer, error: playerError } = await supabase
-          .from('jugadores')
-          .insert({ ...payload, equipo_id: newTeam.id })
-          .select('id,nombre,apellidos,posicion')
-          .single();
-
-        if (playerError) throw playerError;
+        const newPlayer = await insertPlayer(supabase, { ...payload, equipo_id: newTeam.id });
         copiedPlayers++;
-        copiedPlayerSummaries.push(newPlayer);
+        copiedPlayerSummaries.push({
+          id: newPlayer.id,
+          nombre: newPlayer.nombre,
+          apellidos: newPlayer.apellidos,
+          posicion: newPlayer.posicion
+        });
 
-        const { data: evolutions, error: evolutionsError } = await supabase
-          .from('evoluciones')
-          .select('*')
-          .eq('jugador_id', sourcePlayerId)
-          .order('fecha');
-
-        if (evolutionsError) throw evolutionsError;
+        const evolutions = await getEvolutionsByPlayerIdOrdered(supabase, sourcePlayerId);
 
         const evolutionPayloads = (evolutions || []).map((evo) => {
-          const clean = { ...evo, jugador_id: newPlayer.id };
-          delete clean.id;
-          delete clean.created_at;
-          return clean;
+          const cleanEvo = { ...evo, jugador_id: newPlayer.id };
+          delete cleanEvo.id;
+          delete cleanEvo.created_at;
+          return cleanEvo;
         });
 
         if (evolutionPayloads.length) {
-          const { error: insertEvolutionsError } = await supabase
-            .from('evoluciones')
-            .insert(evolutionPayloads);
-          if (insertEvolutionsError) throw insertEvolutionsError;
+          await insertEvolutionsBulk(supabase, evolutionPayloads);
         }
       }
 
@@ -181,3 +154,4 @@ export async function POST(request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

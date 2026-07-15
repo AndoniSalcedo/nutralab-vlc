@@ -3,7 +3,16 @@ import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getOwnedPlayer } from '@/lib/team-access';
 import { cleanText, toPositiveNumber } from '@/lib/utils';
-
+import {
+  getAllSuplementos,
+  getAllSuplementacionListas,
+  getAllSuplementacionListaItems,
+  getJugadorSuplementacion,
+  getJugadorSuplementosExtra,
+  upsertJugadorSuplementacion,
+  upsertJugadorSuplementosExtra,
+  deleteJugadorSuplementosExtra
+} from '@/repositories/supplementationRepository';
 
 function canManage(user) {
   return user && user.role !== 'jugador';
@@ -43,33 +52,33 @@ export async function GET(request) {
   if (jugadorError) return jugadorError;
 
   const supabase = getSupabaseAdmin();
-  const [
-    suplementosRes,
-    listasRes,
-    itemsRes,
-    asignacionRes,
-    extrasRes,
-  ] = await Promise.all([
-    supabase.from('suplementos').select('*').order('nombre', { ascending: true }),
-    supabase.from('suplementacion_listas').select('*').order('orden', { ascending: true }),
-    supabase.from('suplementacion_lista_items').select('*').order('orden', { ascending: true }),
-    supabase.from('jugador_suplementacion').select('*').eq('jugador_id', jugadorId).maybeSingle(),
-    supabase.from('jugador_suplementos_extra').select('*').eq('jugador_id', jugadorId).order('created_at', { ascending: true }),
-  ]);
+  
+  try {
+    const [
+      suplementos,
+      listas,
+      items,
+      asignacion,
+      extras,
+    ] = await Promise.all([
+      getAllSuplementos(supabase),
+      getAllSuplementacionListas(supabase),
+      getAllSuplementacionListaItems(supabase),
+      getJugadorSuplementacion(supabase, jugadorId),
+      getJugadorSuplementosExtra(supabase, jugadorId),
+    ]);
 
-  const firstError = [suplementosRes, listasRes, itemsRes, asignacionRes, extrasRes].find((res) => res.error)?.error;
-  if (firstError) {
+    return NextResponse.json({
+      suplementos,
+      listas,
+      items,
+      asignacion,
+      extras,
+      canManage: canManage(user),
+    });
+  } catch (firstError) {
     return NextResponse.json({ error: firstError.message }, { status: 500 });
   }
-
-  return NextResponse.json({
-    suplementos: suplementosRes.data || [],
-    listas: listasRes.data || [],
-    items: itemsRes.data || [],
-    asignacion: asignacionRes.data || null,
-    extras: extrasRes.data || [],
-    canManage: canManage(user),
-  });
 }
 
 export async function POST(request) {
@@ -92,64 +101,51 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Sin permisos' }, { status: 403 });
   }
 
-  if (action === 'set_list') {
-    const listaId = toPositiveNumber(body.lista_id);
-    const payload = {
-      jugador_id: jugadorId,
-      lista_id: listaId,
-      updated_at: new Date().toISOString(),
-    };
+  try {
+    if (action === 'set_list') {
+      const listaId = toPositiveNumber(body.lista_id);
+      const payload = {
+        jugador_id: jugadorId,
+        lista_id: listaId,
+        updated_at: new Date().toISOString(),
+      };
 
-    const { data, error } = await supabase
-      .from('jugador_suplementacion')
-      .upsert(payload, { onConflict: 'jugador_id' })
-      .select('*')
-      .single();
-
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ asignacion: data });
-  }
-
-  if (action === 'add_extra') {
-    const suplementoId = toPositiveNumber(body.suplemento_id);
-    if (!suplementoId) {
-      return NextResponse.json({ error: 'Falta suplemento_id' }, { status: 400 });
+      const data = await upsertJugadorSuplementacion(supabase, payload);
+      return NextResponse.json({ asignacion: data });
     }
 
-    const payload = {
-      jugador_id: jugadorId,
-      suplemento_id: suplementoId,
-      dose_override: cleanText(body.dose_override) || null,
-      timing_override: cleanText(body.timing_override) || null,
-      note_override: cleanText(body.note_override) || null,
-      updated_at: new Date().toISOString(),
-    };
+    if (action === 'add_extra') {
+      const suplementoId = toPositiveNumber(body.suplemento_id);
+      if (!suplementoId) {
+        return NextResponse.json({ error: 'Falta suplemento_id' }, { status: 400 });
+      }
 
-    const { data, error } = await supabase
-      .from('jugador_suplementos_extra')
-      .upsert(payload, { onConflict: 'jugador_id,suplemento_id' })
-      .select('*')
-      .single();
+      const payload = {
+        jugador_id: jugadorId,
+        suplemento_id: suplementoId,
+        dose_override: cleanText(body.dose_override) || null,
+        timing_override: cleanText(body.timing_override) || null,
+        note_override: cleanText(body.note_override) || null,
+        updated_at: new Date().toISOString(),
+      };
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ extra: data }, { status: 201 });
-  }
-
-  if (action === 'delete_extra') {
-    const extraId = toPositiveNumber(body.extra_id);
-    if (!extraId) {
-      return NextResponse.json({ error: 'Falta extra_id' }, { status: 400 });
+      const data = await upsertJugadorSuplementosExtra(supabase, payload);
+      return NextResponse.json({ extra: data }, { status: 201 });
     }
 
-    const { error } = await supabase
-      .from('jugador_suplementos_extra')
-      .delete()
-      .eq('id', extraId)
-      .eq('jugador_id', jugadorId);
+    if (action === 'delete_extra') {
+      const extraId = toPositiveNumber(body.extra_id);
+      if (!extraId) {
+        return NextResponse.json({ error: 'Falta extra_id' }, { status: 400 });
+      }
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ ok: true });
+      await deleteJugadorSuplementosExtra(supabase, extraId, jugadorId);
+      return NextResponse.json({ ok: true });
+    }
+
+    return NextResponse.json({ error: 'Acción no soportada' }, { status: 400 });
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  return NextResponse.json({ error: 'Acción no soportada' }, { status: 400 });
 }
+

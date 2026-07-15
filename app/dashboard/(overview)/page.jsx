@@ -3,6 +3,8 @@ import TeamsDashboard from '@/components/TeamsDashboard';
 import { getUser } from '@/lib/auth';
 import { getOwnerId } from '@/lib/team-access';
 import { redirect } from 'next/navigation';
+import { getPlayerById, getPlayersByOwner } from '@/repositories/playerRepository';
+import { getTeamsByOwner } from '@/repositories/teamRepository';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -13,7 +15,7 @@ export default async function Dashboard() {
   
   // Jugador flow
   if (user?.role === 'jugador') {
-    const { data: jugador } = await supabase.from('jugadores').select('*').eq('id', user.id).single();
+    const jugador = await getPlayerById(supabase, user.id);
     
     if (!jugador) {
       return <p>Error: No se encontró tu perfil de jugador.</p>;
@@ -28,25 +30,13 @@ export default async function Dashboard() {
   let teams = [];
   try {
     const [resEquipos, resJugadores] = await Promise.all([
-      supabase
-        .from('equipos')
-        .select('*')
-        .eq('owner_id', ownerId)
-        .order('temporada', { ascending: false })
-        .order('nombre'),
-      supabase
-        .from('jugadores')
-        .select('id,equipo_id,nombre,apellidos,posicion,equipos!inner(owner_id)')
-        .eq('equipos.owner_id', ownerId)
-        .order('nombre')
+      getTeamsByOwner(supabase, ownerId),
+      getPlayersByOwner(supabase, ownerId)
     ]);
-
-    if (resEquipos.error) throw resEquipos.error;
-    if (resJugadores.error) throw resJugadores.error;
 
     const counts = new Map();
     const playersByTeam = new Map();
-    for (const player of resJugadores.data || []) {
+    for (const player of resJugadores || []) {
       const teamId = String(player.equipo_id);
       counts.set(teamId, (counts.get(teamId) || 0) + 1);
       const currentPlayers = playersByTeam.get(teamId) || [];
@@ -59,7 +49,7 @@ export default async function Dashboard() {
       playersByTeam.set(teamId, currentPlayers);
     }
 
-    teams = (resEquipos.data || []).map((team) => ({
+    teams = (resEquipos || []).map((team) => ({
       ...team,
       players_count: counts.get(String(team.id)) || 0,
       players: playersByTeam.get(String(team.id)) || [],
@@ -70,3 +60,4 @@ export default async function Dashboard() {
 
   return <TeamsDashboard teams={teams} />;
 }
+

@@ -9,6 +9,13 @@ import WeeklySquadReportDocument from '@/lib/reports/WeeklySquadReportDocument';
 import { planDataToLegacyContent } from '@/lib/nutrition-plan-card';
 import { generarDatosPlan } from '@/lib/ai-plan-generator';
 import { sanitizeFilename, pdfHeaders as getPdfHeaders } from '@/lib/utils';
+import { getPlayerById, getPlayersByTeam } from '@/repositories/playerRepository';
+import { getTeamById } from '@/repositories/teamRepository';
+import { getWeeklyReport, upsertWeeklyReport } from '@/repositories/weeklyReportsRepository';
+import { getEvolutionsByPlayerIds } from '@/repositories/evolutionRepository';
+import { getMenuByWeekAndTeam } from '@/repositories/menuRepository';
+import { getAiPlansByPlayerIdsFull, updateAiPlan, insertAiPlan } from '@/repositories/aiPlanRepository';
+
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -53,23 +60,13 @@ function httpError(message, status = 400) {
 
 async function resolveTeam(supabase, user, teamId) {
   if (user.role === 'jugador') {
-    const { data: player, error } = await supabase
-      .from('jugadores')
-      .select('equipo_id')
-      .eq('id', user.id)
-      .single();
-
-    if (error || !player?.equipo_id) {
+    const player = await getPlayerById(supabase, user.id);
+    if (!player?.equipo_id) {
       throw httpError('No tienes equipo asignado', 403);
     }
 
-    const { data: team, error: teamError } = await supabase
-      .from('equipos')
-      .select('*')
-      .eq('id', player.equipo_id)
-      .single();
-
-    if (teamError || !team) {
+    const team = await getTeamById(supabase, player.equipo_id);
+    if (!team) {
       throw httpError('No tienes acceso a este equipo', 403);
     }
 
@@ -87,42 +84,25 @@ async function resolveTeam(supabase, user, teamId) {
 async function loadStoredMeta(supabase, teamId, semana) {
   if (!semana) return defaultMeta();
 
-  const { data: informe, error } = await supabase
-    .from('informes_semanales')
-    .select('meta')
-    .eq('equipo_id', teamId)
-    .eq('semana', semana)
-    .maybeSingle();
-
-  if (error) throw error;
-
+  const informe = await getWeeklyReport(supabase, teamId, semana);
   return defaultMeta(informe?.meta);
 }
 
 async function persistWeeklyReport(supabase, teamId, meta, semana) {
   const semanaVal = semana || new Date().toISOString().split('T')[0];
-  const { error } = await supabase
-    .from('informes_semanales')
-    .upsert(
-      {
-        equipo_id: teamId,
-        semana: semanaVal,
-        meta: {
-          ...meta,
-          semana: semanaVal,
-        },
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'equipo_id,semana' }
-    );
-
-  if (error) {
+  try {
+    await upsertWeeklyReport(supabase, teamId, semanaVal, {
+      ...meta,
+      semana: semanaVal,
+    });
+  } catch (error) {
     console.error('Error saving weekly report configuration:', error);
     throw httpError(`Error al guardar el informe en la base de datos: ${error.message}`, 500);
   }
 
   return semanaVal;
 }
+
 
 async function runWithConcurrency(items, limit, fn) {
   const results = [];
@@ -141,48 +121,29 @@ async function runWithConcurrency(items, limit, fn) {
 }
 
 async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, calendario, semanaMenu, contexto, forceRegenerate = false) {
-  let playersQuery = supabase.from('jugadores').select('*').eq('equipo_id', team.id).order('nombre');
+  const rawPlayers = await getPlayersByTeam(supabase, team.id);
+  let players = rawPlayers || [];
   if (jugadorIds.length) {
-    playersQuery = playersQuery.in('id', jugadorIds);
+    const idsSet = new Set(jugadorIds.map(String));
+    players = players.filter((p) => idsSet.has(String(p.id)));
   }
 
-  const { data: rawPlayers, error: playersError } = await playersQuery;
-  if (playersError) throw playersError;
-
-  const players = rawPlayers || [];
   if (!players.length) {
     throw httpError('No hay jugadores para generar el informe', 400);
   }
 
   const playerIds = players.map((player) => player.id);
-  const { data: evoluciones, error: evolucionesError } = await supabase
-    .from('evoluciones')
-    .select('jugador_id,fecha,altura_cm,peso_kg,porcentaje_grasa,masa_magra_kg,peso_muscular,suma_6_pliegues,suma_8_pliegues,metricas_excel')
-    .in('jugador_id', playerIds)
-    .order('fecha', { ascending: true });
-
-  if (evolucionesError) throw evolucionesError;
+  const evoluciones = await getEvolutionsByPlayerIds(supabase, playerIds);
 
   // Load menu
   let menu = null;
   if (semanaMenu !== 'none') {
     const menuWeekKey = semanaMenu || semana;
-    const { data: menuData } = await supabase
-      .from('menu_semanal')
-      .select('*')
-      .eq('semana', menuWeekKey)
-      .eq('equipo_id', team.id)
-      .maybeSingle();
-    menu = menuData || null;
+    menu = await getMenuByWeekAndTeam(supabase, menuWeekKey, team.id);
   }
 
   // Load all plans for these players
-  const { data: allPlans, error: plansError } = await supabase
-    .from('planes_ia')
-    .select('*')
-    .in('jugador_id', playerIds);
-
-  if (plansError) throw plansError;
+  const allPlans = await getAiPlansByPlayerIdsFull(supabase, playerIds);
 
   const resolvedPlayers = await runWithConcurrency(players, 5, async (rawPlayer) => {
     const playerEvoluciones = (evoluciones || []).filter((item) => String(item.jugador_id) === String(rawPlayer.id));
@@ -206,37 +167,22 @@ async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, c
 
       if (activePlan) {
         // Overwrite existing plan
-        const { error: updateError } = await supabase
-          .from('planes_ia')
-          .update({
-            contexto: contexto || 'semana_partido',
-            contenido: finalContenido,
-            datos: baseData,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', activePlan.id);
-
-        if (updateError) {
-          console.error('Error updating plan for player:', player.id, updateError);
-        }
+        await updateAiPlan(supabase, activePlan.id, {
+          contexto: contexto || 'semana_partido',
+          contenido: finalContenido,
+          datos: baseData,
+          updated_at: new Date().toISOString(),
+        });
         activePlan.datos = baseData;
       } else {
         // Insert new plan
-        const { data: newPlan, error: insertError } = await supabase
-          .from('planes_ia')
-          .insert({
-            jugador_id: player.id,
-            nombre: `Plan ${semana}`,
-            contexto: contexto || 'semana_partido',
-            contenido: finalContenido,
-            datos: baseData,
-          })
-          .select()
-          .single();
-
-        if (insertError) {
-          console.error('Error inserting plan for player:', player.id, insertError);
-        }
+        const newPlan = await insertAiPlan(supabase, {
+          jugador_id: player.id,
+          nombre: `Plan ${semana}`,
+          contexto: contexto || 'semana_partido',
+          contenido: finalContenido,
+          datos: baseData,
+        });
         activePlan = newPlan || { datos: baseData };
       }
     }

@@ -4,6 +4,13 @@ import Anthropic from '@anthropic-ai/sdk';
 import { env } from '@/lib/env';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedTeam } from '@/lib/team-access';
+import {
+  upsertMenu,
+  getMenuById,
+  updateMenu,
+  deleteMenu,
+  getMenusByTeamLimit
+} from '@/repositories/menuRepository';
 
 const client = new Anthropic({ apiKey: env.AI_API_KEY });
 
@@ -22,12 +29,7 @@ export async function POST(req) {
       const team = await getOwnedTeam(supabase, user, equipo_id);
       if (!team) return forbidden('No tienes acceso a este equipo');
 
-      const { data, error } = await supabase
-        .from('menu_semanal')
-        .upsert({ semana, equipo_id, dias: dias || [], updated_at: new Date().toISOString() }, { onConflict: 'semana,equipo_id' })
-        .select().single();
-
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      const data = await upsertMenu(supabase, { semana, equipo_id, dias: dias || [], updated_at: new Date().toISOString() });
       return NextResponse.json({ ok: true, menu: data });
     }
 
@@ -77,12 +79,7 @@ export async function POST(req) {
     const clean = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
 
-    const { data, error } = await supabase
-      .from('menu_semanal')
-      .upsert({ semana, equipo_id: equipoId, dias: parsed.dias, updated_at: new Date().toISOString() }, { onConflict: 'semana,equipo_id' })
-      .select().single();
-
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    const data = await upsertMenu(supabase, { semana, equipo_id: equipoId, dias: parsed.dias, updated_at: new Date().toISOString() });
     return NextResponse.json({ ok: true, menu: data });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -99,26 +96,13 @@ export async function PUT(req) {
     if (!id || !dias) return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
 
     const supabase = getSupabaseAdmin();
-    const { data: menu, error: fetchError } = await supabase
-      .from('menu_semanal')
-      .select('id, equipo_id')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (fetchError) throw fetchError;
+    const menu = await getMenuById(supabase, id);
     if (!menu) return NextResponse.json({ error: 'Menú no encontrado' }, { status: 404 });
 
     const team = await getOwnedTeam(supabase, user, menu.equipo_id);
     if (!team) return forbidden('No tienes acceso a este equipo');
 
-    const { data, error } = await supabase
-      .from('menu_semanal')
-      .update({ dias, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
+    const data = await updateMenu(supabase, id, { dias, updated_at: new Date().toISOString() });
     return NextResponse.json({ ok: true, menu: data });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });
@@ -132,15 +116,12 @@ export async function GET(req) {
   if (!equipoId) return NextResponse.json({ error: 'Falta equipo_id' }, { status: 400 });
 
   const supabase = getSupabaseAdmin();
-  const query = supabase
-    .from('menu_semanal')
-    .select('*')
-    .eq('equipo_id', equipoId)
-    .order('semana', { ascending: false });
-  if (semana) query.eq('semana', semana);
-  const { data, error } = await query.limit(10);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ menus: data });
+  try {
+    const data = await getMenusByTeamLimit(supabase, equipoId, semana, 10);
+    return NextResponse.json({ menus: data });
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
 
 export async function DELETE(req) {
@@ -153,20 +134,13 @@ export async function DELETE(req) {
     const user = await getUser();
     if (!user || user.role === 'jugador') return forbidden('No autorizado');
 
-    const { data: menu, error: fetchError } = await supabase
-      .from('menu_semanal')
-      .select('id, equipo_id')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (fetchError) throw fetchError;
+    const menu = await getMenuById(supabase, id);
     if (!menu) return NextResponse.json({ error: 'Menú no encontrado' }, { status: 404 });
 
     const team = await getOwnedTeam(supabase, user, menu.equipo_id);
     if (!team) return forbidden('No tienes acceso a este equipo');
 
-    const { error } = await supabase.from('menu_semanal').delete().eq('id', id);
-    if (error) throw error;
+    await deleteMenu(supabase, id);
 
     return NextResponse.json({ ok: true });
   } catch (e) {

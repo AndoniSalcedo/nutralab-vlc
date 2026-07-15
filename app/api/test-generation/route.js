@@ -2,17 +2,23 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { withLatestMeasurement } from '@/lib/player-metrics';
 import { generarDatosPlan } from '@/lib/ai-plan-generator';
+import { getPlayersByTeam } from '@/repositories/playerRepository';
+import { getTeamById } from '@/repositories/teamRepository';
+import { getEvolutionsByPlayerIdOrdered } from '@/repositories/evolutionRepository';
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const teamId = Number(searchParams.get('teamId'));
   
   const supabase = getSupabaseAdmin();
-  const { data: jug } = await supabase.from('jugadores').select('*, equipos(configuracion_nutricional)').eq('equipo_id', teamId).limit(1);
-  if (!jug || !jug.length) return NextResponse.json({ error: 'No players found' });
+  const players = await getPlayersByTeam(supabase, teamId);
+  if (!players || !players.length) return NextResponse.json({ error: 'No players found' });
   
-  const rawPlayer = jug[0];
-  const { data: evo } = await supabase.from('evoluciones').select('*').eq('jugador_id', rawPlayer.id).order('fecha', { ascending: true });
+  const rawPlayer = players[0];
+  const team = await getTeamById(supabase, teamId);
+  const teamConfig = team?.configuracion_nutricional;
+
+  const evo = await getEvolutionsByPlayerIdOrdered(supabase, rawPlayer.id);
   const player = withLatestMeasurement(rawPlayer, evo || []);
   
   try {
@@ -20,7 +26,7 @@ export async function GET(req) {
       jugador: player,
       nombre: 'Test Plan',
       contexto: 'semana_normal',
-      teamConfig: rawPlayer.equipos?.configuracion_nutricional
+      teamConfig
     });
     return NextResponse.json({
       player: player.nombre,
@@ -31,3 +37,4 @@ export async function GET(req) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

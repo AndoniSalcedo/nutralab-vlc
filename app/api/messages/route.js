@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { forbidden, getOwnedPlayer, getOwnedTeam, getOwnerId } from '@/lib/team-access';
+import { getPlayerByIdMaybe } from '@/repositories/playerRepository';
+import { getMessages, insertMessages } from '@/repositories/messagesRepository';
 
 function cleanText(value) {
   return String(value || '').trim();
@@ -38,11 +40,7 @@ export async function GET(request) {
 
   let equipoId = null;
   if (user.role === 'jugador') {
-    const { data: jugador } = await supabase
-      .from('jugadores')
-      .select('equipo_id')
-      .eq('id', jugadorId)
-      .maybeSingle();
+    const jugador = await getPlayerByIdMaybe(supabase, jugadorId);
     equipoId = jugador?.equipo_id || null;
   } else {
     const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
@@ -50,18 +48,12 @@ export async function GET(request) {
     equipoId = ownedPlayer.equipo_id;
   }
 
-  const { data, error } = await supabase
-    .from('mensajes')
-    .select('id,jugador_id,titulo,contenido,created_by_name,created_at')
-    .eq('equipo_id', equipoId)
-    .or(`jugador_id.is.null,jugador_id.eq.${jugadorId}`)
-    .order('created_at', { ascending: false });
-
-  if (error) {
+  try {
+    const data = await getMessages(supabase, equipoId, jugadorId);
+    return NextResponse.json({ messages: data || [] });
+  } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  return NextResponse.json({ messages: data || [] });
 }
 
 export async function POST(request) {
@@ -109,14 +101,11 @@ export async function POST(request) {
     ? [{ ...base, owner_id: getOwnerId(user), equipo_id: team.id, jugador_id: null }]
     : recipientIds.map((jugadorId) => ({ ...base, owner_id: getOwnerId(user), equipo_id: team.id, jugador_id: jugadorId }));
 
-  const { data, error } = await supabase
-    .from('mensajes')
-    .insert(rows)
-    .select('id,jugador_id,titulo,contenido,created_by_name,created_at');
-
-  if (error) {
+  try {
+    const data = await insertMessages(supabase, rows);
+    return NextResponse.json({ messages: data || [] }, { status: 201 });
+  } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  return NextResponse.json({ messages: data || [] }, { status: 201 });
 }
+

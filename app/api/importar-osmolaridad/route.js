@@ -4,6 +4,9 @@ import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedTeam } from '@/lib/team-access';
 import { normalizeName, playerFullName, partialCandidates, previewCandidate } from '@/lib/player-excel-import';
 import { toNumber as parseCsvNumber, parseDate as parseCsvDate, normalizeKey } from '@/lib/utils';
+import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
+import { upsertHydrationRecords } from '@/repositories/hydrationRepository';
+
 
 
 function normalizeRecordType(type) {
@@ -68,15 +71,9 @@ function getVal(row, headers, keys) {
 
 
 async function loadTeamPlayers(supabase, teamId) {
-  const { data, error } = await supabase
-    .from('jugadores')
-    .select('id,nombre,apellidos,fecha_nacimiento')
-    .eq('equipo_id', teamId)
-    .order('nombre');
-
-  if (error) throw error;
-  return data || [];
+  return getPlayersByTeamSelect(supabase, teamId, 'id,nombre,apellidos,fecha_nacimiento');
 }
+
 
 export async function POST(req) {
   try {
@@ -360,11 +357,7 @@ export async function POST(req) {
       }
 
       if (recordsToUpsert.length > 0) {
-        const { error } = await supabase
-          .from('registros_hidratacion')
-          .upsert(recordsToUpsert, { onConflict: 'jugador_id,fecha,tipo' });
-
-        if (error) throw error;
+        await upsertHydrationRecords(supabase, recordsToUpsert);
       }
 
       return NextResponse.json({

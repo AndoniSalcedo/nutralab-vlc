@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { env } from '@/lib/env';
 import { buildSessionValue, COOKIE_NAME } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getPlayerByAuthUserIdSingle } from '@/repositories/playerRepository';
 
 export async function POST(request) {
   try {
@@ -33,12 +34,7 @@ export async function POST(request) {
 
     // Buscar al jugador en la tabla jugadores por su auth UUID
     const supabaseAdmin = getSupabaseAdmin();
-
-    const { data: jugador } = await supabaseAdmin
-      .from('jugadores')
-      .select('id, nombre, apellidos')
-      .eq('auth_user_id', supabaseUser.id)
-      .single();
+    const jugador = await getPlayerByAuthUserIdSingle(supabaseAdmin, supabaseUser.id);
 
     if (!jugador) {
       return NextResponse.json(
@@ -71,3 +67,4 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }
+
