@@ -109,17 +109,19 @@ function parseMeals(val) {
   return val.split(',').map((s) => s.trim()).filter(Boolean);
 }
 
-export function ComidasEditable({ label, numComidas, postentreno, jugadorId, readOnly = false }) {
+export function ComidasEditable({ label, numComidas, postentreno, jugadorId, recomendacionesDefecto = {}, readOnly = false }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [meals, setMeals] = useState(() => parseMeals(numComidas));
   const [hasPost, setHasPost] = useState(Boolean(postentreno));
+  const [recsDefecto, setRecsDefecto] = useState(() => recomendacionesDefecto || {});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setMeals(parseMeals(numComidas));
     setHasPost(Boolean(postentreno));
-  }, [numComidas, postentreno]);
+    setRecsDefecto(recomendacionesDefecto || {});
+  }, [numComidas, postentreno, recomendacionesDefecto]);
 
   const MEAL_OPTIONS = AVAILABLE_MEALS;
 
@@ -129,12 +131,13 @@ export function ComidasEditable({ label, numComidas, postentreno, jugadorId, rea
       const mealsValue = meals.join(', ');
       await updatePlayerField(jugadorId, 'num_comidas', mealsValue);
       await updatePlayerField(jugadorId, 'postentreno', hasPost);
+      await updatePlayerField(jugadorId, 'recomendaciones_defecto', recsDefecto);
       setEditing(false);
       router.refresh();
       notifications.show({
         color: 'green',
         title: 'Comidas guardadas',
-        message: 'Las comidas y la opción de post-entreno se han actualizado correctamente.',
+        message: 'Las comidas, la opción de post-entreno y las recomendaciones por defecto se han actualizado correctamente.',
       });
     } catch (e) {
       notifications.show({
@@ -150,6 +153,7 @@ export function ComidasEditable({ label, numComidas, postentreno, jugadorId, rea
   function handleCancel() {
     setMeals(parseMeals(numComidas));
     setHasPost(Boolean(postentreno));
+    setRecsDefecto(recomendacionesDefecto || {});
     setEditing(false);
   }
 
@@ -157,8 +161,8 @@ export function ComidasEditable({ label, numComidas, postentreno, jugadorId, rea
 
   return (
     <BentoCard title={label} icon={IconEdit} color="gray" style={{ height: 'auto' }}>
-      <Stack gap="xs">
-        <Group justify="space-between" align="center">
+      <Stack gap="sm">
+        <Group justify="space-between" align="flex-start" wrap="nowrap">
           <Box style={{ flex: 1 }}>
             {editing ? (
               <Stack gap="xs">
@@ -167,7 +171,17 @@ export function ComidasEditable({ label, numComidas, postentreno, jugadorId, rea
                   placeholder="Ej. Desayuno, Merienda, Cena"
                   data={MEAL_OPTIONS}
                   value={meals}
-                  onChange={setMeals}
+                  onChange={(val) => {
+                    setMeals(val);
+                    // Also clean up any recommendations for meals that are deselected
+                    setRecsDefecto((prev) => {
+                      const clean = { ...prev };
+                      Object.keys(clean).forEach((k) => {
+                        if (!val.includes(k)) delete clean[k];
+                      });
+                      return clean;
+                    });
+                  }}
                   size="sm"
                   searchable
                   clearable
@@ -195,24 +209,58 @@ export function ComidasEditable({ label, numComidas, postentreno, jugadorId, rea
           </Box>
 
           {!readOnly && (
-            <Group gap={6} align="flex-start" style={{ alignSelf: editing ? 'flex-start' : 'center', marginTop: editing ? '24px' : '0' }}>
+            <Box style={{ minWidth: editing ? '90px' : 'auto', marginTop: editing ? '20px' : '0' }}>
               {!editing ? (
                 <Button variant="subtle" size="xs" radius="xl" onClick={() => setEditing(true)}>
                   Editar
                 </Button>
               ) : (
-                <>
-                  <Button variant="subtle" color="gray" size="xs" radius="xl" onClick={handleCancel}>
-                    Cancelar
-                  </Button>
+                <Stack gap={6} align="stretch">
                   <Button variant="filled" size="xs" radius="xl" onClick={save} loading={saving}>
                     Guardar
                   </Button>
-                </>
+                  <Button variant="subtle" color="gray" size="xs" radius="xl" onClick={handleCancel}>
+                    Cancelar
+                  </Button>
+                </Stack>
               )}
-            </Group>
+            </Box>
           )}
         </Group>
+
+        {editing ? (
+          meals.filter((m) => m.toLowerCase() !== 'post-entreno').length > 0 && (
+            <Paper p="xs" withBorder bg="gray.0" mt="xs">
+              <Text size="xs" fw={700} mb="xs">Recomendaciones por defecto:</Text>
+              <Stack gap="xs">
+                {meals.filter((m) => m.toLowerCase() !== 'post-entreno').map((meal) => (
+                  <TextInput
+                    key={meal}
+                    label={meal}
+                    placeholder={`Ej. Tostadas de aguacate con pavo...`}
+                    value={recsDefecto[meal] || ''}
+                    onChange={(e) => setRecsDefecto((prev) => ({ ...prev, [meal]: e.target.value }))}
+                    size="xs"
+                  />
+                ))}
+              </Stack>
+            </Paper>
+          )
+        ) : (
+          Object.values(recsDefecto).some((v) => v) && (
+            <Box mt="xs">
+              <Text size="sm" fw={600} c="dimmed" mb={4}>Recomendaciones por defecto:</Text>
+              <Stack gap={4}>
+                {Object.entries(recsDefecto).filter((entry) => entry[1]).map(([m, val]) => (
+                  <Text key={m} size="xs">
+                    <Text span fw={600}>{m}: </Text>
+                    {val}
+                  </Text>
+                ))}
+              </Stack>
+            </Box>
+          )
+        )}
       </Stack>
     </BentoCard>
   );

@@ -47,7 +47,7 @@ export async function GET(req) {
 
 export async function POST(req) {
   try {
-    const { jugador, nombre, contexto, contextoAdicional, contenido, datos, draftOnly = false, calendario, semanaMenu } = await req.json();
+    const { jugador, nombre, contexto, contextoAdicional, contenido, datos, draftOnly = false, calendario, semanaMenu, recomendacionesIngestas } = await req.json();
     const planNombre = String(nombre || '').trim();
     if (!jugador?.id) return NextResponse.json({ error: 'Falta jugador' }, { status: 400 });
     if (!planNombre) return NextResponse.json({ error: 'El nombre del plan es obligatorio' }, { status: 400 });
@@ -74,7 +74,16 @@ export async function POST(req) {
     }
 
     const generatedDatos = draftOnly || (!datos && (contenido === undefined || contenido === ''))
-      ? await generarDatosPlan({ jugador: jugadorConMetricas, nombre: planNombre, contexto, contextoAdicional, calendario, menu: resolvedMenu, teamConfig })
+      ? await generarDatosPlan({
+          jugador: jugadorConMetricas,
+          nombre: planNombre,
+          contexto: contexto || 'semana_normal',
+          contextoAdicional,
+          calendario,
+          menu: resolvedMenu,
+          teamConfig,
+          recomendacionesIngestas
+        })
       : sanitizePlanData(datos, teamConfig);
 
     if (draftOnly) {

@@ -9,6 +9,7 @@ import {
   Button,
   Group,
   Loader,
+  Modal,
   NumberInput,
   Paper,
   Select,
@@ -35,7 +36,7 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/nutrition-plan-card';
-import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getObjectiveLabel, PLAN_CONTEXTS, getTeamNutritionDayTypes } from '@/lib/calculations';
+import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getObjectiveLabel, getTeamNutritionDayTypes } from '@/lib/calculations';
 import { getUserMeals } from '@/lib/nutrition-day-types';
 import IntercambiosModal from './IntercambiosModal';
 import NothingFound from '@/components/NothingFound/NothingFound';
@@ -53,7 +54,7 @@ function formatNumber(value, suffix = '') {
   return formatNumberDecimal(value, suffix, 1);
 }
 
-function planWithMeta(data, { nombre, contexto, contextoAdicional }) {
+function planWithMeta(data, { nombre, contextoAdicional, recomendacionesIngestas }) {
   const clean = sanitizePlanData(data);
   if (!clean) return null;
   return {
@@ -61,8 +62,9 @@ function planWithMeta(data, { nombre, contexto, contextoAdicional }) {
     meta: {
       ...clean.meta,
       nombre,
-      contexto,
+      contexto: clean.meta?.contexto || 'semana_normal',
       contextoAdicional,
+      recomendacionesIngestas,
     },
   };
 }
@@ -265,7 +267,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [intercambiosOpened, setIntercambiosOpened] = useState(false);
 
   const [nombre, setNombre] = useState('');
-  const [contexto, setContexto] = useState('semana_normal');
   const [contextoAdicional, setContextoAdicional] = useState('');
   const [contenido, setContenido] = useState('');
   const [datos, setDatos] = useState(null);
@@ -273,6 +274,16 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [actionType, setActionType] = useState(null);
   const [availableMenus, setAvailableMenus] = useState([]);
   const [selectedMenuWeek, setSelectedMenuWeek] = useState(null);
+
+  const [recomendacionesIngestas, setRecomendacionesIngestas] = useState({});
+
+  // Creation modal states
+  const [creationModalOpened, setCreationModalOpened] = useState(false);
+  const [modalNombre, setModalNombre] = useState('');
+  const [modalSelectedMenuWeek, setModalSelectedMenuWeek] = useState('none');
+  const [modalContextoAdicional, setModalContextoAdicional] = useState('');
+  const [modalRecomendacionesIngestas, setModalRecomendacionesIngestas] = useState({});
+  const [modalCalendar, setModalCalendar] = useState(getDefaultCalendar());
 
   const teamConfig = jugador?.equipos?.configuracion_nutricional;
 
@@ -340,33 +351,122 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     };
   }, [jugador.id, jugador.equipo_id]);
 
-  function startCreate() {
+  function openCreateModal() {
     const now = new Date();
-    const nextNombre = `Ficha ${now.toLocaleDateString('es-ES')}`;
-    setMode('create');
-    setNombre(nextNombre);
-    setContexto('semana_normal');
-    setContextoAdicional('');
-    setContenido('');
-    const initialCalendar = getDefaultCalendar();
+    setModalNombre(`Ficha ${now.toLocaleDateString('es-ES')}`);
+    setModalSelectedMenuWeek(selectedMenuWeek || 'none');
+    setModalContextoAdicional('');
+    setModalCalendar(getDefaultCalendar());
     
-    let resolvedMenu = undefined;
-    if (selectedMenuWeek === 'none' || !selectedMenuWeek) {
-      resolvedMenu = null;
-    } else {
-      resolvedMenu = availableMenus.find(m => m.semana === selectedMenuWeek) || null;
+    const meals = getUserMeals(jugador);
+    const initialRecs = {};
+    const defaultRecs = jugador?.recomendaciones_defecto || {};
+    meals.forEach((meal) => {
+      initialRecs[meal] = defaultRecs[meal] || '';
+    });
+    setModalRecomendacionesIngestas(initialRecs);
+    setCreationModalOpened(true);
+  }
+
+  function createEmptyPlan() {
+    setMode('create');
+    setNombre(modalNombre);
+    setSelectedMenuWeek(modalSelectedMenuWeek);
+    setContextoAdicional(modalContextoAdicional);
+    setRecomendacionesIngestas(modalRecomendacionesIngestas);
+    setContenido('');
+    
+    let resolvedMenu = null;
+    if (modalSelectedMenuWeek !== 'none' && modalSelectedMenuWeek) {
+      resolvedMenu = availableMenus.find(m => m.semana === modalSelectedMenuWeek) || null;
     }
 
-    setDatos(buildBasePlanData({ jugador, nombre: nextNombre, contexto: 'semana_normal', contextoAdicional: '', menu: resolvedMenu, calendario: initialCalendar }));
+    setDatos(buildBasePlanData({
+      jugador,
+      nombre: modalNombre,
+      contexto: 'semana_normal',
+      contextoAdicional: modalContextoAdicional,
+      menu: resolvedMenu,
+      calendario: modalCalendar,
+      teamConfig
+    }));
+    
     setHasGeneratedAi(false);
+    setCreationModalOpened(false);
+  }
+
+  async function generatePlanFromModal() {
+    const notificationId = 'ai-plan-generate';
+    setActionType('generate');
+    notifications.show({
+      id: notificationId,
+      color: 'blue',
+      title: 'Generando ficha nutricional',
+      message: `Preparando ficha compacta para ${jugador.nombre}.`,
+      loading: true,
+      autoClose: false,
+      withCloseButton: false,
+    });
+    try {
+      if (modalSelectedMenuWeek === 'none') {
+        notifications.show({
+          color: 'yellow',
+          title: 'Generando sin menú',
+          message: 'La IA tendrá libertad total para crear los platos ya que no se ha seleccionado menú comedor.',
+        });
+      }
+
+      const data = await generateAiPlanDraft({
+        jugador,
+        nombre: modalNombre,
+        contextoAdicional: modalContextoAdicional,
+        calendario: modalCalendar,
+        semanaMenu: modalSelectedMenuWeek,
+        recomendacionesIngestas: modalRecomendacionesIngestas
+      });
+
+      setNombre(modalNombre);
+      setSelectedMenuWeek(modalSelectedMenuWeek);
+      setContextoAdicional(modalContextoAdicional);
+      setRecomendacionesIngestas(modalRecomendacionesIngestas);
+      
+      setDatos(data.datos || null);
+      setContenido('');
+      setHasGeneratedAi(true);
+      setMode('create');
+      setCreationModalOpened(false);
+      
+      notifications.update({
+        id: notificationId,
+        color: 'green',
+        title: 'Ficha generada',
+        message: 'Ya puedes revisar y editar los datos antes de guardarlos.',
+        loading: false,
+        autoClose: 4000,
+        withCloseButton: true,
+      });
+    } catch (e) {
+      notifications.update({
+        id: notificationId,
+        color: 'red',
+        title: 'No se pudo generar la ficha',
+        message: e.message,
+        loading: false,
+        autoClose: 6000,
+        withCloseButton: true,
+      });
+    } finally {
+      setActionType(null);
+    }
   }
 
   function startEdit() {
     if (!currentPlan) return;
     setMode('edit');
     setNombre(currentPlan.nombre || '');
-    setContexto(currentPlan.contexto || currentPlan.datos?.meta?.contexto || 'semana_normal');
     setContextoAdicional(currentPlan.contexto_adicional || currentPlan.datos?.meta?.contextoAdicional || '');
+    setRecomendacionesIngestas(currentPlan.datos?.meta?.recomendacionesIngestas || {});
+    setSelectedMenuWeek(currentPlan.datos?.meta?.semanaMenu || 'none');
     setContenido(currentPlan.contenido || '');
     setDatos(currentDatos ? clonePlan(currentDatos) : null);
     setHasGeneratedAi(true);
@@ -414,7 +514,14 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         });
       }
 
-      const data = await generateAiPlanDraft({ jugador, nombre, contexto, contextoAdicional, calendario: currentCalendar, semanaMenu: selectedMenuWeek });
+      const data = await generateAiPlanDraft({
+        jugador,
+        nombre,
+        contextoAdicional,
+        calendario: currentCalendar || getDefaultCalendar(),
+        semanaMenu: selectedMenuWeek,
+        recomendacionesIngestas
+      });
       setDatos(data.datos || null);
       setContenido('');
       setHasGeneratedAi(true);
@@ -444,7 +551,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
   async function saveCreate() {
     const notificationId = 'ai-plan-save';
-    const finalDatos = planWithMeta(datos, { nombre, contexto, contextoAdicional });
+    const finalDatos = planWithMeta(datos, { nombre, contextoAdicional, recomendacionesIngestas });
     setActionType('save');
     notifications.show({
       id: notificationId,
@@ -459,9 +566,9 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       const data = await saveAiPlan({
         jugador,
         nombre,
-        contexto,
+        contexto: 'semana_normal',
         contextoAdicional,
-        datos: hasGeneratedAi ? finalDatos : undefined,
+        datos: finalDatos,
         contenido
       });
       setPlanes((prev) => [data.plan, ...prev]);
@@ -494,7 +601,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   async function saveEdit() {
     if (!currentPlan) return;
     const notificationId = 'ai-plan-save';
-    const finalDatos = planWithMeta(datos, { nombre, contexto, contextoAdicional });
+    const finalDatos = planWithMeta(datos, { nombre, contextoAdicional, recomendacionesIngestas });
     setActionType('save');
     notifications.show({
       id: notificationId,
@@ -511,7 +618,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         nombre,
         contenido,
         datos: finalDatos,
-        contexto,
+        contexto: 'semana_normal',
         contextoAdicional,
       });
       setPlanes((prev) => [data.plan, ...prev.filter((plan) => plan.id !== data.plan.id)]);
@@ -689,7 +796,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                       Editar actual
                     </Button>
                   )}
-                  <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={startCreate} fullWidth={isMobile}>
+                  <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={openCreateModal} fullWidth={isMobile}>
                     Crear ficha
                   </Button>
                 </>
@@ -785,7 +892,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                   value={selectedMenuWeek}
                   onChange={(val) => setSelectedMenuWeek(val || '')}
                   data={[
-                    { value: 'none', label: 'Sin menú comedor (Libertad total para la IA)' },
+                    { value: 'none', label: 'Sin menú comedor' },
                     ...availableMenus.map((m) => ({
                       value: m.semana,
                       label: `Menú de la semana del ${m.semana}`,
@@ -793,14 +900,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                   ]}
                   size="sm"
                   allowDeselect={false}
-                />
-
-                <Select
-                  label="Contexto actual"
-                  placeholder="Selecciona el contexto"
-                  data={PLAN_CONTEXTS}
-                  value={contexto}
-                  onChange={(value) => setContexto(value || 'semana_normal')}
                 />
               </SimpleGrid>
 
@@ -811,6 +910,22 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                 onChange={(e) => setContextoAdicional(e.target.value)}
                 rows={2}
               />
+
+              <Paper p="sm" radius="md" withBorder bg="gray.0">
+                <Text size="sm" fw={700} mb="xs">Recomendaciones para las ingestas del jugador</Text>
+                <Stack gap="sm">
+                  {getUserMeals(jugador).filter((meal) => meal.toLowerCase() !== 'post-entreno').map((meal) => (
+                    <TextInput
+                      key={meal}
+                      label={meal}
+                      placeholder={`Ej: Tostadas de aguacate con pavo...`}
+                      value={recomendacionesIngestas[meal] || ''}
+                      onChange={(e) => setRecomendacionesIngestas((prev) => ({ ...prev, [meal]: e.target.value }))}
+                      size="sm"
+                    />
+                  ))}
+                </Stack>
+              </Paper>
 
               {datos ? (
                 <>
@@ -1037,6 +1152,118 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         confirmLabel="Eliminar"
         loading={deleting}
       />
+
+      <Modal
+        opened={creationModalOpened}
+        onClose={() => setCreationModalOpened(false)}
+        fullScreen={isMobile}
+        title={
+          <Group gap="xs">
+            <IconBrain size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Text fw={700}>Crear Ficha Nutricional</Text>
+          </Group>
+        }
+        size="xl"
+        radius="lg"
+        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
+      >
+        <Stack gap="md">
+          <TextInput
+            label="Nombre del plan"
+            placeholder="Ej: Semana de 3 partidos"
+            value={modalNombre}
+            onChange={(e) => setModalNombre(e.target.value)}
+            required
+          />
+
+          <Select
+            label="Menú a utilizar"
+            placeholder="Selecciona una semana o Sin Menú..."
+            value={modalSelectedMenuWeek}
+            onChange={(val) => setModalSelectedMenuWeek(val || 'none')}
+            data={[
+              { value: 'none', label: 'Sin menú comedor' },
+              ...availableMenus.map((m) => ({
+                value: m.semana,
+                label: `Menú de la semana del ${m.semana}`,
+              }))
+            ]}
+            allowDeselect={false}
+          />
+
+          <Textarea
+            label="Instrucciones adicionales para la IA"
+            placeholder="Ej: Sale de lesión, reduce fibra el día de partido..."
+            value={modalContextoAdicional}
+            onChange={(e) => setModalContextoAdicional(e.target.value)}
+            rows={2}
+          />
+
+          <Paper p="sm" radius="md" withBorder bg="gray.0">
+            <Text size="sm" fw={700} mb="xs">Recomendaciones para las ingestas del jugador</Text>
+            <Stack gap="sm">
+              {getUserMeals(jugador).filter((meal) => meal.toLowerCase() !== 'post-entreno').map((meal) => (
+                <TextInput
+                  key={meal}
+                  label={meal}
+                  placeholder={`Ej: Tostadas de aguacate con pavo...`}
+                  value={modalRecomendacionesIngestas[meal] || ''}
+                  onChange={(e) => setModalRecomendacionesIngestas((prev) => ({ ...prev, [meal]: e.target.value }))}
+                />
+              ))}
+            </Stack>
+          </Paper>
+
+          <Paper p="sm" radius="md" withBorder bg="gray.0">
+            <Text size="sm" fw={700} mb="xs">Calendario de tipos de día de la semana</Text>
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
+              {['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'].map((dayKey) => {
+                const labels = {
+                  lunes: 'Lunes',
+                  martes: 'Martes',
+                  miercoles: 'Miércoles',
+                  jueves: 'Jueves',
+                  viernes: 'Viernes',
+                  sabado: 'Sábado',
+                  domingo: 'Domingo',
+                };
+                return (
+                  <Select
+                    key={dayKey}
+                    label={labels[dayKey]}
+                    data={dayTypeOptions}
+                    value={modalCalendar[dayKey]}
+                    onChange={(val) => setModalCalendar((prev) => ({ ...prev, [dayKey]: val || 'entreno' }))}
+                    size="xs"
+                  />
+                );
+              })}
+            </SimpleGrid>
+          </Paper>
+
+          <Group justify="flex-end" mt="md">
+            <Button variant="subtle" color="gray" onClick={() => setCreationModalOpened(false)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="light"
+              color="blue"
+              onClick={createEmptyPlan}
+              disabled={!modalNombre.trim()}
+            >
+              Crear vacío (Manual)
+            </Button>
+            <Button
+              leftSection={<IconSparkles size={16} />}
+              onClick={generatePlanFromModal}
+              disabled={!modalNombre.trim() || actionType === 'generate'}
+              loading={actionType === 'generate'}
+            >
+              Generar con IA
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Stack>
   );
 }

@@ -5,11 +5,20 @@ export async function getAiPlans(jugadorId) {
   return data;
 }
 
-export async function generateAiPlanDraft({ jugador, nombre, contexto, contextoAdicional, calendario, semanaMenu }) {
+export async function generateAiPlanDraft({ jugador, nombre, contextoAdicional, calendario, semanaMenu, recomendacionesIngestas }) {
   const res = await fetch('/api/ai-plan', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ jugador, nombre, contexto, contextoAdicional, calendario, semanaMenu, draftOnly: true }),
+    body: JSON.stringify({
+      jugador,
+      nombre,
+      contexto: 'semana_normal',
+      contextoAdicional,
+      calendario,
+      semanaMenu,
+      recomendacionesIngestas,
+      draftOnly: true
+    }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Error al generar la ficha');

@@ -6,7 +6,7 @@ import { forbidden, getOwnedPlayer } from '@/lib/team-access';
 const CAMPOS_PERMITIDOS = [
   'notas_hidratacion', 'notas_suplementacion', 'notas_protocolos',
   'gustos_preferencias', 'aversiones', 'intolerancias', 'alergias',
-  'contexto_clinico', 'objetivo', 'posicion', 'num_comidas', 'postentreno',
+  'contexto_clinico', 'objetivo', 'posicion', 'num_comidas', 'postentreno', 'recomendaciones_defecto',
 ];
 
 export async function POST(req) {
