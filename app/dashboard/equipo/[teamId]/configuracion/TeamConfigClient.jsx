@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { slugify } from '@/lib/utils';
-import { Button, Group, Stack, TextInput, NumberInput, Select, Accordion, Paper, Title, ActionIcon, Table, Modal } from '@mantine/core';
+import { Button, Group, Stack, NumberInput, Accordion, Paper, Title, ActionIcon, Table } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil } from '@tabler/icons-react';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
-import ConfirmModal from '@/components/ConfirmModal';
+import ConfirmModal from '@/components/modals/ConfirmModal';
+import DayTypeModal from '@/components/modals/DayTypeModal';
 
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
 
@@ -198,26 +199,14 @@ export default function TeamConfigClient({ team }) {
         </Button>
       </Group>
 
-      <Modal opened={modalOpen} onClose={() => setModalOpen(false)} title={editingDayType?.key ? 'Editar Tipo de Día' : 'Nuevo Tipo de Día'}>
-        {editingDayType && (
-          <Stack>
-            <TextInput 
-              label="Nombre del Tipo de Día" 
-              value={editingDayType.label} 
-              onChange={e => {
-                const val = e.target.value;
-                setEditingDayType({
-                  ...editingDayType, 
-                  label: val, 
-                  planLabel: val.toLowerCase().startsWith('día') || val.toLowerCase().startsWith('dia') ? val : `Día ${val.toLowerCase()}`
-                });
-              }} 
-            />
-            <Select label="Color" data={COLORS.map(c => ({ value: c, label: c }))} value={editingDayType.color} onChange={v => setEditingDayType({...editingDayType, color: v})} />
-            <Button onClick={handleSaveDayType} fullWidth mt="md">Aceptar</Button>
-          </Stack>
-        )}
-      </Modal>
+      <DayTypeModal
+        opened={modalOpen}
+        onClose={() => setModalOpen(false)}
+        editingDayType={editingDayType}
+        setEditingDayType={setEditingDayType}
+        COLORS={COLORS}
+        handleSaveDayType={handleSaveDayType}
+      />
       <ConfirmModal
         opened={!!deleteDayTypeKey}
         onClose={() => setDeleteDayTypeKey(null)}

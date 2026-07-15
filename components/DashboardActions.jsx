@@ -1,14 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Group, Modal, Text, Tabs } from '@mantine/core';
-import { IconPlus, IconFileSpreadsheet, IconMail, IconUserPlus, IconDroplet, IconSettings } from '@tabler/icons-react';
-import PlayerForm from './PlayerForm';
-import PlayerExcelImporter from './PlayerExcelImporter';
-import TeamOsmolarityImporter from './TeamOsmolarityImporter';
-import MessageComposer from './MessageComposer';
-
+import { Button, Group } from '@mantine/core';
+import { IconPlus, IconFileSpreadsheet, IconMail, IconSettings } from '@tabler/icons-react';
 import Link from 'next/link';
+
+import NewPlayerModal from '@/components/modals/NewPlayerModal';
+import ImportDataModal from '@/components/modals/ImportDataModal';
+import SendMessageModal from '@/components/modals/SendMessageModal';
 
 export default function DashboardActions({ players = [], team }) {
   const [openedModal, setOpenedModal] = useState(null);
@@ -66,71 +65,25 @@ export default function DashboardActions({ players = [], team }) {
         </Button>
       </Group>
 
-      <Modal
+      <NewPlayerModal
         opened={openedModal === 'new-player'}
         onClose={closeModal}
-        title={
-          <Group gap="xs">
-            <IconUserPlus size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-            <Text fw={700}>Añadir jugador</Text>
-          </Group>
-        }
-        size="xl"
-        radius="lg"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-      >
-        <PlayerForm initial={null} team={team} />
-      </Modal>
+        team={team}
+      />
 
-      <Modal
+      <ImportDataModal
         opened={openedModal === 'import'}
         onClose={closeModal}
-        title={
-          <Group gap="xs">
-            <IconFileSpreadsheet size={20} style={{ color: 'var(--mantine-color-teal-6)' }} />
-            <Text fw={700}>Importar datos</Text>
-          </Group>
-        }
-        size="1200px"
-        radius="lg"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-      >
-        <Tabs defaultValue="metrics" variant="outline" radius="md">
-          <Tabs.List grow mb="md">
-            <Tabs.Tab value="metrics" leftSection={<IconFileSpreadsheet size={16} />}>
-              Métricas (Excel de jugadores)
-            </Tabs.Tab>
-            <Tabs.Tab value="osmolarity" leftSection={<IconDroplet size={16} />}>
-              Osmolaridad (CSV de equipo)
-            </Tabs.Tab>
-          </Tabs.List>
+        team={team}
+      />
 
-          <Tabs.Panel value="metrics">
-            <PlayerExcelImporter team={team} />
-          </Tabs.Panel>
-
-          <Tabs.Panel value="osmolarity">
-            <TeamOsmolarityImporter team={team} />
-          </Tabs.Panel>
-        </Tabs>
-      </Modal>
-
-
-      <Modal
+      <SendMessageModal
         opened={openedModal === 'message'}
         onClose={closeModal}
-        title={
-          <Group gap="xs">
-            <IconMail size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-            <Text fw={700}>Enviar mensaje</Text>
-          </Group>
-        }
-        size="lg"
-        radius="lg"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-      >
-        <MessageComposer players={players} team={team} onSent={closeModal} />
-      </Modal>
+        players={players}
+        team={team}
+        onSent={closeModal}
+      />
     </>
   );
 }

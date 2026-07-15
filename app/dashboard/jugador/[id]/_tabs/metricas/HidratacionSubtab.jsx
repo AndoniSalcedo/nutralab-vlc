@@ -13,17 +13,13 @@ import {
   ThemeIcon,
   Title,
   Button,
-  FileButton,
-  Modal,
   Table,
   ScrollArea,
   ActionIcon,
   Tooltip as MantineTooltip,
-  TextInput,
-  Select,
-  Textarea,
-  Tabs
 } from '@mantine/core';
+import ImportCsvModal from '@/components/modals/ImportCsvModal';
+import EditRecordModal from '@/components/modals/EditRecordModal';
 import { notifications } from '@mantine/notifications';
 import { saveHydrationRecord, importHydrationRecords, refetchHydrationRecords, deleteHydrationRecord } from '@/services/hydration';
 import { updatePlayerField } from '@/services/player';
@@ -37,10 +33,8 @@ import {
   IconClock,
   IconAlertCircle,
   IconEdit,
-  IconFlame,
-  IconDownload
 } from '@tabler/icons-react';
-import ConfirmModal from '@/components/ConfirmModal';
+import ConfirmModal from '@/components/modals/ConfirmModal';
 import {
   ComposedChart,
   Area,
@@ -770,267 +764,35 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
         </Stack>
       </Box>
 
-      {/* CSV Preview and Confirm Modal */}
-      <Modal
+      <ImportCsvModal
         opened={modalOpen}
-        onClose={() => {
-          setModalOpen(false);
-          setAllImportRows([]);
-          setPreviewRows([]);
-        }}
-        title={
-          <Group gap="xs">
-            <IconDatabaseImport size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-            <Text fw={700}>Añadir datos</Text>
-          </Group>
-        }
-        size="xl"
-        radius="lg"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-      >
-        <Stack gap="md">
-          <Tabs
-            value={importKind}
-            onChange={(value) => {
-              setImportKind(value || 'hydration');
-              setAllImportRows([]);
-              setPreviewRows([]);
-            }}
-            variant="outline"
-            radius="md"
-          >
-            <Tabs.List grow>
-              <Tabs.Tab value="hydration" leftSection={<IconDroplet size={15} />}>
-                Hidratación
-              </Tabs.Tab>
-              <Tabs.Tab value="sweat" leftSection={<IconFlame size={15} />}>
-                Sudoración
-              </Tabs.Tab>
-            </Tabs.List>
+        onClose={() => setModalOpen(false)}
+        importKind={importKind}
+        setImportKind={setImportKind}
+        allImportRows={allImportRows}
+        setAllImportRows={setAllImportRows}
+        previewRows={previewRows}
+        setPreviewRows={setPreviewRows}
+        downloadTemplate={downloadTemplate}
+        handleFileChange={handleFileChange}
+        triggerImport={triggerImport}
+        importing={importing}
+        getCsvVal={getCsvVal}
+        getRecordStatusConfig={getRecordStatusConfig}
+      />
 
-            <Tabs.Panel value="hydration" pt="md">
-              <Group justify="space-between" align="center" wrap="wrap">
-                <Text size="sm" c="dimmed">Carga un CSV de osmolaridad salival.</Text>
-                <Group gap="xs">
-                  <Button
-                    onClick={() => downloadTemplate('hydration')}
-                    leftSection={<IconDownload size={14} />}
-                    variant="outline"
-                    color="blue"
-                    radius="xl"
-                    size="xs"
-                  >
-                    Descargar plantilla
-                  </Button>
-                  <FileButton onChange={(file) => handleFileChange(file, 'hydration')} accept=".csv">
-                    {(props) => (
-                      <Button {...props} leftSection={<IconDatabaseImport size={16} />} color="blue" radius="xl" size="xs">
-                        Seleccionar CSV
-                      </Button>
-                    )}
-                  </FileButton>
-                </Group>
-              </Group>
-            </Tabs.Panel>
-
-            <Tabs.Panel value="sweat" pt="md">
-              <Group justify="space-between" align="center" wrap="wrap">
-                <Text size="sm" c="dimmed">Carga un CSV de sodio en sudor.</Text>
-                <Group gap="xs">
-                  <Button
-                    onClick={() => downloadTemplate('sweat')}
-                    leftSection={<IconDownload size={14} />}
-                    variant="outline"
-                    color="orange"
-                    radius="xl"
-                    size="xs"
-                  >
-                    Descargar plantilla
-                  </Button>
-                  <FileButton onChange={(file) => handleFileChange(file, 'sweat')} accept=".csv">
-                    {(props) => (
-                      <Button {...props} leftSection={<IconDatabaseImport size={16} />} color="orange" radius="xl" size="xs">
-                        Seleccionar CSV
-                      </Button>
-                    )}
-                  </FileButton>
-                </Group>
-              </Group>
-            </Tabs.Panel>
-          </Tabs>
-
-          {allImportRows.length > 0 ? (
-            <>
-              <Text size="xs" fw={700} c="dimmed">
-                Vista previa de los primeros {previewRows.length} registros (Total: {allImportRows.length}):
-              </Text>
-
-              <ScrollArea>
-                <Table striped highlightOnHover verticalSpacing="xs">
-                  <Table.Thead bg="gray.0">
-                    <Table.Tr>
-                      <Table.Th style={{ fontSize: 10 }}>Fecha</Table.Th>
-                      <Table.Th style={{ fontSize: 10 }}>Hora</Table.Th>
-                      <Table.Th style={{ fontSize: 10 }}>Tipo</Table.Th>
-                      <Table.Th style={{ fontSize: 10, textAlign: 'right' }}>Valor</Table.Th>
-                      <Table.Th style={{ fontSize: 10 }}>Unidad</Table.Th>
-                      <Table.Th style={{ fontSize: 10 }}>Estado</Table.Th>
-                      <Table.Th style={{ fontSize: 10 }}>Notas</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {previewRows.map((r, i) => {
-                      const rawDate = getCsvVal(r, ['Date', 'fecha', 'dia', 'measurement date']);
-                      const rawTime = getCsvVal(r, ['Time', 'hora']);
-                      const rawType = getCsvVal(r, ['Type', 'tipo']);
-                      const rawVal = getCsvVal(r, ['Value', 'valor', 'sosm', 'osmolarity', 'osmolaridad']);
-                      const rawUnit = getCsvVal(r, ['Unit', 'unidad']);
-                      const rawStatus = getCsvVal(r, ['Status', 'estado']);
-                      const rawNotes = getCsvVal(r, ['Notes', 'notas']);
-
-                      const cfg = getRecordStatusConfig(rawStatus, rawType);
-
-                      return (
-                        <Table.Tr key={i}>
-                          <Table.Td style={{ fontSize: 10 }}>{rawDate}</Table.Td>
-                          <Table.Td style={{ fontSize: 10 }}>{rawTime || '-'}</Table.Td>
-                          <Table.Td style={{ fontSize: 10 }}>
-                            <Badge size="xs" color="gray" variant="outline">{rawType || 'sosm'}</Badge>
-                          </Table.Td>
-                          <Table.Td style={{ fontSize: 10, fontWeight: 700, textAlign: 'right' }}>{rawVal}</Table.Td>
-                          <Table.Td style={{ fontSize: 10 }}>{rawUnit || (String(rawType).toLowerCase() === 'sweat' ? 'mg/L' : 'mOsm')}</Table.Td>
-                          <Table.Td style={{ fontSize: 10 }}>
-                            <Badge style={{ backgroundColor: cfg.bg, color: cfg.color }} size="xs">
-                              {cfg.label}
-                            </Badge>
-                          </Table.Td>
-                          <Table.Td style={{ fontSize: 10, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {rawNotes || '-'}
-                          </Table.Td>
-                        </Table.Tr>
-                      );
-                    })}
-                  </Table.Tbody>
-                </Table>
-              </ScrollArea>
-            </>
-          ) : (
-            <Paper p="md" radius="md" bg="gray.0" withBorder>
-              <Text size="sm" fw={700}>
-                Selecciona un CSV desde la pestaña {importKind === 'sweat' ? 'Sudoración' : 'Hidratación'}.
-              </Text>
-            </Paper>
-          )}
-
-          <Group justify="flex-end" mt="md">
-            <Button variant="light" color="gray" radius="xl" size="xs" onClick={() => setModalOpen(false)} disabled={importing}>
-              Cancelar
-            </Button>
-            <Button
-              color="blue"
-              radius="xl"
-              size="xs"
-              leftSection={<IconCheck size={16} />}
-              onClick={triggerImport}
-              loading={importing}
-              disabled={allImportRows.length === 0}
-            >
-              Confirmar e Importar {allImportRows.length} Registros
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
-
-      {/* Edit Record Modal */}
-      <Modal
+      <EditRecordModal
         opened={editModalOpen}
         onClose={() => {
           setEditModalOpen(false);
           setEditingRecord(null);
         }}
-        title={
-          <Group gap="xs">
-            <IconEdit size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-            <Text fw={700}>Editar Registro</Text>
-          </Group>
-        }
-        radius="lg"
-        size="md"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-      >
-        <Stack gap="md">
-          <SimpleGrid cols={2} spacing="sm">
-            <TextInput label="Fecha" value={editForm.fecha} disabled />
-            <TextInput
-              label="Hora"
-              placeholder="e.g. 9:22 AM"
-              value={editForm.hora}
-              onChange={(e) => setEditForm(prev => ({ ...prev, hora: e.target.value }))}
-            />
-            <TextInput
-              label="Tipo"
-              placeholder="e.g. sosm"
-              value={editForm.tipo}
-              onChange={(e) => setEditForm(prev => ({ ...prev, tipo: e.target.value }))}
-            />
-            <TextInput
-              label="Valor"
-              type="number"
-              placeholder="e.g. 60"
-              value={editForm.valor}
-              onChange={(e) => setEditForm(prev => ({ ...prev, valor: e.target.value }))}
-            />
-            <TextInput
-              label="Unidad"
-              placeholder="e.g. mOsm"
-              value={editForm.unidad}
-              onChange={(e) => setEditForm(prev => ({ ...prev, unidad: e.target.value }))}
-            />
-            <Select
-              label="Estado"
-              value={editForm.estado}
-              onChange={(val) => setEditForm(prev => ({ ...prev, estado: val }))}
-              data={String(editForm.tipo || '').toLowerCase() === 'sweat'
-                ? [
-                  { value: 'Low Sodium', label: 'Sodio Bajo (Low)' },
-                  { value: 'Moderate Sodium', label: 'Sodio Moderado (Moderate)' },
-                  { value: 'High Sodium', label: 'Sodio Alto (High)' },
-                ]
-                : [
-                  { value: 'Hydrated', label: 'Hidratado (Hydrated)' },
-                  { value: 'Mildly Dehydrated', label: 'Deshidratación Leve (Mildly)' },
-                  { value: 'Moderately Dehydrated', label: 'Deshidratación Moderada (Moderately)' },
-                  { value: 'Severely Dehydrated', label: 'Deshidratación Severa (Severely)' },
-                ]}
-            />
-          </SimpleGrid>
+        editForm={editForm}
+        setEditForm={setEditForm}
+        saveEditedRecord={saveEditedRecord}
+        savingEdit={savingEdit}
+      />
 
-          <Textarea
-            label="Notas"
-            value={editForm.notas}
-            onChange={(e) => setEditForm(prev => ({ ...prev, notas: e.target.value }))}
-            minRows={2}
-          />
-          <Textarea
-            label="Cuestionario"
-            value={editForm.cuestionario}
-            onChange={(e) => setEditForm(prev => ({ ...prev, cuestionario: e.target.value }))}
-            minRows={2}
-          />
-
-          <Group justify="flex-end" mt="sm">
-            <Button variant="light" color="gray" radius="xl" size="xs" onClick={() => {
-              setEditModalOpen(false);
-              setEditingRecord(null);
-            }}>
-              Cancelar
-            </Button>
-            <Button color="blue" radius="xl" size="xs" leftSection={<IconCheck size={16} />} onClick={saveEditedRecord} loading={savingEdit}>
-              Guardar Cambios
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
       <ConfirmModal
         opened={!!deleteRecordId}
         onClose={() => setDeleteRecordId(null)}

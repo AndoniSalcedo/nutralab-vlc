@@ -2,10 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  ActionIcon,
   Group,
-  Image,
-  Modal,
   Stack,
   Text,
   Box,
@@ -18,12 +15,14 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { DatePickerInput } from '@mantine/dates';
-import { IconX, IconPlus, IconPhoto, IconCalendar } from '@tabler/icons-react';
+import { IconPlus, IconPhoto, IconCalendar } from '@tabler/icons-react';
 
 import NothingFound from '@/components/NothingFound/NothingFound';
 import { deletePlayerMeal, listPlayerMeals } from '@/services/meal';
 import MealCard from './MealCard';
-import MealForm from './MealForm';
+import ImageViewerModal from '@/components/modals/ImageViewerModal';
+import MealEditorModal from '@/components/modals/MealEditorModal';
+import ConfirmModal from '@/components/modals/ConfirmModal';
 
 function groupByDate(items) {
   const map = new Map();
@@ -243,92 +242,32 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
       {/* 3. MODALES */}
       
       {/* Visor */}
-      <Modal
+      <ImageViewerModal
         opened={viewer.open}
         onClose={() => setViewer({ open: false, src: '', caption: '' })}
-        size="lg"
-        centered
-        withCloseButton={false}
-        padding={0}
-        radius="lg"
-        styles={{ body: { padding: 0, backgroundColor: 'black' } }}
-      >
-        <Stack gap={0} bg="black" style={{ position: 'relative' }}>
-          <Box style={{ position: 'relative' }}>
-             {viewer.src ? (
-                <Image src={viewer.src} alt="" fit="contain" h="auto" w="100%" style={{ maxHeight: '80vh' }} />
-             ) : (
-                <Box h={300} c="dimmed" display="flex" style={{alignItems: 'center', justifyContent: 'center'}}>Sin imagen</Box>
-             )}
-             
-             <ActionIcon 
-                variant="filled" 
-                color="dark" 
-                radius="xl" 
-                size="lg" 
-                onClick={() => setViewer({ open: false, src: '', caption: '' })}
-                style={{ position: 'absolute', top: 10, right: 10, zIndex: 10 }}
-             >
-                <IconX size={20} />
-             </ActionIcon>
-          </Box>
-          
-          {viewer.caption && (
-            <Paper p="md" bg="dark.7" radius={0}>
-                <Text c="white" size="sm" ta="center">{viewer.caption}</Text>
-            </Paper>
-          )}
-        </Stack>
-      </Modal>
+        viewer={viewer}
+      />
 
-      {/* Editor */}
-      {!readOnly && (
-        <Modal
-          opened={editorOpen}
-          onClose={closeEditor}
-          size="lg"
-          centered
-          title={<Text fw={700}>{editorMeal ? 'Editar Comida' : 'Registrar Comida'}</Text>}
-          radius="lg"
-          padding="lg"
-        >
-          <MealForm 
-            jugadorId={jugador.id}
-            meal={editorMeal}
-            onSuccess={() => {
-              closeEditor();
-              setReload(prev => prev + 1);
-            }}
-            onCancel={closeEditor}
-          />
-        </Modal>
-      )}
+      <MealEditorModal
+        opened={editorOpen && !readOnly}
+        onClose={closeEditor}
+        jugadorId={jugador.id}
+        meal={editorMeal}
+        onSuccess={() => {
+          closeEditor();
+          setReload(prev => prev + 1);
+        }}
+        onCancel={closeEditor}
+      />
 
-      {/* Eliminar */}
-      {!readOnly && (
-        <Modal
-          opened={Boolean(deleteMeal)}
-          onClose={() => setDeleteMeal(null)}
-          centered
-          title={<Text fw={700}>Eliminar ingesta</Text>}
-          radius="lg"
-          padding="lg"
-        >
-          <Stack gap="md">
-            <Text>
-              Vas a eliminar esta ingesta de forma definitiva. Esta acción no se puede deshacer.
-            </Text>
-            <Group justify="flex-end">
-              <Button variant="subtle" color="gray" radius="xl" onClick={() => setDeleteMeal(null)}>
-                Cancelar
-              </Button>
-              <Button color="red" radius="xl" onClick={handleConfirmDelete}>
-                Eliminar
-              </Button>
-            </Group>
-          </Stack>
-        </Modal>
-      )}
+      <ConfirmModal
+        opened={Boolean(deleteMeal) && !readOnly}
+        onClose={() => setDeleteMeal(null)}
+        onConfirm={handleConfirmDelete}
+        title="Eliminar ingesta"
+        message="Vas a eliminar esta ingesta de forma definitiva. Esta acción no se puede deshacer."
+        confirmLabel="Eliminar"
+      />
     </Box>
   );
 }

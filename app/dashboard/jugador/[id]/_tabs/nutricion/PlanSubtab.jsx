@@ -9,7 +9,6 @@ import {
   Button,
   Group,
   Loader,
-  Modal,
   NumberInput,
   Paper,
   Select,
@@ -20,6 +19,7 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
+import CreateNutritionPlanModal from '@/components/modals/CreateNutritionPlanModal';
 import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPlanPdf, deleteAiPlan } from '@/services/plan';
@@ -38,9 +38,9 @@ import {
 import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/nutrition-plan-card';
 import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getObjectiveLabel, getTeamNutritionDayTypes } from '@/lib/calculations';
 import { getUserMeals } from '@/lib/nutrition-day-types';
-import IntercambiosModal from './IntercambiosModal';
+import IntercambiosModal from '@/components/modals/IntercambiosModal';
 import NothingFound from '@/components/NothingFound/NothingFound';
-import ConfirmModal from '@/components/ConfirmModal';
+import ConfirmModal from '@/components/modals/ConfirmModal';
 
 
 
@@ -1153,117 +1153,28 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         loading={deleting}
       />
 
-      <Modal
+      <CreateNutritionPlanModal
         opened={creationModalOpened}
         onClose={() => setCreationModalOpened(false)}
-        fullScreen={isMobile}
-        title={
-          <Group gap="xs">
-            <IconBrain size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-            <Text fw={700}>Crear Ficha Nutricional</Text>
-          </Group>
-        }
-        size="xl"
-        radius="lg"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-      >
-        <Stack gap="md">
-          <TextInput
-            label="Nombre del plan"
-            placeholder="Ej: Semana de 3 partidos"
-            value={modalNombre}
-            onChange={(e) => setModalNombre(e.target.value)}
-            required
-          />
-
-          <Select
-            label="Menú a utilizar"
-            placeholder="Selecciona una semana o Sin Menú..."
-            value={modalSelectedMenuWeek}
-            onChange={(val) => setModalSelectedMenuWeek(val || 'none')}
-            data={[
-              { value: 'none', label: 'Sin menú comedor' },
-              ...availableMenus.map((m) => ({
-                value: m.semana,
-                label: `Menú de la semana del ${m.semana}`,
-              }))
-            ]}
-            allowDeselect={false}
-          />
-
-          <Textarea
-            label="Instrucciones adicionales para la IA"
-            placeholder="Ej: Sale de lesión, reduce fibra el día de partido..."
-            value={modalContextoAdicional}
-            onChange={(e) => setModalContextoAdicional(e.target.value)}
-            rows={2}
-          />
-
-          <Paper p="sm" radius="md" withBorder bg="gray.0">
-            <Text size="sm" fw={700} mb="xs">Recomendaciones para las ingestas del jugador</Text>
-            <Stack gap="sm">
-              {getUserMeals(jugador).filter((meal) => meal.toLowerCase() !== 'post-entreno').map((meal) => (
-                <TextInput
-                  key={meal}
-                  label={meal}
-                  placeholder={`Ej: Tostadas de aguacate con pavo...`}
-                  value={modalRecomendacionesIngestas[meal] || ''}
-                  onChange={(e) => setModalRecomendacionesIngestas((prev) => ({ ...prev, [meal]: e.target.value }))}
-                />
-              ))}
-            </Stack>
-          </Paper>
-
-          <Paper p="sm" radius="md" withBorder bg="gray.0">
-            <Text size="sm" fw={700} mb="xs">Calendario de tipos de día de la semana</Text>
-            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
-              {['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'].map((dayKey) => {
-                const labels = {
-                  lunes: 'Lunes',
-                  martes: 'Martes',
-                  miercoles: 'Miércoles',
-                  jueves: 'Jueves',
-                  viernes: 'Viernes',
-                  sabado: 'Sábado',
-                  domingo: 'Domingo',
-                };
-                return (
-                  <Select
-                    key={dayKey}
-                    label={labels[dayKey]}
-                    data={dayTypeOptions}
-                    value={modalCalendar[dayKey]}
-                    onChange={(val) => setModalCalendar((prev) => ({ ...prev, [dayKey]: val || 'entreno' }))}
-                    size="xs"
-                  />
-                );
-              })}
-            </SimpleGrid>
-          </Paper>
-
-          <Group justify="flex-end" mt="md">
-            <Button variant="subtle" color="gray" onClick={() => setCreationModalOpened(false)}>
-              Cancelar
-            </Button>
-            <Button
-              variant="light"
-              color="blue"
-              onClick={createEmptyPlan}
-              disabled={!modalNombre.trim()}
-            >
-              Crear vacío (Manual)
-            </Button>
-            <Button
-              leftSection={<IconSparkles size={16} />}
-              onClick={generatePlanFromModal}
-              disabled={!modalNombre.trim() || actionType === 'generate'}
-              loading={actionType === 'generate'}
-            >
-              Generar con IA
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+        isMobile={isMobile}
+        modalNombre={modalNombre}
+        setModalNombre={setModalNombre}
+        modalSelectedMenuWeek={modalSelectedMenuWeek}
+        setModalSelectedMenuWeek={setModalSelectedMenuWeek}
+        availableMenus={availableMenus}
+        modalContextoAdicional={modalContextoAdicional}
+        setModalContextoAdicional={setModalContextoAdicional}
+        jugador={jugador}
+        modalRecomendacionesIngestas={modalRecomendacionesIngestas}
+        setModalRecomendacionesIngestas={setModalRecomendacionesIngestas}
+        modalCalendar={modalCalendar}
+        setModalCalendar={setModalCalendar}
+        dayTypeOptions={dayTypeOptions}
+        createEmptyPlan={createEmptyPlan}
+        generatePlanFromModal={generatePlanFromModal}
+        actionType={actionType}
+        getUserMeals={getUserMeals}
+      />
     </Stack>
   );
 }

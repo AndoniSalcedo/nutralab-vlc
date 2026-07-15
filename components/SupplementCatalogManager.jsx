@@ -9,7 +9,6 @@ import {
   Box,
   Divider,
   Group,
-  Modal,
   LoadingOverlay,
   Paper,
   ThemeIcon,
@@ -25,6 +24,7 @@ import {
   SegmentedControl,
   MultiSelect,
 } from '@mantine/core';
+import ConfirmModal from '@/components/modals/ConfirmModal';
 import { notifications } from '@mantine/notifications';
 import { getSupplementationCatalog, updateSupplementationCatalog } from '@/services/supplement';
 import {
@@ -794,48 +794,17 @@ export default function SupplementCatalogManager({
       </Tabs>
 
       {/* Inline confirmation modal (replaces window.confirm) */}
-      <Modal
+      <ConfirmModal
         opened={!!confirmAction}
         onClose={() => setConfirmAction(null)}
-        title={
-          <Group gap="xs">
-            <IconInfoCircle size={20} style={{ color: 'var(--mantine-color-red-6)' }} />
-            <Text fw={700}>Confirmar acción</Text>
-          </Group>
-        }
-        size="sm"
-        centered
-        radius="lg"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-        zIndex={1000}
-        withCloseButton={false}
-      >
-        <Stack gap="md">
-          <Text size="sm">{confirmAction?.message}</Text>
-          <Group justify="flex-end" gap="xs">
-            <Button
-              variant="default"
-              size="xs"
-              radius="xl"
-              onClick={() => setConfirmAction(null)}
-            >
-              Cancelar
-            </Button>
-            <Button
-              color="red"
-              size="xs"
-              radius="xl"
-              loading={saving}
-              onClick={async () => {
-                await confirmAction?.onConfirm?.();
-                setConfirmAction(null);
-              }}
-            >
-              Confirmar
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+        onConfirm={async () => {
+          await confirmAction?.onConfirm?.();
+          setConfirmAction(null);
+        }}
+        title="Confirmar acción"
+        message={confirmAction?.message}
+        loading={saving}
+      />
     </Stack>
   );
 }

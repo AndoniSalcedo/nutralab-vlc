@@ -17,26 +17,24 @@ import {
   Box,
   Button,
   Group,
-  Modal,
   Paper,
   Select,
   SimpleGrid,
   Stack,
   Table,
   Text,
-  TextInput,
-  Textarea,
   ThemeIcon,
   Title,
   ScrollArea,
 } from '@mantine/core';
+import MeasurementModal from '@/components/modals/MeasurementModal';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { saveEvolution, deleteEvolution } from '@/services/evolution';
-import { IconCalendarStats, IconCheck, IconEdit, IconPlus, IconRuler2, IconTrash, IconFilter } from '@tabler/icons-react';
+import { IconCalendarStats, IconEdit, IconPlus, IconRuler2, IconTrash, IconFilter } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
 import NothingFound from '@/components/NothingFound/NothingFound';
-import ConfirmModal from '@/components/ConfirmModal';
+import ConfirmModal from '@/components/modals/ConfirmModal';
 import {
   MEASUREMENT_DETAIL_SECTIONS,
   TREND_MEASUREMENT_METRICS,
@@ -410,47 +408,15 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         </Stack>
       </Paper>
 
-      <Modal
+      <MeasurementModal
         opened={!!modalMode && !readOnly}
         onClose={cancelForm}
-        title={
-          <Group gap="xs">
-            {modalMode === 'new' ? (
-              <IconRuler2 size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-            ) : (
-              <IconEdit size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-            )}
-            <Text fw={700}>
-              {modalMode === 'new' ? 'Registrar medición' : 'Editar medición'}
-            </Text>
-          </Group>
-        }
-        size="lg"
-        radius="lg"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-      >
-        <Stack gap="md">
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-            <TextInput label="Fecha" type="date" value={form.fecha} onChange={(e) => updateFormField('fecha', e.target.value)} />
-            <TextInput label="Altura (cm)" type="number" value={form.altura_cm} onChange={(e) => updateFormField('altura_cm', e.target.value)} />
-            <TextInput label="Peso (kg)" type="number" value={form.peso_kg} onChange={(e) => updateFormField('peso_kg', e.target.value)} />
-            <TextInput label="% Grasa" type="number" value={form.porcentaje_grasa} onChange={(e) => updateFormField('porcentaje_grasa', e.target.value)} />
-            <TextInput label="Masa magra (kg)" type="number" value={form.masa_magra_kg} onChange={(e) => updateFormField('masa_magra_kg', e.target.value)} />
-            <TextInput label="Σ6 pliegues (mm)" type="number" value={form.suma_6_pliegues} onChange={(e) => updateFormField('suma_6_pliegues', e.target.value)} />
-          </SimpleGrid>
-
-          <Textarea label="Notas" value={form.notas} onChange={(e) => updateFormField('notas', e.target.value)} minRows={2} />
-
-          <Group justify="flex-end">
-            <Button size="xs" radius="xl" variant="subtle" color="gray" onClick={cancelForm} disabled={saving}>
-              Cancelar
-            </Button>
-            <Button size="xs" radius="xl" leftSection={<IconCheck size={16} />} onClick={handleSave} loading={saving} disabled={!form.fecha}>
-              Guardar medición
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+        modalMode={modalMode}
+        form={form}
+        updateFormField={updateFormField}
+        handleSave={handleSave}
+        saving={saving}
+      />
 
       <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         {sortedAsc.length === 0 ? (

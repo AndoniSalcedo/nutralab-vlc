@@ -2,11 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import { slugify } from '@/lib/utils';
-import { Alert, Button, Group, Menu, Modal, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
+import { Button, Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconKey, IconRefresh, IconShieldCheck } from '@tabler/icons-react';
+import { IconKey, IconShieldCheck } from '@tabler/icons-react';
 
 import { updatePlayerCredentials } from '@/services/player';
+import PlayerCredentialsModal from '@/components/modals/PlayerCredentialsModal';
 
 function generatePassword() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@$%';
@@ -86,58 +87,21 @@ export default function PlayerCredentialsButton({ jugador, compact = false, menu
         </Button>
       )}
 
-      <Modal
+      <PlayerCredentialsModal
         opened={opened}
         onClose={() => setOpened(false)}
-        title={
-          <Group gap="xs">
-            {hasCredentials ? <IconShieldCheck size={20} style={{ color: 'var(--mantine-color-green-6)' }} /> : <IconKey size={20} style={{ color: 'var(--mantine-color-yellow-6)' }} />}
-            <Text fw={700}>{buttonLabel}</Text>
-          </Group>
-        }
-        size="md"
-        radius="lg"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-      >
-        <Stack gap="md">
-          {savedPassword && (
-            <Alert color="green" icon={<IconShieldCheck size={16} />} radius="md" title="Credenciales listas">
-              <Stack gap={2}>
-                <Text size="xs"><strong>Correo:</strong> {email}</Text>
-                <Text size="xs"><strong>Contraseña:</strong> {savedPassword}</Text>
-              </Stack>
-            </Alert>
-          )}
-
-          <TextInput
-            label="Correo de acceso"
-            placeholder={suggestedEmail || 'jugador@club.com'}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-
-          <PasswordInput
-            label="Contraseña"
-            description="Déjala vacía para autogenerarla al guardar."
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <Group justify="space-between">
-            <Button size="xs" radius="xl" variant="light" color="gray" leftSection={<IconRefresh size={14} />} onClick={() => setPassword(generatePassword())}>
-              Autogenerar
-            </Button>
-            <Group gap="xs">
-              <Button size="xs" radius="xl" variant="subtle" color="gray" onClick={() => setOpened(false)} disabled={saving}>
-                Cerrar
-              </Button>
-              <Button size="xs" radius="xl" leftSection={<IconCheck size={14} />} onClick={saveCredentials} loading={saving} disabled={!email.trim()}>
-                Guardar acceso
-              </Button>
-            </Group>
-          </Group>
-        </Stack>
-      </Modal>
+        email={email}
+        setEmail={setEmail}
+        password={password}
+        setPassword={setPassword}
+        savedPassword={savedPassword}
+        saving={saving}
+        suggestedEmail={suggestedEmail}
+        generatePassword={generatePassword}
+        saveCredentials={saveCredentials}
+        hasCredentials={hasCredentials}
+        buttonLabel={buttonLabel}
+      />
     </>
   );
 }

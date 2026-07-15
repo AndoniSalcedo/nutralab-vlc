@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Group, Menu, Modal, PasswordInput, Stack, Text } from '@mantine/core';
+import { Button, Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconLock } from '@tabler/icons-react';
 import { updatePlayerPassword } from '@/services/player';
+import PlayerPasswordModal from '@/components/modals/PlayerPasswordModal';
 
 export default function PlayerPasswordButton({ compact = false, menuItem = false }) {
   const [opened, setOpened] = useState(false);
@@ -48,33 +49,16 @@ export default function PlayerPasswordButton({ compact = false, menuItem = false
         </Button>
       )}
 
-      <Modal
+      <PlayerPasswordModal
         opened={opened}
         onClose={() => setOpened(false)}
-        title={
-          <Group gap="xs">
-            <IconLock size={20} style={{ color: 'var(--mantine-color-gray-6)' }} />
-            <Text fw={700}>Cambiar contraseña</Text>
-          </Group>
-        }
-        size="sm"
-        radius="lg"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-      >
-        <Stack gap="md">
-          <PasswordInput label="Nueva contraseña" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <PasswordInput label="Repetir contraseña" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
-
-          <Group justify="flex-end">
-            <Button size="xs" radius="xl" variant="subtle" color="gray" onClick={() => setOpened(false)} disabled={saving}>
-              Cerrar
-            </Button>
-            <Button size="xs" radius="xl" onClick={savePassword} loading={saving}>
-              Guardar contraseña
-            </Button>
-          </Group>
-        </Stack>
-      </Modal>
+        password={password}
+        setPassword={setPassword}
+        confirm={confirm}
+        setConfirm={setConfirm}
+        savePassword={savePassword}
+        saving={saving}
+      />
     </>
   );
 }

@@ -10,7 +10,6 @@ import {
   Button,
   Group,
   Menu,
-  Modal,
   Paper,
   Stack,
   Text,
@@ -19,7 +18,7 @@ import {
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconAlertTriangle, IconChevronLeft, IconEdit, IconLogout, IconMenu2 } from '@tabler/icons-react';
-import PlayerForm from './PlayerForm';
+import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
 
@@ -245,21 +244,12 @@ export default function JugadorHeader({ jugador, user }) {
         />
       )}
 
-      <Modal
+      <PlayerEditModal
         opened={opened}
         onClose={() => setOpened(false)}
-        title={
-          <Group gap="xs">
-            <IconEdit size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-            <Text fw={700}>Editar Ficha de Jugador</Text>
-          </Group>
-        }
-        size="xl"
-        radius="lg"
-        overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
-      >
-        <PlayerForm initial={jugador} />
-      </Modal>
+        player={jugador}
+        title="Editar Ficha de Jugador"
+      />
     </>
   );
 }
