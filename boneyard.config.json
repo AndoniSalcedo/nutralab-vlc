@@ -1,0 +1,24 @@
+{
+  "out": "./components/bones",
+  "routes": [
+    "/dashboard",
+    "/dashboard/equipo/4",
+    "/dashboard/equipo/4/suplementacion",
+    "/dashboard/equipo/4/evolucion",
+    "/dashboard/equipo/4/menu",
+    "/dashboard/equipo/4/analiticas",
+    "/dashboard/equipo/4/configuracion",
+    "/dashboard/jugador/220"
+  ],
+  "wait": 1500,
+  "auth": {
+    "cookies": [
+      {
+        "name": "boneyard_bypass",
+        "value": "true",
+        "path": "/",
+        "domain": "localhost"
+      }
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 'use client';
 
-import TeamMenuSkeleton from '@/components/skeletons/TeamMenuSkeleton';
+import Skeleton from '@/components/bones/BoneyardSkeleton';
 
 export default function TeamMenuLoading() {
-  return <TeamMenuSkeleton />;
+  return <Skeleton name="team-menu" loading={true} />;
 }

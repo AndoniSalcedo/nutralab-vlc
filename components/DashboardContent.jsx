@@ -18,6 +18,7 @@ import ImportDataModal from '@/components/modals/ImportDataModal';
 import SendMessageModal from '@/components/modals/SendMessageModal';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import SquadReportModal from '@/components/modals/SquadReportModal';
+import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 const PAGE_SIZE = 8;
 
@@ -395,7 +396,8 @@ export default function DashboardContent({ players = [], team }) {
   }
 
   return (
-    <Stack gap="lg">
+    <BoneyardSkeleton name="team-dashboard" loading={false}>
+      <Stack gap="lg">
       {/* 1. RESUMEN / ACCIONES */}
       <Paper
         p={{ base: 'sm', sm: 'md' }}
@@ -759,6 +761,7 @@ export default function DashboardContent({ players = [], team }) {
         confirmLabel="Eliminar"
         loading={deletingId !== null}
       />
-    </Stack>
+      </Stack>
+    </BoneyardSkeleton>
   );
 }

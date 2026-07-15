@@ -1,7 +1,7 @@
 'use client';
 
-import TeamEvolutionSkeleton from '@/components/skeletons/TeamEvolutionSkeleton';
+import Skeleton from '@/components/bones/BoneyardSkeleton';
 
 export default function TeamEvolutionLoading() {
-  return <TeamEvolutionSkeleton />;
+  return <Skeleton name="team-evolution" loading={true} />;
 }

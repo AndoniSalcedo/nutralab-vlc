@@ -25,6 +25,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import SupplementManagerModal from '@/components/modals/SupplementManagerModal';
 import SupplementHistoryModal from '@/components/modals/SupplementHistoryModal';
+import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 dayjs.locale('es');
 
@@ -57,7 +58,8 @@ export default function TeamSupplementationDashboard({
   }
 
   return (
-    <Stack gap="lg">
+    <BoneyardSkeleton name="team-supplementation" loading={false}>
+      <Stack gap="lg">
       <Paper
         p={{ base: 'sm', sm: 'md' }}
         shadow="sm"
@@ -187,6 +189,7 @@ export default function TeamSupplementationDashboard({
         historyModal={historyModal}
         catalogsById={catalogsById}
       />
-    </Stack>
+      </Stack>
+    </BoneyardSkeleton>
   );
 }

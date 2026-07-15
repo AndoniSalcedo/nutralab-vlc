@@ -5,6 +5,7 @@ import { getOwnedPlayer } from '@/lib/team-access';
 import JugadorHeader from '@/components/JugadorHeader';
 import { Anchor, Stack, Text } from '@mantine/core';
 import PlayerTabs from './_tabs/PlayerTabs';
+import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 export default async function JugadorView({ id, activeTab = 'resumen', activeSubtab }) {
   const supabase = getSupabaseAdmin();
@@ -91,7 +92,7 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
   }
 
   return (
-    <>
+    <BoneyardSkeleton name="player-dashboard" loading={false}>
       <JugadorHeader jugador={jugador} user={user} />
       <PlayerTabs
         jugador={jugador}
@@ -104,6 +105,6 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
         activeSubtab={activeSubtab}
         readOnly={isPlayer}
       />
-    </>
+    </BoneyardSkeleton>
   );
 }

@@ -8,6 +8,7 @@ import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil } from '@tabler/icons
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import DayTypeModal from '@/components/modals/DayTypeModal';
+import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
 
@@ -106,7 +107,8 @@ export default function TeamConfigClient({ team }) {
   };
 
   return (
-    <Stack gap="xl">
+    <BoneyardSkeleton name="team-config" loading={false}>
+      <Stack gap="xl">
       <Paper p="md" radius="lg" shadow="sm" withBorder>
         <Group justify="space-between" mb="md">
           <Title order={4}>Tipos de Día</Title>
@@ -215,6 +217,7 @@ export default function TeamConfigClient({ team }) {
         message="¿Seguro que quieres eliminar este tipo de día?"
         confirmLabel="Eliminar"
       />
-    </Stack>
+      </Stack>
+    </BoneyardSkeleton>
   );
 }

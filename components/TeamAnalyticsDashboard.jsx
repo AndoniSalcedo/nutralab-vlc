@@ -23,6 +23,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useRouter } from 'next/navigation';
+import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 import {
   BarChart,
@@ -338,7 +339,8 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
   ];
 
   return (
-    <Stack gap="lg">
+    <BoneyardSkeleton name="team-analytics" loading={false}>
+      <Stack gap="lg">
       {/* Cabecera */}
       <Paper
         p={{ base: 'sm', sm: 'md' }}
@@ -795,6 +797,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
         </Stack>
       </Paper>
 
-    </Stack>
+      </Stack>
+    </BoneyardSkeleton>
   );
 }

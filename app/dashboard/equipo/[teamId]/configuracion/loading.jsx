@@ -1,7 +1,7 @@
 'use client';
 
-import TeamConfigSkeleton from '@/components/skeletons/TeamConfigSkeleton';
+import Skeleton from '@/components/bones/BoneyardSkeleton';
 
 export default function TeamConfigLoading() {
-  return <TeamConfigSkeleton />;
+  return <Skeleton name="team-config" loading={true} />;
 }

@@ -4,6 +4,7 @@ import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
 import { ColorSchemeScript } from '@mantine/core';
 import Providers from '@/components/Providers';
+import '@/components/bones/registry';
 
 export const metadata = {
   title: 'Nutralab - Cuídate y disfruta',

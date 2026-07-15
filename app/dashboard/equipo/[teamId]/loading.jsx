@@ -1,7 +1,7 @@
 'use client';
 
-import TeamDashboardSkeleton from '@/components/skeletons/TeamDashboardSkeleton';
+import Skeleton from '@/components/bones/BoneyardSkeleton';
 
 export default function TeamDashboardLoading() {
-  return <TeamDashboardSkeleton />;
+  return <Skeleton name="team-dashboard" loading={true} />;
 }

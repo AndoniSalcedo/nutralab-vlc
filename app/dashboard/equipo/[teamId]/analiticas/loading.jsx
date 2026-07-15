@@ -1,7 +1,7 @@
 'use client';
 
-import TeamAnalyticsSkeleton from '@/components/skeletons/TeamAnalyticsSkeleton';
+import Skeleton from '@/components/bones/BoneyardSkeleton';
 
 export default function TeamAnalyticsLoading() {
-  return <TeamAnalyticsSkeleton />;
+  return <Skeleton name="team-analytics" loading={true} />;
 }

@@ -25,6 +25,7 @@ import {
 import MeasurementDetailModal from '@/components/modals/MeasurementDetailModal';
 import { DateInput } from '@mantine/dates';
 import { useRouter } from 'next/navigation';
+import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import {
   ComposedChart,
   Bar,
@@ -583,7 +584,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   }
 
   return (
-    <Stack gap="lg">
+    <BoneyardSkeleton name="team-evolution" loading={false}>
+      <Stack gap="lg">
       <Paper
         p={{ base: 'sm', sm: 'md' }}
         shadow="sm"
@@ -1499,6 +1501,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
         METRICS={METRICS}
         MEASUREMENT_DETAIL_SECTIONS={MEASUREMENT_DETAIL_SECTIONS}
       />
-    </Stack>
+      </Stack>
+    </BoneyardSkeleton>
   );
 }

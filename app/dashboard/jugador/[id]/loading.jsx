@@ -1,7 +1,7 @@
 'use client';
 
-import PlayerDashboardSkeleton from '@/components/skeletons/PlayerDashboardSkeleton';
+import Skeleton from '@/components/bones/BoneyardSkeleton';
 
 export default function PlayerDashboardLoading() {
-  return <PlayerDashboardSkeleton />;
+  return <Skeleton name="player-dashboard" loading={true} />;
 }

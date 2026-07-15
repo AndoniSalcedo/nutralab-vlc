@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { playerFullName } from '@/lib/utils';
 import {
   ActionIcon,
   Badge,
@@ -33,6 +32,7 @@ import { useRouter } from 'next/navigation';
 import NothingFound from './NothingFound/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import TeamFormModal from '@/components/modals/TeamFormModal';
+import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 function nextSeasonLabel() {
   const now = new Date();
@@ -212,161 +212,162 @@ export default function TeamsDashboard({ teams = [] }) {
   }
 
   return (
-    <Stack gap="lg">
-      <Paper p={{ base: 'sm', sm: 'md' }} shadow="sm" radius="lg" withBorder bg="white">
-        <Group justify="space-between" align="center" wrap="wrap" gap="md">
-          <Group gap="sm">
-            <ThemeIcon color="dark" variant="light" radius="md" size={42}>
-              <IconUsersGroup size={21} />
-            </ThemeIcon>
-            <Box>
-              <Title order={3} fw={850} c="#24291f" lh={1.1}>
-                Equipos
-              </Title>
-              <Text size="xs" c="dimmed" mt={2}>
-                Selecciona un equipo para abrir su dashboard.
-              </Text>
-            </Box>
+    <BoneyardSkeleton name="teams-list" loading={false}>
+      <Stack gap="lg">
+        <Paper p={{ base: 'sm', sm: 'md' }} shadow="sm" radius="lg" withBorder bg="white">
+          <Group justify="space-between" align="center" wrap="wrap" gap="md">
+            <Group gap="sm">
+              <ThemeIcon color="dark" variant="light" radius="md" size={42}>
+                <IconUsersGroup size={21} />
+              </ThemeIcon>
+              <Box>
+                <Title order={3} fw={850} c="#24291f" lh={1.1}>
+                  Equipos
+                </Title>
+                <Text size="xs" c="dimmed" mt={2}>
+                  Selecciona un equipo para abrir su dashboard.
+                </Text>
+              </Box>
+            </Group>
+            <Button radius="xl" size="xs" leftSection={<IconPlus size={14} />} onClick={openCreate}>
+              Nuevo equipo
+            </Button>
           </Group>
-          <Button radius="xl" size="xs" leftSection={<IconPlus size={14} />} onClick={openCreate}>
-            Nuevo equipo
-          </Button>
-        </Group>
 
-        <Group gap="xs" mt="md" wrap="wrap">
-          <TextInput
-            placeholder="Buscar equipo"
-            leftSection={<IconSearch size={16} />}
-            value={search}
-            onChange={(event) => setSearch(event.currentTarget.value)}
-            radius="xl"
-            variant="filled"
-            style={{ flex: 2, minWidth: 220 }}
-          />
-          <Select
-            placeholder="Temporada"
-            data={seasons}
-            value={season}
-            onChange={(value) => setSeason(value || '')}
-            leftSection={<IconCalendarStats size={16} />}
-            radius="xl"
-            variant="filled"
-            allowDeselect={false}
-            style={{ flex: 1, minWidth: 190 }}
-          />
-        </Group>
-      </Paper>
+          <Group gap="xs" mt="md" wrap="wrap">
+            <TextInput
+              placeholder="Buscar equipo"
+              leftSection={<IconSearch size={16} />}
+              value={search}
+              onChange={(event) => setSearch(event.currentTarget.value)}
+              radius="xl"
+              variant="filled"
+              style={{ flex: 2, minWidth: 220 }}
+            />
+            <Select
+              placeholder="Temporada"
+              data={seasons}
+              value={season}
+              onChange={(value) => setSeason(value || '')}
+              leftSection={<IconCalendarStats size={16} />}
+              radius="xl"
+              variant="filled"
+              allowDeselect={false}
+              style={{ flex: 1, minWidth: 190 }}
+            />
+          </Group>
+        </Paper>
 
-      {filteredTeams.length ? (
-        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-          {filteredTeams.map((team) => (
-            <Paper
-              key={team.id}
-              p="md"
-              radius="lg"
-              withBorder
-              shadow="sm"
-              bg="white"
-              style={{ cursor: 'pointer' }}
-              onClick={() => router.push(`/dashboard/equipo/${team.id}`)}
-            >
-              <Stack gap="md">
-                <Group justify="space-between" align="flex-start" wrap="nowrap">
-                  <ThemeIcon color="blue" variant="light" radius="md" size={40}>
-                    <IconUsersGroup size={20} />
-                  </ThemeIcon>
-                  <Menu shadow="md" width={220} position="bottom-end" withArrow>
-                    <Menu.Target>
-                      <ActionIcon
-                        variant="subtle"
-                        color="gray"
-                        radius="xl"
-                        loading={saving}
-                        onClick={(event) => event.stopPropagation()}
-                      >
-                        <IconDots size={18} />
-                      </ActionIcon>
-                    </Menu.Target>
-                    <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
-                      <Menu.Item leftSection={<IconCopy size={14} />} onClick={() => openCopy(team)}>
-                        Copiar a temporada
-                      </Menu.Item>
-                      <Menu.Divider />
-                      <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeleteTeam(team)}>
-                        Eliminar
-                      </Menu.Item>
-                    </Menu.Dropdown>
-                  </Menu>
-                </Group>
-
-                <Box>
-                  <Group gap="xs" mb={6}>
-                    <Title order={4} fw={800} c="dark.4" lh={1.1}>
-                      {team.nombre}
-                    </Title>
-                    <Badge variant="light" color="gray" radius="sm">
-                      {team.temporada}
-                    </Badge>
+        {filteredTeams.length ? (
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+            {filteredTeams.map((team) => (
+              <Paper
+                key={team.id}
+                p="md"
+                radius="lg"
+                withBorder
+                shadow="sm"
+                bg="white"
+                style={{ cursor: 'pointer' }}
+                onClick={() => router.push(`/dashboard/equipo/${team.id}`)}
+              >
+                <Stack gap="md">
+                  <Group justify="space-between" align="flex-start" wrap="nowrap">
+                    <ThemeIcon color="blue" variant="light" radius="md" size={40}>
+                      <IconUsersGroup size={20} />
+                    </ThemeIcon>
+                    <Menu shadow="md" width={220} position="bottom-end" withArrow>
+                      <Menu.Target>
+                        <ActionIcon
+                          variant="subtle"
+                          color="gray"
+                          radius="xl"
+                          loading={saving}
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          <IconDots size={18} />
+                        </ActionIcon>
+                      </Menu.Target>
+                      <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
+                        <Menu.Item leftSection={<IconCopy size={14} />} onClick={() => openCopy(team)}>
+                          Copiar a temporada
+                        </Menu.Item>
+                        <Menu.Divider />
+                        <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeleteTeam(team)}>
+                          Eliminar
+                        </Menu.Item>
+                      </Menu.Dropdown>
+                    </Menu>
                   </Group>
-                  <Text size="sm" c="dimmed" lineClamp={2}>
-                    {team.descripcion || 'Sin descripción'}
-                  </Text>
-                </Box>
 
-                <Group justify="space-between">
-                  <Text size="xs" c="dimmed">
-                    {team.players_count || 0} jugador{Number(team.players_count || 0) === 1 ? '' : 'es'}
-                  </Text>
-                  <Text size="xs" fw={700} c="blue.7">
-                    Abrir dashboard
-                  </Text>
-                </Group>
-              </Stack>
-            </Paper>
-          ))}
-        </SimpleGrid>
-      ) : (
-        <NothingFound
-          withPaper
-          icon={IconUsersGroup}
-          title={teamsState.length ? 'Sin equipos en esta búsqueda' : 'Sin equipos'}
-          description={teamsState.length ? 'Cambia los filtros para ver otros equipos.' : 'Crea tu primer equipo para empezar.'}
+                  <Box>
+                    <Group gap="xs" mb={6}>
+                      <Title order={4} fw={800} c="dark.4" lh={1.1}>
+                        {team.nombre}
+                      </Title>
+                      <Badge variant="light" color="gray" radius="sm">
+                        {team.temporada}
+                      </Badge>
+                    </Group>
+                    <Text size="sm" c="dimmed" lineClamp={2}>
+                      {team.descripcion || 'Sin descripción'}
+                    </Text>
+                  </Box>
+
+                  <Group justify="space-between">
+                    <Text size="xs" c="dimmed">
+                      {team.players_count || 0} jugador{Number(team.players_count || 0) === 1 ? '' : 'es'}
+                    </Text>
+                    <Text size="xs" fw={700} c="blue.7">
+                      Abrir dashboard
+                    </Text>
+                  </Group>
+                </Stack>
+              </Paper>
+            ))}
+          </SimpleGrid>
+        ) : (
+          <NothingFound
+            withPaper
+            icon={IconUsersGroup}
+            title={teamsState.length ? 'Sin equipos en esta búsqueda' : 'Sin equipos'}
+            description={teamsState.length ? 'Cambia los filtros para ver otros equipos.' : 'Crea tu primer equipo para empezar.'}
+          />
+        )}
+
+        <TeamFormModal
+          opened={!!modal.type}
+          onClose={closeModal}
+          modal={modal}
+          submitTeam={submitTeam}
+          form={form}
+          setForm={setForm}
+          sourceTeamOptions={sourceTeamOptions}
+          createSourceTeamId={createSourceTeamId}
+          toggleCreateImport={toggleCreateImport}
+          selectCreateSourceTeam={selectCreateSourceTeam}
+          isImportingPlayers={isImportingPlayers}
+          sourceTeam={sourceTeam}
+          selectedCount={selectedCount}
+          copyPlayers={copyPlayers}
+          allCopyPlayersSelected={allCopyPlayersSelected}
+          someCopyPlayersSelected={someCopyPlayersSelected}
+          toggleAllCopyPlayers={toggleAllCopyPlayers}
+          selectedPlayerIds={selectedPlayerIds}
+          toggleCopyPlayer={toggleCopyPlayer}
+          saving={saving}
+          playerCountLabel={playerCountLabel}
         />
-      )}
-
-      <TeamFormModal
-        opened={!!modal.type}
-        onClose={closeModal}
-        modal={modal}
-        submitTeam={submitTeam}
-        form={form}
-        setForm={setForm}
-        sourceTeamOptions={sourceTeamOptions}
-        createSourceTeamId={createSourceTeamId}
-        toggleCreateImport={toggleCreateImport}
-        selectCreateSourceTeam={selectCreateSourceTeam}
-        isImportingPlayers={isImportingPlayers}
-        sourceTeam={sourceTeam}
-        selectedCount={selectedCount}
-        copyPlayers={copyPlayers}
-        allCopyPlayersSelected={allCopyPlayersSelected}
-        someCopyPlayersSelected={someCopyPlayersSelected}
-        toggleAllCopyPlayers={toggleAllCopyPlayers}
-        selectedPlayerIds={selectedPlayerIds}
-        toggleCopyPlayer={toggleCopyPlayer}
-        saving={saving}
-        playerFullName={playerFullName}
-        playerCountLabel={playerCountLabel}
-      />
-      <ConfirmModal
-        opened={!!deleteTeamData}
-        onClose={() => setDeleteTeamData(null)}
-        onConfirm={confirmDeleteTeam}
-        title="Eliminar equipo"
-        message={deleteTeamData ? `¿Eliminar ${deleteTeamData.nombre} (${deleteTeamData.temporada}) y todos sus jugadores?` : ''}
-        confirmLabel="Eliminar"
-        loading={saving}
-      />
-    </Stack>
+        <ConfirmModal
+          opened={!!deleteTeamData}
+          onClose={() => setDeleteTeamData(null)}
+          onConfirm={confirmDeleteTeam}
+          title="Eliminar equipo"
+          message={deleteTeamData ? `¿Eliminar ${deleteTeamData.nombre} (${deleteTeamData.temporada}) y todos sus jugadores?` : ''}
+          confirmLabel="Eliminar"
+          loading={saving}
+        />
+      </Stack>
+    </BoneyardSkeleton>
   );
 }
