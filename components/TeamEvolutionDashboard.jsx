@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   Group,
+  MultiSelect,
   Paper,
   ScrollArea,
   SegmentedControl,
@@ -71,6 +72,12 @@ function formatDate(value) {
   if (!value) return '-';
   return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
     .format(new Date(`${value}T00:00:00`));
+}
+
+function formatShortDate(value) {
+  if (!value) return '-';
+  const date = new Date(`${value}T00:00:00`);
+  return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: '2-digit' }).format(date);
 }
 
 function dateValue(value) {
@@ -287,7 +294,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   });
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState('all');
+  const [visibleMetricKeys, setVisibleMetricKeys] = useState(() => {
+    return METRICS.map((m) => m.key);
+  });
   const [detailRow, setDetailRow] = useState(null);
 
   // States for multi-metric filters
@@ -333,6 +343,16 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
   const handleViewModeChange = (newMode) => {
     setViewMode(newMode);
+    if (newMode === 'day' && selectedDate === 'all') {
+      setSelectedDate(availableDates.at(-1) || '');
+    }
+  };
+
+  const handleDateChange = (value) => {
+    setSelectedDate(value || '');
+    if (value === 'all' && viewMode === 'day') {
+      setViewMode('ranking');
+    }
   };
 
   const positionOptions = useMemo(() => {
@@ -399,15 +419,19 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
     () => Array.from(dateCounts.keys()).sort(),
     [dateCounts]
   );
-  const currentDay = (selectedDate && availableDates.includes(selectedDate)) ? selectedDate : (availableDates.at(-1) || '');
-  const daySelectValue = availableDates.includes(currentDay) ? currentDay : null;
+  const currentDay = (selectedDate === 'all' || (selectedDate && availableDates.includes(selectedDate))) ? selectedDate : (availableDates.at(-1) || '');
+  const daySelectValue = (selectedDate === 'all' || availableDates.includes(currentDay)) ? currentDay : null;
 
-  const dateOptions = useMemo(() => (
-    [...availableDates].reverse().map((date) => ({
+  const dateOptions = useMemo(() => {
+    const options = [...availableDates].reverse().map((date) => ({
       value: date,
       label: `${formatDate(date)} · ${dateCounts.get(date) || 0}`,
-    }))
-  ), [availableDates, dateCounts]);
+    }));
+    return [
+      { value: 'all', label: 'Todas las mediciones' },
+      ...options,
+    ];
+  }, [availableDates, dateCounts]);
 
   const dayRows = useMemo(() => allRows.map((row) => {
     const measurement = row.records.find((record) => String(record.fecha) === String(currentDay)) || null;
@@ -420,7 +444,17 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
     };
   }), [allRows, currentDay]);
 
-  const measuredDayRows = dayRows.filter((row) => row.measuredOnDay);
+  const measuredDayRows = useMemo(() => {
+    if (selectedDate === 'all') {
+      return allRows
+        .filter((row) => row.records.length > 0)
+        .map((row) => ({
+          ...row,
+          measuredOnDay: true,
+        }));
+    }
+    return dayRows.filter((row) => row.measuredOnDay);
+  }, [allRows, dayRows, selectedDate]);
   const missingDayRows = dayRows.filter((row) => !row.measuredOnDay);
   const dayMeasuredPct = scopedPlayers.length ? Math.round((measuredDayRows.length / scopedPlayers.length) * 100) : 0;
   const dayImported = measuredDayRows.filter((row) => row.measurement?.fuente_hoja).length;
@@ -448,23 +482,63 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
         }
       }
     });
-    return base;
+    return base.filter((m) => visibleMetricKeys.includes(m.key));
+  }, [activeFilters, ALL_METRICS_MAP, visibleMetricKeys]);
+
+  const multiSelectData = useMemo(() => {
+    const base = [...METRICS];
+    activeFilters.forEach((filter) => {
+      if (!base.some((m) => m.key === filter.metric)) {
+        const extraConfig = ALL_METRICS_MAP.get(filter.metric);
+        if (extraConfig) {
+          base.push(extraConfig);
+        }
+      }
+    });
+    return base.map((m) => ({ value: m.key, label: m.label }));
   }, [activeFilters, ALL_METRICS_MAP]);
+
+  const maxMeasurements = useMemo(() => {
+    if (selectedDate !== 'all') return 1;
+    let max = 0;
+    measuredDayRows.forEach((row) => {
+      if (row.records.length > max) {
+        max = row.records.length;
+      }
+    });
+    return max || 1;
+  }, [measuredDayRows, selectedDate]);
 
   const filteredPlayersTableData = useMemo(() => {
     return measuredDayRows.map((row) => {
       const alertMatches = {};
       let totalAlerts = 0;
 
-      activeFilters.forEach((filter) => {
-        const config = ALL_METRICS_MAP.get(filter.metric);
-        const val = config ? metricValue(row.measurement, config) : null;
-        const matches = checkFilterMatch(val, filter.operator, filter.value);
-        if (matches) {
-          alertMatches[filter.metric] = true;
-          totalAlerts += 1;
-        }
-      });
+      if (selectedDate === 'all') {
+        activeFilters.forEach((filter) => {
+          const config = ALL_METRICS_MAP.get(filter.metric);
+          if (config) {
+            row.records.forEach((record, idx) => {
+              const val = metricValue(record, config);
+              const matches = checkFilterMatch(val, filter.operator, filter.value);
+              if (matches) {
+                alertMatches[`${filter.metric}_${idx}`] = true;
+                totalAlerts += 1;
+              }
+            });
+          }
+        });
+      } else {
+        activeFilters.forEach((filter) => {
+          const config = ALL_METRICS_MAP.get(filter.metric);
+          const val = config ? metricValue(row.measurement, config) : null;
+          const matches = checkFilterMatch(val, filter.operator, filter.value);
+          if (matches) {
+            alertMatches[filter.metric] = true;
+            totalAlerts += 1;
+          }
+        });
+      }
 
       return {
         ...row,
@@ -472,7 +546,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
         totalAlerts,
       };
     });
-  }, [measuredDayRows, activeFilters, ALL_METRICS_MAP]);
+  }, [measuredDayRows, activeFilters, ALL_METRICS_MAP, selectedDate]);
 
   const sortedTableData = useMemo(() => {
     const data = [...filteredPlayersTableData];
@@ -506,8 +580,13 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
       // Sort by metric
       const metricConfig = ALL_METRICS_MAP.get(sortField);
-      valA = a.measuredOnDay ? metricNumber(a.measurement, metricConfig) : null;
-      valB = b.measuredOnDay ? metricNumber(b.measurement, metricConfig) : null;
+      if (selectedDate === 'all') {
+        valA = metricNumber(a.latest, metricConfig);
+        valB = metricNumber(b.latest, metricConfig);
+      } else {
+        valA = a.measuredOnDay ? metricNumber(a.measurement, metricConfig) : null;
+        valB = b.measuredOnDay ? metricNumber(b.measurement, metricConfig) : null;
+      }
 
       if (valA === null && valB === null) return 0;
       if (valA === null) return 1;
@@ -516,7 +595,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
       return sortDirection === 'asc' ? valA - valB : valB - valA;
     });
     return data;
-  }, [filteredPlayersTableData, sortField, sortDirection, ALL_METRICS_MAP]);
+  }, [filteredPlayersTableData, sortField, sortDirection, ALL_METRICS_MAP, selectedDate]);
 
 
   const sortOptions = useMemo(() => {
@@ -550,24 +629,45 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   const detailRawEntries = rawMetricEntries(detailMeasurement);
 
   function buildFiltersCsv(data, metricsList) {
-    const headers = [
-      'Jugador',
-      'Posicion',
-      'Alertas',
-      ...metricsList.map((m) => `${m.label} (${m.unit || ''})`),
-    ];
+    const headers = ['Jugador', 'Posicion', 'Alertas'];
+
+    if (selectedDate === 'all') {
+      metricsList.forEach((m) => {
+        for (let idx = 0; idx < maxMeasurements; idx++) {
+          headers.push(`${m.label} ${idx + 1}`);
+        }
+      });
+    } else {
+      metricsList.forEach((m) => {
+        headers.push(`${m.label} (${m.unit || ''})`);
+      });
+    }
+
     const csvRows = data.map((row) => {
       const line = [
         playerName(row),
         row.posicion || '',
         row.totalAlerts,
-        ...metricsList.map((m) => {
-          const val = row.measuredOnDay ? metricValue(row.measurement, m) : null;
-          return val !== null && val !== undefined ? val : '';
-        }),
       ];
+
+      if (selectedDate === 'all') {
+        metricsList.forEach((m) => {
+          for (let idx = 0; idx < maxMeasurements; idx++) {
+            const record = row.records[idx] || null;
+            const val = record ? metricValue(record, m) : null;
+            line.push(val !== null && val !== undefined ? val : '');
+          }
+        });
+      } else {
+        metricsList.forEach((m) => {
+          const val = row.measuredOnDay ? metricValue(row.measurement, m) : null;
+          line.push(val !== null && val !== undefined ? val : '');
+        });
+      }
+
       return line.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(',');
     });
+
     return [headers.join(','), ...csvRows].join('\n');
   }
 
@@ -577,7 +677,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
       return;
     }
     if (viewMode === 'ranking') {
-      downloadCsv(`filtros-equipo-${currentDay || 'dia'}.csv`, buildFiltersCsv(sortedTableData, displayedMetrics));
+      const fileName = selectedDate === 'all' ? 'filtros-equipo-todas-las-mediciones.csv' : `filtros-equipo-${currentDay || 'dia'}.csv`;
+      downloadCsv(fileName, buildFiltersCsv(sortedTableData, displayedMetrics));
       return;
     }
     downloadCsv('evolucion-equipo.csv', buildTrendCsv(rows));
@@ -586,921 +687,1032 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   return (
     <BoneyardSkeleton name="team-evolution" loading={false}>
       <Stack gap="lg">
-      <Paper
-        p={{ base: 'sm', sm: 'md' }}
-        shadow="sm"
-        radius="xl"
-        withBorder
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
-          zIndex: 10,
-          position: 'relative',
-        }}
-      >
-        <Stack gap="sm">
-          <Group justify="space-between" align="center" wrap="wrap" gap="md">
-            <Group gap="sm" wrap="nowrap">
-              <Tooltip label="Volver al panel" withArrow>
-                <ActionIcon component={Anchor} href={team?.id ? `/dashboard/equipo/${team.id}` : '/dashboard'} variant="light" color="gray" radius="xl" size={42}>
-                  <IconArrowLeft size={20} />
-                </ActionIcon>
-              </Tooltip>
-              <ThemeIcon color={viewMode === 'day' ? 'teal' : viewMode === 'ranking' ? 'grape' : 'blue'} variant="light" radius="xl" size={42}>
-                {viewMode === 'day' ? <IconCalendarStats size={21} /> : viewMode === 'ranking' ? <IconFilter size={21} /> : <IconChartLine size={21} />}
-              </ThemeIcon>
-              <Box>
-                <Title order={3} fw={850} c="#24291f" lh={1.1}>
-                  Evolución de {team?.nombre || 'equipo'}
-                </Title>
-                <Text size="xs" c="dimmed" mt={2}>
-                  {team?.temporada ? `${team.temporada} · ` : ''}
-                  {viewMode === 'day'
-                    ? 'Mediciones por jornada'
-                    : viewMode === 'ranking'
-                      ? 'Comparativas, umbrales y alertas'
-                      : 'Tendencias corporales y cambios recientes'}
-                </Text>
-              </Box>
+        <Paper
+          p={{ base: 'sm', sm: 'md' }}
+          shadow="sm"
+          radius="xl"
+          withBorder
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
+            zIndex: 10,
+            position: 'relative',
+          }}
+        >
+          <Stack gap="sm">
+            <Group justify="space-between" align="center" wrap="wrap" gap="md">
+              <Group gap="sm" wrap="nowrap">
+                <Tooltip label="Volver al panel" withArrow>
+                  <ActionIcon component={Anchor} href={team?.id ? `/dashboard/equipo/${team.id}` : '/dashboard'} variant="light" color="gray" radius="xl" size={42}>
+                    <IconArrowLeft size={20} />
+                  </ActionIcon>
+                </Tooltip>
+                <ThemeIcon color={viewMode === 'day' ? 'teal' : viewMode === 'ranking' ? 'grape' : 'blue'} variant="light" radius="xl" size={42}>
+                  {viewMode === 'day' ? <IconCalendarStats size={21} /> : viewMode === 'ranking' ? <IconFilter size={21} /> : <IconChartLine size={21} />}
+                </ThemeIcon>
+                <Box>
+                  <Title order={3} fw={850} c="#24291f" lh={1.1}>
+                    Evolución de {team?.nombre || 'equipo'}
+                  </Title>
+                  <Text size="xs" c="dimmed" mt={2}>
+                    {team?.temporada ? `${team.temporada} · ` : ''}
+                    {viewMode === 'day'
+                      ? 'Mediciones por jornada'
+                      : viewMode === 'ranking'
+                        ? 'Comparativas, umbrales y alertas'
+                        : 'Tendencias corporales y cambios recientes'}
+                  </Text>
+                </Box>
+              </Group>
+
+              <Group gap="xs" wrap="wrap" justify="flex-end">
+                <SegmentedControl
+                  value={viewMode}
+                  onChange={handleViewModeChange}
+                  data={[
+                    {
+                      value: 'trends',
+                      label: (
+                        <Group component="span" gap={6} justify="center" wrap="nowrap">
+                          <IconChartLine size={16} />
+                          <Text component="span" size="sm" fw={700}>Histórico</Text>
+                        </Group>
+                      ),
+                    },
+                    {
+                      value: 'day',
+                      label: (
+                        <Group component="span" gap={6} justify="center" wrap="nowrap">
+                          <IconCalendarStats size={16} />
+                          <Text component="span" size="sm" fw={700}>Jornada</Text>
+                        </Group>
+                      ),
+                    },
+                    {
+                      value: 'ranking',
+                      label: (
+                        <Group component="span" gap={6} justify="center" wrap="nowrap">
+                          <IconFilter size={16} />
+                          <Text component="span" size="sm" fw={700}>Filtros</Text>
+                        </Group>
+                      ),
+                    },
+                  ]}
+                  aria-label="Modo de visualización"
+                  color={viewMode === 'day' ? 'teal' : viewMode === 'ranking' ? 'grape' : 'blue'}
+                  radius="xl"
+                  size="sm"
+                  styles={{
+                    root: { minWidth: 380 },
+                    control: { minWidth: 124 },
+                    label: { minHeight: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+                  }}
+                />
+                <Button
+                  radius="xl"
+                  size="sm"
+                  variant="light"
+                  color="gray"
+                  leftSection={<IconDownload size={16} />}
+                  onClick={handleDownloadCsv}
+                  disabled={viewMode === 'day' ? measuredDayRows.length === 0 : rows.length === 0}
+                >
+                  CSV
+                </Button>
+              </Group>
             </Group>
 
-            <Group gap="xs" wrap="wrap" justify="flex-end">
-              <SegmentedControl
-                value={viewMode}
-                onChange={handleViewModeChange}
-                data={[
-                  {
-                    value: 'trends',
-                    label: (
-                      <Group component="span" gap={6} justify="center" wrap="nowrap">
-                        <IconChartLine size={16} />
-                        <Text component="span" size="sm" fw={700}>Histórico</Text>
-                      </Group>
-                    ),
-                  },
-                  {
-                    value: 'day',
-                    label: (
-                      <Group component="span" gap={6} justify="center" wrap="nowrap">
-                        <IconCalendarStats size={16} />
-                        <Text component="span" size="sm" fw={700}>Jornada</Text>
-                      </Group>
-                    ),
-                  },
-                  {
-                    value: 'ranking',
-                    label: (
-                      <Group component="span" gap={6} justify="center" wrap="nowrap">
-                        <IconFilter size={16} />
-                        <Text component="span" size="sm" fw={700}>Filtros</Text>
-                      </Group>
-                    ),
-                  },
-                ]}
-                aria-label="Modo de visualización"
-                color={viewMode === 'day' ? 'teal' : viewMode === 'ranking' ? 'grape' : 'blue'}
-                radius="xl"
-                size="sm"
-                styles={{
-                  root: { minWidth: 380 },
-                  control: { minWidth: 124 },
-                  label: { minHeight: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-                }}
-              />
-              <Button
-                radius="xl"
-                size="sm"
-                variant="light"
-                color="gray"
-                leftSection={<IconDownload size={16} />}
-                onClick={handleDownloadCsv}
-                disabled={viewMode === 'day' ? measuredDayRows.length === 0 : rows.length === 0}
-              >
-                CSV
-              </Button>
-            </Group>
-          </Group>
+            <Paper p={6} radius="xl" shadow="xs" withBorder bg="white" w="100%">
+              <Group gap={8} w="100%" wrap="wrap" align="center">
+                <Select
+                  placeholder="Posición"
+                  leftSection={<IconUsers size={16} style={{ opacity: 0.7 }} />}
+                  data={positionOptions}
+                  value={position}
+                  onChange={(value) => setPosition(value || '')}
+                  variant="filled"
+                  radius="xl"
+                  size="sm"
+                  searchable
+                  allowDeselect={false}
+                  style={{ flex: 1, minWidth: 170 }}
+                />
 
-          <Paper p={6} radius="xl" shadow="xs" withBorder bg="white" w="100%">
-            <Group gap={8} w="100%" wrap="wrap" align="center">
-              <Select
-                placeholder="Posición"
-                leftSection={<IconUsers size={16} style={{ opacity: 0.7 }} />}
-                data={positionOptions}
-                value={position}
-                onChange={(value) => setPosition(value || '')}
-                variant="filled"
-                radius="xl"
-                size="sm"
-                searchable
-                allowDeselect={false}
-                style={{ flex: 1, minWidth: 170 }}
-              />
+                <Select
+                  placeholder="Temporada"
+                  leftSection={<IconCalendarStats size={16} style={{ opacity: 0.7 }} />}
+                  data={seasonOptions}
+                  value={selectedSeason}
+                  onChange={(value) => setSelectedSeason(value || '')}
+                  variant="filled"
+                  radius="xl"
+                  size="sm"
+                  searchable
+                  allowDeselect={false}
+                  style={{ flex: 1, minWidth: 180 }}
+                />
 
-              <Select
-                placeholder="Temporada"
-                leftSection={<IconCalendarStats size={16} style={{ opacity: 0.7 }} />}
-                data={seasonOptions}
-                value={selectedSeason}
-                onChange={(value) => setSelectedSeason(value || '')}
-                variant="filled"
-                radius="xl"
-                size="sm"
-                searchable
-                allowDeselect={false}
-                style={{ flex: 1, minWidth: 180 }}
-              />
-
-              {viewMode === 'trends' ? (
-                <>
-                  <DateInput
-                    placeholder="Fecha de inicio"
-                    leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
-                    value={dateValue(dateFrom)}
-                    onChange={(value) => setDateFrom(dateInputToIso(value))}
-                    variant="filled"
-                    radius="xl"
-                    size="sm"
-                    valueFormat="DD/MM/YYYY"
-                    clearable
-                    style={{ flex: 1, minWidth: 160 }}
-                  />
-                  <DateInput
-                    placeholder="Fecha de fin"
-                    leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
-                    value={dateValue(dateTo)}
-                    onChange={(value) => setDateTo(dateInputToIso(value))}
-                    variant="filled"
-                    radius="xl"
-                    size="sm"
-                    valueFormat="DD/MM/YYYY"
-                    clearable
-                    style={{ flex: 1, minWidth: 160 }}
-                  />
-                </>
-              ) : (
-                <>
-                  <Select
-                    placeholder="Fecha de medición"
-                    leftSection={<IconCalendarStats size={16} style={{ opacity: 0.7 }} />}
-                    data={dateOptions}
-                    value={daySelectValue}
-                    onChange={(value) => setSelectedDate(value || '')}
-                    variant="filled"
-                    radius="xl"
-                    size="sm"
-                    searchable
-                    nothingFoundMessage="Sin jornadas"
-                    style={{ flex: 1.2, minWidth: 240 }}
-                  />
-                </>
-              )}
-            </Group>
-          </Paper>
-        </Stack>
-      </Paper>
-
-      {viewMode === 'trends' && (
-        <>
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md">
-            <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-              <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Plantilla total</Text>
-              <Title order={2} c="dark.4" mt={4}>{scopedPlayers.length}</Title>
-              <Text size="xs" c="dimmed">jugadores activos</Text>
+                {viewMode === 'trends' ? (
+                  <>
+                    <DateInput
+                      placeholder="Fecha de inicio"
+                      leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+                      value={dateValue(dateFrom)}
+                      onChange={(value) => setDateFrom(dateInputToIso(value))}
+                      variant="filled"
+                      radius="xl"
+                      size="sm"
+                      valueFormat="DD/MM/YYYY"
+                      clearable
+                      style={{ flex: 1, minWidth: 160 }}
+                    />
+                    <DateInput
+                      placeholder="Fecha de fin"
+                      leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+                      value={dateValue(dateTo)}
+                      onChange={(value) => setDateTo(dateInputToIso(value))}
+                      variant="filled"
+                      radius="xl"
+                      size="sm"
+                      valueFormat="DD/MM/YYYY"
+                      clearable
+                      style={{ flex: 1, minWidth: 160 }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Select
+                      placeholder="Fecha de medición"
+                      leftSection={<IconCalendarStats size={16} style={{ opacity: 0.7 }} />}
+                      data={dateOptions}
+                      value={daySelectValue}
+                      onChange={handleDateChange}
+                      variant="filled"
+                      radius="xl"
+                      size="sm"
+                      searchable
+                      nothingFoundMessage="Sin jornadas"
+                      style={{ flex: 1.2, minWidth: 240 }}
+                    />
+                  </>
+                )}
+              </Group>
             </Paper>
-            <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-              <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Jugadores medidos</Text>
-              <Title order={2} c="dark.4" mt={4}>{latestRows.length}/{scopedPlayers.length}</Title>
-              <Text size="xs" c="dimmed">{measuredPct}% con al menos una medición</Text>
-            </Paper>
-            <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-              <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Registros filtrados</Text>
-              <Title order={2} c="dark.4" mt={4}>{totalRecords}</Title>
-              <Text size="xs" c="dimmed">mediciones en el rango</Text>
-            </Paper>
-            <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-              <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Última fecha</Text>
-              <Title order={3} c="dark.4" mt={8}>{formatDate(lastDate)}</Title>
-              <Text size="xs" c="dimmed">último registro disponible</Text>
-            </Paper>
-          </SimpleGrid>
+          </Stack>
+        </Paper>
 
-          {chartData.length > 0 ? (
-            <SimpleGrid cols={{ base: 1, md: 1, lg: 2 }} spacing="lg">
-              {METRICS.map((item) => {
-                const latestValuesForMetric = latestRows
-                  .map((row) => Number(metricRecord(row.records, item, 0)?.[item.key]))
-                  .filter(Number.isFinite);
-                const avg = latestValuesForMetric.length
-                  ? number(latestValuesForMetric.reduce((sum, value) => sum + value, 0) / latestValuesForMetric.length)
-                  : null;
-                const metricData = chartData.filter(d => d[item.key] !== null);
-                const reverseMetricData = [...metricData].reverse();
-
-                return (
-                  <Paper key={item.key} p="md" radius="lg" withBorder bg="white">
-                    <Group justify="space-between" align="flex-start" gap="sm" mb="md">
-                      <Box>
-                        <Title order={4} fw={800} c="dark.4">{item.label}</Title>
-                        <Text size="xs" c="dimmed">Tendencia media del equipo</Text>
-                      </Box>
-                      <Badge color={item.goodDown === true ? 'red' : item.goodDown === false ? 'green' : 'blue'} variant="light" radius="sm">
-                        Media: {avg === null ? '-' : `${avg} ${item.unit}`}
-                      </Badge>
-                    </Group>
-
-                    <Stack gap="md">
-                      <Box h={200}>
-                        <ResponsiveContainer width="100%" height="100%">
-                          <ComposedChart data={metricData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                            <defs>
-                              <linearGradient id={`gradient_${item.key}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor={item.color} stopOpacity={0.4} />
-                                <stop offset="95%" stopColor={item.color} stopOpacity={0.05} />
-                              </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
-                            <XAxis
-                              dataKey="fecha"
-                              tick={{ fontSize: 9 }}
-                              tickFormatter={(value) => String(value).slice(5)}
-                              stroke="var(--mantine-color-gray-5)"
-                              axisLine={false}
-                              tickLine={false}
-                            />
-                            <YAxis
-                              tick={{ fontSize: 9 }}
-                              domain={['auto', 'auto']}
-                              stroke="var(--mantine-color-gray-5)"
-                              axisLine={false}
-                              tickLine={false}
-                            />
-                            <ChartTooltip
-                              labelFormatter={(value) => formatDate(value)}
-                              formatter={(value) => [`${value} ${item.unit}`, item.label]}
-                              labelStyle={{ fontWeight: 700, color: 'var(--mantine-color-dark-4)', fontSize: 10 }}
-                              contentStyle={{ borderRadius: '12px', border: '1px solid var(--mantine-color-gray-2)', padding: '6px 10px', fontSize: 10 }}
-                            />
-                            <Bar
-                              dataKey={item.key}
-                              fill={`url(#gradient_${item.key})`}
-                              radius={[4, 4, 0, 0]}
-                              maxBarSize={32}
-                            />
-                            <Line
-                              type="monotone"
-                              dataKey={item.key}
-                              stroke={item.color}
-                              strokeWidth={2}
-                              dot={{ r: 3.5, fill: 'white', stroke: item.color, strokeWidth: 2 }}
-                              activeDot={{ r: 5, strokeWidth: 0 }}
-                              connectNulls
-                            />
-                          </ComposedChart>
-                        </ResponsiveContainer>
-                      </Box>
-
-                      <ScrollArea h={120} offsetScrollbars>
-                        <Table verticalSpacing={4} striped highlightOnHover style={{ minWidth: 150 }}>
-                          <Table.Thead bg="gray.0">
-                            <Table.Tr>
-                              <Table.Th style={{ fontSize: 10, padding: '4px 8px' }}>Fecha</Table.Th>
-                              <Table.Th style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right' }}>Media</Table.Th>
-                            </Table.Tr>
-                          </Table.Thead>
-                          <Table.Tbody>
-                            {reverseMetricData.map((row) => (
-                              <Table.Tr key={row.fecha}>
-                                <Table.Td style={{ fontSize: 10, padding: '4px 8px' }}>
-                                  {formatDate(row.fecha)}
-                                </Table.Td>
-                                <Table.Td style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right', fontWeight: 650 }}>
-                                  {row[item.key]} {item.unit}
-                                </Table.Td>
-                              </Table.Tr>
-                            ))}
-                          </Table.Tbody>
-                        </Table>
-                      </ScrollArea>
-                    </Stack>
-                  </Paper>
-                );
-              })}
+        {viewMode === 'trends' && (
+          <>
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md">
+              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
+                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Plantilla total</Text>
+                <Title order={2} c="dark.4" mt={4}>{scopedPlayers.length}</Title>
+                <Text size="xs" c="dimmed">jugadores activos</Text>
+              </Paper>
+              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
+                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Jugadores medidos</Text>
+                <Title order={2} c="dark.4" mt={4}>{latestRows.length}/{scopedPlayers.length}</Title>
+                <Text size="xs" c="dimmed">{measuredPct}% con al menos una medición</Text>
+              </Paper>
+              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
+                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Registros filtrados</Text>
+                <Title order={2} c="dark.4" mt={4}>{totalRecords}</Title>
+                <Text size="xs" c="dimmed">mediciones en el rango</Text>
+              </Paper>
+              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
+                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Última fecha</Text>
+                <Title order={3} c="dark.4" mt={8}>{formatDate(lastDate)}</Title>
+                <Text size="xs" c="dimmed">último registro disponible</Text>
+              </Paper>
             </SimpleGrid>
-          ) : (
-            <NothingFound
-              withPaper
-              icon={IconChartLine}
-              title="Sin datos"
-              description="No hay mediciones para los filtros seleccionados."
-            />
-          )}
 
-          {rows.length > 0 && (
-            <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
-              <ScrollArea>
-                <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 760 + METRICS.length * 128 }}>
-                  <Table.Thead bg="gray.0">
-                    <Table.Tr>
-                      <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
-                      <Table.Th>Última medición</Table.Th>
-                      {METRICS.map((item) => <Table.Th key={item.key}>{item.label}</Table.Th>)}
-                      <Table.Th>Registros</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {rows.map((row) => {
-                      const latest = row.latest || {};
-                      return (
+            {chartData.length > 0 ? (
+              <SimpleGrid cols={{ base: 1, md: 1, lg: 2 }} spacing="lg">
+                {METRICS.map((item) => {
+                  const latestValuesForMetric = latestRows
+                    .map((row) => Number(metricRecord(row.records, item, 0)?.[item.key]))
+                    .filter(Number.isFinite);
+                  const avg = latestValuesForMetric.length
+                    ? number(latestValuesForMetric.reduce((sum, value) => sum + value, 0) / latestValuesForMetric.length)
+                    : null;
+                  const metricData = chartData.filter(d => d[item.key] !== null);
+                  const reverseMetricData = [...metricData].reverse();
+
+                  return (
+                    <Paper key={item.key} p="md" radius="lg" withBorder bg="white">
+                      <Group justify="space-between" align="flex-start" gap="sm" mb="md">
+                        <Box>
+                          <Title order={4} fw={800} c="dark.4">{item.label}</Title>
+                          <Text size="xs" c="dimmed">Tendencia media del equipo</Text>
+                        </Box>
+                        <Badge color={item.goodDown === true ? 'red' : item.goodDown === false ? 'green' : 'blue'} variant="light" radius="sm">
+                          Media: {avg === null ? '-' : `${avg} ${item.unit}`}
+                        </Badge>
+                      </Group>
+
+                      <Stack gap="md">
+                        <Box h={200}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <ComposedChart data={metricData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                              <defs>
+                                <linearGradient id={`gradient_${item.key}`} x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor={item.color} stopOpacity={0.4} />
+                                  <stop offset="95%" stopColor={item.color} stopOpacity={0.05} />
+                                </linearGradient>
+                              </defs>
+                              <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
+                              <XAxis
+                                dataKey="fecha"
+                                tick={{ fontSize: 9 }}
+                                tickFormatter={(value) => String(value).slice(5)}
+                                stroke="var(--mantine-color-gray-5)"
+                                axisLine={false}
+                                tickLine={false}
+                              />
+                              <YAxis
+                                tick={{ fontSize: 9 }}
+                                domain={['auto', 'auto']}
+                                stroke="var(--mantine-color-gray-5)"
+                                axisLine={false}
+                                tickLine={false}
+                              />
+                              <ChartTooltip
+                                labelFormatter={(value) => formatDate(value)}
+                                formatter={(value) => [`${value} ${item.unit}`, item.label]}
+                                labelStyle={{ fontWeight: 700, color: 'var(--mantine-color-dark-4)', fontSize: 10 }}
+                                contentStyle={{ borderRadius: '12px', border: '1px solid var(--mantine-color-gray-2)', padding: '6px 10px', fontSize: 10 }}
+                              />
+                              <Bar
+                                dataKey={item.key}
+                                fill={`url(#gradient_${item.key})`}
+                                radius={[4, 4, 0, 0]}
+                                maxBarSize={32}
+                              />
+                              <Line
+                                type="monotone"
+                                dataKey={item.key}
+                                stroke={item.color}
+                                strokeWidth={2}
+                                dot={{ r: 3.5, fill: 'white', stroke: item.color, strokeWidth: 2 }}
+                                activeDot={{ r: 5, strokeWidth: 0 }}
+                                connectNulls
+                              />
+                            </ComposedChart>
+                          </ResponsiveContainer>
+                        </Box>
+
+                        <ScrollArea h={120} offsetScrollbars>
+                          <Table verticalSpacing={4} striped highlightOnHover style={{ minWidth: 150 }}>
+                            <Table.Thead bg="gray.0">
+                              <Table.Tr>
+                                <Table.Th style={{ fontSize: 10, padding: '4px 8px' }}>Fecha</Table.Th>
+                                <Table.Th style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right' }}>Media</Table.Th>
+                              </Table.Tr>
+                            </Table.Thead>
+                            <Table.Tbody>
+                              {reverseMetricData.map((row) => (
+                                <Table.Tr key={row.fecha}>
+                                  <Table.Td style={{ fontSize: 10, padding: '4px 8px' }}>
+                                    {formatDate(row.fecha)}
+                                  </Table.Td>
+                                  <Table.Td style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right', fontWeight: 650 }}>
+                                    {row[item.key]} {item.unit}
+                                  </Table.Td>
+                                </Table.Tr>
+                              ))}
+                            </Table.Tbody>
+                          </Table>
+                        </ScrollArea>
+                      </Stack>
+                    </Paper>
+                  );
+                })}
+              </SimpleGrid>
+            ) : (
+              <NothingFound
+                withPaper
+                icon={IconChartLine}
+                title="Sin datos"
+                description="No hay mediciones para los filtros seleccionados."
+              />
+            )}
+
+            {rows.length > 0 && (
+              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
+                <ScrollArea>
+                  <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 760 + METRICS.length * 128 }}>
+                    <Table.Thead bg="gray.0">
+                      <Table.Tr>
+                        <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
+                        <Table.Th>Última medición</Table.Th>
+                        {METRICS.map((item) => <Table.Th key={item.key}>{item.label}</Table.Th>)}
+                        <Table.Th>Registros</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {rows.map((row) => {
+                        const latest = row.latest || {};
+                        return (
+                          <Table.Tr
+                            key={row.id}
+                            onClick={() => router.push(`/dashboard/jugador/${row.id}/metricas/mediciones`)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <Table.Td style={{ paddingLeft: 24 }}>
+                              <Text fz="sm" fw={650} c="dark.4">{playerName(row)}</Text>
+                              <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
+                            </Table.Td>
+                            <Table.Td>{formatDate(latest.fecha)}</Table.Td>
+                            {METRICS.map((item) => {
+                              const latestMetric = metricRecord(row.records, item, 0);
+                              const previousMetric = metricRecord(row.records, item, 1);
+                              const val = latestMetric?.[item.key] ?? null;
+                              const delta = deltaFor(latestMetric, previousMetric, item);
+                              return (
+                                <Table.Td key={item.key}>
+                                  <Group gap={6} wrap="nowrap">
+                                    <Text fz="sm" fw={600} c="dark.4">
+                                      {metricDisplay(val, item.unit)}
+                                    </Text>
+                                    {delta !== null && delta !== 0 && (
+                                      <Badge
+                                        color={deltaColor(delta, item)}
+                                        variant="light"
+                                        size="xs"
+                                        radius="sm"
+                                        style={{ padding: '0 4px', height: 16 }}
+                                      >
+                                        {delta > 0 ? `+${delta}` : delta}
+                                      </Badge>
+                                    )}
+                                  </Group>
+                                </Table.Td>
+                              );
+                            })}
+                            <Table.Td>{row.records.length}</Table.Td>
+                          </Table.Tr>
+                        );
+                      })}
+                    </Table.Tbody>
+                  </Table>
+                </ScrollArea>
+              </Paper>
+            )}
+          </>
+        )}
+
+        {viewMode === 'day' && (
+          <>
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md">
+              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
+                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Fecha</Text>
+                <Title order={3} c="dark.4" mt={8}>{formatDate(currentDay)}</Title>
+                <Text size="xs" c="dimmed">{availableDates.length} jornadas registradas</Text>
+              </Paper>
+              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
+                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Medidos ese día</Text>
+                <Title order={2} c="dark.4" mt={4}>{measuredDayRows.length}/{scopedPlayers.length}</Title>
+                <Text size="xs" c="dimmed">{dayMeasuredPct}% de cobertura</Text>
+              </Paper>
+              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
+                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Importadas</Text>
+                <Title order={2} c="dark.4" mt={4}>{dayImported}</Title>
+                <Text size="xs" c="dimmed">{dayCorrected ? `${dayCorrected} fechas corregidas` : 'sin correcciones de fecha'}</Text>
+              </Paper>
+              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
+                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Columnas Excel</Text>
+                <Title order={2} c="dark.4" mt={4}>{rawColumnTotal}</Title>
+                <Text size="xs" c="dimmed">datos crudos disponibles</Text>
+              </Paper>
+            </SimpleGrid>
+
+            {measuredDayRows.length > 0 ? (
+              <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+                {dayAverages.filter((metric) => metric.count > 0).map((metric) => (
+                  <Paper key={metric.key} p="md" radius="lg" withBorder bg="white">
+                    <Group justify="space-between" align="flex-start" gap="sm">
+                      <Box>
+                        <Text size="xs" c="dimmed" tt="uppercase" fw={750}>{metric.label}</Text>
+                        <Title order={3} c="dark.4" mt={4}>{metricDisplay(metric.avg, metric.unit)}</Title>
+                      </Box>
+                      <Badge variant="light" color="gray">{metric.count}/{measuredDayRows.length}</Badge>
+                    </Group>
+                  </Paper>
+                ))}
+              </SimpleGrid>
+            ) : (
+              <NothingFound
+                withPaper
+                icon={IconCalendarStats}
+                title="Sin mediciones ese día"
+                description="No hay jugadores medidos para la fecha seleccionada."
+              />
+            )}
+
+            {measuredDayRows.length > 0 && (
+              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
+                <Group justify="space-between" p="md" pb="xs" align="center">
+                  <Box>
+                    <Title order={4} fw={800} c="dark.4">Mediciones del día</Title>
+                    <Text size="xs" c="dimmed">{formatDate(currentDay)} · {measuredDayRows.length} jugadores</Text>
+                  </Box>
+                  <Badge variant="light" color="teal">{dayMeasuredPct}% cobertura</Badge>
+                </Group>
+                <ScrollArea>
+                  <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 880 + METRICS.length * 132 }}>
+                    <Table.Thead bg="gray.0">
+                      <Table.Tr>
+                        <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
+                        <Table.Th>Origen</Table.Th>
+                        {METRICS.map((item) => <Table.Th key={item.key}>{item.label}</Table.Th>)}
+                        <Table.Th>Acciones</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {measuredDayRows.map((row) => (
                         <Table.Tr
-                          key={row.id}
-                          onClick={() => router.push(`/dashboard/jugador/${row.id}/metricas/mediciones`)}
+                          key={`${row.id}-${currentDay}`}
+                          onClick={() => setDetailRow(row)}
                           style={{ cursor: 'pointer' }}
                         >
                           <Table.Td style={{ paddingLeft: 24 }}>
                             <Text fz="sm" fw={650} c="dark.4">{playerName(row)}</Text>
                             <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
                           </Table.Td>
-                          <Table.Td>{formatDate(latest.fecha)}</Table.Td>
+                          <Table.Td>
+                            <Text fz="xs" fw={650} c="dark.4">{row.measurement?.fuente_hoja || 'Manual'}</Text>
+                            <Text fz="xs" c="dimmed">{row.measurement?.fuente_fila ? `Fila ${row.measurement.fuente_fila}` : formatDate(row.measurement?.fecha)}</Text>
+                          </Table.Td>
                           {METRICS.map((item) => {
-                            const latestMetric = metricRecord(row.records, item, 0);
-                            const previousMetric = metricRecord(row.records, item, 1);
-                            const val = latestMetric?.[item.key] ?? null;
-                            const delta = deltaFor(latestMetric, previousMetric, item);
+                            const value = metricValue(row.measurement, item);
+                            const delta = deltaFor(row.measurement, row.previous, item);
                             return (
                               <Table.Td key={item.key}>
-                                <Group gap={6} wrap="nowrap">
-                                  <Text fz="sm" fw={600} c="dark.4">
-                                    {metricDisplay(val, item.unit)}
-                                  </Text>
+                                <Stack gap={3}>
+                                  <Text fz="sm" fw={650} c="dark.4">{metricDisplay(value, item.unit)}</Text>
                                   {delta !== null && delta !== 0 && (
                                     <Badge
                                       color={deltaColor(delta, item)}
                                       variant="light"
                                       size="xs"
                                       radius="sm"
-                                      style={{ padding: '0 4px', height: 16 }}
+                                      w="fit-content"
                                     >
                                       {delta > 0 ? `+${delta}` : delta}
                                     </Badge>
                                   )}
-                                </Group>
+                                </Stack>
                               </Table.Td>
                             );
                           })}
-                          <Table.Td>{row.records.length}</Table.Td>
+                          <Table.Td>
+                            <Group gap={4} wrap="nowrap">
+                              <Tooltip label="Ver detalle" withArrow>
+                                <ActionIcon
+                                  variant="subtle"
+                                  color="blue"
+                                  radius="xl"
+                                  aria-label="Ver detalle"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    setDetailRow(row);
+                                  }}
+                                >
+                                  <IconEye size={17} />
+                                </ActionIcon>
+                              </Tooltip>
+                              <Tooltip label="Abrir ficha" withArrow>
+                                <ActionIcon
+                                  component={Anchor}
+                                  href={`/dashboard/jugador/${row.id}/metricas/mediciones`}
+                                  variant="subtle"
+                                  color="gray"
+                                  radius="xl"
+                                  aria-label="Abrir ficha"
+                                  onClick={(event) => event.stopPropagation()}
+                                >
+                                  <IconExternalLink size={17} />
+                                </ActionIcon>
+                              </Tooltip>
+                            </Group>
+                          </Table.Td>
                         </Table.Tr>
-                      );
-                    })}
-                  </Table.Tbody>
-                </Table>
-              </ScrollArea>
-            </Paper>
-          )}
-        </>
-      )}
+                      ))}
+                    </Table.Tbody>
+                  </Table>
+                </ScrollArea>
+              </Paper>
+            )}
 
-      {viewMode === 'day' && (
-        <>
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md">
-            <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-              <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Fecha</Text>
-              <Title order={3} c="dark.4" mt={8}>{formatDate(currentDay)}</Title>
-              <Text size="xs" c="dimmed">{availableDates.length} jornadas registradas</Text>
-            </Paper>
-            <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-              <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Medidos ese día</Text>
-              <Title order={2} c="dark.4" mt={4}>{measuredDayRows.length}/{scopedPlayers.length}</Title>
-              <Text size="xs" c="dimmed">{dayMeasuredPct}% de cobertura</Text>
-            </Paper>
-            <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-              <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Importadas</Text>
-              <Title order={2} c="dark.4" mt={4}>{dayImported}</Title>
-              <Text size="xs" c="dimmed">{dayCorrected ? `${dayCorrected} fechas corregidas` : 'sin correcciones de fecha'}</Text>
-            </Paper>
-            <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-              <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Columnas Excel</Text>
-              <Title order={2} c="dark.4" mt={4}>{rawColumnTotal}</Title>
-              <Text size="xs" c="dimmed">datos crudos disponibles</Text>
-            </Paper>
-          </SimpleGrid>
+            {missingDayRows.length > 0 && (
+              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
+                <Group justify="space-between" p="md" pb="xs" align="center">
+                  <Box>
+                    <Title order={4} fw={800} c="dark.4">Sin medición ese día</Title>
+                    <Text size="xs" c="dimmed">{missingDayRows.length} jugadores sin registro en {formatDate(currentDay)}</Text>
+                  </Box>
+                  <Badge variant="light" color="gray">{missingDayRows.length}</Badge>
+                </Group>
+                <ScrollArea.Autosize mah={260}>
+                  <Table verticalSpacing="sm" highlightOnHover>
+                    <Table.Thead bg="gray.0">
+                      <Table.Tr>
+                        <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
+                        <Table.Th>Última medición</Table.Th>
+                        <Table.Th>Registros</Table.Th>
+                        <Table.Th>Acción</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {missingDayRows.map((row) => (
+                        <Table.Tr key={`missing-${row.id}`}>
+                          <Table.Td style={{ paddingLeft: 24 }}>
+                            <Text fz="sm" fw={650} c="dark.4">{playerName(row)}</Text>
+                            <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
+                          </Table.Td>
+                          <Table.Td>{formatDate(row.latest?.fecha)}</Table.Td>
+                          <Table.Td>{row.records.length}</Table.Td>
+                          <Table.Td>
+                            <Button
+                              component={Anchor}
+                              href={`/dashboard/jugador/${row.id}/metricas/mediciones`}
+                              size="xs"
+                              radius="xl"
+                              variant="light"
+                              color="gray"
+                              leftSection={<IconExternalLink size={14} />}
+                            >
+                              Abrir ficha
+                            </Button>
+                          </Table.Td>
+                        </Table.Tr>
+                      ))}
+                    </Table.Tbody>
+                  </Table>
+                </ScrollArea.Autosize>
+              </Paper>
+            )}
+          </>
+        )}
 
-          {measuredDayRows.length > 0 ? (
-            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-              {dayAverages.filter((metric) => metric.count > 0).map((metric) => (
-                <Paper key={metric.key} p="md" radius="lg" withBorder bg="white">
-                  <Group justify="space-between" align="flex-start" gap="sm">
-                    <Box>
-                      <Text size="xs" c="dimmed" tt="uppercase" fw={750}>{metric.label}</Text>
-                      <Title order={3} c="dark.4" mt={4}>{metricDisplay(metric.avg, metric.unit)}</Title>
-                    </Box>
-                    <Badge variant="light" color="gray">{metric.count}/{measuredDayRows.length}</Badge>
-                  </Group>
-                </Paper>
-              ))}
-            </SimpleGrid>
-          ) : (
-            <NothingFound
-              withPaper
-              icon={IconCalendarStats}
-              title="Sin mediciones ese día"
-              description="No hay jugadores medidos para la fecha seleccionada."
-            />
-          )}
-
-          {measuredDayRows.length > 0 && (
-            <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
-              <Group justify="space-between" p="md" pb="xs" align="center">
+        {viewMode === 'ranking' && (
+          <Stack gap="lg">
+            <Paper p="md" radius="lg" withBorder bg="white">
+              <Stack gap="md">
                 <Box>
-                  <Title order={4} fw={800} c="dark.4">Mediciones del día</Title>
-                  <Text size="xs" c="dimmed">{formatDate(currentDay)} · {measuredDayRows.length} jugadores</Text>
+                  <Text size="xs" fw={700} c="dimmed" mb={8} tt="uppercase">
+                    Métricas Visibles en la Tabla
+                  </Text>
+                  <MultiSelect
+                    placeholder="Selecciona las métricas a mostrar..."
+                    data={multiSelectData}
+                    value={visibleMetricKeys}
+                    onChange={setVisibleMetricKeys}
+                    radius="xl"
+                    size="sm"
+                    variant="filled"
+                    clearable
+                    searchable
+                  />
                 </Box>
-                <Badge variant="light" color="teal">{dayMeasuredPct}% cobertura</Badge>
-              </Group>
-              <ScrollArea>
-                <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 880 + METRICS.length * 132 }}>
-                  <Table.Thead bg="gray.0">
-                    <Table.Tr>
-                      <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
-                      <Table.Th>Origen</Table.Th>
-                      {METRICS.map((item) => <Table.Th key={item.key}>{item.label}</Table.Th>)}
-                      <Table.Th>Acciones</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {measuredDayRows.map((row) => (
-                      <Table.Tr
-                        key={`${row.id}-${currentDay}`}
-                        onClick={() => setDetailRow(row)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <Table.Td style={{ paddingLeft: 24 }}>
-                          <Text fz="sm" fw={650} c="dark.4">{playerName(row)}</Text>
-                          <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
-                        </Table.Td>
-                        <Table.Td>
-                          <Text fz="xs" fw={650} c="dark.4">{row.measurement?.fuente_hoja || 'Manual'}</Text>
-                          <Text fz="xs" c="dimmed">{row.measurement?.fuente_fila ? `Fila ${row.measurement.fuente_fila}` : formatDate(row.measurement?.fecha)}</Text>
-                        </Table.Td>
-                        {METRICS.map((item) => {
-                          const value = metricValue(row.measurement, item);
-                          const delta = deltaFor(row.measurement, row.previous, item);
-                          return (
-                            <Table.Td key={item.key}>
-                              <Stack gap={3}>
-                                <Text fz="sm" fw={650} c="dark.4">{metricDisplay(value, item.unit)}</Text>
-                                {delta !== null && delta !== 0 && (
-                                  <Badge
-                                    color={deltaColor(delta, item)}
-                                    variant="light"
-                                    size="xs"
-                                    radius="sm"
-                                    w="fit-content"
-                                  >
-                                    {delta > 0 ? `+${delta}` : delta}
-                                  </Badge>
-                                )}
-                              </Stack>
-                            </Table.Td>
-                          );
-                        })}
-                        <Table.Td>
-                          <Group gap={4} wrap="nowrap">
-                            <Tooltip label="Ver detalle" withArrow>
+
+                <hr style={{ border: 0, borderTop: '1px solid var(--mantine-color-gray-2)', margin: '6px 0' }} />
+
+                <Text size="sm" fw={800} c="dark.4" tt="uppercase">
+                  Configurar Filtros de Alerta
+                </Text>
+
+                <Group gap="md" align="flex-end" wrap="wrap">
+                  <Box style={{ flex: 1, minWidth: 200 }}>
+                    <Text size="xs" fw={700} c="dimmed" mb={5}>MÉTRICA</Text>
+                    <Select
+                      placeholder="Selecciona una métrica..."
+                      leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+                      data={filterMetricOptions}
+                      value={newFilterMetric}
+                      onChange={(value) => {
+                        setNewFilterMetric(value || '');
+                        setNewFilterValue('');
+                      }}
+                      variant="filled"
+                      radius="xl"
+                      size="sm"
+                      searchable
+                      allowDeselect={false}
+                    />
+                  </Box>
+
+                  <Box style={{ width: 150 }}>
+                    <Text size="xs" fw={700} c="dimmed" mb={5}>CONDICIÓN</Text>
+                    <Select
+                      placeholder="Condición"
+                      data={[
+                        { value: '>', label: 'Mayor que (>)' },
+                        { value: '<', label: 'Menor que (<)' },
+                        { value: '>=', label: 'Mayor o igual (>=)' },
+                        { value: '<=', label: 'Menor o igual (<=)' },
+                        { value: '=', label: 'Igual a (=)' },
+                      ]}
+                      value={newFilterOperator}
+                      onChange={(value) => setNewFilterOperator(value || '>')}
+                      disabled={!newFilterMetric}
+                      variant="filled"
+                      radius="xl"
+                      size="sm"
+                      allowDeselect={false}
+                    />
+                  </Box>
+
+                  <Box style={{ width: 130 }}>
+                    <Text size="xs" fw={700} c="dimmed" mb={5}>UMBRAL</Text>
+                    <TextInput
+                      placeholder={
+                        ALL_METRICS_MAP.get(newFilterMetric)?.unit
+                          ? `Ej: 10`
+                          : 'Valor'
+                      }
+                      rightSection={
+                        ALL_METRICS_MAP.get(newFilterMetric)?.unit ? (
+                          <Text size="xs" c="dimmed" pr="xs">
+                            {ALL_METRICS_MAP.get(newFilterMetric).unit}
+                          </Text>
+                        ) : null
+                      }
+                      value={newFilterValue}
+                      onChange={(event) => setNewFilterValue(event.currentTarget.value)}
+                      disabled={!newFilterMetric}
+                      type="number"
+                      step="any"
+                      variant="filled"
+                      radius="xl"
+                      size="sm"
+                    />
+                  </Box>
+
+                  <Button
+                    color="grape"
+                    radius="xl"
+                    size="sm"
+                    leftSection={<IconPlus size={16} />}
+                    onClick={() => {
+                      if (!newFilterMetric || newFilterValue === '') return;
+                      const id = Date.now().toString();
+                      setActiveFilters([
+                        ...activeFilters,
+                        {
+                          id,
+                          metric: newFilterMetric,
+                          operator: newFilterOperator,
+                          value: newFilterValue,
+                        },
+                      ]);
+                      if (!visibleMetricKeys.includes(newFilterMetric)) {
+                        setVisibleMetricKeys([...visibleMetricKeys, newFilterMetric]);
+                      }
+                      setNewFilterValue('');
+                    }}
+                    disabled={!newFilterMetric || newFilterValue === ''}
+                  >
+                    Añadir Filtro
+                  </Button>
+
+                  <Box style={{ width: 220 }}>
+                    <Text size="xs" fw={700} c="dimmed" mb={5}>ORDENAR POR</Text>
+                    <Select
+                      placeholder="Ordenar por..."
+                      data={sortOptions}
+                      value={`${sortField}_${sortDirection}`}
+                      onChange={handleSortOptionChange}
+                      variant="filled"
+                      radius="xl"
+                      size="sm"
+                      allowDeselect={false}
+                    />
+                  </Box>
+                </Group>
+
+
+                <Box mt="xs">
+                  <Text size="xs" fw={700} c="dimmed" mb={8}>
+                    FILTROS ACTIVOS ({activeFilters.length})
+                  </Text>
+                  {activeFilters.length > 0 ? (
+                    <Group gap="xs" wrap="wrap">
+                      {activeFilters.map((filter) => {
+                        const config = ALL_METRICS_MAP.get(filter.metric);
+                        const label = config ? config.label : filter.metric;
+                        const unit = config?.unit ? ` ${config.unit}` : '';
+                        return (
+                          <Badge
+                            key={filter.id}
+                            variant="light"
+                            color="red"
+                            size="lg"
+                            radius="xl"
+                            pr={3}
+                            rightSection={
                               <ActionIcon
-                                variant="subtle"
-                                color="blue"
+                                size="xs"
+                                color="red"
                                 radius="xl"
-                                aria-label="Ver detalle"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  setDetailRow(row);
+                                variant="subtle"
+                                onClick={() =>
+                                  setActiveFilters(
+                                    activeFilters.filter((f) => f.id !== filter.id)
+                                  )
+                                }
+                              >
+                                <IconX size={10} />
+                              </ActionIcon>
+                            }
+                          >
+                            {`${label} ${filter.operator} ${filter.value}${unit}`}
+                          </Badge>
+                        );
+                      })}
+                    </Group>
+                  ) : (
+                    <Text size="xs" c="dimmed" fs="italic">
+                      No hay filtros activos. Las métricas de los jugadores se compararán con los filtros que agregues arriba.
+                    </Text>
+                  )}
+                </Box>
+              </Stack>
+            </Paper>
+
+            {sortedTableData.length > 0 ? (
+              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
+                <Group justify="space-between" p="md" pb="xs" align="center">
+                  <Box>
+                    <Title order={4} fw={800} c="dark.4">
+                      Tabla de Filtros de Plantilla
+                    </Title>
+                    <Text size="xs" c="dimmed">
+                      {selectedDate === 'all' ? 'Temporada completa' : formatDate(currentDay)} · {sortedTableData.length} jugadores · Ordenado por:{' '}
+                      <Text span fw={700} c="grape.7">
+                        {sortField === 'alerts'
+                          ? 'Alertas'
+                          : sortField === 'name'
+                            ? 'Nombre'
+                            : sortField === 'posicion'
+                              ? 'Posición'
+                              : ALL_METRICS_MAP.get(sortField)?.label || sortField} ({sortDirection === 'asc' ? 'ascendente' : 'descendente'})
+                      </Text>
+                    </Text>
+                  </Box>
+                  {activeFilters.length > 0 && (
+                    <Badge variant="light" color="red" size="lg">
+                      {sortedTableData.filter((r) => r.totalAlerts > 0).length} de {sortedTableData.length} con alertas
+                    </Badge>
+                  )}
+                </Group>
+
+                <ScrollArea>
+                  <Table
+                    verticalSpacing="sm"
+                    highlightOnHover
+                    style={{ minWidth: 400 + (selectedDate === 'all' ? displayedMetrics.length * maxMeasurements * 90 : displayedMetrics.length * 110) }}
+                  >
+                    <Table.Thead bg="gray.0">
+                      <Table.Tr>
+                        <Table.Th
+                          style={{
+                            position: 'sticky',
+                            left: 0,
+                            background: 'var(--mantine-color-gray-0)',
+                            zIndex: 2,
+                            paddingLeft: 24,
+                            boxShadow: '2px 0 5px -2px rgba(0,0,0,0.15)',
+                          }}
+                        >
+                          <Text fz="xs" fw={700} c="dark.4">
+                            Jugador
+                          </Text>
+                        </Table.Th>
+
+                        <Table.Th w={100} style={{ textAlign: 'center' }}>
+                          <Text fz="xs" fw={700} c="dark.4">
+                            Alertas
+                          </Text>
+                        </Table.Th>
+
+                        {displayedMetrics.map((item) => {
+                          if (selectedDate === 'all') {
+                            return Array.from({ length: maxMeasurements }).map((_, idx) => (
+                              <Table.Th
+                                key={`${item.key}_${idx}`}
+                                style={{
+                                  whiteSpace: 'nowrap',
+                                  borderLeft: idx === 0 ? '1px solid var(--mantine-color-gray-3)' : undefined,
                                 }}
                               >
-                                <IconEye size={17} />
-                              </ActionIcon>
-                            </Tooltip>
-                            <Tooltip label="Abrir ficha" withArrow>
+                                <Group gap={6} wrap="nowrap">
+                                  <Box
+                                    style={{
+                                      width: 8,
+                                      height: 8,
+                                      borderRadius: '50%',
+                                      backgroundColor: item.color || '#adb5bd',
+                                      flexShrink: 0,
+                                    }}
+                                  />
+                                  <Stack gap={0}>
+                                    <Text fz="xs" fw={700} c="dark.4">
+                                      {item.label} {idx + 1}
+                                    </Text>
+                                    {item.unit && (
+                                      <Text fz="9px" c="dimmed" fw={500}>
+                                        ({item.unit})
+                                      </Text>
+                                    )}
+                                  </Stack>
+                                </Group>
+                              </Table.Th>
+                            ));
+                          }
+                          return (
+                            <Table.Th
+                              key={item.key}
+                              style={{ whiteSpace: 'nowrap' }}
+                            >
+                              <Group gap={6} wrap="nowrap">
+                                <Box
+                                  style={{
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: '50%',
+                                    backgroundColor: item.color || '#adb5bd',
+                                    flexShrink: 0,
+                                  }}
+                                />
+                                <Stack gap={0}>
+                                  <Text fz="xs" fw={700} c="dark.4">
+                                    {item.label}
+                                  </Text>
+                                  {item.unit && (
+                                    <Text fz="10px" c="dimmed" fw={500}>
+                                      ({item.unit})
+                                    </Text>
+                                  )}
+                                </Stack>
+                              </Group>
+                            </Table.Th>
+                          );
+                        })}
+
+                        <Table.Th w={80} style={{ textAlign: 'center' }}>Acción</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+
+                    <Table.Tbody>
+                      {sortedTableData.map((row) => (
+                        <Table.Tr
+                          key={selectedDate === 'all' ? `all-${row.id}` : `${row.id}-${currentDay}`}
+                          onClick={() => router.push(`/dashboard/jugador/${row.id}`)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <Table.Td
+                            style={{
+                              position: 'sticky',
+                              left: 0,
+                              background: 'white',
+                              zIndex: 1,
+                              paddingLeft: 24,
+                              boxShadow: '2px 0 5px -2px rgba(0,0,0,0.15)',
+                            }}
+                          >
+                            <Text fz="sm" fw={650} c="dark.4">
+                              {playerName(row)}
+                            </Text>
+                            <Text fz="xs" c="dimmed">
+                              {row.posicion || 'Sin posición'}
+                            </Text>
+                          </Table.Td>
+
+                          <Table.Td style={{ textAlign: 'center' }}>
+                            {row.totalAlerts > 0 ? (
+                              <Badge color="red" variant="filled" size="sm" radius="xl">
+                                {row.totalAlerts}
+                              </Badge>
+                            ) : (
+                              <Badge color="gray" variant="light" size="sm" radius="xl">
+                                0
+                              </Badge>
+                            )}
+                          </Table.Td>
+
+                          {displayedMetrics.map((item) => {
+                            if (selectedDate === 'all') {
+                              return Array.from({ length: maxMeasurements }).map((_, idx) => {
+                                const record = row.records[idx] || null;
+                                const value = record ? metricValue(record, item) : null;
+                                const matches = row.alertMatches[`${item.key}_${idx}`];
+                                const dateStr = record?.fecha ? formatShortDate(record.fecha) : '';
+
+                                return (
+                                  <Table.Td
+                                    key={`${item.key}_${idx}`}
+                                    style={{
+                                      borderLeft: idx === 0 ? '1px solid var(--mantine-color-gray-2)' : undefined,
+                                      ...(matches
+                                        ? {
+                                          backgroundColor: 'var(--mantine-color-red-0)',
+                                          color: 'var(--mantine-color-red-8)',
+                                          fontWeight: 700,
+                                          transition: 'background-color 0.2s ease',
+                                        }
+                                        : {}),
+                                    }}
+                                  >
+                                    <Stack gap={1} align="center">
+                                      <Text fz="sm" fw={matches ? 700 : 500} ta="center">
+                                        {metricDisplay(value, '')}
+                                      </Text>
+                                      {dateStr && (
+                                        <Text fz="9px" c="dimmed" fw={500} style={{ display: 'block' }} ta="center">
+                                          {dateStr}
+                                        </Text>
+                                      )}
+                                    </Stack>
+                                  </Table.Td>
+                                );
+                              });
+                            }
+
+                            const hasVal = row.measuredOnDay;
+                            const value = hasVal ? metricValue(row.measurement, item) : null;
+                            const matches = row.alertMatches[item.key];
+
+                            return (
+                              <Table.Td
+                                key={item.key}
+                                style={
+                                  matches
+                                    ? {
+                                      backgroundColor: 'var(--mantine-color-red-0)',
+                                      color: 'var(--mantine-color-red-8)',
+                                      fontWeight: 700,
+                                      transition: 'background-color 0.2s ease',
+                                    }
+                                    : undefined
+                                }
+                              >
+                                <Text fz="sm" fw={matches ? 700 : 500}>
+                                  {metricDisplay(value, '')}
+                                </Text>
+                              </Table.Td>
+                            );
+                          })}
+
+                          <Table.Td onClick={(e) => e.stopPropagation()} style={{ textAlign: 'center' }}>
+                            <Tooltip label="Ver mediciones" withArrow>
                               <ActionIcon
                                 component={Anchor}
                                 href={`/dashboard/jugador/${row.id}/metricas/mediciones`}
                                 variant="subtle"
                                 color="gray"
                                 radius="xl"
-                                aria-label="Abrir ficha"
-                                onClick={(event) => event.stopPropagation()}
+                                aria-label="Ver mediciones"
                               >
                                 <IconExternalLink size={17} />
                               </ActionIcon>
                             </Tooltip>
-                          </Group>
-                        </Table.Td>
-                      </Table.Tr>
-                    ))}
-                  </Table.Tbody>
-                </Table>
-              </ScrollArea>
-            </Paper>
-          )}
+                          </Table.Td>
+                        </Table.Tr>
+                      ))}
+                    </Table.Tbody>
+                  </Table>
+                </ScrollArea>
+              </Paper>
+            ) : (
+              <NothingFound
+                withPaper
+                icon={IconFilter}
+                title="Sin datos"
+                description="No hay jugadores medidos con la métrica seleccionada para los filtros de posición y temporada actuales."
+              />
+            )}
+          </Stack>
+        )}
 
-          {missingDayRows.length > 0 && (
-            <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
-              <Group justify="space-between" p="md" pb="xs" align="center">
-                <Box>
-                  <Title order={4} fw={800} c="dark.4">Sin medición ese día</Title>
-                  <Text size="xs" c="dimmed">{missingDayRows.length} jugadores sin registro en {formatDate(currentDay)}</Text>
-                </Box>
-                <Badge variant="light" color="gray">{missingDayRows.length}</Badge>
-              </Group>
-              <ScrollArea.Autosize mah={260}>
-                <Table verticalSpacing="sm" highlightOnHover>
-                  <Table.Thead bg="gray.0">
-                    <Table.Tr>
-                      <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
-                      <Table.Th>Última medición</Table.Th>
-                      <Table.Th>Registros</Table.Th>
-                      <Table.Th>Acción</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {missingDayRows.map((row) => (
-                      <Table.Tr key={`missing-${row.id}`}>
-                        <Table.Td style={{ paddingLeft: 24 }}>
-                          <Text fz="sm" fw={650} c="dark.4">{playerName(row)}</Text>
-                          <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
-                        </Table.Td>
-                        <Table.Td>{formatDate(row.latest?.fecha)}</Table.Td>
-                        <Table.Td>{row.records.length}</Table.Td>
-                        <Table.Td>
-                          <Button
-                            component={Anchor}
-                            href={`/dashboard/jugador/${row.id}/metricas/mediciones`}
-                            size="xs"
-                            radius="xl"
-                            variant="light"
-                            color="gray"
-                            leftSection={<IconExternalLink size={14} />}
-                          >
-                            Abrir ficha
-                          </Button>
-                        </Table.Td>
-                      </Table.Tr>
-                    ))}
-                  </Table.Tbody>
-                </Table>
-              </ScrollArea.Autosize>
-            </Paper>
-          )}
-        </>
-      )}
-
-      {viewMode === 'ranking' && (
-        <Stack gap="lg">
-          <Paper p="md" radius="lg" withBorder bg="white">
-            <Stack gap="md">
-              <Text size="sm" fw={800} c="dark.4" tt="uppercase">
-                Configurar Filtros de Alerta
-              </Text>
-              
-              <Group gap="md" align="flex-end" wrap="wrap">
-                <Box style={{ flex: 1, minWidth: 200 }}>
-                  <Text size="xs" fw={700} c="dimmed" mb={5}>MÉTRICA</Text>
-                  <Select
-                    placeholder="Selecciona una métrica..."
-                    leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
-                    data={filterMetricOptions}
-                    value={newFilterMetric}
-                    onChange={(value) => {
-                      setNewFilterMetric(value || '');
-                      setNewFilterValue('');
-                    }}
-                    variant="filled"
-                    radius="xl"
-                    size="sm"
-                    searchable
-                    allowDeselect={false}
-                  />
-                </Box>
-
-                <Box style={{ width: 150 }}>
-                  <Text size="xs" fw={700} c="dimmed" mb={5}>CONDICIÓN</Text>
-                  <Select
-                    placeholder="Condición"
-                    data={[
-                      { value: '>', label: 'Mayor que (>)' },
-                      { value: '<', label: 'Menor que (<)' },
-                      { value: '>=', label: 'Mayor o igual (>=)' },
-                      { value: '<=', label: 'Menor o igual (<=)' },
-                      { value: '=', label: 'Igual a (=)' },
-                    ]}
-                    value={newFilterOperator}
-                    onChange={(value) => setNewFilterOperator(value || '>')}
-                    disabled={!newFilterMetric}
-                    variant="filled"
-                    radius="xl"
-                    size="sm"
-                    allowDeselect={false}
-                  />
-                </Box>
-
-                <Box style={{ width: 130 }}>
-                  <Text size="xs" fw={700} c="dimmed" mb={5}>UMBRAL</Text>
-                  <TextInput
-                    placeholder={
-                      ALL_METRICS_MAP.get(newFilterMetric)?.unit
-                        ? `Ej: 10`
-                        : 'Valor'
-                    }
-                    rightSection={
-                      ALL_METRICS_MAP.get(newFilterMetric)?.unit ? (
-                        <Text size="xs" c="dimmed" pr="xs">
-                          {ALL_METRICS_MAP.get(newFilterMetric).unit}
-                        </Text>
-                      ) : null
-                    }
-                    value={newFilterValue}
-                    onChange={(event) => setNewFilterValue(event.currentTarget.value)}
-                    disabled={!newFilterMetric}
-                    type="number"
-                    step="any"
-                    variant="filled"
-                    radius="xl"
-                    size="sm"
-                  />
-                </Box>
-
-                <Button
-                  color="grape"
-                  radius="xl"
-                  size="sm"
-                  leftSection={<IconPlus size={16} />}
-                  onClick={() => {
-                    if (!newFilterMetric || newFilterValue === '') return;
-                    const id = Date.now().toString();
-                    setActiveFilters([
-                      ...activeFilters,
-                      {
-                        id,
-                        metric: newFilterMetric,
-                        operator: newFilterOperator,
-                        value: newFilterValue,
-                      },
-                    ]);
-                    setNewFilterValue('');
-                  }}
-                  disabled={!newFilterMetric || newFilterValue === ''}
-                >
-                  Añadir Filtro
-                </Button>
-
-                <Box style={{ width: 220 }}>
-                  <Text size="xs" fw={700} c="dimmed" mb={5}>ORDENAR POR</Text>
-                  <Select
-                    placeholder="Ordenar por..."
-                    data={sortOptions}
-                    value={`${sortField}_${sortDirection}`}
-                    onChange={handleSortOptionChange}
-                    variant="filled"
-                    radius="xl"
-                    size="sm"
-                    allowDeselect={false}
-                  />
-                </Box>
-              </Group>
-
-              <Box mt="xs">
-                <Text size="xs" fw={700} c="dimmed" mb={8}>
-                  FILTROS ACTIVOS ({activeFilters.length})
-                </Text>
-                {activeFilters.length > 0 ? (
-                  <Group gap="xs" wrap="wrap">
-                    {activeFilters.map((filter) => {
-                      const config = ALL_METRICS_MAP.get(filter.metric);
-                      const label = config ? config.label : filter.metric;
-                      const unit = config?.unit ? ` ${config.unit}` : '';
-                      return (
-                        <Badge
-                          key={filter.id}
-                          variant="light"
-                          color="red"
-                          size="lg"
-                          radius="xl"
-                          pr={3}
-                          rightSection={
-                            <ActionIcon
-                              size="xs"
-                              color="red"
-                              radius="xl"
-                              variant="subtle"
-                              onClick={() =>
-                                setActiveFilters(
-                                  activeFilters.filter((f) => f.id !== filter.id)
-                                )
-                              }
-                            >
-                              <IconX size={10} />
-                            </ActionIcon>
-                          }
-                        >
-                          {`${label} ${filter.operator} ${filter.value}${unit}`}
-                        </Badge>
-                      );
-                    })}
-                  </Group>
-                ) : (
-                  <Text size="xs" c="dimmed" fs="italic">
-                    No hay filtros activos. Las métricas de los jugadores se compararán con los filtros que agregues arriba.
-                  </Text>
-                )}
-              </Box>
-            </Stack>
-          </Paper>
-
-          {sortedTableData.length > 0 ? (
-            <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
-              <Group justify="space-between" p="md" pb="xs" align="center">
-                <Box>
-                  <Title order={4} fw={800} c="dark.4">
-                    Tabla de Filtros de Plantilla
-                  </Title>
-                  <Text size="xs" c="dimmed">
-                    {formatDate(currentDay)} · {sortedTableData.length} jugadores · Ordenado por:{' '}
-                    <Text span fw={700} c="grape.7">
-                      {sortField === 'alerts'
-                        ? 'Alertas'
-                        : sortField === 'name'
-                        ? 'Nombre'
-                        : sortField === 'posicion'
-                        ? 'Posición'
-                        : ALL_METRICS_MAP.get(sortField)?.label || sortField} ({sortDirection === 'asc' ? 'ascendente' : 'descendente'})
-                    </Text>
-                  </Text>
-                </Box>
-                {activeFilters.length > 0 && (
-                  <Badge variant="light" color="red" size="lg">
-                    {sortedTableData.filter((r) => r.totalAlerts > 0).length} de {sortedTableData.length} con alertas
-                  </Badge>
-                )}
-              </Group>
-
-              <ScrollArea>
-                <Table
-                  verticalSpacing="sm"
-                  highlightOnHover
-                  style={{ minWidth: 400 + displayedMetrics.length * 110 }}
-                >
-                  <Table.Thead bg="gray.0">
-                    <Table.Tr>
-                      <Table.Th style={{ paddingLeft: 24 }}>
-                        <Text fz="xs" fw={700} c="dark.4">
-                          Jugador
-                        </Text>
-                      </Table.Th>
-
-                      <Table.Th w={100} style={{ textAlign: 'center' }}>
-                        <Text fz="xs" fw={700} c="dark.4">
-                          Alertas
-                        </Text>
-                      </Table.Th>
-
-                      {displayedMetrics.map((item) => {
-                        return (
-                          <Table.Th
-                            key={item.key}
-                            style={{ whiteSpace: 'nowrap' }}
-                          >
-                            <Group gap={6} wrap="nowrap">
-                              <Box
-                                style={{
-                                  width: 8,
-                                  height: 8,
-                                  borderRadius: '50%',
-                                  backgroundColor: item.color || '#adb5bd',
-                                  flexShrink: 0,
-                                }}
-                              />
-                              <Stack gap={0}>
-                                <Text fz="xs" fw={700} c="dark.4">
-                                  {item.label}
-                                </Text>
-                                {item.unit && (
-                                  <Text fz="10px" c="dimmed" fw={500}>
-                                    ({item.unit})
-                                  </Text>
-                                )}
-                              </Stack>
-                            </Group>
-                          </Table.Th>
-                        );
-                      })}
-
-                      <Table.Th w={80} style={{ textAlign: 'center' }}>Acción</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-
-                  <Table.Tbody>
-                    {sortedTableData.map((row) => (
-                      <Table.Tr
-                        key={`${row.id}-${currentDay}`}
-                        onClick={() => router.push(`/dashboard/jugador/${row.id}`)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <Table.Td style={{ paddingLeft: 24 }}>
-                          <Text fz="sm" fw={650} c="dark.4">
-                            {playerName(row)}
-                          </Text>
-                          <Text fz="xs" c="dimmed">
-                            {row.posicion || 'Sin posición'}
-                          </Text>
-                        </Table.Td>
-
-                        <Table.Td style={{ textAlign: 'center' }}>
-                          {row.totalAlerts > 0 ? (
-                            <Badge color="red" variant="filled" size="sm" radius="xl">
-                              {row.totalAlerts}
-                            </Badge>
-                          ) : (
-                            <Badge color="gray" variant="light" size="sm" radius="xl">
-                              0
-                            </Badge>
-                          )}
-                        </Table.Td>
-
-                        {displayedMetrics.map((item) => {
-                          const hasVal = row.measuredOnDay;
-                          const value = hasVal ? metricValue(row.measurement, item) : null;
-                          const matches = row.alertMatches[item.key];
-
-                          return (
-                            <Table.Td
-                              key={item.key}
-                              style={
-                                matches
-                                  ? {
-                                      backgroundColor: 'var(--mantine-color-red-0)',
-                                      color: 'var(--mantine-color-red-8)',
-                                      fontWeight: 700,
-                                      transition: 'background-color 0.2s ease',
-                                    }
-                                  : undefined
-                              }
-                            >
-                              <Text fz="sm" fw={matches ? 700 : 500}>
-                                {metricDisplay(value, '')}
-                              </Text>
-                            </Table.Td>
-                          );
-                        })}
-
-                        <Table.Td onClick={(e) => e.stopPropagation()} style={{ textAlign: 'center' }}>
-                          <Tooltip label="Ver mediciones" withArrow>
-                            <ActionIcon
-                              component={Anchor}
-                              href={`/dashboard/jugador/${row.id}/metricas/mediciones`}
-                              variant="subtle"
-                              color="gray"
-                              radius="xl"
-                              aria-label="Ver mediciones"
-                            >
-                              <IconExternalLink size={17} />
-                            </ActionIcon>
-                          </Tooltip>
-                        </Table.Td>
-                      </Table.Tr>
-                    ))}
-                  </Table.Tbody>
-                </Table>
-              </ScrollArea>
-            </Paper>
-          ) : (
-            <NothingFound
-              withPaper
-              icon={IconFilter}
-              title="Sin datos"
-              description="No hay jugadores medidos con la métrica seleccionada para los filtros de posición y temporada actuales."
-            />
-          )}
-        </Stack>
-      )}
-
-      <MeasurementDetailModal
-        opened={Boolean(detailRow)}
-        onClose={() => setDetailRow(null)}
-        detailRow={detailRow}
-        detailMeasurement={detailMeasurement}
-        detailPrevious={detailPrevious}
-        playerName={playerName}
-        formatDate={formatDate}
-        sourceRows={sourceRows}
-        metricValue={metricValue}
-        deltaFor={deltaFor}
-        hasMetricValue={hasMetricValue}
-        metricDisplay={metricDisplay}
-        deltaColor={deltaColor}
-        displayRawValue={displayRawValue}
-        detailRawEntries={detailRawEntries}
-        METRICS={METRICS}
-        MEASUREMENT_DETAIL_SECTIONS={MEASUREMENT_DETAIL_SECTIONS}
-      />
+        <MeasurementDetailModal
+          opened={Boolean(detailRow)}
+          onClose={() => setDetailRow(null)}
+          detailRow={detailRow}
+          detailMeasurement={detailMeasurement}
+          detailPrevious={detailPrevious}
+          playerName={playerName}
+          formatDate={formatDate}
+          sourceRows={sourceRows}
+          metricValue={metricValue}
+          deltaFor={deltaFor}
+          hasMetricValue={hasMetricValue}
+          metricDisplay={metricDisplay}
+          deltaColor={deltaColor}
+          displayRawValue={displayRawValue}
+          detailRawEntries={detailRawEntries}
+          METRICS={METRICS}
+          MEASUREMENT_DETAIL_SECTIONS={MEASUREMENT_DETAIL_SECTIONS}
+        />
       </Stack>
     </BoneyardSkeleton>
   );
