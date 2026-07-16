@@ -54,7 +54,7 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
               leftSection={<IconPlus size={14} />}
               onClick={open}
             >
-              Nuevo mensaje
+              Nuevo
             </Button>
           )}
         </Group>

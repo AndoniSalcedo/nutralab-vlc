@@ -747,7 +747,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                   loading={actionType === 'download'}
                   fullWidth={isMobile}
                 >
-                  Descargar PDF
+                  Descargar
                 </Button>
               )}
               {!readOnly && (
@@ -763,7 +763,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                       loading={deleting}
                       fullWidth={isMobile}
                     >
-                      Eliminar actual
+                      Eliminar
                     </Button>
                   )}
                   {currentPlan && mode === 'view' && (
@@ -775,11 +775,11 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                       onClick={startEdit}
                       fullWidth={isMobile}
                     >
-                      Editar actual
+                      Editar
                     </Button>
                   )}
                   <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={openCreateModal} fullWidth={isMobile}>
-                    Crear ficha
+                    Crear
                   </Button>
                 </>
               )}
