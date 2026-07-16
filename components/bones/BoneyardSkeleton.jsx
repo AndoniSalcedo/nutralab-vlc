@@ -12,6 +12,7 @@ import _team_menu from './team-menu.bones.json';
 import _team_analytics from './team-analytics.bones.json';
 import _team_config from './team-config.bones.json';
 import _player_dashboard from './player-dashboard.bones.json';
+import _diario_comidas from './diario-comidas.bones.json';
 
 const bonesMap = {
   'teams-list': _teams_list,
@@ -22,6 +23,7 @@ const bonesMap = {
   'team-analytics': _team_analytics,
   'team-config': _team_config,
   'player-dashboard': _player_dashboard,
+  'diario-comidas': _diario_comidas,
 };
 
 function normalizeBone(b) {

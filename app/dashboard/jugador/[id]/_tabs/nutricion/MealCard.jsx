@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
-import { AspectRatio, Badge, Box, Group, Image, Paper, Stack, Text, ActionIcon, Tooltip, Collapse } from "@mantine/core";
+import { AspectRatio, Badge, Box, Group, Image, Paper, Stack, Text, ActionIcon, Tooltip, Collapse, useMantineTheme, useComputedColorScheme } from "@mantine/core";
 import { IconClock, IconEdit, IconTrash } from "@tabler/icons-react";
-import MealCardSkeleton from "@/components/skeletons/MealCardSkeleton";
 import foods from "@/data/foods";
 
 const calcNutrient = (food, grams, key) => {
@@ -24,6 +23,62 @@ const MEAL_META = {
 
 function metaFor(mealType) {
   return MEAL_META[mealType] || { label: mealType || '—', color: 'gray' };
+}
+
+const PLACEHOLDER_EMOJIS = {
+  breakfast: '🍳',
+  midMorning: '🥪',
+  lunch: '🍽️',
+  snack: '🧁',
+  dinner: '🍲',
+  lateSnack: '🌙',
+};
+
+function MealCardPlaceholder({ mealType }) {
+  const { label } = metaFor(mealType);
+  const emoji = PLACEHOLDER_EMOJIS[mealType] || '🥗';
+  const theme = useMantineTheme();
+  const computedColorScheme = useComputedColorScheme('light');
+
+  const brand = theme.colors.nutralabColor || [
+    "#f5f6ef","#e5e6e0","#d1d2ca","#b8baad","#a2a594",
+    "#949784","#8d917a","#7a7d68","#6c705a","#5c6049",
+  ];
+
+  const isDark = computedColorScheme === "dark";
+  const base   = isDark ? brand[8] : brand[1];
+  const accent = isDark ? brand[9] : brand[4];
+  const textColor = isDark ? theme.colors.gray[2] : theme.colors.dark[7];
+
+  return (
+    <Box
+      style={{
+        width: "100%",
+        height: "100%",
+        background: `linear-gradient(135deg, ${base}, ${accent})`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        borderRadius: theme.radius.md,
+      }}
+    >
+      <Box
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0, rgba(255,255,255,.06) 2px, transparent 2px, transparent 14px)",
+          opacity: isDark ? 0.4 : 0.3,
+          borderRadius: theme.radius.md,
+        }}
+      />
+      <Stack align="center" gap={2} style={{ zIndex: 1 }}>
+        <Text fz={42} style={{ lineHeight: 1 }}>{emoji}</Text>
+        <Text fz="xs" style={{ color: textColor }}>{label}</Text>
+      </Stack>
+    </Box>
+  );
 }
 
 export default function MealCard({ m, onOpen, onEdit, onDelete }) {
@@ -97,7 +152,7 @@ export default function MealCard({ m, onOpen, onEdit, onDelete }) {
           {m.photoUrl ? (
             <Image src={m.photoUrl} alt={label} fit="cover" />
           ) : (
-            <MealCardSkeleton mealType={m.mealType} />
+            <MealCardPlaceholder mealType={m.mealType} />
           )}
         </AspectRatio>
 

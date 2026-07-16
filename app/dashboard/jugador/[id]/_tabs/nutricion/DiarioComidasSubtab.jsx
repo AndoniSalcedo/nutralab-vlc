@@ -11,7 +11,6 @@ import {
   SimpleGrid,
   Title,
   Paper,
-  Skeleton,
   ThemeIcon
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -24,6 +23,7 @@ import MealCard from './MealCard';
 import ImageViewerModal from '@/components/modals/ImageViewerModal';
 import MealEditorModal from '@/components/modals/MealEditorModal';
 import ConfirmModal from '@/components/modals/ConfirmModal';
+import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 function groupByDate(items) {
   const map = new Map();
@@ -60,9 +60,9 @@ const MEAL_TYPES = [
   { value: 'lateSnack', label: 'Re-cena' },
 ];
 
-export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
-  const [loading, setLoading] = useState(true);
-  const [meals, setMeals] = useState([]);
+export default function DiarioComidasSubtab({ jugador, readOnly = false, initialMeals }) {
+  const [loading, setLoading] = useState(initialMeals ? false : true);
+  const [meals, setMeals] = useState(initialMeals || []);
   
   const [viewer, setViewer] = useState({ open: false, src: '', caption: '' });
   const [mealType, setMealType] = useState('');
@@ -74,6 +74,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
   const [reload, setReload] = useState(0);
 
   useEffect(() => {
+    if (initialMeals && reload === 0) return;
     let alive = true;
     setLoading(true);
     (async () => {
@@ -212,11 +213,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
             {/* 2. LISTA DE COMIDAS */}
             <Stack gap="lg">
               {loading ? (
-                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-                   <Skeleton h={280} radius="xl" animate /> 
-                   <Skeleton h={280} radius="xl" animate />
-                   <Skeleton h={280} radius="xl" animate />
-                 </SimpleGrid>
+                <BoneyardSkeleton name="diario-comidas" loading={true} />
               ) : meals.length === 0 ? (
                 <Box mt="xl">
                   <NothingFound
