@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Text } from '@mantine/core';
-import MealForm from '@/app/dashboard/jugador/[id]/_tabs/nutricion/MealForm';
+import MealForm from '@/components/forms/MealForm';
 
 export default function MealEditorModal({
   opened,

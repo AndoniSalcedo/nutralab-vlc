@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Group, Text } from '@mantine/core';
 import { IconPencil } from '@tabler/icons-react';
-import PlayerForm from '@/components/PlayerForm';
+import PlayerForm from '@/components/forms/PlayerForm';
 
 export default function PlayerEditModal({
   opened,

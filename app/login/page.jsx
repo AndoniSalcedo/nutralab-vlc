@@ -1,6 +1,6 @@
 import { getUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import LoginForm from './LoginForm';
+import LoginForm from '@/components/forms/LoginForm';
 
 export default async function LoginPage() {
   const user = await getUser();

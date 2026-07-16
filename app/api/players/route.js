@@ -10,6 +10,7 @@ import {
   updatePlayer,
   insertPlayer
 } from '@/repositories/playerRepository';
+import { insertEvolution } from '@/repositories/evolutionRepository';
 
 
 export async function POST(request) {
@@ -55,27 +56,42 @@ export async function POST(request) {
     nombre: String(form.get('nombre') || ''),
     apellidos: String(form.get('apellidos') || ''),
     posicion: String(form.get('posicion') || ''),
-    factor_actividad: toNumber(form.get('factor_actividad')),
+    club: form.get('club') ? String(form.get('club')) : null,
+    fecha_nacimiento: form.get('fecha_nacimiento') ? String(form.get('fecha_nacimiento')) : null,
+    factor_actividad: form.get('factor_actividad') ? toNumber(form.get('factor_actividad')) : 1.55,
+    num_comidas: form.get('num_comidas') ? String(form.get('num_comidas')) : DEFAULT_PLAYER_MEALS_STRING,
+    preentreno: form.get('preentreno') === 'true',
+    postentreno: form.get('postentreno') === 'true',
     gustos_preferencias: String(form.get('gustos_preferencias') || ''),
     contexto_clinico: String(form.get('contexto_clinico') || ''),
+    aversiones: String(form.get('aversiones') || ''),
+    intolerancias: String(form.get('intolerancias') || ''),
+    alergias: String(form.get('alergias') || ''),
     objetivo: String(form.get('objetivo') || ''),
-    kcal_objetivo: toNumber(form.get('kcal_objetivo')),
-    cho_objetivo_g: toNumber(form.get('cho_objetivo_g')),
-    proteina_objetivo_g: toNumber(form.get('proteina_objetivo_g')),
-    grasa_objetivo_g: toNumber(form.get('grasa_objetivo_g')),
-    agua_objetivo_ml: toNumber(form.get('agua_objetivo_ml')),
+    kcal_objetivo: form.get('kcal_objetivo') ? toNumber(form.get('kcal_objetivo')) : null,
+    cho_objetivo_g: form.get('cho_objetivo_g') ? toNumber(form.get('cho_objetivo_g')) : null,
+    proteina_objetivo_g: form.get('proteina_objetivo_g') ? toNumber(form.get('proteina_objetivo_g')) : null,
+    grasa_objetivo_g: form.get('grasa_objetivo_g') ? toNumber(form.get('grasa_objetivo_g')) : null,
+    agua_objetivo_ml: form.get('agua_objetivo_ml') ? toNumber(form.get('agua_objetivo_ml')) : null,
   };
 
   if (id) {
     await updatePlayer(supabase, id, payload);
   } else {
-    const insertPayload = {
-      ...payload,
-      num_comidas: DEFAULT_PLAYER_MEALS_STRING,
-      preentreno: false,
-      postentreno: false,
-    };
-    await insertPlayer(supabase, insertPayload);
+    const newPlayer = await insertPlayer(supabase, payload);
+
+    const initialWeight = form.get('initial_weight') ? toNumber(form.get('initial_weight')) : null;
+    const initialHeight = form.get('initial_height') ? toNumber(form.get('initial_height')) : null;
+
+    if (newPlayer?.id && (initialWeight !== null || initialHeight !== null)) {
+      await insertEvolution(supabase, {
+        jugador_id: newPlayer.id,
+        fecha: new Date().toISOString().split('T')[0],
+        peso_kg: initialWeight,
+        altura_cm: initialHeight,
+        notas: 'Medición inicial al crear jugador',
+      });
+    }
   }
 
   return NextResponse.redirect(new URL(`/dashboard/equipo/${targetTeam.id}`, request.url), 303);

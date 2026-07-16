@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Group, Text } from '@mantine/core';
 import { IconMail } from '@tabler/icons-react';
-import MessageComposer from '@/components/MessageComposer';
+import MessageComposerForm from '@/components/forms/MessageComposerForm';
 
 export default function SendMessageModal({
   opened,
@@ -26,7 +26,7 @@ export default function SendMessageModal({
       radius="lg"
       overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
     >
-      <MessageComposer
+      <MessageComposerForm
         players={players}
         team={team}
         onSent={onSent}

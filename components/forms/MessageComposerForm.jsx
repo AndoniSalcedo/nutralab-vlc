@@ -7,7 +7,7 @@ import { IconSend } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { sendMessage } from '@/services/message';
 
-export default function MessageComposer({
+export default function MessageComposerForm({
   players = [],
   defaultRecipientIds = [],
   forceRecipients = false,

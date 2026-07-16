@@ -91,7 +91,7 @@ export default function LoginForm() {
             backdropFilter: isMobile ? 'none' : 'blur(18px)',
           }}
         >
-          <SimpleGrid cols={{ base: 1, md: 2 }} spacing={0}>
+          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="0">
             <Box
               visibleFrom="md"
               p={{ base: 10, sm: 22, md: 34 }}
