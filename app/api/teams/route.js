@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { forbidden, getOwnedTeam, getOwnerId } from '@/lib/team-access';
-import { insertTeam, deleteTeam } from '@/repositories/teamRepository';
+import { insertTeam, deleteTeam, updateTeam } from '@/repositories/teamRepository';
 import { getPlayersByTeam, insertPlayer } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIdOrdered, insertEvolutionsBulk } from '@/repositories/evolutionRepository';
 
@@ -76,6 +76,23 @@ export async function POST(request) {
 
       await deleteTeam(supabase, team.id);
       return NextResponse.json({ ok: true });
+    }
+
+    if (action === 'update') {
+      const teamId = clean(body.team_id);
+      const nombre = clean(body.nombre);
+      const temporada = clean(body.temporada);
+      const descripcion = clean(body.descripcion) || null;
+
+      if (!nombre) {
+        return NextResponse.json({ error: 'El nombre del equipo es obligatorio' }, { status: 400 });
+      }
+
+      const team = await getOwnedTeam(supabase, user, teamId);
+      if (!team) return forbidden('No tienes acceso a este equipo');
+
+      const data = await updateTeam(supabase, team.id, { nombre, temporada, descripcion });
+      return NextResponse.json({ equipo: data }, { status: 200 });
     }
 
     if (action === 'copy_season') {

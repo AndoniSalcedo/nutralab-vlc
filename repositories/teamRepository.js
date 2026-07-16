@@ -93,3 +93,15 @@ export async function updateTeamConfig(supabase, teamId, configuracion_nutricion
   if (error) throw error;
   return true;
 }
+
+export async function updateTeam(supabase, teamId, { nombre, temporada, descripcion }) {
+  const { data, error } = await supabase
+    .from('equipos')
+    .update({ nombre, temporada, descripcion })
+    .eq('id', teamId)
+    .select('*')
+    .single();
+
+  if (error) throw error;
+  return data;
+}
