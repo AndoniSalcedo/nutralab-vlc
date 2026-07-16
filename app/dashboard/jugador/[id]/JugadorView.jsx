@@ -12,6 +12,7 @@ import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
 import { getMenusByTeam } from '@/repositories/menuRepository';
 import { getHydrationRecordsByPlayerId } from '@/repositories/hydrationRepository';
 import { getMessages } from '@/repositories/messagesRepository';
+import { Stack, Text, Anchor } from '@mantine/core';
 
 export default async function JugadorView({ id, activeTab = 'resumen', activeSubtab }) {
   const supabase = getSupabaseAdmin();

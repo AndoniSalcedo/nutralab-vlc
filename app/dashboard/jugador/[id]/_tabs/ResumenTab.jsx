@@ -5,7 +5,7 @@ import { IconMail, IconUser, IconCalendar } from '@tabler/icons-react';
 import { tabLabel } from './tab-label';
 import MensajesSubtab from './resumen/MensajesSubtab';
 import PerfilSubtab from './resumen/PerfilSubtab';
-import DiarioComidasSubtab from './nutricion/DiarioComidasSubtab';
+import DiarioComidasSubtab from './resumen/DiarioComidasSubtab';
 
 export default function ResumenTab({ jugador, evoluciones = [], messages = [], activeSubtab, onSubtabChange, readOnly = false }) {
   return (

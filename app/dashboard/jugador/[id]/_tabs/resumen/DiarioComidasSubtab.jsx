@@ -19,7 +19,7 @@ import { IconPlus, IconPhoto, IconCalendar } from '@tabler/icons-react';
 
 import NothingFound from '@/components/NothingFound';
 import { deletePlayerMeal, listPlayerMeals } from '@/services/meal';
-import MealCard from './MealCard';
+import MealCard from '@/components/MealCard';
 import ImageViewerModal from '@/components/modals/ImageViewerModal';
 import MealEditorModal from '@/components/modals/MealEditorModal';
 import ConfirmModal from '@/components/modals/ConfirmModal';

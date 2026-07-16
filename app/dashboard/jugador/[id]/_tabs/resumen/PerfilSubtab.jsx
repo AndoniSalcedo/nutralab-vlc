@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Group,
@@ -11,13 +11,84 @@ import {
   ThemeIcon,
   Title,
   Badge,
-  ActionIcon
+  ActionIcon,
+  RingProgress,
+  Progress,
+  Button,
+  Center,
+  Loader
 } from '@mantine/core';
 
-import { IconClipboardList, IconTargetArrow, IconUser, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import {
+  IconClipboardList,
+  IconTargetArrow,
+  IconUser,
+  IconChevronLeft,
+  IconChevronRight,
+  IconFlame,
+  IconCheck,
+  IconPlus
+} from '@tabler/icons-react';
+import { useRouter } from 'next/navigation';
 import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES, getObjectiveLabel } from '@/lib/calculations';
 import { CampoEditable, ComidasEditable } from '../editable';
 import { latestMetricValue } from '@/lib/player-metrics';
+import { listPlayerMeals } from '@/services/meal';
+import foods from '@/data/foods';
+
+const calcNutrient = (food, grams, key) => {
+  const value = Number(food?.[key]);
+  const qty = Number(grams);
+  if (!Number.isFinite(value) || !Number.isFinite(qty)) return 0;
+  return (value * qty) / 100;
+};
+
+const roundMacro = (value) => Math.round(value * 10) / 10;
+
+function calculateConsumedStats(meals) {
+  let kcal = 0;
+  let cho = 0;
+  let pro = 0;
+  let fat = 0;
+
+  meals.forEach((meal) => {
+    // 1. Calories - sum up explicit meal.calories if present
+    if (meal.calories != null && Number.isFinite(Number(meal.calories))) {
+      kcal += Number(meal.calories);
+    }
+
+    // 2. Parse ingredients to get macros (and calories if meal.calories is not set)
+    if (Array.isArray(meal.ingredients)) {
+      let tempKcal = 0;
+      meal.ingredients.forEach((ingredientStr) => {
+        const match = ingredientStr.match(/^(.+?)\s*\((\d+(?:\.\d+)?)\s*g\)$/i);
+        if (match) {
+          const foodName = match[1].trim();
+          const grams = parseFloat(match[2]);
+          const foundFood = foods.find(f => f.name.toLowerCase() === foodName.toLowerCase());
+          if (foundFood && !isNaN(grams)) {
+            tempKcal += calcNutrient(foundFood, grams, 'kcal');
+            cho += calcNutrient(foundFood, grams, 'cho');
+            pro += calcNutrient(foundFood, grams, 'pro');
+            fat += calcNutrient(foundFood, grams, 'fat');
+          }
+        }
+      });
+      
+      // If the meal had no explicit calories, we sum up the parsed ingredients' calories
+      if (meal.calories == null || !Number.isFinite(Number(meal.calories))) {
+        kcal += tempKcal;
+      }
+    }
+  });
+
+  return {
+    kcal: Math.round(kcal),
+    cho: roundMacro(cho),
+    pro: roundMacro(pro),
+    fat: roundMacro(fat),
+  };
+}
 
 function StatCard({ label, value, order = 2, subtext }) {
   return (
@@ -30,6 +101,38 @@ function StatCard({ label, value, order = 2, subtext }) {
 }
 
 export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = false }) {
+  const router = useRouter();
+  const [meals, setMeals] = useState([]);
+  const [loadingMeals, setLoadingMeals] = useState(true);
+
+  useEffect(() => {
+    if (!jugador?.id) return;
+    let active = true;
+    setLoadingMeals(true);
+
+    const todayStr = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Madrid' });
+
+    listPlayerMeals(jugador.id, { day: todayStr })
+      .then((data) => {
+        if (active) {
+          setMeals(data || []);
+          setLoadingMeals(false);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching today\'s meals:', err);
+        if (active) {
+          setLoadingMeals(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [jugador?.id]);
+
+  const consumed = useMemo(() => calculateConsumedStats(meals), [meals]);
+
   const pesoActual = latestMetricValue(evoluciones, 'peso_kg', jugador?.peso_kg);
   const weightKg = Number(pesoActual || 0);
 
@@ -110,6 +213,179 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
       {/* Content wrapper */}
       <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         <Stack gap="md">
+          {/* Daily Tracker / Consumo de Hoy */}
+          <Paper p={{ base: 'md', sm: 'lg' }} bg="white" shadow="xs" radius="lg" withBorder>
+            <Group justify="space-between" align="center" wrap="wrap" mb="md" gap="md">
+              <Group gap="xs">
+                <ThemeIcon color="orange" variant="light" radius="xl" size="lg">
+                  <IconFlame size={20} />
+                </ThemeIcon>
+                <Box>
+                  <Title order={3} fw={800} c="dark.4">Progreso de Hoy</Title>
+                  <Text size="sm" c="dimmed">
+                    Tu registro y balance nutricional acumulado para el día de hoy.
+                  </Text>
+                </Box>
+              </Group>
+              {readOnly && (
+                <Button
+                  variant="light"
+                  color="blue"
+                  size="xs"
+                  radius="md"
+                  leftSection={<IconPlus size={16} />}
+                  onClick={() => router.replace(`/dashboard/jugador/${jugador.id}/resumen/diario`)}
+                >
+                  Registrar comida
+                </Button>
+              )}
+            </Group>
+
+            {loadingMeals ? (
+              <Center py="xl">
+                <Loader size="md" color="orange" />
+              </Center>
+            ) : (
+              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl" mt="md">
+                {/* Calorías (Circular Progress) */}
+                <Paper withBorder p="md" radius="md" bg="gray.0">
+                  <Group justify="center" gap="lg" align="center" style={{ height: '100%' }} wrap="wrap">
+                    <RingProgress
+                      size={140}
+                      thickness={12}
+                      roundCaps
+                      sections={[
+                        {
+                          value: kcal && Number(kcal) > 0 ? Math.min(100, Math.round((consumed.kcal / Number(kcal)) * 100)) : 0,
+                          color: kcal && Number(kcal) > 0 && consumed.kcal >= Number(kcal) ? 'green.6' : 'orange.6'
+                        }
+                      ]}
+                      label={
+                        <Center>
+                          <Stack gap={0} align="center">
+                            <Text size="xl" fw={800} c="dark.4" lh={1.2}>
+                              {kcal && Number(kcal) > 0 ? Math.min(100, Math.round((consumed.kcal / Number(kcal)) * 100)) : 0}%
+                            </Text>
+                            <Text size="10px" c="dimmed" fw={700} tt="uppercase">calorías</Text>
+                          </Stack>
+                        </Center>
+                      }
+                    />
+                    <Stack gap={4} style={{ flex: 1, minWidth: '150px' }}>
+                      <Text size="xs" c="dimmed" fw={700} tt="uppercase" style={{ letterSpacing: '0.5px' }}>
+                        Calorías Consumidas
+                      </Text>
+                      <Group gap={6} align="baseline">
+                        <Text size="26px" fw={900} c="dark.4" lh={1}>
+                          {consumed.kcal}
+                        </Text>
+                        <Text size="sm" c="dimmed" fw={500}>
+                          / {kcal || '-'} kcal
+                        </Text>
+                      </Group>
+                      
+                      {kcal && Number(kcal) > 0 ? (
+                        consumed.kcal >= Number(kcal) ? (
+                          <Badge color="green" variant="light" size="xs" leftSection={<IconCheck size={12} />}>
+                            Meta alcanzada
+                          </Badge>
+                        ) : (
+                          <Text size="xs" c="orange.7" fw={600}>
+                            Faltan {Math.round(Number(kcal) - consumed.kcal)} kcal
+                          </Text>
+                        )
+                      ) : (
+                        <Text size="xs" c="dimmed">
+                          Sin meta de calorías hoy
+                        </Text>
+                      )}
+                    </Stack>
+                  </Group>
+                </Paper>
+
+                {/* Macronutrientes (Barras de progreso) */}
+                <Paper withBorder p="md" radius="md" bg="gray.0">
+                  <Stack gap="md" justify="center" h="100%">
+                    {/* Proteínas */}
+                    <Box>
+                      <Group justify="space-between" mb={6}>
+                        <Group gap={6}>
+                          <Box style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--mantine-color-red-6)' }} />
+                          <Text size="xs" fw={700} c="dark.3">Proteínas</Text>
+                        </Group>
+                        <Group gap={4}>
+                          <Text size="xs" fw={800} c="dark.4">{consumed.pro}g</Text>
+                          <Text size="xs" c="dimmed">/ {protein || '-'}g</Text>
+                          {protein && Number(protein) > 0 && (
+                            <Badge size="xs" color="red" variant="subtle" ml={4}>
+                              {Math.round((consumed.pro / Number(protein)) * 100)}%
+                            </Badge>
+                          )}
+                        </Group>
+                      </Group>
+                      <Progress
+                        value={protein && Number(protein) > 0 ? Math.min(100, (consumed.pro / Number(protein)) * 100) : 0}
+                        color="red.6"
+                        size="sm"
+                        radius="xl"
+                      />
+                    </Box>
+
+                    {/* Carbohidratos */}
+                    <Box>
+                      <Group justify="space-between" mb={6}>
+                        <Group gap={6}>
+                          <Box style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--mantine-color-yellow-6)' }} />
+                          <Text size="xs" fw={700} c="dark.3">Carbohidratos</Text>
+                        </Group>
+                        <Group gap={4}>
+                          <Text size="xs" fw={800} c="dark.4">{consumed.cho}g</Text>
+                          <Text size="xs" c="dimmed">/ {cho || '-'}g</Text>
+                          {cho && Number(cho) > 0 && (
+                            <Badge size="xs" color="yellow" variant="subtle" ml={4}>
+                              {Math.round((consumed.cho / Number(cho)) * 100)}%
+                            </Badge>
+                          )}
+                        </Group>
+                      </Group>
+                      <Progress
+                        value={cho && Number(cho) > 0 ? Math.min(100, (consumed.cho / Number(cho)) * 100) : 0}
+                        color="yellow.6"
+                        size="sm"
+                        radius="xl"
+                      />
+                    </Box>
+
+                    {/* Grasas */}
+                    <Box>
+                      <Group justify="space-between" mb={6}>
+                        <Group gap={6}>
+                          <Box style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--mantine-color-blue-6)' }} />
+                          <Text size="xs" fw={700} c="dark.3">Grasas</Text>
+                        </Group>
+                        <Group gap={4}>
+                          <Text size="xs" fw={800} c="dark.4">{consumed.fat}g</Text>
+                          <Text size="xs" c="dimmed">/ {fat || '-'}g</Text>
+                          {fat && Number(fat) > 0 && (
+                            <Badge size="xs" color="blue" variant="subtle" ml={4}>
+                              {Math.round((consumed.fat / Number(fat)) * 100)}%
+                            </Badge>
+                          )}
+                        </Group>
+                      </Group>
+                      <Progress
+                        value={fat && Number(fat) > 0 ? Math.min(100, (consumed.fat / Number(fat)) * 100) : 0}
+                        color="blue.6"
+                        size="sm"
+                        radius="xl"
+                      />
+                    </Box>
+                  </Stack>
+                </Paper>
+              </SimpleGrid>
+            )}
+          </Paper>
+
           {/* Nutritional Objectives Card */}
           <Paper p={{ base: 'md', sm: 'lg' }} bg="white" shadow="xs" radius="lg" withBorder>
             <Group justify="space-between" align="flex-start" wrap="wrap" mb="md" gap="md">

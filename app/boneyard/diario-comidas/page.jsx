@@ -1,5 +1,5 @@
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
-import DiarioComidasSubtab from '@/app/dashboard/jugador/[id]/_tabs/nutricion/DiarioComidasSubtab';
+import DiarioComidasSubtab from '@/app/dashboard/jugador/[id]/_tabs/resumen/DiarioComidasSubtab';
 import { mockPlayers, mockMeals } from '@/lib/boneyardMockData';
 
 export const dynamic = 'force-dynamic';
