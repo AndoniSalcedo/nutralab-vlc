@@ -18,7 +18,7 @@ import {
   IconFlame,
   IconToolsKitchen,
 } from '@tabler/icons-react';
-import NothingFound from '@/components/NothingFound/NothingFound';
+import NothingFound from '@/components/NothingFound';
 import { BentoCard } from '@/components/Bento/BentoItem';
 
 // Standard Spanish weekday names to match database records

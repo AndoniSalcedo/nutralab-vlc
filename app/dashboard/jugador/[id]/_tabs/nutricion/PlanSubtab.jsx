@@ -39,7 +39,7 @@ import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/n
 import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getObjectiveLabel, getTeamNutritionDayTypes } from '@/lib/calculations';
 import { getUserMeals } from '@/lib/nutrition-day-types';
 import IntercambiosModal from '@/components/modals/IntercambiosModal';
-import NothingFound from '@/components/NothingFound/NothingFound';
+import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 
 

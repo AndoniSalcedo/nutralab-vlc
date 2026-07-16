@@ -1,9 +1,9 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { getOwnedTeam } from '@/lib/team-access';
-import { Anchor, Stack, Text } from '@mantine/core';
 import TeamMenuDashboard from '@/components/TeamMenuDashboard';
 import { getMenusByTeam } from '@/repositories/menuRepository';
+import NothingFound from '@/components/NothingFound';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -15,10 +15,13 @@ export default async function TeamMenuPage({ params }) {
 
   if (!team) {
     return (
-      <Stack gap="lg" mt="md">
-        <Text c="red">No se pudo cargar este equipo o no tienes acceso.</Text>
-        <Anchor href="/dashboard">Volver a equipos</Anchor>
-      </Stack>
+      <NothingFound
+        title="Sin acceso"
+        description="No se pudo cargar este equipo o no tienes acceso."
+        actionLabel="Volver a equipos"
+        actionHref="/dashboard"
+        withPaper
+      />
     );
   }
 

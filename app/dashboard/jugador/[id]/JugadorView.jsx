@@ -3,10 +3,10 @@ import { getUser } from '@/lib/auth';
 import { withLatestMeasurement } from '@/lib/player-metrics';
 import { getOwnedPlayer } from '@/lib/team-access';
 import JugadorHeader from '@/components/JugadorHeader';
-import { Anchor, Stack, Text } from '@mantine/core';
 import PlayerTabs from './_tabs/PlayerTabs';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
+import NothingFound from '@/components/NothingFound';
 import { getAnalyticsByPlayerId } from '@/repositories/analyticsRepository';
 import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
 import { getMenusByTeam } from '@/repositories/menuRepository';
@@ -22,10 +22,13 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
     const ownedPlayer = await getOwnedPlayer(supabase, user, id);
     if (!ownedPlayer) {
       return (
-        <Stack gap="lg" mt="md">
-          <Text c="red">No tienes acceso a este jugador.</Text>
-          <Anchor href="/dashboard">Volver al panel</Anchor>
-        </Stack>
+        <NothingFound
+          title="Sin acceso"
+          description="No tienes acceso a este jugador."
+          actionLabel="Volver al panel"
+          actionHref="/dashboard"
+          withPaper
+        />
       );
     }
   }
@@ -72,10 +75,13 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
 
   if (isPlayer && String(user.id) !== String(jugador.id)) {
     return (
-      <Stack gap="lg" mt="md">
-        <Text c="red">No tienes acceso a este jugador.</Text>
-        <Anchor href="/dashboard">Volver al panel</Anchor>
-      </Stack>
+      <NothingFound
+        title="Sin acceso"
+        description="No tienes acceso a este jugador."
+        actionLabel="Volver al panel"
+        actionHref="/dashboard"
+        withPaper
+      />
     );
   }
 

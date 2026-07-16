@@ -51,7 +51,7 @@ import {
   IconSortDescending,
   IconChartLine,
 } from '@tabler/icons-react';
-import NothingFound from '@/components/NothingFound/NothingFound';
+import NothingFound from '@/components/NothingFound';
 import { initials } from '@/lib/utils';
 
 function formatDate(dateStr) {

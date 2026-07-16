@@ -1,5 +1,6 @@
 import { Box, Button, Group, Paper, Stack, Text, ThemeIcon } from '@mantine/core';
 import { IconInbox } from '@tabler/icons-react';
+import Link from 'next/link';
 
 export default function NothingFound({
   title = 'Sin resultados',
@@ -7,9 +8,11 @@ export default function NothingFound({
   icon: Icon = IconInbox,
   actionLabel,
   onAction,
+  actionHref,
   actionProps = {},
   secondaryLabel,
   onSecondary,
+  secondaryHref,
   secondaryProps = {},
   compact = false,
   withPaper = false,
@@ -45,15 +48,27 @@ export default function NothingFound({
 
       {(actionLabel || secondaryLabel) && (
         <Group gap="xs" mt={compact ? 4 : 'sm'}>
-          {secondaryLabel && (
-            <Button variant="subtle" color="gray" size="xs" radius="xl" onClick={onSecondary} {...secondaryProps}>
+          {secondaryHref ? (
+            <Button component={Link} href={secondaryHref} variant="subtle" color="gray" size="xs" radius="xl" {...secondaryProps}>
               {secondaryLabel}
             </Button>
+          ) : (
+            secondaryLabel && (
+              <Button variant="subtle" color="gray" size="xs" radius="xl" onClick={onSecondary} {...secondaryProps}>
+                {secondaryLabel}
+              </Button>
+            )
           )}
-          {actionLabel && (
-            <Button variant="light" color="dark" size="xs" radius="xl" onClick={onAction} {...actionProps}>
+          {actionHref ? (
+            <Button component={Link} href={actionHref} variant="light" color="dark" size="xs" radius="xl" {...actionProps}>
               {actionLabel}
             </Button>
+          ) : (
+            actionLabel && (
+              <Button variant="light" color="dark" size="xs" radius="xl" onClick={onAction} {...actionProps}>
+                {actionLabel}
+              </Button>
+            )
           )}
         </Group>
       )}

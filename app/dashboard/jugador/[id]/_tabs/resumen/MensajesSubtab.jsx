@@ -5,7 +5,7 @@ import { Badge, Box, Button, Group, Paper, Stack, Text, ThemeIcon, Title } from 
 import { useDisclosure } from '@mantine/hooks';
 import { IconInbox, IconMail, IconPlus } from '@tabler/icons-react';
 import SendMessageModal from '@/components/modals/SendMessageModal';
-import NothingFound from '@/components/NothingFound/NothingFound';
+import NothingFound from '@/components/NothingFound';
 
 function formatDate(value) {
   if (!value) return '';

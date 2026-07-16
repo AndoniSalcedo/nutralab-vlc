@@ -5,6 +5,7 @@ import { getOwnerId } from '@/lib/team-access';
 import { redirect } from 'next/navigation';
 import { getPlayerById, getPlayersByOwner } from '@/repositories/playerRepository';
 import { getTeamsByOwner } from '@/repositories/teamRepository';
+import NothingFound from '@/components/NothingFound';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -18,7 +19,13 @@ export default async function Dashboard() {
     const jugador = await getPlayerById(supabase, user.id);
     
     if (!jugador) {
-      return <p>Error: No se encontró tu perfil de jugador.</p>;
+      return (
+        <NothingFound
+          title="Error"
+          description="No se encontró tu perfil de jugador."
+          withPaper
+        />
+      );
     }
 
     redirect(`/dashboard/jugador/${jugador.id}`);

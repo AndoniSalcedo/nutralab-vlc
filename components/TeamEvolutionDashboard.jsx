@@ -49,7 +49,7 @@ import {
   IconPlus,
   IconX,
 } from '@tabler/icons-react';
-import NothingFound from '@/components/NothingFound/NothingFound';
+import NothingFound from '@/components/NothingFound';
 import {
   MEASUREMENT_DETAIL_SECTIONS,
   TREND_MEASUREMENT_METRICS,

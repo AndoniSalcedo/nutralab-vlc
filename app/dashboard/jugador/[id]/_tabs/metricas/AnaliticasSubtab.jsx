@@ -30,7 +30,7 @@ import {
   IconEyeOff,
 } from '@tabler/icons-react';
 import { BentoCard } from '@/components/Bento/BentoItem';
-import NothingFound from '@/components/NothingFound/NothingFound';
+import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import UploadAnaliticaModal from '@/components/modals/UploadAnaliticaModal';
 

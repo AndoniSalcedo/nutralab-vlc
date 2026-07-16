@@ -8,7 +8,7 @@ import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
 import { notifications } from '@mantine/notifications';
 import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconSettings, IconBottle, IconPlus, IconFileSpreadsheet, IconReportMedical } from '@tabler/icons-react';
-import NothingFound from '@/components/NothingFound/NothingFound';
+import NothingFound from '@/components/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import { calculateByObjective, getTeamNutritionDayTypes } from '@/lib/calculations';
 import { useRouter } from 'next/navigation';

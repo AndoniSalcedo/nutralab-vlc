@@ -29,7 +29,7 @@ import {
   IconUsersGroup,
 } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
-import NothingFound from './NothingFound/NothingFound';
+import NothingFound from './NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import TeamFormModal from '@/components/modals/TeamFormModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';

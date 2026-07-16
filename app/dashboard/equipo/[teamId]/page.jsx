@@ -3,9 +3,9 @@ import DashboardContent from '@/components/DashboardContent';
 import { getUser } from '@/lib/auth';
 import { withLatestMeasurement } from '@/lib/player-metrics';
 import { getOwnedTeam } from '@/lib/team-access';
-import { Anchor, Stack, Text } from '@mantine/core';
 import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIdsSimple } from '@/repositories/evolutionRepository';
+import NothingFound from '@/components/NothingFound';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -17,10 +17,13 @@ export default async function TeamDashboard({ params }) {
 
   if (!team) {
     return (
-      <Stack gap="lg" mt="md">
-        <Text c="red">No se pudo cargar este equipo o no tienes acceso.</Text>
-        <Anchor href="/dashboard">Volver a equipos</Anchor>
-      </Stack>
+      <NothingFound
+        title="Sin acceso"
+        description="No se pudo cargar este equipo o no tienes acceso."
+        actionLabel="Volver a equipos"
+        actionHref="/dashboard"
+        withPaper
+      />
     );
   }
 
