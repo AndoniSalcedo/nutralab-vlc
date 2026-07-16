@@ -1,2 +1,1 @@
 - prepartido que carlos pueda indicar las comidas que hacer las 24 horas antes del partido
-- crear carpeta de demo para que se autogenere el skeleton

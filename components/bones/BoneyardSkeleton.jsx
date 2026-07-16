@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { Skeleton } from 'boneyard-js/react';
 
 // Import all bone data
 import _teams_list from './teams-list.bones.json';
@@ -57,9 +58,14 @@ export default function BoneyardSkeleton({ name, loading = true, children }) {
     }
   }, []);
 
-  // When not loading, just render children (wrapper mode for boneyard build)
+  // When not loading, wrap children in the real boneyard Skeleton component
+  // so that the boneyard build crawler can detect the DOM and snapshot the bones.
   if (!loading) {
-    return children || null;
+    return (
+      <Skeleton name={name} loading={false}>
+        {children}
+      </Skeleton>
+    );
   }
 
   // Loading mode: render skeleton bones
