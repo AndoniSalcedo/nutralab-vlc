@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { slugify } from '@/lib/utils';
-import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon } from '@mantine/core';
+import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings } from '@tabler/icons-react';
+import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft } from '@tabler/icons-react';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import DayTypeModal from '@/components/modals/DayTypeModal';
@@ -129,15 +129,31 @@ export default function TeamConfigClient({ team, readOnly = false }) {
 
   return (
     <BoneyardSkeleton name="team-config" loading={false}>
-      <Stack gap="xl">
-        {/* Botón de guardar maestro en la parte superior para alinearse con el resto de la app */}
-        {!readOnly && (
-          <Group justify="flex-end">
-            <Button loading={loading} onClick={saveConfig} leftSection={<IconDeviceFloppy size={18} />} size="md" radius="xl" color="blue">
-              Guardar Cambios
-            </Button>
+      <Stack gap="lg">
+        {/* Cabecera integrada con el botón de guardar */}
+        <Paper p="md" radius="lg" shadow="sm" withBorder>
+          <Group justify="space-between" align="center" wrap="wrap" gap="md">
+            <Group gap="md" align="center" wrap="nowrap">
+              <Tooltip label="Volver al equipo" withArrow>
+                <ActionIcon component="a" href={`/dashboard/equipo/${team.id}`} variant="light" color="gray" radius="xl" size={42}>
+                  <IconArrowLeft size={20} />
+                </ActionIcon>
+              </Tooltip>
+              <div>
+                <Title order={3} fw={700} c="#24291f">Configuración Nutricional: {teamName}</Title>
+                <Text c="dimmed" size="sm" mt={2}>
+                  Personaliza los tipos de día y multiplicadores de macros que se usarán en este equipo.
+                </Text>
+              </div>
+            </Group>
+
+            {!readOnly && (
+              <Button loading={loading} onClick={saveConfig} leftSection={<IconDeviceFloppy size={18} />} size="sm" radius="xl" color="blue">
+                Guardar Cambios
+              </Button>
+            )}
           </Group>
-        )}
+        </Paper>
 
         <Paper p="md" radius="lg" shadow="sm" withBorder style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))' }}>
           <Group gap="sm" mb="lg">
