@@ -17,7 +17,7 @@ import {
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconDroplet, IconBottle, IconCup, IconCheck, IconRotate, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
-import { BentoCard } from './Bento/BentoItem';
+import { BentoCard } from './BentoItem';
 import { calculateHydration, getTeamNutritionDayTypes } from '@/lib/calculations';
 
 

@@ -30,7 +30,7 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import { EditableSection } from '../editable';
-import { BentoCard } from '@/components/Bento/BentoItem';
+import { BentoCard } from '@/components/BentoItem';
 
 
 function byId(items) {
@@ -48,7 +48,7 @@ function formatDose(suplemento, peso, override) {
     const min = Math.round(Number(suplemento.dose_min || 0) * peso);
     const max = Math.round(Number(suplemento.dose_max || 0) * peso);
     const unit = suplemento.dose_unit || '';
-    
+
     if (min === max) {
       return { value: `${min} ${unit}`.trim(), needsWeight: false };
     }

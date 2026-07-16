@@ -19,7 +19,7 @@ import {
   IconToolsKitchen,
 } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound';
-import { BentoCard } from '@/components/Bento/BentoItem';
+import { BentoCard } from '@/components/BentoItem';
 
 // Standard Spanish weekday names to match database records
 export const WEEKDAY_ORDER = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
@@ -272,8 +272,8 @@ export default function MenuSemanal({
   const orderedDays = isEditing
     ? [...editedDias].sort((a, b) => WEEKDAY_ORDER.indexOf(a.dia) - WEEKDAY_ORDER.indexOf(b.dia))
     : (selectedMenu
-        ? [...selectedMenu.dias].sort((a, b) => WEEKDAY_ORDER.indexOf(a.dia) - WEEKDAY_ORDER.indexOf(b.dia))
-        : []);
+      ? [...selectedMenu.dias].sort((a, b) => WEEKDAY_ORDER.indexOf(a.dia) - WEEKDAY_ORDER.indexOf(b.dia))
+      : []);
 
   useEffect(() => {
     if (orderedDays.length > 0) {

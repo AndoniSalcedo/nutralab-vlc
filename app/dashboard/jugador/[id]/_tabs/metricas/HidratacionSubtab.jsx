@@ -47,7 +47,7 @@ import {
   ReferenceLine
 } from 'recharts';
 import { EditableSection } from '../editable';
-import { BentoCard } from '@/components/Bento/BentoItem';
+import { BentoCard } from '@/components/BentoItem';
 import HydrationCalculator from '@/components/HydrationCalculator';
 
 const METRIC_TABS = {

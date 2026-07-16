@@ -3,7 +3,7 @@
 import { Badge, Box, Group, Paper, SimpleGrid, Stack, Text, ThemeIcon, Timeline, Title } from '@mantine/core';
 import { IconApple, IconBatteryCharging, IconClipboardList, IconCoffee, IconDroplet, IconFlag, IconRun } from '@tabler/icons-react';
 import { EditableSection } from '../editable';
-import { BentoCard } from '@/components/Bento/BentoItem';
+import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/services/player';
 
 export default function ProtocolosSubtab({ jugador, readOnly = false }) {

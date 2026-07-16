@@ -38,7 +38,7 @@ import {
   IconTrash,
   IconUsers,
 } from '@tabler/icons-react';
-import { BentoCard } from '@/components/Bento/BentoItem';
+import { BentoCard } from '@/components/BentoItem';
 
 function emptySupplementForm() {
   return {
@@ -66,10 +66,10 @@ function byId(items) {
   return new Map((items || []).map((item) => [Number(item.id), item]));
 }
 
-export default function SupplementCatalogManager({ 
-  players = [], 
-  team, 
-  activeTab = 'assign', 
+export default function SupplementCatalogManager({
+  players = [],
+  team,
+  activeTab = 'assign',
   onTabChange,
   initialSelectedPlayerIds = null
 }) {

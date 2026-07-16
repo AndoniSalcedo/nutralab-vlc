@@ -17,7 +17,7 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconEdit } from '@tabler/icons-react';
-import { BentoCard } from '@/components/Bento/BentoItem';
+import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/services/player';
 import { useRouter } from 'next/navigation';
 import { AVAILABLE_MEALS, STANDARD_MEALS } from '@/lib/nutrition-day-types';

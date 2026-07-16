@@ -263,7 +263,7 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
         return;
       }
       if (takenAtDate) fd.append('takenAt', takenAtDate.toISOString());
-      
+
       const cleanDishName = dishName.trim();
       if (cleanDishName) fd.append('dishName', cleanDishName);
       fd.append('mealType', mealType);
@@ -300,13 +300,13 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
       }
 
       await savePlayerMeal(jugadorId, fd);
-      
+
       notifications.show({
         title: meal?.id ? 'Comida modificada' : 'Comida registrada',
         message: meal?.id ? 'La ingesta se actualizó correctamente.' : 'La ingesta se guardó en el diario.',
         color: 'green',
       });
-      
+
       onSuccess?.();
 
     } catch (e) {
@@ -338,6 +338,7 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
               h={220}
               w="100%"
               fit="cover"
+              alt=''
               onLoad={(e) => {
                 if (file) URL.revokeObjectURL(e.currentTarget.src);
               }}
