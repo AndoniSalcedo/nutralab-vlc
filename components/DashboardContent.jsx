@@ -148,10 +148,6 @@ function defaultReportForm() {
 
 
 function getPlayerPlan(player, teamConfig) {
-  if (player.kcal_objetivo) {
-    return { kcal: Number(player.kcal_objetivo), calculated: false };
-  }
-
   const weightKg = Number(player.peso_kg || 0);
   if (!weightKg) return { kcal: null, calculated: false };
 

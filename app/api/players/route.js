@@ -56,9 +56,7 @@ export async function POST(request) {
     nombre: String(form.get('nombre') || ''),
     apellidos: String(form.get('apellidos') || ''),
     posicion: String(form.get('posicion') || ''),
-    club: form.get('club') ? String(form.get('club')) : null,
     fecha_nacimiento: form.get('fecha_nacimiento') ? String(form.get('fecha_nacimiento')) : null,
-    factor_actividad: form.get('factor_actividad') ? toNumber(form.get('factor_actividad')) : 1.55,
     num_comidas: form.get('num_comidas') ? String(form.get('num_comidas')) : DEFAULT_PLAYER_MEALS_STRING,
     preentreno: form.get('preentreno') === 'true',
     postentreno: form.get('postentreno') === 'true',
@@ -68,11 +66,6 @@ export async function POST(request) {
     intolerancias: String(form.get('intolerancias') || ''),
     alergias: String(form.get('alergias') || ''),
     objetivo: String(form.get('objetivo') || ''),
-    kcal_objetivo: form.get('kcal_objetivo') ? toNumber(form.get('kcal_objetivo')) : null,
-    cho_objetivo_g: form.get('cho_objetivo_g') ? toNumber(form.get('cho_objetivo_g')) : null,
-    proteina_objetivo_g: form.get('proteina_objetivo_g') ? toNumber(form.get('proteina_objetivo_g')) : null,
-    grasa_objetivo_g: form.get('grasa_objetivo_g') ? toNumber(form.get('grasa_objetivo_g')) : null,
-    agua_objetivo_ml: form.get('agua_objetivo_ml') ? toNumber(form.get('agua_objetivo_ml')) : null,
   };
 
   if (id) {

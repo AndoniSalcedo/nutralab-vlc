@@ -719,7 +719,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     }
     
     const extras = [];
-    if (jugador.preentreno) extras.push('Pre-entreno');
     if (base) extras.push(base);
     if (jugador.postentreno) extras.push('Post-entreno');
     

@@ -14,7 +14,7 @@ import {
   ActionIcon
 } from '@mantine/core';
 
-import { IconClipboardList, IconTargetArrow, IconUser, IconInfoCircle, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { IconClipboardList, IconTargetArrow, IconUser, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES, getObjectiveLabel } from '@/lib/calculations';
 import { CampoEditable, ComidasEditable } from '../editable';
 import { latestMetricValue } from '@/lib/player-metrics';
@@ -72,18 +72,11 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
   }, [weightKg, playerObjective, DAY_TYPES, teamConfig]);
 
   const currentPlan = plans[activeDayType];
-  const isDefaultFactorType = activeDayType === defaultDiaType;
 
-  // Use manual override if it exists and we are looking at the default factor day type
-  const hasManualOverride = Boolean(
-    isDefaultFactorType &&
-    (jugador.kcal_objetivo || jugador.proteina_objetivo_g || jugador.cho_objetivo_g || jugador.grasa_objetivo_g)
-  );
-
-  const kcal = (isDefaultFactorType && jugador.kcal_objetivo) || currentPlan?.kcal || '-';
-  const protein = (isDefaultFactorType && jugador.proteina_objetivo_g) || currentPlan?.protein || null;
-  const cho = (isDefaultFactorType && jugador.cho_objetivo_g) || currentPlan?.cho || null;
-  const fat = (isDefaultFactorType && jugador.grasa_objetivo_g) || currentPlan?.fat || null;
+  const kcal = currentPlan?.kcal || '-';
+  const protein = currentPlan?.protein || null;
+  const cho = currentPlan?.cho || null;
+  const fat = currentPlan?.fat || null;
 
   const activeIdx = DAY_TYPES.findIndex(d => d.value === activeDayType);
   const activeDay = DAY_TYPES[activeIdx !== -1 ? activeIdx : 0] || {};
@@ -132,16 +125,9 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
                 </Box>
               </Group>
 
-              <Group gap="xs">
-                <Badge color="green" variant="light" size="md" leftSection={<IconTargetArrow size={14} />}>
-                  {getObjectiveLabel(playerObjective)}
-                </Badge>
-                {hasManualOverride && (
-                  <Badge color="yellow" variant="light" size="md" leftSection={<IconInfoCircle size={14} />}>
-                    Objetivo manual activo para este día
-                  </Badge>
-                )}
-              </Group>
+              <Badge color="green" variant="light" size="md" leftSection={<IconTargetArrow size={14} />}>
+                {getObjectiveLabel(playerObjective)}
+              </Badge>
             </Group>
 
             {/* Day Type selector carousel switcher */}
@@ -236,22 +222,22 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
               <StatCard
                 label="Kcal objetivo"
                 value={kcal ? `${kcal} kcal` : '-'}
-                subtext={hasManualOverride ? 'Fijado manualmente' : getObjectiveLabel(playerObjective)}
+                subtext={getObjectiveLabel(playerObjective)}
               />
               <StatCard
                 label="Proteína"
                 value={protein ? `${protein}g` : '-'}
-                subtext={hasManualOverride ? 'Fijado manualmente' : getObjectiveLabel(playerObjective)}
+                subtext={getObjectiveLabel(playerObjective)}
               />
               <StatCard
                 label="Carbohidratos (CHO)"
                 value={cho ? `${cho}g` : '-'}
-                subtext={hasManualOverride ? 'Fijado manualmente' : getObjectiveLabel(playerObjective)}
+                subtext={getObjectiveLabel(playerObjective)}
               />
               <StatCard
                 label="Grasa"
                 value={fat ? `${fat}g` : '-'}
-                subtext={hasManualOverride ? 'Fijado manualmente' : getObjectiveLabel(playerObjective)}
+                subtext={getObjectiveLabel(playerObjective)}
               />
             </SimpleGrid>
           </Paper>

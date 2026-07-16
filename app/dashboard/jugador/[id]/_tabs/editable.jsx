@@ -114,14 +114,12 @@ export function ComidasEditable({ label, numComidas, postentreno, preentreno, ju
   const [editing, setEditing] = useState(false);
   const [meals, setMeals] = useState(() => parseMeals(numComidas));
   const [hasPost, setHasPost] = useState(Boolean(postentreno));
-  const [hasPre, setHasPre] = useState(Boolean(preentreno));
   const [recsDefecto, setRecsDefecto] = useState(() => recomendacionesDefecto || {});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setMeals(parseMeals(numComidas));
     setHasPost(Boolean(postentreno));
-    setHasPre(Boolean(preentreno));
     setRecsDefecto(recomendacionesDefecto || {});
   }, [numComidas, postentreno, preentreno, recomendacionesDefecto]);
 
@@ -132,7 +130,7 @@ export function ComidasEditable({ label, numComidas, postentreno, preentreno, ju
     try {
       const mealsValue = meals.join(', ');
       await updatePlayerField(jugadorId, 'num_comidas', mealsValue);
-      await updatePlayerField(jugadorId, 'preentreno', hasPre);
+      await updatePlayerField(jugadorId, 'preentreno', false);
       await updatePlayerField(jugadorId, 'postentreno', hasPost);
       await updatePlayerField(jugadorId, 'recomendaciones_defecto', recsDefecto);
       setEditing(false);
@@ -156,7 +154,6 @@ export function ComidasEditable({ label, numComidas, postentreno, preentreno, ju
   function handleCancel() {
     setMeals(parseMeals(numComidas));
     setHasPost(Boolean(postentreno));
-    setHasPre(Boolean(preentreno));
     setRecsDefecto(recomendacionesDefecto || {});
     setEditing(false);
   }
@@ -191,13 +188,6 @@ export function ComidasEditable({ label, numComidas, postentreno, preentreno, ju
                   clearable
                 />
                 <Checkbox
-                  label="Pre-entreno"
-                  checked={hasPre}
-                  onChange={(event) => setHasPre(event.currentTarget.checked)}
-                  mt="xs"
-                  size="sm"
-                />
-                <Checkbox
                   label="Post-entreno"
                   checked={hasPost}
                   onChange={(event) => setHasPost(event.currentTarget.checked)}
@@ -210,10 +200,6 @@ export function ComidasEditable({ label, numComidas, postentreno, preentreno, ju
                 <Text size="sm">
                   <Text span fw={600} c="dimmed">Comidas: </Text>
                   {displayMeals}
-                </Text>
-                <Text size="sm">
-                  <Text span fw={600} c="dimmed">Pre-entreno: </Text>
-                  {hasPre ? 'Sí' : 'No'}
                 </Text>
                 <Text size="sm">
                   <Text span fw={600} c="dimmed">Post-entreno: </Text>

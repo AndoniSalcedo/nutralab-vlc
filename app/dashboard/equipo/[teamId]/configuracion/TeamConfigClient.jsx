@@ -27,6 +27,9 @@ export default function TeamConfigClient({ team, readOnly = false }) {
     }
     return list.map((d) => ({
       ...d,
+      tienePostentreno: d.tienePostentreno !== undefined 
+        ? d.tienePostentreno 
+        : (d.tienePreentreno !== undefined ? d.tienePreentreno : ['doble', 'entreno', 'partido'].includes(d.key)),
       tienePreentreno: d.tienePreentreno !== undefined ? d.tienePreentreno : ['doble', 'entreno', 'partido'].includes(d.key)
     }));
   });
@@ -213,7 +216,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                 color="blue"
                 onClick={() => {
                   const randomColor = COLORS[dayTypes.length % COLORS.length];
-                  setEditingDayType({ key: '', label: '', planLabel: '', color: randomColor, tienePreentreno: false });
+                  setEditingDayType({ key: '', label: '', planLabel: '', color: randomColor, tienePostentreno: false, tienePreentreno: false });
                   setModalOpen(true);
                 }}
               >
@@ -233,8 +236,8 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                      </Group>
                   </Table.Td>
                   <Table.Td>
-                    <Badge variant="light" color={d.tienePreentreno ? 'teal' : 'gray'}>
-                      {d.tienePreentreno ? 'Pre-entreno' : 'Sin Pre-entreno'}
+                    <Badge variant="light" color={(d.tienePostentreno !== undefined ? d.tienePostentreno : d.tienePreentreno) ? 'teal' : 'gray'}>
+                      {(d.tienePostentreno !== undefined ? d.tienePostentreno : d.tienePreentreno) ? 'Post-entreno' : 'Sin Post-entreno'}
                     </Badge>
                   </Table.Td>
                   {!readOnly && (

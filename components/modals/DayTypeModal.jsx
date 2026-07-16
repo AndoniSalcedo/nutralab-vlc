@@ -40,10 +40,14 @@ export default function DayTypeModal({
             onChange={(v) => setEditingDayType({ ...editingDayType, color: v })}
           />
           <Switch
-            label="Incluir comida de pre-entreno"
+            label="Incluir batido de proteínas (Post-entreno)"
             description="Activa esta ingesta para este tipo de día si el jugador la tiene asignada"
-            checked={Boolean(editingDayType.tienePreentreno)}
-            onChange={(e) => setEditingDayType({ ...editingDayType, tienePreentreno: e.currentTarget.checked })}
+            checked={Boolean(editingDayType.tienePostentreno !== undefined ? editingDayType.tienePostentreno : editingDayType.tienePreentreno)}
+            onChange={(e) => setEditingDayType({ 
+              ...editingDayType, 
+              tienePostentreno: e.currentTarget.checked,
+              tienePreentreno: e.currentTarget.checked 
+            })}
             mt="xs"
           />
           <Button onClick={handleSaveDayType} fullWidth mt="md" radius="xl" color="blue">
