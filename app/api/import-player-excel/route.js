@@ -47,6 +47,7 @@ async function createPlayer(supabase, teamId, group) {
     fecha_nacimiento: group.fechaNacimiento || null,
     factor_actividad: 1.55,
     num_comidas: DEFAULT_PLAYER_MEALS_STRING,
+    preentreno: false,
     postentreno: false,
   });
 }

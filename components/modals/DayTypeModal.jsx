@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Stack, TextInput, Select, Button } from '@mantine/core';
+import { Modal, Stack, TextInput, Select, Button, Switch } from '@mantine/core';
 
 export default function DayTypeModal({
   opened,
@@ -38,6 +38,13 @@ export default function DayTypeModal({
             data={COLORS.map((c) => ({ value: c, label: c }))}
             value={editingDayType.color}
             onChange={(v) => setEditingDayType({ ...editingDayType, color: v })}
+          />
+          <Switch
+            label="Incluir comida de pre-entreno"
+            description="Activa esta ingesta para este tipo de día si el jugador la tiene asignada"
+            checked={Boolean(editingDayType.tienePreentreno)}
+            onChange={(e) => setEditingDayType({ ...editingDayType, tienePreentreno: e.currentTarget.checked })}
+            mt="xs"
           />
           <Button onClick={handleSaveDayType} fullWidth mt="md" radius="xl" color="blue">
             Guardar Tipo de Día

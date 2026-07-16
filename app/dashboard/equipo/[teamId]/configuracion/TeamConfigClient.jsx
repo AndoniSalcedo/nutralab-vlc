@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { slugify } from '@/lib/utils';
-import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip } from '@mantine/core';
+import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft } from '@tabler/icons-react';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
@@ -19,8 +19,16 @@ export default function TeamConfigClient({ team, readOnly = false }) {
   const [teamSeason, setTeamSeason] = useState(team.temporada || '');
 
   const [dayTypes, setDayTypes] = useState(() => {
-    if (team.configuracion_nutricional?.dayTypes) return team.configuracion_nutricional.dayTypes;
-    return JSON.parse(JSON.stringify(NUTRITION_DAY_TYPES));
+    let list = [];
+    if (team.configuracion_nutricional?.dayTypes) {
+      list = team.configuracion_nutricional.dayTypes;
+    } else {
+      list = JSON.parse(JSON.stringify(NUTRITION_DAY_TYPES));
+    }
+    return list.map((d) => ({
+      ...d,
+      tienePreentreno: d.tienePreentreno !== undefined ? d.tienePreentreno : ['doble', 'entreno', 'partido'].includes(d.key)
+    }));
   });
   
   const [objectiveMacros, setObjectiveMacros] = useState(() => {
@@ -205,7 +213,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                 color="blue"
                 onClick={() => {
                   const randomColor = COLORS[dayTypes.length % COLORS.length];
-                  setEditingDayType({ key: '', label: '', planLabel: '', color: randomColor });
+                  setEditingDayType({ key: '', label: '', planLabel: '', color: randomColor, tienePreentreno: false });
                   setModalOpen(true);
                 }}
               >
@@ -223,6 +231,11 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                        <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: `var(--mantine-color-${d.color}-6)` }} />
                        <Text fw={600} size="sm" c="dark.4">{d.label}</Text>
                      </Group>
+                  </Table.Td>
+                  <Table.Td>
+                    <Badge variant="light" color={d.tienePreentreno ? 'teal' : 'gray'}>
+                      {d.tienePreentreno ? 'Pre-entreno' : 'Sin Pre-entreno'}
+                    </Badge>
                   </Table.Td>
                   {!readOnly && (
                     <Table.Td w={120}>

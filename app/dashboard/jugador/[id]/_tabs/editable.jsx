@@ -109,19 +109,21 @@ function parseMeals(val) {
   return val.split(',').map((s) => s.trim()).filter(Boolean);
 }
 
-export function ComidasEditable({ label, numComidas, postentreno, jugadorId, recomendacionesDefecto = {}, readOnly = false }) {
+export function ComidasEditable({ label, numComidas, postentreno, preentreno, jugadorId, recomendacionesDefecto = {}, readOnly = false }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [meals, setMeals] = useState(() => parseMeals(numComidas));
   const [hasPost, setHasPost] = useState(Boolean(postentreno));
+  const [hasPre, setHasPre] = useState(Boolean(preentreno));
   const [recsDefecto, setRecsDefecto] = useState(() => recomendacionesDefecto || {});
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setMeals(parseMeals(numComidas));
     setHasPost(Boolean(postentreno));
+    setHasPre(Boolean(preentreno));
     setRecsDefecto(recomendacionesDefecto || {});
-  }, [numComidas, postentreno, recomendacionesDefecto]);
+  }, [numComidas, postentreno, preentreno, recomendacionesDefecto]);
 
   const MEAL_OPTIONS = AVAILABLE_MEALS;
 
@@ -130,6 +132,7 @@ export function ComidasEditable({ label, numComidas, postentreno, jugadorId, rec
     try {
       const mealsValue = meals.join(', ');
       await updatePlayerField(jugadorId, 'num_comidas', mealsValue);
+      await updatePlayerField(jugadorId, 'preentreno', hasPre);
       await updatePlayerField(jugadorId, 'postentreno', hasPost);
       await updatePlayerField(jugadorId, 'recomendaciones_defecto', recsDefecto);
       setEditing(false);
@@ -137,7 +140,7 @@ export function ComidasEditable({ label, numComidas, postentreno, jugadorId, rec
       notifications.show({
         color: 'green',
         title: 'Comidas guardadas',
-        message: 'Las comidas, la opción de post-entreno y las recomendaciones por defecto se han actualizado correctamente.',
+        message: 'Las comidas, la opción de pre/post-entreno y las recomendaciones por defecto se han actualizado correctamente.',
       });
     } catch (e) {
       notifications.show({
@@ -153,6 +156,7 @@ export function ComidasEditable({ label, numComidas, postentreno, jugadorId, rec
   function handleCancel() {
     setMeals(parseMeals(numComidas));
     setHasPost(Boolean(postentreno));
+    setHasPre(Boolean(preentreno));
     setRecsDefecto(recomendacionesDefecto || {});
     setEditing(false);
   }
@@ -187,6 +191,13 @@ export function ComidasEditable({ label, numComidas, postentreno, jugadorId, rec
                   clearable
                 />
                 <Checkbox
+                  label="Pre-entreno"
+                  checked={hasPre}
+                  onChange={(event) => setHasPre(event.currentTarget.checked)}
+                  mt="xs"
+                  size="sm"
+                />
+                <Checkbox
                   label="Post-entreno"
                   checked={hasPost}
                   onChange={(event) => setHasPost(event.currentTarget.checked)}
@@ -199,6 +210,10 @@ export function ComidasEditable({ label, numComidas, postentreno, jugadorId, rec
                 <Text size="sm">
                   <Text span fw={600} c="dimmed">Comidas: </Text>
                   {displayMeals}
+                </Text>
+                <Text size="sm">
+                  <Text span fw={600} c="dimmed">Pre-entreno: </Text>
+                  {hasPre ? 'Sí' : 'No'}
                 </Text>
                 <Text size="sm">
                   <Text span fw={600} c="dimmed">Post-entreno: </Text>

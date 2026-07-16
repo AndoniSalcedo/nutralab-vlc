@@ -72,6 +72,7 @@ export async function POST(request) {
     const insertPayload = {
       ...payload,
       num_comidas: DEFAULT_PLAYER_MEALS_STRING,
+      preentreno: false,
       postentreno: false,
     };
     await insertPlayer(supabase, insertPayload);

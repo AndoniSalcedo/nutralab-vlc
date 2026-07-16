@@ -711,13 +711,19 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   }
 
   const getComidasResumen = () => {
-    if (!jugador.num_comidas) {
-      return jugador.postentreno ? 'Post-entreno' : null;
+    let base = '';
+    if (jugador.num_comidas) {
+      base = !isNaN(Number(jugador.num_comidas))
+        ? `${jugador.num_comidas} comidas/día`
+        : jugador.num_comidas;
     }
-    const label = !isNaN(Number(jugador.num_comidas))
-      ? `${jugador.num_comidas} comidas/día`
-      : jugador.num_comidas;
-    return jugador.postentreno ? `${label} + Post-entreno` : label;
+    
+    const extras = [];
+    if (jugador.preentreno) extras.push('Pre-entreno');
+    if (base) extras.push(base);
+    if (jugador.postentreno) extras.push('Post-entreno');
+    
+    return extras.length > 0 ? extras.join(' + ') : null;
   };
 
   const perfilResumen = [
