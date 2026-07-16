@@ -11,7 +11,8 @@ import {
   SimpleGrid,
   Title,
   Paper,
-  Skeleton
+  Skeleton,
+  ThemeIcon
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { DatePickerInput } from '@mantine/dates';
@@ -140,103 +141,130 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
 
   return (
     <Box w="100%" p={0} bg="gray.0" mih="100%" style={{ overflowX: 'hidden' }}>
-      
-      {/* 1. CONTROLES Y FILTROS */}
-      <Paper p="md" bg="white" shadow="xs" radius={0} style={{ borderBottomLeftRadius: 24, borderBottomRightRadius: 24, zIndex: 10, position: 'relative' }}>
-        <Stack gap="sm">
-            <Group justify="space-between" align="center">
+      <Stack gap={0}>
+        {/* Tab Header Banner */}
+        <Paper
+          p={{ base: 'sm', sm: 'md' }}
+          bg="white"
+          shadow="xs"
+          radius="lg"
+          withBorder
+          style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
+        >
+          <Group justify="space-between" align="center" gap="sm" wrap="wrap">
+            <Group gap="xs">
+              <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
+                <IconCalendar size={20} />
+              </ThemeIcon>
+              <Box>
                 <Title order={3} fw={800} c="dark.4">Diario de Comidas</Title>
-                {!readOnly && (
-                  <Button 
-                      id='btn-add-meal'
-                      size="sm" 
-                      radius="xl" 
-                      leftSection={<IconPlus size={16} />} 
-                      onClick={openNewMeal}
-                      color="dark"
-                  >
-                      Registrar
-                  </Button>
-                )}
+                <Text size="sm" c="dimmed">
+                  Registro diario de ingestas y comidas del jugador.
+                </Text>
+              </Box>
             </Group>
 
-            {/* Grid de Filtros */}
-            <SimpleGrid cols={2} spacing="xs">
-                <DatePickerInput
-                    placeholder="Fecha"
-                    leftSection={<IconCalendar size={16} />}
-                    value={day}
-                    onChange={setDay}
-                    clearable
-                    radius="md"
-                    variant="filled"
-                />
-                <Select
-                    placeholder="Tipo de comida"
-                    value={mealType}
-                    onChange={setMealType}
-                    data={[{ value: '', label: 'Todas' }, ...MEAL_TYPES]}
-                    radius="md"
-                    variant="filled"
-                    allowDeselect={false}
-                />
-            </SimpleGrid>
-        </Stack>
-      </Paper>
-
-      {/* 2. LISTA DE COMIDAS */}
-      <Stack p="md" gap="lg">
-        {loading ? (
-           <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-             <Skeleton h={280} radius="xl" animate /> 
-             <Skeleton h={280} radius="xl" animate />
-             <Skeleton h={280} radius="xl" animate />
-           </SimpleGrid>
-        ) : meals.length === 0 ? (
-          <Box mt="xl">
-            <NothingFound
-                title="Diario vacío"
-                description="No hay comidas registradas con estos filtros."
-                icon={IconPhoto}
-            />
-          </Box>
-        ) : (
-          grouped.map((g) => (
-            <Stack key={g.iso} gap="sm">
-              <Text 
-                c="dimmed" 
-                size="sm" 
-                fw={700} 
-                tt="uppercase" 
-                style={{ paddingLeft: 4, letterSpacing: 0.5 }}
+            {!readOnly && (
+              <Button 
+                  id='btn-add-meal'
+                  size="md" 
+                  radius="xl" 
+                  leftSection={<IconPlus size={18} />} 
+                  onClick={openNewMeal}
+                  color="blue"
               >
-                {g.label}
-              </Text>
-              
-              <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-                {g.items.map((m) => (
-                  <MealCard
-                    key={m.id}
-                    m={m}
-                    onEdit={!readOnly ? () => openEditMeal(m) : undefined}
-                    onDelete={!readOnly ? () => setDeleteMeal(m) : undefined}
-                    onOpen={() =>
-                      m.photoUrl &&
-                      setViewer({
-                        open: true,
-                        src: m.photoUrl,
-                        caption: `${new Date(m.takenAt).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })} · ${Number.isFinite(m.calories) ? `${m.calories} kcal` : ''}`,
-                      })
-                    }
+                  Registrar
+              </Button>
+            )}
+          </Group>
+        </Paper>
+
+        {/* Content wrapper */}
+        <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+          <Stack gap="md">
+            {/* 1. CONTROLES Y FILTROS */}
+            <Paper p="md" bg="white" shadow="xs" radius="lg" withBorder>
+              <Stack gap="xs">
+                <Text size="xs" fw={700} c="dimmed" tt="uppercase">Filtrar ingestas</Text>
+                <SimpleGrid cols={2} spacing="xs">
+                    <DatePickerInput
+                        placeholder="Fecha"
+                        leftSection={<IconCalendar size={16} />}
+                        value={day}
+                        onChange={setDay}
+                        clearable
+                        radius="md"
+                        variant="filled"
+                    />
+                    <Select
+                        placeholder="Tipo de comida"
+                        value={mealType}
+                        onChange={setMealType}
+                        data={[{ value: '', label: 'Todas' }, ...MEAL_TYPES]}
+                        radius="md"
+                        variant="filled"
+                        allowDeselect={false}
+                    />
+                </SimpleGrid>
+              </Stack>
+            </Paper>
+
+            {/* 2. LISTA DE COMIDAS */}
+            <Stack gap="lg">
+              {loading ? (
+                 <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+                   <Skeleton h={280} radius="xl" animate /> 
+                   <Skeleton h={280} radius="xl" animate />
+                   <Skeleton h={280} radius="xl" animate />
+                 </SimpleGrid>
+              ) : meals.length === 0 ? (
+                <Box mt="xl">
+                  <NothingFound
+                      title="Diario vacío"
+                      description="No hay comidas registradas con estos filtros."
+                      icon={IconPhoto}
                   />
-                ))}
-              </SimpleGrid>
+                </Box>
+              ) : (
+                grouped.map((g) => (
+                  <Stack key={g.iso} gap="sm">
+                    <Text 
+                      c="dimmed" 
+                      size="sm" 
+                      fw={700} 
+                      tt="uppercase" 
+                      style={{ paddingLeft: 4, letterSpacing: 0.5 }}
+                    >
+                      {g.label}
+                    </Text>
+                    
+                    <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+                      {g.items.map((m) => (
+                        <MealCard
+                          key={m.id}
+                          m={m}
+                          onEdit={!readOnly ? () => openEditMeal(m) : undefined}
+                          onDelete={!readOnly ? () => setDeleteMeal(m) : undefined}
+                          onOpen={() =>
+                            m.photoUrl &&
+                            setViewer({
+                              open: true,
+                              src: m.photoUrl,
+                              caption: `${new Date(m.takenAt).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })} · ${Number.isFinite(m.calories) ? `${m.calories} kcal` : ''}`,
+                            })
+                          }
+                        />
+                      ))}
+                    </SimpleGrid>
+                  </Stack>
+                ))
+              )}
             </Stack>
-          ))
-        )}
+          </Stack>
+        </Box>
       </Stack>
 
       {/* 3. MODALES */}

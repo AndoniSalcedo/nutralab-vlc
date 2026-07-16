@@ -39,7 +39,7 @@ export default async function TeamConfigPage({ params }) {
           </div>
         </Group>
       </Paper>
-      <TeamConfigClient team={team} />
+      <TeamConfigClient team={team} readOnly={user?.role === 'tecnico'} />
     </Stack>
   );
 }

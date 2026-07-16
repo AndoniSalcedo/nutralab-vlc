@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { slugify } from '@/lib/utils';
-import { Button, Group, Stack, NumberInput, Accordion, Paper, Title, ActionIcon, Table } from '@mantine/core';
+import { Button, Group, Stack, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil } from '@tabler/icons-react';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
@@ -12,7 +12,7 @@ import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
 
-export default function TeamConfigClient({ team }) {
+export default function TeamConfigClient({ team, readOnly = false }) {
   const [loading, setLoading] = useState(false);
   const [dayTypes, setDayTypes] = useState(() => {
     if (team.configuracion_nutricional?.dayTypes) return team.configuracion_nutricional.dayTypes;
@@ -112,37 +112,48 @@ export default function TeamConfigClient({ team }) {
       <Paper p="md" radius="lg" shadow="sm" withBorder>
         <Group justify="space-between" mb="md">
           <Title order={4}>Tipos de Día</Title>
-          <Button 
-            leftSection={<IconPlus size={14} />} 
-            size="xs" 
-            onClick={() => {
-              setEditingDayType({ key: '', label: '', planLabel: '', color: 'blue' });
-              setModalOpen(true);
-            }}
-          >
-            Añadir
-          </Button>
+          {!readOnly && (
+            <Button 
+              leftSection={<IconPlus size={14} />} 
+              size="xs" 
+              onClick={() => {
+                setEditingDayType({ key: '', label: '', planLabel: '', color: 'blue' });
+                setModalOpen(true);
+              }}
+            >
+              Añadir
+            </Button>
+          )}
         </Group>
 
         <Table striped highlightOnHover>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Tipo de Día</Table.Th>
-              <Table.Th>Color</Table.Th>
-              <Table.Th />
+              {!readOnly && <Table.Th />}
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
             {dayTypes.map(d => (
               <Table.Tr key={d.key}>
-                <Table.Td>{d.label}</Table.Td>
-                <Table.Td>{d.color}</Table.Td>
                 <Table.Td>
-                  <Group gap="xs" justify="flex-end">
-                    <ActionIcon onClick={() => { setEditingDayType(d); setModalOpen(true); }}><IconPencil size={16} /></ActionIcon>
-                    <ActionIcon color="red" onClick={() => removeDayType(d.key)}><IconTrash size={16} /></ActionIcon>
+                  <Group gap="xs">
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: `var(--mantine-color-${d.color}-6)` }} />
+                    <Text fw={600} size="sm" c="dark.4">{d.label}</Text>
                   </Group>
                 </Table.Td>
+                {!readOnly && (
+                  <Table.Td w={120}>
+                    <Group gap="xs" justify="flex-end" wrap="nowrap">
+                      <ActionIcon variant="light" color="blue" radius="xl" size="md" onClick={() => { setEditingDayType(d); setModalOpen(true); }}>
+                        <IconPencil size={16} />
+                      </ActionIcon>
+                      <ActionIcon variant="light" color="red" radius="xl" size="md" onClick={() => removeDayType(d.key)}>
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Group>
+                  </Table.Td>
+                )}
               </Table.Tr>
             ))}
           </Table.Tbody>
@@ -150,56 +161,65 @@ export default function TeamConfigClient({ team }) {
       </Paper>
 
       <Paper p="md" radius="lg" shadow="sm" withBorder>
-        <Title order={4} mb="md">Multiplicadores por Objetivo</Title>
-        <Accordion variant="separated">
+        <Title order={4} mb="md" c="dark.4">Multiplicadores por Objetivo</Title>
+        <Accordion variant="separated" radius="md">
           {PLAYER_OBJECTIVES.map(obj => (
-            <Accordion.Item key={obj.value} value={obj.value}>
-              <Accordion.Control>{obj.label}</Accordion.Control>
+            <Accordion.Item key={obj.value} value={obj.value} style={{ backgroundColor: 'white' }}>
+              <Accordion.Control fw={600} c="dark.3">{obj.label}</Accordion.Control>
               <Accordion.Panel>
-                <Table>
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th>Tipo de Día</Table.Th>
-                      <Table.Th>Kcal / Kg</Table.Th>
-                      <Table.Th>Prot (g/kg)</Table.Th>
-                      <Table.Th>HC (g/kg)</Table.Th>
-                      <Table.Th>Grasa (g/kg)</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {dayTypes.map(d => {
-                      const macros = objectiveMacros[obj.value]?.[d.key] || { kcalPerKg: 0, proteinGkg: 0, carbsGkg: 0, fatGkg: 0 };
-                      return (
-                        <Table.Tr key={d.key}>
-                          <Table.Td>{d.label}</Table.Td>
-                          <Table.Td>
-                            <NumberInput value={macros.kcalPerKg} onChange={(v) => updateMacro(obj.value, d.key, 'kcalPerKg', v)} decimalScale={2} hideControls />
-                          </Table.Td>
-                          <Table.Td>
-                            <NumberInput value={macros.proteinGkg} onChange={(v) => updateMacro(obj.value, d.key, 'proteinGkg', v)} decimalScale={2} hideControls />
-                          </Table.Td>
-                          <Table.Td>
-                            <NumberInput value={macros.carbsGkg} onChange={(v) => updateMacro(obj.value, d.key, 'carbsGkg', v)} decimalScale={2} hideControls />
-                          </Table.Td>
-                          <Table.Td>
-                            <NumberInput value={macros.fatGkg} onChange={(v) => updateMacro(obj.value, d.key, 'fatGkg', v)} decimalScale={2} hideControls />
-                          </Table.Td>
-                        </Table.Tr>
-                      );
-                    })}
-                  </Table.Tbody>
-                </Table>
+                <div style={{ overflowX: 'auto' }}>
+                  <Table verticalSpacing="sm" striped>
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th style={{ minWidth: 150 }}>Tipo de Día</Table.Th>
+                        <Table.Th>Kcal / Kg</Table.Th>
+                        <Table.Th>Prot (g/kg)</Table.Th>
+                        <Table.Th>HC (g/kg)</Table.Th>
+                        <Table.Th>Grasa (g/kg)</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {dayTypes.map(d => {
+                        const macros = objectiveMacros[obj.value]?.[d.key] || { kcalPerKg: 0, proteinGkg: 0, carbsGkg: 0, fatGkg: 0 };
+                        return (
+                          <Table.Tr key={d.key}>
+                            <Table.Td>
+                              <Group gap="xs">
+                                <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: `var(--mantine-color-${d.color}-6)` }} />
+                                <Text size="sm" fw={500} c="dark.4">{d.label}</Text>
+                              </Group>
+                            </Table.Td>
+                            <Table.Td>
+                              <NumberInput value={macros.kcalPerKg} onChange={(v) => updateMacro(obj.value, d.key, 'kcalPerKg', v)} decimalScale={2} hideControls readOnly={readOnly} variant={readOnly ? 'unstyled' : 'filled'} radius="md" style={{ minWidth: 75 }} />
+                            </Table.Td>
+                            <Table.Td>
+                              <NumberInput value={macros.proteinGkg} onChange={(v) => updateMacro(obj.value, d.key, 'proteinGkg', v)} decimalScale={2} hideControls readOnly={readOnly} variant={readOnly ? 'unstyled' : 'filled'} radius="md" style={{ minWidth: 75 }} />
+                            </Table.Td>
+                            <Table.Td>
+                              <NumberInput value={macros.carbsGkg} onChange={(v) => updateMacro(obj.value, d.key, 'carbsGkg', v)} decimalScale={2} hideControls readOnly={readOnly} variant={readOnly ? 'unstyled' : 'filled'} radius="md" style={{ minWidth: 75 }} />
+                            </Table.Td>
+                            <Table.Td>
+                              <NumberInput value={macros.fatGkg} onChange={(v) => updateMacro(obj.value, d.key, 'fatGkg', v)} decimalScale={2} hideControls readOnly={readOnly} variant={readOnly ? 'unstyled' : 'filled'} radius="md" style={{ minWidth: 75 }} />
+                            </Table.Td>
+                          </Table.Tr>
+                        );
+                      })}
+                    </Table.Tbody>
+                  </Table>
+                </div>
               </Accordion.Panel>
             </Accordion.Item>
           ))}
         </Accordion>
       </Paper>
 
-      <Group justify="flex-end">
-        <Button loading={loading} onClick={saveConfig} leftSection={<IconDeviceFloppy size={16} />}>
-          Guardar Configuración
-        </Button>
-      </Group>
+      {!readOnly && (
+        <Group justify="flex-end">
+          <Button loading={loading} onClick={saveConfig} leftSection={<IconDeviceFloppy size={16} />}>
+            Guardar Configuración
+          </Button>
+        </Group>
+      )}
 
       <DayTypeModal
         opened={modalOpen}

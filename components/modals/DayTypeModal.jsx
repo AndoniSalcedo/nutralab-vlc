@@ -14,11 +14,14 @@ export default function DayTypeModal({
       opened={opened}
       onClose={onClose}
       title={editingDayType?.key ? 'Editar Tipo de Día' : 'Nuevo Tipo de Día'}
+      radius="md"
+      size="sm"
     >
       {editingDayType && (
         <Stack>
           <TextInput
             label="Nombre del Tipo de Día"
+            placeholder="Ej: Día de partido"
             value={editingDayType.label}
             onChange={(e) => {
               const val = e.target.value;
@@ -28,6 +31,7 @@ export default function DayTypeModal({
                 planLabel: val.toLowerCase().startsWith('día') || val.toLowerCase().startsWith('dia') ? val : `Día ${val.toLowerCase()}`
               });
             }}
+            radius="md"
           />
           <Select
             label="Color"
@@ -35,8 +39,8 @@ export default function DayTypeModal({
             value={editingDayType.color}
             onChange={(v) => setEditingDayType({ ...editingDayType, color: v })}
           />
-          <Button onClick={handleSaveDayType} fullWidth mt="md">
-            Aceptar
+          <Button onClick={handleSaveDayType} fullWidth mt="md" radius="xl" color="blue">
+            Guardar Tipo de Día
           </Button>
         </Stack>
       )}
