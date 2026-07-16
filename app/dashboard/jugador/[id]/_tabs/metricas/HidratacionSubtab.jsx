@@ -149,7 +149,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       const sampleRow = kind === 'sweat'
         ? ['4/4/2026', '09:15', 'sweat', '650', 'mg/L', 'Moderate', 'Pérdida moderada de sodio']
         : ['4/4/2026', '12:51', 'sosm', '76', 'mOsm', 'Mildly Dehydrated', 'Falta reponer sales'];
-      
+
       const csvContent = [
         headers.join(','),
         sampleRow.join(',')
@@ -643,7 +643,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
                   setModalOpen(true);
                 }}
               >
-                Importar CSV
+                Importar
               </Button>
             )}
           </Group>

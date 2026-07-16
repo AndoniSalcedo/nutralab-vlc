@@ -13,25 +13,20 @@ import {
   Badge,
   ActionIcon,
   RingProgress,
-  Button,
   Center,
   Loader,
   Grid,
-  Progress,
-  Flex
+  Progress
 } from '@mantine/core';
 
 import {
   IconClipboardList,
-  IconTargetArrow,
   IconUser,
   IconChevronLeft,
   IconChevronRight,
   IconFlame,
-  IconPlus
 } from '@tabler/icons-react';
-import { useRouter } from 'next/navigation';
-import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES, getObjectiveLabel } from '@/lib/calculations';
+import { calculateByObjective, getTeamNutritionDayTypes } from '@/lib/calculations';
 import { CampoEditable, ComidasEditable } from '../editable';
 import { latestMetricValue } from '@/lib/player-metrics';
 import { listPlayerMeals } from '@/services/meal';
@@ -138,7 +133,6 @@ function PremiumMacroBar({ label, color, consumed, target, icon }) {
 }
 
 export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = false }) {
-  const router = useRouter();
   const [meals, setMeals] = useState([]);
   const [loadingMeals, setLoadingMeals] = useState(true);
 
@@ -266,8 +260,6 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
 
               </Group>
               <Box mb="lg">
-                <Text size='xs' fw="700" c="dimmed" mb="xs" tt="uppercase" style={{ letterSpacing: '0.5px' }}>Tipo de Día</Text>
-
                 {/* Selector interactivo integrado de Tipo de Día */}
                 <Paper withBorder p="md" radius="xl" bg="var(--mantine-color-white)">
                   <Group justify="space-between" align="center" wrap="nowrap">

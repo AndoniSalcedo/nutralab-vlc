@@ -295,7 +295,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
                   Borrar
                 </Button>
                 <Button size="xs" radius="xl" leftSection={<IconPlus size={14} />} onClick={startUpload}>
-                  Añadir PDF
+                  Añadir
                 </Button>
               </Group>
             )}

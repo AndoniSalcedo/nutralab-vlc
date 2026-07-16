@@ -342,10 +342,10 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                   loading={deleting}
                   disabled={!selected}
                 >
-                  Borrar actual
+                  Borrar
                 </Button>
                 <Button size="xs" variant="light" color="dark" radius="xl" leftSection={<IconEdit size={14} />} disabled={!selected} onClick={startEdit}>
-                  Editar actual
+                  Editar
                 </Button>
                 <Button size="xs" radius="xl" leftSection={<IconPlus size={14} />} onClick={startNew}>
                   Añadir

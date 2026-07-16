@@ -36,7 +36,7 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/nutrition-plan-card';
-import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getObjectiveLabel, getTeamNutritionDayTypes } from '@/lib/calculations';
+import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getTeamNutritionDayTypes } from '@/lib/calculations';
 import { getUserMeals } from '@/lib/nutrition-day-types';
 import IntercambiosModal from '@/components/modals/IntercambiosModal';
 import NothingFound from '@/components/NothingFound';
@@ -357,7 +357,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setModalSelectedMenuWeek(selectedMenuWeek || 'none');
     setModalContextoAdicional('');
     setModalCalendar(getDefaultCalendar());
-    
+
     const meals = getUserMeals(jugador);
     const initialRecs = {};
     const defaultRecs = jugador?.recomendaciones_defecto || {};
@@ -375,7 +375,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setContextoAdicional(modalContextoAdicional);
     setRecomendacionesIngestas(modalRecomendacionesIngestas);
     setContenido('');
-    
+
     let resolvedMenu = null;
     if (modalSelectedMenuWeek !== 'none' && modalSelectedMenuWeek) {
       resolvedMenu = availableMenus.find(m => m.semana === modalSelectedMenuWeek) || null;
@@ -390,7 +390,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       calendario: modalCalendar,
       teamConfig
     }));
-    
+
     setHasGeneratedAi(false);
     setCreationModalOpened(false);
   }
@@ -429,13 +429,13 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       setSelectedMenuWeek(modalSelectedMenuWeek);
       setContextoAdicional(modalContextoAdicional);
       setRecomendacionesIngestas(modalRecomendacionesIngestas);
-      
+
       setDatos(data.datos || null);
       setContenido('');
       setHasGeneratedAi(true);
       setMode('create');
       setCreationModalOpened(false);
-      
+
       notifications.update({
         id: notificationId,
         color: 'green',
@@ -710,29 +710,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     }
   }
 
-  const getComidasResumen = () => {
-    let base = '';
-    if (jugador.num_comidas) {
-      base = !isNaN(Number(jugador.num_comidas))
-        ? `${jugador.num_comidas} comidas/día`
-        : jugador.num_comidas;
-    }
-    
-    const extras = [];
-    if (base) extras.push(base);
-    if (jugador.postentreno) extras.push('Post-entreno');
-    
-    return extras.length > 0 ? extras.join(' + ') : null;
-  };
-
-  const perfilResumen = [
-    getComidasResumen(),
-    jugador.objetivo ? getObjectiveLabel(jugador.objetivo) : null,
-    jugador.alergias ? `Alergias: ${jugador.alergias.slice(0, 30)}` : null,
-    jugador.intolerancias ? `Intol: ${jugador.intolerancias.slice(0, 30)}` : null,
-    jugador.gustos_preferencias ? `Gustos: ${jugador.gustos_preferencias.slice(0, 30)}` : null,
-  ].filter(Boolean);
-
   const canSave = nombre.trim() && (datos || contenido.trim()) && actionType !== 'generate';
 
   return (
@@ -809,16 +786,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
             </Group>
           </Group>
 
-          {perfilResumen.length > 0 && (
-            <Group gap={6}>
-              {perfilResumen.map((item, i) => (
-                <Badge key={i} variant="light" color="gray" size="sm" radius="sm">
-                  {item}
-                </Badge>
-              ))}
-            </Group>
-          )}
-
           <Select
             placeholder={loadingList ? 'Cargando planes...' : 'Sin planes creados'}
             data={planes.map((plan) => ({ value: String(plan.id), label: planLabel(plan) }))}
@@ -890,7 +857,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                   onChange={(e) => setNombre(e.target.value)}
                   required
                 />
-                
+
                 <Select
                   label="Menú a utilizar"
                   placeholder="Selecciona una semana o Sin Menú..."
