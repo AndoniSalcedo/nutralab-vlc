@@ -1066,7 +1066,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
               title="Sin planes nutricionales"
               description="Todavía no hay planes nutricionales creados para este jugador."
               actionLabel={!readOnly ? 'Crear primera ficha' : undefined}
-              onAction={!readOnly ? startCreate : undefined}
+              onAction={!readOnly ? openCreateModal : undefined}
             />
           </Box>
         ) : currentDatos ? (

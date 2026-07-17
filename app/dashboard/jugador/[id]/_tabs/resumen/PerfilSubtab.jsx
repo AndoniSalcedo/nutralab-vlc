@@ -26,7 +26,7 @@ import {
   IconChevronRight,
   IconFlame,
 } from '@tabler/icons-react';
-import { calculateByObjective, getTeamNutritionDayTypes } from '@/lib/calculations';
+import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/lib/calculations';
 import { CampoEditable, ComidasEditable } from '../editable';
 import { latestMetricValue } from '@/lib/player-metrics';
 import { listPlayerMeals } from '@/services/meal';
