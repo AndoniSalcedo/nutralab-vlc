@@ -4,6 +4,7 @@ import { registerBones } from 'boneyard-js'
 
 import _diario_comidas from './diario-comidas.bones.json'
 import _player_dashboard from './player-dashboard.bones.json'
+import _balance_nutricional from './balance-nutricional.bones.json'
 import _team_analytics from './team-analytics.bones.json'
 import _team_config from './team-config.bones.json'
 import _team_dashboard from './team-dashboard.bones.json'
@@ -15,6 +16,7 @@ import _teams_list from './teams-list.bones.json'
 registerBones({
   "diario-comidas": _diario_comidas,
   "player-dashboard": _player_dashboard,
+  "balance-nutricional": _balance_nutricional,
   "team-analytics": _team_analytics,
   "team-config": _team_config,
   "team-dashboard": _team_dashboard,

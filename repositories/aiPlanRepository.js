@@ -1,9 +1,14 @@
-export async function getAiPlansByPlayerId(supabase, jugadorId) {
-  const { data, error } = await supabase
+export async function getAiPlansByPlayerId(supabase, jugadorId, semana = null) {
+  let query = supabase
     .from('planes_ia')
     .select('*')
-    .eq('jugador_id', jugadorId)
-    .order('created_at', { ascending: false });
+    .eq('jugador_id', jugadorId);
+
+  if (semana) {
+    query = query.eq('datos->meta->>semanaMenu', semana);
+  }
+
+  const { data, error } = await query.order('created_at', { ascending: false });
 
   if (error) throw error;
   return data || [];

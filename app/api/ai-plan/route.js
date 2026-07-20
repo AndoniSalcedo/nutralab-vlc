@@ -40,7 +40,8 @@ export async function GET(req) {
       if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
     }
 
-    const planes = await getAiPlansByPlayerId(supabase, jugadorId);
+    const semana = searchParams.get('semana');
+    const planes = await getAiPlansByPlayerId(supabase, jugadorId, semana);
     return NextResponse.json({ planes: planes || [] });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });

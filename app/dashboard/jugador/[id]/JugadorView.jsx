@@ -12,7 +12,7 @@ import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
 import { getMenusByTeam } from '@/repositories/menuRepository';
 import { getHydrationRecordsByPlayerId } from '@/repositories/hydrationRepository';
 import { getMessages } from '@/repositories/messagesRepository';
-import { Stack, Text, Anchor } from '@mantine/core';
+
 
 export default async function JugadorView({ id, activeTab = 'resumen', activeSubtab }) {
   const supabase = getSupabaseAdmin();
@@ -67,10 +67,13 @@ export default async function JugadorView({ id, activeTab = 'resumen', activeSub
 
   if (!jugador) {
     return (
-      <Stack gap="lg" mt="md">
-        <Text c="red">No se pudo cargar la información del jugador o no existe.</Text>
-        <Anchor href="/dashboard">Volver al panel</Anchor>
-      </Stack>
+      <NothingFound
+        title="Jugador no encontrado"
+        description="No se pudo cargar la información del jugador o no existe."
+        actionLabel="Volver al panel"
+        actionHref="/dashboard"
+        withPaper
+      />
     );
   }
 

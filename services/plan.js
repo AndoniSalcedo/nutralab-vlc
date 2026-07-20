@@ -1,5 +1,8 @@
-export async function getAiPlans(jugadorId) {
-  const res = await fetch(`/api/ai-plan?jugador_id=${jugadorId}`);
+export async function getAiPlans(jugadorId, semana = null) {
+  const url = semana
+    ? `/api/ai-plan?jugador_id=${jugadorId}&semana=${semana}`
+    : `/api/ai-plan?jugador_id=${jugadorId}`;
+  const res = await fetch(url);
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Error al cargar planes');
   return data;

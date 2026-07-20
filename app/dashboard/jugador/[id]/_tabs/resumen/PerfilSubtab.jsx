@@ -13,11 +13,10 @@ import {
   Badge,
   ActionIcon,
   RingProgress,
-  Center,
-  Loader,
-  Grid,
-  Progress
+  Progress,
+  Flex
 } from '@mantine/core';
+import { DateInput } from '@mantine/dates';
 
 import {
   IconClipboardList,
@@ -25,11 +24,17 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconFlame,
+  IconEgg,
+  IconApple,
+  IconDroplet,
+  IconCalendar,
 } from '@tabler/icons-react';
 import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/lib/calculations';
 import { CampoEditable, ComidasEditable } from '../editable';
 import { latestMetricValue } from '@/lib/player-metrics';
 import { listPlayerMeals } from '@/services/meal';
+import { getAiPlans } from '@/services/plan';
+import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import foods from '@/data/foods';
 
 const calcNutrient = (food, grams, key) => {
@@ -86,46 +91,54 @@ function calculateConsumedStats(meals) {
   };
 }
 
-function PremiumMacroBar({ label, color, consumed, target, icon }) {
-  const [hovered, setHovered] = useState(false);
+function getDayInfo(date) {
+  const temp = new Date(date);
+  const day = temp.getDay(); // 0 = Sunday, 1 = Monday, ...
+  const diff = temp.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(temp.setDate(diff));
+  const mondayStr = monday.toLocaleDateString('sv-SE', { timeZone: 'Europe/Madrid' });
+  
+  const keys = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+  const dayKey = keys[day];
+  
+  return { mondayStr, dayKey };
+}
+
+function PremiumMacroBar({ label, color, consumed, target, icon: IconComponent }) {
   const targetNum = target && Number(target) > 0 ? Number(target) : 0;
   const pct = targetNum > 0 ? Math.min(100, Math.round((consumed / targetNum) * 100)) : 0;
 
   return (
     <Box
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       style={{
-        padding: '12px 16px',
-        borderRadius: '16px',
-        backgroundColor: hovered ? 'rgba(0,0,0,0.02)' : 'transparent',
-        transition: 'background-color 0.2s ease',
+        padding: '8px 12px',
+        borderRadius: '12px',
         cursor: 'default'
       }}
     >
-      <Group justify="space-between" mb={10}>
-        <Group gap="sm">
-          <ThemeIcon color={color} variant="light" size="md" radius="xl">
-            <Text size="sm">{icon}</Text>
+      <Group justify="space-between" mb={6}>
+        <Group gap="xs">
+          <ThemeIcon color={color} variant="light" size="sm" radius="md">
+            <IconComponent size={14} />
           </ThemeIcon>
-          <Text fw={800} size="sm" c="dark.5" tt="uppercase" ls={0.5}>{label}</Text>
+          <Text fw={700} size="sm" c="dark.4">{label}</Text>
         </Group>
-        <Group gap={8} align="baseline">
-          <Text fw={900} size="xl" c="dark.6" lh={1}>{consumed}g</Text>
-          <Text fw={600} size="sm" c="dimmed">/ {target || '-'}g</Text>
+        <Group gap={4} align="baseline">
+          <Text fw={700} size="sm" c="dark.5">{consumed}g</Text>
+          <Text fw={500} size="xs" c="dimmed">/ {target || '-'}g</Text>
         </Group>
       </Group>
       <Progress
         value={pct}
         color={color}
-        size="md"
+        size="sm"
         radius="xl"
         bg="gray.1"
       />
-      <Group justify="space-between" mt={6}>
-        <Text size="10px" fw={700} c="dimmed">{pct}% completado</Text>
+      <Group justify="space-between" mt={4}>
+        <Text size="10px" fw={600} c="dimmed">{pct}% completado</Text>
         {targetNum > 0 && consumed >= targetNum && (
-          <Text size="10px" fw={800} c="green.6">¡Meta alcanzada!</Text>
+          <Text size="10px" fw={700} c="green.6">¡Meta alcanzada!</Text>
         )}
       </Group>
     </Box>
@@ -135,32 +148,51 @@ function PremiumMacroBar({ label, color, consumed, target, icon }) {
 export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = false }) {
   const [meals, setMeals] = useState([]);
   const [loadingMeals, setLoadingMeals] = useState(true);
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
 
   useEffect(() => {
     if (!jugador?.id) return;
     let active = true;
     setLoadingMeals(true);
 
-    const todayStr = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Madrid' });
+    const { mondayStr, dayKey } = getDayInfo(selectedDate);
+    const dateStr = new Date(selectedDate).toLocaleDateString('sv-SE', { timeZone: 'Europe/Madrid' });
 
-    listPlayerMeals(jugador.id, { day: todayStr })
-      .then((data) => {
-        if (active) {
-          setMeals(data || []);
-          setLoadingMeals(false);
-        }
+    Promise.all([
+      listPlayerMeals(jugador.id, { day: dateStr }),
+      getAiPlans(jugador.id, mondayStr).catch((err) => {
+        console.error('Error fetching plan for week:', err);
+        return { planes: [] };
       })
-      .catch((err) => {
-        console.error('Error fetching today\'s meals:', err);
-        if (active) {
-          setLoadingMeals(false);
+    ]).then(([mealsData, plansData]) => {
+      if (!active) return;
+      
+      setMeals(mealsData || []);
+      setLoadingMeals(false);
+      
+      const matchingPlan = plansData.planes?.[0] || null;
+      
+      if (matchingPlan) {
+        const planDayType = matchingPlan.datos?.dias?.[dayKey]?.tipoDia;
+        if (planDayType) {
+          setActiveDayType(planDayType);
         }
-      });
+      } else {
+        setActiveDayType('entreno');
+      }
+    }).catch((err) => {
+      console.error('Error in Resumen tab load:', err);
+      if (active) {
+        setMeals([]);
+        setLoadingMeals(false);
+        setActiveDayType('entreno');
+      }
+    });
 
     return () => {
       active = false;
     };
-  }, [jugador?.id]);
+  }, [jugador?.id, selectedDate]);
 
   const consumed = useMemo(() => calculateConsumedStats(meals), [meals]);
 
@@ -183,6 +215,8 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
 
   const defaultDiaType = 'entreno';
   const [activeDayType, setActiveDayType] = useState(defaultDiaType);
+
+
 
   const playerObjective = jugador?.objetivo || 'mejora_rendimiento';
 
@@ -246,18 +280,61 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
         <Stack gap="md">
           {/* Daily Tracker / Consumo de Hoy (Unified Premium Dashboard) */}
           <Paper p={{ base: 'md', sm: 'lg' }} bg="white" shadow="xs" radius="lg" withBorder>
-
             <Box style={{ position: 'relative', zIndex: 1 }}>
+              <Group justify="space-between" align="center" mb="md" wrap="wrap" gap="sm">
+                <Group gap="xs">
+                  <ThemeIcon color="red" variant="light" radius="xl" size="lg">
+                    <IconFlame size={24} />
+                  </ThemeIcon>
+                  <Stack gap={2}>
+                    <Title order={3} fw={800} c="dark.4">Balance Nutricional</Title>
+                    <Text size="sm" c="dimmed">Progreso diario según la exigencia del entrenamiento</Text>
+                  </Stack>
+                </Group>
 
-              <Group gap="xs" mb="md">
-                <ThemeIcon color="red" variant="light" radius="xl" size="lg">
-                  <IconFlame size={24} />
-                </ThemeIcon>
-                <Box>
-                  <Title order={3} fw={800} c="dark.4">Balance Nutricional</Title>
-                  <Text size="sm" c="dimmed">Progreso diario según la exigencia del entrenamiento</Text>
-                </Box>
+                {/* Interactive Date Picker with Chevron Navigators */}
+                <Group gap="xs" w={{ base: '100%', sm: 'auto' }} style={{ flexGrow: { base: 1, sm: 0 } }}>
+                  <ActionIcon
+                    variant="subtle"
+                    color="gray"
+                    radius="md"
+                    size="lg"
+                    onClick={() => {
+                      const prev = new Date(selectedDate);
+                      prev.setDate(prev.getDate() - 1);
+                      setSelectedDate(prev);
+                    }}
+                  >
+                    <IconChevronLeft size={18} />
+                  </ActionIcon>
+                  
+                  <DateInput
+                    value={new Date(selectedDate)}
+                    onChange={(val) => val && setSelectedDate(val)}
+                    valueFormat="DD/MM/YYYY"
+                    maxDate={new Date()}
+                    size="xs"
+                    radius="md"
+                    leftSection={<IconCalendar size={14} />}
+                    style={{ width: 180, flex: 1 }}
+                    allowDeselect={false}
+                  />
 
+                  <ActionIcon
+                    variant="subtle"
+                    color="gray"
+                    radius="md"
+                    size="lg"
+                    disabled={new Date(selectedDate).toDateString() === new Date().toDateString()}
+                    onClick={() => {
+                      const next = new Date(selectedDate);
+                      next.setDate(next.getDate() + 1);
+                      setSelectedDate(next);
+                    }}
+                  >
+                    <IconChevronRight size={18} />
+                  </ActionIcon>
+                </Group>
               </Group>
               <Box mb="lg">
                 {/* Selector interactivo integrado de Tipo de Día */}
@@ -342,34 +419,28 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
                 </Paper>
               </Box>
 
-              {loadingMeals ? (
-                <Center py="xl">
-                  <Loader size="md" color="orange" />
-                </Center>
-              ) : (
-                <Grid gutter={40} align="center">
-                  <Grid.Col span={{ base: 12, md: 5 }}>
-                    <Center>
-                      <RingProgress
-                        size={240}
-                        thickness={20}
-                        roundCaps
-                        sections={[{
-                          value: kcal && Number(kcal) > 0 ? Math.min(100, Math.round((consumed.kcal / Number(kcal)) * 100)) : 0,
-                          color: consumed.kcal >= (Number(kcal) || 0) && Number(kcal) > 0 ? 'teal.5' : 'orange.5'
-                        }]}
-                        label={
-                          <Stack gap={0} align="center" style={{ transform: 'translateY(-2px)' }}>
-                            <Text size="xs" c="dimmed" fw={800} tt="uppercase" ls={1.5}>Calorías</Text>
-                            <Text size="48px" fw={900} lh={1} c="dark.6" style={{ letterSpacing: '-1.5px' }}>{consumed.kcal}</Text>
-                            <Text size="sm" c="dimmed" fw={600} mt={4}>/ {kcal || '-'} kcal</Text>
-                          </Stack>
-                        }
-                      />
-                    </Center>
-                  </Grid.Col>
+              <BoneyardSkeleton name="balance-nutricional" loading={loadingMeals}>
+                <Flex direction={{ base: 'column', md: 'row' }} gap={40} align="center">
+                  <Box style={{ flexShrink: 0 }} px={{ base: 0, md: 'lg' }}>
+                    <RingProgress
+                      size={240}
+                      thickness={20}
+                      roundCaps
+                      sections={[{
+                        value: kcal && Number(kcal) > 0 ? Math.min(100, Math.round((consumed.kcal / Number(kcal)) * 100)) : 0,
+                        color: consumed.kcal >= (Number(kcal) || 0) && Number(kcal) > 0 ? 'teal.5' : 'orange.5'
+                      }]}
+                      label={
+                        <Stack gap={0} align="center" style={{ transform: 'translateY(-2px)' }}>
+                          <Text size="xs" c="dimmed" fw={700}>Calorías</Text>
+                          <Text size="32px" fw={850} lh={1.1} c="dark.6" style={{ letterSpacing: '-0.5px' }}>{consumed.kcal}</Text>
+                          <Text size="xs" c="dimmed" fw={600}>/ {kcal || '-'} kcal</Text>
+                        </Stack>
+                      }
+                    />
+                  </Box>
 
-                  <Grid.Col span={{ base: 12, md: 7 }}>
+                  <Box style={{ flexGrow: 1, width: '100%' }}>
                     <Stack gap="sm">
                       {/* Proteínas */}
                       <PremiumMacroBar
@@ -377,7 +448,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
                         color="red"
                         consumed={consumed.pro}
                         target={protein}
-                        icon="🍖"
+                        icon={IconEgg}
                       />
                       {/* Carbohidratos */}
                       <PremiumMacroBar
@@ -385,7 +456,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
                         color="yellow"
                         consumed={consumed.cho}
                         target={cho}
-                        icon="🌾"
+                        icon={IconApple}
                       />
                       {/* Grasas */}
                       <PremiumMacroBar
@@ -393,12 +464,12 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
                         color="blue"
                         consumed={consumed.fat}
                         target={fat}
-                        icon="🥑"
+                        icon={IconDroplet}
                       />
                     </Stack>
-                  </Grid.Col>
-                </Grid>
-              )}
+                  </Box>
+                </Flex>
+              </BoneyardSkeleton>
             </Box>
           </Paper>
 
