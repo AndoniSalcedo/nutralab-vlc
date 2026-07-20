@@ -52,7 +52,7 @@ function resolveBreakpoint(bonesData, width) {
  * 2. loading={false} (with children) — renders children directly.
  *    Used as a wrapper in content components for boneyard build snapshots.
  */
-export default function BoneyardSkeleton({ name, loading = true, children }) {
+export default function BoneyardSkeleton({ name, loading = true, minY = 0, children }) {
   const containerRef = useRef(null);
   const [width, setWidth] = useState(1280);
 
@@ -82,9 +82,15 @@ export default function BoneyardSkeleton({ name, loading = true, children }) {
   if (!resolved || !resolved.bones) return children || null;
 
   const { bones, height: capturedHeight, width: capturedWidth } = resolved;
-  const nonContainerBones = bones.map(normalizeBone).filter(b => !b.c);
+  let nonContainerBones = bones.map(normalizeBone).filter(b => !b.c);
+
+  if (minY > 0) {
+    nonContainerBones = nonContainerBones.filter(b => b.y >= minY);
+  }
 
   if (nonContainerBones.length === 0) return children || null;
+
+  const adjustedHeight = capturedHeight ? Math.max(0, capturedHeight - minY) : '100vh';
 
   return (
     <div
@@ -92,7 +98,7 @@ export default function BoneyardSkeleton({ name, loading = true, children }) {
       style={{
         position: 'relative',
         width: '100%',
-        minHeight: capturedHeight || '100vh',
+        minHeight: adjustedHeight,
         overflow: 'hidden',
       }}
       aria-busy="true"
@@ -100,6 +106,7 @@ export default function BoneyardSkeleton({ name, loading = true, children }) {
       {nonContainerBones.map((b, i) => {
         const capturedPxW = (b.w / 100) * (capturedWidth || width);
         const isCircle = b.r === '50%' && Math.abs(capturedPxW - b.h) < 4;
+        const adjustedTop = b.y - minY;
 
         return (
           <div
@@ -107,7 +114,7 @@ export default function BoneyardSkeleton({ name, loading = true, children }) {
             style={{
               position: 'absolute',
               left: `${b.x}%`,
-              top: b.y,
+              top: adjustedTop,
               width: isCircle ? b.h : `${b.w}%`,
               height: b.h,
               borderRadius: typeof b.r === 'string' ? b.r : `${b.r}px`,

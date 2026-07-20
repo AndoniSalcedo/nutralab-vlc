@@ -2,7 +2,7 @@
 
 import { Box, Tabs, rem } from '@mantine/core';
 import { IconChartBar, IconInfoCircle, IconSalad } from '@tabler/icons-react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import MetricasTab from './MetricasTab';
 import NutricionTab from './NutricionTab';
 import ResumenTab from './ResumenTab';
@@ -25,13 +25,22 @@ export default function PlayerTabs({
   activeTab: activeTabProp = 'resumen',
   activeSubtab: activeSubtabProp,
   readOnly = false,
+  children,
 }) {
   const router = useRouter();
+  const params = useParams();
 
-  const normalizedTab = activeTabProp === 'general' ? 'resumen' : activeTabProp;
-  const normalizedSubtab = activeSubtabProp === 'ficha' || activeSubtabProp === 'objetivos'
+  const routeTab = params?.tab;
+  const routeSubtab = params?.subtab?.[0];
+
+  const activeTabPropFromParams = routeTab || activeTabProp;
+  const activeSubtabPropFromParams = routeSubtab || activeSubtabProp;
+
+  const normalizedTab = activeTabPropFromParams === 'general' ? 'resumen' : activeTabPropFromParams;
+  const normalizedSubtab = activeSubtabPropFromParams === 'ficha' || activeSubtabPropFromParams === 'objetivos'
     ? 'perfil'
-    : activeSubtabProp;
+    : activeSubtabPropFromParams;
+
   const validSubtabs = {
     resumen: ['perfil', 'diario', 'mensajes'],
     metricas: readOnly 
@@ -76,39 +85,43 @@ export default function PlayerTabs({
         <Tabs.Tab value="nutricion" leftSection={<IconSalad size={18} />} style={activeTabStyle('nutricion')}>Nutrición</Tabs.Tab>
       </Tabs.List>
 
-      <Box>
-        <Tabs.Panel value="resumen">
-          <ResumenTab
-            jugador={jugador}
-            evoluciones={evoluciones}
-            messages={messages}
-            activeSubtab={activeTab === 'resumen' ? activeSubtab : DEFAULT_SUBTABS.resumen}
-            onSubtabChange={(value) => navigate('resumen', value)}
-            readOnly={readOnly}
-          />
-        </Tabs.Panel>
+      <Box mt="md">
+        {children ? children : (
+          <>
+            <Tabs.Panel value="resumen">
+              <ResumenTab
+                jugador={jugador}
+                evoluciones={evoluciones}
+                messages={messages}
+                activeSubtab={activeTab === 'resumen' ? activeSubtab : DEFAULT_SUBTABS.resumen}
+                onSubtabChange={(value) => navigate('resumen', value)}
+                readOnly={readOnly}
+              />
+            </Tabs.Panel>
 
-        <Tabs.Panel value="metricas">
-          <MetricasTab
-            jugador={jugador}
-            analiticas={analiticas}
-            evoluciones={evoluciones}
-            registrosHidratacion={registrosHidratacion}
-            activeSubtab={activeTab === 'metricas' ? activeSubtab : DEFAULT_SUBTABS.metricas}
-            onSubtabChange={(value) => navigate('metricas', value)}
-            readOnly={readOnly}
-          />
-        </Tabs.Panel>
+            <Tabs.Panel value="metricas">
+              <MetricasTab
+                jugador={jugador}
+                analiticas={analiticas}
+                evoluciones={evoluciones}
+                registrosHidratacion={registrosHidratacion}
+                activeSubtab={activeTab === 'metricas' ? activeSubtab : DEFAULT_SUBTABS.metricas}
+                onSubtabChange={(value) => navigate('metricas', value)}
+                readOnly={readOnly}
+              />
+            </Tabs.Panel>
 
-        <Tabs.Panel value="nutricion">
-          <NutricionTab
-            jugador={jugador}
-            menus={menus}
-            activeSubtab={activeTab === 'nutricion' ? activeSubtab : DEFAULT_SUBTABS.nutricion}
-            onSubtabChange={(value) => navigate('nutricion', value)}
-            readOnly={readOnly}
-          />
-        </Tabs.Panel>
+            <Tabs.Panel value="nutricion">
+              <NutricionTab
+                jugador={jugador}
+                menus={menus}
+                activeSubtab={activeTab === 'nutricion' ? activeSubtab : DEFAULT_SUBTABS.nutricion}
+                onSubtabChange={(value) => navigate('nutricion', value)}
+                readOnly={readOnly}
+              />
+            </Tabs.Panel>
+          </>
+        )}
       </Box>
     </Tabs>
   );

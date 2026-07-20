@@ -1,7 +1,7 @@
-import JugadorView from './JugadorView';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default function JugadorPage({ params }) {
-  return <JugadorView id={params.id} />;
+  redirect(`/dashboard/jugador/${params.id}/resumen/perfil`);
 }

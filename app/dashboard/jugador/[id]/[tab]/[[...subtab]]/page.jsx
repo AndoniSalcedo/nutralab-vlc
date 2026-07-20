@@ -1,13 +1,114 @@
-import JugadorView from '../../JugadorView';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getUser } from '@/lib/auth';
+import { withLatestMeasurement } from '@/lib/player-metrics';
+import { getOwnedPlayer } from '@/lib/team-access';
+import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
+import { getAnalyticsByPlayerId } from '@/repositories/analyticsRepository';
+import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
+import { getMenusByTeam } from '@/repositories/menuRepository';
+import { getHydrationRecordsByPlayerId } from '@/repositories/hydrationRepository';
+import { getMessages } from '@/repositories/messagesRepository';
+import NothingFound from '@/components/NothingFound';
+import PlayerTabContainer from './PlayerTabContainer';
 
 export const dynamic = 'force-dynamic';
 
-export default function JugadorTabPage({ params }) {
+export default async function JugadorTabPage({ params }) {
+  const supabase = getSupabaseAdmin();
+  const user = await getUser();
+  const isPlayer = user?.role === 'jugador';
+  const id = params.id;
+  const activeTab = params.tab;
+  const activeSubtab = params.subtab?.[0];
+
+  const rawJugador = await getPlayerWithTeamConfig(supabase, id);
+  if (!rawJugador) {
+    return (
+      <NothingFound
+        title="Jugador no encontrado"
+        description="No se pudo cargar la información del jugador o no existe."
+        actionLabel="Volver al panel"
+        actionHref="/dashboard"
+        withPaper
+      />
+    );
+  }
+
+  if (!isPlayer) {
+    const ownedPlayer = await getOwnedPlayer(supabase, user, id);
+    if (!ownedPlayer) {
+      return (
+        <NothingFound
+          title="Sin acceso"
+          description="No tienes acceso a este jugador."
+          actionLabel="Volver al panel"
+          actionHref="/dashboard"
+          withPaper
+        />
+      );
+    }
+  }
+
+  if (isPlayer && String(user.id) !== String(rawJugador.id)) {
+    return (
+      <NothingFound
+        title="Sin acceso"
+        description="No tienes acceso a este jugador."
+        actionLabel="Volver al panel"
+        actionHref="/dashboard"
+        withPaper
+      />
+    );
+  }
+
+  let evoluciones = [];
+  let analiticas = [];
+  let registrosHidratacion = [];
+  let messages = [];
+  let menus = [];
+  let jugador = rawJugador;
+
+  try {
+    if (activeTab === 'resumen') {
+      const [resEvoluciones] = await Promise.all([
+        getEvolutionsByPlayerId(supabase, id),
+      ]);
+      evoluciones = resEvoluciones;
+      jugador = withLatestMeasurement(rawJugador, evoluciones);
+      if (jugador?.equipo_id) {
+        messages = await getMessages(supabase, jugador.equipo_id, id);
+      }
+    } else if (activeTab === 'metricas') {
+      const [resAnaliticas, resEvoluciones, resHidratacion] = await Promise.all([
+        getAnalyticsByPlayerId(supabase, id),
+        getEvolutionsByPlayerId(supabase, id),
+        getHydrationRecordsByPlayerId(supabase, id),
+      ]);
+      analiticas = isPlayer ? resAnaliticas.filter(a => a.visible_para_jugador === true) : resAnaliticas;
+      evoluciones = resEvoluciones;
+      jugador = withLatestMeasurement(rawJugador, evoluciones);
+      registrosHidratacion = resHidratacion;
+    } else if (activeTab === 'nutricion') {
+      const resMenus = rawJugador?.equipo_id 
+        ? await getMenusByTeam(supabase, rawJugador.equipo_id) 
+        : [];
+      menus = resMenus.slice(0, 10);
+    }
+  } catch (err) {
+    console.error('Error fetching tab details:', err);
+  }
+
   return (
-    <JugadorView
-      id={params.id}
-      activeTab={params.tab}
-      activeSubtab={params.subtab?.[0]}
+    <PlayerTabContainer
+      tab={activeTab}
+      activeSubtab={activeSubtab}
+      jugador={jugador}
+      readOnly={isPlayer}
+      evoluciones={evoluciones}
+      analiticas={analiticas}
+      registrosHidratacion={registrosHidratacion}
+      messages={messages}
+      menus={menus}
     />
   );
 }
