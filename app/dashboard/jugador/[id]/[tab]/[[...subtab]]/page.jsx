@@ -89,10 +89,13 @@ export default async function JugadorTabPage({ params }) {
       jugador = withLatestMeasurement(rawJugador, evoluciones);
       registrosHidratacion = resHidratacion;
     } else if (activeTab === 'nutricion') {
-      const resMenus = rawJugador?.equipo_id 
-        ? await getMenusByTeam(supabase, rawJugador.equipo_id) 
-        : [];
+      const [resMenus, resEvoluciones] = await Promise.all([
+        rawJugador?.equipo_id ? getMenusByTeam(supabase, rawJugador.equipo_id) : [],
+        getEvolutionsByPlayerId(supabase, id),
+      ]);
       menus = resMenus.slice(0, 10);
+      evoluciones = resEvoluciones;
+      jugador = withLatestMeasurement(rawJugador, evoluciones);
     }
   } catch (err) {
     console.error('Error fetching tab details:', err);
