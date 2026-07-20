@@ -68,29 +68,31 @@ function dateInputToIso(value) {
 }
 
 function emptyForm() {
-  return {
+  const form = {
     id: null,
     fecha: new Date().toISOString().split('T')[0],
-    altura_cm: '',
-    peso_kg: '',
-    porcentaje_grasa: '',
-    masa_magra_kg: '',
-    suma_6_pliegues: '',
     notas: '',
   };
+  MEASUREMENT_DETAIL_SECTIONS.forEach((section) => {
+    section.fields.forEach((field) => {
+      form[field.key] = '';
+    });
+  });
+  return form;
 }
 
 function formFromMedicion(medicion) {
-  return {
+  const form = {
     id: medicion?.id || null,
     fecha: medicion?.fecha || new Date().toISOString().split('T')[0],
-    altura_cm: medicion?.altura_cm ?? '',
-    peso_kg: medicion?.peso_kg ?? '',
-    porcentaje_grasa: medicion?.porcentaje_grasa ?? '',
-    masa_magra_kg: medicion?.masa_magra_kg ?? '',
-    suma_6_pliegues: medicion?.suma_6_pliegues ?? '',
     notas: medicion?.notas || '',
   };
+  MEASUREMENT_DETAIL_SECTIONS.forEach((section) => {
+    section.fields.forEach((field) => {
+      form[field.key] = medicion ? (metricValue(medicion, field) ?? '') : '';
+    });
+  });
+  return form;
 }
 
 function fechaLabel(fecha) {
@@ -234,15 +236,25 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
     if (readOnly) return;
     setSaving(true);
     try {
-      const data = await saveEvolution({
+      const payload = {
         jugador_id: jugadorId,
-        ...form,
-        altura_cm: form.altura_cm ? Number(form.altura_cm) : null,
-        peso_kg: form.peso_kg ? Number(form.peso_kg) : null,
-        porcentaje_grasa: form.porcentaje_grasa ? Number(form.porcentaje_grasa) : null,
-        masa_magra_kg: form.masa_magra_kg ? Number(form.masa_magra_kg) : null,
-        suma_6_pliegues: form.suma_6_pliegues ? Number(form.suma_6_pliegues) : null,
+        id: form.id,
+        fecha: form.fecha,
+        notas: form.notas,
+      };
+
+      MEASUREMENT_DETAIL_SECTIONS.forEach((section) => {
+        section.fields.forEach((field) => {
+          const val = form[field.key];
+          payload[field.key] = val !== '' && val !== null && val !== undefined ? Number(val) : null;
+        });
       });
+
+      // Keep legacy fallback columns in sync
+      payload.perimetro_pantorrilla = payload.perimetro_pantorrilla_derecha;
+      payload.perimetro_muslo = payload.perimetro_muslo_derecho;
+
+      const data = await saveEvolution(payload);
 
       setEvoluciones((prev) => {
         const filtered = prev.filter((e) => e.id !== data.evolucion.id && e.fecha !== data.evolucion.fecha);

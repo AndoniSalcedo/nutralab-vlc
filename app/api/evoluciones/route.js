@@ -31,10 +31,47 @@ export async function GET(req) {
   }
 }
 
+const EVOLUTION_FIELDS = [
+  'fecha',
+  'altura_cm',
+  'peso_kg',
+  'porcentaje_grasa',
+  'masa_magra_kg',
+  'pliegue_biceps',
+  'pliegue_triceps',
+  'pliegue_subescapular',
+  'pliegue_cresta_iliaca',
+  'pliegue_supraeliaco',
+  'pliegue_abdominal',
+  'pliegue_pantorrilla',
+  'pliegue_muslo',
+  'suma_6_pliegues',
+  'suma_8_pliegues',
+  'porcentaje_grasa_faulkner',
+  'porcentaje_grasa_yuhasz',
+  'peso_oseo',
+  'peso_residual',
+  'peso_graso',
+  'peso_muscular',
+  'peso_magro',
+  'peso_deseable',
+  'endomorfia',
+  'mesomorfia',
+  'ectomorfia',
+  'perimetro_brazo_contraido',
+  'perimetro_pantorrilla_derecha',
+  'perimetro_pantorrilla_izquierda',
+  'perimetro_muslo_derecho',
+  'perimetro_muslo_izquierdo',
+  'perimetro_pantorrilla',
+  'perimetro_muslo',
+  'notas'
+];
+
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { id, jugador_id, fecha, altura_cm, peso_kg, porcentaje_grasa, masa_magra_kg, suma_6_pliegues, notas } = body;
+    const { id, jugador_id, fecha } = body;
     if (!jugador_id || !fecha) return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
     const supabase = getSupabaseAdmin();
     const user = await getUser();
@@ -42,27 +79,20 @@ export async function POST(req) {
     const ownedPlayer = await getOwnedPlayer(supabase, user, jugador_id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
+    const payload = {};
+    for (const key of EVOLUTION_FIELDS) {
+      if (body[key] !== undefined) {
+        payload[key] = body[key];
+      }
+    }
+
     let data;
     if (id) {
-      data = await updateEvolution(supabase, id, {
-        fecha,
-        altura_cm,
-        peso_kg,
-        porcentaje_grasa,
-        masa_magra_kg,
-        suma_6_pliegues,
-        notas
-      });
+      data = await updateEvolution(supabase, id, payload);
     } else {
       data = await upsertEvolution(supabase, {
         jugador_id,
-        fecha,
-        altura_cm,
-        peso_kg,
-        porcentaje_grasa,
-        masa_magra_kg,
-        suma_6_pliegues,
-        notas
+        ...payload
       });
     }
 
