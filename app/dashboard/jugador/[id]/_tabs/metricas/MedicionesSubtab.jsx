@@ -504,7 +504,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                             />
                             <YAxis
                               tick={{ fontSize: 9 }}
-                              domain={['auto', 'auto']}
+                              domain={[0, 'auto']}
                               stroke="var(--mantine-color-gray-5)"
                               axisLine={false}
                               tickLine={false}
