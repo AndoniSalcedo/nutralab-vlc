@@ -463,6 +463,9 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                     radius="lg"
                     withBorder
                     bg="white"
+                    style={{
+                      gridColumn: m.key === 'peso_kg' ? 'span 2' : undefined
+                    }}
                   >
                     <Group justify="space-between" align="flex-start" mb="xs">
                       <Box>

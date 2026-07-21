@@ -7,7 +7,7 @@ import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconSettings, IconBottle, IconPlus, IconFileSpreadsheet, IconReportMedical } from '@tabler/icons-react';
+import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconSettings, IconBottle, IconPlus, IconFileSpreadsheet, IconReportMedical, IconScale } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import { calculateByObjective, getTeamNutritionDayTypes } from '@/lib/calculations';
@@ -18,6 +18,7 @@ import ImportDataModal from '@/components/modals/ImportDataModal';
 import SendMessageModal from '@/components/modals/SendMessageModal';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import SquadReportModal from '@/components/modals/SquadReportModal';
+import SquadWeightModal from '@/components/modals/SquadWeightModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 const PAGE_SIZE = 8;
@@ -165,6 +166,11 @@ function getPlayerPlan(player, teamConfig) {
 export default function DashboardContent({ players = [], team }) {
   const router = useRouter();
   const [playersState, setPlayersState] = useState(players);
+
+  useEffect(() => {
+    setPlayersState(players);
+  }, [players]);
+
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [deletePlayerData, setDeletePlayerData] = useState(null);
@@ -434,9 +440,9 @@ export default function DashboardContent({ players = [], team }) {
               </Group>
             </Grid.Col>
 
-            {/* Right part: Grid of 8 buttons */}
+            {/* Right part: Grid of buttons */}
             <Grid.Col span={{ base: 12, md: 'auto' }}>
-              <SimpleGrid cols={{ base: 2, lg: 3 }} spacing="xs">
+              <SimpleGrid cols={{ base: 2, sm: 3, lg: 4 }} spacing="xs">
                 {/* Row 1: Modals */}
                 <DashboardStat
                   title="Plantilla"
@@ -466,8 +472,15 @@ export default function DashboardContent({ players = [], team }) {
                   value="Añadir jugador"
                   onClick={() => setActiveModal('new-player')}
                 />
+                <DashboardStat
+                  title="Peso"
+                  icon={IconScale}
+                  color="orange"
+                  value="Registrar peso"
+                  onClick={() => setActiveModal('weight')}
+                />
 
-                {/* Row 2 & 3: Redirects */}
+                {/* Row 2: Redirects */}
                 <DashboardStat
                   title="Suplementación"
                   icon={IconBottle}
@@ -747,6 +760,13 @@ export default function DashboardContent({ players = [], team }) {
         players={playersState}
         team={team}
         onSent={closeModal}
+      />
+
+      <SquadWeightModal
+        opened={activeModal === 'weight'}
+        onClose={closeModal}
+        players={playersState}
+        team={team}
       />
       <ConfirmModal
         opened={!!deletePlayerData}
