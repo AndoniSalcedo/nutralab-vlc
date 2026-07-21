@@ -284,6 +284,12 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [modalContextoAdicional, setModalContextoAdicional] = useState('');
   const [modalRecomendacionesIngestas, setModalRecomendacionesIngestas] = useState({});
   const [modalCalendar, setModalCalendar] = useState(getDefaultCalendar());
+  const [modalPreMatchConfig, setModalPreMatchConfig] = useState({
+    enabled: false,
+    diaPartido: 'sabado',
+    horario: 'tarde',
+    texto: '',
+  });
 
   const teamConfig = jugador?.equipos?.configuracion_nutricional;
 
@@ -356,7 +362,15 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setModalNombre(`Ficha ${now.toLocaleDateString('es-ES')}`);
     setModalSelectedMenuWeek(selectedMenuWeek || 'none');
     setModalContextoAdicional('');
-    setModalCalendar(getDefaultCalendar());
+    const defaultCal = getDefaultCalendar();
+    setModalCalendar(defaultCal);
+    const matchDay = Object.keys(defaultCal).find((k) => defaultCal[k] === 'partido') || 'sabado';
+    setModalPreMatchConfig({
+      enabled: false,
+      diaPartido: matchDay,
+      horario: 'tarde',
+      texto: '',
+    });
 
     const meals = getUserMeals(jugador);
     const initialRecs = {};
@@ -388,6 +402,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       contextoAdicional: modalContextoAdicional,
       menu: resolvedMenu,
       calendario: modalCalendar,
+      preMatchConfig: modalPreMatchConfig,
       teamConfig
     }));
 
@@ -422,7 +437,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         contextoAdicional: modalContextoAdicional,
         calendario: modalCalendar,
         semanaMenu: modalSelectedMenuWeek,
-        recomendacionesIngestas: modalRecomendacionesIngestas
+        recomendacionesIngestas: modalRecomendacionesIngestas,
+        preMatchConfig: modalPreMatchConfig,
       });
 
       setNombre(modalNombre);
@@ -1141,6 +1157,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         setModalRecomendacionesIngestas={setModalRecomendacionesIngestas}
         modalCalendar={modalCalendar}
         setModalCalendar={setModalCalendar}
+        modalPreMatchConfig={modalPreMatchConfig}
+        setModalPreMatchConfig={setModalPreMatchConfig}
         dayTypeOptions={dayTypeOptions}
         createEmptyPlan={createEmptyPlan}
         generatePlanFromModal={generatePlanFromModal}

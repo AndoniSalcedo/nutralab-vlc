@@ -143,6 +143,12 @@ function defaultReportForm() {
       sabado: 'descanso',
       domingo: 'descanso',
     },
+    preMatchConfig: {
+      enabled: false,
+      diaPartido: 'sabado',
+      horario: 'tarde',
+      texto: '',
+    },
   };
 }
 

@@ -14,6 +14,9 @@ import {
   Textarea,
   Checkbox,
   ScrollArea,
+  Switch,
+  SegmentedControl,
+  Badge,
 } from '@mantine/core';
 import {
   IconFileText,
@@ -24,9 +27,9 @@ import {
   IconBook,
   IconDownload,
   IconSettings,
-  IconSparkles
+  IconSparkles,
+  IconTrophy,
 } from '@tabler/icons-react';
-import { PLAN_CONTEXTS } from '@/lib/calculations';
 
 const SQUAD_GENERATION_MESSAGES = [
   "Iniciando procesamiento de plantilla...",
@@ -244,7 +247,7 @@ export default function SquadReportModal({
             </Group>
 
             <Stack gap="sm">
-              <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
                 <TextInput
                   type="date"
                   label="Fecha de la semana (Lunes)"
@@ -266,14 +269,6 @@ export default function SquadReportModal({
                   label="Título de semana"
                   value={reportForm.title}
                   onChange={(event) => updateReportField('title', event.currentTarget.value)}
-                />
-                <Select
-                  label="Contexto general"
-                  placeholder="Selecciona el contexto"
-                  data={PLAN_CONTEXTS}
-                  value={reportForm.contexto || 'semana_partido'}
-                  onChange={(val) => updateReportField('contexto', val || 'semana_partido')}
-                  allowDeselect={false}
                 />
               </SimpleGrid>
 
@@ -370,6 +365,113 @@ export default function SquadReportModal({
                 />
               ))}
             </SimpleGrid>
+          </Paper>
+
+          {/* Panel 3.5: Comidas 24h Pre-Partido */}
+          <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(231, 245, 255, 0.4)', borderColor: '#74c0fc' }}>
+            <Group justify="space-between" mb="xs">
+              <Group gap="xs">
+                <ThemeIcon color="blue" size="sm" radius="xl" variant="light">
+                  <IconTrophy size={14} />
+                </ThemeIcon>
+                <Text fw={700} size="sm" c="blue.9">Comidas 24h Pre-Partido</Text>
+              </Group>
+              <Switch
+                checked={reportForm.preMatchConfig?.enabled || false}
+                onChange={(e) => {
+                  const isChecked = Boolean(e?.currentTarget?.checked);
+                  updateReportField('preMatchConfig', {
+                    ...(reportForm.preMatchConfig || {}),
+                    enabled: isChecked,
+                    horario: reportForm.preMatchConfig?.horario || 'tarde',
+                    texto: reportForm.preMatchConfig?.texto || '',
+                  });
+                }}
+                label="Especificar comidas 24h antes para la plantilla"
+                size="xs"
+              />
+            </Group>
+
+            {reportForm.preMatchConfig?.enabled && (
+              <Stack gap="sm" mt="xs">
+                {DAYS_OF_WEEK.filter((d) => reportForm.calendario?.[d.key] === 'partido').length > 0 ? (
+                  DAYS_OF_WEEK.filter((d) => reportForm.calendario?.[d.key] === 'partido').map((d) => {
+                    const dayKey = d.key;
+                    const dayConfig = reportForm.preMatchConfig?.partidos?.[dayKey] || {
+                      horario: reportForm.preMatchConfig?.horario || 'tarde',
+                      texto: reportForm.preMatchConfig?.texto || '',
+                    };
+
+                    return (
+                      <Paper key={dayKey} p="xs" radius="md" withBorder bg="white">
+                        <Group justify="space-between" align="center" mb="xs">
+                          <Badge color="red" variant="filled" size="md">
+                            Partido del {d.label}
+                          </Badge>
+
+                          <Stack gap={2} style={{ maxWidth: '220px' }}>
+                            <Text size="xs" fw={600} c="dimmed">Horario del partido</Text>
+                            <SegmentedControl
+                              size="xs"
+                              fullWidth
+                              data={[
+                                { label: 'Tarde / Noche', value: 'tarde' },
+                                { label: 'Mañana', value: 'manana' },
+                              ]}
+                              value={dayConfig.horario || 'tarde'}
+                              onChange={(val) =>
+                                updateReportField('preMatchConfig', {
+                                  ...(reportForm.preMatchConfig || {}),
+                                  partidos: {
+                                    ...(reportForm.preMatchConfig?.partidos || {}),
+                                    [dayKey]: {
+                                      ...(reportForm.preMatchConfig?.partidos?.[dayKey] || {}),
+                                      horario: val,
+                                      texto: dayConfig.texto || '',
+                                    },
+                                  },
+                                })
+                              }
+                            />
+                          </Stack>
+                        </Group>
+
+                        <Textarea
+                          label={`Indicaciones de menú 24h previas al partido del ${d.label}`}
+                          placeholder={
+                            dayConfig.horario === 'manana'
+                              ? 'Ej:\nComida (día anterior): Arroz con pechuga de pollo.\nMerienda: Yogur con frutos secos.\nCena (día anterior): Salmón con patata cocida.\nDesayuno pre-partido: Tortitas de avena y plátano...'
+                              : 'Ej:\nCena (día anterior): Arroz blanco con pavo a la plancha.\nDesayuno: Tostadas de pan con mermelada y zumo.\nComida pre-partido: Pasta blanca con pechuga de pollo...'
+                          }
+                          value={dayConfig.texto || ''}
+                          onChange={(event) => {
+                            const textVal = event.currentTarget.value;
+                            updateReportField('preMatchConfig', {
+                              ...(reportForm.preMatchConfig || {}),
+                              partidos: {
+                                ...(reportForm.preMatchConfig?.partidos || {}),
+                                [dayKey]: {
+                                  ...(reportForm.preMatchConfig?.partidos?.[dayKey] || {}),
+                                  horario: dayConfig.horario || 'tarde',
+                                  texto: textVal,
+                                },
+                              },
+                            });
+                          }}
+                          rows={3}
+                          size="xs"
+                          description={`Estas comidas sobreescribirán el menú del comedor para las 24h previas al partido del ${d.label} en la plantilla.`}
+                        />
+                      </Paper>
+                    );
+                  })
+                ) : (
+                  <Text size="xs" c="orange.8" fw={500} p="xs">
+                    Sin días de partido asignados en la plantilla. Selecciona &quot;Partido&quot; en al menos un día del calendario superior para configurar sus 24h previas.
+                  </Text>
+                )}
+              </Stack>
+            )}
           </Paper>
 
           {/* Panel 4: Seleccionar Jugadores */}

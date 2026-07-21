@@ -8,7 +8,7 @@ export async function getAiPlans(jugadorId, semana = null) {
   return data;
 }
 
-export async function generateAiPlanDraft({ jugador, nombre, contextoAdicional, calendario, semanaMenu, recomendacionesIngestas }) {
+export async function generateAiPlanDraft({ jugador, nombre, contextoAdicional, calendario, semanaMenu, recomendacionesIngestas, preMatchConfig }) {
   const res = await fetch('/api/ai-plan', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -20,6 +20,7 @@ export async function generateAiPlanDraft({ jugador, nombre, contextoAdicional, 
       calendario,
       semanaMenu,
       recomendacionesIngestas,
+      preMatchConfig,
       draftOnly: true
     }),
   });

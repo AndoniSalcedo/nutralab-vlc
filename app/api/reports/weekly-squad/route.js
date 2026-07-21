@@ -48,6 +48,7 @@ function defaultMeta(meta = {}) {
       sabado: 'descanso',
       domingo: 'descanso',
     },
+    preMatchConfig: meta.preMatchConfig || null,
   };
 }
 
@@ -120,7 +121,7 @@ async function runWithConcurrency(items, limit, fn) {
   return results;
 }
 
-async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, calendario, semanaMenu, contexto, forceRegenerate = false) {
+async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, calendario, semanaMenu, contexto, forceRegenerate = false, preMatchConfig = null) {
   const rawPlayers = await getPlayersByTeam(supabase, team.id);
   let players = rawPlayers || [];
   if (jugadorIds.length) {
@@ -161,6 +162,7 @@ async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, c
         contexto: contexto || 'semana_partido',
         menu,
         calendario,
+        preMatchConfig,
         teamConfig: team.configuracion_nutricional
       });
       const finalContenido = planDataToLegacyContent(baseData, team.configuracion_nutricional);
@@ -252,7 +254,8 @@ export async function POST(request) {
       calendario,
       semanaMenu,
       meta.contexto,
-      forceRegenerate
+      forceRegenerate,
+      meta.preMatchConfig
     );
 
     if (generateOnly) {
@@ -292,7 +295,7 @@ export async function GET(request) {
 
     const team = await resolveTeam(supabase, user, paramTeamId);
     const meta = await loadStoredMeta(supabase, team.id, semanaParam);
-    const players = await loadPlayersWithMeasurements(supabase, team, jugadorIds, semanaParam, meta?.calendario, meta?.semanaMenu, meta?.contexto);
+    const players = await loadPlayersWithMeasurements(supabase, team, jugadorIds, semanaParam, meta?.calendario, meta?.semanaMenu, meta?.contexto, false, meta?.preMatchConfig);
 
     return renderReportResponse(meta, players, semanaParam, team.configuracion_nutricional);
   } catch (error) {
