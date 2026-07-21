@@ -190,6 +190,7 @@ export default function DashboardContent({ players = [], team }) {
   }, [teamConfig]);
 
   const [generatingReport, setGeneratingReport] = useState(false);
+  const [reportProgress, setReportProgress] = useState(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [availableMenus, setAvailableMenus] = useState([]);
   const [selectedMenuWeek, setSelectedMenuWeek] = useState('');
@@ -327,6 +328,21 @@ export default function DashboardContent({ players = [], team }) {
 
 
 
+  async function downloadPdfFromResponse(res) {
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filenameFromResponse(
+      res,
+      reportModal.player ? `Informe_${reportModal.player.nombre || 'Jugador'}.pdf` : 'Informe_Plantilla.pdf'
+    );
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
   async function generateReport() {
     const jugadorIds = reportModal.player ? [reportModal.player.id] : selectedPlayerIds;
     if (jugadorIds.length === 0) {
@@ -356,27 +372,85 @@ export default function DashboardContent({ players = [], team }) {
     }
 
     setGeneratingReport(true);
-    try {
-      const res = await generateWeeklySquadReport({
-        meta: reportForm,
-        jugadorIds,
-        calendario: reportForm.calendario,
-        team_id: team?.id,
-        semanaMenu: selectedMenuWeek
-      });
+    setReportProgress({
+      current: 0,
+      total: jugadorIds.length,
+      currentPlayerName: ''
+    });
 
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filenameFromResponse(
-        res,
-        reportModal.player ? `Informe_${reportModal.player.nombre || 'Jugador'}.pdf` : 'Informe_Plantilla.pdf'
-      );
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+    try {
+      if (jugadorIds.length === 1) {
+        const id = jugadorIds[0];
+        const pObj = playersState.find((p) => p.id === id);
+        const name = pObj ? `${pObj.nombre} ${pObj.apellidos || ''}`.trim() : `Jugador ${id}`;
+        setReportProgress({
+          current: 0,
+          total: 1,
+          currentPlayerName: name
+        });
+
+        const res = await generateWeeklySquadReport({
+          meta: reportForm,
+          jugadorIds,
+          calendario: reportForm.calendario,
+          team_id: team?.id,
+          semanaMenu: selectedMenuWeek,
+          forceRegenerate: true,
+          generateOnly: false
+        });
+        await downloadPdfFromResponse(res);
+      } else {
+        const chunkSize = 3;
+        const chunks = [];
+        for (let i = 0; i < jugadorIds.length; i += chunkSize) {
+          chunks.push(jugadorIds.slice(i, i + chunkSize));
+        }
+
+        for (let index = 0; index < chunks.length; index++) {
+          const chunk = chunks[index];
+          const names = chunk
+            .map((id) => {
+              const pObj = playersState.find((p) => p.id === id);
+              return pObj ? pObj.nombre : `Jugador ${id}`;
+            })
+            .filter(Boolean)
+            .join(', ');
+
+          const processedSoFar = index * chunkSize;
+          setReportProgress({
+            current: processedSoFar,
+            total: jugadorIds.length,
+            currentPlayerName: names
+          });
+
+          await generateWeeklySquadReport({
+            meta: reportForm,
+            jugadorIds: chunk,
+            calendario: reportForm.calendario,
+            team_id: team?.id,
+            semanaMenu: selectedMenuWeek,
+            forceRegenerate: true,
+            generateOnly: true
+          });
+        }
+
+        setReportProgress({
+          current: jugadorIds.length,
+          total: jugadorIds.length,
+          currentPlayerName: 'Compilando PDF final...'
+        });
+
+        const res = await generateWeeklySquadReport({
+          meta: reportForm,
+          jugadorIds,
+          calendario: reportForm.calendario,
+          team_id: team?.id,
+          semanaMenu: selectedMenuWeek,
+          forceRegenerate: false,
+          generateOnly: false
+        });
+        await downloadPdfFromResponse(res);
+      }
 
       notifications.show({
         color: 'green',
@@ -394,6 +468,7 @@ export default function DashboardContent({ players = [], team }) {
       });
     } finally {
       setGeneratingReport(false);
+      setReportProgress(null);
     }
   }
 
@@ -727,6 +802,7 @@ export default function DashboardContent({ players = [], team }) {
         onClose={closeReportModal}
         reportModal={reportModal}
         generatingReport={generatingReport}
+        reportProgress={reportProgress}
         reportForm={reportForm}
         updateReportField={updateReportField}
         availableMenus={availableMenus}

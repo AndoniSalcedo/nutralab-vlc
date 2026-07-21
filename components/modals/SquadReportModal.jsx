@@ -70,7 +70,7 @@ function getWeekRangeLabel(mondayInput) {
   }
 }
 
-function AiGenerationOverlay({ opened, messages = [] }) {
+function AiGenerationOverlay({ opened, messages = [], progress }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -85,6 +85,9 @@ function AiGenerationOverlay({ opened, messages = [] }) {
   }, [opened, messages.length]);
 
   if (!opened) return null;
+
+  const hasProgress = progress && typeof progress.current === 'number';
+  const percentage = hasProgress && progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0;
 
   return (
     <div style={{
@@ -129,18 +132,42 @@ function AiGenerationOverlay({ opened, messages = [] }) {
           Generando Planificación Inteligente
         </Text>
 
-        <Text size="sm" c="dimmed" fw={500} style={{ minHeight: '24px' }}>
-          {messages[index]}
-        </Text>
+        {hasProgress ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '380px', marginTop: '0.5rem' }}>
+            <Text size="sm" fw={650} c="gray.7" mb="xs" style={{ display: 'flex', gap: '4px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+              Procesando: <span style={{ color: 'var(--mantine-color-blue-6)', fontWeight: 800 }}>{progress.currentPlayerName}</span>
+            </Text>
+            <Text size="md" fw={800} c="dark" mb="sm">
+              {progress.current} de {progress.total} jugadores ({percentage}%)
+            </Text>
+            <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--mantine-color-gray-2)', borderRadius: '4px', overflow: 'hidden', position: 'relative', marginBottom: '1rem' }}>
+              <div style={{
+                height: '100%',
+                background: 'linear-gradient(90deg, var(--mantine-color-blue-5), var(--mantine-color-grape-5))',
+                width: `${percentage}%`,
+                transition: 'width 0.4s ease-in-out',
+              }} />
+            </div>
+            <Text size="xs" c="dimmed" fw={500} style={{ minHeight: '24px', fontStyle: 'italic' }}>
+              {messages[index]}
+            </Text>
+          </div>
+        ) : (
+          <>
+            <Text size="sm" c="dimmed" fw={500} style={{ minHeight: '24px' }}>
+              {messages[index]}
+            </Text>
 
-        <div style={{ width: '150px', height: '4px', backgroundColor: 'var(--mantine-color-gray-2)', borderRadius: '2px', marginTop: '1.5rem', overflow: 'hidden' }}>
-          <div style={{
-            height: '100%',
-            background: 'linear-gradient(90deg, var(--mantine-color-blue-5), var(--mantine-color-grape-5))',
-            width: '100%',
-            animation: 'loadingProgress 2s infinite ease-in-out',
-          }} />
-        </div>
+            <div style={{ width: '150px', height: '4px', backgroundColor: 'var(--mantine-color-gray-2)', borderRadius: '2px', marginTop: '1.5rem', overflow: 'hidden' }}>
+              <div style={{
+                height: '100%',
+                background: 'linear-gradient(90deg, var(--mantine-color-blue-5), var(--mantine-color-grape-5))',
+                width: '100%',
+                animation: 'loadingProgress 2s infinite ease-in-out',
+              }} />
+            </div>
+          </>
+        )}
       </div>
 
       <style dangerouslySetInnerHTML={{
@@ -168,6 +195,7 @@ export default function SquadReportModal({
   onClose,
   reportModal,
   generatingReport,
+  reportProgress,
   reportForm,
   updateReportField,
   availableMenus,
@@ -204,7 +232,7 @@ export default function SquadReportModal({
       overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
     >
       <Box style={{ position: 'relative', minHeight: generatingReport ? '450px' : 'auto' }}>
-        <AiGenerationOverlay opened={generatingReport} messages={SQUAD_GENERATION_MESSAGES} />
+        <AiGenerationOverlay opened={generatingReport} messages={SQUAD_GENERATION_MESSAGES} progress={reportProgress} />
         <Stack gap="md">
           {/* Panel 1: Datos de la Semana */}
           <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(231, 245, 255, 0.35)', borderColor: '#a5d8ff' }}>

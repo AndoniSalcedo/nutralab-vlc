@@ -241,7 +241,27 @@ export async function POST(request) {
     let semana = body?.meta?.semana;
 
     semana = await persistWeeklyReport(supabase, team.id, { ...meta, semanaMenu }, semana);
-    const players = await loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, calendario, semanaMenu, meta.contexto, true);
+    const forceRegenerate = body?.forceRegenerate !== false;
+    const generateOnly = !!body?.generateOnly;
+
+    const players = await loadPlayersWithMeasurements(
+      supabase,
+      team,
+      jugadorIds,
+      semana,
+      calendario,
+      semanaMenu,
+      meta.contexto,
+      forceRegenerate
+    );
+
+    if (generateOnly) {
+      return NextResponse.json({
+        success: true,
+        generatedPlayers: players.map((p) => p.id),
+      });
+    }
+
     return renderReportResponse(meta, players, semana, team.configuracion_nutricional);
   } catch (error) {
     console.error('Error generating weekly squad report:', error);
