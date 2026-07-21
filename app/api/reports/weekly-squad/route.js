@@ -36,8 +36,8 @@ function defaultMeta(meta = {}) {
     author: meta.author || 'Carlos Ferrando · Nutralab',
     handle: meta.handle || '@c.ferrando',
     microcycle: meta.microcycle || 'DOM 10 · 16:15. Partido.\nJUE 14 · 19:00. Partido.\nDOM 17 · 19:00. Partido.',
-    rules: meta.rules || 'Ningun dia en deficit calorico. Carga glucogenica continua.\nPescado azul 4-5 tomas minimo. Frutos rojos diarios.\nBatido post-entreno y post-partido obligatorio.\nHidratacion reforzada y sueno 8 h.',
-    buffet: meta.buffet || 'Desayuno y comidas usan exclusivamente las opciones disponibles del buffet. Las meriendas se hacen en casa con yogur de proteina, tortitas de arroz, fruta y frutos secos.',
+    rules: meta.rules || 'Ningún día en déficit calórico. Carga glucogénica continua.\nPescado azul 4-5 tomas mínimo. Frutos rojos diarios.\nBatido post-entreno y post-partido obligatorio.\nHidratación reforzada y sueño 8 h.',
+    buffet: meta.buffet || 'Desayuno y comidas usan exclusivamente las opciones disponibles del buffet. Las meriendas se hacen en casa con yogur de proteína, tortitas de arroz, fruta y frutos secos.',
     contexto: meta.contexto || 'semana_partido',
     calendario: meta.calendario || {
       lunes: 'entreno',
