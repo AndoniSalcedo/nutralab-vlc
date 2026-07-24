@@ -16,6 +16,7 @@ import {
   Badge,
   Box,
   Button,
+  Grid,
   Group,
   Paper,
   Select,
@@ -443,7 +444,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
           </Box>
         ) : selected ? (
           <Stack gap={0}>
-            <SimpleGrid cols={{ base: 1, md: 1, lg: 2 }} spacing="lg" mb={{ base: 'md', sm: 'xl' }}>
+            <Grid gutter="lg" mb={{ base: 'md', sm: 'xl' }}>
               {METRICAS.map((m) => {
                 const metricData = sortedAsc
                   .map((item) => {
@@ -457,150 +458,151 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                 const reverseMetricData = [...metricData].reverse();
 
                 return (
-                  <Paper
+                  <Grid.Col
                     key={m.key}
-                    p="md"
-                    radius="lg"
-                    withBorder
-                    bg="white"
-                    style={{
-                      gridColumn: m.key === 'peso_kg' ? 'span 2' : undefined
-                    }}
+                    span={{ base: 12, lg: m.key === 'peso_kg' ? 12 : 6 }}
                   >
-                    <Group justify="space-between" align="flex-start" mb="xs">
-                      <Box>
-                        <Text size="xs" c="dimmed" tt="uppercase" fw={750}>
-                          {m.label}
-                        </Text>
-                        <Title order={2} mt={4}>
-                          {formatMetricValue(metricValue(selected, m), unit)}
-                        </Title>
-                      </Box>
-                      {d && (
-                        <Badge variant="light" color={d.color} size="sm">
-                          {d.val} {unit}
-                        </Badge>
-                      )}
-                    </Group>
+                    <Paper
+                      p="md"
+                      radius="lg"
+                      withBorder
+                      bg="white"
+                    >
+                      <Group justify="space-between" align="flex-start" mb="xs">
+                        <Box>
+                          <Text size="xs" c="dimmed" tt="uppercase" fw={750}>
+                            {m.label}
+                          </Text>
+                          <Title order={2} mt={4}>
+                            {formatMetricValue(metricValue(selected, m), unit)}
+                          </Title>
+                        </Box>
+                        {d && (
+                          <Badge variant="light" color={d.color} size="sm">
+                            {d.val} {unit}
+                          </Badge>
+                        )}
+                      </Group>
 
-                    <Stack gap="md">
-                      <Box h={180}>
-                        <ResponsiveContainer width="100%" height="100%">
-                          <ComposedChart data={metricData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                            <defs>
-                              <linearGradient id={`gradient_player_${m.key}`} x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor={m.color} stopOpacity={0.4} />
-                                <stop offset="95%" stopColor={m.color} stopOpacity={0.05} />
-                              </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
-                            <XAxis
-                              dataKey="fecha"
-                              tick={{ fontSize: 9 }}
-                              tickFormatter={(v) => String(v).slice(5)}
-                              stroke="var(--mantine-color-gray-5)"
-                              axisLine={false}
-                              tickLine={false}
-                            />
-                            <YAxis
-                              tick={{ fontSize: 9 }}
-                              domain={[0, 'auto']}
-                              stroke="var(--mantine-color-gray-5)"
-                              axisLine={false}
-                              tickLine={false}
-                            />
-                            <Tooltip
-                              labelFormatter={(value) => fechaLabel(value)}
-                              formatter={(value) => [`${value} ${unit}`, m.label]}
-                              labelStyle={{ fontWeight: 700, color: 'var(--mantine-color-dark-4)', fontSize: 10 }}
-                              contentStyle={{ borderRadius: '8px', border: '1px solid var(--mantine-color-gray-2)', padding: '4px 8px', fontSize: 10 }}
-                            />
-                            <Bar
-                              dataKey={m.key}
-                              radius={[4, 4, 0, 0]}
-                              maxBarSize={32}
-                            >
-                              {metricData.map((entry, index) => {
-                                const isSelected = String(entry.id) === String(selected?.id);
+                      <Stack gap="md">
+                        <Box h={180}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <ComposedChart data={metricData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                              <defs>
+                                <linearGradient id={`gradient_player_${m.key}`} x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="5%" stopColor={m.color} stopOpacity={0.4} />
+                                  <stop offset="95%" stopColor={m.color} stopOpacity={0.05} />
+                                </linearGradient>
+                              </defs>
+                              <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
+                              <XAxis
+                                dataKey="fecha"
+                                tick={{ fontSize: 9 }}
+                                tickFormatter={(v) => String(v).slice(5)}
+                                stroke="var(--mantine-color-gray-5)"
+                                axisLine={false}
+                                tickLine={false}
+                              />
+                              <YAxis
+                                tick={{ fontSize: 9 }}
+                                domain={[0, 'auto']}
+                                stroke="var(--mantine-color-gray-5)"
+                                axisLine={false}
+                                tickLine={false}
+                              />
+                              <Tooltip
+                                labelFormatter={(value) => fechaLabel(value)}
+                                formatter={(value) => [`${value} ${unit}`, m.label]}
+                                labelStyle={{ fontWeight: 700, color: 'var(--mantine-color-dark-4)', fontSize: 10 }}
+                                contentStyle={{ borderRadius: '8px', border: '1px solid var(--mantine-color-gray-2)', padding: '4px 8px', fontSize: 10 }}
+                              />
+                              <Bar
+                                dataKey={m.key}
+                                radius={[4, 4, 0, 0]}
+                                maxBarSize={32}
+                              >
+                                {metricData.map((entry, index) => {
+                                  const isSelected = String(entry.id) === String(selected?.id);
+                                  return (
+                                    <Cell
+                                      key={`cell-${entry.id || index}-${m.key}`}
+                                      fill={isSelected ? 'var(--mantine-color-orange-5)' : `url(#gradient_player_${m.key})`}
+                                      style={{ cursor: 'pointer' }}
+                                      onClick={() => setCurrentId(String(entry.id))}
+                                    />
+                                  );
+                                })}
+                              </Bar>
+                              <Line
+                                type="monotone"
+                                dataKey={m.key}
+                                stroke={m.color}
+                                strokeWidth={2}
+                                dot={(props) => {
+                                  if (!props) return null;
+                                  const { cx, cy, payload } = props;
+                                  if (cx === undefined || cy === undefined || !payload) return null;
+                                  const isSelected = String(payload.id) === String(selected?.id);
+                                  return (
+                                    <circle
+                                      cx={cx}
+                                      cy={cy}
+                                      r={isSelected ? 6 : 3.5}
+                                      fill={isSelected ? m.color : 'white'}
+                                      stroke={m.color}
+                                      strokeWidth={isSelected ? 0 : 2}
+                                      key={`dot-${payload.id}-${m.key}`}
+                                      style={{ cursor: 'pointer' }}
+                                      onClick={() => setCurrentId(String(payload.id))}
+                                    />
+                                  );
+                                }}
+                                activeDot={{ r: 5, strokeWidth: 0 }}
+                                connectNulls
+                              />
+                            </ComposedChart>
+                          </ResponsiveContainer>
+                        </Box>
+
+                        <ScrollArea h={120} offsetScrollbars>
+                          <Table verticalSpacing={4} striped highlightOnHover style={{ minWidth: 150 }}>
+                            <Table.Thead bg="gray.0">
+                              <Table.Tr>
+                                <Table.Th style={{ fontSize: 10, padding: '4px 8px' }}>Fecha</Table.Th>
+                                <Table.Th style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right' }}>Valor</Table.Th>
+                              </Table.Tr>
+                            </Table.Thead>
+                            <Table.Tbody>
+                              {reverseMetricData.map((row) => {
+                                const isSelected = String(row.id) === String(selected?.id);
                                 return (
-                                  <Cell
-                                    key={`cell-${entry.id || index}-${m.key}`}
-                                    fill={isSelected ? 'var(--mantine-color-orange-5)' : `url(#gradient_player_${m.key})`}
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={() => setCurrentId(String(entry.id))}
-                                  />
+                                  <Table.Tr
+                                    key={row.fecha}
+                                    onClick={() => setCurrentId(String(row.id))}
+                                    style={{
+                                      cursor: 'pointer',
+                                      backgroundColor: isSelected ? 'var(--mantine-color-blue-0)' : undefined,
+                                      transition: 'background-color 0.2s ease',
+                                    }}
+                                  >
+                                    <Table.Td style={{ fontSize: 10, padding: '4px 8px', fontWeight: isSelected ? 700 : 400 }}>
+                                      {row.fecha ? new Date(`${row.fecha}T00:00:00`).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '-'}
+                                    </Table.Td>
+                                    <Table.Td style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right', fontWeight: isSelected ? 800 : 650 }}>
+                                      {row[m.key]} {unit}
+                                    </Table.Td>
+                                  </Table.Tr>
                                 );
                               })}
-                            </Bar>
-                            <Line
-                              type="monotone"
-                              dataKey={m.key}
-                              stroke={m.color}
-                              strokeWidth={2}
-                              dot={(props) => {
-                                if (!props) return null;
-                                const { cx, cy, payload } = props;
-                                if (cx === undefined || cy === undefined || !payload) return null;
-                                const isSelected = String(payload.id) === String(selected?.id);
-                                return (
-                                  <circle
-                                    cx={cx}
-                                    cy={cy}
-                                    r={isSelected ? 6 : 3.5}
-                                    fill={isSelected ? m.color : 'white'}
-                                    stroke={m.color}
-                                    strokeWidth={isSelected ? 0 : 2}
-                                    key={`dot-${payload.id}-${m.key}`}
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={() => setCurrentId(String(payload.id))}
-                                  />
-                                );
-                              }}
-                              activeDot={{ r: 5, strokeWidth: 0 }}
-                              connectNulls
-                            />
-                          </ComposedChart>
-                        </ResponsiveContainer>
-                      </Box>
-
-                      <ScrollArea h={120} offsetScrollbars>
-                        <Table verticalSpacing={4} striped highlightOnHover style={{ minWidth: 150 }}>
-                          <Table.Thead bg="gray.0">
-                            <Table.Tr>
-                              <Table.Th style={{ fontSize: 10, padding: '4px 8px' }}>Fecha</Table.Th>
-                              <Table.Th style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right' }}>Valor</Table.Th>
-                            </Table.Tr>
-                          </Table.Thead>
-                          <Table.Tbody>
-                            {reverseMetricData.map((row) => {
-                              const isSelected = String(row.id) === String(selected?.id);
-                              return (
-                                <Table.Tr
-                                  key={row.fecha}
-                                  onClick={() => setCurrentId(String(row.id))}
-                                  style={{
-                                    cursor: 'pointer',
-                                    backgroundColor: isSelected ? 'var(--mantine-color-blue-0)' : undefined,
-                                    transition: 'background-color 0.2s ease',
-                                  }}
-                                >
-                                  <Table.Td style={{ fontSize: 10, padding: '4px 8px', fontWeight: isSelected ? 700 : 400 }}>
-                                    {row.fecha ? new Date(`${row.fecha}T00:00:00`).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '-'}
-                                  </Table.Td>
-                                  <Table.Td style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right', fontWeight: isSelected ? 800 : 650 }}>
-                                    {row[m.key]} {unit}
-                                  </Table.Td>
-                                </Table.Tr>
-                              );
-                            })}
-                          </Table.Tbody>
-                        </Table>
-                      </ScrollArea>
-                    </Stack>
-                  </Paper>
+                            </Table.Tbody>
+                          </Table>
+                        </ScrollArea>
+                      </Stack>
+                    </Paper>
+                  </Grid.Col>
                 );
               })}
-            </SimpleGrid>
+            </Grid>
 
             <BentoCard title="Detalle completo" icon={IconRuler2} color="gray">
               <Stack gap="lg">
