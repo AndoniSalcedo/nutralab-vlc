@@ -2,7 +2,7 @@ import pandas as pd
 
 # 1. Leer el archivo Excel
 # Asegúrate de que el nombre del archivo coincida exactamente con el tuyo
-nombre_archivo = 'base_datos_nutricional_ampliada_1517_alimentos.xlsx'
+nombre_archivo = 'db.xlsx'
 
 try:
     # Leemos específicamente la hoja 'alimentos_master'
