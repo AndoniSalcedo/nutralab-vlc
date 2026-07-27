@@ -37,6 +37,7 @@ export default function TeamSupplementationDashboard({
   initialExtras = [],
   history = [],
   catalogs = [],
+  readOnly = false,
   initialSelectedPlayerIds = null
 }) {
   const router = useRouter();
@@ -88,11 +89,13 @@ export default function TeamSupplementationDashboard({
               </Text>
             </Box>
           </Group>
-          <Group>
-            <Button size="xs" radius="xl" variant="light" color="grape" onClick={() => setManagerModal('assign')} leftSection={<IconUsers size={14} />}>Asignar fases</Button>
-            <Button size="xs" radius="xl" variant="light" color="grape" onClick={() => setManagerModal('catalogs')} leftSection={<IconList size={14} />}>Catálogos</Button>
-            <Button size="xs" radius="xl" variant="light" color="grape" onClick={() => setManagerModal('supplements')} leftSection={<IconPill size={14} />}>Suplementos</Button>
-          </Group>
+          {!readOnly && (
+            <Group>
+              <Button size="xs" radius="xl" variant="light" color="grape" onClick={() => setManagerModal('assign')} leftSection={<IconUsers size={14} />}>Asignar fases</Button>
+              <Button size="xs" radius="xl" variant="light" color="grape" onClick={() => setManagerModal('catalogs')} leftSection={<IconList size={14} />}>Catálogos</Button>
+              <Button size="xs" radius="xl" variant="light" color="grape" onClick={() => setManagerModal('supplements')} leftSection={<IconPill size={14} />}>Suplementos</Button>
+            </Group>
+          )}
         </Group>
       </Paper>
 

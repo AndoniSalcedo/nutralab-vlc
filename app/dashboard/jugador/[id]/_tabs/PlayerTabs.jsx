@@ -24,8 +24,8 @@ export default function PlayerTabs({
   menus = [],
   activeTab: activeTabProp = 'resumen',
   activeSubtab: activeSubtabProp,
-  readOnly = false,
   children,
+  isPlayer = false,
 }) {
   const router = useRouter();
   const params = useParams();
@@ -96,6 +96,7 @@ export default function PlayerTabs({
                 activeSubtab={activeTab === 'resumen' ? activeSubtab : DEFAULT_SUBTABS.resumen}
                 onSubtabChange={(value) => navigate('resumen', value)}
                 readOnly={readOnly}
+                isPlayer={isPlayer}
               />
             </Tabs.Panel>
 

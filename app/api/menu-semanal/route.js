@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-server';
 import Anthropic from '@anthropic-ai/sdk';
 import { env } from '@/lib/env';
 import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedTeam } from '@/lib/team-access';
+import { forbidden, getOwnedTeam, getAccessibleTeam } from '@/lib/team-access';
 import {
   upsertMenu,
   getMenuById,
@@ -68,7 +68,7 @@ export async function POST(req) {
     const archivo = formData.get('file');
     const semana = formData.get('semana');
     const equipoId = formData.get('equipo_id');
-    if (!archivo || !semana || !equipoId) return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
+    if (user.role === 'tecnico') return forbidden('No autorizado');
 
     const supabase = getSupabaseAdmin();
     const team = await getOwnedTeam(supabase, user, equipoId);
@@ -202,7 +202,18 @@ export async function GET(req) {
   const equipoId = searchParams.get('equipo_id');
   if (!equipoId) return NextResponse.json({ error: 'Falta equipo_id' }, { status: 400 });
 
+  const user = await getUser();
+  if (!user) return forbidden('No autenticado');
+
   const supabase = getSupabaseAdmin();
+  if (user.role === 'jugador') {
+    const { data: player } = await supabase.from('jugadores').select('equipo_id').eq('id', user.id).single();
+    if (String(player?.equipo_id) !== String(equipoId)) return forbidden('No autorizado');
+  } else {
+    const team = await getAccessibleTeam(supabase, user, equipoId);
+    if (!team) return forbidden('No tienes acceso a este equipo');
+  }
+
   try {
     const data = await getMenusByTeamLimit(supabase, equipoId, semana, 10);
     return NextResponse.json({ menus: data });
@@ -219,7 +230,7 @@ export async function DELETE(req) {
 
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     const menu = await getMenuById(supabase, id);
     if (!menu) return NextResponse.json({ error: 'Menú no encontrado' }, { status: 404 });

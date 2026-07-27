@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { forbidden, getOwnedPlayer, getOwnedTeam, getOwnerId } from '@/lib/team-access';
+import { forbidden, getOwnedPlayer, getOwnedTeam, getOwnerId, getAccessiblePlayer } from '@/lib/team-access';
 import { getPlayerByIdMaybe } from '@/repositories/playerRepository';
 import { getMessages, insertMessages } from '@/repositories/messagesRepository';
 
@@ -43,9 +43,9 @@ export async function GET(request) {
     const jugador = await getPlayerByIdMaybe(supabase, jugadorId);
     equipoId = jugador?.equipo_id || null;
   } else {
-    const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
-    if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
-    equipoId = ownedPlayer.equipo_id;
+    const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+    if (!accessiblePlayer) return forbidden('No tienes acceso a este jugador');
+    equipoId = accessiblePlayer.equipo_id;
   }
 
   try {

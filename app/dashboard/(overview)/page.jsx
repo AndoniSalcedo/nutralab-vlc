@@ -31,6 +31,58 @@ export default async function Dashboard() {
     redirect(`/dashboard/jugador/${jugador.id}`);
   }
 
+  // Técnico flow
+  if (user?.role === 'tecnico') {
+    let teams = [];
+    try {
+      const { data: assignedTeams, error: resEquiposErr } = await supabase
+        .from('tecnico_equipos')
+        .select('equipo_id, equipos(*)')
+        .eq('tecnico_id', user.id);
+
+      if (resEquiposErr) throw resEquiposErr;
+
+      const rawTeams = (assignedTeams || []).map((a) => a.equipos).filter(Boolean);
+      const teamIds = rawTeams.map((t) => t.id);
+
+      let resJugadores = { data: [] };
+      if (teamIds.length > 0) {
+        resJugadores = await supabase
+          .from('jugadores')
+          .select('id,equipo_id,nombre,apellidos,posicion')
+          .in('equipo_id', teamIds)
+          .order('nombre');
+
+        if (resJugadores.error) throw resJugadores.error;
+      }
+
+      const counts = new Map();
+      const playersByTeam = new Map();
+      for (const player of resJugadores.data || []) {
+        const teamId = String(player.equipo_id);
+        counts.set(teamId, (counts.get(teamId) || 0) + 1);
+        const currentPlayers = playersByTeam.get(teamId) || [];
+        currentPlayers.push({
+          id: player.id,
+          nombre: player.nombre,
+          apellidos: player.apellidos,
+          posicion: player.posicion,
+        });
+        playersByTeam.set(teamId, currentPlayers);
+      }
+
+      teams = rawTeams.map((team) => ({
+        ...team,
+        players_count: counts.get(String(team.id)) || 0,
+        players: playersByTeam.get(String(team.id)) || [],
+      }));
+    } catch (err) {
+      console.error('Error fetching tecnico teams:', err);
+    }
+
+    return <TeamsDashboard teams={teams} readOnly={true} />;
+  }
+
   const ownerId = getOwnerId(user);
   if (!ownerId) redirect('/login');
 

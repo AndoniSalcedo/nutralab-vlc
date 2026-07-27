@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getOwnedPlayer } from '@/lib/team-access';
+import { getAccessiblePlayer } from '@/lib/team-access';
 import { cleanText, toPositiveNumber } from '@/lib/utils';
 import {
   getAllSuplementos,
@@ -33,8 +33,8 @@ async function getAllowedJugadorId(request, user) {
 
   if (user?.role !== 'jugador') {
     const supabase = getSupabaseAdmin();
-    const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
-    if (!ownedPlayer) {
+    const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+    if (!accessiblePlayer) {
       return { error: NextResponse.json({ error: 'Sin permisos' }, { status: 403 }) };
     }
   }
@@ -74,7 +74,7 @@ export async function GET(request) {
       items,
       asignacion,
       extras,
-      canManage: canManage(user),
+      canManage: canManage(user) && user?.role !== 'tecnico',
     });
   } catch (firstError) {
     return NextResponse.json({ error: firstError.message }, { status: 500 });
@@ -83,7 +83,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   const user = await getUser();
-  if (!canManage(user)) {
+  if (!canManage(user) || user?.role === 'tecnico') {
     return NextResponse.json({ error: 'Sin permisos' }, { status: 403 });
   }
 
@@ -96,8 +96,8 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Falta jugador_id' }, { status: 400 });
   }
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
-  if (!ownedPlayer) {
+  const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+  if (!accessiblePlayer) {
     return NextResponse.json({ error: 'Sin permisos' }, { status: 403 });
   }
 

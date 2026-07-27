@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { renderToStream } from '@react-pdf/renderer';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedPlayer } from '@/lib/team-access';
+import { forbidden, getAccessiblePlayer } from '@/lib/team-access';
 import NutritionPlanCardDocument from '@/lib/reports/NutritionPlanCardDocument';
 import { sanitizeFilename, pdfHeaders } from '@/lib/utils';
 import { getAiPlanById } from '@/repositories/aiPlanRepository';
@@ -30,8 +30,8 @@ export async function GET(_request, { params }) {
     if (user.role === 'jugador') {
       if (String(user.id) !== String(plan.jugador_id)) return forbidden();
     } else {
-      const ownedPlayer = await getOwnedPlayer(supabase, user, plan.jugador_id);
-      if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+      const accessiblePlayer = await getAccessiblePlayer(supabase, user, plan.jugador_id);
+      if (!accessiblePlayer) return forbidden('No tienes acceso a este jugador');
     }
 
     let weeklyReportMeta = null;

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedPlayer } from '@/lib/team-access';
+import { forbidden, getOwnedPlayer, getAccessiblePlayer } from '@/lib/team-access';
 import { planDataToLegacyContent, sanitizePlanData } from '@/lib/nutrition-plan-card';
 import { withLatestMeasurement } from '@/lib/player-metrics';
 import { generarDatosPlan } from '@/lib/ai-plan-generator';
@@ -36,8 +36,8 @@ export async function GET(req) {
     if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
     if (user.role === 'jugador' && String(user.id) !== String(jugadorId)) return forbidden();
     if (user.role !== 'jugador') {
-      const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
-      if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+      const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+      if (!accessiblePlayer) return forbidden('No tienes acceso a este jugador');
     }
 
     const semana = searchParams.get('semana');
@@ -57,7 +57,7 @@ export async function POST(req) {
 
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
     const ownedPlayer = await getOwnedPlayer(supabase, user, jugador.id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
     const jugadorConMetricas = await loadPlayerWithLatestMetrics(supabase, jugador.id);
@@ -116,7 +116,7 @@ export async function PATCH(req) {
 
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     const currentPlan = await getAiPlanById(supabase, id);
     if (!currentPlan) return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 });
@@ -152,7 +152,7 @@ export async function DELETE(req) {
 
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     const plan = await getAiPlanById(supabase, id);
     if (!plan) return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 });

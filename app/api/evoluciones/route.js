@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedPlayer } from '@/lib/team-access';
+import { forbidden, getOwnedPlayer, getAccessiblePlayer } from '@/lib/team-access';
 import {
   getEvolutionsByPlayerId,
   getEvolutionById,
@@ -19,8 +19,8 @@ export async function GET(req) {
   if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
   if (user.role === 'jugador' && String(user.id) !== String(jugadorId)) return forbidden();
   if (user.role !== 'jugador') {
-    const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
-    if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+    const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+    if (!accessiblePlayer) return forbidden('No tienes acceso a este jugador');
   }
 
   try {

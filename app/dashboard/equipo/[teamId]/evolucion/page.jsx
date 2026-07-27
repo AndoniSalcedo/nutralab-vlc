@@ -1,7 +1,7 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import TeamEvolutionDashboard from '@/components/TeamEvolutionDashboard';
 import { getUser } from '@/lib/auth';
-import { getOwnedTeam } from '@/lib/team-access';
+import { getAccessibleTeam } from '@/lib/team-access';
 import { getPlayersByTeamSelectSimple } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIds } from '@/repositories/evolutionRepository';
 import NothingFound from '@/components/NothingFound';
@@ -12,7 +12,7 @@ export const revalidate = 0;
 export default async function TeamEvolutionPage({ params }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
-  const team = await getOwnedTeam(supabase, user, params.teamId);
+  const team = await getAccessibleTeam(supabase, user, params.teamId);
 
   if (!team) {
     return (
@@ -40,6 +40,13 @@ export default async function TeamEvolutionPage({ params }) {
     console.error('Error fetching team evolution:', error);
   }
 
-  return <TeamEvolutionDashboard players={players} evolutions={evolutions} team={team} />;
+  return (
+    <TeamEvolutionDashboard 
+      players={players} 
+      evolutions={evolutions} 
+      team={team} 
+      readOnly={user?.role === 'tecnico'}
+    />
+  );
 }
 

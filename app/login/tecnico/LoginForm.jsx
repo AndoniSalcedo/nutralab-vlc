@@ -31,6 +31,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 import { login } from '@/services/auth';
+import { registerTecnico } from '@/services/tecnico';
 import { env } from '@/lib/env';
 import { useMediaQuery } from '@mantine/hooks';
 
@@ -40,10 +41,14 @@ const highlights = [
   { icon: IconActivityHeartbeat, label: 'Métricas', value: 'evolución visible' },
 ];
 
-export default function LoginForm() {
+export default function TecnicoLoginForm() {
   const isMobile = useMediaQuery('(max-width: 62em)');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [nombre, setNombre] = useState('');
+  const [apellidos, setApellidos] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -54,13 +59,27 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      await login(email, password);
-
-      router.push('/dashboard');
+      if (isRegister) {
+        if (password !== confirmPassword) {
+          throw new Error('Las contraseñas no coinciden');
+        }
+        await registerTecnico({ nombre, apellidos, email, password });
+        notifications.show({
+          color: 'green',
+          title: 'Registro exitoso',
+          message: 'Tu cuenta de técnico ha sido creada. Ahora puedes iniciar sesión y solicitar al nutricionista que te vincule por correo.',
+        });
+        setIsRegister(false);
+        setPassword('');
+        setConfirmPassword('');
+      } else {
+        await login(email, password);
+        router.push('/dashboard');
+      }
     } catch (err) {
       notifications.show({
         color: 'red',
-        title: 'No se pudo iniciar sesión',
+        title: isRegister ? 'Error al registrarse' : 'No se pudo iniciar sesión',
         message: err.message,
       });
     } finally {
@@ -91,7 +110,8 @@ export default function LoginForm() {
             backdropFilter: isMobile ? 'none' : 'blur(18px)',
           }}
         >
-          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="0">
+          <SimpleGrid cols={{ base: 1, md: 2 }} spacing={0}>
+            {/* Columna Izquierda: Branding/Imagen */}
             <Box
               visibleFrom="md"
               p={{ base: 10, sm: 22, md: 34 }}
@@ -110,13 +130,13 @@ export default function LoginForm() {
                   radius="sm"
                   leftSection={<IconShieldCheck size={14} />}
                 >
-                  Acceso privado
+                  Acceso cuerpo técnico
                 </Badge>
                 <Title order={1} mt="lg" fw={850} c="#24291f" lh={1.05}>
-                  Portal del jugador
+                  Portal de técnicos
                 </Title>
                 <Text c="#5c6049" size="lg" mt="md" maw={430}>
-                  Consulta tu plan, métricas y pautas de nutrición con las credenciales que te ha facilitado tu nutricionista.
+                  Accede como parte del cuerpo técnico para colaborar con los nutricionistas y supervisar a tus equipos asignados.
                 </Text>
               </Box>
 
@@ -137,6 +157,7 @@ export default function LoginForm() {
               </SimpleGrid>
             </Box>
 
+            {/* Columna Derecha: Formulario */}
             <Box
               p={{ base: 0, md: 34 }}
               style={{
@@ -171,15 +192,16 @@ export default function LoginForm() {
                     color="nutralabColor"
                     radius="sm"
                     leftSection={<IconShieldCheck size={14} />}
-                    mb="xs"
                   >
-                    Acceso privado
+                    Acceso técnico
                   </Badge>
                   <Title order={2} fw={850} c="#24291f" ta="center">
-                    Portal del jugador
+                    {isRegister ? 'Registro de técnico' : 'Portal de técnicos'}
                   </Title>
                   <Text c="dimmed" size="sm" ta="center" px="xs" mb="sm">
-                    Entra con las credenciales de tu nutricionista para revisar tu seguimiento.
+                    {isRegister 
+                      ? 'Crea tu cuenta de técnico para colaborar.'
+                      : 'Entra con tus credenciales de técnico para acceder.'}
                   </Text>
                 </Stack>
 
@@ -187,10 +209,10 @@ export default function LoginForm() {
                 <Group justify="space-between" align="flex-start" mb="xl" visibleFrom="md">
                   <Box>
                     <Title order={2} fw={800} c="#24291f">
-                      Iniciar sesión
+                      {isRegister ? 'Crear cuenta' : 'Portal de Técnicos'}
                     </Title>
                     <Text c="dimmed" size="sm" mt={4}>
-                      Entra para revisar tu seguimiento.
+                      {isRegister ? 'Regístrate como técnico en el sistema.' : 'Inicia sesión para gestionar equipos.'}
                     </Text>
                   </Box>
                   <ThemeIcon size={46} radius="md" color="nutralabColor" variant="light">
@@ -200,10 +222,33 @@ export default function LoginForm() {
 
                 <form onSubmit={handleSubmit}>
                   <Stack gap="md">
+                    {isRegister && (
+                      <>
+                        <TextInput
+                          label="Nombre"
+                          name="nombre"
+                          placeholder="Tu nombre"
+                          required
+                          value={nombre}
+                          onChange={(e) => setNombre(e.target.value)}
+                          size="md"
+                          radius="md"
+                        />
+                        <TextInput
+                          label="Apellidos"
+                          name="apellidos"
+                          placeholder="Tus apellidos"
+                          value={apellidos}
+                          onChange={(e) => setApellidos(e.target.value)}
+                          size="md"
+                          radius="md"
+                        />
+                      </>
+                    )}
                     <TextInput
                       label="Email"
                       name="email"
-                      placeholder="tu.email@ejemplo.com"
+                      placeholder="tecnico@ejemplo.com"
                       required
                       autoComplete="email"
                       leftSection={<IconMail size={18} />}
@@ -215,15 +260,29 @@ export default function LoginForm() {
                     <PasswordInput
                       label="Contraseña"
                       name="password"
-                      placeholder="Tu contraseña"
+                      placeholder="Tu contraseña (mín. 8 caracteres)"
                       required
-                      autoComplete="current-password"
+                      autoComplete={isRegister ? 'new-password' : 'current-password'}
                       leftSection={<IconLock size={18} />}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       size="md"
                       radius="md"
                     />
+                    {isRegister && (
+                      <PasswordInput
+                        label="Confirmar contraseña"
+                        name="confirmPassword"
+                        placeholder="Repite tu contraseña"
+                        required
+                        autoComplete="new-password"
+                        leftSection={<IconLock size={18} />}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        size="md"
+                        radius="md"
+                      />
+                    )}
                     <Button
                       fullWidth
                       mt="sm"
@@ -234,18 +293,36 @@ export default function LoginForm() {
                       color="nutralabColor.8"
                       rightSection={<IconArrowRight size={18} />}
                     >
-                      Entrar
+                      {isRegister ? 'Registrarse' : 'Entrar'}
                     </Button>
                   </Stack>
                 </form>
 
-                <Divider my="xl" />
+                <Divider my="lg" />
 
                 <Stack gap="xs">
                   <Text size="sm" c="dimmed" ta={{ base: 'center', sm: 'left' }}>
-                    ¿Eres técnico?{' '}
-                    <Anchor href="/login/tecnico" fw={700} c="#5c6049">
-                      Accede al portal de técnicos
+                    {isRegister ? (
+                      <>
+                        ¿Ya tienes cuenta?{' '}
+                        <Anchor component="button" type="button" fw={700} c="#5c6049" onClick={() => setIsRegister(false)}>
+                          Inicia sesión aquí
+                        </Anchor>
+                      </>
+                    ) : (
+                      <>
+                        ¿No tienes cuenta de técnico?{' '}
+                        <Anchor component="button" type="button" fw={700} c="#5c6049" onClick={() => setIsRegister(true)}>
+                          Regístrate aquí
+                        </Anchor>
+                      </>
+                    )}
+                  </Text>
+
+                  <Text size="sm" c="dimmed" ta={{ base: 'center', sm: 'left' }}>
+                    ¿Eres jugador?{' '}
+                    <Anchor href="/login" fw={700} c="#5c6049">
+                      Accede al portal de jugadores
                     </Anchor>
                   </Text>
 

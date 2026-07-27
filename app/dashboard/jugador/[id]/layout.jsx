@@ -1,6 +1,6 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
-import { getOwnedPlayer } from '@/lib/team-access';
+import { getAccessiblePlayer } from '@/lib/team-access';
 import JugadorHeader from '@/components/JugadorHeader';
 import PlayerTabs from './_tabs/PlayerTabs';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
@@ -14,8 +14,8 @@ export default async function JugadorLayout({ children, params }) {
   const id = params.id;
 
   if (!isPlayer) {
-    const ownedPlayer = await getOwnedPlayer(supabase, user, id);
-    if (!ownedPlayer) {
+    const accessiblePlayer = await getAccessiblePlayer(supabase, user, id);
+    if (!accessiblePlayer) {
       return (
         <NothingFound
           title="Sin acceso"
@@ -62,7 +62,7 @@ export default async function JugadorLayout({ children, params }) {
   return (
     <BoneyardSkeleton name="player-dashboard" loading={false}>
       <JugadorHeader jugador={jugador} user={user} />
-      <PlayerTabs jugador={jugador}>
+      <PlayerTabs jugador={jugador} readOnly={isPlayer || user?.role === 'tecnico'} isPlayer={isPlayer}>
         {children}
       </PlayerTabs>
     </BoneyardSkeleton>

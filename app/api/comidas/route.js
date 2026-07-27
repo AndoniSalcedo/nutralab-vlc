@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedPlayer } from '@/lib/team-access';
+import { forbidden, getOwnedPlayer, getAccessiblePlayer } from '@/lib/team-access';
 import {
   getMealsFiltered,
   getMealById,
@@ -33,8 +33,8 @@ export async function GET(req) {
 
     const isPlayer = user.role === 'jugador';
     if (!isPlayer) {
-      const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
-      if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+      const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+      if (!accessiblePlayer) return forbidden('No tienes acceso a este jugador');
     } else {
       if (String(user.id) !== String(jugadorId)) {
         return forbidden('No tienes acceso a este jugador');
@@ -78,9 +78,9 @@ export async function POST(req) {
     if (!jugadorId) return NextResponse.json({ error: 'Falta jugador_id' }, { status: 400 });
     if (!mealType) return NextResponse.json({ error: 'Falta el tipo de ingesta' }, { status: 400 });
 
-    const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user) return forbidden('No autorizado');
+    if (!user || user.role === 'tecnico') return forbidden('No autorizado');
+    const supabase = getSupabaseAdmin();
 
     const isPlayer = user.role === 'jugador';
     if (!isPlayer) {
@@ -143,7 +143,7 @@ export async function DELETE(req) {
 
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user) return forbidden('No autorizado');
+    if (!user || user.role === 'tecnico') return forbidden('No autorizado');
 
     const meal = await getMealById(supabase, id);
     if (!meal) return NextResponse.json({ error: 'Comida no encontrada' }, { status: 404 });

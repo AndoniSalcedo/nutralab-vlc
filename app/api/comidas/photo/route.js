@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedPlayer } from '@/lib/team-access';
+import { forbidden, getAccessiblePlayer } from '@/lib/team-access';
 import { getMealPhotoWithMeta } from '@/repositories/mealsRepository';
 
 export const dynamic = 'force-dynamic';
@@ -23,8 +23,8 @@ export async function GET(req) {
 
     const isPlayer = user.role === 'jugador';
     if (!isPlayer) {
-      const ownedPlayer = await getOwnedPlayer(supabase, user, meal.jugador_id);
-      if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
+      const accessiblePlayer = await getAccessiblePlayer(supabase, user, meal.jugador_id);
+      if (!accessiblePlayer) return forbidden('No tienes acceso a este jugador');
     } else {
       if (String(user.id) !== String(meal.jugador_id)) {
         return forbidden('No tienes acceso a este jugador');

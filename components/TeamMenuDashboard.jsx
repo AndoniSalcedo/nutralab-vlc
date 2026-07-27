@@ -23,7 +23,7 @@ import Link from 'next/link';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import CreateMenuModal from '@/components/modals/CreateMenuModal';
 
-export default function TeamMenuDashboard({ initialMenus = [], teamId }) {
+export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly = false }) {
   const [menus, setMenus] = useState(initialMenus);
   const [selectedMenu, setSelectedMenu] = useState(initialMenus[0] || null);
   const [viewMode, setViewMode] = useState('diaria'); // 'diaria' or 'semanal'
@@ -367,44 +367,46 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId }) {
                     style={{ flex: 1, minWidth: 260 }}
                   />
 
-                  <Group gap={8}>
-                    <Button
-                      color="blue"
-                      radius="xl"
-                      size="sm"
-                      onClick={() => setCreateModalOpen(true)}
-                      leftSection={<IconPlus size={16} />}
-                    >
-                      Nuevo Menú
-                    </Button>
+                  {!readOnly && (
+                    <Group gap={8}>
+                      <Button
+                        color="blue"
+                        radius="xl"
+                        size="sm"
+                        onClick={() => setCreateModalOpen(true)}
+                        leftSection={<IconPlus size={16} />}
+                      >
+                        Nuevo Menú
+                      </Button>
 
-                    {selectedMenu && (
-                      <>
-                        <Button
-                          variant="light"
-                          color="teal"
-                          radius="xl"
-                          size="sm"
-                          onClick={handleStartEdit}
-                          leftSection={<IconEdit size={16} />}
-                        >
-                          Editar Menú
-                        </Button>
+                      {selectedMenu && (
+                        <>
+                          <Button
+                            variant="light"
+                            color="teal"
+                            radius="xl"
+                            size="sm"
+                            onClick={handleStartEdit}
+                            leftSection={<IconEdit size={16} />}
+                          >
+                            Editar Menú
+                          </Button>
 
-                        <Button
-                          variant="light"
-                          color="red"
-                          radius="xl"
-                          size="sm"
-                          onClick={() => handleDeleteMenu(selectedMenu.id)}
-                          loading={deleting}
-                          leftSection={<IconTrash size={16} />}
-                        >
-                          Eliminar Menú
-                        </Button>
-                      </>
-                    )}
-                  </Group>
+                          <Button
+                            variant="light"
+                            color="red"
+                            radius="xl"
+                            size="sm"
+                            onClick={() => handleDeleteMenu(selectedMenu.id)}
+                            loading={deleting}
+                            leftSection={<IconTrash size={16} />}
+                          >
+                            Eliminar Menú
+                          </Button>
+                        </>
+                      )}
+                    </Group>
+                  )}
                 </Group>
               </Paper>
             )}
