@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { initials, filenameFromResponse } from '@/lib/utils';
-import { Anchor, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Grid } from '@mantine/core';
+import { Anchor, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Grid, Modal } from '@mantine/core';
 import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconSettings, IconBottle, IconPlus, IconFileSpreadsheet, IconReportMedical, IconScale } from '@tabler/icons-react';
+import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconSettings, IconBottle, IconPlus, IconFileSpreadsheet, IconReportMedical, IconScale, IconUserCheck } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import { calculateByObjective, getTeamNutritionDayTypes } from '@/lib/calculations';
@@ -20,6 +20,7 @@ import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import SquadReportModal from '@/components/modals/SquadReportModal';
 import SquadWeightModal from '@/components/modals/SquadWeightModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
+import TeamTecnicosConfig from '@/components/TeamTecnicosConfig';
 
 const PAGE_SIZE = 8;
 
@@ -562,6 +563,13 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                       value="Registrar peso"
                       onClick={() => setActiveModal('weight')}
                     />
+                    <DashboardStat
+                      title="Gestionar técnicos"
+                      icon={IconUserCheck}
+                      color="cyan"
+                      value="Cuerpo técnico"
+                      onClick={() => setActiveModal('tecnicos')}
+                    />
                   </>
                 )}
 
@@ -860,6 +868,17 @@ export default function DashboardContent({ players = [], team, readOnly = false 
         players={playersState}
         team={team}
       />
+
+      <Modal
+        opened={activeModal === 'tecnicos'}
+        onClose={closeModal}
+        size="lg"
+        radius="lg"
+        withCloseButton={false}
+        padding={0}
+      >
+        <TeamTecnicosConfig team={team} readOnly={readOnly} />
+      </Modal>
       <ConfirmModal
         opened={!!deletePlayerData}
         onClose={() => setDeletePlayerData(null)}
