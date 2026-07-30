@@ -36,8 +36,7 @@ export async function POST(request) {
     if (jugador?.auth_user_id) {
       await supabase.auth.admin.deleteUser(jugador.auth_user_id);
     }
-    const redirectTeamId = ownedPlayer.equipo_id || teamId;
-    return NextResponse.redirect(new URL(redirectTeamId ? `/dashboard/equipo/${redirectTeamId}` : '/dashboard', request.url));
+    return NextResponse.json({ success: true });
   }
 
   let targetTeam = null;
@@ -87,6 +86,6 @@ export async function POST(request) {
     }
   }
 
-  return NextResponse.redirect(new URL(`/dashboard/equipo/${targetTeam.id}`, request.url), 303);
+  return NextResponse.json({ success: true });
 }
 
