@@ -1,3 +1,5 @@
+import { resolvePlayerSupplementsData } from '@/lib/supplementation-helper';
+
 export async function getAllSuplementos(supabase) {
   const { data, error } = await supabase
     .from('suplementos')
@@ -231,3 +233,30 @@ export async function nextListOrder(supabase) {
   if (error) throw error;
   return Number(data?.[0]?.orden || 0) + 1;
 }
+
+export async function getResolvedPlayerSupplementation(supabase, jugadorId, pesoKg = null) {
+  if (!jugadorId) return [];
+  const [
+    suplementos,
+    listas,
+    items,
+    asignacion,
+    extras,
+  ] = await Promise.all([
+    getAllSuplementos(supabase),
+    getAllSuplementacionListas(supabase),
+    getAllSuplementacionListaItems(supabase),
+    getJugadorSuplementacion(supabase, jugadorId),
+    getJugadorSuplementosExtra(supabase, jugadorId),
+  ]);
+
+  return resolvePlayerSupplementsData({
+    suplementos,
+    listas,
+    items,
+    asignacion,
+    extras,
+    peso: pesoKg,
+  });
+}
+

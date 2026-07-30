@@ -24,6 +24,8 @@ import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPlanPdf, deleteAiPlan } from '@/services/plan';
 import { getWeeklyMenus } from '@/services/menu';
+import { getPlayerSupplementation } from '@/services/supplement';
+import { resolvePlayerSupplementsData } from '@/lib/supplementation-helper';
 import {
   IconArrowsLeftRight,
   IconBrain,
@@ -82,12 +84,16 @@ function MetricCard({ label, value, color = 'orange' }) {
   );
 }
 
-function PlanFicha({ data }) {
+function PlanFicha({ data, activeSupplements = [] }) {
   const plan = sanitizePlanData(data);
   if (!plan) return null;
 
   const leftDays = ['lunes', 'martes', 'miercoles', 'jueves'];
   const rightDays = ['viernes', 'sabado', 'domingo'];
+
+  const supplementsToShow = (plan.suplementacion && plan.suplementacion.length > 0)
+    ? plan.suplementacion
+    : activeSupplements;
 
   const renderDayBox = (dayKey) => {
     const dayData = plan.dias[dayKey];
@@ -138,6 +144,39 @@ function PlanFicha({ data }) {
           </Stack>
           <Stack gap={0}>
             {rightDays.map(renderDayBox)}
+
+            {supplementsToShow?.length > 0 && (
+              <Paper p="md" radius="md" style={{ backgroundColor: '#131e3a', border: '1px solid #23345e' }} mb="sm">
+                <Group justify="space-between" align="center" mb="xs">
+                  <Title order={5} c="orange.4" tt="uppercase">Suplementación Pautada</Title>
+                </Group>
+                <Stack gap="xs">
+                  {supplementsToShow.map((supp, index) => (
+                    <Paper key={index} p="xs" style={{ backgroundColor: '#1d264a', borderRadius: '4px' }}>
+                      <Group justify="space-between" align="flex-start" wrap="nowrap">
+                        <Text size="xs" fw={800} c="white">{supp.nombre}</Text>
+                        {supp.dosis && (
+                          <Badge color="teal" variant="filled" size="xs" radius="xs">
+                            {supp.dosis}
+                          </Badge>
+                        )}
+                      </Group>
+                      {supp.timing && (
+                        <Text size="xs" c="orange.3" fw={700} mt={2}>
+                          Momento: {supp.timing}
+                        </Text>
+                      )}
+                      {supp.notas && (
+                        <Text size="xs" c="gray.3" italic mt={2}>
+                          {supp.notas}
+                        </Text>
+                      )}
+                    </Paper>
+                  ))}
+                </Stack>
+              </Paper>
+            )}
+
             {plan.notas?.length > 0 && (
               <Paper p="md" radius="md" style={{ backgroundColor: '#071e36', border: '1px solid #1e3a8a' }}>
                 <Title order={5} c="teal.3" tt="uppercase" mb="xs">Indicaciones de la semana</Title>
@@ -265,6 +304,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [currentId, setCurrentId] = useState(null);
   const [mode, setMode] = useState('view');
   const [intercambiosOpened, setIntercambiosOpened] = useState(false);
+  const [activeSupplements, setActiveSupplements] = useState([]);
 
   const [nombre, setNombre] = useState('');
   const [contextoAdicional, setContextoAdicional] = useState('');
@@ -274,6 +314,28 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [actionType, setActionType] = useState(null);
   const [availableMenus, setAvailableMenus] = useState([]);
   const [selectedMenuWeek, setSelectedMenuWeek] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    if (!jugador?.id) return;
+    getPlayerSupplementation(jugador.id)
+      .then((suppData) => {
+        if (!active) return;
+        const resolved = resolvePlayerSupplementsData({
+          suplementos: suppData.suplementos,
+          listas: suppData.listas,
+          items: suppData.items,
+          asignacion: suppData.asignacion,
+          extras: suppData.extras,
+          peso: jugador.peso_kg,
+        });
+        setActiveSupplements(resolved);
+      })
+      .catch(() => { });
+    return () => {
+      active = false;
+    };
+  }, [jugador?.id, jugador?.peso_kg]);
 
   const [recomendacionesIngestas, setRecomendacionesIngestas] = useState({});
 
@@ -403,7 +465,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       menu: resolvedMenu,
       calendario: modalCalendar,
       preMatchConfig: modalPreMatchConfig,
-      teamConfig
+      teamConfig,
+      suplementacion: activeSupplements,
     }));
 
     setHasGeneratedAi(false);
@@ -1086,7 +1149,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
             />
           </Box>
         ) : currentDatos ? (
-          <PlanFicha data={currentDatos} jugador={jugador} />
+          <PlanFicha data={currentDatos} jugador={jugador} activeSupplements={activeSupplements} />
         ) : planHtml ? (
           <Paper p={{ base: 'sm', sm: 'xl' }} radius="lg" withBorder shadow="sm">
             <Badge mb="md" color="gray" variant="light">Plan legado</Badge>

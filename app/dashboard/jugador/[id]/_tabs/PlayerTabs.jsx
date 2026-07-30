@@ -26,6 +26,7 @@ export default function PlayerTabs({
   activeSubtab: activeSubtabProp,
   children,
   isPlayer = false,
+  readOnly = false,
 }) {
   const router = useRouter();
   const params = useParams();

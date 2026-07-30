@@ -9,6 +9,7 @@ import { sanitizeFilename, pdfHeaders } from '@/lib/utils';
 import { getAiPlanById } from '@/repositories/aiPlanRepository';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
 import { getWeeklyReport } from '@/repositories/weeklyReportsRepository';
+import { getResolvedPlayerSupplementation } from '@/repositories/supplementationRepository';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -39,9 +40,21 @@ export async function GET(_request, { params }) {
 
     const teamConfig = jugador?.equipos?.configuracion_nutricional;
 
-    let semana = plan.datos?.meta?.semanaMenu;
-    if (!semana && plan.datos?.meta?.fecha) {
-      const d = new Date(plan.datos.meta.fecha);
+    const planData = { ...plan.datos };
+    if (!Array.isArray(planData.suplementacion) || planData.suplementacion.length === 0) {
+      const resolvedSupps = await getResolvedPlayerSupplementation(
+        supabase,
+        plan.jugador_id,
+        planData.metricas?.peso || jugador?.peso_kg
+      );
+      if (resolvedSupps?.length) {
+        planData.suplementacion = resolvedSupps;
+      }
+    }
+
+    let semana = planData.meta?.semanaMenu;
+    if (!semana && planData.meta?.fecha) {
+      const d = new Date(planData.meta.fecha);
       if (!Number.isNaN(d.getTime())) {
         const day = d.getDay();
         const diff = d.getDate() - day + (day === 0 ? -6 : 1);
@@ -59,7 +72,7 @@ export async function GET(_request, { params }) {
     }
 
     const stream = await renderToStream(
-      <NutritionPlanCardDocument data={plan.datos} weeklyReportMeta={weeklyReportMeta} teamConfig={teamConfig} />
+      <NutritionPlanCardDocument data={planData} weeklyReportMeta={weeklyReportMeta} teamConfig={teamConfig} />
     );
     const chunks = [];
     for await (const chunk of stream) {

@@ -182,6 +182,50 @@ const styles = StyleSheet.create({
     lineHeight: 1.2,
     marginBottom: 3,
   },
+  supplementsBox: {
+    backgroundColor: '#111827',
+    borderColor: '#374151',
+    borderWidth: 0.5,
+    borderRadius: 6,
+    padding: 6,
+    flex: 1,
+  },
+  supplementsTitle: {
+    fontSize: 8,
+    fontWeight: 700,
+    color: COLORS.orange,
+    textTransform: 'uppercase',
+    marginBottom: 4,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#374151',
+    paddingBottom: 2,
+  },
+  supplementRow: {
+    marginBottom: 3,
+    paddingBottom: 2,
+    borderBottomWidth: 0.2,
+    borderBottomColor: '#1f2937',
+  },
+  supplementHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  supplementName: {
+    fontSize: 6.5,
+    fontWeight: 700,
+    color: COLORS.text,
+  },
+  supplementDose: {
+    fontSize: 6.2,
+    fontWeight: 700,
+    color: COLORS.teal,
+  },
+  supplementMeta: {
+    fontSize: 5.5,
+    color: COLORS.muted,
+    marginTop: 1,
+  },
   footer: {
     marginTop: 8,
     borderTopWidth: 0.5,
@@ -208,6 +252,7 @@ function formatNumber(value, unit = '') {
 
 export function PlanCardPage({ plan, teamConfig }) {
   const notes = plan?.notas?.length ? plan.notas : [];
+  const supplements = Array.isArray(plan?.suplementacion) ? plan.suplementacion : [];
 
   const leftDays = ['lunes', 'martes', 'miercoles', 'jueves'];
   const rightDays = ['viernes', 'sabado', 'domingo'];
@@ -293,6 +338,22 @@ export function PlanCardPage({ plan, teamConfig }) {
               </View>
             );
           })}
+
+          {supplements.length > 0 && (
+            <View style={styles.supplementsBox}>
+              <Text style={styles.supplementsTitle}>Suplementación Pautada</Text>
+              {supplements.map((supp, index) => (
+                <View key={index} style={styles.supplementRow}>
+                  <View style={styles.supplementHeader}>
+                    <Text style={styles.supplementName}>{supp.nombre}</Text>
+                    {supp.dosis ? <Text style={styles.supplementDose}>{supp.dosis}</Text> : null}
+                  </View>
+                  {supp.timing ? <Text style={styles.supplementMeta}>Momento: {supp.timing}</Text> : null}
+                  {supp.notas ? <Text style={styles.supplementMeta}>{supp.notas}</Text> : null}
+                </View>
+              ))}
+            </View>
+          )}
 
           <View style={styles.notesBox}>
             <Text style={styles.notesTitle}>Indicaciones de la semana</Text>
