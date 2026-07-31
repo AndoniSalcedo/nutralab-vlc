@@ -14,9 +14,13 @@ import {
   ActionIcon,
   RingProgress,
   Progress,
-  Flex
+  Flex,
+  Popover,
+  UnstyledButton
 } from '@mantine/core';
-import { DateInput } from '@mantine/dates';
+import { DatePicker } from '@mantine/dates';
+import dayjs from 'dayjs';
+import 'dayjs/locale/es';
 
 import {
   IconClipboardList,
@@ -27,7 +31,33 @@ import {
   IconApple,
   IconDroplet,
   IconCalendar,
+  IconChevronDown,
 } from '@tabler/icons-react';
+
+dayjs.locale('es');
+
+function formatFriendlyDate(date) {
+  if (!date) return '';
+  const d = dayjs(date);
+  const today = dayjs();
+
+  if (d.isSame(today, 'day')) {
+    return `Hoy, ${d.format('D [de] MMMM')}`;
+  }
+  const yesterday = today.subtract(1, 'day');
+  if (d.isSame(yesterday, 'day')) {
+    return `Ayer, ${d.format('D [de] MMMM')}`;
+  }
+  const tomorrow = today.add(1, 'day');
+  if (d.isSame(tomorrow, 'day')) {
+    return `Mañana, ${d.format('D [de] MMMM')}`;
+  }
+  if (d.year() === today.year()) {
+    const str = d.format('ddd, D [de] MMMM');
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  return d.format('D [de] MMMM, YYYY');
+}
 import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/lib/calculations';
 import { CampoEditable, ComidasEditable } from '../editable';
 import { latestMetricValue } from '@/lib/player-metrics';
@@ -153,6 +183,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
   const [meals, setMeals] = useState([]);
   const [loadingMeals, setLoadingMeals] = useState(true);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
+  const [popoverOpened, setPopoverOpened] = useState(false);
 
   useEffect(() => {
     if (!jugador?.id) return;
@@ -302,53 +333,106 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
                   </ThemeIcon>
                   <Stack gap={2}>
                     <Title order={3} fw={800} c="dark.4">Balance Nutricional</Title>
-                    <Text size="sm" c="dimmed">Progreso diario según</Text>
+                    <Text size="sm" c="dimmed">Historial y registro diario</Text>
                   </Stack>
                 </Group>
 
-                {/* Interactive Date Picker with Chevron Navigators */}
-                <Group gap="xs" w={{ base: '100%', sm: 'auto' }} style={{ flexGrow: { base: 1, sm: 0 } }}>
+                {/* Interactive Date Selector Pill with Chevrons */}
+                <Paper
+                  withBorder
+                  radius="xl"
+                  p={4}
+                  bg="gray.0"
+                  w={{ base: '100%', sm: 'auto' }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 4,
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                  }}
+                >
                   <ActionIcon
                     variant="subtle"
                     color="gray"
-                    radius="md"
-                    size="lg"
+                    radius="xl"
+                    size="md"
                     onClick={() => {
                       const prev = new Date(selectedDate);
                       prev.setDate(prev.getDate() - 1);
                       setSelectedDate(prev);
                     }}
+                    style={{ transition: 'transform 0.1s ease' }}
+                    onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.92)')}
+                    onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                   >
-                    <IconChevronLeft size={18} />
+                    <IconChevronLeft size={18} stroke={2} />
                   </ActionIcon>
 
-                  <DateInput
-                    value={new Date(selectedDate)}
-                    onChange={(val) => val && setSelectedDate(val)}
-                    valueFormat="DD/MM/YYYY"
-                    maxDate={new Date()}
-                    size="xs"
+                  <Popover
+                    opened={popoverOpened}
+                    onChange={setPopoverOpened}
+                    position="bottom"
+                    withArrow
+                    shadow="md"
                     radius="md"
-                    leftSection={<IconCalendar size={14} />}
-                    style={{ width: 180, flex: 1 }}
-                    allowDeselect={false}
-                  />
+                  >
+                    <Popover.Target>
+                      <UnstyledButton
+                        onClick={() => setPopoverOpened((o) => !o)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          padding: '5px 12px',
+                          borderRadius: '16px',
+                          backgroundColor: 'var(--mantine-color-white)',
+                          border: '1px solid var(--mantine-color-gray-3)',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+                        }}
+                      >
+                        <IconCalendar size={15} style={{ color: 'var(--mantine-color-red-6)' }} />
+                        <Text fw={700} size="xs" c="dark.6" style={{ whiteSpace: 'nowrap' }}>
+                          {formatFriendlyDate(selectedDate)}
+                        </Text>
+                        <IconChevronDown size={13} style={{ color: 'var(--mantine-color-gray-5)' }} />
+                      </UnstyledButton>
+                    </Popover.Target>
+                    <Popover.Dropdown p="xs">
+                      <DatePicker
+                        value={new Date(selectedDate)}
+                        onChange={(val) => {
+                          if (val) {
+                            setSelectedDate(val);
+                            setPopoverOpened(false);
+                          }
+                        }}
+                        maxDate={new Date()}
+                        size="sm"
+                      />
+                    </Popover.Dropdown>
+                  </Popover>
 
                   <ActionIcon
                     variant="subtle"
                     color="gray"
-                    radius="md"
-                    size="lg"
+                    radius="xl"
+                    size="md"
                     disabled={new Date(selectedDate).toDateString() === new Date().toDateString()}
                     onClick={() => {
                       const next = new Date(selectedDate);
                       next.setDate(next.getDate() + 1);
                       setSelectedDate(next);
                     }}
+                    style={{ transition: 'transform 0.1s ease' }}
+                    onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.92)')}
+                    onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                   >
-                    <IconChevronRight size={18} />
+                    <IconChevronRight size={18} stroke={2} />
                   </ActionIcon>
-                </Group>
+                </Paper>
               </Group>
               <Box mb="lg">
                 {/* Selector interactivo integrado de Tipo de Día */}
