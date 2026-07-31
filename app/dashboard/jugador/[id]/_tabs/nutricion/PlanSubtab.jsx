@@ -28,8 +28,9 @@ import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPl
 import { getWeeklyMenus } from '@/services/menu';
 import { getPlayerSupplementation } from '@/services/supplement';
 import { resolvePlayerSupplementsData } from '@/lib/supplementation-helper';
-import { IconDownload, IconArrowsLeftRight, IconPlus, IconSparkles, IconEdit, IconCheck, IconTrash, IconChevronDown } from '@tabler/icons-react';
+import { IconDownload, IconArrowsLeftRight, IconPlus, IconSparkles, IconEdit, IconCheck, IconTrash, IconChevronDown, IconBrain } from '@tabler/icons-react';
 import SubtabHeader from '../SubtabHeader';
+import classes from '../SubtabSectionHeader.module.css';
 import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/nutrition-plan-card';
 import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getTeamNutritionDayTypes } from '@/lib/calculations';
 import { getUserMeals } from '@/lib/nutrition-day-types';
@@ -292,7 +293,7 @@ function AiGenerationOverlay({ opened, messages = [] }) {
 }
 
 export default function PlanSubtab({ jugador, readOnly = false }) {
-  const isMobile = useMediaQuery('(max-width: 48em)');
+  const isMobile = useMediaQuery('(max-width: 48em)', true);
   const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const [planes, setPlanes] = useState([]);
   const [currentId, setCurrentId] = useState(null);
@@ -787,7 +788,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
   return (
     <Stack gap={0}>
-      <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+      <Paper className={classes.mobileSticky} p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Stack gap="md">
           <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
             <Group gap="xs" style={{ flex: 1 }}>
@@ -858,7 +859,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
             )}
           </Group>
 
-          <Collapse in={!isMobile || expanded}>
+          <Collapse in={!isMobile || expanded} transitionDuration={isMobile ? 200 : 0}>
             <Stack gap="sm">
               {isMobile && (
                 <Group gap="xs" justify="center" style={{ flexDirection: 'column' }}>

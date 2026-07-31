@@ -26,6 +26,7 @@ import MealEditorModal from '@/components/modals/MealEditorModal';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import SubtabHeader from '../SubtabHeader';
+import classes from '../SubtabSectionHeader.module.css';
 
 function groupByDate(items) {
   const map = new Map();
@@ -63,7 +64,7 @@ const MEAL_TYPES = [
 ];
 
 export default function DiarioComidasSubtab({ jugador, readOnly = false, initialMeals }) {
-  const isMobile = useMediaQuery('(max-width: 48em)');
+  const isMobile = useMediaQuery('(max-width: 48em)', true);
   const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const [loading, setLoading] = useState(initialMeals ? false : true);
   const [meals, setMeals] = useState(initialMeals || []);
@@ -145,10 +146,11 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false, initial
   };
 
   return (
-    <Box w="100%" p={0} bg="gray.0" mih="100%" style={{ overflowX: 'hidden' }}>
+    <Box w="100%" p={0} bg="gray.0" mih="100%" style={{ overflowX: 'clip' }}>
       <Stack gap={0}>
         {/* Tab Header Banner */}
         <Paper
+          className={classes.mobileSticky}
           p={{ base: 'sm', sm: 'md' }}
           bg="white"
           shadow="xs"
@@ -182,7 +184,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false, initial
               )}
             </Group>
 
-            <Collapse in={!isMobile || expanded}>
+            <Collapse in={!isMobile || expanded} transitionDuration={isMobile ? 200 : 0}>
               <Stack gap="sm">
                 {!readOnly && isMobile && (
                   <Button

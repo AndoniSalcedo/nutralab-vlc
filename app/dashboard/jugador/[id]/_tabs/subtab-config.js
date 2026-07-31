@@ -38,7 +38,7 @@ export const SUBTAB_CONFIGS = {
         icon: IconMail,
         iconColor: 'blue',
         title: 'Mensajes',
-        subtitle: 'Comunicaciones del nutricionista para el jugador.',
+        subtitle: 'Comunicaciones hacia el jugador.',
       },
     },
   },

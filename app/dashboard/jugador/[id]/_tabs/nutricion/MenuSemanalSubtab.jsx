@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import SubtabHeader from '../SubtabHeader';
+import classes from '../SubtabSectionHeader.module.css';
 import {
   ActionIcon,
   Paper,
@@ -37,6 +38,7 @@ export default function MenuSemanalSubtab({ menus = [] }) {
   return (
     <Stack gap={0}>
       <Paper
+        className={classes.mobileSticky}
         p={{ base: 'sm', sm: 'md' }}
         shadow="xs"
         radius="lg"

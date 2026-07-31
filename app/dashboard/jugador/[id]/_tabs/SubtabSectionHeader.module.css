@@ -1,0 +1,9 @@
+.mobileSticky {
+  @media (max-width: 48em) {
+    position: sticky;
+    /* The subtab control is 48px tall on mobile. Keeping this header directly
+       beneath it avoids a visible strip of background while scrolling. */
+    top: 48px;
+    z-index: 98;
+  }
+}

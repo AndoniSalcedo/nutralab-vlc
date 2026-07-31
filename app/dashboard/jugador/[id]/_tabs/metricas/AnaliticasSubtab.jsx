@@ -18,6 +18,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import SubtabHeader from '../SubtabHeader';
+import classes from '../SubtabSectionHeader.module.css';
 import dayjs from 'dayjs';
 import { notifications } from '@mantine/notifications';
 import { uploadAnalitica, deleteAnalitica, toggleAnaliticaVisibility } from '@/services/analytic';
@@ -118,7 +119,7 @@ function agrupar(params = []) {
 }
 
 export default function AnaliticasSubtab({ jugador, analiticas: analiticasIniciales = [], readOnly = false }) {
-  const isMobile = useMediaQuery('(max-width: 48em)');
+  const isMobile = useMediaQuery('(max-width: 48em)', true);
   const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const jugadorId = jugador.id;
   const [analiticas, setAnaliticas] = useState(analiticasIniciales || []);
@@ -255,7 +256,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
 
   return (
     <Stack gap={0}>
-      <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+      <Paper className={classes.mobileSticky} p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Stack gap="sm">
           <Group justify="space-between" align="flex-start" wrap="nowrap">
             <Group gap="xs" style={{ flex: 1 }}>
@@ -304,7 +305,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
             )}
           </Group>
 
-          <Collapse in={!isMobile || expanded}>
+          <Collapse in={!isMobile || expanded} transitionDuration={isMobile ? 200 : 0}>
             <Stack gap="sm">
               {!readOnly && isMobile && (
                 <Group gap="xs" justify="center" style={{ flexDirection: 'column' }}>

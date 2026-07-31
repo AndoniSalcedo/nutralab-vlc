@@ -182,17 +182,9 @@ function JugadorHeaderDesktop({ jugador, isAdmin, isPlayer, hasCredentials, onEd
   );
 }
 
-function JugadorHeaderMobile({ jugador, isAdmin, isPlayer, hasCredentials, onEdit }) {
-  return (
-    <Paper
-      radius={0}
-      p="sm"
-      withBorder
-      shadow="xs"
-      bg="white"
-      mb="xs"
-      style={{ position: 'relative' }}
-    >
+function JugadorHeaderMobile({ jugador, isAdmin, isPlayer, hasCredentials, onEdit, embedded = false }) {
+  const content = (
+    <>
       {!isPlayer && (
         <Box style={{ position: 'absolute', top: 14, left: 14, zIndex: 2 }}>
           <BackButton size={50} iconSize={28} equipoId={jugador.equipo_id} />
@@ -213,13 +205,32 @@ function JugadorHeaderMobile({ jugador, isAdmin, isPlayer, hasCredentials, onEdi
           centered
         />
       </Stack>
+    </>
+  );
+
+  if (embedded) {
+    return <Box style={{ position: 'relative' }}>{content}</Box>;
+  }
+
+  return (
+    <Paper
+      radius={0}
+      p="sm"
+      withBorder
+      shadow="xs"
+      bg="white"
+      mb="xs"
+      style={{ position: 'relative' }}
+    >
+      {content}
     </Paper>
   );
 }
 
-export default function JugadorHeader({ jugador, user }) {
+export default function JugadorHeader({ jugador, user, forceMobile = false, embedded = false }) {
   const [opened, setOpened] = useState(false);
-  const isMobile = useMediaQuery('(max-width: 48em)');
+  const matchesMobileViewport = useMediaQuery('(max-width: 48em)');
+  const isMobile = forceMobile || matchesMobileViewport;
   const isAdmin = user?.role === 'admin';
   const isPlayer = user?.role === 'jugador';
   const hasCredentials = Boolean(jugador.auth_user_id);
@@ -233,6 +244,7 @@ export default function JugadorHeader({ jugador, user }) {
           isPlayer={isPlayer}
           hasCredentials={hasCredentials}
           onEdit={() => setOpened(true)}
+          embedded={embedded}
         />
       ) : (
         <JugadorHeaderDesktop

@@ -3,6 +3,7 @@
 import { Badge, Box, Group, Paper, SimpleGrid, Stack, Text, Timeline } from '@mantine/core';
 import { IconClipboardList, IconDroplet, IconApple, IconRun, IconCoffee, IconBatteryCharging, IconFlag } from '@tabler/icons-react';
 import SubtabHeader from '../SubtabHeader';
+import classes from '../SubtabSectionHeader.module.css';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/services/player';
@@ -37,7 +38,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
 
   return (
     <Stack gap={0}>
-      <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+      <Paper className={classes.mobileSticky} p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Group justify="space-between" align="flex-start" wrap="wrap">
           <Group gap="xs">
             <SubtabHeader tab="metricas" subtab="protocolos" />

@@ -18,6 +18,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import SubtabHeader from '../SubtabHeader';
+import classes from '../SubtabSectionHeader.module.css';
 import PlayerSupplementModal from '@/components/modals/PlayerSupplementModal';
 import { notifications } from '@mantine/notifications';
 import { getPlayerSupplementation, postPlayerSupplementation } from '@/services/supplement';
@@ -182,7 +183,7 @@ function buildProtocol(jugador, lista, items, peso) {
 }
 
 export default function SuplementacionSubtab({ jugador, readOnly = false }) {
-  const isMobile = useMediaQuery('(max-width: 48em)');
+  const isMobile = useMediaQuery('(max-width: 48em)', true);
   const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const peso = Number(jugador.peso_kg || 0);
   const [loading, setLoading] = useState(true);
@@ -364,7 +365,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
         handleAddExtra={handleAddExtra}
       />
 
-      <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+      <Paper className={classes.mobileSticky} p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Stack gap="md">
           <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
             <Group gap="xs" style={{ flex: 1 }}>
@@ -389,7 +390,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
             )}
           </Group>
 
-          <Collapse in={!isMobile || expanded}>
+          <Collapse in={!isMobile || expanded} transitionDuration={isMobile ? 200 : 0}>
             <Stack gap="sm">
               {canManage && isMobile && (
                 <Button

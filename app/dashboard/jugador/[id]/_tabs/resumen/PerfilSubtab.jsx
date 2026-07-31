@@ -36,6 +36,9 @@ import { getAiPlans } from '@/services/plan';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import { getSubtabHeader } from '../subtab-config';
 import foods from '@/data/foods';
+import JugadorHeader from '@/components/JugadorHeader';
+import { usePlayerDashboard } from '../PlayerDashboardContext';
+import classes from '../SubtabSectionHeader.module.css';
 
 const calcNutrient = (food, grams, key) => {
   const value = Number(food?.[key]);
@@ -146,6 +149,7 @@ function PremiumMacroBar({ label, color, consumed, target, icon: IconComponent }
 }
 
 export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = false }) {
+  const { user } = usePlayerDashboard();
   const [meals, setMeals] = useState([]);
   const [loadingMeals, setLoadingMeals] = useState(true);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
@@ -256,6 +260,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
     <Stack gap={0}>
       {/* Tab Header Banner */}
       <Paper
+        className={classes.mobileSticky}
         p={{ base: 'sm', sm: 'md' }}
         bg="white"
         shadow="xs"
@@ -263,19 +268,25 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
         withBorder
         style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
       >
-        <Group justify="space-between" align="center" wrap="wrap" gap="sm">
-          <Group gap="xs">
-            <ThemeIcon color={headerConfig.iconColor} variant="light" radius="xl" size="lg">
-              <HeaderIcon size={20} />
-            </ThemeIcon>
-            <Box>
-              <Title order={3} fw={800} c="dark.4">{headerConfig.title}</Title>
-              <Text size="sm" c="dimmed">
-                {readOnly ? (headerConfig.subtitleReadOnly || headerConfig.subtitle) : headerConfig.subtitle}
-              </Text>
-            </Box>
+        <Stack gap="sm">
+          <Group justify="space-between" align="center" wrap="wrap" gap="sm">
+            <Group gap="xs">
+              <ThemeIcon color={headerConfig.iconColor} variant="light" radius="xl" size="lg">
+                <HeaderIcon size={20} />
+              </ThemeIcon>
+              <Box>
+                <Title order={3} fw={800} c="dark.4">{headerConfig.title}</Title>
+                <Text size="sm" c="dimmed">
+                  {readOnly ? (headerConfig.subtitleReadOnly || headerConfig.subtitle) : headerConfig.subtitle}
+                </Text>
+              </Box>
+            </Group>
           </Group>
-        </Group>
+
+          <Box hiddenFrom="sm">
+            <JugadorHeader jugador={jugador} user={user} forceMobile embedded />
+          </Box>
+        </Stack>
       </Paper>
 
       {/* Content wrapper */}

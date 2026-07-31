@@ -6,6 +6,7 @@ import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { IconInbox, IconPlus, IconChevronDown } from '@tabler/icons-react';
 import SendMessageModal from '@/components/modals/SendMessageModal';
 import SubtabHeader from '../SubtabHeader';
+import classes from '../SubtabSectionHeader.module.css';
 import NothingFound from '@/components/NothingFound';
 
 function formatDate(value) {
@@ -20,7 +21,7 @@ function formatDate(value) {
 }
 
 export default function MensajesSubtab({ jugador, messages = [], readOnly = false }) {
-  const isMobile = useMediaQuery('(max-width: 48em)');
+  const isMobile = useMediaQuery('(max-width: 48em)', true);
   const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const [opened, { open, close }] = useDisclosure(false);
   const playerOption = useMemo(() => [jugador], [jugador]);
@@ -28,6 +29,7 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
   return (
     <Stack gap={0}>
       <Paper
+        className={classes.mobileSticky}
         p={{ base: 'sm', sm: 'md' }}
         radius="lg"
         withBorder
@@ -61,7 +63,7 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
             )}
           </Group>
 
-          <Collapse in={!isMobile || expanded}>
+          <Collapse in={!isMobile || expanded} transitionDuration={isMobile ? 200 : 0}>
             {!readOnly && isMobile && (
               <Button
                 radius="xl"

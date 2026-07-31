@@ -21,6 +21,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import SubtabHeader from '../SubtabHeader';
+import classes from '../SubtabSectionHeader.module.css';
 import ImportCsvModal from '@/components/modals/ImportCsvModal';
 import EditRecordModal from '@/components/modals/EditRecordModal';
 import { notifications } from '@mantine/notifications';
@@ -140,7 +141,7 @@ function getCsvVal(row, keys) {
 }
 
 export default function HidratacionSubtab({ jugador, registrosHidratacion = [], readOnly = false }) {
-  const isMobile = useMediaQuery('(max-width: 48em)');
+  const isMobile = useMediaQuery('(max-width: 48em)', true);
   const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const jugadorId = jugador.id;
   const peso = Number(jugador.peso_kg || 0);
@@ -618,7 +619,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
 
   return (
     <Stack gap="md">
-      <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+      <Paper className={classes.mobileSticky} p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Stack gap="sm">
           <Group justify="space-between" align="flex-start" wrap="nowrap">
             <Group gap="xs" style={{ flex: 1 }}>
@@ -655,7 +656,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
             )}
           </Group>
           
-          <Collapse in={!isMobile || expanded}>
+          <Collapse in={!isMobile || expanded} transitionDuration={isMobile ? 200 : 0}>
             {isMobile && (
               <Group gap="xs" justify="center" style={{ flexDirection: 'column' }}>
                 {peso > 0 && (
