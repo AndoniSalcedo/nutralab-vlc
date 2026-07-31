@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { slugify } from '@/lib/utils';
-import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge } from '@mantine/core';
+import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft } from '@tabler/icons-react';
+import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft, IconBook } from '@tabler/icons-react';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
+import { useRouter } from 'next/navigation';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import DayTypeModal from '@/components/modals/DayTypeModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
@@ -13,10 +14,15 @@ import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
 
 export default function TeamConfigClient({ team, readOnly = false }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   
   const [teamName, setTeamName] = useState(team.nombre || '');
   const [teamSeason, setTeamSeason] = useState(team.temporada || '');
+
+  const [pdfMicrocycle, setPdfMicrocycle] = useState(team.configuracion_nutricional?.pdfMicrocycle || '');
+  const [pdfRules, setPdfRules] = useState(team.configuracion_nutricional?.pdfRules || '');
+  const [pdfBuffet, setPdfBuffet] = useState(team.configuracion_nutricional?.pdfBuffet || '');
 
   const [dayTypes, setDayTypes] = useState(() => {
     let list = [];
@@ -124,13 +130,17 @@ export default function TeamConfigClient({ team, readOnly = false }) {
         body: JSON.stringify({
           configuracion_nutricional: {
             dayTypes,
-            objectiveMacros
+            objectiveMacros,
+            pdfMicrocycle,
+            pdfRules,
+            pdfBuffet
           }
         })
       });
 
       if (!res.ok) throw new Error('Error guardando configuración nutricional');
       notifications.show({ title: 'Guardado exitoso', message: 'Los ajustes del equipo se han actualizado.', color: 'green' });
+      router.refresh();
     } catch (e) {
       notifications.show({ title: 'Error', message: e.message, color: 'red' });
     } finally {
@@ -197,6 +207,44 @@ export default function TeamConfigClient({ team, readOnly = false }) {
               radius="md"
             />
           </Group>
+        </Paper>
+
+        <Paper p="md" radius="lg" shadow="sm" withBorder>
+          <Group gap="sm" mb="lg">
+            <ThemeIcon size="md" radius="xl" variant="light" color="gray">
+              <IconBook size={18} />
+            </ThemeIcon>
+            <Title order={4} c="dark.4">Textos Base para PDF</Title>
+          </Group>
+          <Stack gap="md">
+            <Textarea
+              label="Microciclo / calendario"
+              placeholder="Ej. Partido Domingo vs Barcelona. Lunes y Martes entreno normal..."
+              value={pdfMicrocycle}
+              onChange={(e) => setPdfMicrocycle(e.currentTarget.value)}
+              readOnly={readOnly}
+              minRows={3}
+              autosize
+            />
+            <Textarea
+              label="Reglas de la semana"
+              placeholder="Ej. Hidratación regular, suplementación básica..."
+              value={pdfRules}
+              onChange={(e) => setPdfRules(e.currentTarget.value)}
+              readOnly={readOnly}
+              minRows={4}
+              autosize
+            />
+            <Textarea
+              label="Equipamiento del buffet"
+              placeholder="Ej. Indicaciones de cómo servirse según día de entreno/partido..."
+              value={pdfBuffet}
+              onChange={(e) => setPdfBuffet(e.currentTarget.value)}
+              readOnly={readOnly}
+              minRows={4}
+              autosize
+            />
+          </Stack>
         </Paper>
 
         <Paper p="md" radius="lg" shadow="sm" withBorder>

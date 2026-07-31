@@ -109,7 +109,7 @@ function getWeekRangeLabel(mondayInput) {
   }
 }
 
-function defaultReportForm() {
+function defaultReportForm(teamConfig) {
   const today = new Date();
   const monday = new Date(today);
   const day = today.getDay();
@@ -125,16 +125,9 @@ function defaultReportForm() {
     team: 'Valencia CF · Primer Equipo',
     author: 'Carlos Ferrando · Nutralab',
     handle: '@c.ferrando',
-    microcycle: '',
-    rules: [
-      'Ningún día en déficit calórico. Carga glucogénica continua, HC en cada ingesta principal.',
-      'Pescado azul 4-5 tomas mínimo. Frutos rojos diarios. Cúrcuma cada cena.',
-      'Batido post-entreno y post-partido obligatorio: whey 30 g + colágeno 15 g + Vit C 200 mg.',
-      'Caseína nocturna (requesón o cottage) en todo el grupo durante esta semana.',
-      'Hidratación reforzada. Reposición 1,5 L por kg perdido en las 4-6 h post.',
-      'Sueño 8 h. Cero alcohol. Cafeína solo el día de partido (3 mg/kg a -45 min).',
-    ].join('\n'),
-    buffet: 'Desayuno y comidas usan exclusivamente las opciones del listado oficial de Paterna (huevos, pavo, jamón serrano, porridge, focaccia, pan blanco, frutos rojos, fruta entera, yogur de proteína, AOVE...). Las meriendas se hacen en casa: yogur de proteína + tortitas de arroz + fruta + frutos secos (15 g) y, solo MD-1, browniato disponible.',
+    microcycle: teamConfig?.pdfMicrocycle || '',
+    rules: teamConfig?.pdfRules || '',
+    buffet: teamConfig?.pdfBuffet || '',
     calendario: {
       lunes: 'entreno',
       martes: 'entreno',
@@ -182,7 +175,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
   const [deletingId, setDeletingId] = useState(null);
   const [deletePlayerData, setDeletePlayerData] = useState(null);
   const [reportModal, setReportModal] = useState({ opened: false, player: null });
-  const [reportForm, setReportForm] = useState(defaultReportForm);
+  const [reportForm, setReportForm] = useState(() => defaultReportForm(team?.configuracion_nutricional));
   const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
   const [activeModal, setActiveModal] = useState(null);
   const closeModal = () => setActiveModal(null);
@@ -482,412 +475,412 @@ export default function DashboardContent({ players = [], team, readOnly = false 
   return (
     <BoneyardSkeleton name="team-dashboard" loading={false}>
       <Stack gap="lg">
-      {/* 1. RESUMEN / ACCIONES */}
-      <Paper
-        p={{ base: 'sm', sm: 'md' }}
-        shadow="sm"
-        radius="xl"
-        withBorder
-        style={{
-          background:
-            'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
-          zIndex: 10,
-          position: 'relative'
-        }}
-      >
-        <Stack gap="sm">
-          <Grid align="center" gutter="md">
-            {/* Left part: Back arrow and Team Stack */}
-            <Grid.Col span={{ base: 12, md: 'content' }}>
-              <Group gap={0} justify="center" align="center" wrap="nowrap" style={{ height: '100%' }}>
-                <Tooltip label="Volver a equipos" withArrow>
-                  <ActionIcon component={Anchor} href="/dashboard" variant="light" color="gray" radius="xl" size={42}>
-                    <IconArrowLeft size={20} />
-                  </ActionIcon>
-                </Tooltip>
+        {/* 1. RESUMEN / ACCIONES */}
+        <Paper
+          p={{ base: 'sm', sm: 'md' }}
+          shadow="sm"
+          radius="xl"
+          withBorder
+          style={{
+            background:
+              'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
+            zIndex: 10,
+            position: 'relative'
+          }}
+        >
+          <Stack gap="sm">
+            <Grid align="center" gutter="md">
+              {/* Left part: Back arrow and Team Stack */}
+              <Grid.Col span={{ base: 12, md: 'content' }}>
+                <Group gap={0} justify="center" align="center" wrap="nowrap" style={{ height: '100%' }}>
+                  <Tooltip label="Volver a equipos" withArrow>
+                    <ActionIcon component={Anchor} href="/dashboard" variant="light" color="gray" radius="xl" size={42}>
+                      <IconArrowLeft size={20} />
+                    </ActionIcon>
+                  </Tooltip>
 
-                <Stack gap="xs" align="center" style={{ flex: 1 }}>
-                  <ThemeIcon color="dark" variant="light" radius="xl" size={54}>
-                    <IconUsers size={28} />
-                  </ThemeIcon>
-                  <Stack gap={2} align="center">
-                    <Title order={3} fw={850} c="#24291f" lh={1.1} style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                      {team?.nombre || 'Equipo'}
-                    </Title>
-                    <Text size="xs" c="dimmed" style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                      {team?.temporada ? `${team.temporada}` : ''}
-                    </Text>
+                  <Stack gap="xs" align="center" style={{ flex: 1 }}>
+                    <ThemeIcon color="dark" variant="light" radius="xl" size={54}>
+                      <IconUsers size={28} />
+                    </ThemeIcon>
+                    <Stack gap={2} align="center">
+                      <Title order={3} fw={850} c="#24291f" lh={1.1} style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                        {team?.nombre || 'Equipo'}
+                      </Title>
+                      <Text size="xs" c="dimmed" style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                        {team?.temporada ? `${team.temporada}` : ''}
+                      </Text>
+                    </Stack>
                   </Stack>
-                </Stack>
+                </Group>
+              </Grid.Col>
+
+              {/* Right part: Grid of buttons */}
+              <Grid.Col span={{ base: 12, md: 'auto' }}>
+                <SimpleGrid cols={{ base: 2, sm: 3, lg: 4 }} spacing="xs">
+                  {/* Row 1: Modals */}
+                  {!readOnly && (
+                    <>
+                      <DashboardStat
+                        title="Plantilla"
+                        icon={IconUsers}
+                        color="blue"
+                        value={`${totalPlayers} jugadores`}
+                        onClick={() => openReportModal()}
+                      />
+                      <DashboardStat
+                        title="Importar datos"
+                        icon={IconFileSpreadsheet}
+                        color="teal"
+                        value="Excel / CSV"
+                        onClick={() => setActiveModal('import')}
+                      />
+                      <DashboardStat
+                        title="Mensaje"
+                        icon={IconMail}
+                        color="blue"
+                        value="Enviar mensaje"
+                        onClick={() => setActiveModal('message')}
+                      />
+                      <DashboardStat
+                        title="Nuevo jugador"
+                        icon={IconPlus}
+                        color="blue"
+                        value="Añadir jugador"
+                        onClick={() => setActiveModal('new-player')}
+                      />
+                      <DashboardStat
+                        title="Peso"
+                        icon={IconScale}
+                        color="orange"
+                        value="Registrar peso"
+                        onClick={() => setActiveModal('weight')}
+                      />
+                      <DashboardStat
+                        title="Gestionar técnicos"
+                        icon={IconUserCheck}
+                        color="cyan"
+                        value="Cuerpo técnico"
+                        onClick={() => setActiveModal('tecnicos')}
+                      />
+                    </>
+                  )}
+
+                  {/* Row 2: Redirects */}
+                  <DashboardStat
+                    title="Suplementación"
+                    icon={IconBottle}
+                    color="grape"
+                    value="Ver suplementos"
+                    href={team?.id ? `/dashboard/equipo/${team.id}/suplementacion` : '#'}
+                  />
+                  <DashboardStat
+                    title="Evolución equipo"
+                    icon={IconChartLine}
+                    color="blue"
+                    value="Ver análisis"
+                    href={team?.id ? `/dashboard/equipo/${team.id}/evolucion` : '#'}
+                  />
+                  <DashboardStat
+                    title="Analíticas equipo"
+                    icon={IconReportMedical}
+                    color="red"
+                    value="Ver analíticas"
+                    href={team?.id ? `/dashboard/equipo/${team.id}/analiticas` : '#'}
+                  />
+                  <DashboardStat
+                    title="Menú esta semana"
+                    icon={IconCalendarEvent}
+                    color="teal"
+                    value="Ver menú"
+                    href={team?.id ? `/dashboard/equipo/${team.id}/menu` : '#'}
+                  />
+                  <DashboardStat
+                    title="Configuración"
+                    icon={IconSettings}
+                    color="gray"
+                    value="Ajustes de equipo"
+                    href={team?.id ? `/dashboard/equipo/${team.id}/configuracion` : '#'}
+                  />
+                </SimpleGrid>
+              </Grid.Col>
+            </Grid>
+
+            <Paper p={6} radius="xl" shadow="xs" withBorder bg="white" w="100%">
+              <Group gap={8} w="100%" wrap="wrap" align="center">
+                <TextInput
+                  placeholder="Buscar por nombre"
+                  leftSection={<IconSearch size={16} style={{ opacity: 0.7 }} />}
+                  variant="filled"
+                  radius="xl"
+                  size="sm"
+                  value={filters.name}
+                  onChange={(event) => {
+                    const { value } = event.currentTarget;
+                    setFilters((current) => ({ ...current, name: value }));
+                  }}
+                  style={{ flex: 2, minWidth: 190 }}
+                />
+                <TextInput
+                  placeholder="Buscar por email"
+                  leftSection={<IconMail size={16} style={{ opacity: 0.7 }} />}
+                  variant="filled"
+                  radius="xl"
+                  size="sm"
+                  value={filters.email}
+                  onChange={(event) => {
+                    const { value } = event.currentTarget;
+                    setFilters((current) => ({ ...current, email: value }));
+                  }}
+                  style={{ flex: 2, minWidth: 190 }}
+                />
+                <Select
+                  placeholder="Posición"
+                  leftSection={<IconUsers size={16} style={{ opacity: 0.7 }} />}
+                  data={positionOptions}
+                  value={filters.position}
+                  onChange={(value) => setFilters((current) => ({ ...current, position: value || '' }))}
+                  variant="filled"
+                  radius="xl"
+                  size="sm"
+                  allowDeselect={false}
+                  style={{ flex: 1, minWidth: 150 }}
+                />
               </Group>
-            </Grid.Col>
+            </Paper>
+          </Stack>
+        </Paper>
 
-            {/* Right part: Grid of buttons */}
-            <Grid.Col span={{ base: 12, md: 'auto' }}>
-              <SimpleGrid cols={{ base: 2, sm: 3, lg: 4 }} spacing="xs">
-                {/* Row 1: Modals */}
-                {!readOnly && (
-                  <>
-                    <DashboardStat
-                      title="Plantilla"
-                      icon={IconUsers}
-                      color="blue"
-                      value={`${totalPlayers} jugadores`}
-                      onClick={() => openReportModal()}
-                    />
-                    <DashboardStat
-                      title="Importar datos"
-                      icon={IconFileSpreadsheet}
-                      color="teal"
-                      value="Excel / CSV"
-                      onClick={() => setActiveModal('import')}
-                    />
-                    <DashboardStat
-                      title="Mensaje"
-                      icon={IconMail}
-                      color="blue"
-                      value="Enviar mensaje"
-                      onClick={() => setActiveModal('message')}
-                    />
-                    <DashboardStat
-                      title="Nuevo jugador"
-                      icon={IconPlus}
-                      color="blue"
-                      value="Añadir jugador"
-                      onClick={() => setActiveModal('new-player')}
-                    />
-                    <DashboardStat
-                      title="Peso"
-                      icon={IconScale}
-                      color="orange"
-                      value="Registrar peso"
-                      onClick={() => setActiveModal('weight')}
-                    />
-                    <DashboardStat
-                      title="Gestionar técnicos"
-                      icon={IconUserCheck}
-                      color="cyan"
-                      value="Cuerpo técnico"
-                      onClick={() => setActiveModal('tecnicos')}
-                    />
-                  </>
-                )}
-
-                {/* Row 2: Redirects */}
-                <DashboardStat
-                  title="Suplementación"
-                  icon={IconBottle}
-                  color="grape"
-                  value="Ver suplementos"
-                  href={team?.id ? `/dashboard/equipo/${team.id}/suplementacion` : '#'}
-                />
-                <DashboardStat
-                  title="Evolución equipo"
-                  icon={IconChartLine}
-                  color="blue"
-                  value="Ver análisis"
-                  href={team?.id ? `/dashboard/equipo/${team.id}/evolucion` : '#'}
-                />
-                <DashboardStat
-                  title="Analíticas equipo"
-                  icon={IconReportMedical}
-                  color="red"
-                  value="Ver analíticas"
-                  href={team?.id ? `/dashboard/equipo/${team.id}/analiticas` : '#'}
-                />
-                <DashboardStat
-                  title="Menú esta semana"
-                  icon={IconCalendarEvent}
-                  color="teal"
-                  value="Ver menú"
-                  href={team?.id ? `/dashboard/equipo/${team.id}/menu` : '#'}
-                />
-                <DashboardStat
-                  title="Configuración"
-                  icon={IconSettings}
-                  color="gray"
-                  value="Ajustes de equipo"
-                  href={team?.id ? `/dashboard/equipo/${team.id}/configuracion` : '#'}
-                />
-              </SimpleGrid>
-            </Grid.Col>
-          </Grid>
-
-          <Paper p={6} radius="xl" shadow="xs" withBorder bg="white" w="100%">
-            <Group gap={8} w="100%" wrap="wrap" align="center">
-              <TextInput
-                placeholder="Buscar por nombre"
-                leftSection={<IconSearch size={16} style={{ opacity: 0.7 }} />}
-                variant="filled"
-                radius="xl"
-                size="sm"
-                value={filters.name}
-                onChange={(event) => {
-                  const { value } = event.currentTarget;
-                  setFilters((current) => ({ ...current, name: value }));
-                }}
-                style={{ flex: 2, minWidth: 190 }}
-              />
-              <TextInput
-                placeholder="Buscar por email"
-                leftSection={<IconMail size={16} style={{ opacity: 0.7 }} />}
-                variant="filled"
-                radius="xl"
-                size="sm"
-                value={filters.email}
-                onChange={(event) => {
-                  const { value } = event.currentTarget;
-                  setFilters((current) => ({ ...current, email: value }));
-                }}
-                style={{ flex: 2, minWidth: 190 }}
-              />
-              <Select
-                placeholder="Posición"
-                leftSection={<IconUsers size={16} style={{ opacity: 0.7 }} />}
-                data={positionOptions}
-                value={filters.position}
-                onChange={(value) => setFilters((current) => ({ ...current, position: value || '' }))}
-                variant="filled"
-                radius="xl"
-                size="sm"
-                allowDeselect={false}
-                style={{ flex: 1, minWidth: 150 }}
-              />
-            </Group>
-          </Paper>
-        </Stack>
-      </Paper>
-
-      {/* 3. LISTADO DE JUGADORES (TABLA) */}
-      <Box>
-        {filteredPlayers.length > 0 ? (
-          <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
-            <ScrollArea>
-              <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 800 }}>
-                <Table.Thead bg="gray.0">
-                  <Table.Tr>
-                    <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
-                    <Table.Th visibleFrom="xs">Métricas</Table.Th>
-                    <Table.Th visibleFrom="sm">Plan</Table.Th>
-                    <Table.Th>Posición</Table.Th>
-                    <Table.Th w={70} />
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {paginatedPlayers.map((player) => (
-                    <Table.Tr
-                      h={75}
-                      key={player.id}
-                      onClick={() => router.push(`/dashboard/jugador/${player.id}`)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {/* COLUMNA 1: JUGADOR */}
-                      <Table.Td style={{ paddingLeft: 24 }}>
-                        <Group gap="sm" wrap="nowrap">
-                          <Avatar size={42} radius="xl" color="initials">
-                            {initials(`${player.nombre} ${player.apellidos || ''}`)}
-                          </Avatar>
-                          <Box style={{ minWidth: 0 }}>
-                            <Group gap={6} wrap="nowrap">
-                              <Text fz="sm" fw={600} c="dark.4" truncate>
-                                {player.nombre} {player.apellidos}
-                              </Text>
-                              {!player.auth_user_id && (
-                                <Tooltip label="El usuario no tiene credenciales para entrar" withArrow>
-                                  <ThemeIcon color="yellow" variant="light" radius="xl" size="sm" style={{ flex: '0 0 auto' }}>
-                                    <IconAlertTriangle size={14} />
-                                  </ThemeIcon>
-                                </Tooltip>
-                              )}
-                            </Group>
-                            <Text c="dimmed" fz="xs" style={{ lineHeight: 1 }} truncate>
-                              {player.auth_email || 'Sin credenciales de acceso'}
-                            </Text>
-                          </Box>
-                        </Group>
-                      </Table.Td>
-
-                      {/* COLUMNA 2: MÉTRICAS */}
-                      <Table.Td visibleFrom="xs">
-                        {player.peso_kg || player.porcentaje_grasa ? (
-                          <>
-                            <Text fz="sm" fw={500} c="dark.4">
-                              {player.peso_kg ? `${player.peso_kg} kg` : '—'}
-                              {player.porcentaje_grasa ? ` · ${player.porcentaje_grasa}% GC` : ''}
-                            </Text>
-                            <Text fz="xs" c="dimmed">Composición</Text>
-                          </>
-                        ) : (
-                          <Text fz="sm" c="dimmed">—</Text>
-                        )}
-                      </Table.Td>
-
-                      {/* COLUMNA 3: KCAL OBJETIVO */}
-                      <Table.Td visibleFrom="sm">
-                        {player.plan.kcal ? (
-                          <Group gap={6} wrap="nowrap">
-                            <IconFlame size={14} style={{ opacity: 0.5 }} color="var(--mantine-color-orange-6)" />
-                            <Box>
-                              <Text fz="sm" fw={500} c="dark.4" lh={1.2}>
-                                {player.plan.kcal} kcal
-                              </Text>
-                              <Text fz="xs" c="dimmed">
-                                {player.plan.calculated ? 'Estimado' : 'Objetivo'}
+        {/* 3. LISTADO DE JUGADORES (TABLA) */}
+        <Box>
+          {filteredPlayers.length > 0 ? (
+            <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
+              <ScrollArea>
+                <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 800 }}>
+                  <Table.Thead bg="gray.0">
+                    <Table.Tr>
+                      <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
+                      <Table.Th visibleFrom="xs">Métricas</Table.Th>
+                      <Table.Th visibleFrom="sm">Plan</Table.Th>
+                      <Table.Th>Posición</Table.Th>
+                      <Table.Th w={70} />
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {paginatedPlayers.map((player) => (
+                      <Table.Tr
+                        h={75}
+                        key={player.id}
+                        onClick={() => router.push(`/dashboard/jugador/${player.id}`)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {/* COLUMNA 1: JUGADOR */}
+                        <Table.Td style={{ paddingLeft: 24 }}>
+                          <Group gap="sm" wrap="nowrap">
+                            <Avatar size={42} radius="xl" color="initials">
+                              {initials(`${player.nombre} ${player.apellidos || ''}`)}
+                            </Avatar>
+                            <Box style={{ minWidth: 0 }}>
+                              <Group gap={6} wrap="nowrap">
+                                <Text fz="sm" fw={600} c="dark.4" truncate>
+                                  {player.nombre} {player.apellidos}
+                                </Text>
+                                {!player.auth_user_id && (
+                                  <Tooltip label="El usuario no tiene credenciales para entrar" withArrow>
+                                    <ThemeIcon color="yellow" variant="light" radius="xl" size="sm" style={{ flex: '0 0 auto' }}>
+                                      <IconAlertTriangle size={14} />
+                                    </ThemeIcon>
+                                  </Tooltip>
+                                )}
+                              </Group>
+                              <Text c="dimmed" fz="xs" style={{ lineHeight: 1 }} truncate>
+                                {player.auth_email || 'Sin credenciales de acceso'}
                               </Text>
                             </Box>
                           </Group>
-                        ) : (
-                          <Text fz="sm" c="dimmed">—</Text>
-                        )}
-                      </Table.Td>
+                        </Table.Td>
 
-                      {/* COLUMNA 4: POSICIÓN */}
-                      <Table.Td>
-                        <Badge variant="light" color="gray" radius="sm">
-                          {player.posicion || 'Sin posición'}
-                        </Badge>
-                      </Table.Td>
+                        {/* COLUMNA 2: MÉTRICAS */}
+                        <Table.Td visibleFrom="xs">
+                          {player.peso_kg || player.porcentaje_grasa ? (
+                            <>
+                              <Text fz="sm" fw={500} c="dark.4">
+                                {player.peso_kg ? `${player.peso_kg} kg` : '—'}
+                                {player.porcentaje_grasa ? ` · ${player.porcentaje_grasa}% GC` : ''}
+                              </Text>
+                              <Text fz="xs" c="dimmed">Composición</Text>
+                            </>
+                          ) : (
+                            <Text fz="sm" c="dimmed">—</Text>
+                          )}
+                        </Table.Td>
 
-                      {/* COLUMNA 5: ACCIONES */}
-                      <Table.Td>
-                        <Group gap={4} justify="flex-end" wrap="nowrap">
-                          <Menu shadow="md" width={220} position="bottom-end" withArrow radius="md" keepMounted>
-                            <Menu.Target>
-                              <ActionIcon
-                                variant="subtle"
-                                color="gray"
-                                radius="xl"
-                                loading={deletingId === player.id}
-                                onClick={(event) => event.stopPropagation()}
-                              >
-                                <IconDots size={18} stroke={1.5} />
-                              </ActionIcon>
-                            </Menu.Target>
-                            <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
-                              {!readOnly && (
-                                <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => setEditingPlayer(player)}>
-                                  Editar
-                                </Menu.Item>
-                              )}
-                              <Menu.Item leftSection={<IconFileTypePdf size={14} />} onClick={() => openReportModal(player)}>
-                                Generar informe
-                              </Menu.Item>
-                              {!readOnly && (
-                                <>
-                                  <PlayerCredentialsButton
-                                    jugador={player}
-                                    menuItem
-                                    onSaved={(credentials) => updateCredentials(player.id, credentials)}
-                                  />
-                                  <Menu.Divider />
-                                  <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeletePlayer(player)}>
-                                    Eliminar
+                        {/* COLUMNA 3: KCAL OBJETIVO */}
+                        <Table.Td visibleFrom="sm">
+                          {player.plan.kcal ? (
+                            <Group gap={6} wrap="nowrap">
+                              <IconFlame size={14} style={{ opacity: 0.5 }} color="var(--mantine-color-orange-6)" />
+                              <Box>
+                                <Text fz="sm" fw={500} c="dark.4" lh={1.2}>
+                                  {player.plan.kcal} kcal
+                                </Text>
+                                <Text fz="xs" c="dimmed">
+                                  {player.plan.calculated ? 'Estimado' : 'Objetivo'}
+                                </Text>
+                              </Box>
+                            </Group>
+                          ) : (
+                            <Text fz="sm" c="dimmed">—</Text>
+                          )}
+                        </Table.Td>
+
+                        {/* COLUMNA 4: POSICIÓN */}
+                        <Table.Td>
+                          <Badge variant="light" color="gray" radius="sm">
+                            {player.posicion || 'Sin posición'}
+                          </Badge>
+                        </Table.Td>
+
+                        {/* COLUMNA 5: ACCIONES */}
+                        <Table.Td>
+                          <Group gap={4} justify="flex-end" wrap="nowrap">
+                            <Menu shadow="md" width={220} position="bottom-end" withArrow radius="md" keepMounted>
+                              <Menu.Target>
+                                <ActionIcon
+                                  variant="subtle"
+                                  color="gray"
+                                  radius="xl"
+                                  loading={deletingId === player.id}
+                                  onClick={(event) => event.stopPropagation()}
+                                >
+                                  <IconDots size={18} stroke={1.5} />
+                                </ActionIcon>
+                              </Menu.Target>
+                              <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
+                                {!readOnly && (
+                                  <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => setEditingPlayer(player)}>
+                                    Editar
                                   </Menu.Item>
-                                </>
-                              )}
-                            </Menu.Dropdown>
-                          </Menu>
-                        </Group>
-                      </Table.Td>
-                    </Table.Tr>
-                  ))}
-                </Table.Tbody>
-              </Table>
-            </ScrollArea>
+                                )}
+                                <Menu.Item leftSection={<IconFileTypePdf size={14} />} onClick={() => openReportModal(player)}>
+                                  Generar informe
+                                </Menu.Item>
+                                {!readOnly && (
+                                  <>
+                                    <PlayerCredentialsButton
+                                      jugador={player}
+                                      menuItem
+                                      onSaved={(credentials) => updateCredentials(player.id, credentials)}
+                                    />
+                                    <Menu.Divider />
+                                    <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeletePlayer(player)}>
+                                      Eliminar
+                                    </Menu.Item>
+                                  </>
+                                )}
+                              </Menu.Dropdown>
+                            </Menu>
+                          </Group>
+                        </Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              </ScrollArea>
 
-            <Group justify="center" p="md" bg="gray.0" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
-              <Pagination
-                total={totalPages}
-                value={page}
-                onChange={setPage}
-                radius="xl"
-              />
-            </Group>
-          </Paper>
-        ) : (
-          <NothingFound
-            withPaper
-            icon={IconUserPlus}
-            title={playersState.length ? 'Sin resultados' : 'Sin jugadores'}
-            description={playersState.length ? 'No hay jugadores que coincidan con los filtros.' : 'Importa un Excel o añade un jugador manualmente para empezar.'}
-          />
-        )}
-      </Box>
+              <Group justify="center" p="md" bg="gray.0" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+                <Pagination
+                  total={totalPages}
+                  value={page}
+                  onChange={setPage}
+                  radius="xl"
+                />
+              </Group>
+            </Paper>
+          ) : (
+            <NothingFound
+              withPaper
+              icon={IconUserPlus}
+              title={playersState.length ? 'Sin resultados' : 'Sin jugadores'}
+              description={playersState.length ? 'No hay jugadores que coincidan con los filtros.' : 'Importa un Excel o añade un jugador manualmente para empezar.'}
+            />
+          )}
+        </Box>
 
-      <PlayerEditModal
-        opened={!!editingPlayer}
-        onClose={() => setEditingPlayer(null)}
-        player={editingPlayer}
-        team={team}
-      />
+        <PlayerEditModal
+          opened={!!editingPlayer}
+          onClose={() => setEditingPlayer(null)}
+          player={editingPlayer}
+          team={team}
+        />
 
-      <SquadReportModal
-        opened={reportModal.opened}
-        onClose={closeReportModal}
-        reportModal={reportModal}
-        generatingReport={generatingReport}
-        reportProgress={reportProgress}
-        reportForm={reportForm}
-        updateReportField={updateReportField}
-        availableMenus={availableMenus}
-        selectedMenuWeek={selectedMenuWeek}
-        setSelectedMenuWeek={setSelectedMenuWeek}
-        showAdvanced={showAdvanced}
-        setShowAdvanced={setShowAdvanced}
-        dayTypeOptions={dayTypeOptions}
-        updateCalendarioDay={updateCalendarioDay}
-        selectedPlayerIds={selectedPlayerIds}
-        setSelectedPlayerIds={setSelectedPlayerIds}
-        playersState={playersState}
-        generateReport={generateReport}
-      />
+        <SquadReportModal
+          opened={reportModal.opened}
+          onClose={closeReportModal}
+          reportModal={reportModal}
+          generatingReport={generatingReport}
+          reportProgress={reportProgress}
+          reportForm={reportForm}
+          updateReportField={updateReportField}
+          availableMenus={availableMenus}
+          selectedMenuWeek={selectedMenuWeek}
+          setSelectedMenuWeek={setSelectedMenuWeek}
+          showAdvanced={showAdvanced}
+          setShowAdvanced={setShowAdvanced}
+          dayTypeOptions={dayTypeOptions}
+          updateCalendarioDay={updateCalendarioDay}
+          selectedPlayerIds={selectedPlayerIds}
+          setSelectedPlayerIds={setSelectedPlayerIds}
+          playersState={playersState}
+          generateReport={generateReport}
+        />
 
-      <NewPlayerModal
-        opened={activeModal === 'new-player'}
-        onClose={closeModal}
-        team={team}
-      />
+        <NewPlayerModal
+          opened={activeModal === 'new-player'}
+          onClose={closeModal}
+          team={team}
+        />
 
-      <ImportDataModal
-        opened={activeModal === 'import'}
-        onClose={closeModal}
-        team={team}
-      />
+        <ImportDataModal
+          opened={activeModal === 'import'}
+          onClose={closeModal}
+          team={team}
+        />
 
-      <SendMessageModal
-        opened={activeModal === 'message'}
-        onClose={closeModal}
-        players={playersState}
-        team={team}
-        onSent={closeModal}
-      />
+        <SendMessageModal
+          opened={activeModal === 'message'}
+          onClose={closeModal}
+          players={playersState}
+          team={team}
+          onSent={closeModal}
+        />
 
-      <SquadWeightModal
-        opened={activeModal === 'weight'}
-        onClose={closeModal}
-        players={playersState}
-        team={team}
-      />
+        <SquadWeightModal
+          opened={activeModal === 'weight'}
+          onClose={closeModal}
+          players={playersState}
+          team={team}
+        />
 
-      <Modal
-        opened={activeModal === 'tecnicos'}
-        onClose={closeModal}
-        size="lg"
-        radius="lg"
-        withCloseButton={false}
-        padding={0}
-      >
-        <TeamTecnicosConfig team={team} readOnly={readOnly} />
-      </Modal>
-      <ConfirmModal
-        opened={!!deletePlayerData}
-        onClose={() => setDeletePlayerData(null)}
-        onConfirm={confirmDeletePlayer}
-        title="Eliminar jugador"
-        message={deletePlayerData ? `¿Seguro que deseas eliminar a ${deletePlayerData.nombre} ${deletePlayerData.apellidos || ''}?` : ''}
-        confirmLabel="Eliminar"
-        loading={deletingId !== null}
-      />
+        <Modal
+          opened={activeModal === 'tecnicos'}
+          onClose={closeModal}
+          size="lg"
+          radius="lg"
+          withCloseButton={false}
+          padding={0}
+        >
+          <TeamTecnicosConfig team={team} readOnly={readOnly} />
+        </Modal>
+        <ConfirmModal
+          opened={!!deletePlayerData}
+          onClose={() => setDeletePlayerData(null)}
+          onConfirm={confirmDeletePlayer}
+          title="Eliminar jugador"
+          message={deletePlayerData ? `¿Seguro que deseas eliminar a ${deletePlayerData.nombre} ${deletePlayerData.apellidos || ''}?` : ''}
+          confirmLabel="Eliminar"
+          loading={deletingId !== null}
+        />
       </Stack>
     </BoneyardSkeleton>
   );
