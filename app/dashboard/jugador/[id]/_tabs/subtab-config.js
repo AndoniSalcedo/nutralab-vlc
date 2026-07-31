@@ -46,7 +46,7 @@ export const SUBTAB_CONFIGS = {
     defaultSubtab: 'mediciones',
     tabs: [
       { value: 'mediciones', icon: IconChartLine, label: 'Mediciones', mobileLabel: 'Med.' },
-      { value: 'analiticas', icon: IconReportAnalytics, label: 'Analíticas', mobileLabel: 'Anal.' },
+      { value: 'analiticas', icon: IconReportAnalytics, label: 'Analíticas', mobileLabel: 'Anali.' },
       { value: 'hidratacion', icon: IconDroplet, label: 'Hidratación', mobileLabel: 'Hidra.' },
       { value: 'protocolos', icon: IconClipboardList, label: 'Protocolos', mobileLabel: 'Prot.' },
     ],

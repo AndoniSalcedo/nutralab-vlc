@@ -10,10 +10,8 @@ import ProtocolosSubtab from './metricas/ProtocolosSubtab';
 
 export default function MetricasTab({ jugador, analiticas, evoluciones, registrosHidratacion = [], activeSubtab, onSubtabChange, readOnly = false }) {
   const analiticasVisibles = readOnly ? (analiticas || []).filter(a => a.visible_para_jugador) : (analiticas || []);
-  const showAnaliticas = !readOnly || analiticasVisibles.length > 0;
 
-  const allTabs = getSubtabControlData('metricas', tabLabel);
-  const tabsData = showAnaliticas ? allTabs : allTabs.filter(t => t.value !== 'analiticas');
+  const tabsData = getSubtabControlData('metricas', tabLabel);
 
   return (
     <Stack gap={0}>
@@ -53,7 +51,7 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, registro
         {activeSubtab === 'mediciones' && (
           <MedicionesSubtab jugador={jugador} evoluciones={evoluciones} readOnly={readOnly} />
         )}
-        {activeSubtab === 'analiticas' && showAnaliticas && (
+        {activeSubtab === 'analiticas' && (
           <AnaliticasSubtab jugador={jugador} analiticas={analiticasVisibles} readOnly={readOnly} />
         )}
         {activeSubtab === 'hidratacion' && (

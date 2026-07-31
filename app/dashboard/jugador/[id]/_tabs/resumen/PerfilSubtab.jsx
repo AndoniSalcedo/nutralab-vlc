@@ -434,7 +434,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
               </Box>
 
               <BoneyardSkeleton name="balance-nutricional" loading={loadingMeals}>
-                <Flex direction={{ base: 'column', md: 'row' }} gap={40} align="center">
+                <Flex direction={{ base: 'column', md: 'row' }} gap={{ base: 0, md: 40 }} align="center">
                   <Box style={{ flexShrink: 0 }} px={{ base: 0, md: 'lg' }}>
                     <RingProgress
                       size={240}
