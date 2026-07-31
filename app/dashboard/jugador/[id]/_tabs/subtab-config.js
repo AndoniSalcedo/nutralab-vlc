@@ -55,7 +55,7 @@ export const SUBTAB_CONFIGS = {
         icon: IconRuler2,
         iconColor: 'cyan',
         title: 'Composición',
-        subtitle: 'Historial de medidas y evolución del jugador.',
+        subtitle: 'Historial de medidas y evolución.',
       },
       analiticas: {
         icon: IconReportMedical,
@@ -67,7 +67,7 @@ export const SUBTAB_CONFIGS = {
         icon: IconDroplet,
         iconColor: 'blue',
         title: 'Hidratación y sudoración',
-        subtitle: 'Análisis de osmolaridad salival y sodio en sudor.',
+        subtitle: 'Osmolaridad salival y sodio en sudor.',
       },
       protocolos: {
         icon: IconClipboardList,
@@ -95,7 +95,7 @@ export const SUBTAB_CONFIGS = {
         icon: IconBottle,
         iconColor: 'grape',
         title: 'Suplementación',
-        subtitle: 'Asignación de catálogos de suplementación.',
+        subtitle: 'Asignación de catálogos.',
       },
       menu: {
         icon: IconChefHat,
