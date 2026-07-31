@@ -16,6 +16,8 @@ import {
   Badge,
   Box,
   Button,
+  Collapse,
+  ActionIcon,
   Grid,
   Group,
   Paper,
@@ -28,11 +30,12 @@ import {
   Title,
   ScrollArea,
 } from '@mantine/core';
+import { useMediaQuery, useDisclosure } from '@mantine/hooks';
 import MeasurementModal from '@/components/modals/MeasurementModal';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { saveEvolution, deleteEvolution } from '@/services/evolution';
-import { IconCalendarStats, IconEdit, IconPlus, IconRuler2, IconTrash, IconFilter } from '@tabler/icons-react';
+import { IconCalendarStats, IconEdit, IconPlus, IconRuler2, IconTrash, IconFilter, IconChevronDown } from '@tabler/icons-react';
 import { BentoCard } from '@/components/BentoItem';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
@@ -133,6 +136,8 @@ function sourceRows(medicion) {
 }
 
 export default function MedicionesSubtab({ jugador, evoluciones: evolucionesIniciales = [], readOnly = false }) {
+  const isMobile = useMediaQuery('(max-width: 48em)');
+  const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const jugadorId = jugador.id;
   const [evoluciones, setEvoluciones] = useState(evolucionesIniciales || []);
   const [currentId, setCurrentId] = useState(evolucionesIniciales.length ? String(evolucionesIniciales[evolucionesIniciales.length - 1].id) : null);
@@ -330,8 +335,8 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
     <Stack gap={0}>
       <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Stack gap="sm">
-          <Group justify="space-between" align="center" wrap="wrap">
-            <Group gap="xs">
+          <Group justify="space-between" align="flex-start" wrap="nowrap">
+            <Group gap="xs" style={{ flex: 1 }}>
               <ThemeIcon color="cyan" variant="light" radius="xl" size="lg">
                 <IconRuler2 size={20} />
               </ThemeIcon>
@@ -343,18 +348,9 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
               </Stack>
             </Group>
 
-            {!readOnly && (
+            {!readOnly && !isMobile && (
               <Group gap="xs">
-                <Button
-                  size="xs"
-                  variant="light"
-                  color="red"
-                  radius="xl"
-                  leftSection={<IconTrash size={14} />}
-                  onClick={handleDelete}
-                  loading={deleting}
-                  disabled={!selected}
-                >
+                <Button size="xs" variant="light" color="red" radius="xl" leftSection={<IconTrash size={14} />} onClick={handleDelete} loading={deleting} disabled={!selected}>
                   Borrar
                 </Button>
                 <Button size="xs" variant="light" color="dark" radius="xl" leftSection={<IconEdit size={14} />} disabled={!selected} onClick={startEdit}>
@@ -365,59 +361,83 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                 </Button>
               </Group>
             )}
+
+            {isMobile && (
+              <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="md">
+                <IconChevronDown size={20} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: '200ms' }} />
+              </ActionIcon>
+            )}
           </Group>
 
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="sm">
-            <Select
-              placeholder="Temporada"
-              leftSection={<IconCalendarStats size={16} />}
-              data={[{ value: 'Todas', label: 'Todas las temporadas' }, ...seasons.map(s => ({ value: s, label: formatSeasonOption(s) }))]}
-              value={selectedSeason}
-              onChange={handleSeasonChange}
-              variant="filled"
-              radius="md"
-              allowDeselect={false}
-              disabled={seasons.length === 0}
-            />
-            <Group gap="xs" grow style={{ minWidth: 260 }}>
-              <DateInput
-                placeholder="Fecha de inicio"
-                leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
-                value={dateValue(dateFrom)}
-                onChange={(value) => setDateFrom(dateInputToIso(value))}
-                variant="filled"
-                radius="md"
-                valueFormat="DD/MM/YYYY"
-                clearable
-              />
-              <DateInput
-                placeholder="Fecha de fin"
-                leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
-                value={dateValue(dateTo)}
-                onChange={(value) => setDateTo(dateInputToIso(value))}
-                variant="filled"
-                radius="md"
-                valueFormat="DD/MM/YYYY"
-                clearable
-              />
-            </Group>
-            <Select
-              placeholder="Selecciona fecha"
-              leftSection={<IconCalendarStats size={16} />}
-              data={sortedDesc.map((m) => ({ value: String(m.id), label: fechaLabel(m.fecha) }))}
-              value={currentId}
-              onChange={(val) => {
-                if (!val) return;
-                setCurrentId(val);
-              }}
-              searchable
-              variant="filled"
-              radius="md"
-              allowDeselect={false}
-              disabled={sortedDesc.length === 0}
-              nothingFoundMessage="No hay registros"
-            />
-          </SimpleGrid>
+          <Collapse in={!isMobile || expanded}>
+            <Stack gap="sm">
+              {!readOnly && isMobile && (
+                <Group gap="xs" justify="center" style={{ flexDirection: 'column' }}>
+                  <Button size="xs" variant="light" color="red" radius="xl" leftSection={<IconTrash size={14} />} onClick={handleDelete} loading={deleting} disabled={!selected} fullWidth>
+                    Borrar
+                  </Button>
+                  <Button size="xs" variant="light" color="dark" radius="xl" leftSection={<IconEdit size={14} />} disabled={!selected} onClick={startEdit} fullWidth>
+                    Editar
+                  </Button>
+                  <Button size="xs" radius="xl" leftSection={<IconPlus size={14} />} onClick={startNew} fullWidth>
+                    Añadir
+                  </Button>
+                </Group>
+              )}
+
+              <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="sm">
+                <Select
+                  placeholder="Temporada"
+                  leftSection={<IconCalendarStats size={16} />}
+                  data={[{ value: 'Todas', label: 'Todas las temporadas' }, ...seasons.map(s => ({ value: s, label: formatSeasonOption(s) }))]}
+                  value={selectedSeason}
+                  onChange={handleSeasonChange}
+                  variant="filled"
+                  radius="md"
+                  allowDeselect={false}
+                  disabled={seasons.length === 0}
+                />
+                <Group gap="xs" grow style={{ minWidth: 260 }}>
+                  <DateInput
+                    placeholder="Fecha de inicio"
+                    leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+                    value={dateValue(dateFrom)}
+                    onChange={(value) => setDateFrom(dateInputToIso(value))}
+                    variant="filled"
+                    radius="md"
+                    valueFormat="DD/MM/YYYY"
+                    clearable
+                  />
+                  <DateInput
+                    placeholder="Fecha de fin"
+                    leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+                    value={dateValue(dateTo)}
+                    onChange={(value) => setDateTo(dateInputToIso(value))}
+                    variant="filled"
+                    radius="md"
+                    valueFormat="DD/MM/YYYY"
+                    clearable
+                  />
+                </Group>
+                <Select
+                  placeholder="Selecciona fecha"
+                  leftSection={<IconCalendarStats size={16} />}
+                  data={sortedDesc.map((m) => ({ value: String(m.id), label: fechaLabel(m.fecha) }))}
+                  value={currentId}
+                  onChange={(val) => {
+                    if (!val) return;
+                    setCurrentId(val);
+                  }}
+                  searchable
+                  variant="filled"
+                  radius="md"
+                  allowDeselect={false}
+                  disabled={sortedDesc.length === 0}
+                  nothingFoundMessage="No hay registros"
+                />
+              </SimpleGrid>
+            </Stack>
+          </Collapse>
         </Stack>
       </Paper>
 

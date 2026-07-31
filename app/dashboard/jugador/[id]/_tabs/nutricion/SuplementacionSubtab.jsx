@@ -15,7 +15,9 @@ import {
   Text,
   ThemeIcon,
   Title,
+  Collapse,
 } from '@mantine/core';
+import { useMediaQuery, useDisclosure } from '@mantine/hooks';
 import PlayerSupplementModal from '@/components/modals/PlayerSupplementModal';
 import { notifications } from '@mantine/notifications';
 import { getPlayerSupplementation, postPlayerSupplementation } from '@/services/supplement';
@@ -28,6 +30,7 @@ import {
   IconPill,
   IconSparkles,
   IconTrash,
+  IconChevronDown,
 } from '@tabler/icons-react';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
@@ -179,6 +182,8 @@ function buildProtocol(jugador, lista, items, peso) {
 }
 
 export default function SuplementacionSubtab({ jugador, readOnly = false }) {
+  const isMobile = useMediaQuery('(max-width: 48em)');
+  const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const peso = Number(jugador.peso_kg || 0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -361,20 +366,20 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
 
       <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Stack gap="md">
-          <Group justify="space-between" align="flex-start" wrap="wrap">
-            <Group gap="xs">
+          <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
+            <Group gap="xs" style={{ flex: 1 }}>
               <ThemeIcon color="grape" variant="light" radius="xl" size="lg">
                 <IconBottle size={20} />
               </ThemeIcon>
               <Stack gap={2}>
                 <Title order={3} fw={800} c="dark.4">Suplementación</Title>
                 <Text size="sm" c="dimmed">
-                  Asignación de catálogo, extras y suplementación.
+                  Asignación de catálogos de suplementación.
                 </Text>
               </Stack>
             </Group>
 
-            {canManage && (
+            {canManage && !isMobile && (
               <Button
                 radius="xl"
                 size="xs"
@@ -384,46 +389,68 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
                 Añadir
               </Button>
             )}
+
+            {isMobile && (
+              <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="md">
+                <IconChevronDown size={20} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: '200ms' }} />
+              </ActionIcon>
+            )}
           </Group>
 
-          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing={6}>
-            <Paper py={6} px="xs" radius="md" bg="gray.0" withBorder>
-              <Group gap="xs" wrap="nowrap">
-                <ThemeIcon color="blue" variant="light" radius="xl" size="sm">
-                  <IconCalendarStats size={14} />
-                </ThemeIcon>
-                <Group gap={4} wrap="nowrap" style={{ minWidth: 0 }}>
-                  <Text size="xs" c="dimmed" fw={800}>Catálogo</Text>
-                  <Text size="sm" fw={900} truncate>{activeList ? activeList.nombre : 'Sin asignar'}</Text>
-                  <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>{activeList ? `(${listSupplementCount})` : ''}</Text>
-                </Group>
-              </Group>
-            </Paper>
+          <Collapse in={!isMobile || expanded}>
+            <Stack gap="sm">
+              {canManage && isMobile && (
+                <Button
+                  radius="xl"
+                  size="xs"
+                  leftSection={<IconCirclePlus size={15} />}
+                  onClick={() => setModalOpened(true)}
+                  fullWidth
+                >
+                  Añadir
+                </Button>
+              )}
 
-            <Paper py={6} px="xs" radius="md" bg="gray.0" withBorder>
-              <Group gap="xs" wrap="nowrap">
-                <ThemeIcon color="grape" variant="light" radius="xl" size="sm">
-                  <IconCirclePlus size={14} />
-                </ThemeIcon>
-                <Group gap={4} wrap="nowrap">
-                  <Text size="xs" c="dimmed" fw={800}>Extras</Text>
-                  <Text size="sm" fw={900}>{data.extras.length}</Text>
-                </Group>
-              </Group>
-            </Paper>
+              <SimpleGrid cols={{ base: 1, sm: 3 }} spacing={6}>
+                <Paper py={6} px="xs" radius="md" bg="gray.0" withBorder>
+                  <Group gap="xs" wrap="nowrap">
+                    <ThemeIcon color="blue" variant="light" radius="xl" size="sm">
+                      <IconCalendarStats size={14} />
+                    </ThemeIcon>
+                    <Group gap={4} wrap="nowrap" style={{ minWidth: 0 }}>
+                      <Text size="xs" c="dimmed" fw={800}>Catálogo</Text>
+                      <Text size="sm" fw={900} truncate>{activeList ? activeList.nombre : 'Sin asignar'}</Text>
+                      <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>{activeList ? `(${listSupplementCount})` : ''}</Text>
+                    </Group>
+                  </Group>
+                </Paper>
 
-            <Paper py={6} px="xs" radius="md" bg="gray.0" withBorder>
-              <Group gap="xs" wrap="nowrap">
-                <ThemeIcon color={peso ? 'teal' : 'orange'} variant="light" radius="xl" size="sm">
-                  <IconPill size={14} />
-                </ThemeIcon>
-                <Group gap={4} wrap="nowrap">
-                  <Text size="xs" c="dimmed" fw={800}>Peso</Text>
-                  <Text size="sm" fw={900}>{peso ? `${peso} kg` : 'Pendiente'}</Text>
-                </Group>
-              </Group>
-            </Paper>
-          </SimpleGrid>
+                <Paper py={6} px="xs" radius="md" bg="gray.0" withBorder>
+                  <Group gap="xs" wrap="nowrap">
+                    <ThemeIcon color="grape" variant="light" radius="xl" size="sm">
+                      <IconCirclePlus size={14} />
+                    </ThemeIcon>
+                    <Group gap={4} wrap="nowrap">
+                      <Text size="xs" c="dimmed" fw={800}>Extras</Text>
+                      <Text size="sm" fw={900}>{data.extras.length}</Text>
+                    </Group>
+                  </Group>
+                </Paper>
+
+                <Paper py={6} px="xs" radius="md" bg="gray.0" withBorder>
+                  <Group gap="xs" wrap="nowrap">
+                    <ThemeIcon color={peso ? 'teal' : 'orange'} variant="light" radius="xl" size="sm">
+                      <IconPill size={14} />
+                    </ThemeIcon>
+                    <Group gap={4} wrap="nowrap">
+                      <Text size="xs" c="dimmed" fw={800}>Peso</Text>
+                      <Text size="sm" fw={900}>{peso ? `${peso} kg` : 'Pendiente'}</Text>
+                    </Group>
+                  </Group>
+                </Paper>
+              </SimpleGrid>
+            </Stack>
+          </Collapse>
         </Stack>
       </Paper>
 

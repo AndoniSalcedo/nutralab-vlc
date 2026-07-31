@@ -1,9 +1,9 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Badge, Box, Button, Group, Paper, Stack, Text, ThemeIcon, Title } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { IconInbox, IconMail, IconPlus } from '@tabler/icons-react';
+import { Badge, Box, Button, Group, Paper, Stack, Text, ThemeIcon, Title, Collapse, ActionIcon } from '@mantine/core';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { IconInbox, IconMail, IconPlus, IconChevronDown } from '@tabler/icons-react';
 import SendMessageModal from '@/components/modals/SendMessageModal';
 import NothingFound from '@/components/NothingFound';
 
@@ -19,6 +19,8 @@ function formatDate(value) {
 }
 
 export default function MensajesSubtab({ jugador, messages = [], readOnly = false }) {
+  const isMobile = useMediaQuery('(max-width: 48em)');
+  const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const [opened, { open, close }] = useDisclosure(false);
   const playerOption = useMemo(() => [jugador], [jugador]);
 
@@ -32,32 +34,56 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
         shadow="xs"
         style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
       >
-        <Group justify="space-between" align="center" gap="sm" wrap="wrap">
-          <Group gap="xs">
-            <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
-              <IconMail size={20} />
-            </ThemeIcon>
-            <Box>
-              <Title order={3} fw={800} c="dark.4">Mensajes</Title>
-              <Text size="sm" c="dimmed">
-                Comunicaciones del nutricionista para el jugador.
-              </Text>
-            </Box>
+        <Stack gap="sm">
+          <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
+            <Group gap="xs" style={{ flex: 1 }}>
+              <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
+                <IconMail size={20} />
+              </ThemeIcon>
+              <Box>
+                <Title order={3} fw={800} c="dark.4">Mensajes</Title>
+                <Text size="sm" c="dimmed">
+                  Comunicaciones del nutricionista para el jugador.
+                </Text>
+              </Box>
+            </Group>
+
+            {!readOnly && !isMobile && (
+              <Button
+                radius="xl"
+                size="xs"
+                color="blue"
+                variant="light"
+                leftSection={<IconPlus size={14} />}
+                onClick={open}
+              >
+                Nuevo
+              </Button>
+            )}
+
+            {isMobile && (
+              <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="md">
+                <IconChevronDown size={20} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: '200ms' }} />
+              </ActionIcon>
+            )}
           </Group>
 
-          {!readOnly && (
-            <Button
-              radius="xl"
-              size="xs"
-              color="blue"
-              variant="light"
-              leftSection={<IconPlus size={14} />}
-              onClick={open}
-            >
-              Nuevo
-            </Button>
-          )}
-        </Group>
+          <Collapse in={!isMobile || expanded}>
+            {!readOnly && isMobile && (
+              <Button
+                radius="xl"
+                size="xs"
+                color="blue"
+                variant="light"
+                leftSection={<IconPlus size={14} />}
+                onClick={open}
+                fullWidth
+              >
+                Nuevo
+              </Button>
+            )}
+          </Collapse>
+        </Stack>
       </Paper>
 
       <SendMessageModal

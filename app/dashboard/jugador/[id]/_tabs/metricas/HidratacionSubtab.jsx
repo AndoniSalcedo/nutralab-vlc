@@ -14,10 +14,12 @@ import {
   Title,
   Button,
   Table,
-  ScrollArea,
   ActionIcon,
   Tooltip as MantineTooltip,
+  Collapse,
+  ScrollArea,
 } from '@mantine/core';
+import { useMediaQuery, useDisclosure } from '@mantine/hooks';
 import ImportCsvModal from '@/components/modals/ImportCsvModal';
 import EditRecordModal from '@/components/modals/EditRecordModal';
 import { notifications } from '@mantine/notifications';
@@ -33,6 +35,7 @@ import {
   IconClock,
   IconAlertCircle,
   IconEdit,
+  IconChevronDown,
 } from '@tabler/icons-react';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import {
@@ -137,6 +140,8 @@ function getCsvVal(row, keys) {
 }
 
 export default function HidratacionSubtab({ jugador, registrosHidratacion = [], readOnly = false }) {
+  const isMobile = useMediaQuery('(max-width: 48em)');
+  const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const jugadorId = jugador.id;
   const peso = Number(jugador.peso_kg || 0);
   const aguaBase = peso ? Math.round(peso * 40) : 0;
@@ -613,41 +618,77 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
 
   return (
     <Stack gap="md">
-      {/* Header Panel */}
       <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
-        <Group justify="space-between" align="center" wrap="wrap">
-          <Group gap="xs">
-            <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
-              <IconDroplet size={20} />
-            </ThemeIcon>
-            <Stack gap={2}>
-              <Title order={3} fw={800} c="dark.4">Hidratación y sudoración</Title>
-              <Text size="sm" c="dimmed">
-                Análisis de osmolaridad salival y sodio en sudor.
-              </Text>
-            </Stack>
-          </Group>
-          <Group gap="xs">
-            {peso && (
-              <Badge color="blue" variant="light" size="lg">{peso} kg · base 40 ml/kg</Badge>
+        <Stack gap="sm">
+          <Group justify="space-between" align="flex-start" wrap="nowrap">
+            <Group gap="xs" style={{ flex: 1 }}>
+              <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
+                <IconDroplet size={20} />
+              </ThemeIcon>
+              <Stack gap={2}>
+                <Title order={3} fw={800} c="dark.4">Hidratación y sudoración</Title>
+                <Text size="sm" c="dimmed">
+                  Análisis de osmolaridad salival y sodio en sudor.
+                </Text>
+              </Stack>
+            </Group>
+            
+            {!isMobile && (
+              <Group gap="xs">
+                {peso > 0 && (
+                  <Badge color="blue" variant="light" size="lg">{peso} kg · base 40 ml/kg</Badge>
+                )}
+                {!readOnly && (
+                  <Button
+                    leftSection={<IconDatabaseImport size={16} />}
+                    color="blue"
+                    radius="xl"
+                    size="xs"
+                    onClick={() => {
+                      setAllImportRows([]);
+                      setPreviewRows([]);
+                      setModalOpen(true);
+                    }}
+                  >
+                    Importar
+                  </Button>
+                )}
+              </Group>
             )}
-            {!readOnly && (
-              <Button
-                leftSection={<IconDatabaseImport size={16} />}
-                color="blue"
-                radius="xl"
-                size="xs"
-                onClick={() => {
-                  setAllImportRows([]);
-                  setPreviewRows([]);
-                  setModalOpen(true);
-                }}
-              >
-                Importar
-              </Button>
+
+            {isMobile && (
+              <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="md">
+                <IconChevronDown size={20} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: '200ms' }} />
+              </ActionIcon>
             )}
           </Group>
-        </Group>
+          
+          <Collapse in={!isMobile || expanded}>
+            {isMobile && (
+              <Group gap="xs" justify="center" style={{ flexDirection: 'column' }}>
+                {peso > 0 && (
+                  <Badge color="blue" variant="light" size="lg">{peso} kg · base 40 ml/kg</Badge>
+                )}
+                {!readOnly && (
+                  <Button
+                    leftSection={<IconDatabaseImport size={16} />}
+                    color="blue"
+                    radius="xl"
+                    size="xs"
+                    fullWidth
+                    onClick={() => {
+                      setAllImportRows([]);
+                      setPreviewRows([]);
+                      setModalOpen(true);
+                    }}
+                  >
+                    Importar
+                  </Button>
+                )}
+              </Group>
+            )}
+          </Collapse>
+        </Stack>
       </Paper>
 
       {/* Horizontal Charts Section */}

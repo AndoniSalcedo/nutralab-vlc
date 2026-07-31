@@ -15,7 +15,10 @@ import {
   ThemeIcon,
   Title,
   Tooltip,
+  Collapse,
+  ActionIcon,
 } from '@mantine/core';
+import { useMediaQuery, useDisclosure } from '@mantine/hooks';
 import dayjs from 'dayjs';
 import { notifications } from '@mantine/notifications';
 import { uploadAnalitica, deleteAnalitica, toggleAnaliticaVisibility } from '@/services/analytic';
@@ -28,6 +31,7 @@ import {
   IconTrash,
   IconEye,
   IconEyeOff,
+  IconChevronDown,
 } from '@tabler/icons-react';
 import { BentoCard } from '@/components/BentoItem';
 import NothingFound from '@/components/NothingFound';
@@ -115,6 +119,8 @@ function agrupar(params = []) {
 }
 
 export default function AnaliticasSubtab({ jugador, analiticas: analiticasIniciales = [], readOnly = false }) {
+  const isMobile = useMediaQuery('(max-width: 48em)');
+  const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const jugadorId = jugador.id;
   const [analiticas, setAnaliticas] = useState(analiticasIniciales || []);
   const [currentId, setCurrentId] = useState(analiticasIniciales?.[0]?.id ? String(analiticasIniciales[0].id) : null);
@@ -252,8 +258,8 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
     <Stack gap={0}>
       <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Stack gap="sm">
-          <Group justify="space-between" align="flex-start" wrap="wrap">
-            <Group gap="xs">
+          <Group justify="space-between" align="flex-start" wrap="nowrap">
+            <Group gap="xs" style={{ flex: 1 }}>
               <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
                 <IconReportMedical size={20} />
               </ThemeIcon>
@@ -265,7 +271,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
               </Stack>
             </Group>
 
-            {!readOnly && (
+            {!readOnly && !isMobile && (
               <Group gap="xs">
                 {selected && (
                   <Tooltip label={selected.visible_para_jugador ? 'Ocultar al jugador' : 'Hacer visible al jugador'} withArrow position="top">
@@ -299,26 +305,71 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
                 </Button>
               </Group>
             )}
+
+            {isMobile && (
+              <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="md">
+                <IconChevronDown size={20} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: '200ms' }} />
+              </ActionIcon>
+            )}
           </Group>
 
-          <Select
-            placeholder="Selecciona documento"
-            data={sorted.map((a) => ({
-              value: String(a.id),
-              label: `${fechaLabel(a.fecha_extraccion)} · ${a.pdf_nombre || 'Analítica'}`,
-            }))}
-            value={currentId}
-            onChange={(val) => {
-              if (!val) return;
-              setCurrentId(val);
-            }}
-            allowDeselect={false}
-            searchable
-            variant="filled"
-            radius="md"
-            disabled={sorted.length === 0}
-            leftSection={<IconFileAnalytics size={16} />}
-          />
+          <Collapse in={!isMobile || expanded}>
+            <Stack gap="sm">
+              {!readOnly && isMobile && (
+                <Group gap="xs" justify="center" style={{ flexDirection: 'column' }}>
+                  {selected && (
+                    <Button
+                      size="xs"
+                      variant={selected.visible_para_jugador ? 'light' : 'default'}
+                      color={selected.visible_para_jugador ? 'green' : 'gray'}
+                      radius="xl"
+                      leftSection={selected.visible_para_jugador ? <IconEye size={14} /> : <IconEyeOff size={14} />}
+                      onClick={handleToggleVisibility}
+                      loading={toggling}
+                      fullWidth
+                    >
+                      {selected.visible_para_jugador ? 'Visible' : 'Oculto'}
+                    </Button>
+                  )}
+                  <Button
+                    size="xs"
+                    variant="light"
+                    color="red"
+                    radius="xl"
+                    leftSection={<IconTrash size={14} />}
+                    onClick={handleDelete}
+                    disabled={!selected}
+                    loading={deleting}
+                    fullWidth
+                  >
+                    Borrar
+                  </Button>
+                  <Button size="xs" radius="xl" leftSection={<IconPlus size={14} />} onClick={startUpload} fullWidth>
+                    Añadir
+                  </Button>
+                </Group>
+              )}
+
+              <Select
+                placeholder="Selecciona documento"
+                data={sorted.map((a) => ({
+                  value: String(a.id),
+                  label: `${fechaLabel(a.fecha_extraccion)} · ${a.pdf_nombre || 'Analítica'}`,
+                }))}
+                value={currentId}
+                onChange={(val) => {
+                  if (!val) return;
+                  setCurrentId(val);
+                }}
+                allowDeselect={false}
+                searchable
+                variant="filled"
+                radius="md"
+                disabled={sorted.length === 0}
+                leftSection={<IconFileAnalytics size={16} />}
+              />
+            </Stack>
+          </Collapse>
         </Stack>
       </Paper>
 

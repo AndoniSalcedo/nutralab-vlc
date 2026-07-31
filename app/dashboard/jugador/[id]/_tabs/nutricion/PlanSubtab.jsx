@@ -18,9 +18,11 @@ import {
   Textarea,
   TextInput,
   Title,
+  Collapse,
+  ActionIcon,
 } from '@mantine/core';
 import CreateNutritionPlanModal from '@/components/modals/CreateNutritionPlanModal';
-import { useMediaQuery } from '@mantine/hooks';
+import { useMediaQuery, useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPlanPdf, deleteAiPlan } from '@/services/plan';
 import { getWeeklyMenus } from '@/services/menu';
@@ -32,10 +34,10 @@ import {
   IconCheck,
   IconDownload,
   IconEdit,
-  IconFileAi,
   IconPlus,
   IconSparkles,
   IconTrash,
+  IconChevronDown,
 } from '@tabler/icons-react';
 import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/nutrition-plan-card';
 import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getTeamNutritionDayTypes } from '@/lib/calculations';
@@ -300,6 +302,7 @@ function AiGenerationOverlay({ opened, messages = [] }) {
 
 export default function PlanSubtab({ jugador, readOnly = false }) {
   const isMobile = useMediaQuery('(max-width: 48em)');
+  const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const [planes, setPlanes] = useState([]);
   const [currentId, setCurrentId] = useState(null);
   const [mode, setMode] = useState('view');
@@ -795,8 +798,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     <Stack gap={0}>
       <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Stack gap="md">
-          <Group justify="space-between" align={isMobile ? 'stretch' : 'flex-start'} style={{ flexDirection: isMobile ? 'column' : 'row' }} gap="md">
-            <Group gap="xs">
+          <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
+            <Group gap="xs" style={{ flex: 1 }}>
               <IconBrain size={22} color="var(--mantine-color-blue-filled)" />
               <Stack gap={2}>
                 <Title order={3} fw={800} c="dark.4">Planes nutricionales</Title>
@@ -805,82 +808,147 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                 </Text>
               </Stack>
             </Group>
-            <Group gap="xs" style={{ width: isMobile ? '100%' : 'auto', flexDirection: isMobile ? 'column' : 'row' }} align={isMobile ? 'stretch' : 'center'}>
-              <Button
-                size="xs"
-                radius="xl"
-                color="dark"
-                leftSection={<IconArrowsLeftRight size={16} />}
-                onClick={() => setIntercambiosOpened(true)}
-                fullWidth={isMobile}
-              >
-                Intercambios
-              </Button>
-              {currentDatos && mode === 'view' && (
+
+            {!isMobile && (
+              <Group gap="xs">
                 <Button
                   size="xs"
                   radius="xl"
-                  variant="light"
-                  leftSection={<IconDownload size={16} />}
-                  onClick={downloadPdf}
-                  loading={actionType === 'download'}
-                  fullWidth={isMobile}
+                  color="dark"
+                  leftSection={<IconArrowsLeftRight size={16} />}
+                  onClick={() => setIntercambiosOpened(true)}
                 >
-                  Descargar
+                  Intercambios
                 </Button>
-              )}
-              {!readOnly && (
-                <>
-                  {currentPlan && mode === 'view' && (
-                    <Button
-                      size="xs"
-                      radius="xl"
-                      variant="light"
-                      color="red"
-                      leftSection={<IconTrash size={16} />}
-                      onClick={() => handleDeletePlan(currentPlan.id)}
-                      loading={deleting}
-                      fullWidth={isMobile}
-                    >
-                      Eliminar
-                    </Button>
-                  )}
-                  {currentPlan && mode === 'view' && (
-                    <Button
-                      size="xs"
-                      radius="xl"
-                      variant="light"
-                      leftSection={<IconEdit size={16} />}
-                      onClick={startEdit}
-                      fullWidth={isMobile}
-                    >
-                      Editar
-                    </Button>
-                  )}
-                  <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={openCreateModal} fullWidth={isMobile}>
-                    Crear
+                {currentDatos && mode === 'view' && (
+                  <Button
+                    size="xs"
+                    radius="xl"
+                    variant="light"
+                    leftSection={<IconDownload size={16} />}
+                    onClick={downloadPdf}
+                    loading={actionType === 'download'}
+                  >
+                    Descargar
                   </Button>
-                </>
-              )}
-            </Group>
+                )}
+                {!readOnly && (
+                  <>
+                    {currentPlan && mode === 'view' && (
+                      <Button
+                        size="xs"
+                        radius="xl"
+                        variant="light"
+                        color="red"
+                        leftSection={<IconTrash size={16} />}
+                        onClick={() => handleDeletePlan(currentPlan.id)}
+                        loading={deleting}
+                      >
+                        Eliminar
+                      </Button>
+                    )}
+                    {currentPlan && mode === 'view' && (
+                      <Button
+                        size="xs"
+                        radius="xl"
+                        variant="light"
+                        leftSection={<IconEdit size={16} />}
+                        onClick={startEdit}
+                      >
+                        Editar
+                      </Button>
+                    )}
+                    <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={openCreateModal}>
+                      Crear
+                    </Button>
+                  </>
+                )}
+              </Group>
+            )}
+
+            {isMobile && (
+              <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="md">
+                <IconChevronDown size={20} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: '200ms' }} />
+              </ActionIcon>
+            )}
           </Group>
 
-          <Select
-            placeholder={loadingList ? 'Cargando planes...' : 'Sin planes creados'}
-            data={planes.map((plan) => ({ value: String(plan.id), label: planLabel(plan) }))}
-            value={currentId}
-            onChange={(val) => {
-              if (!val) return;
-              setCurrentId(val);
-              setMode('view');
-            }}
-            allowDeselect={false}
-            variant="filled"
-            radius="md"
-            leftSection={<IconFileAi size={16} />}
-            disabled={loadingList || planes.length === 0 || isDocumentMode}
-            style={{ flex: 1, minWidth: 260 }}
-          />
+          <Collapse in={!isMobile || expanded}>
+            <Stack gap="sm">
+              {isMobile && (
+                <Group gap="xs" justify="center" style={{ flexDirection: 'column' }}>
+                  <Button
+                    size="xs"
+                    radius="xl"
+                    color="dark"
+                    leftSection={<IconArrowsLeftRight size={16} />}
+                    onClick={() => setIntercambiosOpened(true)}
+                    fullWidth
+                  >
+                    Intercambios
+                  </Button>
+                  {currentDatos && mode === 'view' && (
+                    <Button
+                      size="xs"
+                      radius="xl"
+                      variant="light"
+                      leftSection={<IconDownload size={16} />}
+                      onClick={downloadPdf}
+                      loading={actionType === 'download'}
+                      fullWidth
+                    >
+                      Descargar
+                    </Button>
+                  )}
+                  {!readOnly && (
+                    <>
+                      {currentPlan && mode === 'view' && (
+                        <Button
+                          size="xs"
+                          radius="xl"
+                          variant="light"
+                          color="red"
+                          leftSection={<IconTrash size={16} />}
+                          onClick={() => handleDeletePlan(currentPlan.id)}
+                          loading={deleting}
+                          fullWidth
+                        >
+                          Eliminar
+                        </Button>
+                      )}
+                      {currentPlan && mode === 'view' && (
+                        <Button
+                          size="xs"
+                          radius="xl"
+                          variant="light"
+                          leftSection={<IconEdit size={16} />}
+                          onClick={startEdit}
+                          fullWidth
+                        >
+                          Editar
+                        </Button>
+                      )}
+                      <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={openCreateModal} fullWidth>
+                        Crear
+                      </Button>
+                    </>
+                  )}
+                </Group>
+              )}
+
+              <Select
+                placeholder={loadingList ? 'Cargando planes...' : 'Sin planes creados'}
+                data={planes.map((plan) => ({ value: String(plan.id), label: planLabel(plan) }))}
+                value={currentId}
+                onChange={(val) => {
+                  if (val && mode === 'view') setCurrentId(val);
+                }}
+                disabled={mode !== 'view' || planes.length === 0}
+                variant="filled"
+                radius="md"
+              />
+            </Stack>
+          </Collapse>
         </Stack>
       </Paper>
 

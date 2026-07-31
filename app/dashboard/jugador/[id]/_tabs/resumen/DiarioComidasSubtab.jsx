@@ -8,15 +8,17 @@ import {
   Box,
   Button,
   Select,
-  SimpleGrid,
   Title,
   Paper,
-  ThemeIcon
+  ThemeIcon,
+  Collapse,
+  ActionIcon,
+  SimpleGrid,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { DatePickerInput } from '@mantine/dates';
-import { useMediaQuery } from '@mantine/hooks';
-import { IconPlus, IconPhoto, IconCalendar } from '@tabler/icons-react';
+import { useMediaQuery, useDisclosure } from '@mantine/hooks';
+import { IconPlus, IconPhoto, IconCalendar, IconChevronDown } from '@tabler/icons-react';
 
 import NothingFound from '@/components/NothingFound';
 import { deletePlayerMeal, listPlayerMeals } from '@/services/meal';
@@ -63,6 +65,7 @@ const MEAL_TYPES = [
 
 export default function DiarioComidasSubtab({ jugador, readOnly = false, initialMeals }) {
   const isMobile = useMediaQuery('(max-width: 48em)');
+  const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const [loading, setLoading] = useState(initialMeals ? false : true);
   const [meals, setMeals] = useState(initialMeals || []);
 
@@ -155,8 +158,8 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false, initial
           style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
         >
           <Stack gap="sm">
-            <Group justify="space-between" align={isMobile ? 'stretch' : 'center'} style={{ flexDirection: isMobile ? 'column' : 'row' }} gap="sm">
-              <Group gap="xs">
+            <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
+              <Group gap="xs" style={{ flex: 1 }}>
                 <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
                   <IconCalendar size={20} />
                 </ThemeIcon>
@@ -168,41 +171,64 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false, initial
                 </Box>
               </Group>
 
-              {!readOnly && (
+              {!readOnly && !isMobile && (
                 <Button
                   id='btn-add-meal'
                   size="xs"
                   radius="xl"
-                  color="dark"
+                  color="blue"
                   leftSection={<IconPlus size={16} />}
                   onClick={openNewMeal}
-                  fullWidth={isMobile}
                 >
                   Registrar
                 </Button>
               )}
+
+              {isMobile && (
+                <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="md">
+                  <IconChevronDown size={20} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: '200ms' }} />
+                </ActionIcon>
+              )}
             </Group>
 
-            <SimpleGrid cols={2} spacing="xs">
-              <DatePickerInput
-                placeholder="Fecha"
-                leftSection={<IconCalendar size={16} />}
-                value={day}
-                onChange={setDay}
-                clearable
-                radius="md"
-                variant="filled"
-              />
-              <Select
-                placeholder="Tipo de comida"
-                value={mealType}
-                onChange={setMealType}
-                data={[{ value: '', label: 'Todas' }, ...MEAL_TYPES]}
-                radius="md"
-                variant="filled"
-                allowDeselect={false}
-              />
-            </SimpleGrid>
+            <Collapse in={!isMobile || expanded}>
+              <Stack gap="sm">
+                {!readOnly && isMobile && (
+                  <Button
+                    id='btn-add-meal'
+                    size="xs"
+                    radius="xl"
+                    color="blue"
+                    leftSection={<IconPlus size={16} />}
+                    onClick={openNewMeal}
+                    fullWidth
+                  >
+                    Registrar
+                  </Button>
+                )}
+                
+                <SimpleGrid cols={2} spacing="xs">
+                  <DatePickerInput
+                    placeholder="Fecha"
+                    leftSection={<IconCalendar size={16} />}
+                    value={day}
+                    onChange={setDay}
+                    clearable
+                    radius="md"
+                    variant="filled"
+                  />
+                  <Select
+                    placeholder="Tipo de comida"
+                    value={mealType}
+                    onChange={setMealType}
+                    data={[{ value: '', label: 'Todas' }, ...MEAL_TYPES]}
+                    radius="md"
+                    variant="filled"
+                    allowDeselect={false}
+                  />
+                </SimpleGrid>
+              </Stack>
+            </Collapse>
           </Stack>
         </Paper>
 
