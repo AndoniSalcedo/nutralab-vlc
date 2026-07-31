@@ -106,7 +106,8 @@ export default async function JugadorTabPage({ params }) {
       tab={activeTab}
       activeSubtab={activeSubtab}
       jugador={jugador}
-      readOnly={isPlayer}
+      readOnly={isPlayer || user?.role === 'tecnico'}
+      isPlayer={isPlayer}
       evoluciones={evoluciones}
       analiticas={analiticas}
       registrosHidratacion={registrosHidratacion}
