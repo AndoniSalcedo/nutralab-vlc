@@ -2,7 +2,7 @@
 
 import { SegmentedControl } from '@mantine/core';
 
-const styles = {
+const styles = () => ({
   root: {
     width: '100%',
     boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.06)',
@@ -13,13 +13,11 @@ const styles = {
   label: {
     padding: '8px 4px',
     color: 'var(--mantine-color-dimmed)',
-  },
-  control: {
-    '&[data-active] label': {
+    '&[data-active]': {
       color: 'var(--mantine-color-dark-filled)',
     },
   },
-};
+});
 
 /** Shared subtab selector design for both mobile and desktop. */
 export default function PlayerSubtabControl({ value, onChange, data, readOnly = false }) {

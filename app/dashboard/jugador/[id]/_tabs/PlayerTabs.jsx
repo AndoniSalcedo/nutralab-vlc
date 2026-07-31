@@ -59,6 +59,7 @@ export default function PlayerTabs({
     : DEFAULT_SUBTABS[activeTab];
 
   function navigate(nextTab, nextSubtab = DEFAULT_SUBTABS[nextTab]) {
+    if (!params?.id) return;
     router.replace(`/dashboard/jugador/${jugador.id}/${nextTab}/${nextSubtab}`, { scroll: false });
   }
 
