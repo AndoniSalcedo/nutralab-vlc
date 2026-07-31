@@ -1,8 +1,9 @@
 'use client';
 
-import { Box, Paper, SegmentedControl, Stack } from '@mantine/core';
+import { Box, Paper, Stack } from '@mantine/core';
 import { tabLabel } from './tab-label';
 import { getSubtabControlData } from './subtab-config';
+import PlayerSubtabControl from './PlayerSubtabControl';
 import MensajesSubtab from './resumen/MensajesSubtab';
 import PerfilSubtab from './resumen/PerfilSubtab';
 import DiarioComidasSubtab from './resumen/DiarioComidasSubtab';
@@ -27,18 +28,10 @@ export default function ResumenTab({ jugador, evoluciones = [], messages = [], a
           boxShadow: 'none',
         }}
       >
-        <SegmentedControl
+        <PlayerSubtabControl
           value={activeSubtab}
           onChange={onSubtabChange}
-          fullWidth
-          radius="xl"
-          size="sm"
-          bg="gray.1"
           data={getSubtabControlData('resumen', tabLabel)}
-          styles={{
-            root: { border: 'none', width: '100%' },
-            indicator: { boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
-          }}
         />
       </Paper>
 

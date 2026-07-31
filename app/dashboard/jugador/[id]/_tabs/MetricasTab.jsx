@@ -1,8 +1,9 @@
 'use client';
 
-import { Box, Paper, SegmentedControl, Stack } from '@mantine/core';
+import { Box, Paper, Stack } from '@mantine/core';
 import { tabLabel } from './tab-label';
 import { getSubtabControlData } from './subtab-config';
+import PlayerSubtabControl from './PlayerSubtabControl';
 import AnaliticasSubtab from './metricas/AnaliticasSubtab';
 import MedicionesSubtab from './metricas/MedicionesSubtab';
 import HidratacionSubtab from './metricas/HidratacionSubtab';
@@ -32,18 +33,10 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, registro
           boxShadow: 'none',
         }}
       >
-        <SegmentedControl
+        <PlayerSubtabControl
           value={activeSubtab}
           onChange={onSubtabChange}
-          fullWidth
-          radius="xl"
-          size="sm"
-          bg="gray.1"
           data={tabsData}
-          styles={{
-            root: { border: 'none', width: '100%' },
-            indicator: { boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
-          }}
         />
       </Paper>
 

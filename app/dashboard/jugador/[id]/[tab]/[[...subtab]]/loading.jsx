@@ -1,9 +1,10 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { Paper, SegmentedControl, Stack, Box, Group, ThemeIcon, Title, Text } from '@mantine/core';
+import { Paper, Stack, Box, Group, ThemeIcon, Title, Text } from '@mantine/core';
 import { tabLabel } from '@/app/dashboard/jugador/[id]/_tabs/tab-label';
 import { getSubtabControlData, resolveSubtab, getSubtabHeader } from '@/app/dashboard/jugador/[id]/_tabs/subtab-config';
+import PlayerSubtabControl from '@/app/dashboard/jugador/[id]/_tabs/PlayerSubtabControl';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 export default function PlayerSubtabLoading() {
@@ -36,17 +37,9 @@ export default function PlayerSubtabLoading() {
           boxShadow: 'none',
         }}
       >
-        <SegmentedControl
+        <PlayerSubtabControl
           value={activeSubtab}
-          fullWidth
-          radius="xl"
-          size="sm"
-          bg="gray.1"
           data={controlData}
-          styles={{
-            root: { border: 'none', width: '100%' },
-            indicator: { boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
-          }}
           readOnly
         />
       </Paper>

@@ -1,8 +1,9 @@
 'use client';
 
-import { Box, Paper, SegmentedControl, Stack } from '@mantine/core';
+import { Box, Paper, Stack } from '@mantine/core';
 import { tabLabel } from './tab-label';
 import { getSubtabControlData } from './subtab-config';
+import PlayerSubtabControl from './PlayerSubtabControl';
 import PlanSubtab from './nutricion/PlanSubtab';
 import SuplementacionSubtab from './nutricion/SuplementacionSubtab';
 import MenuSemanalSubtab from './nutricion/MenuSemanalSubtab';
@@ -27,18 +28,10 @@ export default function NutricionTab({ jugador, menus = [], activeSubtab, onSubt
           boxShadow: 'none',
         }}
       >
-        <SegmentedControl
+        <PlayerSubtabControl
           value={activeSubtab}
           onChange={onSubtabChange}
-          fullWidth
-          radius="xl"
-          size="sm"
-          bg="gray.1"
           data={getSubtabControlData('nutricion', tabLabel)}
-          styles={{
-            root: { border: 'none', width: '100%' },
-            indicator: { boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
-          }}
         />
       </Paper>
 
