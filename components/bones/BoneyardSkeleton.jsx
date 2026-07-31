@@ -11,7 +11,9 @@ import _team_evolution from './team-evolution.bones.json';
 import _team_menu from './team-menu.bones.json';
 import _team_analytics from './team-analytics.bones.json';
 import _team_config from './team-config.bones.json';
-import _player_dashboard from './player-dashboard.bones.json';
+import _player_dashboard_resumen from './player-dashboard-resumen.bones.json';
+import _player_dashboard_metricas from './player-dashboard-metricas.bones.json';
+import _player_dashboard_nutricion from './player-dashboard-nutricion.bones.json';
 import _diario_comidas from './diario-comidas.bones.json';
 import _balance_nutricional from './balance-nutricional.bones.json';
 
@@ -23,7 +25,9 @@ const bonesMap = {
   'team-menu': _team_menu,
   'team-analytics': _team_analytics,
   'team-config': _team_config,
-  'player-dashboard': _player_dashboard,
+  'player-dashboard-resumen': _player_dashboard_resumen,
+  'player-dashboard-metricas': _player_dashboard_metricas,
+  'player-dashboard-nutricion': _player_dashboard_nutricion,
   'diario-comidas': _diario_comidas,
   'balance-nutricional': _balance_nutricional,
 };

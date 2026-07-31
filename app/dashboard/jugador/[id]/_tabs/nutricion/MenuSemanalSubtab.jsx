@@ -1,21 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import SubtabHeader from '../SubtabHeader';
 import {
   ActionIcon,
   Paper,
   Stack,
   Group,
-  Title,
-  Text,
-  ThemeIcon,
   Tooltip,
   Select,
   Box,
 } from '@mantine/core';
 import {
   IconCalendar,
-  IconChefHat,
   IconList,
 } from '@tabler/icons-react';
 import MenuSemanal, { formatWeek } from '@/components/MenuSemanal';
@@ -55,15 +52,7 @@ export default function MenuSemanalSubtab({ menus = [] }) {
           {/* Header Title/Subtitle and Switcher Row */}
           <Group justify="space-between" align="center" wrap="wrap" gap="md">
             <Group gap="xs">
-              <ThemeIcon color="teal" variant="light" radius="xl" size="lg">
-                <IconChefHat size={20} />
-              </ThemeIcon>
-              <Stack gap={2}>
-                <Title order={3} fw={800} c="dark.4">Menú comedor</Title>
-                <Text size="sm" c="dimmed">
-                  Comedor del equipo.
-                </Text>
-              </Stack>
+              <SubtabHeader tab="nutricion" subtab="menu" />
             </Group>
 
             {/* Premium Micro-segmented Pill Switcher */}

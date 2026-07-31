@@ -1,7 +1,8 @@
 'use client';
 
-import { Badge, Box, Group, Paper, SimpleGrid, Stack, Text, ThemeIcon, Timeline, Title } from '@mantine/core';
-import { IconApple, IconBatteryCharging, IconClipboardList, IconCoffee, IconDroplet, IconFlag, IconRun } from '@tabler/icons-react';
+import { Badge, Box, Group, Paper, SimpleGrid, Stack, Text, Timeline } from '@mantine/core';
+import { IconClipboardList, IconDroplet, IconApple, IconRun, IconCoffee, IconBatteryCharging, IconFlag } from '@tabler/icons-react';
+import SubtabHeader from '../SubtabHeader';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/services/player';
@@ -39,15 +40,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
       <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
         <Group justify="space-between" align="flex-start" wrap="wrap">
           <Group gap="xs">
-            <ThemeIcon color="dark" variant="light" radius="xl" size="lg">
-              <IconClipboardList size={20} />
-            </ThemeIcon>
-            <Stack gap={2}>
-              <Title order={3} fw={800} c="dark.4">Protocolos</Title>
-              <Text size="sm" c="dimmed">
-                Guía nutricional para distintos protocolos.
-              </Text>
-            </Stack>
+            <SubtabHeader tab="metricas" subtab="protocolos" />
           </Group>
           <Badge color="dark" variant="light" size="lg">Prepartido · medio tiempo · post</Badge>
         </Group>

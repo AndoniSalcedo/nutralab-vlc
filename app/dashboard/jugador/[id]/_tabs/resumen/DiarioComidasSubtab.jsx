@@ -8,9 +8,7 @@ import {
   Box,
   Button,
   Select,
-  Title,
   Paper,
-  ThemeIcon,
   Collapse,
   ActionIcon,
   SimpleGrid,
@@ -27,6 +25,7 @@ import ImageViewerModal from '@/components/modals/ImageViewerModal';
 import MealEditorModal from '@/components/modals/MealEditorModal';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
+import SubtabHeader from '../SubtabHeader';
 
 function groupByDate(items) {
   const map = new Map();
@@ -160,15 +159,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false, initial
           <Stack gap="sm">
             <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
               <Group gap="xs" style={{ flex: 1 }}>
-                <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
-                  <IconCalendar size={20} />
-                </ThemeIcon>
-                <Box>
-                  <Title order={3} fw={800} c="dark.4">Diario de Comidas</Title>
-                  <Text size="sm" c="dimmed">
-                    Registro diario de ingestas.
-                  </Text>
-                </Box>
+                <SubtabHeader tab="resumen" subtab="diario" />
               </Group>
 
               {!readOnly && !isMobile && (

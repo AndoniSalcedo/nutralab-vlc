@@ -3,7 +3,6 @@ import { getUser } from '@/lib/auth';
 import { getAccessiblePlayer } from '@/lib/team-access';
 import JugadorHeader from '@/components/JugadorHeader';
 import PlayerTabs from './_tabs/PlayerTabs';
-import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
 import NothingFound from '@/components/NothingFound';
 
@@ -60,11 +59,11 @@ export default async function JugadorLayout({ children, params }) {
   }
 
   return (
-    <BoneyardSkeleton name="player-dashboard" loading={false}>
+    <>
       <JugadorHeader jugador={jugador} user={user} />
       <PlayerTabs jugador={jugador} readOnly={isPlayer || user?.role === 'tecnico'} isPlayer={isPlayer}>
         {children}
       </PlayerTabs>
-    </BoneyardSkeleton>
+    </>
   );
 }

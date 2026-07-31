@@ -1,8 +1,8 @@
 'use client';
 
 import { Box, Paper, SegmentedControl, Stack } from '@mantine/core';
-import { IconChartLine, IconReportAnalytics, IconDroplet, IconClipboardList } from '@tabler/icons-react';
 import { tabLabel } from './tab-label';
+import { getSubtabControlData } from './subtab-config';
 import AnaliticasSubtab from './metricas/AnaliticasSubtab';
 import MedicionesSubtab from './metricas/MedicionesSubtab';
 import HidratacionSubtab from './metricas/HidratacionSubtab';
@@ -12,16 +12,13 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, registro
   const analiticasVisibles = readOnly ? (analiticas || []).filter(a => a.visible_para_jugador) : (analiticas || []);
   const showAnaliticas = !readOnly || analiticasVisibles.length > 0;
 
-  const tabsData = [
-    { value: 'mediciones', label: tabLabel(IconChartLine, 'Mediciones', 'Med.') },
-    ...(showAnaliticas ? [{ value: 'analiticas', label: tabLabel(IconReportAnalytics, 'Analíticas', 'Anal.') }] : []),
-    { value: 'hidratacion', label: tabLabel(IconDroplet, 'Hidratación', 'Hidra.') },
-    { value: 'protocolos', label: tabLabel(IconClipboardList, 'Protocolos', 'Prot.') },
-  ];
+  const allTabs = getSubtabControlData('metricas', tabLabel);
+  const tabsData = showAnaliticas ? allTabs : allTabs.filter(t => t.value !== 'analiticas');
 
   return (
     <Stack gap={0}>
       <Paper
+        data-boneyard-ignore="true"
         p="xs"
         bg="white"
         radius={0}

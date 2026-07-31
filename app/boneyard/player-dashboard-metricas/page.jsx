@@ -31,7 +31,7 @@ export default function BoneyardPlayerDashboard() {
   };
 
   return (
-    <BoneyardSkeleton name="player-dashboard" loading={false}>
+    <BoneyardSkeleton name="player-dashboard-metricas" loading={false}>
       <JugadorHeader jugador={jugador} user={mockUser} />
       <PlayerTabs
         jugador={jugador}
@@ -40,7 +40,7 @@ export default function BoneyardPlayerDashboard() {
         registrosHidratacion={registrosHidratacion}
         messages={messages}
         menus={menus}
-        activeTab="resumen"
+        activeTab="metricas"
         readOnly={false}
       />
     </BoneyardSkeleton>

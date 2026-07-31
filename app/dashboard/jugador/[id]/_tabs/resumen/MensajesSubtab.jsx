@@ -1,10 +1,11 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Badge, Box, Button, Group, Paper, Stack, Text, ThemeIcon, Title, Collapse, ActionIcon } from '@mantine/core';
+import { Badge, Box, Button, Group, Paper, Stack, Text, Title, Collapse, ActionIcon } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { IconInbox, IconMail, IconPlus, IconChevronDown } from '@tabler/icons-react';
+import { IconInbox, IconPlus, IconChevronDown } from '@tabler/icons-react';
 import SendMessageModal from '@/components/modals/SendMessageModal';
+import SubtabHeader from '../SubtabHeader';
 import NothingFound from '@/components/NothingFound';
 
 function formatDate(value) {
@@ -37,15 +38,7 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
         <Stack gap="sm">
           <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
             <Group gap="xs" style={{ flex: 1 }}>
-              <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
-                <IconMail size={20} />
-              </ThemeIcon>
-              <Box>
-                <Title order={3} fw={800} c="dark.4">Mensajes</Title>
-                <Text size="sm" c="dimmed">
-                  Comunicaciones del nutricionista para el jugador.
-                </Text>
-              </Box>
+              <SubtabHeader tab="resumen" subtab="mensajes" />
             </Group>
 
             {!readOnly && !isMobile && (

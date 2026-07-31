@@ -19,7 +19,8 @@ import {
   Collapse,
   ScrollArea,
 } from '@mantine/core';
-import { useMediaQuery, useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import SubtabHeader from '../SubtabHeader';
 import ImportCsvModal from '@/components/modals/ImportCsvModal';
 import EditRecordModal from '@/components/modals/EditRecordModal';
 import { notifications } from '@mantine/notifications';
@@ -27,14 +28,13 @@ import { saveHydrationRecord, importHydrationRecords, refetchHydrationRecords, d
 import { updatePlayerField } from '@/services/player';
 import {
   IconActivityHeartbeat,
-  IconDroplet,
   IconTrash,
+  IconEdit,
   IconDatabaseImport,
   IconCheck,
   IconCalendarStats,
-  IconClock,
   IconAlertCircle,
-  IconEdit,
+  IconClock,
   IconChevronDown,
 } from '@tabler/icons-react';
 import ConfirmModal from '@/components/modals/ConfirmModal';
@@ -622,15 +622,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
         <Stack gap="sm">
           <Group justify="space-between" align="flex-start" wrap="nowrap">
             <Group gap="xs" style={{ flex: 1 }}>
-              <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
-                <IconDroplet size={20} />
-              </ThemeIcon>
-              <Stack gap={2}>
-                <Title order={3} fw={800} c="dark.4">Hidratación y sudoración</Title>
-                <Text size="sm" c="dimmed">
-                  Análisis de osmolaridad salival y sodio en sudor.
-                </Text>
-              </Stack>
+              <SubtabHeader tab="metricas" subtab="hidratacion" />
             </Group>
             
             {!isMobile && (

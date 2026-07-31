@@ -8,7 +8,9 @@
     "/boneyard/team-menu",
     "/boneyard/team-analytics",
     "/boneyard/team-config",
-    "/boneyard/player-dashboard",
+    "/boneyard/player-dashboard-resumen",
+    "/boneyard/player-dashboard-metricas",
+    "/boneyard/player-dashboard-nutricion",
     "/boneyard/diario-comidas"
   ],
   "wait": 1500

@@ -28,17 +28,8 @@ import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPl
 import { getWeeklyMenus } from '@/services/menu';
 import { getPlayerSupplementation } from '@/services/supplement';
 import { resolvePlayerSupplementsData } from '@/lib/supplementation-helper';
-import {
-  IconArrowsLeftRight,
-  IconBrain,
-  IconCheck,
-  IconDownload,
-  IconEdit,
-  IconPlus,
-  IconSparkles,
-  IconTrash,
-  IconChevronDown,
-} from '@tabler/icons-react';
+import { IconDownload, IconArrowsLeftRight, IconPlus, IconSparkles, IconEdit, IconCheck, IconTrash, IconChevronDown } from '@tabler/icons-react';
+import SubtabHeader from '../SubtabHeader';
 import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/nutrition-plan-card';
 import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getTeamNutritionDayTypes } from '@/lib/calculations';
 import { getUserMeals } from '@/lib/nutrition-day-types';
@@ -800,13 +791,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         <Stack gap="md">
           <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
             <Group gap="xs" style={{ flex: 1 }}>
-              <IconBrain size={22} color="var(--mantine-color-blue-filled)" />
-              <Stack gap={2}>
-                <Title order={3} fw={800} c="dark.4">Planes nutricionales</Title>
-                <Text size="sm" c="dimmed">
-                  Fichas con métricas, macros y pautas.
-                </Text>
-              </Stack>
+              <SubtabHeader tab="nutricion" subtab="plan" />
             </Group>
 
             {!isMobile && (

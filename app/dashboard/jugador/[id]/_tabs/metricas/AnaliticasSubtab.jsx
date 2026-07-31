@@ -12,13 +12,12 @@ import {
   Stack,
   Table,
   Text,
-  ThemeIcon,
-  Title,
   Tooltip,
   Collapse,
   ActionIcon,
 } from '@mantine/core';
-import { useMediaQuery, useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import SubtabHeader from '../SubtabHeader';
 import dayjs from 'dayjs';
 import { notifications } from '@mantine/notifications';
 import { uploadAnalitica, deleteAnalitica, toggleAnaliticaVisibility } from '@/services/analytic';
@@ -260,15 +259,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
         <Stack gap="sm">
           <Group justify="space-between" align="flex-start" wrap="nowrap">
             <Group gap="xs" style={{ flex: 1 }}>
-              <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
-                <IconReportMedical size={20} />
-              </ThemeIcon>
-              <Stack gap={2}>
-                <Title order={3} fw={800} c="dark.4">Analíticas</Title>
-                <Text size="sm" c="dimmed">
-                  Documentos clínicos destacados.
-                </Text>
-              </Stack>
+              <SubtabHeader tab="metricas" subtab="analiticas" readOnly={readOnly} />
             </Group>
 
             {!readOnly && !isMobile && (

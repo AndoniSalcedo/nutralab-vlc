@@ -1,8 +1,8 @@
 'use client';
 
 import { Box, Paper, SegmentedControl, Stack } from '@mantine/core';
-import { IconMail, IconUser, IconCalendar } from '@tabler/icons-react';
 import { tabLabel } from './tab-label';
+import { getSubtabControlData } from './subtab-config';
 import MensajesSubtab from './resumen/MensajesSubtab';
 import PerfilSubtab from './resumen/PerfilSubtab';
 import DiarioComidasSubtab from './resumen/DiarioComidasSubtab';
@@ -11,6 +11,7 @@ export default function ResumenTab({ jugador, evoluciones = [], messages = [], a
   return (
     <Stack gap={0}>
       <Paper
+        data-boneyard-ignore="true"
         p="xs"
         bg="white"
         radius={0}
@@ -33,11 +34,7 @@ export default function ResumenTab({ jugador, evoluciones = [], messages = [], a
           radius="xl"
           size="sm"
           bg="gray.1"
-          data={[
-            { value: 'perfil', label: tabLabel(IconUser, 'Perfil') },
-            { value: 'diario', label: tabLabel(IconCalendar, 'Diario de comidas', 'Diario') },
-            { value: 'mensajes', label: tabLabel(IconMail, 'Mensajes') },
-          ]}
+          data={getSubtabControlData('resumen', tabLabel)}
           styles={{
             root: { border: 'none', width: '100%' },
             indicator: { boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },

@@ -26,11 +26,11 @@ import {
   Stack,
   Table,
   Text,
-  ThemeIcon,
   Title,
   ScrollArea,
 } from '@mantine/core';
-import { useMediaQuery, useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import SubtabHeader from '../SubtabHeader';
 import MeasurementModal from '@/components/modals/MeasurementModal';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
@@ -337,15 +337,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         <Stack gap="sm">
           <Group justify="space-between" align="flex-start" wrap="nowrap">
             <Group gap="xs" style={{ flex: 1 }}>
-              <ThemeIcon color="cyan" variant="light" radius="xl" size="lg">
-                <IconRuler2 size={20} />
-              </ThemeIcon>
-              <Stack gap={2}>
-                <Title order={3} fw={800} c="dark.4">Composición</Title>
-                <Text size="sm" c="dimmed">
-                  Historial de medidas y evolución del jugador.
-                </Text>
-              </Stack>
+              <SubtabHeader tab="metricas" subtab="mediciones" />
             </Group>
 
             {!readOnly && !isMobile && (

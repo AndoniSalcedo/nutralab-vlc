@@ -20,7 +20,6 @@ import { DateInput } from '@mantine/dates';
 
 import {
   IconClipboardList,
-  IconUser,
   IconChevronLeft,
   IconChevronRight,
   IconFlame,
@@ -35,6 +34,7 @@ import { latestMetricValue } from '@/lib/player-metrics';
 import { listPlayerMeals } from '@/services/meal';
 import { getAiPlans } from '@/services/plan';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
+import { getSubtabHeader } from '../subtab-config';
 import foods from '@/data/foods';
 
 const calcNutrient = (food, grams, key) => {
@@ -97,10 +97,10 @@ function getDayInfo(date) {
   const diff = temp.getDate() - day + (day === 0 ? -6 : 1);
   const monday = new Date(temp.setDate(diff));
   const mondayStr = monday.toLocaleDateString('sv-SE', { timeZone: 'Europe/Madrid' });
-  
+
   const keys = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
   const dayKey = keys[day];
-  
+
   return { mondayStr, dayKey };
 }
 
@@ -166,12 +166,12 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
       })
     ]).then(([mealsData, plansData]) => {
       if (!active) return;
-      
+
       setMeals(mealsData || []);
       setLoadingMeals(false);
-      
+
       const matchingPlan = plansData.planes?.[0] || null;
-      
+
       if (matchingPlan) {
         const planDayType = matchingPlan.datos?.dias?.[dayKey]?.tipoDia;
         if (planDayType) {
@@ -249,6 +249,9 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
   const activeIdx = DAY_TYPES.findIndex(d => d.value === activeDayType);
   const activeDay = DAY_TYPES[activeIdx !== -1 ? activeIdx : 0] || {};
 
+  const headerConfig = getSubtabHeader('resumen', 'perfil');
+  const HeaderIcon = headerConfig.icon;
+
   return (
     <Stack gap={0}>
       {/* Tab Header Banner */}
@@ -262,13 +265,13 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
       >
         <Group justify="space-between" align="center" wrap="wrap" gap="sm">
           <Group gap="xs">
-            <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
-              <IconUser size={20} />
+            <ThemeIcon color={headerConfig.iconColor} variant="light" radius="xl" size="lg">
+              <HeaderIcon size={20} />
             </ThemeIcon>
             <Box>
-              <Title order={3} fw={800} c="dark.4">Perfil del jugador</Title>
+              <Title order={3} fw={800} c="dark.4">{headerConfig.title}</Title>
               <Text size="sm" c="dimmed">
-                {readOnly ? 'Objetivos y pautas semanales.' : 'Objetivos, preferencias y ajustes individuales.'}
+                {readOnly ? (headerConfig.subtitleReadOnly || headerConfig.subtitle) : headerConfig.subtitle}
               </Text>
             </Box>
           </Group>
@@ -288,7 +291,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
                   </ThemeIcon>
                   <Stack gap={2}>
                     <Title order={3} fw={800} c="dark.4">Balance Nutricional</Title>
-                    <Text size="sm" c="dimmed">Progreso diario según la exigencia del entrenamiento</Text>
+                    <Text size="sm" c="dimmed">Progreso diario según</Text>
                   </Stack>
                 </Group>
 
@@ -307,7 +310,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
                   >
                     <IconChevronLeft size={18} />
                   </ActionIcon>
-                  
+
                   <DateInput
                     value={new Date(selectedDate)}
                     onChange={(val) => val && setSelectedDate(val)}

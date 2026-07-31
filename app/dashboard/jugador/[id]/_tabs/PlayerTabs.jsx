@@ -44,8 +44,8 @@ export default function PlayerTabs({
 
   const validSubtabs = {
     resumen: ['perfil', 'diario', 'mensajes'],
-    metricas: readOnly 
-      ? ['mediciones', 'hidratacion', 'protocolos'] 
+    metricas: readOnly
+      ? ['mediciones', 'hidratacion', 'protocolos']
       : ['mediciones', 'analiticas', 'hidratacion', 'protocolos'],
     nutricion: ['plan', 'suplementacion', 'menu'],
   };
@@ -86,7 +86,7 @@ export default function PlayerTabs({
         <Tabs.Tab value="nutricion" leftSection={<IconSalad size={18} />} style={activeTabStyle('nutricion')}>Nutrición</Tabs.Tab>
       </Tabs.List>
 
-      <Box mt="md">
+      <Box>
         {children ? children : (
           <>
             <Tabs.Panel value="resumen">

@@ -1,8 +1,8 @@
 'use client';
 
 import { Box, Paper, SegmentedControl, Stack } from '@mantine/core';
-import { IconBottle, IconBrain, IconChefHat } from '@tabler/icons-react';
 import { tabLabel } from './tab-label';
+import { getSubtabControlData } from './subtab-config';
 import PlanSubtab from './nutricion/PlanSubtab';
 import SuplementacionSubtab from './nutricion/SuplementacionSubtab';
 import MenuSemanalSubtab from './nutricion/MenuSemanalSubtab';
@@ -11,6 +11,7 @@ export default function NutricionTab({ jugador, menus = [], activeSubtab, onSubt
   return (
     <Stack gap={0}>
       <Paper
+        data-boneyard-ignore="true"
         p="xs"
         bg="white"
         radius={0}
@@ -33,11 +34,7 @@ export default function NutricionTab({ jugador, menus = [], activeSubtab, onSubt
           radius="xl"
           size="sm"
           bg="gray.1"
-          data={[
-            { value: 'plan', label: tabLabel(IconBrain, 'Plan nutricional', 'Plan') },
-            { value: 'suplementacion', label: tabLabel(IconBottle, 'Suplementación', 'Supl.') },
-            { value: 'menu', label: tabLabel(IconChefHat, 'Menú semanal', 'Menú') },
-          ]}
+          data={getSubtabControlData('nutricion', tabLabel)}
           styles={{
             root: { border: 'none', width: '100%' },
             indicator: { boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },

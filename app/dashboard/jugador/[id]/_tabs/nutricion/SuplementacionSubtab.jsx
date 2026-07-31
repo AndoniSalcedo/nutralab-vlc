@@ -14,10 +14,10 @@ import {
   Stack,
   Text,
   ThemeIcon,
-  Title,
   Collapse,
 } from '@mantine/core';
-import { useMediaQuery, useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import SubtabHeader from '../SubtabHeader';
 import PlayerSupplementModal from '@/components/modals/PlayerSupplementModal';
 import { notifications } from '@mantine/notifications';
 import { getPlayerSupplementation, postPlayerSupplementation } from '@/services/supplement';
@@ -368,15 +368,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
         <Stack gap="md">
           <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
             <Group gap="xs" style={{ flex: 1 }}>
-              <ThemeIcon color="grape" variant="light" radius="xl" size="lg">
-                <IconBottle size={20} />
-              </ThemeIcon>
-              <Stack gap={2}>
-                <Title order={3} fw={800} c="dark.4">Suplementación</Title>
-                <Text size="sm" c="dimmed">
-                  Asignación de catálogos de suplementación.
-                </Text>
-              </Stack>
+              <SubtabHeader tab="nutricion" subtab="suplementacion" />
             </Group>
 
             {canManage && !isMobile && (
