@@ -15,6 +15,7 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { DatePickerInput } from '@mantine/dates';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconPlus, IconPhoto, IconCalendar } from '@tabler/icons-react';
 
 import NothingFound from '@/components/NothingFound';
@@ -61,6 +62,7 @@ const MEAL_TYPES = [
 ];
 
 export default function DiarioComidasSubtab({ jugador, readOnly = false, initialMeals }) {
+  const isMobile = useMediaQuery('(max-width: 48em)');
   const [loading, setLoading] = useState(initialMeals ? false : true);
   const [meals, setMeals] = useState(initialMeals || []);
 
@@ -153,7 +155,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false, initial
           style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
         >
           <Stack gap="sm">
-            <Group justify="space-between" align="center" gap="sm" wrap="wrap">
+            <Group justify="space-between" align={isMobile ? 'stretch' : 'center'} style={{ flexDirection: isMobile ? 'column' : 'row' }} gap="sm">
               <Group gap="xs">
                 <ThemeIcon color="blue" variant="light" radius="xl" size="lg">
                   <IconCalendar size={20} />
@@ -169,11 +171,12 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false, initial
               {!readOnly && (
                 <Button
                   id='btn-add-meal'
-                  size="md"
+                  size="xs"
                   radius="xl"
-                  leftSection={<IconPlus size={18} />}
+                  color="dark"
+                  leftSection={<IconPlus size={16} />}
                   onClick={openNewMeal}
-                  color="blue"
+                  fullWidth={isMobile}
                 >
                   Registrar
                 </Button>

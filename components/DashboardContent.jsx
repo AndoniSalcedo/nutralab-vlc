@@ -751,7 +751,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                       {/* COLUMNA 5: ACCIONES */}
                       <Table.Td>
                         <Group gap={4} justify="flex-end" wrap="nowrap">
-                          <Menu shadow="md" width={220} position="bottom-end" withArrow radius="md">
+                          <Menu shadow="md" width={220} position="bottom-end" withArrow radius="md" keepMounted>
                             <Menu.Target>
                               <ActionIcon
                                 variant="subtle"

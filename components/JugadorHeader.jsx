@@ -77,7 +77,7 @@ function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, compact = false }) 
 
   if (compact) {
     return (
-      <Menu shadow="md" width={230} position="bottom-end" withArrow radius="md">
+      <Menu shadow="md" width={230} position="bottom-end" withArrow radius="md" keepMounted>
         <Menu.Target>
           <ActionIcon variant="light" color="gray" radius="xl" size={48}>
             <IconMenu2 size={24} stroke={1.7} />
