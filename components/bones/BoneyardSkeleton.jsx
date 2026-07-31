@@ -11,6 +11,18 @@ import _team_evolution from './team-evolution.bones.json';
 import _team_menu from './team-menu.bones.json';
 import _team_analytics from './team-analytics.bones.json';
 import _team_config from './team-config.bones.json';
+
+import _player_dashboard_resumen_perfil from './player-dashboard-resumen-perfil.bones.json';
+import _player_dashboard_resumen_diario from './player-dashboard-resumen-diario.bones.json';
+import _player_dashboard_resumen_mensajes from './player-dashboard-resumen-mensajes.bones.json';
+import _player_dashboard_metricas_mediciones from './player-dashboard-metricas-mediciones.bones.json';
+import _player_dashboard_metricas_analiticas from './player-dashboard-metricas-analiticas.bones.json';
+import _player_dashboard_metricas_hidratacion from './player-dashboard-metricas-hidratacion.bones.json';
+import _player_dashboard_metricas_protocolos from './player-dashboard-metricas-protocolos.bones.json';
+import _player_dashboard_nutricion_plan from './player-dashboard-nutricion-plan.bones.json';
+import _player_dashboard_nutricion_suplementacion from './player-dashboard-nutricion-suplementacion.bones.json';
+import _player_dashboard_nutricion_menu from './player-dashboard-nutricion-menu.bones.json';
+
 import _player_dashboard_resumen from './player-dashboard-resumen.bones.json';
 import _player_dashboard_metricas from './player-dashboard-metricas.bones.json';
 import _player_dashboard_nutricion from './player-dashboard-nutricion.bones.json';
@@ -25,9 +37,22 @@ const bonesMap = {
   'team-menu': _team_menu,
   'team-analytics': _team_analytics,
   'team-config': _team_config,
-  'player-dashboard-resumen': _player_dashboard_resumen,
-  'player-dashboard-metricas': _player_dashboard_metricas,
-  'player-dashboard-nutricion': _player_dashboard_nutricion,
+
+  'player-dashboard-resumen-perfil': _player_dashboard_resumen_perfil,
+  'player-dashboard-resumen-diario': _player_dashboard_resumen_diario,
+  'player-dashboard-resumen-mensajes': _player_dashboard_resumen_mensajes,
+  'player-dashboard-metricas-mediciones': _player_dashboard_metricas_mediciones,
+  'player-dashboard-metricas-analiticas': _player_dashboard_metricas_analiticas,
+  'player-dashboard-metricas-hidratacion': _player_dashboard_metricas_hidratacion,
+  'player-dashboard-metricas-protocolos': _player_dashboard_metricas_protocolos,
+  'player-dashboard-nutricion-plan': _player_dashboard_nutricion_plan,
+  'player-dashboard-nutricion-suplementacion': _player_dashboard_nutricion_suplementacion,
+  'player-dashboard-nutricion-menu': _player_dashboard_nutricion_menu,
+
+  'player-dashboard-resumen': _player_dashboard_resumen_perfil || _player_dashboard_resumen,
+  'player-dashboard-metricas': _player_dashboard_metricas_mediciones || _player_dashboard_metricas,
+  'player-dashboard-nutricion': _player_dashboard_nutricion_plan || _player_dashboard_nutricion,
+
   'diario-comidas': _diario_comidas,
   'balance-nutricional': _balance_nutricional,
 };

@@ -16,7 +16,9 @@ export default function PlayerSubtabLoading() {
   const controlData = getSubtabControlData(tab, tabLabel);
   const header = getSubtabHeader(tab, activeSubtab);
   const HeaderIcon = header?.icon;
-  const skeletonName = `player-dashboard-${tab}`;
+  const skeletonName = activeSubtab
+    ? `player-dashboard-${tab}-${activeSubtab}`
+    : `player-dashboard-${tab}`;
 
   return (
     <Stack gap={0}>

@@ -31,7 +31,7 @@ export default function BoneyardPlayerDashboard() {
   };
 
   return (
-    <BoneyardSkeleton name="player-dashboard-nutricion" loading={false}>
+    <BoneyardSkeleton name="player-dashboard-nutricion-plan" loading={false}>
       <JugadorHeader jugador={jugador} user={mockUser} />
       <PlayerTabs
         jugador={jugador}
@@ -41,6 +41,7 @@ export default function BoneyardPlayerDashboard() {
         messages={messages}
         menus={menus}
         activeTab="nutricion"
+        activeSubtab="plan"
         readOnly={false}
       />
     </BoneyardSkeleton>
