@@ -63,9 +63,8 @@ export default function TeamSupplementationDashboard({
       <Stack gap="lg">
       <Paper
         p={{ base: 'sm', sm: 'md' }}
-        shadow="sm"
-        radius="xl"
-        withBorder
+        shadow="xs"
+        radius={24}
         style={{
           background: 'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
         }}

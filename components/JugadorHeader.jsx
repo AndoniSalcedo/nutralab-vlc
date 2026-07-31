@@ -163,10 +163,9 @@ function PlayerIdentity({ jugador, isAdmin, hasCredentials, avatarSize = 84, tit
 function JugadorHeaderDesktop({ jugador, isAdmin, isPlayer, hasCredentials, onEdit }) {
   return (
     <Paper
-      radius="lg"
+      radius={24}
       p="lg"
-      withBorder
-      shadow="sm"
+      shadow="xs"
       bg="white"
       mb="md"
     >

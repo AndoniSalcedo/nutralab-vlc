@@ -166,7 +166,7 @@ export default function TecnicosManager({ teams = [] }) {
 
   return (
     <Stack gap="lg">
-      <Paper p={{ base: 'sm', sm: 'md' }} shadow="sm" radius="lg" withBorder bg="white">
+      <Paper p={{ base: 'sm', sm: 'md' }} shadow="xs" radius={24} bg="white">
         <Group justify="space-between" align="center" wrap="wrap" gap="md">
           <Group gap="sm">
             <ThemeIcon color="dark" variant="light" radius="md" size={42}>

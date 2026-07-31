@@ -8,7 +8,7 @@ export default async function DashboardLayout({ children }) {
   if (!user) redirect('/login');
   if (user.role === 'jugador') {
     return (
-      <Box bg="gray.0" mih="100vh" pt={ {sm: "md", base: 0}}>
+      <Box bg="white" mih="100vh" pt={ {sm: "md", base: 0}}>
         <Container size="xl" p={0}>
           {children}
         </Container>

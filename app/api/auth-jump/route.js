@@ -6,6 +6,8 @@ import { env } from '@/lib/env';
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get('token');
+  const url = searchParams.get('url') || '/dashboard';
+  console.log(url)
 
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url), 303);
@@ -23,7 +25,7 @@ export async function GET(request) {
       role: 'admin'
     };
 
-    const response = NextResponse.redirect(new URL('/dashboard', request.url), 303);
+    const response = NextResponse.redirect(new URL(url, request.url), 303);
 
     response.cookies.set(COOKIE_NAME, buildSessionValue(sessionObj), {
       httpOnly: true,

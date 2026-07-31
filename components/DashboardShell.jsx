@@ -21,6 +21,7 @@ import {
   UnstyledButton,
 } from '@mantine/core';
 import { useRouter } from 'next/navigation';
+import cx from 'clsx';
 
 import classes from './DashboardShell.module.css';
 import Logo from './Logo';
@@ -49,15 +50,16 @@ export default function DashboardShell({ children, user }) {
           >
             <Menu.Target>
               <UnstyledButton
-                className={`${classes.user} ${opened ? classes.userActive : ''}`}
+                className={cx(classes.user, { [classes.userActive]: opened })}
               >
                 <Group gap={2}>
                   <Avatar
                     src={undefined}
-                    alt={user?.name || "Avatar"}
+                    alt={user?.name}
                     radius="xl"
-                    size={42} >
-                    {initials(user?.name || user?.username || user?.email || "Usuario")}
+                    size={42} 
+                  >
+                    {initials(user?.name || user?.username || user?.email)}
                   </Avatar>
                   <IconChevronDown size={16} stroke={1.5} />
                 </Group>
