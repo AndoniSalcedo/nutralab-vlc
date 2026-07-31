@@ -60,13 +60,15 @@ function DashboardStat({ title, icon: Icon, color = 'blue', value, description, 
           <Text fw={400} c="dimmed" fz={10} tt="uppercase" lts={0.6} truncate style={{ whiteSpace: 'nowrap' }}>
             {title}
           </Text>
-          <Group gap={6} align="baseline" wrap="nowrap">
-            <Text fw={700} size="sm" c="#24291f" lh={1.1} style={{ whiteSpace: 'nowrap' }}>
+          <Group gap={6} align="baseline" wrap="nowrap" style={{ minWidth: 0, width: '100%' }}>
+            <Text fw={700} fz={{ base: 11, xs: 12, sm: 14 }} c="#24291f" lh={1.2} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 1 }}>
               {value}
             </Text>
-            <Text size="xs" c="dimmed" truncate visibleFrom="sm" style={{ whiteSpace: 'nowrap' }}>
-              {description}
-            </Text>
+            {description && (
+              <Text size="xs" c="dimmed" visibleFrom="sm" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 2 }}>
+                {description}
+              </Text>
+            )}
           </Group>
         </Box>
         {isClickable && (
