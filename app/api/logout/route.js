@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { COOKIE_NAME, getUser } from '@/lib/auth';
-import { env } from '@/lib/env';
+import { env } from '@/config/env';
 
 export async function POST(request) {
   const user = await getUser();

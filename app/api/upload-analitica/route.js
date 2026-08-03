@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { forbidden, getOwnedPlayer } from '@/lib/team-access';
 import Anthropic from '@anthropic-ai/sdk';
-import { env } from '@/lib/env';
+import { env } from '@/config/env';
 import {
   insertAnalytics,
   getAnalyticsById,

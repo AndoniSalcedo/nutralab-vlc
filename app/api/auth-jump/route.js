@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { buildSessionValue, COOKIE_NAME } from '@/lib/auth';
-import { env } from '@/lib/env';
+import { env } from '@/config/env';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);

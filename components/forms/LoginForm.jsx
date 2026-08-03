@@ -31,7 +31,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 import { login } from '@/services/auth';
-import { env } from '@/lib/env';
+import { env } from '@/config/env';
 import { useMediaQuery } from '@mantine/hooks';
 
 const highlights = [

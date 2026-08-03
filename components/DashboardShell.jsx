@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { initials } from '@/lib/utils';
-import { env } from '@/lib/env';
+import { env } from '@/config/env';
 import {
   IconChevronDown,
   IconLogout,
