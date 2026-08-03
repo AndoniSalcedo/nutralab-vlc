@@ -37,7 +37,7 @@ import {
 import { savePlayerMeal } from '@/services/meal';
 import { compressFoodPhoto } from '@/lib/compress';
 import { notifications } from '@mantine/notifications';
-import foods from '@/data/foods';
+import { useFoods } from '@/lib/use-foods';
 
 const MEAL_TYPES = [
   { value: 'breakfast', label: 'Desayuno' },
@@ -110,6 +110,7 @@ const toValidDate = (value) => {
 };
 
 export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
+  const { foods, loading: foodsLoading } = useFoods();
   const [saving, setSaving] = useState(false);
 
   const [takenAt, setTakenAt] = useState(new Date());
@@ -161,14 +162,14 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
     }
     calcIdRef.current = nextId;
     setCalculatedFoods(initialCalculated);
-  }, [meal]);
+  }, [meal, foods]);
 
   const foodOptions = useMemo(
-    () => foods.map((food, index) => ({
-      value: String(index),
+    () => foods.map((food) => ({
+      value: food.id,
       label: food.name,
     })),
-    []
+    [foods]
   );
 
   const calculatedTotals = useMemo(() => calculatedFoods.reduce((acc, item) => ({
@@ -191,7 +192,7 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
   };
 
   const handleAddCalculatedFood = () => {
-    const food = foods[Number(foodValue)];
+    const food = foods.find((item) => item.id === foodValue);
     const grams = Number(foodGrams);
 
     if (!food || !Number.isFinite(grams) || grams <= 0) {
@@ -463,9 +464,10 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
               searchable
               clearable
               limit={25}
+              disabled={foodsLoading}
               variant="filled"
               radius="md"
-              nothingFoundMessage="No hay alimentos"
+              nothingFoundMessage={foodsLoading ? 'Cargando alimentos…' : 'No hay alimentos'}
             />
             <Group gap="xs" wrap="nowrap" align="flex-start">
               <NumberInput

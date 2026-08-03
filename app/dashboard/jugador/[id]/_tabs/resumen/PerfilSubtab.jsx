@@ -65,7 +65,7 @@ import { listPlayerMeals } from '@/services/meal';
 import { getAiPlans } from '@/services/plan';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import { getSubtabHeader } from '../subtab-config';
-import foods from '@/data/foods';
+import { useFoods } from '@/lib/use-foods';
 import JugadorHeader from '@/components/JugadorHeader';
 import { usePlayerDashboard } from '../PlayerDashboardContext';
 import classes from '../SubtabSectionHeader.module.css';
@@ -79,7 +79,7 @@ const calcNutrient = (food, grams, key) => {
 
 const roundMacro = (value) => Math.round(value * 10) / 10;
 
-function calculateConsumedStats(meals) {
+function calculateConsumedStats(meals, foods) {
   let kcal = 0;
   let cho = 0;
   let pro = 0;
@@ -179,6 +179,7 @@ function PremiumMacroBar({ label, color, consumed, target, icon: IconComponent }
 }
 
 export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = false }) {
+  const { foods } = useFoods();
   const { user } = usePlayerDashboard();
   const [meals, setMeals] = useState([]);
   const [loadingMeals, setLoadingMeals] = useState(true);
@@ -229,7 +230,7 @@ export default function PerfilSubtab({ jugador, evoluciones = [], readOnly = fal
     };
   }, [jugador?.id, selectedDate]);
 
-  const consumed = useMemo(() => calculateConsumedStats(meals), [meals]);
+  const consumed = useMemo(() => calculateConsumedStats(meals, foods), [meals, foods]);
 
   const pesoActual = latestMetricValue(evoluciones, 'peso_kg', jugador?.peso_kg);
   const weightKg = Number(pesoActual || 0);

@@ -3,18 +3,24 @@
 import { useMemo, useState } from 'react';
 import { Card, Text, Group, Select, NumberInput, Grid, ThemeIcon, Stack, Title, Badge, Paper } from '@mantine/core';
 import { IconFlame, IconMeat, IconWheat, IconDroplet, IconScale } from '@tabler/icons-react';
-import foods from '@/data/foods';
+import { useFoods } from '@/lib/use-foods';
+
+const EMPTY_FOOD = { kcal: 0, cho: 0, pro: 0, fat: 0 };
 
 export default function FoodCalculator() {
+  const { foods, loading } = useFoods();
   const foodOptions = useMemo(
-    () => foods.map((food, index) => ({ value: String(index), label: food.name })),
-    []
+    () => foods.map((food) => ({ value: food.id, label: food.name })),
+    [foods]
   );
 
-  const [foodId, setFoodId] = useState('0');
+  const [foodId, setFoodId] = useState(null);
   const [grams, setGrams] = useState(100);
 
-  const food = foods[Number(foodId)] || foods[0];
+  const food = useMemo(
+    () => foods.find((item) => item.id === foodId) || foods[0] || EMPTY_FOOD,
+    [foods, foodId]
+  );
   
   const result = useMemo(() => {
     const g = Number(grams || 0) / 100;
@@ -46,10 +52,11 @@ export default function FoodCalculator() {
               placeholder="Escribe para buscar un alimento o plato"
               data={foodOptions}
               value={foodId}
-              onChange={(value) => setFoodId(value || '0')}
+              onChange={setFoodId}
               searchable
               limit={50}
-              nothingFoundMessage="No hay alimentos con ese nombre"
+              disabled={loading}
+              nothingFoundMessage={loading ? 'Cargando alimentos…' : 'No hay alimentos con ese nombre'}
               radius="md"
               size="md"
             />
