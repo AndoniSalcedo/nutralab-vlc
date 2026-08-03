@@ -143,7 +143,6 @@ function defaultReportForm(teamConfig) {
       enabled: false,
       diaPartido: 'sabado',
       horario: 'tarde',
-      texto: '',
     },
   };
 }

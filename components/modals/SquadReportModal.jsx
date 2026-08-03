@@ -31,6 +31,12 @@ import {
   IconTrophy,
 } from '@tabler/icons-react';
 
+const MATCH_SCHEDULE_OPTIONS = [
+  { label: 'Mañana', value: 'manana' },
+  { label: 'Tarde', value: 'tarde' },
+  { label: 'Noche', value: 'noche' },
+];
+
 const SQUAD_GENERATION_MESSAGES = [
   "Iniciando procesamiento de plantilla...",
   "Cargando métricas físicas y composición corporal...",
@@ -387,7 +393,7 @@ export default function SquadReportModal({
                     texto: reportForm.preMatchConfig?.texto || '',
                   });
                 }}
-                label="Especificar comidas 24h antes para la plantilla"
+                label="Aplicar rutinas 24h pre-partido personalizadas a la plantilla"
                 size="xs"
               />
             </Group>
@@ -399,25 +405,21 @@ export default function SquadReportModal({
                     const dayKey = d.key;
                     const dayConfig = reportForm.preMatchConfig?.partidos?.[dayKey] || {
                       horario: reportForm.preMatchConfig?.horario || 'tarde',
-                      texto: reportForm.preMatchConfig?.texto || '',
                     };
 
                     return (
                       <Paper key={dayKey} p="xs" radius="md" withBorder bg="white">
-                        <Group justify="space-between" align="center" mb="xs">
+                        <Group justify="space-between" align="center" mb="xs" wrap="wrap">
                           <Badge color="red" variant="filled" size="md">
                             Partido del {d.label}
                           </Badge>
 
-                          <Stack gap={2} style={{ maxWidth: '220px' }}>
+                          <Stack gap={2} style={{ flexGrow: 1, maxWidth: '300px', minWidth: '240px' }}>
                             <Text size="xs" fw={600} c="dimmed">Horario del partido</Text>
                             <SegmentedControl
                               size="xs"
                               fullWidth
-                              data={[
-                                { label: 'Tarde / Noche', value: 'tarde' },
-                                { label: 'Mañana', value: 'manana' },
-                              ]}
+                              data={MATCH_SCHEDULE_OPTIONS}
                               value={dayConfig.horario || 'tarde'}
                               onChange={(val) =>
                                 updateReportField('preMatchConfig', {
@@ -427,7 +429,6 @@ export default function SquadReportModal({
                                     [dayKey]: {
                                       ...(reportForm.preMatchConfig?.partidos?.[dayKey] || {}),
                                       horario: val,
-                                      texto: dayConfig.texto || '',
                                     },
                                   },
                                 })
@@ -436,38 +437,15 @@ export default function SquadReportModal({
                           </Stack>
                         </Group>
 
-                        <Textarea
-                          label={`Indicaciones de menú 24h previas al partido del ${d.label}`}
-                          placeholder={
-                            dayConfig.horario === 'manana'
-                              ? 'Ej:\nComida (día anterior): Arroz con pechuga de pollo.\nMerienda: Yogur con frutos secos.\nCena (día anterior): Salmón con patata cocida.\nDesayuno pre-partido: Tortitas de avena y plátano...'
-                              : 'Ej:\nCena (día anterior): Arroz blanco con pavo a la plancha.\nDesayuno: Tostadas de pan con mermelada y zumo.\nComida pre-partido: Pasta blanca con pechuga de pollo...'
-                          }
-                          value={dayConfig.texto || ''}
-                          onChange={(event) => {
-                            const textVal = event.currentTarget.value;
-                            updateReportField('preMatchConfig', {
-                              ...(reportForm.preMatchConfig || {}),
-                              partidos: {
-                                ...(reportForm.preMatchConfig?.partidos || {}),
-                                [dayKey]: {
-                                  ...(reportForm.preMatchConfig?.partidos?.[dayKey] || {}),
-                                  horario: dayConfig.horario || 'tarde',
-                                  texto: textVal,
-                                },
-                              },
-                            });
-                          }}
-                          rows={3}
-                          size="xs"
-                          description={`Estas comidas sobreescribirán el menú del comedor para las 24h previas al partido del ${d.label} en la plantilla.`}
-                        />
+                        <Text size="xs" c="dimmed" mt="xs">
+                          Para cada jugador de la plantilla se inyectarán de forma independiente las ingestas, recomendaciones y pauta de 24h previas que tenga personalizadas en su perfil para partidos por la <strong>{dayConfig.horario === 'manana' ? 'Mañana' : dayConfig.horario === 'noche' ? 'Noche' : 'Tarde'}</strong>.
+                        </Text>
                       </Paper>
                     );
                   })
                 ) : (
                   <Text size="xs" c="orange.8" fw={500} p="xs">
-                    Sin días de partido asignados en la plantilla. Selecciona &quot;Partido&quot; en al menos un día del calendario superior para configurar sus 24h previas.
+                    Sin días de partido asignados en el calendario superior. Selecciona &quot;Partido&quot; en al menos un día del calendario para configurar el horario de juego.
                   </Text>
                 )}
               </Stack>

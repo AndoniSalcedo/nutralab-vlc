@@ -67,6 +67,14 @@ export async function POST(request) {
     objetivo: String(form.get('objetivo') || ''),
   };
 
+  if (form.has('config_prepartido')) {
+    try {
+      payload.config_prepartido = JSON.parse(String(form.get('config_prepartido')));
+    } catch {
+      payload.config_prepartido = {};
+    }
+  }
+
   if (id) {
     await updatePlayer(supabase, id, payload);
   } else {

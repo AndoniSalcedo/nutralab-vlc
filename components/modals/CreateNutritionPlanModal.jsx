@@ -17,6 +17,12 @@ import {
 import { IconBrain, IconSparkles, IconTrophy } from '@tabler/icons-react';
 import { getUserMeals } from '@/lib/nutrition-day-types';
 
+const MATCH_SCHEDULE_OPTIONS = [
+  { label: 'Mañana', value: 'manana' },
+  { label: 'Tarde', value: 'tarde' },
+  { label: 'Noche', value: 'noche' },
+];
+
 export default function CreateNutritionPlanModal({
   opened,
   onClose,
@@ -165,25 +171,21 @@ export default function CreateNutritionPlanModal({
                   matchDaysInCalendar.map((dayKey) => {
                     const dayConfig = modalPreMatchConfig?.partidos?.[dayKey] || {
                       horario: modalPreMatchConfig?.horario || 'tarde',
-                      texto: modalPreMatchConfig?.texto || '',
                     };
 
                     return (
                       <Paper key={dayKey} p="xs" radius="md" withBorder bg="white">
-                        <Group justify="space-between" align="center" mb="xs">
+                        <Group justify="space-between" align="center" mb="xs" wrap="wrap">
                           <Badge color="red" variant="filled" size="md">
                             Partido del {dayLabels[dayKey]}
                           </Badge>
 
-                          <Stack gap={2} style={{ maxWidth: '220px' }}>
+                          <Stack gap={2} style={{ flexGrow: 1, maxWidth: '300px', minWidth: '240px' }}>
                             <Text size="xs" fw={600} c="dimmed">Horario del partido</Text>
                             <SegmentedControl
                               size="xs"
                               fullWidth
-                              data={[
-                                { label: 'Tarde / Noche', value: 'tarde' },
-                                { label: 'Mañana', value: 'manana' },
-                              ]}
+                              data={MATCH_SCHEDULE_OPTIONS}
                               value={dayConfig.horario || 'tarde'}
                               onChange={(val) =>
                                 setModalPreMatchConfig((prev) => ({
@@ -193,7 +195,6 @@ export default function CreateNutritionPlanModal({
                                     [dayKey]: {
                                       ...(prev?.partidos?.[dayKey] || {}),
                                       horario: val,
-                                      texto: dayConfig.texto || '',
                                     },
                                   },
                                 }))
@@ -202,38 +203,15 @@ export default function CreateNutritionPlanModal({
                           </Stack>
                         </Group>
 
-                        <Textarea
-                          label={`Comidas de las 24 horas previas al partido del ${dayLabels[dayKey]}`}
-                          placeholder={
-                            dayConfig.horario === 'manana'
-                              ? 'Ej:\nComida (día anterior): Arroz con pechuga de pollo.\nMerienda: Yogur con frutos secos.\nCena (día anterior): Salmón con patata cocida.\nDesayuno pre-partido: Tortitas de avena y plátano...'
-                              : 'Ej:\nCena (día anterior): Arroz blanco con pavo a la plancha.\nDesayuno: Tostadas de pan con mermelada y zumo.\nComida pre-partido: Pasta blanca con pechuga de pollo...'
-                          }
-                          value={dayConfig.texto || ''}
-                          onChange={(e) => {
-                            const textVal = e.target.value;
-                            setModalPreMatchConfig((prev) => ({
-                              ...prev,
-                              partidos: {
-                                ...(prev?.partidos || {}),
-                                [dayKey]: {
-                                  ...(prev?.partidos?.[dayKey] || {}),
-                                  horario: dayConfig.horario || 'tarde',
-                                  texto: textVal,
-                                },
-                              },
-                            }));
-                          }}
-                          rows={3}
-                          size="xs"
-                          description={`Estas comidas sobreescribirán el menú del comedor para las 24h previas al partido del ${dayLabels[dayKey]} y se adaptarán a las ingestas de cada jugador.`}
-                        />
+                        <Text size="xs" c="dimmed" mt="xs">
+                          Al generar el plan con IA, se aplicarán automáticamente las ingestas, recomendaciones y pauta de 24h previas que este jugador tenga configuradas en su perfil para partidos por la <strong>{dayConfig.horario === 'manana' ? 'Mañana' : dayConfig.horario === 'noche' ? 'Noche' : 'Tarde'}</strong>.
+                        </Text>
                       </Paper>
                     );
                   })
                 ) : (
                   <Text size="xs" c="orange.8" fw={500} p="xs">
-                    Sin días de partido asignados en el calendario superior. Selecciona &quot;Partido&quot; en al menos un día del calendario para configurar sus 24h previas.
+                    Sin días de partido asignados en el calendario superior. Selecciona &quot;Partido&quot; en al menos un día del calendario para configurar su horario pre-partido.
                   </Text>
                 )}
               </Stack>

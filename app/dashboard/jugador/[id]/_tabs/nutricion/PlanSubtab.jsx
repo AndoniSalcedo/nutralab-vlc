@@ -345,7 +345,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     enabled: false,
     diaPartido: 'sabado',
     horario: 'tarde',
-    texto: '',
   });
 
   const teamConfig = jugador?.equipos?.configuracion_nutricional;
@@ -426,7 +425,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       enabled: false,
       diaPartido: matchDay,
       horario: 'tarde',
-      texto: '',
     });
 
     const meals = getUserMeals(jugador);

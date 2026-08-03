@@ -208,6 +208,13 @@ export default function PlayerForm({ initial, team }) {
                     onChange={(e) => setPostentreno(e.currentTarget.checked)}
                   />
                 </Group>
+
+                <Paper withBorder p="sm" radius="md" bg="blue.0" style={{ borderColor: 'var(--mantine-color-blue-3)' }}>
+                  <Text size="xs" fw={700} c="blue.9" mb={2}>Rutina 24h y Día de Partido</Text>
+                  <Text size="xs" c="dimmed">
+                    Una vez creado o guardado el jugador, podrás configurar sus ingestas específicas pre-partido para partidos por la Mañana, Tarde y Noche desde su ficha individual (pestaña Resumen &gt; Preferencias y contexto).
+                  </Text>
+                </Paper>
               </Stack>
             </div>
 
