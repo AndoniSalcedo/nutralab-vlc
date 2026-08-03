@@ -91,30 +91,60 @@ export async function POST(request) {
         return NextResponse.json({ error: 'La contraseña debe tener al menos 8 caracteres' }, { status: 400 });
       }
 
-      // Comprobar si ya existe el usuario
-      const existingUser = await findAuthUserByEmail(supabase, email);
-      if (existingUser) {
-        return NextResponse.json({ error: 'El email ya está registrado' }, { status: 400 });
+      // Comprobar primero si ya hay un técnico registrado con este email en la BD
+      const { data: existingTecnico } = await supabase
+        .from('tecnicos')
+        .select('id')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (existingTecnico) {
+        return NextResponse.json(
+          { error: 'Este email ya está registrado como técnico. Puedes iniciar sesión directamente.' },
+          { status: 400 }
+        );
       }
 
-      // 1. Crear el usuario en Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: {
-          role: 'tecnico',
-          name: `${nombre} ${apellidos}`.trim(),
-        },
-      });
+      // Comprobar si ya existe el usuario en Supabase Auth (por ejemplo, porque también es jugador)
+      const existingUser = await findAuthUserByEmail(supabase, email);
+      let authUserId = null;
+      let isNewAuthUser = false;
 
-      if (authError) throw authError;
+      if (existingUser) {
+        // Reutilizar usuario en Auth y actualizar contraseña y metadatos
+        authUserId = existingUser.id;
+        const { error: updateAuthError } = await supabase.auth.admin.updateUserById(authUserId, {
+          password,
+          email_confirm: true,
+          user_metadata: {
+            ...(existingUser.user_metadata || {}),
+            role: 'tecnico',
+            name: `${nombre} ${apellidos}`.trim(),
+          },
+        });
+        if (updateAuthError) throw updateAuthError;
+      } else {
+        // 1. Crear el usuario en Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: {
+            role: 'tecnico',
+            name: `${nombre} ${apellidos}`.trim(),
+          },
+        });
+
+        if (authError) throw authError;
+        authUserId = authData.user.id;
+        isNewAuthUser = true;
+      }
 
       // 2. Crear el técnico en la base de datos de teams
       const { data: tecnico, error: dbError } = await supabase
         .from('tecnicos')
         .insert({
-          auth_user_id: authData.user.id,
+          auth_user_id: authUserId,
           nombre,
           apellidos,
           email,
@@ -124,8 +154,10 @@ export async function POST(request) {
         .single();
 
       if (dbError) {
-        // Rollback Auth user creation if DB insert fails
-        await supabase.auth.admin.deleteUser(authData.user.id);
+        // Rollback Auth user creation ONLY if we created it in this request
+        if (isNewAuthUser && authUserId) {
+          await supabase.auth.admin.deleteUser(authUserId);
+        }
         throw dbError;
       }
 

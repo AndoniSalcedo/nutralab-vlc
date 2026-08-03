@@ -73,7 +73,7 @@ export default function TecnicoLoginForm() {
         setPassword('');
         setConfirmPassword('');
       } else {
-        await login(email, password);
+        await login(email, password, 'tecnico');
         router.push('/dashboard');
       }
     } catch (err) {

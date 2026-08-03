@@ -7,7 +7,7 @@ import { getPlayerByAuthUserIdSingle } from '@/repositories/playerRepository';
 
 export async function POST(request) {
   try {
-    const { email, password } = await request.json();
+    const { email, password, expectedRole } = await request.json();
     const cleanEmail = String(email || '').trim().toLowerCase();
 
     if (!cleanEmail || !password) {
@@ -32,24 +32,37 @@ export async function POST(request) {
 
     const supabaseUser = authData.user;
 
-    // Buscar al jugador en la tabla jugadores por su auth UUID
     const supabaseAdmin = getSupabaseAdmin();
-    const jugador = await getPlayerByAuthUserIdSingle(supabaseAdmin, supabaseUser.id);
+    let jugador = null;
+    let tecnico = null;
 
-    if (!jugador) {
-      const { data: tecnico } = await supabaseAdmin
+    // Si esperamos rol jugador (o no se especifica rol), buscamos en la tabla jugadores
+    if (expectedRole === 'jugador' || !expectedRole) {
+      jugador = await getPlayerByAuthUserIdSingle(supabaseAdmin, supabaseUser.id);
+    }
+
+    // Si esperamos rol técnico (o no se especifica rol y no era jugador), buscamos en tecnicos
+    if (!jugador && (expectedRole === 'tecnico' || !expectedRole)) {
+      const { data } = await supabaseAdmin
         .from('tecnicos')
         .select('id, nombre, apellidos')
         .eq('auth_user_id', supabaseUser.id)
         .maybeSingle();
+      tecnico = data;
+    }
 
-      if (!tecnico) {
-        return NextResponse.json(
-          { error: 'No se ha encontrado un perfil asociado a este email. Contacta con tu nutricionista.' },
-          { status: 403 }
-        );
-      }
+    if (!jugador && !tecnico) {
+      const errorMsg =
+        expectedRole === 'tecnico'
+          ? 'No se ha encontrado un perfil de técnico asociado a este email.'
+          : expectedRole === 'jugador'
+            ? 'No se ha encontrado un perfil de jugador asociado a este email. Contacta con tu nutricionista.'
+            : 'No se ha encontrado un perfil asociado a este email. Contacta con tu nutricionista.';
 
+      return NextResponse.json({ error: errorMsg }, { status: 403 });
+    }
+
+    if (tecnico) {
       // Crear la cookie de sesión con el rol de técnico
       const sessionObj = {
         id: tecnico.id,

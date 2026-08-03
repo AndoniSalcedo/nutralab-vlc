@@ -54,7 +54,7 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      await login(email, password, 'jugador');
 
       router.push('/dashboard');
     } catch (err) {
