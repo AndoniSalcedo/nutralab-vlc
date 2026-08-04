@@ -33,6 +33,7 @@ import {
   createTecnico,
   getTecnicos,
 } from '@/services/tecnico';
+import ConfirmModal from '@/components/modals/ConfirmModal';
 
 export default function TeamTecnicosConfig({ team, readOnly = false }) {
   const [tecnicos, setTecnicos] = useState([]);
@@ -44,6 +45,8 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
   const [addMode, setAddMode] = useState('existing'); // 'existing' | 'new'
   const [selectedTecnicoId, setSelectedTecnicoId] = useState(null);
   const [emailForm, setEmailForm] = useState('');
+  const [unassigningTecnico, setUnassigningTecnico] = useState(null);
+  const [unassigning, setUnassigning] = useState(false);
 
   async function loadTecnicos() {
     setLoading(true);
@@ -149,22 +152,23 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
     }
   }
 
-  async function handleUnassign(tecnico) {
-    const ok = window.confirm(
-      `¿Estás seguro de que deseas desvincular a ${tecnico.nombre} ${tecnico.apellidos || ''} de este equipo?`
-    );
-    if (!ok) return;
+  function handleUnassign(tecnico) {
+    setUnassigningTecnico(tecnico);
+  }
 
+  async function executeUnassign() {
+    if (!unassigningTecnico) return;
+    setUnassigning(true);
     try {
-      const newTeamIds = (tecnico.team_ids || []).filter(
+      const newTeamIds = (unassigningTecnico.team_ids || []).filter(
         (id) => String(id) !== String(team.id)
       );
-      await assignTeams(tecnico.id, newTeamIds);
+      await assignTeams(unassigningTecnico.id, newTeamIds);
 
       notifications.show({
         color: 'green',
         title: 'Técnico desvinculado',
-        message: `${tecnico.nombre} ya no tiene acceso a este equipo.`,
+        message: `${unassigningTecnico.nombre} ya no tiene acceso a este equipo.`,
       });
 
       await loadTecnicos();
@@ -174,6 +178,9 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
         title: 'Error',
         message: err.message,
       });
+    } finally {
+      setUnassigning(false);
+      setUnassigningTecnico(null);
     }
   }
 
@@ -385,6 +392,16 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
           </Tabs.Panel>
         </Tabs>
       </Modal>
+
+      <ConfirmModal
+        opened={unassigningTecnico !== null}
+        onClose={() => setUnassigningTecnico(null)}
+        onConfirm={executeUnassign}
+        title="Desvincular técnico"
+        message={`¿Estás seguro de que deseas desvincular a ${unassigningTecnico?.nombre || ''} ${unassigningTecnico?.apellidos || ''} de este equipo?`}
+        confirmLabel="Desvincular"
+        loading={unassigning}
+      />
     </Paper>
   );
 }

@@ -35,6 +35,7 @@ import {
   assignTeams,
   getTecnicos,
 } from '@/services/tecnico';
+import ConfirmModal from '@/components/modals/ConfirmModal';
 
 export default function TecnicosManager({ teams = [] }) {
   const [tecnicos, setTecnicos] = useState([]);
@@ -47,6 +48,8 @@ export default function TecnicosManager({ teams = [] }) {
   const [form, setForm] = useState({
     email: '',
   });
+  const [deletingTecnico, setDeletingTecnico] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const filteredTeamsGrouped = useMemo(() => {
     const needle = assignSearch.toLowerCase().trim();
@@ -110,18 +113,19 @@ export default function TecnicosManager({ teams = [] }) {
     }
   }
 
-  async function handleDelete(tecnico) {
-    const ok = window.confirm(
-      `¿Estás seguro de que deseas eliminar al técnico ${tecnico.nombre} ${tecnico.apellidos || ''}? Se eliminará su acceso por completo.`
-    );
-    if (!ok) return;
+  function handleDelete(tecnico) {
+    setDeletingTecnico(tecnico);
+  }
 
+  async function executeDelete() {
+    if (!deletingTecnico) return;
+    setDeleting(true);
     try {
-      await deleteTecnico(tecnico.id);
+      await deleteTecnico(deletingTecnico.id);
       notifications.show({
         color: 'green',
         title: 'Técnico eliminado',
-        message: `${tecnico.nombre} ha sido eliminado.`,
+        message: `${deletingTecnico.nombre} ha sido eliminado.`,
       });
       loadTecnicos();
     } catch (err) {
@@ -130,6 +134,9 @@ export default function TecnicosManager({ teams = [] }) {
         title: 'Error',
         message: err.message,
       });
+    } finally {
+      setDeleting(false);
+      setDeletingTecnico(null);
     }
   }
 
@@ -449,6 +456,16 @@ export default function TecnicosManager({ teams = [] }) {
           </Group>
         </Stack>
       </Modal>
+
+      <ConfirmModal
+        opened={deletingTecnico !== null}
+        onClose={() => setDeletingTecnico(null)}
+        onConfirm={executeDelete}
+        title="Eliminar técnico"
+        message={`¿Estás seguro de que deseas eliminar al técnico ${deletingTecnico?.nombre || ''} ${deletingTecnico?.apellidos || ''}? Se eliminará su acceso por completo.`}
+        confirmLabel="Eliminar"
+        loading={deleting}
+      />
     </Stack>
   );
 }

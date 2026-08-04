@@ -32,7 +32,7 @@ export default function ConfirmModal({
       zIndex={2000}
       withCloseButton={false}
     >
-      <Stack gap="md">
+      <Stack gap="md" onClick={(e) => e.stopPropagation()}>
         <Text size="sm">{message}</Text>
         <Group justify="flex-end" gap="xs">
           <Button
