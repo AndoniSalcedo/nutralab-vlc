@@ -14,7 +14,6 @@ import {
   Title,
   MultiSelect,
   Checkbox,
-  Badge,
   Divider,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -425,12 +424,6 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
           const currentPost = cfg.postentreno !== undefined ? Boolean(cfg.postentreno) : defaultPost;
           const currentRecs = cfg.recomendaciones || {};
           const currentDiaAnterior = cfg.dia_anterior || '';
-
-          const hasData = config?.[opt.value] && (
-            (Array.isArray(cfg.ingestas) && cfg.ingestas.length > 0) ||
-            (cfg.recomendaciones && Object.values(cfg.recomendaciones).some(Boolean)) ||
-            (cfg.dia_anterior && cfg.dia_anterior.trim() !== '')
-          );
           const mealsList = cfg.ingestas && cfg.ingestas.length > 0 ? cfg.ingestas.join(', ') : 'Habituales';
 
           if (!isEditingThis) {

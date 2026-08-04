@@ -12,6 +12,7 @@ import {
   Box,
   Button,
   Divider,
+  Text,
 } from '@mantine/core';
 import { playerFullName } from '@/lib/utils';
 
