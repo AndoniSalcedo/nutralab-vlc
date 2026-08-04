@@ -24,7 +24,6 @@ export default function TeamFormModal({
   selectedPlayerIds,
   toggleCopyPlayer,
   saving,
-  playerFullName,
   playerCountLabel
 }) {
   return (
@@ -61,7 +60,6 @@ export default function TeamFormModal({
         selectedPlayerIds={selectedPlayerIds}
         toggleCopyPlayer={toggleCopyPlayer}
         saving={saving}
-        playerFullName={playerFullName}
         playerCountLabel={playerCountLabel}
         modalType={modal.type}
       />

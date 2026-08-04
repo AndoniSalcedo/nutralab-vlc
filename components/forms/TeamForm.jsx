@@ -12,8 +12,8 @@ import {
   Box,
   Button,
   Divider,
-  Text
 } from '@mantine/core';
+import { playerFullName } from '@/lib/utils';
 
 export default function TeamForm({
   submitTeam,
@@ -33,7 +33,6 @@ export default function TeamForm({
   selectedPlayerIds = [],
   toggleCopyPlayer,
   saving = false,
-  playerFullName,
   playerCountLabel,
   modalType,
 }) {
