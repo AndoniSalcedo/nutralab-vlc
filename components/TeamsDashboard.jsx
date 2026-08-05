@@ -157,7 +157,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
     setSaving(true);
     try {
       if (modal.type === 'edit') {
-        const data = await updateTeam(modal.team.id, form);
+        await updateTeam(modal.team.id, form);
         setTeamsState((current) =>
           current.map((item) => (String(item.id) === String(modal.team.id) ? { ...item, ...form } : item))
         );
