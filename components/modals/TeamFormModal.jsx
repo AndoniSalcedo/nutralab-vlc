@@ -11,20 +11,16 @@ export default function TeamFormModal({
   form,
   setForm,
   sourceTeamOptions,
-  createSourceTeamId,
   toggleCreateImport,
-  selectCreateSourceTeam,
   isImportingPlayers,
   sourceTeam,
   selectedCount,
-  copyPlayers,
-  allCopyPlayersSelected,
-  someCopyPlayersSelected,
-  toggleAllCopyPlayers,
   selectedPlayerIds,
+  onChangeSelectedPlayerIds,
   toggleCopyPlayer,
   saving,
-  playerCountLabel
+  playerCountLabel,
+  allPlayers,
 }) {
   return (
     <Modal
@@ -34,7 +30,11 @@ export default function TeamFormModal({
         <Group gap="xs">
           <IconUsersGroup size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
           <Text fw={700}>
-            {modal.type === 'copy' ? 'Copiar equipo a temporada' : 'Nuevo equipo'}
+            {modal.type === 'copy'
+              ? 'Copiar equipo a temporada'
+              : modal.type === 'edit'
+              ? 'Editar equipo'
+              : 'Nuevo equipo'}
           </Text>
         </Group>
       }
@@ -47,21 +47,17 @@ export default function TeamFormModal({
         form={form}
         setForm={setForm}
         sourceTeamOptions={sourceTeamOptions}
-        createSourceTeamId={createSourceTeamId}
         toggleCreateImport={toggleCreateImport}
-        selectCreateSourceTeam={selectCreateSourceTeam}
         isImportingPlayers={isImportingPlayers}
         sourceTeam={sourceTeam}
         selectedCount={selectedCount}
-        copyPlayers={copyPlayers}
-        allCopyPlayersSelected={allCopyPlayersSelected}
-        someCopyPlayersSelected={someCopyPlayersSelected}
-        toggleAllCopyPlayers={toggleAllCopyPlayers}
         selectedPlayerIds={selectedPlayerIds}
+        onChangeSelectedPlayerIds={onChangeSelectedPlayerIds}
         toggleCopyPlayer={toggleCopyPlayer}
         saving={saving}
         playerCountLabel={playerCountLabel}
         modalType={modal.type}
+        allPlayers={allPlayers}
       />
     </Modal>
   );

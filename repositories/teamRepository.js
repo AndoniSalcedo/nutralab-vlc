@@ -63,10 +63,10 @@ export async function getTeamByIdAndOwner(supabase, teamId, ownerId) {
   return data || null;
 }
 
-export async function insertTeam(supabase, { owner_id, nombre, temporada, descripcion }) {
+export async function insertTeam(supabase, { owner_id, nombre, temporada, descripcion, configuracion_nutricional = null }) {
   const { data, error } = await supabase
     .from('equipos')
-    .insert({ owner_id, nombre, temporada, descripcion })
+    .insert({ owner_id, nombre, temporada, descripcion, configuracion_nutricional })
     .select('*')
     .single();
 

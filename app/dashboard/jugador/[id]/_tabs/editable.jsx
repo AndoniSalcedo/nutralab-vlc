@@ -21,7 +21,7 @@ import { IconEdit } from '@tabler/icons-react';
 import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/services/player';
 import { useRouter } from 'next/navigation';
-import { AVAILABLE_MEALS, STANDARD_MEALS } from '@/lib/nutrition-day-types';
+import { AVAILABLE_MEALS, STANDARD_MEALS, sortMeals } from '@/lib/nutrition-day-types';
 
 export function CampoEditable({ label, campo, valor, jugadorId, tipo = 'textarea', opciones, readOnly = false }) {
   const router = useRouter();
@@ -107,7 +107,7 @@ function parseMeals(val) {
     const count = Number(val);
     return STANDARD_MEALS.slice(0, Math.min(count, 5));
   }
-  return val.split(',').map((s) => s.trim()).filter(Boolean);
+  return sortMeals(val.split(',').map((s) => s.trim()).filter(Boolean));
 }
 
 export function ComidasEditable({ label, numComidas, postentreno, preentreno, jugadorId, recomendacionesDefecto = {}, readOnly = false }) {
@@ -174,12 +174,13 @@ export function ComidasEditable({ label, numComidas, postentreno, preentreno, ju
                   data={MEAL_OPTIONS}
                   value={meals}
                   onChange={(val) => {
-                    setMeals(val);
+                    const sorted = sortMeals(val);
+                    setMeals(sorted);
                     // Also clean up any recommendations for meals that are deselected
                     setRecsDefecto((prev) => {
                       const clean = { ...prev };
                       Object.keys(clean).forEach((k) => {
-                        if (!val.includes(k)) delete clean[k];
+                        if (!sorted.includes(k)) delete clean[k];
                       });
                       return clean;
                     });
@@ -370,10 +371,14 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
     const currentRecs = currentCfg.recomendaciones || {};
     const currentDiaAnterior = currentCfg.dia_anterior || '';
 
+    if (updates.ingestas && Array.isArray(updates.ingestas)) {
+      updates.ingestas = sortMeals(updates.ingestas);
+    }
+
     setConfig((prev) => ({
       ...prev,
       [scheduleKey]: {
-        ingestas: currentMeals,
+        ingestas: sortMeals(currentMeals),
         postentreno: currentPost,
         recomendaciones: { ...currentRecs },
         dia_anterior: currentDiaAnterior,
@@ -420,11 +425,11 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
         {scheduleOptions.map((opt) => {
           const cfg = config?.[opt.value] || {};
           const isEditingThis = editingSchedule === opt.value;
-          const currentMeals = Array.isArray(cfg.ingestas) ? cfg.ingestas : defaultMeals;
+          const currentMeals = sortMeals(Array.isArray(cfg.ingestas) ? cfg.ingestas : defaultMeals);
           const currentPost = cfg.postentreno !== undefined ? Boolean(cfg.postentreno) : defaultPost;
           const currentRecs = cfg.recomendaciones || {};
           const currentDiaAnterior = cfg.dia_anterior || '';
-          const mealsList = cfg.ingestas && cfg.ingestas.length > 0 ? cfg.ingestas.join(', ') : 'Habituales';
+          const mealsList = cfg.ingestas && cfg.ingestas.length > 0 ? sortMeals(cfg.ingestas).join(', ') : 'Habituales';
 
           if (!isEditingThis) {
             return (
@@ -457,7 +462,7 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
                   {Object.entries(currentRecs).filter((entry) => entry[1]).length > 0 && (
                     <Text size="xs" c="dark.6">
                       <Text span fw={600} c="dimmed">Recomendaciones: </Text>
-                      {Object.entries(currentRecs).filter((entry) => entry[1]).map(([m, val]) => `${m} (${val})`).join(' · ')}
+                      {sortMeals(Object.keys(currentRecs)).filter((m) => currentRecs[m]).map((m) => `${m} (${currentRecs[m]})`).join(' · ')}
                     </Text>
                   )}
 
@@ -499,11 +504,12 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
                     data={AVAILABLE_MEALS}
                     value={currentMeals}
                     onChange={(val) => {
+                      const sorted = sortMeals(val);
                       const cleanRecs = { ...currentRecs };
                       Object.keys(cleanRecs).forEach((k) => {
-                        if (!val.includes(k)) delete cleanRecs[k];
+                        if (!sorted.includes(k)) delete cleanRecs[k];
                       });
-                      handleUpdateSchedule(opt.value, { ingestas: val, recomendaciones: cleanRecs });
+                      handleUpdateSchedule(opt.value, { ingestas: sorted, recomendaciones: cleanRecs });
                     }}
                     size="xs"
                     searchable

@@ -74,3 +74,13 @@ export async function deleteHydrationRecord(supabase, id) {
   if (error) throw error;
   return true;
 }
+
+export async function insertHydrationRecordsBulk(supabase, records) {
+  const { data, error } = await supabase
+    .from('registros_hidratacion')
+    .insert(records)
+    .select('*');
+
+  if (error) throw error;
+  return data || [];
+}

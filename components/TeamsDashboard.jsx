@@ -18,7 +18,7 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { createTeam, deleteTeam } from '@/services/team';
+import { createTeam, deleteTeam, updateTeam } from '@/services/team';
 import {
   IconCalendarStats,
   IconCopy,
@@ -27,6 +27,12 @@ import {
   IconSearch,
   IconTrash,
   IconUsersGroup,
+  IconPencil,
+  IconChartLine,
+  IconReportMedical,
+  IconBottle,
+  IconCalendarEvent,
+  IconSettings,
 } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import NothingFound from './NothingFound';
@@ -59,18 +65,26 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
     descripcion: '',
   });
   const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
-  const [createSourceTeamId, setCreateSourceTeamId] = useState('');
+  const [isCreateImporting, setIsCreateImporting] = useState(false);
 
-  const createSourceTeam = useMemo(
-    () => teamsState.find((team) => String(team.id) === String(createSourceTeamId)) || null,
-    [createSourceTeamId, teamsState]
-  );
-  const sourceTeam = modal.type === 'copy' ? modal.team : createSourceTeam;
-  const isImportingPlayers = modal.type === 'copy' || Boolean(createSourceTeamId);
-  const copyPlayers = isImportingPlayers ? sourceTeam?.players || [] : [];
+  const sourceTeam = modal.type === 'copy' ? modal.team : null;
+  const isImportingPlayers = modal.type === 'copy' || (modal.type === 'create' && isCreateImporting);
   const selectedCount = selectedPlayerIds.length;
-  const allCopyPlayersSelected = copyPlayers.length > 0 && selectedCount === copyPlayers.length;
-  const someCopyPlayersSelected = selectedCount > 0 && selectedCount < copyPlayers.length;
+
+  const allPlayers = useMemo(() => {
+    const result = [];
+    for (const t of teamsState) {
+      for (const p of t.players || []) {
+        result.push({
+          ...p,
+          teamId: String(t.id),
+          teamNombre: t.nombre,
+          teamTemporada: t.temporada,
+        });
+      }
+    }
+    return result;
+  }, [teamsState]);
 
   const seasons = useMemo(() => {
     const values = Array.from(new Set(teamsState.map((team) => team.temporada).filter(Boolean))).sort().reverse();
@@ -94,48 +108,40 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
     [teamsState]
   );
 
-  function selectCreateSourceTeam(teamId) {
-    const id = String(teamId || '');
-    const team = teamsState.find((item) => String(item.id) === id);
-    setCreateSourceTeamId(id);
-    setSelectedPlayerIds((team?.players || []).map((player) => String(player.id)));
-  }
-
   function openCreate() {
     setSelectedPlayerIds([]);
-    setCreateSourceTeamId('');
+    setIsCreateImporting(false);
     setForm({ nombre: '', temporada: season || nextSeasonLabel(), descripcion: '' });
     setModal({ type: 'create', team: null });
   }
 
   function openCopy(team) {
-    setCreateSourceTeamId('');
+    setIsCreateImporting(false);
     setSelectedPlayerIds((team.players || []).map((player) => String(player.id)));
     setForm({ nombre: team.nombre, temporada: nextSeasonLabel(), descripcion: team.descripcion || '' });
     setModal({ type: 'copy', team });
   }
 
+  function openEdit(team) {
+    setIsCreateImporting(false);
+    setSelectedPlayerIds([]);
+    setForm({ nombre: team.nombre, temporada: team.temporada, descripcion: team.descripcion || '' });
+    setModal({ type: 'edit', team });
+  }
+
   function closeModal() {
     if (!saving) {
       setSelectedPlayerIds([]);
-      setCreateSourceTeamId('');
+      setIsCreateImporting(false);
       setModal({ type: null, team: null });
     }
   }
 
   function toggleCreateImport(checked) {
+    setIsCreateImporting(checked);
     if (!checked) {
-      setCreateSourceTeamId('');
       setSelectedPlayerIds([]);
-      return;
     }
-
-    const defaultTeam = teamsState.find((team) => Number(team.players_count || 0) > 0) || teamsState[0];
-    selectCreateSourceTeam(defaultTeam?.id || '');
-  }
-
-  function toggleAllCopyPlayers(checked) {
-    setSelectedPlayerIds(checked ? copyPlayers.map((player) => String(player.id)) : []);
   }
 
   function toggleCopyPlayer(playerId, checked) {
@@ -150,38 +156,50 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
     event.preventDefault();
     setSaving(true);
     try {
-      const isCopy = modal.type === 'copy';
-      const sourceTeamId = isCopy ? modal.team?.id : createSourceTeamId;
-      const shouldCopyPlayers = Boolean(sourceTeamId);
-      const payload = {
-        action: shouldCopyPlayers ? 'copy_season' : 'create',
-        team_id: sourceTeamId,
-        ...form,
-      };
+      if (modal.type === 'edit') {
+        const data = await updateTeam(modal.team.id, form);
+        setTeamsState((current) =>
+          current.map((item) => (String(item.id) === String(modal.team.id) ? { ...item, ...form } : item))
+        );
+        notifications.show({
+          color: 'green',
+          title: 'Equipo actualizado',
+          message: `${form.nombre} guardado correctamente.`,
+        });
+      } else {
+        const isCopy = modal.type === 'copy';
+        const sourceTeamId = isCopy ? modal.team?.id : null;
+        const shouldCopyPlayers = isImportingPlayers && selectedPlayerIds.length > 0;
+        const payload = {
+          action: shouldCopyPlayers ? 'copy_season' : 'create',
+          team_id: sourceTeamId,
+          ...form,
+        };
 
-      if (shouldCopyPlayers) {
-        payload.player_ids = selectedPlayerIds;
+        if (shouldCopyPlayers) {
+          payload.player_ids = selectedPlayerIds;
+        }
+
+        const data = await createTeam(payload);
+
+        const copiedPlayers = Number(data.copiedPlayers || 0);
+        const newTeam = {
+          ...data.equipo,
+          players_count: shouldCopyPlayers ? copiedPlayers : 0,
+          players: data.players || [],
+        };
+
+        setTeamsState((current) => [newTeam, ...current]);
+        notifications.show({
+          color: 'green',
+          title: shouldCopyPlayers ? 'Equipo creado con plantilla e historial' : 'Equipo creado',
+          message: shouldCopyPlayers
+            ? `${playerCountLabel(copiedPlayers)} y todo su historial importados a ${data.equipo.temporada}.`
+            : `${data.equipo.nombre} está listo.`,
+        });
       }
-
-      const data = await createTeam(payload);
-
-      const copiedPlayers = Number(data.copiedPlayers || 0);
-      const newTeam = {
-        ...data.equipo,
-        players_count: shouldCopyPlayers ? copiedPlayers : 0,
-        players: data.players || [],
-      };
-
-      setTeamsState((current) => [newTeam, ...current]);
-      notifications.show({
-        color: 'green',
-        title: shouldCopyPlayers ? 'Equipo creado con plantilla' : 'Equipo creado',
-        message: shouldCopyPlayers
-          ? `${playerCountLabel(copiedPlayers)} importado${copiedPlayers === 1 ? '' : 's'} a ${data.equipo.temporada}.`
-          : `${data.equipo.nombre} está listo.`,
-      });
       setSelectedPlayerIds([]);
-      setCreateSourceTeamId('');
+      setIsCreateImporting(false);
       setModal({ type: null, team: null });
       router.refresh();
     } catch (error) {
@@ -279,7 +297,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                       <IconUsersGroup size={20} />
                     </ThemeIcon>
                     {!readOnly && (
-                      <Menu shadow="md" width={220} position="bottom-end" withArrow>
+                      <Menu shadow="md" width={240} position="bottom-end" withArrow radius="md">
                         <Menu.Target>
                           <ActionIcon
                             variant="subtle"
@@ -292,8 +310,28 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                           </ActionIcon>
                         </Menu.Target>
                         <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
+                          <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => openEdit(team)}>
+                            Editar equipo
+                          </Menu.Item>
                           <Menu.Item leftSection={<IconCopy size={14} />} onClick={() => openCopy(team)}>
                             Copiar a temporada
+                          </Menu.Item>
+                          <Menu.Divider />
+                          <Menu.Label>Accesos rápidos</Menu.Label>
+                          <Menu.Item leftSection={<IconChartLine size={14} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/evolucion`)}>
+                            Evolución equipo
+                          </Menu.Item>
+                          <Menu.Item leftSection={<IconReportMedical size={14} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/analiticas`)}>
+                            Analíticas equipo
+                          </Menu.Item>
+                          <Menu.Item leftSection={<IconBottle size={14} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/suplementacion`)}>
+                            Suplementación
+                          </Menu.Item>
+                          <Menu.Item leftSection={<IconCalendarEvent size={14} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/menu`)}>
+                            Menú semanal
+                          </Menu.Item>
+                          <Menu.Item leftSection={<IconSettings size={14} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/configuracion`)}>
+                            Configuración
                           </Menu.Item>
                           <Menu.Divider />
                           <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeleteTeam(team)}>
@@ -347,20 +385,16 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
           form={form}
           setForm={setForm}
           sourceTeamOptions={sourceTeamOptions}
-          createSourceTeamId={createSourceTeamId}
           toggleCreateImport={toggleCreateImport}
-          selectCreateSourceTeam={selectCreateSourceTeam}
           isImportingPlayers={isImportingPlayers}
           sourceTeam={sourceTeam}
           selectedCount={selectedCount}
-          copyPlayers={copyPlayers}
-          allCopyPlayersSelected={allCopyPlayersSelected}
-          someCopyPlayersSelected={someCopyPlayersSelected}
-          toggleAllCopyPlayers={toggleAllCopyPlayers}
           selectedPlayerIds={selectedPlayerIds}
+          onChangeSelectedPlayerIds={setSelectedPlayerIds}
           toggleCopyPlayer={toggleCopyPlayer}
           saving={saving}
           playerCountLabel={playerCountLabel}
+          allPlayers={allPlayers}
         />
         <ConfirmModal
           opened={!!deleteTeamData}

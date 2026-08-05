@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Stack,
   TextInput,
@@ -13,7 +13,9 @@ import {
   Button,
   Divider,
   Text,
+  SimpleGrid,
 } from '@mantine/core';
+import { IconSearch } from '@tabler/icons-react';
 import { playerFullName } from '@/lib/utils';
 
 export default function TeamForm({
@@ -21,22 +23,67 @@ export default function TeamForm({
   form,
   setForm,
   sourceTeamOptions = [],
-  createSourceTeamId,
   toggleCreateImport,
-  selectCreateSourceTeam,
   isImportingPlayers = false,
   sourceTeam,
   selectedCount = 0,
-  copyPlayers = [],
-  allCopyPlayersSelected = false,
-  someCopyPlayersSelected = false,
-  toggleAllCopyPlayers,
   selectedPlayerIds = [],
+  onChangeSelectedPlayerIds,
   toggleCopyPlayer,
   saving = false,
   playerCountLabel,
   modalType,
+  allPlayers = [],
 }) {
+  const [filterTeamId, setFilterTeamId] = useState(sourceTeam ? String(sourceTeam.id) : '');
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    setFilterTeamId(sourceTeam ? String(sourceTeam.id) : '');
+    setSearch('');
+  }, [sourceTeam, isImportingPlayers]);
+
+  const teamFilterOptions = useMemo(() => {
+    return [
+      { value: '', label: 'Todos los equipos y temporadas' },
+      ...sourceTeamOptions,
+    ];
+  }, [sourceTeamOptions]);
+
+  const displayedPlayers = useMemo(() => {
+    const needle = search.trim().toLowerCase();
+    return (allPlayers || []).filter((p) => {
+      const matchesTeam = !filterTeamId || String(p.teamId) === String(filterTeamId);
+      const nameStr = playerFullName(p, '').toLowerCase();
+      const posStr = String(p.posicion || '').toLowerCase();
+      const matchesSearch = !needle || nameStr.includes(needle) || posStr.includes(needle);
+      return matchesTeam && matchesSearch;
+    });
+  }, [allPlayers, filterTeamId, search]);
+
+  const displayedSelectedCount = displayedPlayers.filter((p) => selectedPlayerIds.includes(String(p.id))).length;
+  const allDisplayedSelected = displayedPlayers.length > 0 && displayedSelectedCount === displayedPlayers.length;
+  const someDisplayedSelected = displayedSelectedCount > 0 && displayedSelectedCount < displayedPlayers.length;
+
+  function handleToggleAllDisplayed(checked) {
+    const displayedIds = displayedPlayers.map((p) => String(p.id));
+    if (checked) {
+      const union = Array.from(new Set([...selectedPlayerIds, ...displayedIds]));
+      if (onChangeSelectedPlayerIds) onChangeSelectedPlayerIds(union);
+    } else {
+      const remaining = selectedPlayerIds.filter((id) => !displayedIds.includes(id));
+      if (onChangeSelectedPlayerIds) onChangeSelectedPlayerIds(remaining);
+    }
+  }
+
+  let submitLabel = 'Crear equipo';
+  if (modalType === 'edit') {
+    submitLabel = 'Guardar cambios';
+  } else if (isImportingPlayers) {
+    const prefix = modalType === 'copy' ? 'Copiar equipo' : 'Crear equipo';
+    submitLabel = selectedCount ? `${prefix} con ${playerCountLabel(selectedCount)}` : prefix;
+  }
+
   return (
     <form onSubmit={submitTeam}>
       <Stack gap="md">
@@ -67,57 +114,69 @@ export default function TeamForm({
             setForm((current) => ({ ...current, descripcion: value }));
           }}
         />
-        {modalType === 'create' && sourceTeamOptions.length ? (
-          <Paper withBorder radius="md" p="sm" bg={createSourceTeamId ? 'blue.0' : 'gray.0'}>
-            <Stack gap="sm">
-              <Switch
-                label="Copiar jugadores desde otra temporada"
-                checked={Boolean(createSourceTeamId)}
-                onChange={(event) => toggleCreateImport(event.currentTarget.checked)}
-              />
-              {createSourceTeamId ? (
-                <Select
-                  label="Equipo origen"
-                  data={sourceTeamOptions}
-                  value={createSourceTeamId}
-                  onChange={selectCreateSourceTeam}
-                  searchable
-                  allowDeselect={false}
-                />
-              ) : null}
-            </Stack>
+        {modalType === 'create' && allPlayers.length > 0 ? (
+          <Paper withBorder radius="md" p="sm" bg={isImportingPlayers ? 'blue.0' : 'gray.0'}>
+            <Switch
+              label="Importar jugadores de otros equipos / temporadas"
+              checked={isImportingPlayers}
+              onChange={(event) => toggleCreateImport(event.currentTarget.checked)}
+            />
           </Paper>
         ) : null}
         {isImportingPlayers && (
           <>
             <Divider />
             <Stack gap="sm">
-              <Group justify="space-between" align="flex-start" wrap="nowrap">
+              <Group justify="space-between" align="center" wrap="wrap">
                 <Box>
                   <Text size="sm" fw={800} c="#24291f">
                     Jugadores a importar
                   </Text>
                   <Text size="xs" c="dimmed">
-                    {sourceTeam?.nombre} · {sourceTeam?.temporada}
+                    Selecciona jugadores de cualquier equipo o temporada
                   </Text>
                 </Box>
-                <Badge variant="light" color={selectedCount ? 'blue' : 'gray'} radius="sm">
-                  {selectedCount}/{copyPlayers.length}
+                <Badge variant="filled" color={selectedCount ? 'blue' : 'gray'} size="md" radius="sm">
+                  {selectedCount} {selectedCount === 1 ? 'jugador seleccionado' : 'jugadores seleccionados'}
                 </Badge>
               </Group>
 
-              {copyPlayers.length ? (
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+                <Select
+                  label="Filtrar por equipo"
+                  data={teamFilterOptions}
+                  value={filterTeamId}
+                  onChange={(val) => setFilterTeamId(val || '')}
+                  searchable
+                  allowDeselect={false}
+                  size="xs"
+                  radius="md"
+                />
+                <TextInput
+                  label="Buscar jugador"
+                  placeholder="Nombre o posición..."
+                  value={search}
+                  onChange={(event) => setSearch(event.currentTarget.value)}
+                  leftSection={<IconSearch size={14} />}
+                  size="xs"
+                  radius="md"
+                />
+              </SimpleGrid>
+
+              {displayedPlayers.length ? (
                 <>
                   <Checkbox
-                    label="Seleccionar toda la plantilla"
-                    checked={allCopyPlayersSelected}
-                    indeterminate={someCopyPlayersSelected}
-                    onChange={(event) => toggleAllCopyPlayers(event.currentTarget.checked)}
+                    label="Seleccionar todos los mostrados"
+                    checked={allDisplayedSelected}
+                    indeterminate={someDisplayedSelected}
+                    onChange={(event) => handleToggleAllDisplayed(event.currentTarget.checked)}
+                    size="xs"
+                    mt="xs"
                   />
                   <Paper withBorder radius="md" p={0}>
-                    <ScrollArea h={Math.min(292, 54 * copyPlayers.length)} offsetScrollbars>
+                    <ScrollArea h={Math.min(292, 58 * displayedPlayers.length)} offsetScrollbars>
                       <Stack gap={0}>
-                        {copyPlayers.map((player, index) => {
+                        {displayedPlayers.map((player, index) => {
                           const playerId = String(player.id);
                           const checked = selectedPlayerIds.includes(playerId);
 
@@ -128,7 +187,7 @@ export default function TeamForm({
                               py="xs"
                               style={{
                                 borderBottom:
-                                  index === copyPlayers.length - 1
+                                  index === displayedPlayers.length - 1
                                     ? 'none'
                                     : '1px solid var(--mantine-color-gray-2)',
                               }}
@@ -141,11 +200,16 @@ export default function TeamForm({
                                     <Text size="sm" fw={650} c="#24291f">
                                       {playerFullName(player, 'Jugador sin nombre')}
                                     </Text>
-                                    {player.posicion ? (
-                                      <Text size="xs" c="dimmed">
-                                        {player.posicion}
-                                      </Text>
-                                    ) : null}
+                                    <Group gap={6} mt={2} align="center">
+                                      {player.posicion ? (
+                                        <Text size="xs" c="dimmed">
+                                          {player.posicion}
+                                        </Text>
+                                      ) : null}
+                                      <Badge size="xs" variant="outline" color="gray" radius="sm">
+                                        {player.teamNombre} · {player.teamTemporada}
+                                      </Badge>
+                                    </Group>
                                   </Box>
                                 }
                               />
@@ -158,19 +222,17 @@ export default function TeamForm({
                 </>
               ) : (
                 <Paper withBorder radius="md" p="sm" bg="gray.0">
-                  <Text size="sm" c="dimmed">
-                    Este equipo no tiene jugadores para importar.
+                  <Text size="sm" c="dimmed" style={{ textAlign: 'center' }}>
+                    No se encontraron jugadores que coincidan con el filtro actual.
                   </Text>
                 </Paper>
               )}
             </Stack>
           </>
         )}
-        <Group justify="flex-end">
+        <Group justify="flex-end" mt="md">
           <Button type="submit" radius="xl" size="xs" loading={saving}>
-            {isImportingPlayers
-              ? `Crear equipo${copyPlayers.length ? ` con ${playerCountLabel(selectedCount)}` : ''}`
-              : 'Crear equipo'}
+            {submitLabel}
           </Button>
         </Group>
       </Stack>

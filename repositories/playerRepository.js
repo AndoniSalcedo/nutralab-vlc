@@ -245,3 +245,16 @@ export async function deletePlayer(supabase, id) {
   if (error) throw error;
   return true;
 }
+
+export async function getOwnedPlayersByIds(supabase, ownerId, playerIds) {
+  if (!ownerId || !playerIds || !playerIds.length) return [];
+
+  const { data, error } = await supabase
+    .from('jugadores')
+    .select('*, equipos!inner(owner_id)')
+    .in('id', playerIds)
+    .eq('equipos.owner_id', ownerId);
+
+  if (error) throw error;
+  return data || [];
+}

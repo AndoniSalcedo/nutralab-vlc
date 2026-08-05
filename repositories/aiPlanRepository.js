@@ -89,3 +89,13 @@ export async function getAiPlansByPlayerIdsFull(supabase, playerIds) {
   return data || [];
 }
 
+export async function insertAiPlansBulk(supabase, payloads) {
+  const { data, error } = await supabase
+    .from('planes_ia')
+    .insert(payloads)
+    .select('*');
+
+  if (error) throw error;
+  return data || [];
+}
+

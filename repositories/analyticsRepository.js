@@ -63,3 +63,13 @@ export async function deleteAnalytics(supabase, id) {
   if (error) throw error;
   return true;
 }
+
+export async function insertAnalyticsBulk(supabase, payloads) {
+  const { data, error } = await supabase
+    .from('analiticas')
+    .insert(payloads)
+    .select();
+
+  if (error) throw error;
+  return data || [];
+}

@@ -19,3 +19,14 @@ export async function deleteTeam(teamId) {
   if (!res.ok) throw new Error(data.error || 'No se pudo eliminar el equipo');
   return data;
 }
+
+export async function updateTeam(teamId, payload) {
+  const res = await fetch('/api/teams', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'update', team_id: teamId, ...payload }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'No se pudo actualizar el equipo');
+  return data;
+}
