@@ -34,6 +34,7 @@ export default function PlayerTabContainer({
         jugador={jugador}
         activeSubtab={activeSubtab}
         onSubtabChange={handleSubtabChange}
+        pesajes={rest.pesajes}
         {...rest}
       />
     );

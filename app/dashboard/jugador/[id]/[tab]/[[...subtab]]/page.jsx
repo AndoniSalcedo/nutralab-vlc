@@ -5,6 +5,7 @@ import { getOwnedPlayer } from '@/lib/team-access';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
 import { getAnalyticsByPlayerId } from '@/repositories/analyticsRepository';
 import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
+import { getPesajesByPlayerId } from '@/repositories/pesajeRepository';
 import { getMenusByTeam } from '@/repositories/menuRepository';
 import { getHydrationRecordsByPlayerId } from '@/repositories/hydrationRepository';
 import { getMessages } from '@/repositories/messagesRepository';
@@ -62,6 +63,7 @@ export default async function JugadorTabPage({ params }) {
   }
 
   let evoluciones = [];
+  let pesajes = [];
   let analiticas = [];
   let registrosHidratacion = [];
   let messages = [];
@@ -70,32 +72,38 @@ export default async function JugadorTabPage({ params }) {
 
   try {
     if (activeTab === 'resumen') {
-      const [resEvoluciones] = await Promise.all([
+      const [resEvoluciones, resPesajes] = await Promise.all([
         getEvolutionsByPlayerId(supabase, id),
+        getPesajesByPlayerId(supabase, id),
       ]);
       evoluciones = resEvoluciones;
-      jugador = withLatestMeasurement(rawJugador, evoluciones);
+      pesajes = resPesajes;
+      jugador = withLatestMeasurement(rawJugador, evoluciones, pesajes);
       if (jugador?.equipo_id) {
         messages = await getMessages(supabase, jugador.equipo_id, id);
       }
     } else if (activeTab === 'metricas') {
-      const [resAnaliticas, resEvoluciones, resHidratacion] = await Promise.all([
+      const [resAnaliticas, resEvoluciones, resHidratacion, resPesajes] = await Promise.all([
         getAnalyticsByPlayerId(supabase, id),
         getEvolutionsByPlayerId(supabase, id),
         getHydrationRecordsByPlayerId(supabase, id),
+        getPesajesByPlayerId(supabase, id),
       ]);
       analiticas = isPlayer ? resAnaliticas.filter(a => a.visible_para_jugador === true) : resAnaliticas;
       evoluciones = resEvoluciones;
-      jugador = withLatestMeasurement(rawJugador, evoluciones);
+      pesajes = resPesajes;
+      jugador = withLatestMeasurement(rawJugador, evoluciones, pesajes);
       registrosHidratacion = resHidratacion;
     } else if (activeTab === 'nutricion') {
-      const [resMenus, resEvoluciones] = await Promise.all([
+      const [resMenus, resEvoluciones, resPesajes] = await Promise.all([
         rawJugador?.equipo_id ? getMenusByTeam(supabase, rawJugador.equipo_id) : [],
         getEvolutionsByPlayerId(supabase, id),
+        getPesajesByPlayerId(supabase, id),
       ]);
       menus = resMenus.slice(0, 10);
       evoluciones = resEvoluciones;
-      jugador = withLatestMeasurement(rawJugador, evoluciones);
+      pesajes = resPesajes;
+      jugador = withLatestMeasurement(rawJugador, evoluciones, pesajes);
     }
   } catch (err) {
     console.error('Error fetching tab details:', err);
@@ -109,6 +117,7 @@ export default async function JugadorTabPage({ params }) {
       readOnly={isPlayer || user?.role === 'tecnico'}
       isPlayer={isPlayer}
       evoluciones={evoluciones}
+      pesajes={pesajes}
       analiticas={analiticas}
       registrosHidratacion={registrosHidratacion}
       messages={messages}

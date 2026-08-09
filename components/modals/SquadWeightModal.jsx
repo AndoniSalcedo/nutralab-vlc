@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { IconScale, IconCalendar, IconSearch, IconCheck } from '@tabler/icons-react';
-import { saveEvolution } from '@/services/evolution';
+import { savePesaje } from '@/services/pesaje';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 import { initials } from '@/lib/utils';
@@ -81,7 +81,7 @@ export default function SquadWeightModal({ opened, onClose, players = [] }) {
 
     try {
       const promises = entries.map((entry) =>
-        saveEvolution({
+        savePesaje({
           jugador_id: entry.playerId,
           fecha: dateStr,
           peso_kg: parseFloat(entry.value),

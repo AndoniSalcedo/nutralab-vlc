@@ -1,7 +1,7 @@
 import { IconUser, IconCalendar, IconMail } from '@tabler/icons-react';
 import { IconChartLine, IconReportAnalytics, IconDroplet, IconClipboardList } from '@tabler/icons-react';
 import { IconBrain, IconBottle, IconChefHat } from '@tabler/icons-react';
-import { IconRuler2, IconReportMedical } from '@tabler/icons-react';
+import { IconRuler2, IconReportMedical, IconScale } from '@tabler/icons-react';
 
 /**
  * Single source of truth for all player dashboard subtab configs.
@@ -45,12 +45,19 @@ export const SUBTAB_CONFIGS = {
   metricas: {
     defaultSubtab: 'mediciones',
     tabs: [
+      { value: 'pesos', icon: IconScale, label: 'Pesos', mobileLabel: 'Pesos' },
       { value: 'mediciones', icon: IconChartLine, label: 'Mediciones', mobileLabel: 'Med.' },
       { value: 'analiticas', icon: IconReportAnalytics, label: 'Analíticas', mobileLabel: 'Anali.' },
       { value: 'hidratacion', icon: IconDroplet, label: 'Hidratación', mobileLabel: 'Hidra.' },
       { value: 'protocolos', icon: IconClipboardList, label: 'Protocolos', mobileLabel: 'Prot.' },
     ],
     headers: {
+      pesos: {
+        icon: IconScale,
+        iconColor: 'orange',
+        title: 'Evolución de Peso',
+        subtitle: 'Historial de peso corporal.',
+      },
       mediciones: {
         icon: IconRuler2,
         iconColor: 'cyan',

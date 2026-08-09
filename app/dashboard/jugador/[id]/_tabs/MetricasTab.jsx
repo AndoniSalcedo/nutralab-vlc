@@ -8,8 +8,9 @@ import AnaliticasSubtab from './metricas/AnaliticasSubtab';
 import MedicionesSubtab from './metricas/MedicionesSubtab';
 import HidratacionSubtab from './metricas/HidratacionSubtab';
 import ProtocolosSubtab from './metricas/ProtocolosSubtab';
+import PesosSubtab from './metricas/PesosSubtab';
 
-export default function MetricasTab({ jugador, analiticas, evoluciones, registrosHidratacion = [], activeSubtab, onSubtabChange, readOnly = false }) {
+export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes, registrosHidratacion = [], activeSubtab, onSubtabChange, readOnly = false }) {
   const analiticasVisibles = readOnly ? (analiticas || []).filter(a => a.visible_para_jugador) : (analiticas || []);
 
   const tabsData = getSubtabControlData('metricas', tabLabel);
@@ -41,6 +42,9 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, registro
       </Paper>
 
       <Box mt={0}>
+        {activeSubtab === 'pesos' && (
+          <PesosSubtab jugador={jugador} pesajes={pesajes} readOnly={readOnly} />
+        )}
         {activeSubtab === 'mediciones' && (
           <MedicionesSubtab jugador={jugador} evoluciones={evoluciones} readOnly={readOnly} />
         )}
