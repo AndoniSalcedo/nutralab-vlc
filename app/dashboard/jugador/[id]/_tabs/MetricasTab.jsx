@@ -4,11 +4,11 @@ import { Box, Paper, Stack } from '@mantine/core';
 import { tabLabel } from './tab-label';
 import { getSubtabControlData } from './subtab-config';
 import PlayerSubtabControl from './PlayerSubtabControl';
+
+import PesosSubtab from './metricas/PesosSubtab';
 import AnaliticasSubtab from './metricas/AnaliticasSubtab';
 import MedicionesSubtab from './metricas/MedicionesSubtab';
 import HidratacionSubtab from './metricas/HidratacionSubtab';
-import ProtocolosSubtab from './metricas/ProtocolosSubtab';
-import PesosSubtab from './metricas/PesosSubtab';
 
 export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes, registrosHidratacion = [], activeSubtab, onSubtabChange, readOnly = false }) {
   const analiticasVisibles = readOnly ? (analiticas || []).filter(a => a.visible_para_jugador) : (analiticas || []);
@@ -53,9 +53,6 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes,
         )}
         {activeSubtab === 'hidratacion' && (
           <HidratacionSubtab jugador={jugador} registrosHidratacion={registrosHidratacion} readOnly={readOnly} />
-        )}
-        {activeSubtab === 'protocolos' && (
-          <ProtocolosSubtab jugador={jugador} readOnly={readOnly} />
         )}
       </Box>
     </Stack>

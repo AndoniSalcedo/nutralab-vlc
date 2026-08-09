@@ -104,6 +104,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false, initial
       }
     })();
     return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jugador.id, mealType, day, reload]);
 
   const grouped = useMemo(() => groupByDate(meals), [meals]);

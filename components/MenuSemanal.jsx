@@ -286,6 +286,7 @@ export default function MenuSemanal({
         setActiveDay(orderedDays[0].dia);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMenu]);
 
   const activeDayData = orderedDays.find((d) => d.dia === activeDay) || null;

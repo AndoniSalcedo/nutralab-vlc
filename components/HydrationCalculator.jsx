@@ -35,6 +35,7 @@ export default function HydrationCalculator({ jugador }) {
     if (dayTypes.length && !dayTypes.some(d => d.key === targetType)) {
       setTargetType(dayTypes[0].key);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dayTypes]);
 
   // Calcular objetivos

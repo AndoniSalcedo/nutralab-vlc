@@ -7,6 +7,7 @@ import PlayerSubtabControl from './PlayerSubtabControl';
 import PlanSubtab from './nutricion/PlanSubtab';
 import SuplementacionSubtab from './nutricion/SuplementacionSubtab';
 import MenuSemanalSubtab from './nutricion/MenuSemanalSubtab';
+import ProtocolosSubtab from './metricas/ProtocolosSubtab';
 
 export default function NutricionTab({ jugador, menus = [], activeSubtab, onSubtabChange, readOnly = false }) {
   return (
@@ -39,6 +40,7 @@ export default function NutricionTab({ jugador, menus = [], activeSubtab, onSubt
         {activeSubtab === 'plan' && <PlanSubtab jugador={jugador} readOnly={readOnly} />}
         {activeSubtab === 'suplementacion' && <SuplementacionSubtab jugador={jugador} readOnly={readOnly} />}
         {activeSubtab === 'menu' && <MenuSemanalSubtab menus={menus} />}
+        {activeSubtab === 'protocolos' && <ProtocolosSubtab jugador={jugador} readOnly={readOnly} />}
       </Box>
     </Stack>
   );

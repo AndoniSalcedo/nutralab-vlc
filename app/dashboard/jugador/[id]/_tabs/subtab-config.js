@@ -45,11 +45,10 @@ export const SUBTAB_CONFIGS = {
   metricas: {
     defaultSubtab: 'mediciones',
     tabs: [
-      { value: 'pesos', icon: IconScale, label: 'Pesos', mobileLabel: 'Pesos' },
       { value: 'mediciones', icon: IconChartLine, label: 'Mediciones', mobileLabel: 'Med.' },
+      { value: 'pesos', icon: IconScale, label: 'Pesos', mobileLabel: 'Pesos' },
       { value: 'analiticas', icon: IconReportAnalytics, label: 'Analíticas', mobileLabel: 'Anali.' },
       { value: 'hidratacion', icon: IconDroplet, label: 'Hidratación', mobileLabel: 'Hidra.' },
-      { value: 'protocolos', icon: IconClipboardList, label: 'Protocolos', mobileLabel: 'Prot.' },
     ],
     headers: {
       pesos: {
@@ -76,12 +75,6 @@ export const SUBTAB_CONFIGS = {
         title: 'Hidratación y sudoración',
         subtitle: 'Osmolaridad salival y sodio en sudor.',
       },
-      protocolos: {
-        icon: IconClipboardList,
-        iconColor: 'dark',
-        title: 'Protocolos',
-        subtitle: 'Guía nutricional para distintos protocolos.',
-      },
     },
   },
   nutricion: {
@@ -90,6 +83,7 @@ export const SUBTAB_CONFIGS = {
       { value: 'plan', icon: IconBrain, label: 'Plan nutricional', mobileLabel: 'Plan' },
       { value: 'suplementacion', icon: IconBottle, label: 'Suplementación', mobileLabel: 'Supl.' },
       { value: 'menu', icon: IconChefHat, label: 'Menú semanal', mobileLabel: 'Menú' },
+      { value: 'protocolos', icon: IconClipboardList, label: 'Protocolos', mobileLabel: 'Prot.' },
     ],
     headers: {
       plan: {
@@ -109,6 +103,12 @@ export const SUBTAB_CONFIGS = {
         iconColor: 'teal',
         title: 'Menú comedor',
         subtitle: 'Comedor del equipo.',
+      },
+      protocolos: {
+        icon: IconClipboardList,
+        iconColor: 'dark',
+        title: 'Protocolos',
+        subtitle: 'Guía nutricional para distintos protocolos.',
       },
     },
   },

@@ -48,9 +48,9 @@ export default function PlayerTabs({
   const validSubtabs = {
     resumen: ['perfil', 'diario', 'mensajes'],
     metricas: readOnly
-      ? ['mediciones', 'hidratacion', 'protocolos']
-      : ['mediciones', 'analiticas', 'hidratacion', 'protocolos'],
-    nutricion: ['plan', 'suplementacion', 'menu'],
+      ? ['mediciones', 'pesos', 'hidratacion']
+      : ['mediciones', 'pesos', 'analiticas', 'hidratacion'],
+    nutricion: ['plan', 'suplementacion', 'menu', 'protocolos'],
   };
 
   const activeTab = VALID_TABS.includes(normalizedTab) ? normalizedTab : 'resumen';

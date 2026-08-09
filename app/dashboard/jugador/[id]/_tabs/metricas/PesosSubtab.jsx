@@ -26,12 +26,11 @@ import {
   Modal,
   NumberInput,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
 import SubtabHeader from '../SubtabHeader';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { savePesaje, deletePesaje } from '@/services/pesaje';
-import { IconCalendarStats, IconEdit, IconPlus, IconScale, IconTrash } from '@tabler/icons-react';
+import { IconEdit, IconPlus, IconScale, IconTrash } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 
@@ -229,7 +228,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], r
                         contentStyle={{ borderRadius: '8px', border: '1px solid var(--mantine-color-gray-2)', padding: '4px 8px', fontSize: 10 }}
                       />
                       <Bar dataKey="peso_kg" radius={[4, 4, 0, 0]} maxBarSize={32}>
-                        {sortedAsc.map((entry, index) => {
+                        {sortedAsc.map((entry) => {
                           const isSelected = String(entry.id) === String(selected?.id);
                           return (
                             <Cell
