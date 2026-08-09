@@ -27,6 +27,7 @@ import {
   NumberInput,
 } from '@mantine/core';
 import SubtabHeader from '../SubtabHeader';
+import classes from '../SubtabSectionHeader.module.css';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { savePesaje, deletePesaje } from '@/services/pesaje';
@@ -162,10 +163,12 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], r
   }
 
   return (
-    <Stack gap="md">
-      <Paper p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder>
-        <Group justify="space-between" align="center">
-          <SubtabHeader tab="metricas" subtab="pesos" title="Evolución de Peso" />
+    <Stack gap={0}>
+      <Paper className={classes.mobileSticky} p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+        <Group justify="space-between" align="flex-start" wrap="nowrap">
+          <Group gap="xs" style={{ flex: 1 }}>
+            <SubtabHeader tab="metricas" subtab="pesos" />
+          </Group>
           {!readOnly && (
             <Button size="xs" radius="xl" leftSection={<IconPlus size={14} />} onClick={startNew}>
               Añadir Peso
@@ -174,7 +177,8 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], r
         </Group>
       </Paper>
 
-      {sortedAsc.length === 0 ? (
+      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+        {sortedAsc.length === 0 ? (
         <NothingFound
           icon={IconScale}
           title="Sin registros de peso"
@@ -320,6 +324,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], r
           </Grid.Col>
         </Grid>
       )}
+      </Box>
 
       <Modal opened={modalOpened} onClose={() => setModalOpened(false)} title={<Text fw={700}>{form.id ? 'Editar peso' : 'Nuevo registro de peso'}</Text>} centered radius="lg">
         <Stack gap="md">
