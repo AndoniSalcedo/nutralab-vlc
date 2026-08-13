@@ -12,7 +12,7 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const { teamId } = params;
+    const { teamId } = await params;
     const body = await request.json();
     const { configuracion_nutricional } = body;
 

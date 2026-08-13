@@ -18,9 +18,10 @@ export default async function JugadorTabPage({ params }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
   const isPlayer = user?.role === 'jugador';
-  const id = params.id;
-  const activeTab = params.tab;
-  const activeSubtab = params.subtab?.[0];
+  const resolvedParams = await params;
+  const id = resolvedParams.id;
+  const activeTab = resolvedParams.tab;
+  const activeSubtab = resolvedParams.subtab?.[0];
 
   const rawJugador = await getPlayerWithTeamConfig(supabase, id);
   if (!rawJugador) {

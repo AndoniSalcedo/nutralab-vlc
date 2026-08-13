@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { initials, filenameFromResponse } from '@/lib/utils';
-import { Anchor, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, Badge, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Grid, Modal } from '@mantine/core';
+import { Anchor, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Grid, Modal, Divider } from '@mantine/core';
 import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
@@ -23,6 +23,114 @@ import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import TeamTecnicosConfig from '@/components/TeamTecnicosConfig';
 
 const PAGE_SIZE = 8;
+
+function PlayerPositionText({ position }) {
+  if (!position) {
+    return <Text fz="sm" c="dimmed">—</Text>;
+  }
+
+  return (
+    <Text fz="sm" fw={500} c="dark.4" style={{ textTransform: 'capitalize' }}>
+      {position}
+    </Text>
+  );
+}
+
+function PlayerSemaforoIndicator({ semaforo }) {
+  if (!semaforo?.hasPesajes) {
+    return (
+      <Tooltip label="Sin registros de pesaje para calcular peso de referencia" withArrow radius="md">
+        <Text fz="xs" c="dimmed" style={{ fontStyle: 'italic' }}>
+          Sin pesajes
+        </Text>
+      </Tooltip>
+    );
+  }
+
+  const { status, label, pesoActual, pesoReferencia, diff } = semaforo;
+  const isPositive = diff > 0;
+  const formattedDiff = diff !== null ? (isPositive ? `+${diff.toFixed(2)} kg` : `${diff.toFixed(2)} kg`) : '0.00 kg';
+
+  const statusConfigMap = {
+    verde: {
+      color: '#2e7d32',
+      dotColor: '#2e7d32',
+      title: 'Óptimo',
+    },
+    amarillo: {
+      color: '#b45309',
+      dotColor: '#f59f00',
+      title: 'Precaución',
+    },
+    rojo: {
+      color: '#c92a2a',
+      dotColor: '#e03131',
+      title: diff < 0 ? 'Pérdida' : 'Exceso',
+    },
+  };
+
+  const cfg = statusConfigMap[status] || statusConfigMap.verde;
+
+  return (
+    <Tooltip
+      withArrow
+      radius="md"
+      multiline
+      w={240}
+      label={
+        <Stack gap={4} p={4}>
+          <Group justify="space-between" align="center">
+            <Text size="xs" fw={700} c={cfg.color}>
+              ● {label}
+            </Text>
+            <Text size="xs" fw={700} c={cfg.color} style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {status}
+            </Text>
+          </Group>
+          <Divider my={2} style={{ opacity: 0.2 }} />
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">Peso Actual:</Text>
+            <Text size="xs" fw={700}>{pesoActual} kg</Text>
+          </Group>
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">Peso Ref (Media):</Text>
+            <Text size="xs" fw={700}>{pesoReferencia} kg</Text>
+          </Group>
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">Variación:</Text>
+            <Text size="xs" fw={700} c={cfg.color}>
+              {formattedDiff}
+            </Text>
+          </Group>
+          <Text size="10px" c="dimmed" mt={2} style={{ fontStyle: 'italic' }}>
+            Margen verde (±0,75 kg) · Amarillo (±1,50 kg)
+          </Text>
+        </Stack>
+      }
+    >
+      <Box style={{ cursor: 'pointer' }}>
+        <Group gap={6} align="center" wrap="nowrap">
+          <Box
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              backgroundColor: cfg.dotColor,
+              boxShadow: `0 0 6px ${cfg.dotColor}`,
+              flexShrink: 0,
+            }}
+          />
+          <Text fz="sm" fw={700} style={{ color: cfg.color }}>
+            {formattedDiff}
+          </Text>
+        </Group>
+        <Text fz="11px" c="dimmed" mt={2}>
+          {cfg.title} · Ref: <span style={{ fontWeight: 600 }}>{pesoReferencia} kg</span>
+        </Text>
+      </Box>
+    </Tooltip>
+  );
+}
 
 function normalize(value) {
   return String(value || '').toLowerCase().trim();
@@ -654,47 +762,47 @@ export default function DashboardContent({ players = [], team, readOnly = false 
         {/* 3. LISTADO DE JUGADORES (TABLA) */}
         <Box>
           {filteredPlayers.length > 0 ? (
-            <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
+            <Paper radius="xl" p={0} bg="white" shadow="xs" withBorder style={{ overflow: 'hidden', borderColor: 'rgba(222,226,230,0.8)' }}>
               <ScrollArea>
-                <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 800 }}>
-                  <Table.Thead bg="gray.0">
+                <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 850 }}>
+                  <Table.Thead bg="rgba(248, 249, 250, 0.95)">
                     <Table.Tr>
-                      <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
-                      <Table.Th visibleFrom="xs">Métricas</Table.Th>
-                      <Table.Th visibleFrom="xs">Semáforo</Table.Th>
-                      <Table.Th visibleFrom="sm">Plan</Table.Th>
-                      <Table.Th>Posición</Table.Th>
+                      <Table.Th style={{ paddingLeft: 24, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Jugador</Table.Th>
+                      <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Métricas</Table.Th>
+                      <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Semáforo Peso</Table.Th>
+                      <Table.Th visibleFrom="sm" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Plan Nutricional</Table.Th>
+                      <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Posición</Table.Th>
                       <Table.Th w={70} />
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
                     {paginatedPlayers.map((player) => (
                       <Table.Tr
-                        h={75}
+                        h={74}
                         key={player.id}
                         onClick={() => router.push(`/dashboard/jugador/${player.id}`)}
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: 'pointer', transition: 'background-color 120ms ease' }}
                       >
                         {/* COLUMNA 1: JUGADOR */}
                         <Table.Td style={{ paddingLeft: 24 }}>
                           <Group gap="sm" wrap="nowrap">
-                            <Avatar size={42} radius="xl" color="initials">
+                            <Avatar size={42} radius="xl" color="initials" style={{ border: '1.5px solid rgba(222, 226, 230, 0.7)' }}>
                               {initials(`${player.nombre} ${player.apellidos || ''}`)}
                             </Avatar>
                             <Box style={{ minWidth: 0 }}>
                               <Group gap={6} wrap="nowrap">
-                                <Text fz="sm" fw={600} c="dark.4" truncate>
+                                <Text fz="sm" fw={650} c="dark.4" truncate>
                                   {player.nombre} {player.apellidos}
                                 </Text>
                                 {!player.auth_user_id && (
                                   <Tooltip label="El usuario no tiene credenciales para entrar" withArrow>
-                                    <ThemeIcon color="yellow" variant="light" radius="xl" size="sm" style={{ flex: '0 0 auto' }}>
-                                      <IconAlertTriangle size={14} />
+                                    <ThemeIcon color="yellow" variant="light" radius="xl" size="xs" style={{ flex: '0 0 auto' }}>
+                                      <IconAlertTriangle size={12} />
                                     </ThemeIcon>
                                   </Tooltip>
                                 )}
                               </Group>
-                              <Text c="dimmed" fz="xs" style={{ lineHeight: 1 }} truncate>
+                              <Text c="dimmed" fz="xs" style={{ lineHeight: 1.2 }} truncate>
                                 {player.auth_email || 'Sin credenciales de acceso'}
                               </Text>
                             </Box>
@@ -704,13 +812,15 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                         {/* COLUMNA 2: MÉTRICAS */}
                         <Table.Td visibleFrom="xs">
                           {player.peso_kg || player.porcentaje_grasa ? (
-                            <>
-                              <Text fz="sm" fw={500} c="dark.4">
+                            <Box>
+                              <Text fz="sm" fw={600} c="dark.4">
                                 {player.peso_kg ? `${player.peso_kg} kg` : '—'}
-                                {player.porcentaje_grasa ? ` · ${player.porcentaje_grasa}% GC` : ''}
+                                {player.porcentaje_grasa ? (
+                                  <Text component="span" c="dimmed" fw={400} fz="xs"> · {player.porcentaje_grasa}% GC</Text>
+                                ) : ''}
                               </Text>
-                              <Text fz="xs" c="dimmed">Composición</Text>
-                            </>
+                              <Text fz="11px" c="dimmed">Composición corporal</Text>
+                            </Box>
                           ) : (
                             <Text fz="sm" c="dimmed">—</Text>
                           )}
@@ -718,55 +828,21 @@ export default function DashboardContent({ players = [], team, readOnly = false 
 
                         {/* COLUMNA 3: SEMÁFORO */}
                         <Table.Td visibleFrom="xs">
-                          {player.semaforo?.hasPesajes ? (
-                            <Tooltip
-                              withArrow
-                              multiline
-                              w={220}
-                              label={
-                                <Box p={2}>
-                                  <Text size="xs" fw={700}>Estado: {player.semaforo.label}</Text>
-                                  <Text size="xs">Peso Actual: {player.semaforo.pesoActual} kg</Text>
-                                  <Text size="xs">Peso Ref (Media): {player.semaforo.pesoReferencia} kg</Text>
-                                  <Text size="xs">Variación: {player.semaforo.diff > 0 ? `+${player.semaforo.diff}` : player.semaforo.diff} kg</Text>
-                                </Box>
-                              }
-                            >
-                              <Box style={{ display: 'inline-block' }}>
-                                <Badge
-                                  variant="light"
-                                  color={player.semaforo.color}
-                                  radius="xl"
-                                  size="sm"
-                                  style={{ textTransform: 'none' }}
-                                >
-                                  {player.semaforo.status === 'verde' && '🟢 '}
-                                  {player.semaforo.status === 'amarillo' && '🟡 '}
-                                  {player.semaforo.status === 'rojo' && '🔴 '}
-                                  {player.semaforo.diff !== null ? (player.semaforo.diff > 0 ? `+${player.semaforo.diff} kg` : `${player.semaforo.diff} kg`) : player.semaforo.label}
-                                </Badge>
-                                <Text fz="xs" c="dimmed" mt={2}>
-                                  Ref: {player.semaforo.pesoReferencia} kg
-                                </Text>
-                              </Box>
-                            </Tooltip>
-                          ) : (
-                            <Tooltip label="Sin registros de pesaje para calcular peso de referencia" withArrow>
-                              <Text fz="xs" c="dimmed">Sin pesajes</Text>
-                            </Tooltip>
-                          )}
+                          <PlayerSemaforoIndicator semaforo={player.semaforo} />
                         </Table.Td>
 
                         {/* COLUMNA 4: KCAL OBJETIVO */}
                         <Table.Td visibleFrom="sm">
-                          {player.plan.kcal ? (
-                            <Group gap={6} wrap="nowrap">
-                              <IconFlame size={14} style={{ opacity: 0.5 }} color="var(--mantine-color-orange-6)" />
+                          {player.plan?.kcal ? (
+                            <Group gap={8} wrap="nowrap" align="center">
+                              <ThemeIcon color="orange" variant="light" radius="xl" size={28}>
+                                <IconFlame size={15} color="var(--mantine-color-orange-6)" />
+                              </ThemeIcon>
                               <Box>
-                                <Text fz="sm" fw={500} c="dark.4" lh={1.2}>
+                                <Text fz="sm" fw={650} c="dark.4" lh={1.1}>
                                   {player.plan.kcal} kcal
                                 </Text>
-                                <Text fz="xs" c="dimmed">
+                                <Text fz="11px" c="dimmed">
                                   {player.plan.calculated ? 'Estimado' : 'Objetivo'}
                                 </Text>
                               </Box>
@@ -776,11 +852,9 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                           )}
                         </Table.Td>
 
-                        {/* COLUMNA 4: POSICIÓN */}
+                        {/* COLUMNA 5: POSICIÓN */}
                         <Table.Td>
-                          <Badge variant="light" color="gray" radius="sm">
-                            {player.posicion || 'Sin posición'}
-                          </Badge>
+                          <PlayerPositionText position={player.posicion} />
                         </Table.Td>
 
                         {/* COLUMNA 5: ACCIONES */}

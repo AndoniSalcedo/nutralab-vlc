@@ -12,7 +12,8 @@ export const revalidate = 0;
 export default async function TeamAnalyticsPage({ params }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
-  const team = await getOwnedTeam(supabase, user, params.teamId);
+  const { teamId } = await params;
+  const team = await getOwnedTeam(supabase, user, teamId);
 
   if (!team) {
     return (

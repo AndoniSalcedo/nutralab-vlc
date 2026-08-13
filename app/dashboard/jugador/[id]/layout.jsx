@@ -11,7 +11,7 @@ export default async function JugadorLayout({ children, params }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
   const isPlayer = user?.role === 'jugador';
-  const id = params.id;
+  const { id } = await params;
 
   if (!isPlayer) {
     const accessiblePlayer = await getAccessiblePlayer(supabase, user, id);

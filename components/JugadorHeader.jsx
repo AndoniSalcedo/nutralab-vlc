@@ -6,8 +6,8 @@ import {
   Anchor,
   Avatar,
   Box,
-  Badge,
   Button,
+  Divider,
   Group,
   Menu,
   Paper,
@@ -17,7 +17,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconAlertTriangle, IconChevronLeft, IconEdit, IconLogout, IconMenu2 } from '@tabler/icons-react';
+import { IconChevronLeft, IconEdit, IconLogout, IconMenu2 } from '@tabler/icons-react';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
@@ -39,9 +39,11 @@ function CredentialsWarning({ show }) {
   if (!show) return null;
 
   return (
-    <Badge variant="light" color="yellow" size="sm" radius="sm" leftSection={<IconAlertTriangle size={12} />}>
-      Sin credenciales
-    </Badge>
+    <Box>
+      <Text size="xs" c="orange.7" fw={600}>
+        ⚠️ Sin credenciales
+      </Text>
+    </Box>
   );
 }
 
@@ -131,6 +133,92 @@ function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, compact = false }) 
   );
 }
 
+function HeaderSemaforoIndicator({ semaforo, centered = false }) {
+  if (!semaforo?.hasPesajes) return null;
+
+  const { status, label, pesoActual, pesoReferencia, diff } = semaforo;
+  const isPositive = diff > 0;
+  const formattedDiff = diff !== null ? (isPositive ? `+${diff.toFixed(2)} kg` : `${diff.toFixed(2)} kg`) : '0.00 kg';
+
+  const statusConfigMap = {
+    verde: {
+      color: '#2e7d32',
+      dotColor: '#2e7d32',
+      title: 'Óptimo',
+    },
+    amarillo: {
+      color: '#b45309',
+      dotColor: '#f59f00',
+      title: 'Precaución',
+    },
+    rojo: {
+      color: '#c92a2a',
+      dotColor: '#e03131',
+      title: diff < 0 ? 'Pérdida' : 'Exceso',
+    },
+  };
+
+  const cfg = statusConfigMap[status] || statusConfigMap.verde;
+
+  return (
+    <Tooltip
+      withArrow
+      radius="md"
+      multiline
+      w={240}
+      label={
+        <Stack gap={4} p={4}>
+          <Group justify="space-between" align="center">
+            <Text size="xs" fw={700} c={cfg.color}>
+              ● {label}
+            </Text>
+            <Text size="xs" fw={700} c={cfg.color} style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              {status}
+            </Text>
+          </Group>
+          <Divider my={2} style={{ opacity: 0.2 }} />
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">Peso Actual:</Text>
+            <Text size="xs" fw={700}>{pesoActual} kg</Text>
+          </Group>
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">Peso Ref (Media):</Text>
+            <Text size="xs" fw={700}>{pesoReferencia} kg</Text>
+          </Group>
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">Variación:</Text>
+            <Text size="xs" fw={700} c={cfg.color}>
+              {formattedDiff}
+            </Text>
+          </Group>
+          <Text size="10px" c="dimmed" mt={2} style={{ fontStyle: 'italic' }}>
+            Margen verde (±0,75 kg) · Amarillo (±1,50 kg)
+          </Text>
+        </Stack>
+      }
+    >
+      <Group gap={6} align="center" justify={centered ? 'center' : undefined} style={{ cursor: 'pointer', marginTop: 2 }}>
+        <Box
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            backgroundColor: cfg.dotColor,
+            boxShadow: `0 0 6px ${cfg.dotColor}`,
+            flexShrink: 0,
+          }}
+        />
+        <Text fz="xs" fw={700} style={{ color: cfg.color }}>
+          {pesoActual} kg ({formattedDiff})
+        </Text>
+        <Text fz="xs" c="dimmed">
+          · {cfg.title} (Media: {pesoReferencia} kg)
+        </Text>
+      </Group>
+    </Tooltip>
+  );
+}
+
 function PlayerIdentity({ jugador, isAdmin, hasCredentials, avatarSize = 84, titleSize = 26, centered = false }) {
   return (
     <>
@@ -154,6 +242,7 @@ function PlayerIdentity({ jugador, isAdmin, hasCredentials, avatarSize = 84, tit
             </>
           )}
         </Group>
+        <HeaderSemaforoIndicator semaforo={jugador.semaforo} centered={centered} />
         <CredentialsWarning show={!hasCredentials && isAdmin} />
       </Stack>
     </>

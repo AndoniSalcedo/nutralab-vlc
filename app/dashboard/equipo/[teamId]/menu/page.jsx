@@ -11,7 +11,8 @@ export const revalidate = 0;
 export default async function TeamMenuPage({ params }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
-  const team = await getAccessibleTeam(supabase, user, params.teamId);
+  const { teamId } = await params;
+  const team = await getAccessibleTeam(supabase, user, teamId);
 
   if (!team) {
     return (

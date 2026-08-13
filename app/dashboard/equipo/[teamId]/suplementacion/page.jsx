@@ -17,7 +17,8 @@ export const revalidate = 0;
 export default async function TeamSupplementationPage({ params, searchParams }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
-  const team = await getAccessibleTeam(supabase, user, params.teamId);
+  const { teamId } = await params;
+  const team = await getAccessibleTeam(supabase, user, teamId);
 
   if (!team) {
     return (
@@ -59,7 +60,8 @@ export default async function TeamSupplementationPage({ params, searchParams }) 
     console.error('Error fetching team supplementation:', error);
   }
 
-  const playersParam = searchParams?.players || searchParams?.jugadores || searchParams?.playerIds;
+  const sParams = await searchParams;
+  const playersParam = sParams?.players || sParams?.jugadores || sParams?.playerIds;
   const initialSelectedPlayerIds = playersParam
     ? String(playersParam).split(',').map(Number).filter(Number.isFinite)
     : null;

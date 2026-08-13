@@ -25,7 +25,6 @@ import {
   ScrollArea,
   Modal,
   NumberInput,
-  Badge,
   Tooltip as MantineTooltip,
 } from '@mantine/core';
 import SubtabHeader from '../SubtabHeader';
@@ -219,19 +218,21 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], r
                   >
                     <Box style={{ textAlign: 'right', cursor: 'pointer' }}>
                       <Text size="xs" c="dimmed" tt="uppercase" fw={750} mb={4}>Estado Semáforo</Text>
-                      <Badge
-                        variant="light"
-                        color={semaforo.color}
-                        radius="xl"
-                        size="lg"
-                        style={{ textTransform: 'none' }}
-                      >
-                        {semaforo.status === 'verde' && '🟢 '}
-                        {semaforo.status === 'amarillo' && '🟡 '}
-                        {semaforo.status === 'rojo' && '🔴 '}
-                        {semaforo.label} ({semaforo.diff > 0 ? `+${semaforo.diff}` : semaforo.diff} kg)
-                      </Badge>
-                      <Text size="xs" c="dimmed" mt={4}>
+                      <Group gap={6} justify="flex-end" align="center">
+                        <Box
+                          style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: '50%',
+                            backgroundColor: semaforo.color === 'green' ? '#2e7d32' : semaforo.color === 'yellow' ? '#f59f00' : '#e03131',
+                            boxShadow: `0 0 8px ${semaforo.color === 'green' ? '#2e7d32' : semaforo.color === 'yellow' ? '#f59f00' : '#e03131'}`,
+                          }}
+                        />
+                        <Text size="sm" fw={700} c={semaforo.color === 'green' ? 'green.8' : semaforo.color === 'yellow' ? 'orange.8' : 'red.8'}>
+                          {semaforo.label} ({semaforo.diff > 0 ? `+${semaforo.diff}` : semaforo.diff} kg)
+                        </Text>
+                      </Group>
+                      <Text size="xs" c="dimmed" mt={2}>
                         Peso Ref (Media): <b>{semaforo.pesoReferencia} kg</b>
                       </Text>
                     </Box>

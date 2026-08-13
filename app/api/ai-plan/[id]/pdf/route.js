@@ -17,7 +17,8 @@ export const runtime = 'nodejs';
 
 export async function GET(_request, { params }) {
   try {
-    const planId = params?.id;
+    const resolvedParams = await params;
+    const planId = resolvedParams?.id;
     if (!planId) return NextResponse.json({ error: 'Falta id del plan' }, { status: 400 });
 
     const supabase = getSupabaseAdmin();
