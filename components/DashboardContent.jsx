@@ -661,6 +661,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                     <Table.Tr>
                       <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
                       <Table.Th visibleFrom="xs">Métricas</Table.Th>
+                      <Table.Th visibleFrom="xs">Semáforo</Table.Th>
                       <Table.Th visibleFrom="sm">Plan</Table.Th>
                       <Table.Th>Posición</Table.Th>
                       <Table.Th w={70} />
@@ -715,7 +716,48 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                           )}
                         </Table.Td>
 
-                        {/* COLUMNA 3: KCAL OBJETIVO */}
+                        {/* COLUMNA 3: SEMÁFORO */}
+                        <Table.Td visibleFrom="xs">
+                          {player.semaforo?.hasPesajes ? (
+                            <Tooltip
+                              withArrow
+                              multiline
+                              w={220}
+                              label={
+                                <Box p={2}>
+                                  <Text size="xs" fw={700}>Estado: {player.semaforo.label}</Text>
+                                  <Text size="xs">Peso Actual: {player.semaforo.pesoActual} kg</Text>
+                                  <Text size="xs">Peso Ref (Media): {player.semaforo.pesoReferencia} kg</Text>
+                                  <Text size="xs">Variación: {player.semaforo.diff > 0 ? `+${player.semaforo.diff}` : player.semaforo.diff} kg</Text>
+                                </Box>
+                              }
+                            >
+                              <Box style={{ display: 'inline-block' }}>
+                                <Badge
+                                  variant="light"
+                                  color={player.semaforo.color}
+                                  radius="xl"
+                                  size="sm"
+                                  style={{ textTransform: 'none' }}
+                                >
+                                  {player.semaforo.status === 'verde' && '🟢 '}
+                                  {player.semaforo.status === 'amarillo' && '🟡 '}
+                                  {player.semaforo.status === 'rojo' && '🔴 '}
+                                  {player.semaforo.diff !== null ? (player.semaforo.diff > 0 ? `+${player.semaforo.diff} kg` : `${player.semaforo.diff} kg`) : player.semaforo.label}
+                                </Badge>
+                                <Text fz="xs" c="dimmed" mt={2}>
+                                  Ref: {player.semaforo.pesoReferencia} kg
+                                </Text>
+                              </Box>
+                            </Tooltip>
+                          ) : (
+                            <Tooltip label="Sin registros de pesaje para calcular peso de referencia" withArrow>
+                              <Text fz="xs" c="dimmed">Sin pesajes</Text>
+                            </Tooltip>
+                          )}
+                        </Table.Td>
+
+                        {/* COLUMNA 4: KCAL OBJETIVO */}
                         <Table.Td visibleFrom="sm">
                           {player.plan.kcal ? (
                             <Group gap={6} wrap="nowrap">

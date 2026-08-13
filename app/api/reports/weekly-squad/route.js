@@ -13,6 +13,7 @@ import { getPlayerById, getPlayersByTeam } from '@/repositories/playerRepository
 import { getTeamById } from '@/repositories/teamRepository';
 import { getWeeklyReport, upsertWeeklyReport } from '@/repositories/weeklyReportsRepository';
 import { getEvolutionsByPlayerIds } from '@/repositories/evolutionRepository';
+import { getPesajesByPlayerIds } from '@/repositories/pesajeRepository';
 import { getMenuByWeekAndTeam } from '@/repositories/menuRepository';
 import { getAiPlansByPlayerIdsFull, updateAiPlan, insertAiPlan } from '@/repositories/aiPlanRepository';
 
@@ -134,7 +135,10 @@ async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, c
   }
 
   const playerIds = players.map((player) => player.id);
-  const evoluciones = await getEvolutionsByPlayerIds(supabase, playerIds);
+  const [evoluciones, pesajes] = await Promise.all([
+    getEvolutionsByPlayerIds(supabase, playerIds),
+    getPesajesByPlayerIds(supabase, playerIds),
+  ]);
 
   // Load menu
   let menu = null;
@@ -148,7 +152,8 @@ async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, c
 
   const resolvedPlayers = await runWithConcurrency(players, 5, async (rawPlayer) => {
     const playerEvoluciones = (evoluciones || []).filter((item) => String(item.jugador_id) === String(rawPlayer.id));
-    const player = withLatestMeasurement(rawPlayer, playerEvoluciones);
+    const playerPesajes = (pesajes || []).filter((item) => String(item.jugador_id) === String(rawPlayer.id));
+    const player = withLatestMeasurement(rawPlayer, playerEvoluciones, playerPesajes);
 
     // Find if player has plan for this week
     const playerPlans = (allPlans || []).filter((p) => String(p.jugador_id) === String(player.id));

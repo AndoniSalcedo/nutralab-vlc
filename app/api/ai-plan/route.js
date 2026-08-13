@@ -7,6 +7,7 @@ import { withLatestMeasurement } from '@/lib/player-metrics';
 import { generarDatosPlan } from '@/lib/ai-plan-generator';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
+import { getPesajesByPlayerId } from '@/repositories/pesajeRepository';
 import {
   getAiPlansByPlayerId,
   getAiPlanById,
@@ -17,12 +18,13 @@ import {
 import { getMenuByWeekAndTeam } from '@/repositories/menuRepository';
 
 async function loadPlayerWithLatestMetrics(supabase, jugadorId) {
-  const [jugador, evoluciones] = await Promise.all([
+  const [jugador, evoluciones, pesajes] = await Promise.all([
     getPlayerWithTeamConfig(supabase, jugadorId),
     getEvolutionsByPlayerId(supabase, jugadorId),
+    getPesajesByPlayerId(supabase, jugadorId),
   ]);
 
-  return withLatestMeasurement(jugador, evoluciones || []);
+  return withLatestMeasurement(jugador, evoluciones || [], pesajes || []);
 }
 
 export async function GET(req) {

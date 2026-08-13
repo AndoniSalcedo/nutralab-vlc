@@ -5,6 +5,7 @@ import { withLatestMeasurement } from '@/lib/player-metrics';
 import { getAccessibleTeam } from '@/lib/team-access';
 import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIdsSimple } from '@/repositories/evolutionRepository';
+import { getPesajesByPlayerIdsSimple } from '@/repositories/pesajeRepository';
 import NothingFound from '@/components/NothingFound';
 
 export const dynamic = 'force-dynamic';
@@ -37,15 +38,23 @@ export default async function TeamDashboard({ params }) {
 
     const playerIds = (resJugadores || []).map((player) => player.id);
     let evoluciones = [];
+    let pesajes = [];
     if (playerIds.length) {
-      evoluciones = await getEvolutionsByPlayerIdsSimple(supabase, playerIds);
+      [evoluciones, pesajes] = await Promise.all([
+        getEvolutionsByPlayerIdsSimple(supabase, playerIds),
+        getPesajesByPlayerIdsSimple(supabase, playerIds),
+      ]);
     }
 
     players = (resJugadores || []).map((player) => (
-      withLatestMeasurement(player, evoluciones.filter((item) => String(item.jugador_id) === String(player.id)))
+      withLatestMeasurement(
+        player,
+        evoluciones.filter((item) => String(item.jugador_id) === String(player.id)),
+        pesajes.filter((item) => String(item.jugador_id) === String(player.id))
+      )
     ));
   } catch (err) {
-    console.error('Error fetching team players/evolutions:', err);
+    console.error('Error fetching team players/evolutions/pesajes:', err);
   }
 
   return <DashboardContent players={players} team={team} readOnly={user?.role === 'tecnico'} />;

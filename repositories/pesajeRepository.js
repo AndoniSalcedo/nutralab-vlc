@@ -9,6 +9,30 @@ export async function getPesajesByPlayerId(supabase, playerId) {
   return data || [];
 }
 
+export async function getPesajesByPlayerIdsSimple(supabase, playerIds) {
+  if (!playerIds || playerIds.length === 0) return [];
+  const { data, error } = await supabase
+    .from('pesajes')
+    .select('id,jugador_id,fecha,peso_kg')
+    .in('jugador_id', playerIds)
+    .order('fecha', { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getPesajesByPlayerIds(supabase, playerIds) {
+  if (!playerIds || playerIds.length === 0) return [];
+  const { data, error } = await supabase
+    .from('pesajes')
+    .select('*')
+    .in('jugador_id', playerIds)
+    .order('fecha', { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+}
+
 export async function getPesajeById(supabase, id) {
   const { data, error } = await supabase
     .from('pesajes')

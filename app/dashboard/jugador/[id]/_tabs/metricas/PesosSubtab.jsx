@@ -25,6 +25,8 @@ import {
   ScrollArea,
   Modal,
   NumberInput,
+  Badge,
+  Tooltip as MantineTooltip,
 } from '@mantine/core';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
@@ -34,6 +36,7 @@ import { savePesaje, deletePesaje } from '@/services/pesaje';
 import { IconEdit, IconPlus, IconScale, IconTrash } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
+import { calculateSemaforo } from '@/lib/player-metrics';
 
 function fechaLabel(fecha) {
   if (!fecha) return 'Sin fecha';
@@ -162,6 +165,8 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], r
     }
   }
 
+  const semaforo = useMemo(() => calculateSemaforo(pesajes), [pesajes]);
+
   return (
     <Stack gap={0}>
       <Paper className={classes.mobileSticky} p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
@@ -197,6 +202,41 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], r
                     {selected ? `${selected.peso_kg} kg` : '-'}
                   </Title>
                 </Box>
+
+                {semaforo.hasPesajes && (
+                  <MantineTooltip
+                    withArrow
+                    multiline
+                    w={240}
+                    label={
+                      <Box p={2}>
+                        <Text size="xs" fw={700}>Semáforo: {semaforo.label}</Text>
+                        <Text size="xs">Peso Actual: {semaforo.pesoActual} kg</Text>
+                        <Text size="xs">Peso Ref (Media): {semaforo.pesoReferencia} kg</Text>
+                        <Text size="xs">Variación: {semaforo.diff > 0 ? `+${semaforo.diff}` : semaforo.diff} kg</Text>
+                      </Box>
+                    }
+                  >
+                    <Box style={{ textAlign: 'right', cursor: 'pointer' }}>
+                      <Text size="xs" c="dimmed" tt="uppercase" fw={750} mb={4}>Estado Semáforo</Text>
+                      <Badge
+                        variant="light"
+                        color={semaforo.color}
+                        radius="xl"
+                        size="lg"
+                        style={{ textTransform: 'none' }}
+                      >
+                        {semaforo.status === 'verde' && '🟢 '}
+                        {semaforo.status === 'amarillo' && '🟡 '}
+                        {semaforo.status === 'rojo' && '🔴 '}
+                        {semaforo.label} ({semaforo.diff > 0 ? `+${semaforo.diff}` : semaforo.diff} kg)
+                      </Badge>
+                      <Text size="xs" c="dimmed" mt={4}>
+                        Peso Ref (Media): <b>{semaforo.pesoReferencia} kg</b>
+                      </Text>
+                    </Box>
+                  </MantineTooltip>
+                )}
               </Group>
 
               <Stack gap="md">
