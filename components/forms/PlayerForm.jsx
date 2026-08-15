@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   TextInput, 
   Select, 
@@ -11,20 +11,25 @@ import {
   SimpleGrid, 
   Title, 
   Text, 
-  Box,
-  Checkbox,
-  MultiSelect,
-  NumberInput,
-  Paper,
+  Box, 
+  Checkbox, 
+  MultiSelect, 
+  NumberInput, 
+  Paper, 
   Divider,
+  Avatar,
+  FileButton,
+  ActionIcon,
+  Tooltip,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
-import { IconUser, IconCheck } from '@tabler/icons-react';
+import { IconUser, IconCheck, IconCamera, IconTrash } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { deletePlayer, savePlayer } from '@/services/player';
 import { PLAYER_OBJECTIVES } from '@/lib/calculations';
 import { AVAILABLE_MEALS } from '@/lib/nutrition-day-types';
+import { compressAvatar, avatarFromRecord, initials as getInitials } from '@/lib/avatar';
 
 function dateInputToIso(value) {
   if (!value) return '';
@@ -39,6 +44,38 @@ function dateInputToIso(value) {
 export default function PlayerForm({ initial, team }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
+  // Form states - Foto de perfil
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(() => {
+    if (initial?.avatar_url) return initial.avatar_url;
+    if (initial?.avatar_size) return `/api/players/avatar?id=${initial.id}&t=${initial.updated_at || ''}`;
+    if (typeof initial?.avatar === 'string' && initial.avatar.startsWith('data:')) return initial.avatar;
+    return '';
+  });
+  const [removeAvatar, setRemoveAvatar] = useState(false);
+
+  useEffect(() => {
+    if (initial?.avatar && (typeof initial.avatar === 'object' || String(initial.avatar).startsWith('\\x'))) {
+      avatarFromRecord(initial.avatar, initial.avatar_mime).then((url) => {
+        if (url) setAvatarPreview(url);
+      });
+    }
+  }, [initial]);
+
+  const handleAvatarChange = (file) => {
+    if (!file) return;
+    setAvatarFile(file);
+    setRemoveAvatar(false);
+    const localUrl = URL.createObjectURL(file);
+    setAvatarPreview(localUrl);
+  };
+
+  const handleRemoveAvatar = () => {
+    setAvatarFile(null);
+    setAvatarPreview('');
+    setRemoveAvatar(true);
+  };
 
   // Form states - Datos Personales
   const [nombre, setNombre] = useState(initial?.nombre ?? '');
@@ -99,6 +136,13 @@ export default function PlayerForm({ initial, team }) {
         formData.append('alergias', alergias);
         formData.append('objetivo', objetivo);
 
+        if (removeAvatar) {
+          formData.append('remove_avatar', 'true');
+        } else if (avatarFile instanceof File) {
+          const compressed = await compressAvatar(avatarFile);
+          formData.append('avatar', compressed);
+        }
+
         if (!initial?.id) {
           if (initialWeight) formData.append('initial_weight', String(initialWeight));
           if (initialHeight) formData.append('initial_height', String(initialHeight));
@@ -141,6 +185,66 @@ export default function PlayerForm({ initial, team }) {
             <div>
               <Text fw={700} size="sm" c="blue.8" mb="xs">Datos Personales y Deportivos</Text>
               <Divider mb="md" />
+
+              {/* Avatar Uploader Centrado */}
+              <Stack align="center" gap="xs" mb="lg">
+                <Box style={{ position: 'relative', display: 'inline-block' }}>
+                  <Avatar
+                    src={avatarPreview || undefined}
+                    size={100}
+                    radius="xl"
+                    color="blue"
+                    style={{
+                      border: '3px solid white',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                      backgroundColor: 'var(--mantine-color-blue-1)',
+                      color: 'var(--mantine-color-blue-8)',
+                      fontWeight: 700,
+                      fontSize: '24px',
+                    }}
+                  >
+                    {getInitials(`${nombre || ''} ${apellidos || ''}`)}
+                  </Avatar>
+
+                  <FileButton onChange={handleAvatarChange} accept="image/*">
+                    {(props) => (
+                      <Tooltip label="Subir foto" position="top" withArrow>
+                        <ActionIcon
+                          {...props}
+                          variant="filled"
+                          color="dark"
+                          radius="xl"
+                          size="md"
+                          style={{
+                            position: 'absolute',
+                            bottom: 0,
+                            right: 0,
+                            border: '2px solid white',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <IconCamera size={14} stroke={2} />
+                        </ActionIcon>
+                      </Tooltip>
+                    )}
+                  </FileButton>
+                </Box>
+
+                {avatarPreview && (
+                  <Button
+                    variant="subtle"
+                    color="red"
+                    size="xs"
+                    radius="xl"
+                    leftSection={<IconTrash size={13} />}
+                    onClick={handleRemoveAvatar}
+                  >
+                    Eliminar foto
+                  </Button>
+                )}
+              </Stack>
+
               <Stack gap="md">
                 <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                   <TextInput 
@@ -180,6 +284,7 @@ export default function PlayerForm({ initial, team }) {
             {/* Sección 2: Pautas Nutricionales */}
             <div>
               <Text fw={700} size="sm" c="blue.8" mb="xs">Pautas Nutricionales</Text>
+
               <Divider mb="md" />
               <Stack gap="md">
                 <Select

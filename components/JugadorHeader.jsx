@@ -17,7 +17,11 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconChevronLeft, IconEdit, IconLogout, IconMenu2 } from '@tabler/icons-react';
+import { IconChevronLeft, IconEdit, IconLogout, IconMenu2, IconCamera } from '@tabler/icons-react';
+import { FileButton } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { compressAvatar, avatarFromRecord, initials } from '@/lib/avatar';
+import { uploadPlayerAvatar } from '@/services/player';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
@@ -219,12 +223,102 @@ function HeaderSemaforoIndicator({ semaforo, centered = false }) {
   );
 }
 
-function PlayerIdentity({ jugador, isAdmin, hasCredentials, avatarSize = 84, titleSize = 26, centered = false }) {
+function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
+  const [loading, setLoading] = useState(false);
+  const [avatarSrc, setAvatarSrc] = useState(() => {
+    if (jugador?.avatar_url) return jugador.avatar_url;
+    if (jugador?.avatar_size) return `/api/players/avatar?id=${jugador.id}&t=${jugador.updated_at || ''}`;
+    if (typeof jugador?.avatar === 'string' && jugador.avatar.startsWith('data:')) return jugador.avatar;
+    return '';
+  });
+
+  const canEditPhoto = isAdmin || isPlayer;
+
+  async function handleFileChange(file) {
+    if (!file) return;
+    setLoading(true);
+    try {
+      const compressed = await compressAvatar(file);
+      await uploadPlayerAvatar(jugador.id, compressed);
+      const localUrl = URL.createObjectURL(compressed);
+      setAvatarSrc(localUrl);
+      notifications.show({
+        color: 'green',
+        title: 'Foto actualizada',
+        message: 'La foto de perfil se ha guardado correctamente.',
+      });
+    } catch (err) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al actualizar foto',
+        message: err.message,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const initialsText = initials(`${jugador?.nombre || ''} ${jugador?.apellidos || ''}`);
+
+  return (
+    <Box style={{ position: 'relative', display: 'inline-block' }}>
+      <Avatar
+        src={avatarSrc || undefined}
+        size={size}
+        radius="xl"
+        color="blue"
+        style={{
+          border: '3px solid white',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+          backgroundColor: 'var(--mantine-color-blue-1)',
+          color: 'var(--mantine-color-blue-8)',
+          fontWeight: 700,
+          fontSize: size > 80 ? '24px' : '16px',
+        }}
+      >
+        {initialsText}
+      </Avatar>
+
+      {canEditPhoto && (
+        <FileButton onChange={handleFileChange} accept="image/*">
+          {(props) => (
+            <Tooltip label="Cambiar foto de perfil" position="bottom" withArrow>
+              <ActionIcon
+                {...props}
+                variant="filled"
+                color="dark"
+                radius="xl"
+                size={size > 80 ? 28 : 24}
+                loading={loading}
+                style={{
+                  position: 'absolute',
+                  bottom: -2,
+                  right: -2,
+                  border: '2px solid white',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                  cursor: 'pointer',
+                  zIndex: 3,
+                }}
+              >
+                <IconCamera size={size > 80 ? 14 : 12} stroke={2} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+        </FileButton>
+      )}
+    </Box>
+  );
+}
+
+function PlayerIdentity({ jugador, isAdmin, isPlayer, hasCredentials, avatarSize = 84, titleSize = 26, centered = false }) {
   return (
     <>
-      <Avatar size={avatarSize} radius="xl" color="blue">
-        {jugador.nombre?.[0]}{jugador.apellidos?.[0]}
-      </Avatar>
+      <PlayerAvatarUploader
+        jugador={jugador}
+        isAdmin={isAdmin}
+        isPlayer={isPlayer}
+        size={avatarSize}
+      />
 
       <Stack gap={4} align={centered ? 'center' : undefined} style={{ minWidth: 0 }}>
         <Title order={2} c="dark.4" lh={1.1} fz={titleSize} lineClamp={2}>
@@ -248,6 +342,7 @@ function PlayerIdentity({ jugador, isAdmin, hasCredentials, avatarSize = 84, tit
     </>
   );
 }
+
 
 function JugadorHeaderDesktop({ jugador, isAdmin, isPlayer, hasCredentials, onEdit }) {
   return (

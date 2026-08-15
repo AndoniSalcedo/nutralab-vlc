@@ -158,9 +158,15 @@ export default function SquadWeightModal({ opened, onClose, players = [] }) {
                 return (
                   <Group key={player.id} justify="space-between" align="center" wrap="nowrap">
                     <Group gap="xs" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
-                      <Avatar size={36} radius="xl" color="initials">
+                      <Avatar
+                        src={player.avatar_url || (player.avatar_size ? `/api/players/avatar?id=${player.id}` : undefined)}
+                        size={36}
+                        radius="xl"
+                        color="initials"
+                      >
                         {initials(fullName)}
                       </Avatar>
+
                       <Box style={{ minWidth: 0 }}>
                         <Text size="sm" fw={600} truncate c="dark.4">
                           {fullName}

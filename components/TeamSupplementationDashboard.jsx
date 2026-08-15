@@ -119,9 +119,15 @@ export default function TeamSupplementationDashboard({
                   <Table.Tr key={player.id} h={70}>
                     <Table.Td style={{ paddingLeft: 24 }}>
                       <Group gap="sm" wrap="nowrap">
-                        <Avatar size={42} radius="xl" color="initials">
+                        <Avatar
+                          src={player.avatar_url || (player.avatar_size ? `/api/players/avatar?id=${player.id}` : undefined)}
+                          size={42}
+                          radius="xl"
+                          color="initials"
+                        >
                           {initials(`${player.nombre} ${player.apellidos || ''}`)}
                         </Avatar>
+
                         <Box style={{ minWidth: 0 }}>
                           <Text fz="sm" fw={600} c="dark.4" truncate>
                             {player.nombre} {player.apellidos}

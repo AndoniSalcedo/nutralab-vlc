@@ -33,6 +33,14 @@ export default function DashboardShell({ children, user }) {
   const frontendUrl = env.NEXT_PUBLIC_FRONTEND_URL;
 
 
+  const userAvatarSrc =
+    user?.avatar_url ||
+    (user?.role === 'tecnico'
+      ? `/api/tecnicos/avatar?id=${user.id}`
+      : user?.role === 'jugador'
+        ? `/api/players/avatar?id=${user.id}`
+        : undefined);
+
   return (
     <div className={classes.header}>
       <Container size="lg" px={{ base: 'xs', sm: 'md' }}>
@@ -54,7 +62,7 @@ export default function DashboardShell({ children, user }) {
               >
                 <Group gap={2}>
                   <Avatar
-                    src={undefined}
+                    src={userAvatarSrc}
                     alt={user?.name}
                     radius="xl"
                     size={42} 
@@ -65,6 +73,7 @@ export default function DashboardShell({ children, user }) {
                 </Group>
               </UnstyledButton>
             </Menu.Target>
+
 
             <Menu.Dropdown>
               <Menu.Item

@@ -3,10 +3,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ActionIcon,
+  Avatar,
   Badge,
   Box,
   Button,
   Checkbox,
+  FileButton,
   Group,
   Modal,
   Paper,
@@ -21,6 +23,7 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import {
+  IconCamera,
   IconPlus,
   IconSearch,
   IconTrash,
@@ -34,8 +37,11 @@ import {
   deleteTecnico,
   assignTeams,
   getTecnicos,
+  uploadTecnicoAvatar,
 } from '@/services/tecnico';
+import { compressAvatar, initials } from '@/lib/avatar';
 import ConfirmModal from '@/components/modals/ConfirmModal';
+
 
 export default function TecnicosManager({ teams = [] }) {
   const [tecnicos, setTecnicos] = useState([]);
@@ -110,6 +116,26 @@ export default function TecnicosManager({ teams = [] }) {
       });
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleUploadAvatar(tecnicoId, file) {
+    if (!file) return;
+    try {
+      const compressed = await compressAvatar(file);
+      await uploadTecnicoAvatar(tecnicoId, compressed);
+      notifications.show({
+        color: 'green',
+        title: 'Foto actualizada',
+        message: 'La foto del técnico se ha guardado correctamente.',
+      });
+      loadTecnicos();
+    } catch (err) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al subir foto',
+        message: err.message,
+      });
     }
   }
 
@@ -220,19 +246,55 @@ export default function TecnicosManager({ teams = [] }) {
                   <Table.Tr key={tecnico.id}>
                     <Table.Td>
                       <Group gap="sm" wrap="nowrap">
-                        <ThemeIcon color="blue" variant="light" radius="xl" size={32}>
-                          <IconUser size={16} />
-                        </ThemeIcon>
+                        <Box style={{ position: 'relative', display: 'inline-block' }}>
+                          <Avatar
+                            src={tecnico.avatar_size ? `/api/tecnicos/avatar?id=${tecnico.id}&t=${tecnico.updated_at || Date.now()}` : undefined}
+                            size={38}
+                            radius="xl"
+                            color="blue"
+                            style={{
+                              border: '2px solid white',
+                              boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                              fontWeight: 700,
+                            }}
+                          >
+                            {initials(`${tecnico.nombre || ''} ${tecnico.apellidos || ''}`)}
+                          </Avatar>
+                          <FileButton onChange={(file) => handleUploadAvatar(tecnico.id, file)} accept="image/*">
+                            {(props) => (
+                              <Tooltip label="Cambiar foto" position="top" withArrow>
+                                <ActionIcon
+                                  {...props}
+                                  variant="filled"
+                                  color="dark"
+                                  radius="xl"
+                                  size={18}
+                                  style={{
+                                    position: 'absolute',
+                                    bottom: -2,
+                                    right: -2,
+                                    border: '1.5px solid white',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  <IconCamera size={10} stroke={2} />
+                                </ActionIcon>
+                              </Tooltip>
+                            )}
+                          </FileButton>
+                        </Box>
                         <Box>
                           <Text fw={650} size="sm" c="#24291f" lh={1.2}>
                             {tecnico.nombre} {tecnico.apellidos || ''}
                           </Text>
-                          <Badge size="xs" variant="outline" color="blue" mt={2}>
+                          <Text size="xs" c="dimmed">
                             Técnico
-                          </Badge>
+                          </Text>
                         </Box>
                       </Group>
                     </Table.Td>
+
                     <Table.Td>
                       <Text size="sm" c="dimmed">
                         {tecnico.email}

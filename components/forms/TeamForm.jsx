@@ -14,9 +14,14 @@ import {
   Divider,
   Text,
   SimpleGrid,
+  Avatar,
+  FileButton,
+  ActionIcon,
+  Tooltip,
 } from '@mantine/core';
-import { IconSearch } from '@tabler/icons-react';
+import { IconSearch, IconCamera, IconTrash } from '@tabler/icons-react';
 import { playerFullName } from '@/lib/utils';
+import { initials } from '@/lib/avatar';
 
 export default function TeamForm({
   submitTeam,
@@ -42,6 +47,26 @@ export default function TeamForm({
     setFilterTeamId(sourceTeam ? String(sourceTeam.id) : '');
     setSearch('');
   }, [sourceTeam, isImportingPlayers]);
+
+  const handleFotoChange = (file) => {
+    if (!file) return;
+    const previewUrl = URL.createObjectURL(file);
+    setForm((current) => ({
+      ...current,
+      fotoFile: file,
+      fotoPreview: previewUrl,
+      removeFoto: false,
+    }));
+  };
+
+  const handleRemoveFoto = () => {
+    setForm((current) => ({
+      ...current,
+      fotoFile: null,
+      fotoPreview: '',
+      removeFoto: true,
+    }));
+  };
 
   const teamFilterOptions = useMemo(() => {
     return [
@@ -87,8 +112,68 @@ export default function TeamForm({
   return (
     <form onSubmit={submitTeam}>
       <Stack gap="md">
+        {/* Selector de foto/logo de equipo */}
+        <Stack align="center" gap="xs" mb="xs">
+          <Box style={{ position: 'relative', display: 'inline-block' }}>
+            <Avatar
+              src={form.fotoPreview || undefined}
+              size={90}
+              radius="md"
+              color="blue"
+              style={{
+                border: '3px solid white',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                backgroundColor: 'var(--mantine-color-blue-1)',
+                color: 'var(--mantine-color-blue-8)',
+                fontWeight: 700,
+                fontSize: '22px',
+              }}
+            >
+              {initials(form.nombre || 'Equipo')}
+            </Avatar>
+
+            <FileButton onChange={handleFotoChange} accept="image/*">
+              {(props) => (
+                <Tooltip label="Subir escudo/foto" position="top" withArrow>
+                  <ActionIcon
+                    {...props}
+                    variant="filled"
+                    color="dark"
+                    radius="xl"
+                    size="md"
+                    style={{
+                      position: 'absolute',
+                      bottom: -4,
+                      right: -4,
+                      border: '2px solid white',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <IconCamera size={14} stroke={2} />
+                  </ActionIcon>
+                </Tooltip>
+              )}
+            </FileButton>
+          </Box>
+
+          {form.fotoPreview && (
+            <Button
+              variant="subtle"
+              color="red"
+              size="xs"
+              radius="xl"
+              leftSection={<IconTrash size={13} />}
+              onClick={handleRemoveFoto}
+            >
+              Eliminar foto
+            </Button>
+          )}
+        </Stack>
+
         <TextInput
-          label="Nombre"
+          label="Nombre del equipo"
+          placeholder="Ej. Valencia CF Juvenil A"
           required
           value={form.nombre}
           onChange={(event) => {
@@ -108,12 +193,14 @@ export default function TeamForm({
         />
         <TextInput
           label="Descripción"
+          placeholder="Opcional"
           value={form.descripcion}
           onChange={(event) => {
             const { value } = event.currentTarget;
             setForm((current) => ({ ...current, descripcion: value }));
           }}
         />
+
         {modalType === 'create' && allPlayers.length > 0 ? (
           <Paper withBorder radius="md" p="sm" bg={isImportingPlayers ? 'blue.0' : 'gray.0'}>
             <Switch

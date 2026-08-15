@@ -258,3 +258,15 @@ export async function getOwnedPlayersByIds(supabase, ownerId, playerIds) {
   if (error) throw error;
   return data || [];
 }
+
+export async function getPlayerAvatar(supabase, id) {
+  const { data, error } = await supabase
+    .from('jugadores')
+    .select('id, nombre, apellidos, equipo_id, avatar, avatar_mime, avatar_size, updated_at')
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data || null;
+}
+

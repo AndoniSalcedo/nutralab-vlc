@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import {
   ActionIcon,
+  Avatar,
   Badge,
   Box,
   Button,
@@ -18,7 +19,8 @@ import {
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { createTeam, deleteTeam, updateTeam } from '@/services/team';
+import { createTeam, deleteTeam, updateTeam, uploadTeamPhoto, removeTeamPhoto } from '@/services/team';
+import { compressAvatar, initials } from '@/lib/avatar';
 import {
   IconCalendarStats,
   IconCopy,
@@ -39,6 +41,7 @@ import NothingFound from './NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import TeamFormModal from '@/components/modals/TeamFormModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
+
 
 function nextSeasonLabel() {
   const now = new Date();
@@ -111,21 +114,35 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
   function openCreate() {
     setSelectedPlayerIds([]);
     setIsCreateImporting(false);
-    setForm({ nombre: '', temporada: season || nextSeasonLabel(), descripcion: '' });
+    setForm({ nombre: '', temporada: season || nextSeasonLabel(), descripcion: '', fotoFile: null, fotoPreview: '', removeFoto: false });
     setModal({ type: 'create', team: null });
   }
 
   function openCopy(team) {
     setIsCreateImporting(false);
     setSelectedPlayerIds((team.players || []).map((player) => String(player.id)));
-    setForm({ nombre: team.nombre, temporada: nextSeasonLabel(), descripcion: team.descripcion || '' });
+    setForm({
+      nombre: team.nombre,
+      temporada: nextSeasonLabel(),
+      descripcion: team.descripcion || '',
+      fotoFile: null,
+      fotoPreview: team.foto_size ? `/api/teams/avatar?id=${team.id}&t=${team.updated_at || Date.now()}` : '',
+      removeFoto: false,
+    });
     setModal({ type: 'copy', team });
   }
 
   function openEdit(team) {
     setIsCreateImporting(false);
     setSelectedPlayerIds([]);
-    setForm({ nombre: team.nombre, temporada: team.temporada, descripcion: team.descripcion || '' });
+    setForm({
+      nombre: team.nombre,
+      temporada: team.temporada,
+      descripcion: team.descripcion || '',
+      fotoFile: null,
+      fotoPreview: team.foto_size ? `/api/teams/avatar?id=${team.id}&t=${team.updated_at || Date.now()}` : '',
+      removeFoto: false,
+    });
     setModal({ type: 'edit', team });
   }
 
@@ -157,9 +174,32 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
     setSaving(true);
     try {
       if (modal.type === 'edit') {
-        await updateTeam(modal.team.id, form);
+        await updateTeam(modal.team.id, {
+          nombre: form.nombre,
+          temporada: form.temporada,
+          descripcion: form.descripcion,
+        });
+
+        if (form.removeFoto) {
+          await removeTeamPhoto(modal.team.id);
+        } else if (form.fotoFile instanceof File) {
+          const compressed = await compressAvatar(form.fotoFile);
+          await uploadTeamPhoto(modal.team.id, compressed);
+        }
+
         setTeamsState((current) =>
-          current.map((item) => (String(item.id) === String(modal.team.id) ? { ...item, ...form } : item))
+          current.map((item) =>
+            String(item.id) === String(modal.team.id)
+              ? {
+                  ...item,
+                  nombre: form.nombre,
+                  temporada: form.temporada,
+                  descripcion: form.descripcion,
+                  foto_size: form.removeFoto ? null : form.fotoFile ? 1 : item.foto_size,
+                  updated_at: new Date().toISOString(),
+                }
+              : item
+          )
         );
         notifications.show({
           color: 'green',
@@ -173,7 +213,9 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
         const payload = {
           action: shouldCopyPlayers ? 'copy_season' : 'create',
           team_id: sourceTeamId,
-          ...form,
+          nombre: form.nombre,
+          temporada: form.temporada,
+          descripcion: form.descripcion,
         };
 
         if (shouldCopyPlayers) {
@@ -181,6 +223,16 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
         }
 
         const data = await createTeam(payload);
+
+        if (data.equipo?.id && form.fotoFile instanceof File) {
+          try {
+            const compressed = await compressAvatar(form.fotoFile);
+            await uploadTeamPhoto(data.equipo.id, compressed);
+            data.equipo.foto_size = 1;
+          } catch (e) {
+            console.error('Error subiendo foto al crear equipo:', e);
+          }
+        }
 
         const copiedPlayers = Number(data.copiedPlayers || 0);
         const newTeam = {
@@ -208,6 +260,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
       setSaving(false);
     }
   }
+
 
   async function handleDeleteTeam(team) {
     setDeleteTeamData(team);
@@ -286,16 +339,48 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                 p="md"
                 radius="lg"
                 withBorder
-                shadow="sm"
+                shadow="xs"
                 bg="white"
-                style={{ cursor: 'pointer' }}
+                style={{
+                  cursor: 'pointer',
+                  transition: 'transform 120ms ease, box-shadow 120ms ease',
+                }}
                 onClick={() => router.push(`/dashboard/equipo/${team.id}`)}
               >
-                <Stack gap="md">
-                  <Group justify="space-between" align="flex-start" wrap="nowrap">
-                    <ThemeIcon color="blue" variant="light" radius="md" size={40}>
-                      <IconUsersGroup size={20} />
-                    </ThemeIcon>
+                <Stack gap="sm">
+                  <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
+                    <Group gap="sm" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+                      <Avatar
+                        src={team.foto_size ? `/api/teams/avatar?id=${team.id}&t=${team.updated_at || ''}` : undefined}
+                        size={46}
+                        radius="md"
+                        color="blue"
+                        style={{
+                          border: '1.5px solid rgba(222, 226, 230, 0.7)',
+                          fontWeight: 700,
+                          backgroundColor: 'var(--mantine-color-blue-0)',
+                          color: 'var(--mantine-color-blue-8)',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {initials(team.nombre)}
+                      </Avatar>
+
+                      <Box style={{ minWidth: 0, flex: 1 }}>
+                        <Group gap={6} wrap="nowrap" align="center">
+                          <Title order={4} fw={800} c="dark.4" lh={1.2} truncate>
+                            {team.nombre}
+                          </Title>
+                          <Text size="xs" fw={600} c="dimmed" style={{ flexShrink: 0 }}>
+                            · {team.temporada}
+                          </Text>
+                        </Group>
+                        <Text size="xs" c="dimmed" lineClamp={1} mt={2}>
+                          {team.descripcion || 'Sin descripción'}
+                        </Text>
+                      </Box>
+                    </Group>
+
                     {!readOnly && (
                       <Menu shadow="md" width={240} position="bottom-end" withArrow radius="md">
                         <Menu.Target>
@@ -303,8 +388,10 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                             variant="subtle"
                             color="gray"
                             radius="xl"
+                            size="md"
                             loading={saving}
                             onClick={(event) => event.stopPropagation()}
+                            style={{ flexShrink: 0 }}
                           >
                             <IconDots size={18} />
                           </ActionIcon>
@@ -342,30 +429,17 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                     )}
                   </Group>
 
-                  <Box>
-                    <Group gap="xs" mb={6}>
-                      <Title order={4} fw={800} c="dark.4" lh={1.1}>
-                        {team.nombre}
-                      </Title>
-                      <Badge variant="light" color="gray" radius="sm">
-                        {team.temporada}
-                      </Badge>
-                    </Group>
-                    <Text size="sm" c="dimmed" lineClamp={2}>
-                      {team.descripcion || 'Sin descripción'}
-                    </Text>
-                  </Box>
-
-                  <Group justify="space-between">
+                  <Group justify="space-between" align="center" pt="xs" style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}>
                     <Text size="xs" c="dimmed">
                       {team.players_count || 0} jugador{Number(team.players_count || 0) === 1 ? '' : 'es'}
                     </Text>
                     <Text size="xs" fw={700} c="blue.7">
-                      Abrir dashboard
+                      Abrir dashboard →
                     </Text>
                   </Group>
                 </Stack>
               </Paper>
+
             ))}
           </SimpleGrid>
         ) : (

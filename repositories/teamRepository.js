@@ -63,10 +63,17 @@ export async function getTeamByIdAndOwner(supabase, teamId, ownerId) {
   return data || null;
 }
 
-export async function insertTeam(supabase, { owner_id, nombre, temporada, descripcion, configuracion_nutricional = null }) {
+export async function insertTeam(supabase, { owner_id, nombre, temporada, descripcion, configuracion_nutricional = null, foto = null, foto_mime = null, foto_size = null }) {
+  const payload = { owner_id, nombre, temporada, descripcion, configuracion_nutricional };
+  if (foto !== undefined) {
+    payload.foto = foto;
+    payload.foto_mime = foto_mime;
+    payload.foto_size = foto_size;
+  }
+
   const { data, error } = await supabase
     .from('equipos')
-    .insert({ owner_id, nombre, temporada, descripcion, configuracion_nutricional })
+    .insert(payload)
     .select('*')
     .single();
 
@@ -94,10 +101,10 @@ export async function updateTeamConfig(supabase, teamId, configuracion_nutricion
   return true;
 }
 
-export async function updateTeam(supabase, teamId, { nombre, temporada, descripcion }) {
+export async function updateTeam(supabase, teamId, payload) {
   const { data, error } = await supabase
     .from('equipos')
-    .update({ nombre, temporada, descripcion })
+    .update(payload)
     .eq('id', teamId)
     .select('*')
     .single();
@@ -105,3 +112,15 @@ export async function updateTeam(supabase, teamId, { nombre, temporada, descripc
   if (error) throw error;
   return data;
 }
+
+export async function getTeamPhoto(supabase, teamId) {
+  const { data, error } = await supabase
+    .from('equipos')
+    .select('id, nombre, foto, foto_mime, foto_size, updated_at')
+    .eq('id', teamId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data || null;
+}
+

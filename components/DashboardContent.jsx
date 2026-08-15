@@ -1,13 +1,16 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+
 import { initials, filenameFromResponse } from '@/lib/utils';
-import { Anchor, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Grid, Modal, Divider } from '@mantine/core';
+import { Anchor, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Grid, Modal, Divider, FileButton } from '@mantine/core';
 import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
+import { uploadTeamPhoto } from '@/services/team';
+import { compressAvatar } from '@/lib/avatar';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconSettings, IconBottle, IconPlus, IconFileSpreadsheet, IconReportMedical, IconScale, IconUserCheck, IconExchange } from '@tabler/icons-react';
+import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconSettings, IconBottle, IconPlus, IconFileSpreadsheet, IconReportMedical, IconScale, IconUserCheck, IconExchange, IconCamera } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import { calculateByObjective, getTeamNutritionDayTypes } from '@/lib/calculations';
@@ -22,6 +25,7 @@ import SquadReportModal from '@/components/modals/SquadReportModal';
 import SquadWeightModal from '@/components/modals/SquadWeightModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import TeamTecnicosConfig from '@/components/TeamTecnicosConfig';
+
 
 const PAGE_SIZE = 8;
 
@@ -276,12 +280,34 @@ function getPlayerPlan(player, teamConfig) {
 export default function DashboardContent({ players = [], team, readOnly = false }) {
   const router = useRouter();
   const [playersState, setPlayersState] = useState(players);
+  const [teamPhotoVersion, setTeamPhotoVersion] = useState(() => team?.updated_at || Date.now());
+
+  async function handleTeamPhotoUpload(file) {
+    if (!file || !team?.id) return;
+    try {
+      const compressed = await compressAvatar(file);
+      await uploadTeamPhoto(team.id, compressed);
+      setTeamPhotoVersion(Date.now());
+      notifications.show({
+        color: 'green',
+        title: 'Escudo actualizado',
+        message: 'La imagen del equipo se ha guardado correctamente.',
+      });
+    } catch (err) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al subir imagen',
+        message: err.message,
+      });
+    }
+  }
 
   useEffect(() => {
     setPlayersState(players);
   }, [players]);
 
   const [editingPlayer, setEditingPlayer] = useState(null);
+
   const [deletingId, setDeletingId] = useState(null);
   const [deletePlayerData, setDeletePlayerData] = useState(null);
   const [reportModal, setReportModal] = useState({ opened: false, player: null });
@@ -610,9 +636,49 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                   </Tooltip>
 
                   <Stack gap="xs" align="center" style={{ flex: 1 }}>
-                    <ThemeIcon color="dark" variant="light" radius="xl" size={54}>
-                      <IconUsers size={28} />
-                    </ThemeIcon>
+                    <Box style={{ position: 'relative', display: 'inline-block' }}>
+                      <Avatar
+                        src={team?.id ? `/api/teams/avatar?id=${team.id}&t=${teamPhotoVersion}` : undefined}
+                        size={56}
+                        radius="md"
+                        color="blue"
+                        style={{
+                          border: '2.5px solid white',
+                          boxShadow: '0 3px 8px rgba(0,0,0,0.12)',
+                          backgroundColor: 'var(--mantine-color-blue-1)',
+                          color: 'var(--mantine-color-blue-8)',
+                          fontWeight: 700,
+                          fontSize: '18px',
+                        }}
+                      >
+                        {initials(team?.nombre || 'Equipo')}
+                      </Avatar>
+                      {!readOnly && team?.id && (
+                        <FileButton onChange={handleTeamPhotoUpload} accept="image/*">
+                          {(props) => (
+                            <Tooltip label="Cambiar escudo/foto" position="top" withArrow>
+                              <ActionIcon
+                                {...props}
+                                variant="filled"
+                                color="dark"
+                                radius="xl"
+                                size={20}
+                                style={{
+                                  position: 'absolute',
+                                  bottom: -3,
+                                  right: -3,
+                                  border: '1.5px solid white',
+                                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                <IconCamera size={11} stroke={2} />
+                              </ActionIcon>
+                            </Tooltip>
+                          )}
+                        </FileButton>
+                      )}
+                    </Box>
                     <Stack gap={2} align="center">
                       <Title order={3} fw={850} c="#24291f" lh={1.1} style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                         {team?.nombre || 'Equipo'}
@@ -622,6 +688,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                       </Text>
                     </Stack>
                   </Stack>
+
                 </Group>
               </Grid.Col>
 
@@ -795,10 +862,17 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                         {/* COLUMNA 1: JUGADOR */}
                         <Table.Td style={{ paddingLeft: 24 }}>
                           <Group gap="sm" wrap="nowrap">
-                            <Avatar size={42} radius="xl" color="initials" style={{ border: '1.5px solid rgba(222, 226, 230, 0.7)' }}>
+                            <Avatar
+                              src={player.avatar_url || (player.avatar_size ? `/api/players/avatar?id=${player.id}` : undefined)}
+                              size={42}
+                              radius="xl"
+                              color="initials"
+                              style={{ border: '1.5px solid rgba(222, 226, 230, 0.7)' }}
+                            >
                               {initials(`${player.nombre} ${player.apellidos || ''}`)}
                             </Avatar>
                             <Box style={{ minWidth: 0 }}>
+
                               <Group gap={6} wrap="nowrap">
                                 <Text fz="sm" fw={650} c="dark.4" truncate>
                                   {player.nombre} {player.apellidos}

@@ -75,6 +75,23 @@ export async function POST(request) {
     }
   }
 
+  if (form.has('avatar')) {
+    const avatarFile = form.get('avatar');
+    if (avatarFile && avatarFile instanceof File && avatarFile.size > 0) {
+      const buffer = Buffer.from(await avatarFile.arrayBuffer());
+      payload.avatar = `\\x${buffer.toString('hex')}`;
+      payload.avatar_mime = avatarFile.type || 'image/webp';
+      payload.avatar_size = avatarFile.size;
+    }
+  }
+
+  if (form.get('remove_avatar') === 'true') {
+    payload.avatar = null;
+    payload.avatar_mime = null;
+    payload.avatar_size = null;
+  }
+
+
   if (id) {
     await updatePlayer(supabase, id, payload);
   } else {

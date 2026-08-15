@@ -736,9 +736,15 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
                       >
                         <Table.Td style={{ paddingLeft: 16 }}>
                           <Group gap="xs" wrap="nowrap">
-                            <Avatar size={36} radius="xl" color="initials">
+                            <Avatar
+                              src={player.avatar_url || (player.avatar_size ? `/api/players/avatar?id=${player.id}` : undefined)}
+                              size={36}
+                              radius="xl"
+                              color="initials"
+                            >
                               {initials(`${player.nombre} ${player.apellidos || ''}`)}
                             </Avatar>
+
                             <div>
                               <Text size="sm" fw={700} c="dark.4">
                                 {player.nombre} {player.apellidos}

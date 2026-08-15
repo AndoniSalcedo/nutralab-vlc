@@ -153,9 +153,15 @@ export default function TransferPlayersModal({ opened, onClose, team, players = 
                       tabIndex={-1}
                       style={{ pointerEvents: 'none' }}
                     />
-                    <Avatar size={32} radius="xl" color="initials">
+                    <Avatar
+                      src={player.avatar_url || (player.avatar_size ? `/api/players/avatar?id=${player.id}` : undefined)}
+                      size={32}
+                      radius="xl"
+                      color="initials"
+                    >
                       {initials(`${player.nombre} ${player.apellidos || ''}`)}
                     </Avatar>
+
                     <Box>
                       <Text size="sm" fw={500}>{player.nombre} {player.apellidos}</Text>
                       <Text size="xs" c="dimmed">{player.posicion || 'Sin posición'}</Text>

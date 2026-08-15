@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+
 import { slugify } from '@/lib/utils';
-import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea, Anchor, Box, ColorInput, SimpleGrid } from '@mantine/core';
+import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea, Anchor, Box, ColorInput, SimpleGrid, Avatar, FileButton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft, IconBook, IconClipboardList, IconPalette } from '@tabler/icons-react';
+import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft, IconBook, IconClipboardList, IconPalette, IconCamera } from '@tabler/icons-react';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
+import { compressAvatar, initials } from '@/lib/avatar';
+import { uploadTeamPhoto, removeTeamPhoto } from '@/services/team';
 import { useRouter } from 'next/navigation';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import DayTypeModal from '@/components/modals/DayTypeModal';
@@ -17,9 +20,50 @@ const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink
 export default function TeamConfigClient({ team, readOnly = false }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [teamPhotoVersion, setTeamPhotoVersion] = useState(() => team.updated_at || Date.now());
+
+  async function handleUploadPhoto(file) {
+    if (!file || !team?.id) return;
+    try {
+      const compressed = await compressAvatar(file);
+      await uploadTeamPhoto(team.id, compressed);
+      setTeamPhotoVersion(Date.now());
+      notifications.show({
+        color: 'green',
+        title: 'Escudo actualizado',
+        message: 'La imagen del equipo se ha guardado correctamente.',
+      });
+    } catch (err) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al subir imagen',
+        message: err.message,
+      });
+    }
+  }
+
+  async function handleRemovePhoto() {
+    if (!team?.id) return;
+    try {
+      await removeTeamPhoto(team.id);
+      setTeamPhotoVersion(Date.now());
+      notifications.show({
+        color: 'green',
+        title: 'Escudo eliminado',
+        message: 'La foto del equipo se ha eliminado.',
+      });
+    } catch (err) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al eliminar imagen',
+        message: err.message,
+      });
+    }
+  }
 
   const [teamName, setTeamName] = useState(team.nombre || '');
   const [teamSeason, setTeamSeason] = useState(team.temporada || '');
+
 
   const [pdfMicrocycle, setPdfMicrocycle] = useState(team.configuracion_nutricional?.pdfMicrocycle || '');
   const [pdfRules, setPdfRules] = useState(team.configuracion_nutricional?.pdfRules || '');
@@ -228,31 +272,92 @@ export default function TeamConfigClient({ team, readOnly = false }) {
             </ThemeIcon>
             <Title order={4} c="dark.4">Información del Equipo</Title>
           </Group>
-          <Group align="flex-end" wrap="wrap" gap="md">
-            <TextInput
-              label="Nombre del equipo"
-              value={teamName}
-              onChange={(e) => setTeamName(e.currentTarget.value)}
-              readOnly={readOnly}
-              variant={readOnly ? 'filled' : 'default'}
-              style={{ flex: 1, minWidth: 200 }}
-              fw={readOnly ? 600 : 400}
-              size="md"
-              radius="md"
-            />
-            <TextInput
-              label="Temporada"
-              value={teamSeason}
-              onChange={(e) => setTeamSeason(e.currentTarget.value)}
-              readOnly={readOnly}
-              variant={readOnly ? 'filled' : 'default'}
-              placeholder="Ej: 2026/27"
-              style={{ width: 160 }}
-              size="md"
-              radius="md"
-            />
+          <Group align="center" wrap="wrap" gap="xl">
+            <Stack align="center" gap="xs">
+              <Box style={{ position: 'relative', display: 'inline-block' }}>
+                <Avatar
+                  src={team?.id ? `/api/teams/avatar?id=${team.id}&t=${teamPhotoVersion}` : undefined}
+                  size={72}
+                  radius="md"
+                  color="blue"
+                  style={{
+                    border: '2.5px solid white',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+                    backgroundColor: 'var(--mantine-color-blue-1)',
+                    color: 'var(--mantine-color-blue-8)',
+                    fontWeight: 700,
+                    fontSize: '20px',
+                  }}
+                >
+                  {initials(teamName || team.nombre || 'Equipo')}
+                </Avatar>
+                {!readOnly && team?.id && (
+                  <FileButton onChange={handleUploadPhoto} accept="image/*">
+                    {(props) => (
+                      <Tooltip label="Cambiar escudo/foto" position="top" withArrow>
+                        <ActionIcon
+                          {...props}
+                          variant="filled"
+                          color="dark"
+                          radius="xl"
+                          size={22}
+                          style={{
+                            position: 'absolute',
+                            bottom: -3,
+                            right: -3,
+                            border: '1.5px solid white',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <IconCamera size={12} stroke={2} />
+                        </ActionIcon>
+                      </Tooltip>
+                    )}
+                  </FileButton>
+                )}
+              </Box>
+              {!readOnly && (
+                <Button
+                  variant="subtle"
+                  color="red"
+                  size="xs"
+                  radius="xl"
+                  leftSection={<IconTrash size={12} />}
+                  onClick={handleRemovePhoto}
+                >
+                  Eliminar foto
+                </Button>
+              )}
+            </Stack>
+
+            <Group align="flex-end" wrap="wrap" gap="md" style={{ flex: 1 }}>
+              <TextInput
+                label="Nombre del equipo"
+                value={teamName}
+                onChange={(e) => setTeamName(e.currentTarget.value)}
+                readOnly={readOnly}
+                variant={readOnly ? 'filled' : 'default'}
+                style={{ flex: 1, minWidth: 200 }}
+                fw={readOnly ? 600 : 400}
+                size="md"
+                radius="md"
+              />
+              <TextInput
+                label="Temporada"
+                value={teamSeason}
+                onChange={(e) => setTeamSeason(e.currentTarget.value)}
+                readOnly={readOnly}
+                variant={readOnly ? 'filled' : 'default'}
+                placeholder="Ej: 2026/27"
+                style={{ width: 160 }}
+                size="md"
+                radius="md"
+              />
+            </Group>
           </Group>
         </Paper>
+
 
         <Paper p="md" radius="lg" shadow="sm" withBorder>
           <Group gap="sm" mb="lg">
