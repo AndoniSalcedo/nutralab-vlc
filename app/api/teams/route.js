@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { forbidden, getOwnedTeam, getOwnerId } from '@/lib/team-access';
-import { insertTeam, deleteTeam, updateTeam } from '@/repositories/teamRepository';
+import { insertTeam, deleteTeam, updateTeam, getTeamsByOwner } from '@/repositories/teamRepository';
 import { getPlayersByTeam, insertPlayer, getOwnedPlayersByIds } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIdOrdered, insertEvolutionsBulk } from '@/repositories/evolutionRepository';
 import { getAnalyticsByPlayerId, insertAnalyticsBulk } from '@/repositories/analyticsRepository';
@@ -136,6 +136,21 @@ async function copyPlayerAllHistory(supabase, sourcePlayerId, newPlayerId) {
     }
   } catch (e) {
     console.error(`Error copying extra supplementation for player ${sourcePlayerId}:`, e);
+  }
+}
+
+export async function GET(request) {
+  try {
+    const user = await getUser();
+    const ownerId = getOwnerId(user);
+    if (!ownerId) return forbidden('No autorizado');
+
+    const supabase = getSupabaseAdmin();
+    const teams = await getTeamsByOwner(supabase, ownerId);
+    return NextResponse.json({ equipos: teams });
+  } catch (error) {
+    console.error('Teams GET error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 

@@ -7,7 +7,7 @@ import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconSettings, IconBottle, IconPlus, IconFileSpreadsheet, IconReportMedical, IconScale, IconUserCheck } from '@tabler/icons-react';
+import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconSettings, IconBottle, IconPlus, IconFileSpreadsheet, IconReportMedical, IconScale, IconUserCheck, IconExchange, IconCopy } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import { calculateByObjective, getTeamNutritionDayTypes } from '@/lib/calculations';
@@ -16,6 +16,7 @@ import ConfirmModal from '@/components/modals/ConfirmModal';
 import NewPlayerModal from '@/components/modals/NewPlayerModal';
 import ImportDataModal from '@/components/modals/ImportDataModal';
 import SendMessageModal from '@/components/modals/SendMessageModal';
+import TransferPlayersModal from '@/components/modals/TransferPlayersModal';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import SquadReportModal from '@/components/modals/SquadReportModal';
 import SquadWeightModal from '@/components/modals/SquadWeightModal';
@@ -287,6 +288,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
   const [reportForm, setReportForm] = useState(() => defaultReportForm(team?.configuracion_nutricional));
   const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
   const [activeModal, setActiveModal] = useState(null);
+  const [transferModal, setTransferModal] = useState({ opened: false, initialSelectedIds: [] });
   const closeModal = () => setActiveModal(null);
 
   const teamConfig = team?.configuracion_nutricional;
@@ -644,6 +646,13 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                         onClick={() => setActiveModal('import')}
                       />
                       <DashboardStat
+                        title="Transferir jugadores"
+                        icon={IconExchange}
+                        color="violet"
+                        value="Mover o copiar"
+                        onClick={() => setTransferModal({ opened: true, initialSelectedIds: [] })}
+                      />
+                      <DashboardStat
                         title="Mensaje"
                         icon={IconMail}
                         color="blue"
@@ -883,6 +892,10 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                                 </Menu.Item>
                                 {!readOnly && (
                                   <>
+                                    <Menu.Divider />
+                                    <Menu.Item leftSection={<IconExchange size={14} />} onClick={() => setTransferModal({ opened: true, initialSelectedIds: [player.id] })}>
+                                      Transferir a otro equipo
+                                    </Menu.Item>
                                     <PlayerCredentialsButton
                                       jugador={player}
                                       menuItem
@@ -989,13 +1002,24 @@ export default function DashboardContent({ players = [], team, readOnly = false 
           <TeamTecnicosConfig team={team} readOnly={readOnly} />
         </Modal>
         <ConfirmModal
-          opened={!!deletePlayerData}
-          onClose={() => setDeletePlayerData(null)}
+          opened={!!deletingId || !!deletePlayerData}
+          onClose={() => {
+            setDeletingId(null);
+            setDeletePlayerData(null);
+          }}
           onConfirm={confirmDeletePlayer}
-          title="Eliminar jugador"
-          message={deletePlayerData ? `¿Seguro que deseas eliminar a ${deletePlayerData.nombre} ${deletePlayerData.apellidos || ''}?` : ''}
-          confirmLabel="Eliminar"
-          loading={deletingId !== null}
+          loading={!!deletingId}
+          title="Eliminar Jugador"
+          message={`¿Estás seguro que deseas eliminar a ${deletePlayerData?.nombre}? Todos sus datos, métricas y plan nutricional se perderán. Esta acción no se puede deshacer.`}
+          confirmLabel="Eliminar jugador"
+        />
+
+        <TransferPlayersModal 
+          opened={transferModal.opened} 
+          onClose={() => setTransferModal({ opened: false, initialSelectedIds: [] })} 
+          team={team} 
+          players={playersState}
+          initialSelectedIds={transferModal.initialSelectedIds}
         />
       </Stack>
     </BoneyardSkeleton>

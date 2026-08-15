@@ -70,3 +70,14 @@ export async function updatePlayerField(id, field, value) {
   if (!res.ok) throw new Error(data.error || 'No se pudo guardar el campo');
   return data;
 }
+
+export async function transferPlayers({ playerIds, targetTeamId, action }) {
+  const res = await fetch('/api/players/transfer', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ playerIds, targetTeamId, action }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al transferir jugadores');
+  return data;
+}

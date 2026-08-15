@@ -1,3 +1,10 @@
+export async function getTeams() {
+  const res = await fetch('/api/teams');
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'No se pudieron cargar los equipos');
+  return data.equipos;
+}
+
 export async function createTeam(payload) {
   const res = await fetch('/api/teams', {
     method: 'POST',
