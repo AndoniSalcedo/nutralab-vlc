@@ -5,6 +5,7 @@ import {
   mockPlayers,
   mockAnalytics,
   mockEvolutions,
+  mockPesajes,
   mockHydration,
   mockMessages,
   mockMenus
@@ -16,7 +17,8 @@ export const dynamic = 'force-dynamic';
 export default function BoneyardPlayerDashboard() {
   const rawPlayer = mockPlayers.find((p) => p.id === 220);
   const evoluciones = mockEvolutions.filter((e) => e.jugador_id === 220);
-  const jugador = withLatestMeasurement(rawPlayer, evoluciones);
+  const pesajes = mockPesajes.filter((p) => p.jugador_id === 220);
+  const jugador = withLatestMeasurement(rawPlayer, evoluciones, pesajes);
 
   const analiticas = mockAnalytics.filter((a) => a.jugador_id === 220);
   const registrosHidratacion = mockHydration.filter((h) => h.jugador_id === 220);
@@ -31,17 +33,18 @@ export default function BoneyardPlayerDashboard() {
   };
 
   return (
-    <BoneyardSkeleton name="player-dashboard-metricas-protocolos" loading={false}>
+    <BoneyardSkeleton name="player-dashboard-metricas-pesos" loading={false}>
       <JugadorHeader jugador={jugador} user={mockUser} />
       <PlayerTabs
         jugador={jugador}
         analiticas={analiticas}
         evoluciones={evoluciones}
+        pesajes={pesajes}
         registrosHidratacion={registrosHidratacion}
         messages={messages}
         menus={menus}
         activeTab="metricas"
-        activeSubtab="protocolos"
+        activeSubtab="pesos"
         readOnly={false}
       />
     </BoneyardSkeleton>

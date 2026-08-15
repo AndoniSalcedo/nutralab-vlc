@@ -33,7 +33,7 @@ export default function BoneyardPlayerDashboard() {
   };
 
   return (
-    <BoneyardSkeleton name="player-dashboard-nutricion-menu" loading={false}>
+    <BoneyardSkeleton name="player-dashboard-nutricion-protocolos" loading={false}>
       <JugadorHeader jugador={jugador} user={mockUser} />
       <PlayerTabs
         jugador={jugador}
@@ -44,7 +44,7 @@ export default function BoneyardPlayerDashboard() {
         messages={messages}
         menus={menus}
         activeTab="nutricion"
-        activeSubtab="menu"
+        activeSubtab="protocolos"
         readOnly={false}
       />
     </BoneyardSkeleton>

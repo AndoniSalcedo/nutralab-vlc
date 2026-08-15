@@ -16,12 +16,13 @@ import _player_dashboard_resumen_perfil from './player-dashboard-resumen-perfil.
 import _player_dashboard_resumen_diario from './player-dashboard-resumen-diario.bones.json';
 import _player_dashboard_resumen_mensajes from './player-dashboard-resumen-mensajes.bones.json';
 import _player_dashboard_metricas_mediciones from './player-dashboard-metricas-mediciones.bones.json';
+import _player_dashboard_metricas_pesos from './player-dashboard-metricas-pesos.bones.json';
 import _player_dashboard_metricas_analiticas from './player-dashboard-metricas-analiticas.bones.json';
 import _player_dashboard_metricas_hidratacion from './player-dashboard-metricas-hidratacion.bones.json';
-import _player_dashboard_metricas_protocolos from './player-dashboard-metricas-protocolos.bones.json';
 import _player_dashboard_nutricion_plan from './player-dashboard-nutricion-plan.bones.json';
 import _player_dashboard_nutricion_suplementacion from './player-dashboard-nutricion-suplementacion.bones.json';
 import _player_dashboard_nutricion_menu from './player-dashboard-nutricion-menu.bones.json';
+import _player_dashboard_nutricion_protocolos from './player-dashboard-nutricion-protocolos.bones.json';
 
 import _player_dashboard_resumen from './player-dashboard-resumen.bones.json';
 import _player_dashboard_metricas from './player-dashboard-metricas.bones.json';
@@ -42,12 +43,14 @@ const bonesMap = {
   'player-dashboard-resumen-diario': _player_dashboard_resumen_diario,
   'player-dashboard-resumen-mensajes': _player_dashboard_resumen_mensajes,
   'player-dashboard-metricas-mediciones': _player_dashboard_metricas_mediciones,
+  'player-dashboard-metricas-pesos': _player_dashboard_metricas_pesos,
   'player-dashboard-metricas-analiticas': _player_dashboard_metricas_analiticas,
   'player-dashboard-metricas-hidratacion': _player_dashboard_metricas_hidratacion,
-  'player-dashboard-metricas-protocolos': _player_dashboard_metricas_protocolos,
+  'player-dashboard-metricas-protocolos': _player_dashboard_nutricion_protocolos,
   'player-dashboard-nutricion-plan': _player_dashboard_nutricion_plan,
   'player-dashboard-nutricion-suplementacion': _player_dashboard_nutricion_suplementacion,
   'player-dashboard-nutricion-menu': _player_dashboard_nutricion_menu,
+  'player-dashboard-nutricion-protocolos': _player_dashboard_nutricion_protocolos,
 
   'player-dashboard-resumen': _player_dashboard_resumen_perfil || _player_dashboard_resumen,
   'player-dashboard-metricas': _player_dashboard_metricas_mediciones || _player_dashboard_metricas,
