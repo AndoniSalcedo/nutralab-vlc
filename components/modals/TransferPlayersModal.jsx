@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, Group, Text, Button, Select, Radio, Stack, Checkbox, Avatar, Box, ScrollArea } from '@mantine/core';
-import { IconExchange, IconUsers } from '@tabler/icons-react';
+import { IconExchange } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { getTeams } from '@/services/team';
 import { transferPlayers } from '@/services/player';
@@ -22,6 +22,7 @@ export default function TransferPlayersModal({ opened, onClose, team, players = 
       setAction('move');
       fetchTeams();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, initialSelectedIds]);
 
   const fetchTeams = async () => {

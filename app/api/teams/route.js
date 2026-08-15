@@ -139,7 +139,7 @@ async function copyPlayerAllHistory(supabase, sourcePlayerId, newPlayerId) {
   }
 }
 
-export async function GET(request) {
+export async function GET() {
   try {
     const user = await getUser();
     const ownerId = getOwnerId(user);

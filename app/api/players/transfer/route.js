@@ -58,6 +58,7 @@ export async function POST(request) {
     if (action === 'copy') {
       // Copy players to the new team
       const payloads = players.map(player => {
+        // eslint-disable-next-line no-unused-vars
         const { id, equipo_id, auth_user_id, auth_email, credentials_created_at, created_at, equipos, ...playerData } = player;
         return {
           ...playerData,

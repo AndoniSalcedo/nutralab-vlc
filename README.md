@@ -49,3 +49,21 @@ Para añadir un cambio de base de datos, crea un archivo nuevo con formato:
 ```txt
 supabase/migrations/YYYYMMDDHHMMSS_nombre_del_cambio.sql
 ```
+
+
+feat: en la pestaña de protocolos el texto es fijo lo que quiero haces es que se pueda editar esto Timeline prepartido
+
+-3 / -4 h · Comida principal
+Base alta en CHO: arroz, pasta o patata. Proteína fácil de digerir, 100-150 g.
+
+-90 min · Snack
+Plátano, gel o opción habitual ya testada. Evitar novedades.
+
+-60 min · Cafeína
+249-498 mg según tolerancia y rol esperado.
+
+Medio tiempo
+300-500 ml de isotónica y ajuste de CHO si hay alta carga.
+
++30 min · Recuperación
+Proteína + CHO rápidos. Priorizar disponibilidad si hay viaje. tamnto cambiar el texto como los iconos como añadir mas como eliminar y q ue se pueda crear varios protocolos por ejemplo el que esta puesto es el prepartido pero digo yo quiero crear uno para cada tipo de día de los que hay en configuracion del eqipo sabes tipo que pueda haber un protocolo para dia de entrenamiento de descanso y no solo uno sino varios protocolos para cada tipo de dia por ejemplo en el de prepartido hacer un protocolo post partido esto quiero que sea a nivel del eqipo pero luego que se pueda editar a nivel persinal para ello en la configuración que se pueda añadir esta parte de protocolos para que se pueda configurar segun los tipos de dia y por ahi 
