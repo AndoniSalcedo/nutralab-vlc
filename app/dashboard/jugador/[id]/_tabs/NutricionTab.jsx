@@ -7,7 +7,7 @@ import PlayerSubtabControl from './PlayerSubtabControl';
 import PlanSubtab from './nutricion/PlanSubtab';
 import SuplementacionSubtab from './nutricion/SuplementacionSubtab';
 import MenuSemanalSubtab from './nutricion/MenuSemanalSubtab';
-import ProtocolosSubtab from './metricas/ProtocolosSubtab';
+import ProtocolosSubtab from './nutricion/ProtocolosSubtab';
 
 export default function NutricionTab({ jugador, menus = [], activeSubtab, onSubtabChange, readOnly = false }) {
   return (

@@ -78,9 +78,22 @@ function MetricCard({ label, value, color = 'orange' }) {
   );
 }
 
-function PlanFicha({ data, activeSupplements = [] }) {
+function PlanFicha({ data, activeSupplements = [], jugador }) {
   const plan = sanitizePlanData(data);
   if (!plan) return null;
+
+  const rawColors = jugador?.equipos?.configuracion_nutricional?.planColors || {};
+  const colors = {
+    cardTopBg: rawColors.cardTopBg || '#254d5c',
+    cardTopText: rawColors.cardTopText || '#cad6df',
+    cardBodyBg: rawColors.cardBodyBg || '#101229',
+    cardBodyText: rawColors.cardBodyText || '#ffffff',
+    boxBg: rawColors.boxBg || rawColors.dayBoxBg || rawColors.suppBoxBg || '#151932',
+    boxBorder: rawColors.boxBorder || rawColors.dayBoxBorder || rawColors.suppBoxBorder || '#2d335a',
+    itemBg: rawColors.itemBg || rawColors.mealBoxBg || rawColors.suppItemBg || '#1d1f46',
+    accentText: rawColors.accentText || rawColors.mealTitleText || rawColors.suppTitleText || '#ffa94d',
+    itemText: rawColors.itemText || rawColors.mealDescText || rawColors.notesDescText || '#dee2e6'
+  };
 
   const leftDays = ['lunes', 'martes', 'miercoles', 'jueves'];
   const rightDays = ['viernes', 'sabado', 'domingo'];
@@ -95,9 +108,9 @@ function PlanFicha({ data, activeSupplements = [] }) {
     const color = getDayTypeColor(dayData.tipoDia);
     const label = getDayTypeLabel(dayData.tipoDia);
     return (
-      <Paper key={dayKey} p="md" radius="md" style={{ backgroundColor: '#151932', border: '1px solid #2d335a' }} mb="sm">
+      <Paper key={dayKey} p="md" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }} mb="sm">
         <Group justify="space-between" align="center" mb="xs">
-          <Text size="md" fw={900} tt="uppercase">{dayData.label}</Text>
+          <Text size="md" fw={900} tt="uppercase" style={{ color: colors.cardBodyText }}>{dayData.label}</Text>
           <Badge variant="light" color={color}>{label}</Badge>
         </Group>
         <Text size="xs" fw={700} c="dimmed" mb="sm">
@@ -105,9 +118,9 @@ function PlanFicha({ data, activeSupplements = [] }) {
         </Text>
         <Stack gap="xs">
           {dayData.ingestas.map((meal, mealIndex) => (
-            <Box key={mealIndex} p="xs" style={{ backgroundColor: '#1d1f46', borderRadius: '4px' }}>
-              <Text size="xs" fw={800} c="orange.4" tt="uppercase" lh={1.1}>{meal.nombre}</Text>
-              <Text size="sm" c="gray.3" mt={2} style={{ lineHeight: 1.35 }}>{meal.detalle || '-'}</Text>
+            <Box key={mealIndex} p="xs" style={{ backgroundColor: colors.itemBg, borderRadius: '4px' }}>
+              <Text size="xs" fw={800} tt="uppercase" lh={1.1} style={{ color: colors.accentText }}>{meal.nombre}</Text>
+              <Text size="sm" mt={2} style={{ color: colors.itemText, lineHeight: 1.35 }}>{meal.detalle || '-'}</Text>
             </Box>
           ))}
         </Stack>
@@ -140,15 +153,15 @@ function PlanFicha({ data, activeSupplements = [] }) {
             {rightDays.map(renderDayBox)}
 
             {supplementsToShow?.length > 0 && (
-              <Paper p="md" radius="md" style={{ backgroundColor: '#131e3a', border: '1px solid #23345e' }} mb="sm">
+              <Paper p="md" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }} mb="sm">
                 <Group justify="space-between" align="center" mb="xs">
-                  <Title order={5} c="orange.4" tt="uppercase">Suplementación Pautada</Title>
+                  <Title order={5} tt="uppercase" style={{ color: colors.accentText }}>Suplementación Pautada</Title>
                 </Group>
                 <Stack gap="xs">
                   {supplementsToShow.map((supp, index) => (
-                    <Paper key={index} p="xs" style={{ backgroundColor: '#1d264a', borderRadius: '4px' }}>
+                    <Paper key={index} p="xs" style={{ backgroundColor: colors.itemBg, borderRadius: '4px' }}>
                       <Group justify="space-between" align="flex-start" wrap="nowrap">
-                        <Text size="xs" fw={800} c="white">{supp.nombre}</Text>
+                        <Text size="xs" fw={800} style={{ color: colors.cardBodyText }}>{supp.nombre}</Text>
                         {supp.dosis && (
                           <Badge color="teal" variant="filled" size="xs" radius="xs">
                             {supp.dosis}
@@ -156,12 +169,12 @@ function PlanFicha({ data, activeSupplements = [] }) {
                         )}
                       </Group>
                       {supp.timing && (
-                        <Text size="xs" c="orange.3" fw={700} mt={2}>
+                        <Text size="xs" fw={700} mt={2} style={{ color: colors.itemText }}>
                           Momento: {supp.timing}
                         </Text>
                       )}
                       {supp.notas && (
-                        <Text size="xs" c="gray.3" fs="italic" mt={2}>
+                        <Text size="xs" fs="italic" mt={2} style={{ color: colors.itemText, opacity: 0.8 }}>
                           {supp.notas}
                         </Text>
                       )}
@@ -172,11 +185,11 @@ function PlanFicha({ data, activeSupplements = [] }) {
             )}
 
             {plan.notas?.length > 0 && (
-              <Paper p="md" radius="md" style={{ backgroundColor: '#071e36', border: '1px solid #1e3a8a' }}>
-                <Title order={5} c="teal.3" tt="uppercase" mb="xs">Indicaciones de la semana</Title>
+              <Paper p="md" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }}>
+                <Title order={5} tt="uppercase" mb="xs" style={{ color: colors.accentText }}>Indicaciones de la semana</Title>
                 <Stack gap={4}>
                   {plan.notas.map((note, index) => (
-                    <Text key={index} size="sm" c="blue.1">• {note}</Text>
+                    <Text key={index} size="sm" style={{ color: colors.itemText }}>• {note}</Text>
                   ))}
                 </Stack>
               </Paper>
@@ -300,6 +313,21 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [mode, setMode] = useState('view');
   const [intercambiosOpened, setIntercambiosOpened] = useState(false);
   const [activeSupplements, setActiveSupplements] = useState([]);
+
+  const planColors = jugador?.equipos?.configuracion_nutricional?.planColors || {
+    dayBoxBg: '#151932',
+    dayBoxBorder: '#2d335a',
+    mealBoxBg: '#1d1f46',
+    suppBoxBg: '#131e3a',
+    suppBoxBorder: '#23345e',
+    suppItemBg: '#1d264a',
+    notesBoxBg: '#071e36',
+    notesBoxBorder: '#1e3a8a',
+    cardTopBg: '#254d5c',
+    cardTopText: '#cad6df',
+    cardBodyBg: '#101229',
+    cardBodyText: '#ffffff'
+  };
 
   const [nombre, setNombre] = useState('');
   const [contextoAdicional, setContextoAdicional] = useState('');
@@ -1217,8 +1245,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       <IntercambiosModal opened={intercambiosOpened} onClose={() => setIntercambiosOpened(false)} />
 
       <style>{`
-        .ficha { overflow: hidden; background: #101229; color: white; }
-        .ficha-top { background: #254d5c; color: #cad6df; text-align: center; padding: 18px 12px; text-transform: uppercase; font-size: 11px; letter-spacing: 1.4px; }
+        .ficha { overflow: hidden; background: ${planColors.cardBodyBg}; color: ${planColors.cardBodyText}; }
+        .ficha-top { background: ${planColors.cardTopBg}; color: ${planColors.cardTopText}; text-align: center; padding: 18px 12px; text-transform: uppercase; font-size: 11px; letter-spacing: 1.4px; }
         .ficha-body { padding: 28px clamp(16px, 4vw, 42px) 32px; }
         .ficha-title { color: white; text-align: center; font-size: clamp(28px, 5vw, 44px); line-height: 1; text-transform: uppercase; letter-spacing: 0; }
         .ficha-position { color: #ff8b52; text-align: center; text-transform: uppercase; font-weight: 800; margin-top: 6px; }
