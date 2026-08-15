@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { slugify } from '@/lib/utils';
-import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea } from '@mantine/core';
+import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea, Anchor, Box } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft, IconBook } from '@tabler/icons-react';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
@@ -152,31 +152,47 @@ export default function TeamConfigClient({ team, readOnly = false }) {
     <BoneyardSkeleton name="team-config" loading={false}>
       <Stack gap="lg">
         {/* Cabecera integrada con el botón de guardar */}
-        <Paper p="md" radius="lg" shadow="sm" withBorder>
+        <Paper
+          p={{ base: 'sm', sm: 'md' }}
+          shadow="xs"
+          radius={24}
+          style={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
+            zIndex: 10,
+            position: 'relative',
+          }}
+        >
           <Group justify="space-between" align="center" wrap="wrap" gap="md">
-            <Group gap="md" align="center" wrap="nowrap">
+            <Group gap="sm" wrap="nowrap">
               <Tooltip label="Volver al equipo" withArrow>
-                <ActionIcon component="a" href={`/dashboard/equipo/${team.id}`} variant="light" color="gray" radius="xl" size={42}>
+                <ActionIcon component={Anchor} href={`/dashboard/equipo/${team.id}`} variant="light" color="gray" radius="xl" size={42}>
                   <IconArrowLeft size={20} />
                 </ActionIcon>
               </Tooltip>
-              <div>
-                <Title order={3} fw={700} c="#24291f">Configuración Nutricional: {teamName}</Title>
-                <Text c="dimmed" size="sm" mt={2}>
-                  Personaliza los tipos de día y multiplicadores de macros que se usarán en este equipo.
+              <ThemeIcon color="blue" variant="light" radius="xl" size={42}>
+                <IconSettings size={21} />
+              </ThemeIcon>
+              <Box>
+                <Title order={3} fw={850} c="#24291f" lh={1.1}>
+                  Configuración Nutricional
+                </Title>
+                <Text size="xs" c="dimmed" mt={2}>
+                  {teamName || team.nombre || 'Equipo'} · Personaliza tipos de día y multiplicadores de macros
                 </Text>
-              </div>
+              </Box>
             </Group>
 
-            {!readOnly && (
-              <Button loading={loading} onClick={saveConfig} leftSection={<IconDeviceFloppy size={18} />} size="sm" radius="xl" color="blue">
-                Guardar Cambios
-              </Button>
-            )}
+            <Group gap="xs" wrap="wrap" justify="flex-end">
+              {!readOnly && (
+                <Button loading={loading} onClick={saveConfig} leftSection={<IconDeviceFloppy size={18} />} size="sm" radius="xl" color="blue">
+                  Guardar Cambios
+                </Button>
+              )}
+            </Group>
           </Group>
         </Paper>
 
-        <Paper p="md" radius="lg" shadow="sm" withBorder style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))' }}>
+        <Paper p="md" radius="lg" shadow="sm" withBorder bg="white">
           <Group gap="sm" mb="lg">
             <ThemeIcon size="md" radius="xl" variant="light" color="blue">
               <IconSettings size={18} />
