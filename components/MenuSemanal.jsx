@@ -130,7 +130,7 @@ function AgendaDayRow({ dayData, weekStr }) {
               {dayData.comida?.segundo && <AgendaDishLine label="2º" value={dayData.comida.segundo} />}
               {dayData.comida?.postre && <AgendaDishLine label="P" value={dayData.comida.postre} />}
               {!dayData.comida?.primero && !dayData.comida?.segundo && (
-                <Text size="xs" c="gray.4" italic>Sin registrar</Text>
+                <Text size="xs" c="gray.4" fs="italic">Sin registrar</Text>
               )}
             </Stack>
           </Stack>
@@ -147,7 +147,7 @@ function AgendaDayRow({ dayData, weekStr }) {
               {dayData.cena?.segundo && <AgendaDishLine label="2º" value={dayData.cena.segundo} />}
               {dayData.cena?.postre && <AgendaDishLine label="P" value={dayData.cena.postre} />}
               {!dayData.cena?.primero && !dayData.cena?.segundo && (
-                <Text size="xs" c="gray.4" italic>Sin registrar</Text>
+                <Text size="xs" c="gray.4" fs="italic">Sin registrar</Text>
               )}
             </Stack>
           </Stack>
@@ -164,7 +164,7 @@ function HeroDishSection({ title, label, value, color }) {
         <Text size="xs" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.5px', fontSize: '9px' }}>
           {title}
         </Text>
-        <Text size="sm" c="gray.4" italic fw={400}>
+        <Text size="sm" c="gray.4" fs="italic" fw={400}>
           Sin registrar
         </Text>
       </Stack>

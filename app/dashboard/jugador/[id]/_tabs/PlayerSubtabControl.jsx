@@ -13,9 +13,6 @@ const styles = () => ({
   label: {
     padding: '8px 4px',
     color: 'var(--mantine-color-dimmed)',
-    '&[data-active]': {
-      color: 'var(--mantine-color-dark-filled)',
-    },
   },
 });
 

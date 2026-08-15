@@ -161,7 +161,7 @@ function PlanFicha({ data, activeSupplements = [] }) {
                         </Text>
                       )}
                       {supp.notas && (
-                        <Text size="xs" c="gray.3" italic mt={2}>
+                        <Text size="xs" c="gray.3" fs="italic" mt={2}>
                           {supp.notas}
                         </Text>
                       )}

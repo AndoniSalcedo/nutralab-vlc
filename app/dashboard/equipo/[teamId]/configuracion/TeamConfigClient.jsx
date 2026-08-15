@@ -4,11 +4,12 @@ import { useState } from 'react';
 import { slugify } from '@/lib/utils';
 import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea, Anchor, Box } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft, IconBook } from '@tabler/icons-react';
+import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft, IconBook, IconClipboardList } from '@tabler/icons-react';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
 import { useRouter } from 'next/navigation';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import DayTypeModal from '@/components/modals/DayTypeModal';
+import ProtocolEditorModal from '@/components/modals/ProtocolEditorModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
@@ -48,6 +49,13 @@ export default function TeamConfigClient({ team, readOnly = false }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingDayType, setEditingDayType] = useState(null);
   const [deleteDayTypeKey, setDeleteDayTypeKey] = useState(null);
+
+  const [protocols, setProtocols] = useState(() => {
+    return team.configuracion_nutricional?.protocols || [];
+  });
+  const [protocolModalOpen, setProtocolModalOpen] = useState(false);
+  const [editingProtocol, setEditingProtocol] = useState(null);
+  const [deleteProtocolId, setDeleteProtocolId] = useState(null);
 
   const handleSaveDayType = () => {
     let finalKey = editingDayType.key;
@@ -131,6 +139,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           configuracion_nutricional: {
             dayTypes,
             objectiveMacros,
+            protocols,
             pdfMicrocycle,
             pdfRules,
             pdfBuffet
@@ -323,6 +332,82 @@ export default function TeamConfigClient({ team, readOnly = false }) {
         </Paper>
 
         <Paper p="md" radius="lg" shadow="sm" withBorder>
+          <Group justify="space-between" mb="lg">
+            <Group gap="sm">
+              <ThemeIcon size="md" radius="xl" variant="light" color="cyan">
+                <IconClipboardList size={18} />
+              </ThemeIcon>
+              <Title order={4} c="dark.4">Protocolos por Tipo de Día</Title>
+            </Group>
+          </Group>
+          
+          <Accordion variant="separated" radius="md">
+            {dayTypes.map(d => {
+              const dayProtocols = protocols.filter(p => p.dayTypeKey === d.key);
+              return (
+                <Accordion.Item key={d.key} value={d.key} style={{ backgroundColor: 'white' }}>
+                  <Accordion.Control>
+                    <Group gap="sm">
+                      <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: `var(--mantine-color-${d.color}-6)` }} />
+                      <Text fw={600} c="dark.3">{d.label}</Text>
+                      <Badge size="xs" variant="light" color="gray">{dayProtocols.length} protocolos</Badge>
+                    </Group>
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    <Stack gap="md">
+                      {!readOnly && (
+                        <Button
+                          variant="light"
+                          color="blue"
+                          size="xs"
+                          leftSection={<IconPlus size={14} />}
+                          onClick={() => {
+                            setEditingProtocol({ dayTypeKey: d.key, name: '', timeline: [], checklist: [] });
+                            setProtocolModalOpen(true);
+                          }}
+                          style={{ alignSelf: 'flex-start' }}
+                        >
+                          Nuevo Protocolo para {d.label}
+                        </Button>
+                      )}
+                      
+                      {dayProtocols.length === 0 ? (
+                        <Text c="dimmed" size="sm">No hay protocolos configurados para este tipo de día.</Text>
+                      ) : (
+                        <Table verticalSpacing="sm" striped highlightOnHover>
+                          <Table.Tbody>
+                            {dayProtocols.map(p => (
+                              <Table.Tr key={p.id}>
+                                <Table.Td>
+                                  <Text fw={500} size="sm">{p.name}</Text>
+                                  <Text size="xs" c="dimmed">{p.timeline?.length || 0} pasos · {p.checklist?.length || 0} checks</Text>
+                                </Table.Td>
+                                {!readOnly && (
+                                  <Table.Td w={120}>
+                                    <Group gap="xs" justify="flex-end" wrap="nowrap">
+                                      <ActionIcon variant="light" color="blue" radius="xl" size="md" onClick={() => { setEditingProtocol(p); setProtocolModalOpen(true); }}>
+                                        <IconPencil size={16} />
+                                      </ActionIcon>
+                                      <ActionIcon variant="light" color="red" radius="xl" size="md" onClick={() => setDeleteProtocolId(p.id)}>
+                                        <IconTrash size={16} />
+                                      </ActionIcon>
+                                    </Group>
+                                  </Table.Td>
+                                )}
+                              </Table.Tr>
+                            ))}
+                          </Table.Tbody>
+                        </Table>
+                      )}
+                    </Stack>
+                  </Accordion.Panel>
+                </Accordion.Item>
+              );
+            })}
+          </Accordion>
+        </Paper>
+
+        <Paper p="md" radius="lg" shadow="sm" withBorder>
           <Title order={4} mb="md" c="dark.4">Multiplicadores por Objetivo</Title>
           <Accordion variant="separated" radius="md">
             {PLAYER_OBJECTIVES.map(obj => (
@@ -390,6 +475,33 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           title="Eliminar tipo de día"
           message="¿Seguro que quieres eliminar este tipo de día?"
           confirmLabel="Eliminar"
+        />
+        <ConfirmModal
+          opened={!!deleteProtocolId}
+          onClose={() => setDeleteProtocolId(null)}
+          onConfirm={() => {
+            setProtocols(current => current.filter(p => p.id !== deleteProtocolId));
+            setDeleteProtocolId(null);
+          }}
+          title="Eliminar protocolo"
+          message="¿Seguro que quieres eliminar este protocolo? Los jugadores que ya lo hayan personalizado mantendrán su copia local."
+          confirmLabel="Eliminar"
+        />
+        <ProtocolEditorModal
+          opened={protocolModalOpen}
+          onClose={() => setProtocolModalOpen(false)}
+          protocol={editingProtocol}
+          onSave={(savedProtocol) => {
+            setProtocols(current => {
+              const exists = current.findIndex(p => p.id === savedProtocol.id);
+              if (exists >= 0) {
+                const next = [...current];
+                next[exists] = savedProtocol;
+                return next;
+              }
+              return [...current, savedProtocol];
+            });
+          }}
         />
       </Stack>
     </BoneyardSkeleton>

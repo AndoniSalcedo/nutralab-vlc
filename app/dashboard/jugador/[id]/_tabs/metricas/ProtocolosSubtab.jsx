@@ -1,100 +1,190 @@
 'use client';
 
-import { Badge, Box, Group, Paper, SimpleGrid, Stack, Text, Timeline } from '@mantine/core';
-import { IconClipboardList, IconDroplet, IconApple, IconRun, IconCoffee, IconBatteryCharging, IconFlag } from '@tabler/icons-react';
+import { useState } from 'react';
+import { Badge, Box, Group, Paper, SimpleGrid, Stack, Text, Timeline, Select, Title, Button } from '@mantine/core';
+import { IconClipboardList, IconDroplet, IconApple, IconRun, IconCoffee, IconBatteryCharging, IconFlag, IconBed, IconActivity, IconMeat, IconPill, IconPencil, IconCalendar } from '@tabler/icons-react';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/services/player';
+import ProtocolEditorModal from '@/components/modals/ProtocolEditorModal';
+import NothingFound from '@/components/NothingFound';
+
+const AVAILABLE_ICONS = {
+  IconApple: IconApple,
+  IconRun: IconRun,
+  IconCoffee: IconCoffee,
+  IconDroplet: IconDroplet,
+  IconBatteryCharging: IconBatteryCharging,
+  IconFlag: IconFlag,
+  IconBed: IconBed,
+  IconActivity: IconActivity,
+  IconMeat: IconMeat,
+  IconPill: IconPill,
+  IconClipboardList: IconClipboardList
+};
 
 export default function ProtocolosSubtab({ jugador, readOnly = false }) {
-  const peso = Number(jugador.peso_kg || 0);
-  const cafMin = peso ? Math.round(peso * 3) : 200;
-  const cafMax = peso ? Math.round(peso * 6) : 400;
+  const teamConfig = jugador.equipos?.configuracion_nutricional || {};
+  const dayTypes = teamConfig.dayTypes || [];
+  const baseProtocols = teamConfig.protocols || [];
+  const customProtocols = jugador.protocolos_custom || {};
+
+  const [selectedDayType, setSelectedDayType] = useState(dayTypes.length > 0 ? dayTypes[0].key : null);
+
+  const availableProtocols = baseProtocols.filter(p => p.dayTypeKey === selectedDayType);
+  const [selectedProtocolId, setSelectedProtocolId] = useState(availableProtocols.length > 0 ? availableProtocols[0].id : null);
+
+  // If dayType changes, reset protocol selection
+  if (selectedDayType && availableProtocols.length > 0 && !availableProtocols.find(p => p.id === selectedProtocolId)) {
+    setSelectedProtocolId(availableProtocols[0].id);
+  } else if (selectedDayType && availableProtocols.length === 0 && selectedProtocolId !== null) {
+    setSelectedProtocolId(null);
+  }
+
+  const baseProtocol = availableProtocols.find(p => p.id === selectedProtocolId);
+  const activeProtocol = baseProtocol ? (customProtocols[baseProtocol.id] || baseProtocol) : null;
+
+  const [editorOpen, setEditorOpen] = useState(false);
 
   async function saveField(field, value) {
     await updatePlayerField(jugador.id, field, value);
   }
 
-  const protDef = [
-    `PROTOCOLO PREPARTIDO - ${jugador.nombre} ${jugador.apellidos}`,
-    '',
-    '-3/-4h | COMIDA PRINCIPAL:',
-    '- CHO: arroz/pasta/patata',
-    '- Proteina: 100-150g',
-    '',
-    '-90 min | SNACK: platano o gel',
-    '',
-    `-60 min | CAFEINA: ${cafMin}-${cafMax} mg`,
-    '',
-    'MEDIO TIEMPO: 300-500 ml isotonica',
-    '',
-    'POST +30min: proteina + CHO rapidos',
-    '',
-    'NOTAS:',
-    '',
-  ].join('\n');
+  async function handleSaveCustomProtocol(updatedProtocol) {
+    const newCustoms = { ...customProtocols, [updatedProtocol.id]: updatedProtocol };
+    await updatePlayerField(jugador.id, 'protocolos_custom', newCustoms);
+    // Locally mutate for instant UI update (or wait for SWR/Next to revalidate)
+    jugador.protocolos_custom = newCustoms;
+  }
+
+  const renderTimelineIcon = (iconName) => {
+    const IconComponent = AVAILABLE_ICONS[iconName] || IconFlag;
+    return <IconComponent size={15} />;
+  };
+
+  const dayTypeObj = dayTypes.find(d => d.key === selectedDayType);
 
   return (
     <Stack gap={0}>
       <Paper className={classes.mobileSticky} p={{ base: 'sm', sm: 'md' }} bg="white" shadow="xs" radius="lg" withBorder style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
-        <Group justify="space-between" align="flex-start" wrap="wrap">
-          <Group gap="xs">
-            <SubtabHeader tab="metricas" subtab="protocolos" />
+        <Stack gap="md">
+          <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
+            <Group gap="xs" style={{ flex: 1 }}>
+              <SubtabHeader tab="nutricion" subtab="protocolos" />
+            </Group>
           </Group>
-          <Badge color="dark" variant="light" size="lg">Prepartido · medio tiempo · post</Badge>
-        </Group>
+
+          <Group gap="xs" grow>
+            {dayTypes.length > 0 && (
+              <Select
+                data={dayTypes.map(d => ({ value: d.key, label: d.label }))}
+                value={selectedDayType}
+                onChange={setSelectedDayType}
+                placeholder="Tipo de Día"
+                size="sm"
+                radius="md"
+                variant="filled"
+                allowDeselect={false}
+                leftSection={<IconCalendar size={16} style={{ opacity: 0.7 }} />}
+              />
+            )}
+            {availableProtocols.length > 1 && (
+              <Select
+                data={availableProtocols.map(p => ({ value: p.id, label: p.name }))}
+                value={selectedProtocolId}
+                onChange={setSelectedProtocolId}
+                placeholder="Protocolo"
+                size="sm"
+                radius="md"
+                variant="filled"
+                allowDeselect={false}
+                leftSection={<IconClipboardList size={16} style={{ opacity: 0.7 }} />}
+              />
+            )}
+          </Group>
+        </Stack>
       </Paper>
 
       <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
-        <Stack gap={0}>
-          <SimpleGrid cols={{ base: 1, lg: 2 }} spacing={{ base: 'md', sm: 'md' }} align="stretch" mb={{ base: 'md', sm: 'xl' }}>
-            <BentoCard title="Timeline prepartido" icon={IconFlag} color="dark">
-              <Timeline active={4} bulletSize={28} lineWidth={2} color="dark">
-                <Timeline.Item bullet={<IconApple size={15} />} title="-3 / -4 h · Comida principal">
-                  <Text size="sm" c="dimmed">Base alta en CHO: arroz, pasta o patata. Proteína fácil de digerir, 100-150 g.</Text>
-                </Timeline.Item>
-                <Timeline.Item bullet={<IconRun size={15} />} title="-90 min · Snack">
-                  <Text size="sm" c="dimmed">Plátano, gel o opción habitual ya testada. Evitar novedades.</Text>
-                </Timeline.Item>
-                <Timeline.Item bullet={<IconCoffee size={15} />} title="-60 min · Cafeína">
-                  <Text size="sm" c="dimmed">{cafMin}-{cafMax} mg según tolerancia y rol esperado.</Text>
-                </Timeline.Item>
-                <Timeline.Item bullet={<IconDroplet size={15} />} title="Medio tiempo">
-                  <Text size="sm" c="dimmed">300-500 ml de isotónica y ajuste de CHO si hay alta carga.</Text>
-                </Timeline.Item>
-                <Timeline.Item bullet={<IconBatteryCharging size={15} />} title="+30 min · Recuperación">
-                  <Text size="sm" c="dimmed">Proteína + CHO rápidos. Priorizar disponibilidad si hay viaje.</Text>
-                </Timeline.Item>
-              </Timeline>
-            </BentoCard>
+        <Stack gap="md">
+          {activeProtocol ? (
+            <Stack gap="md">
+              <Group justify="space-between">
+                <Group gap="sm">
+                  {customProtocols[activeProtocol.id] && (
+                    <Badge color="blue" variant="light">Personalizado</Badge>
+                  )}
+                  {dayTypeObj && (
+                    <Badge color={dayTypeObj.color || 'gray'} variant="light">{dayTypeObj.label}</Badge>
+                  )}
+                  <Title order={4} c="dark.3">{activeProtocol.name}</Title>
+                </Group>
+                {!readOnly && (
+                  <Button variant="light" size="xs" leftSection={<IconPencil size={14} />} onClick={() => setEditorOpen(true)} radius="xl">
+                    Personalizar
+                  </Button>
+                )}
+              </Group>
 
-            <BentoCard title="Checklist operativo" icon={IconClipboardList} color="blue">
-              <Stack gap="sm">
-                {[
-                  ['Comida', 'Baja en grasa y fibra si el jugador tiene molestias GI.'],
-                  ['Hidratación', 'Orina clara antes de salida. Electrolitos si calor o alta sudoración.'],
-                  ['Suplementos', 'Solo lo probado en entrenamiento. Nada nuevo en partido.'],
-                  ['Recuperación', 'Dejar preparado batido, snack y cena si hay desplazamiento.'],
-                ].map(([title, detail]) => (
-                  <Paper key={title} p="sm" radius="md" bg="gray.0" withBorder>
-                    <Text size="xs" c="dimmed" tt="uppercase" fw={700}>{title}</Text>
-                    <Text size="sm" fw={600} c="dark.4">{detail}</Text>
-                  </Paper>
-                ))}
-              </Stack>
-            </BentoCard>
-          </SimpleGrid>
+              <SimpleGrid cols={{ base: 1, lg: 2 }} spacing={{ base: 'md', sm: 'md' }} align="stretch" mb={{ base: 'md', sm: 'xl' }}>
+                <BentoCard title="Timeline" icon={IconFlag} color="dark">
+                  {activeProtocol.timeline?.length > 0 ? (
+                    <Timeline active={activeProtocol.timeline.length - 1} bulletSize={28} lineWidth={2} color="dark">
+                      {activeProtocol.timeline.map((item, idx) => (
+                        <Timeline.Item key={item.id || idx} bullet={renderTimelineIcon(item.icon)} title={`${item.timeLabel} · ${item.title}`}>
+                          <Text size="sm" c="dimmed">{item.description}</Text>
+                        </Timeline.Item>
+                      ))}
+                    </Timeline>
+                  ) : (
+                    <Text c="dimmed" size="sm">No hay pasos en el timeline.</Text>
+                  )}
+                </BentoCard>
+
+                <BentoCard title="Checklist operativo" icon={IconClipboardList} color="blue">
+                  <Stack gap="sm">
+                    {activeProtocol.checklist?.length > 0 ? (
+                      activeProtocol.checklist.map((item, idx) => (
+                        <Paper key={item.id || idx} p="sm" radius="md" bg="gray.0" withBorder>
+                          <Text size="xs" c="dimmed" tt="uppercase" fw={700}>{item.title}</Text>
+                          <Text size="sm" fw={600} c="dark.4">{item.description}</Text>
+                        </Paper>
+                      ))
+                    ) : (
+                      <Text c="dimmed" size="sm">No hay items de checklist.</Text>
+                    )}
+                  </Stack>
+                </BentoCard>
+              </SimpleGrid>
+            </Stack>
+          ) : (
+            <NothingFound
+              title="Sin protocolos"
+              description="No hay protocolos configurados para este tipo de día."
+              withPaper
+              icon={IconClipboardList}
+            />
+          )}
 
           <EditableSection
-            title="Notas y protocolo individual"
-            defaultValue={jugador.notas_protocolos || protDef}
+            title="Notas adicionales"
+            defaultValue={jugador.notas_protocolos || ''}
             onSave={(v) => saveField('notas_protocolos', v)}
             readOnly={readOnly}
           />
         </Stack>
       </Box>
+
+      {editorOpen && activeProtocol && (
+        <ProtocolEditorModal
+          opened={editorOpen}
+          onClose={() => setEditorOpen(false)}
+          protocol={activeProtocol}
+          onSave={handleSaveCustomProtocol}
+        />
+      )}
     </Stack>
   );
 }
