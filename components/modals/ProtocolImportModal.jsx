@@ -18,7 +18,7 @@ import {
   Table
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconDownload, IconClipboardList, IconShield } from '@tabler/icons-react';
+import { IconDownload, IconShield } from '@tabler/icons-react';
 import { getTeams } from '@/services/team';
 
 export default function ProtocolImportModal({ 

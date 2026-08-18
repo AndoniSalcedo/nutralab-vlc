@@ -497,7 +497,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
         month: 'short',
         year: 'numeric'
       });
-    } catch (e) {
+    } catch {
       return dateStr;
     }
   };
@@ -560,7 +560,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
                     try {
                       const parts = v.split('-');
                       return `${parts[2]}/${parts[1]}`;
-                    } catch (e) { return v; }
+                    } catch { return v; }
                   }}
                   axisLine={false}
                   tickLine={false}

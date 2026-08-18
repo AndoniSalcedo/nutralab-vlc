@@ -41,7 +41,7 @@ export function getDayDate(weekStr, dayName) {
     if (offset === -1) return null;
     date.setDate(date.getDate() + offset);
     return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-  } catch (e) {
+  } catch {
     return null;
   }
 }
@@ -50,7 +50,7 @@ function isToday(dayName) {
   try {
     const todayName = new Intl.DateTimeFormat('es-ES', { weekday: 'long' }).format(new Date());
     return normalizeKey(dayName) === normalizeKey(todayName);
-  } catch (e) {
+  } catch {
     return false;
   }
 }

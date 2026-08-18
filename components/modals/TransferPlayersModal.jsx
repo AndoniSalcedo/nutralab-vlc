@@ -15,6 +15,15 @@ export default function TransferPlayersModal({ opened, onClose, team, players = 
   const [selectedIds, setSelectedIds] = useState([]);
   const router = useRouter();
 
+  const fetchTeams = async () => {
+    try {
+      const allTeams = await getTeams();
+      setTeams(allTeams.filter(t => t.id !== team?.id));
+    } catch (error) {
+      console.error('Error fetching teams:', error);
+    }
+  };
+
   useEffect(() => {
     if (opened) {
       setSelectedIds(initialSelectedIds);
@@ -24,15 +33,6 @@ export default function TransferPlayersModal({ opened, onClose, team, players = 
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, initialSelectedIds]);
-
-  const fetchTeams = async () => {
-    try {
-      const allTeams = await getTeams();
-      setTeams(allTeams.filter(t => t.id !== team?.id));
-    } catch (error) {
-      console.error('Error fetching teams:', error);
-    }
-  };
 
   const teamOptions = useMemo(() => {
     return teams.map(t => ({ value: String(t.id), label: `${t.nombre} ${t.temporada ? `(${t.temporada})` : ''}` }));

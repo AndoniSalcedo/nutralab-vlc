@@ -20,7 +20,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { IconChevronLeft, IconEdit, IconLogout, IconMenu2, IconCamera } from '@tabler/icons-react';
 import { FileButton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { compressAvatar, avatarFromRecord, initials } from '@/lib/avatar';
+import { compressAvatar, initials } from '@/lib/avatar';
 import { uploadPlayerAvatar } from '@/services/player';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from './PlayerCredentialsButton';

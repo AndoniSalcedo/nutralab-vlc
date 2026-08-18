@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import {
   ActionIcon,
   Avatar,
-  Badge,
   Box,
   Button,
   Group,

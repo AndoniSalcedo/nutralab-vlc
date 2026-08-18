@@ -27,7 +27,6 @@ import {
   IconPlus,
   IconSearch,
   IconTrash,
-  IconUser,
   IconUserCheck,
   IconUserPlus,
   IconUsersGroup,

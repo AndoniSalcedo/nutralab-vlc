@@ -35,7 +35,7 @@ function extractMenuData(message) {
       try {
         const parsed = JSON.parse(jsonMatch[0]);
         if (parsed.dias && Array.isArray(parsed.dias)) return parsed.dias;
-      } catch (e) {
+      } catch {
         // Fallthrough to error
       }
     }
