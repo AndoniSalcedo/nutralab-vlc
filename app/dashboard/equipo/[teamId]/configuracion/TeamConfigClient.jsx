@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { slugify } from '@/lib/utils';
 import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea, Anchor, Box, ColorInput, SimpleGrid, Avatar, FileButton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft, IconBook, IconClipboardList, IconPalette, IconCamera } from '@tabler/icons-react';
+import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft, IconBook, IconClipboardList, IconPalette, IconCamera, IconFolderShare, IconDownload } from '@tabler/icons-react';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
 import { compressAvatar, initials } from '@/lib/avatar';
 import { uploadTeamPhoto, removeTeamPhoto } from '@/services/team';
@@ -13,6 +13,8 @@ import { useRouter } from 'next/navigation';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import DayTypeModal from '@/components/modals/DayTypeModal';
 import ProtocolEditorModal from '@/components/modals/ProtocolEditorModal';
+import ProtocolTransferModal from '@/components/modals/ProtocolTransferModal';
+import ProtocolImportModal from '@/components/modals/ProtocolImportModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
@@ -100,6 +102,9 @@ export default function TeamConfigClient({ team, readOnly = false }) {
   const [protocolModalOpen, setProtocolModalOpen] = useState(false);
   const [editingProtocol, setEditingProtocol] = useState(null);
   const [deleteProtocolId, setDeleteProtocolId] = useState(null);
+  const [transferModalOpen, setTransferModalOpen] = useState(false);
+  const [transferProtocol, setTransferProtocol] = useState(null);
+  const [importModalOpen, setImportModalOpen] = useState(false);
 
   const [planColors, setPlanColors] = useState(() => {
     const raw = team.configuracion_nutricional?.planColors || {};
@@ -563,6 +568,18 @@ export default function TeamConfigClient({ team, readOnly = false }) {
               </ThemeIcon>
               <Title order={4} c="dark.4">Protocolos por Tipo de Día</Title>
             </Group>
+            {!readOnly && (
+              <Button
+                variant="light"
+                color="blue"
+                size="xs"
+                radius="xl"
+                leftSection={<IconDownload size={14} />}
+                onClick={() => setImportModalOpen(true)}
+              >
+                Importar de otro equipo
+              </Button>
+            )}
           </Group>
 
           <Accordion variant="separated" radius="md">
@@ -607,14 +624,32 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                                   <Text size="xs" c="dimmed">{p.timeline?.length || 0} pasos · {p.checklist?.length || 0} checks</Text>
                                 </Table.Td>
                                 {!readOnly && (
-                                  <Table.Td w={120}>
+                                  <Table.Td w={150}>
                                     <Group gap="xs" justify="flex-end" wrap="nowrap">
-                                      <ActionIcon variant="light" color="blue" radius="xl" size="md" onClick={() => { setEditingProtocol(p); setProtocolModalOpen(true); }}>
-                                        <IconPencil size={16} />
-                                      </ActionIcon>
-                                      <ActionIcon variant="light" color="red" radius="xl" size="md" onClick={() => setDeleteProtocolId(p.id)}>
-                                        <IconTrash size={16} />
-                                      </ActionIcon>
+                                      <Tooltip label="Copiar o mover a otro equipo" withArrow>
+                                        <ActionIcon 
+                                          variant="light" 
+                                          color="cyan" 
+                                          radius="xl" 
+                                          size="md" 
+                                          onClick={() => { 
+                                            setTransferProtocol(p); 
+                                            setTransferModalOpen(true); 
+                                          }}
+                                        >
+                                          <IconFolderShare size={16} />
+                                        </ActionIcon>
+                                      </Tooltip>
+                                      <Tooltip label="Editar protocolo" withArrow>
+                                        <ActionIcon variant="light" color="blue" radius="xl" size="md" onClick={() => { setEditingProtocol(p); setProtocolModalOpen(true); }}>
+                                          <IconPencil size={16} />
+                                        </ActionIcon>
+                                      </Tooltip>
+                                      <Tooltip label="Eliminar protocolo" withArrow>
+                                        <ActionIcon variant="light" color="red" radius="xl" size="md" onClick={() => setDeleteProtocolId(p.id)}>
+                                          <IconTrash size={16} />
+                                        </ActionIcon>
+                                      </Tooltip>
                                     </Group>
                                   </Table.Td>
                                 )}
@@ -725,6 +760,31 @@ export default function TeamConfigClient({ team, readOnly = false }) {
               }
               return [...current, savedProtocol];
             });
+          }}
+        />
+        <ProtocolTransferModal
+          opened={transferModalOpen}
+          onClose={() => {
+            setTransferModalOpen(false);
+            setTransferProtocol(null);
+          }}
+          protocol={transferProtocol}
+          currentTeamId={team.id}
+          currentTeamName={teamName || team.nombre}
+          currentDayTypes={dayTypes}
+          onTransferred={({ action, protocol }) => {
+            if (action === 'move') {
+              setProtocols(current => current.filter(p => p.id !== protocol.id));
+            }
+          }}
+        />
+        <ProtocolImportModal
+          opened={importModalOpen}
+          onClose={() => setImportModalOpen(false)}
+          currentTeamId={team.id}
+          currentDayTypes={dayTypes}
+          onImported={(imported) => {
+            setProtocols(current => [...current, ...imported]);
           }}
         />
       </Stack>
