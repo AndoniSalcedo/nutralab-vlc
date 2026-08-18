@@ -368,7 +368,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
 
                       <Box style={{ minWidth: 0, flex: 1 }}>
                         <Group gap={6} wrap="nowrap" align="center">
-                          <Title order={4} fw={800} c="dark.4" lh={1.2} truncate>
+                          <Title order={4} fw={800} c="dark.4" lh={1.2} lineClamp={1}>
                             {team.nombre}
                           </Title>
                           <Text size="xs" fw={600} c="dimmed" style={{ flexShrink: 0 }}>
