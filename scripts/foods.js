@@ -316,7 +316,6 @@ const foods = [
   { name: 'Helado de chocolate', kcal: 216.0, cho: 28.0, pro: 3.8, fat: 11.0 },
   { name: 'Helado de fresa', kcal: 192.0, cho: 26.0, pro: 3.2, fat: 9.0 },
   { name: 'Helado de nata', kcal: 210.0, cho: 23.0, pro: 3.5, fat: 12.0 },
-  { name: 'nan', kcal: nan, cho: nan, pro: nan, fat: nan },
   { name: 'Melocotón', kcal: 39.0, cho: 9.5, pro: 0.9, fat: 0.3 },
   { name: 'Paraguayo', kcal: 42.0, cho: 10.0, pro: 0.9, fat: 0.2 },
   { name: 'Nectarina', kcal: 46.0, cho: 10.6, pro: 1.0, fat: 0.3 },

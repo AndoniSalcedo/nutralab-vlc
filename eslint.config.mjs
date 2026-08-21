@@ -6,6 +6,7 @@ const eslintConfig = nextConfig.map((config) => {
       ...config,
       rules: {
         ...config.rules,
+        'no-undef': 'error',
         'no-unused-vars': [
           'error',
           {
