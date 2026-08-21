@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Modal, 
   Stack, 
@@ -21,11 +21,13 @@ import { notifications } from '@mantine/notifications';
 import { IconDownload, IconShield } from '@tabler/icons-react';
 import { getTeams } from '@/services/team';
 
+const EMPTY_DAY_TYPES = [];
+
 export default function ProtocolImportModal({ 
   opened, 
   onClose, 
   currentTeamId, 
-  currentDayTypes = [], 
+  currentDayTypes = EMPTY_DAY_TYPES,
   onImported 
 }) {
   const [loading, setLoading] = useState(false);
@@ -65,8 +67,14 @@ export default function ProtocolImportModal({
   }, [opened, currentTeamId]);
 
   const sourceTeam = teams.find((t) => String(t.id) === String(sourceTeamId));
-  const sourceProtocols = sourceTeam?.configuracion_nutricional?.protocols || [];
-  const sourceDayTypes = sourceTeam?.configuracion_nutricional?.dayTypes || [];
+  const sourceProtocols = useMemo(
+    () => sourceTeam?.configuracion_nutricional?.protocols || [],
+    [sourceTeam]
+  );
+  const sourceDayTypes = useMemo(
+    () => sourceTeam?.configuracion_nutricional?.dayTypes || [],
+    [sourceTeam]
+  );
 
   // Reset mappings and selections when sourceTeamId changes
   useEffect(() => {
@@ -96,7 +104,7 @@ export default function ProtocolImportModal({
 
     setSelectedProtocolIds(initialSelections);
     setDayTypeMappings(initialMappings);
-  }, [sourceTeamId]);
+  }, [sourceTeamId, currentDayTypes, sourceProtocols]);
 
   const toggleSelectAll = () => {
     const allSelected = sourceProtocols.length > 0 && sourceProtocols.every((p) => selectedProtocolIds[p.id]);

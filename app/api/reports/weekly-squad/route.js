@@ -122,7 +122,42 @@ async function runWithConcurrency(items, limit, fn) {
   return results;
 }
 
-async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, calendario, semanaMenu, contexto, forceRegenerate = false, preMatchConfig = null) {
+async function savePlanForPlayer(supabase, player, activePlan, baseData, semana, contexto) {
+  const finalContenido = planDataToLegacyContent(baseData, player.teamConfig);
+
+  if (activePlan) {
+    await updateAiPlan(supabase, activePlan.id, {
+      contexto: contexto || 'semana_partido',
+      contenido: finalContenido,
+      datos: baseData,
+      updated_at: new Date().toISOString(),
+    });
+    return { ...activePlan, datos: baseData };
+  }
+
+  const newPlan = await insertAiPlan(supabase, {
+    jugador_id: player.id,
+    nombre: `Plan ${semana}`,
+    contexto: contexto || 'semana_partido',
+    contenido: finalContenido,
+    datos: baseData,
+  });
+
+  return newPlan || { datos: baseData };
+}
+
+async function loadPlayersWithMeasurements(
+  supabase,
+  team,
+  jugadorIds,
+  semana,
+  calendario,
+  semanaMenu,
+  contexto,
+  forceRegenerate = false,
+  preMatchConfig = null,
+  { persistPlans = true, draftPlans = null } = {}
+) {
   const rawPlayers = await getPlayersByTeam(supabase, team.id);
   let players = rawPlayers || [];
   if (jugadorIds.length) {
@@ -158,9 +193,22 @@ async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, c
     // Find if player has plan for this week
     const playerPlans = (allPlans || []).filter((p) => String(p.jugador_id) === String(player.id));
     let activePlan = playerPlans.find((p) => p.nombre === `Plan ${semana}`);
+    const draftPlan = draftPlans?.get(String(player.id));
 
-    if (!activePlan || forceRegenerate) {
-      // Create and save AI plan
+    if (draftPlan) {
+      if (persistPlans) {
+        activePlan = await savePlanForPlayer(
+          supabase,
+          { ...player, teamConfig: team.configuracion_nutricional },
+          activePlan,
+          draftPlan,
+          semana,
+          contexto
+        );
+      } else {
+        activePlan = { ...(activePlan || {}), datos: draftPlan };
+      }
+    } else if (!activePlan || forceRegenerate) {
       const baseData = await generarDatosPlan({
         jugador: player,
         nombre: `Plan ${semana}`,
@@ -170,27 +218,18 @@ async function loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, c
         preMatchConfig,
         teamConfig: team.configuracion_nutricional
       });
-      const finalContenido = planDataToLegacyContent(baseData, team.configuracion_nutricional);
 
-      if (activePlan) {
-        // Overwrite existing plan
-        await updateAiPlan(supabase, activePlan.id, {
-          contexto: contexto || 'semana_partido',
-          contenido: finalContenido,
-          datos: baseData,
-          updated_at: new Date().toISOString(),
-        });
-        activePlan.datos = baseData;
+      if (persistPlans) {
+        activePlan = await savePlanForPlayer(
+          supabase,
+          { ...player, teamConfig: team.configuracion_nutricional },
+          activePlan,
+          baseData,
+          semana,
+          contexto
+        );
       } else {
-        // Insert new plan
-        const newPlan = await insertAiPlan(supabase, {
-          jugador_id: player.id,
-          nombre: `Plan ${semana}`,
-          contexto: contexto || 'semana_partido',
-          contenido: finalContenido,
-          datos: baseData,
-        });
-        activePlan = newPlan || { datos: baseData };
+        activePlan = { ...(activePlan || {}), datos: baseData };
       }
     }
 
@@ -246,10 +285,29 @@ export async function POST(request) {
 
     const team = await resolveTeam(supabase, user, body?.team_id);
     let semana = body?.meta?.semana;
-
-    semana = await persistWeeklyReport(supabase, team.id, { ...meta, semanaMenu }, semana);
     const forceRegenerate = body?.forceRegenerate !== false;
     const generateOnly = !!body?.generateOnly;
+    const previewOnly = !!body?.previewOnly;
+    const commitDraft = !!body?.commitDraft;
+
+    if (!previewOnly && !commitDraft) {
+      semana = await persistWeeklyReport(supabase, team.id, { ...meta, semanaMenu }, semana);
+    }
+
+    if (!semana) {
+      semana = new Date().toISOString().split('T')[0];
+    }
+
+    const draftPlayers = Array.isArray(body?.draftPlayers) ? body.draftPlayers : [];
+    const draftPlans = new Map(
+      draftPlayers
+        .filter((item) => item?.id && item?.plan && typeof item.plan === 'object')
+        .map((item) => [String(item.id), item.plan])
+    );
+
+    if (commitDraft && draftPlans.size !== jugadorIds.length) {
+      throw httpError('El borrador de validación no contiene todos los jugadores seleccionados', 400);
+    }
 
     const players = await loadPlayersWithMeasurements(
       supabase,
@@ -260,13 +318,29 @@ export async function POST(request) {
       semanaMenu,
       meta.contexto,
       forceRegenerate,
-      meta.preMatchConfig
+      meta.preMatchConfig,
+      { persistPlans: !previewOnly, draftPlans: commitDraft ? draftPlans : null }
     );
 
-    if (generateOnly) {
+    if (commitDraft && players.length !== jugadorIds.length) {
+      throw httpError('Alguno de los jugadores seleccionados no pertenece a este equipo', 403);
+    }
+
+    if (commitDraft) {
+      semana = await persistWeeklyReport(supabase, team.id, { ...meta, semanaMenu }, semana);
+    }
+
+    if (previewOnly || generateOnly) {
       return NextResponse.json({
         success: true,
         generatedPlayers: players.map((p) => p.id),
+        preview: players.map((p) => ({
+          id: p.id,
+          nombre: p.nombre,
+          apellidos: p.apellidos,
+          posicion: p.posicion,
+          plan: p.plan,
+        })),
       });
     }
 

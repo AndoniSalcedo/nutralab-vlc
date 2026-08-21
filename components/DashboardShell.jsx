@@ -100,20 +100,18 @@ export default function DashboardShell({ children, user }) {
 
                   <Menu.Item
                     leftSection={<IconUserStar size={16} stroke={1.5} />}
-                    onClick={() => {
-                      window.location.href = `${frontendUrl}/admin/nutritionists`;
-                      setOpened(false);
-                    }}
+                    component="a"
+                    href={`${frontendUrl}/admin/nutritionists`}
+                    onClick={() => setOpened(false)}
                   >
                     Gestionar nutricionistas
                   </Menu.Item>
 
                   <Menu.Item
                     leftSection={<IconUserCog size={16} stroke={1.5} />}
-                    onClick={() => {
-                      window.location.href = `${frontendUrl}/users`;
-                      setOpened(false);
-                    }}
+                    component="a"
+                    href={`${frontendUrl}/users`}
+                    onClick={() => setOpened(false)}
                   >
                     Gestionar usuarios
                   </Menu.Item>
@@ -124,20 +122,18 @@ export default function DashboardShell({ children, user }) {
                 <>
                   <Menu.Item
                     leftSection={<IconReceipt size={16} stroke={1.5} />}
-                    onClick={() => {
-                      window.location.href = `${frontendUrl}/recipes`;
-                      setOpened(false);
-                    }}
+                    component="a"
+                    href={`${frontendUrl}/recipes`}
+                    onClick={() => setOpened(false)}
                   >
                     Recetario
                   </Menu.Item>
 
                   <Menu.Item
                     leftSection={<IconBook size={16} stroke={1.5} />}
-                    onClick={() => {
-                      window.location.href = `${frontendUrl}/catalogs`;
-                      setOpened(false);
-                    }}
+                    component="a"
+                    href={`${frontendUrl}/catalogs`}
+                    onClick={() => setOpened(false)}
                   >
                     Catálogos
                   </Menu.Item>
@@ -148,10 +144,9 @@ export default function DashboardShell({ children, user }) {
               {user?.role !== 'tecnico' && (
                 <Menu.Item
                   leftSection={<IconSettings size={16} stroke={1.5} />}
-                  onClick={() => {
-                    window.location.href = `${frontendUrl}/settings`;
-                    setOpened(false);
-                  }}
+                  component="a"
+                  href={`${frontendUrl}/settings`}
+                  onClick={() => setOpened(false)}
                 >
                   Configuración
                 </Menu.Item>

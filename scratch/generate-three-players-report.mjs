@@ -5,7 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { withLatestMeasurement } from "../lib/player-metrics.js";
 import { planDataToLegacyContent } from "../lib/nutrition-plan-card.js";
-import { generarDatosPlan, latestMenu } from "../lib/ai-plan-generator.js";
+import { generarDatosPlan } from "../lib/ai-plan-generator.js";
 import WeeklySquadReportDocument from "../lib/reports/WeeklySquadReportDocument.jsx";
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {

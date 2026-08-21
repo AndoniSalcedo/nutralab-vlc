@@ -283,7 +283,6 @@ function CoverPage({ meta, playersCount }) {
 }
 
 import { getTeamDayTypeColor, getTeamDayTypeLabel, getObjectiveLabel } from '@/lib/calculations';
-import { formatNumberDecimal } from '@/lib/utils';
 
 const detailStyles = StyleSheet.create({
   page: {
@@ -609,4 +608,3 @@ export default function WeeklySquadReportDocument({ meta, players, teamConfig, i
     </Document>
   );
 }
-
