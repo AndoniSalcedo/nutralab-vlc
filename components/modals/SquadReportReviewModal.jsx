@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Accordion,
   Badge,
@@ -9,7 +9,6 @@ import {
   Group,
   Modal,
   Paper,
-  ScrollArea,
   Stack,
   Text,
   ThemeIcon,
@@ -17,7 +16,6 @@ import {
 import {
   IconAlertTriangle,
   IconCheck,
-  IconRefresh,
   IconShieldCheck,
   IconUserCheck,
 } from '@tabler/icons-react';
@@ -35,10 +33,11 @@ export default function SquadReportReviewModal({
   total,
   loading,
   onValidate,
-  onRegenerate,
+  onDiscard,
   onCancel,
 }) {
   const [confirmed, setConfirmed] = useState(false);
+  const contentRef = useRef(null);
   const playerName = `${preview?.nombre || 'Jugador'} ${preview?.apellidos || ''}`.trim();
   const plan = preview?.plan;
   const activeDays = useMemo(
@@ -47,8 +46,27 @@ export default function SquadReportReviewModal({
   );
   const weeklyNotes = plan?.notas || plan?.notes || [];
 
-  React.useEffect(() => {
+  useEffect(() => {
     setConfirmed(false);
+
+    const content = contentRef.current;
+    if (!content) return undefined;
+
+    const frame = requestAnimationFrame(() => {
+      let parent = content.parentElement;
+      while (parent && parent !== document.body) {
+        const styles = window.getComputedStyle(parent);
+        const canScroll = parent.scrollHeight > parent.clientHeight
+          && ['auto', 'scroll'].includes(styles.overflowY);
+        if (canScroll) {
+          parent.scrollTo({ top: 0, behavior: 'auto' });
+          break;
+        }
+        parent = parent.parentElement;
+      }
+    });
+
+    return () => cancelAnimationFrame(frame);
   }, [preview?.id, index]);
 
   return (
@@ -72,7 +90,7 @@ export default function SquadReportReviewModal({
       radius="lg"
       overlayProps={{ backgroundOpacity: 0.65, blur: 5 }}
     >
-      <Stack gap="md">
+      <Stack ref={contentRef} gap="md">
         <Paper p="md" radius="md" withBorder style={{ background: 'linear-gradient(135deg, #e6fcf5, #f3f0ff)', borderColor: '#96f2d7' }}>
           <Group justify="space-between" align="flex-start" wrap="wrap">
             <Group gap="sm" wrap="nowrap">
@@ -96,12 +114,11 @@ export default function SquadReportReviewModal({
             <Text size="sm" fw={700}>Revisa las ingestas y las indicaciones de los siete días</Text>
           </Group>
           <Text size="xs" c="dimmed">
-            Este contenido todavía no se ha guardado. Debes marcar la confirmación para pasar al siguiente jugador.
+            Este contenido todavía no se ha guardado. Puedes guardarlo o descartarlo; al terminar se persistirán solo los jugadores guardados.
           </Text>
         </Paper>
 
-        <ScrollArea h="min(55vh, 560px)" offsetScrollbars>
-          <Stack gap="sm" pr="xs">
+        <Stack gap="sm">
             <Group grow align="stretch">
               <Paper p="xs" withBorder radius="md">
                 <Text size="xs" c="dimmed">Peso</Text>
@@ -154,8 +171,7 @@ export default function SquadReportReviewModal({
                 ))}
               </Paper>
             )}
-          </Stack>
-        </ScrollArea>
+        </Stack>
 
         <Checkbox
           checked={confirmed}
@@ -171,13 +187,12 @@ export default function SquadReportReviewModal({
           <Group gap="xs">
             <Button
               variant="light"
-              color="orange"
-              leftSection={<IconRefresh size={16} />}
-              onClick={onRegenerate}
+              color="red"
+              onClick={onDiscard}
               loading={loading}
               disabled={loading}
             >
-              No es correcto, regenerar
+              Descartar jugador
             </Button>
             <Button
               color="teal"
@@ -186,7 +201,7 @@ export default function SquadReportReviewModal({
               loading={loading}
               disabled={!confirmed || loading}
             >
-              {index + 1 < total ? 'Validar y continuar' : 'Validar y guardar informe'}
+              {index + 1 < total ? 'Guardar y continuar' : 'Guardar informe'}
             </Button>
           </Group>
         </Group>

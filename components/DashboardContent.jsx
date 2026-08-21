@@ -506,28 +506,49 @@ export default function DashboardContent({ players = [], team, readOnly = false 
     if (closeModal) setReportModal({ opened: false, player: null });
   }
 
-  async function generatePlayerPreview(jugadorIds, index, drafts) {
-    const playerId = jugadorIds[index];
-    const pObj = playersState.find((p) => String(p.id) === String(playerId));
-    const playerName = pObj ? `${pObj.nombre} ${pObj.apellidos || ''}`.trim() : `Jugador ${playerId}`;
-
+  async function generateAllPlayerPreviews(jugadorIds) {
     setGeneratingReport(true);
-    setReportProgress({
-      current: index + 1,
-      total: jugadorIds.length,
-      currentPlayerName: playerName,
-    });
+    const chunkSize = 3;
+    const previews = [];
 
-    const res = await generateWeeklySquadReport(reportPayload([playerId], {
-      previewOnly: true,
-      forceRegenerate: true,
-    }));
-    const data = await res.json();
-    const preview = data.preview?.[0];
-    if (!preview?.plan) throw new Error('La API no devolvió el borrador del jugador.');
+    for (let start = 0; start < jugadorIds.length; start += chunkSize) {
+      const chunk = jugadorIds.slice(start, start + chunkSize);
+      const names = chunk.map((id) => {
+        const player = playersState.find((item) => String(item.id) === String(id));
+        return player ? `${player.nombre} ${player.apellidos || ''}`.trim() : `Jugador ${id}`;
+      }).join(', ');
 
-    setReportWorkflow({ jugadorIds, index, drafts });
-    setReviewPreview(preview);
+      setReportProgress({
+        current: start,
+        total: jugadorIds.length,
+        currentPlayerName: names,
+      });
+
+      const res = await generateWeeklySquadReport(reportPayload(chunk, {
+        previewOnly: true,
+        forceRegenerate: true,
+      }));
+      const data = await res.json();
+      const chunkPreview = Array.isArray(data.preview) ? data.preview : [];
+      const previewById = new Map(chunkPreview.map((item) => [String(item.id), item]));
+      const orderedChunkPreview = chunk.map((id) => previewById.get(String(id)));
+
+      if (orderedChunkPreview.some((item) => !item?.plan)) {
+        throw new Error('La API no devolvió todos los borradores de los jugadores.');
+      }
+
+      previews.push(...orderedChunkPreview);
+      setReportProgress({
+        current: Math.min(start + chunk.length, jugadorIds.length),
+        total: jugadorIds.length,
+        currentPlayerName: start + chunk.length < jugadorIds.length ? 'Preparando siguientes jugadores...' : 'Todos los borradores generados.',
+      });
+    }
+
+    if (!previews.length) throw new Error('No se generaron borradores para revisar.');
+
+    setReportWorkflow({ jugadorIds, previews, index: 0, approved: [] });
+    setReviewPreview(previews[0]);
     setReviewOpened(true);
     setReviewLoading(false);
     setGeneratingReport(false);
@@ -562,11 +583,10 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       });
     }
 
-    setReportWorkflow({ jugadorIds, index: 0, drafts: [] });
     setReviewPreview(null);
     setReviewOpened(false);
     try {
-      await generatePlayerPreview(jugadorIds, 0, []);
+      await generateAllPlayerPreviews(jugadorIds);
     } catch (e) {
       resetReportWorkflow(false);
       notifications.show({
@@ -577,40 +597,66 @@ export default function DashboardContent({ players = [], team, readOnly = false 
     }
   }
 
+  async function commitApprovedPlayers(approved) {
+    if (!approved.length) {
+      resetReportWorkflow(true);
+      notifications.show({
+        color: 'blue',
+        title: 'Informe descartado',
+        message: 'Se han descartado todos los jugadores. No se ha guardado ningún informe.',
+      });
+      return;
+    }
+
+    const approvedIds = approved.map((item) => item.id);
+    setReviewOpened(false);
+    setGeneratingReport(true);
+    setReportProgress({
+      current: approvedIds.length,
+      total: approvedIds.length,
+      currentPlayerName: 'Guardando jugadores aprobados y compilando PDF final...',
+    });
+
+    const res = await generateWeeklySquadReport(reportPayload(approvedIds, {
+      commitDraft: true,
+      forceRegenerate: false,
+      draftPlayers: approved,
+    }));
+    await downloadPdfFromResponse(res);
+
+    notifications.show({
+      color: 'green',
+      title: 'Informe guardado y generado',
+      message: reportModal.player
+        ? `PDF individual de ${reportModal.player.nombre} listo para descargar.`
+        : `${approved.length} jugadores guardados y PDF de plantilla listo.`,
+    });
+    resetReportWorkflow(true);
+  }
+
+  async function moveToNextReview(approved) {
+    const { previews, index } = reportWorkflow;
+    if (index + 1 < previews.length) {
+      setReportWorkflow({ ...reportWorkflow, index: index + 1, approved });
+      setReviewPreview(previews[index + 1]);
+      setReviewLoading(false);
+      return;
+    }
+
+    await commitApprovedPlayers(approved);
+  }
+
   async function validateCurrentPreview() {
     if (!reportWorkflow || !reviewPreview) return;
 
-    const { jugadorIds, index, drafts } = reportWorkflow;
-    const nextDrafts = [...drafts, { id: reviewPreview.id, plan: reviewPreview.plan }];
+    const approved = [
+      ...reportWorkflow.approved,
+      { id: reviewPreview.id, plan: reviewPreview.plan },
+    ];
     setReviewLoading(true);
 
     try {
-      if (index + 1 < jugadorIds.length) {
-        setReviewOpened(false);
-        await generatePlayerPreview(jugadorIds, index + 1, nextDrafts);
-        return;
-      }
-
-      setReportProgress({
-        current: jugadorIds.length,
-        total: jugadorIds.length,
-        currentPlayerName: 'Guardando planes validados y compilando PDF final...',
-      });
-      const res = await generateWeeklySquadReport(reportPayload(jugadorIds, {
-        commitDraft: true,
-        forceRegenerate: false,
-        draftPlayers: nextDrafts,
-      }));
-      await downloadPdfFromResponse(res);
-
-      notifications.show({
-        color: 'green',
-        title: 'Informe guardado y generado',
-        message: reportModal.player
-          ? `PDF individual de ${reportModal.player.nombre} listo para descargar.`
-          : 'Todos los jugadores han sido validados y el PDF de plantilla está listo.',
-      });
-      resetReportWorkflow(true);
+      await moveToNextReview(approved);
     } catch (e) {
       setReviewLoading(false);
       setGeneratingReport(false);
@@ -624,22 +670,18 @@ export default function DashboardContent({ players = [], team, readOnly = false 
     }
   }
 
-  async function regenerateCurrentPreview() {
+  async function discardCurrentPreview() {
     if (!reportWorkflow) return;
-    setReviewOpened(false);
-    setReviewLoading(false);
+    setReviewLoading(true);
     try {
-      await generatePlayerPreview(
-        reportWorkflow.jugadorIds,
-        reportWorkflow.index,
-        reportWorkflow.drafts
-      );
+      await moveToNextReview(reportWorkflow.approved);
     } catch (e) {
+      setReviewLoading(false);
       setGeneratingReport(false);
       setReviewOpened(true);
       notifications.show({
         color: 'red',
-        title: 'No se pudo regenerar el borrador',
+        title: 'No se pudo completar la revisión',
         message: e.message,
       });
     }
@@ -1090,7 +1132,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
           total={reportWorkflow?.jugadorIds?.length || 0}
           loading={reviewLoading}
           onValidate={validateCurrentPreview}
-          onRegenerate={regenerateCurrentPreview}
+          onDiscard={discardCurrentPreview}
           onCancel={cancelReportWorkflow}
         />
 
