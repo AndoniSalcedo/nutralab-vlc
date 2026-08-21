@@ -49,6 +49,7 @@ export async function POST(req) {
     const message = await client.messages.create({
       model: env.CHAT_MODEL,
       max_tokens: ANALITICA_MAX_TOKENS,
+      thinking: { type: 'disabled' },
       tool_choice: { type: 'tool', name: ANALITICA_TOOL_NAME },
       tools: [{
         name: ANALITICA_TOOL_NAME,

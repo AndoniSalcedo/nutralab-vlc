@@ -86,6 +86,7 @@ export async function POST(req) {
     const message = await client.messages.create({
       model: env.CHAT_MODEL,
       max_tokens: MENU_MAX_TOKENS,
+      thinking: { type: 'disabled' },
       tool_choice: { type: 'tool', name: MENU_TOOL_NAME },
       tools: [{
         name: MENU_TOOL_NAME,
