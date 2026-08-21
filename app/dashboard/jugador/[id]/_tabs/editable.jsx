@@ -344,6 +344,33 @@ const SCHEDULE_OPTIONS = [
   { label: 'Noche', value: 'noche' },
 ];
 
+function sortPreMatchMealsChronological(scheduleKey, meals = []) {
+  if (!Array.isArray(meals)) return [];
+  // For match schedules, dinner is the 24h pre-match loading meal (the previous night!)
+  let order = ['cena', 'desayuno', 'almuerzo', 'comida', 'merienda', 'post-partido', 'post-entreno'];
+  if (scheduleKey === 'manana') {
+    order = ['cena', 'merienda', 'desayuno', 'almuerzo', 'comida', 'post-partido', 'post-entreno'];
+  }
+  return [...meals].sort((a, b) => {
+    const ia = order.indexOf(String(a).toLowerCase().trim());
+    const ib = order.indexOf(String(b).toLowerCase().trim());
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  });
+}
+
+function getMealTimingBadge(scheduleKey, mealName) {
+  const norm = String(mealName).toLowerCase().trim();
+  if (scheduleKey === 'manana') {
+    if (norm === 'cena' || norm === 'merienda') return 'Día anterior';
+    return 'Día de partido';
+  }
+  if (scheduleKey === 'tarde' || scheduleKey === 'noche') {
+    if (norm === 'cena') return 'Día anterior';
+    return 'Día de partido';
+  }
+  return null;
+}
+
 export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, postentreno, jugadorId, readOnly = false }) {
   const router = useRouter();
   const [editingSchedule, setEditingSchedule] = useState(null);
@@ -369,19 +396,17 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
     const currentMeals = Array.isArray(currentCfg.ingestas) ? currentCfg.ingestas : defaultMeals;
     const currentPost = currentCfg.postentreno !== undefined ? Boolean(currentCfg.postentreno) : defaultPost;
     const currentRecs = currentCfg.recomendaciones || {};
-    const currentDiaAnterior = currentCfg.dia_anterior || '';
 
     if (updates.ingestas && Array.isArray(updates.ingestas)) {
-      updates.ingestas = sortMeals(updates.ingestas);
+      updates.ingestas = sortPreMatchMealsChronological(scheduleKey, updates.ingestas);
     }
 
     setConfig((prev) => ({
       ...prev,
       [scheduleKey]: {
-        ingestas: sortMeals(currentMeals),
+        ingestas: sortPreMatchMealsChronological(scheduleKey, currentMeals),
         postentreno: currentPost,
         recomendaciones: { ...currentRecs },
-        dia_anterior: currentDiaAnterior,
         ...(prev?.[scheduleKey] || {}),
         ...updates,
       },
@@ -425,11 +450,14 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
         {scheduleOptions.map((opt) => {
           const cfg = config?.[opt.value] || {};
           const isEditingThis = editingSchedule === opt.value;
-          const currentMeals = sortMeals(Array.isArray(cfg.ingestas) ? cfg.ingestas : defaultMeals);
+          const currentMeals = sortPreMatchMealsChronological(opt.value, Array.isArray(cfg.ingestas) ? cfg.ingestas : defaultMeals);
           const currentPost = cfg.postentreno !== undefined ? Boolean(cfg.postentreno) : defaultPost;
-          const currentRecs = cfg.recomendaciones || {};
-          const currentDiaAnterior = cfg.dia_anterior || '';
-          const mealsList = cfg.ingestas && cfg.ingestas.length > 0 ? sortMeals(cfg.ingestas).join(', ') : 'Habituales';
+          const currentRecs = { ...(cfg.recomendaciones || {}) };
+          // Fallback legacy dia_anterior into Cena recommendation if present and not overwritten
+          if (cfg.dia_anterior && !currentRecs.Cena && !currentRecs.cena) {
+            currentRecs.Cena = cfg.dia_anterior;
+          }
+          const mealsList = cfg.ingestas && cfg.ingestas.length > 0 ? sortPreMatchMealsChronological(opt.value, cfg.ingestas).join(', ') : 'Habituales';
 
           if (!isEditingThis) {
             return (
@@ -438,7 +466,6 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
                   <Text size="sm" fw={700} c="dark.7">
                     Partido por la {opt.label}
                   </Text>
-
 
                   {!readOnly && (
                     <Button
@@ -455,22 +482,22 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
 
                 <Stack gap={4}>
                   <Text size="xs" c="dark.6">
-                    <Text span fw={600} c="dimmed">Ingestas: </Text>
-                    {mealsList} ({currentPost ? 'con' : 'sin'} post-partido)
+                    <Text span fw={600} c="dimmed">Ingestas pautadas: </Text>
+                    {mealsList} ({currentPost ? 'con toma post-partido' : 'sin post-partido'})
                   </Text>
 
                   {Object.entries(currentRecs).filter((entry) => entry[1]).length > 0 && (
-                    <Text size="xs" c="dark.6">
-                      <Text span fw={600} c="dimmed">Recomendaciones: </Text>
-                      {sortMeals(Object.keys(currentRecs)).filter((m) => currentRecs[m]).map((m) => `${m} (${currentRecs[m]})`).join(' · ')}
-                    </Text>
-                  )}
-
-                  {currentDiaAnterior && (
-                    <Text size="xs" c="dark.6" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.4 }}>
-                      <Text span fw={600} c="dimmed">Pauta 24h antes: </Text>
-                      {currentDiaAnterior}
-                    </Text>
+                    <Stack gap={2} mt={4}>
+                      {currentMeals.filter((m) => currentRecs[m]).map((m) => {
+                        const timing = getMealTimingBadge(opt.value, m);
+                        return (
+                          <Text key={m} size="xs" c="dark.7">
+                            <Text span fw={600} c="dimmed">{m}{timing ? ` (${timing})` : ''}: </Text>
+                            {currentRecs[m]}
+                          </Text>
+                        );
+                      })}
+                    </Stack>
                   )}
                 </Stack>
               </Paper>
@@ -494,17 +521,18 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
               </Group>
 
               <Stack gap="xs">
+                {/* 1º Ingestas que componen la rutina pre-partido */}
                 <Box>
-                  <Text size="xs" fw={700} c="dark.6" mb={2}>1. Distribución de Comidas (Día de Partido)</Text>
+                  <Text size="xs" fw={700} c="dark.7" mb={2}>1. Ingestas del Protocolo Pre-Partido</Text>
                   <Text size="11px" c="dimmed" mb={6}>
-                    Selecciona las ingestas que hará en un partido por la {opt.label.toLowerCase()}:
+                    Selecciona las ingestas que componen la rutina previa (incluyendo la cena de carga del día anterior):
                   </Text>
                   <MultiSelect
-                    placeholder="Ej. Desayuno, Almuerzo, Comida, Cena"
+                    placeholder="Ej. Cena, Desayuno, Comida, Merienda"
                     data={AVAILABLE_MEALS}
                     value={currentMeals}
                     onChange={(val) => {
-                      const sorted = sortMeals(val);
+                      const sorted = sortPreMatchMealsChronological(opt.value, val);
                       const cleanRecs = { ...currentRecs };
                       Object.keys(cleanRecs).forEach((k) => {
                         if (!sorted.includes(k)) delete cleanRecs[k];
@@ -516,7 +544,7 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
                     clearable
                   />
                   <Checkbox
-                    label="Incluir toma Post-partido / Post-entreno"
+                    label="Incluir toma Post-partido / Batido de recuperación"
                     checked={currentPost}
                     onChange={(e) => handleUpdateSchedule(opt.value, { postentreno: e.currentTarget.checked })}
                     mt="xs"
@@ -526,42 +554,34 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
 
                 <Divider my={4} />
 
+                {/* 2º Recomendaciones por Ingesta (Ordenadas cronológicamente) */}
                 {currentMeals.length > 0 && (
-                  <>
-                    <Box>
-                      <Text size="xs" fw={700} c="dark.6" mb={6}>2. Recomendaciones por Ingesta (Día de Partido)</Text>
-                      <Stack gap={6}>
-                        {currentMeals.map((meal) => (
+                  <Box>
+                    <Text size="xs" fw={700} c="dark.7" mb={6}>2. Pautas e Indicaciones por Ingesta</Text>
+                    <Stack gap={6}>
+                      {currentMeals.map((meal) => {
+                        const timing = getMealTimingBadge(opt.value, meal);
+                        return (
                           <TextInput
                             key={meal}
-                            label={meal}
-                            placeholder="Ej. Tortitas de avena pre-partido con plátano y miel..."
+                            label={
+                              <Group gap={4} align="center">
+                                <Text size="xs" fw={600}>{meal}</Text>
+                                {timing && <Text size="10px" c="dimmed">({timing})</Text>}
+                              </Group>
+                            }
+                            placeholder={`Ej. Pauta específica para ${meal.toLowerCase()}...`}
                             value={currentRecs[meal] || ''}
                             onChange={(e) => handleUpdateSchedule(opt.value, {
                               recomendaciones: { ...currentRecs, [meal]: e.target.value }
                             })}
                             size="xs"
                           />
-                        ))}
-                      </Stack>
-                    </Box>
-                    <Divider my={4} />
-                  </>
+                        );
+                      })}
+                    </Stack>
+                  </Box>
                 )}
-
-                <Box>
-                  <Text size="xs" fw={700} c="dark.6" mb={2}>3. Pauta para el Día Anterior (Ventana 24h Previas)</Text>
-                  <Text size="11px" c="dimmed" mb={6}>
-                    Indicaciones para la cena o comidas del día anterior al partido por la {opt.label.toLowerCase()}:
-                  </Text>
-                  <Textarea
-                    placeholder="Ej: Cena día anterior alta en carbohidratos simples (arroz basmati con pavo y patata cocida). Hidratar con 500ml bebida deportiva..."
-                    value={currentDiaAnterior}
-                    onChange={(e) => handleUpdateSchedule(opt.value, { dia_anterior: e.target.value })}
-                    rows={3}
-                    size="xs"
-                  />
-                </Box>
               </Stack>
             </Paper>
           );
