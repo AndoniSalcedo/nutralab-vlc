@@ -13,6 +13,6 @@ export const env = {
   AI_MODEL: process.env.AI_MODEL || 'claude-sonnet-5',
   AI_API_KEY: process.env.AI_API_KEY || '',
   AI_PLAN_MAX_TOKENS: Number(process.env.AI_PLAN_MAX_TOKENS) || 8192,
-  AI_PLAN_THINKING_EFFORT: process.env.AI_PLAN_THINKING_EFFORT || 'low',
+  AI_PLAN_THINKING_EFFORT: process.env.AI_PLAN_THINKING_EFFORT || 'medium',
   ANALITICA_MAX_TOKENS: Number(process.env.ANALITICA_MAX_TOKENS) || 16000,
 };
