@@ -50,12 +50,7 @@ async function main() {
     console.log(`\n--- Generando / Verificando Plan para ${player.nombre} ${player.apellidos} (ID ${player.id}) ---`);
     console.log(`Posición: ${player.posicion} | Peso: ${player.peso_kg} kg | Comidas: ${player.num_comidas} | Post: ${player.postentreno}`);
 
-    let contextoAdicional = "Martes partido a las 21:00 y sábado partido a las 21:00.";
-    if (player.id === 236) {
-      contextoAdicional = "Lunes viaje, martes partido a las 21:00 (pon merienda), y sábado partido a las 21:00. Adaptado a SIBO, antiinflamatorio, sin lactosa ni gluten.";
-    } else if (player.id === 231) {
-      contextoAdicional = "Martes partido a las 21:00 y sábado partido a las 21:00. Evitar verduras muy flatulentas. Le gusta algo dulce ligero nocturno.";
-    }
+    const contextoAdicional = "";
 
     const t0 = Date.now();
     const planDatos = await generarDatosPlan({
@@ -70,50 +65,13 @@ async function main() {
     });
 
     console.log(`Plan generado con éxito en ${((Date.now() - t0)/1000).toFixed(1)}s!`);
-    console.log("Comidas Lunes:", planDatos.dias.lunes.ingestas.map(i => i.nombre).join(" | "));
-    console.log("Comidas Martes (partido):", planDatos.dias.martes.ingestas.map(i => i.nombre).join(" | "));
-
-    // Save to DB
-    const finalContenido = planDataToLegacyContent(planDatos, teamConfig);
-    const { data: existingPlan } = await supabase
-      .from("planes_ia")
-      .select("id")
-      .eq("jugador_id", player.id)
-      .eq("nombre", `Plan ${semana}`)
-      .single();
-
-    let planId;
-    if (existingPlan) {
-      const { data: updated } = await supabase
-        .from("planes_ia")
-        .update({
-          datos: planDatos,
-          contenido: finalContenido,
-          contexto: "semana_partido",
-          contexto_adicional: contextoAdicional,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", existingPlan.id)
-        .select("id")
-        .single();
-      planId = updated?.id || existingPlan.id;
-      console.log(`Plan ${planId} actualizado en DB.`);
-    } else {
-      const { data: inserted } = await supabase
-        .from("planes_ia")
-        .insert({
-          jugador_id: player.id,
-          nombre: `Plan ${semana}`,
-          datos: planDatos,
-          contenido: finalContenido,
-          contexto: "semana_partido",
-          contexto_adicional: contextoAdicional,
-        })
-        .select("id")
-        .single();
-      planId = inserted?.id;
-      console.log(`Nuevo Plan ${planId} insertado en DB.`);
+    for (const [dk, d] of Object.entries(planDatos.dias)) {
+      console.log(`  [${d.label.toUpperCase()} - ${d.tipoDia}]`);
+      for (const ing of d.ingestas) {
+        console.log(`    * ${ing.nombre}: ${ing.detalle}`);
+      }
     }
+
 
     resolvedPlayers.push({
       ...player,
