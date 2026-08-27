@@ -85,8 +85,8 @@ export default function TeamOsmolarityImporter({ team }) {
   function downloadTemplate(e) {
     e.stopPropagation();
     try {
-      const headers = ['Name', 'Type', 'Value', 'Status', 'Time', 'Notes', 'questions'];
-      const sampleRow = ['Thierry', 'Hydration', '76', 'Mildly Dehydrated', '4/4/2026 12:51', '', ''];
+      const headers = ['Measurement ID', 'User ID', 'Name', 'Date', 'Time', 'Type', 'Value', 'Unit', 'Status', 'Notes', 'Questionaire'];
+      const sampleRow = ['', '', 'Thierry Correia', '24 Aug 2026', '9:16 AM', 'sosm', '70', 'mOsm', 'Mildly Dehydrated', '', ''];
       const csvContent = [
         headers.join(','),
         sampleRow.join(',')

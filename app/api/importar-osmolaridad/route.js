@@ -132,7 +132,7 @@ export async function POST(req) {
     const notesHeaders = ['notes', 'notas'];
     const notesColIdx = headers.findIndex(h => notesHeaders.includes(normalizeKey(h)));
 
-    const qHeaders = ['questions', 'questionnaire', 'cuestionario', 'preguntas'];
+    const qHeaders = ['questions', 'questionnaire', 'questionaire', 'cuestionario', 'preguntas'];
     const qColIdx = headers.findIndex(h => qHeaders.includes(normalizeKey(h)));
 
     // Parse records row-by-row
@@ -155,31 +155,27 @@ export async function POST(req) {
       const rawDate = getVal(row, headers, ['Date', 'fecha', 'dia', 'measurement date']);
       const rawTime = getVal(row, headers, ['Time', 'hora']);
 
-      let datePart = null;
-      let timePart = '';
+      let parsedDate = null;
+      let timePart = rawTime ? String(rawTime).trim() : '';
 
       if (rawDate) {
-        datePart = rawDate;
-        timePart = rawTime || '';
+        parsedDate = parseCsvDate(rawDate);
+        if (!parsedDate && String(rawDate).includes(' ')) {
+          const parts = String(rawDate).trim().split(/\s+/);
+          parsedDate = parseCsvDate(parts[0]);
+          if (parsedDate && !timePart) {
+            timePart = parts.slice(1).join(' ');
+          }
+        }
       } else if (rawTime) {
         const cleanedTime = String(rawTime).trim();
         if (cleanedTime.includes(' ')) {
           const parts = cleanedTime.split(/\s+/);
-          datePart = parts[0];
-          timePart = parts[1];
-        } else {
-          datePart = null;
-          timePart = cleanedTime;
+          parsedDate = parseCsvDate(parts[0]);
+          timePart = parts.slice(1).join(' ');
         }
       }
 
-      if (datePart && String(datePart).includes(' ')) {
-        const parts = String(datePart).trim().split(/\s+/);
-        datePart = parts[0];
-        if (!timePart) timePart = parts[1] || '';
-      }
-
-      const parsedDate = parseCsvDate(datePart);
       if (!parsedDate) {
         skippedRows++;
         continue; // Required date
