@@ -17,7 +17,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconChevronLeft, IconEdit, IconLogout, IconMenu2, IconCamera } from '@tabler/icons-react';
+import { IconChevronLeft, IconEdit, IconLogout, IconMenu2, IconCamera, IconDotsVertical } from '@tabler/icons-react';
 import { FileButton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { compressAvatar, initials } from '@/lib/avatar';
@@ -27,7 +27,7 @@ import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
 
-function BackButton({ size = 42, iconSize = 24, equipoId }) {
+export function BackButton({ size = 42, iconSize = 24, equipoId }) {
   const url = equipoId ? `/dashboard/equipo/${equipoId}` : '/dashboard';
   return (
     <Tooltip label="Volver al listado" position="right" withArrow>
@@ -79,15 +79,15 @@ function PlayerLogoutButton({ menuItem = false }) {
   );
 }
 
-function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, compact = false }) {
+export function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, compact = false }) {
   if (!isAdmin && !isPlayer) return null;
 
   if (compact) {
     return (
       <Menu shadow="md" width={230} position="bottom-end" withArrow radius="md" keepMounted>
         <Menu.Target>
-          <ActionIcon variant="light" color="gray" radius="xl" size={48}>
-            <IconMenu2 size={24} stroke={1.7} />
+          <ActionIcon variant="subtle" color="gray" radius="xl" size={38}>
+            <IconDotsVertical size={20} stroke={1.8} />
           </ActionIcon>
         </Menu.Target>
 
@@ -138,7 +138,7 @@ function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, compact = false }) 
   );
 }
 
-function HeaderSemaforoIndicator({ semaforo, centered = false }) {
+export function HeaderSemaforoIndicator({ semaforo, centered = false, compact = false }) {
   if (!semaforo?.hasPesajes) return null;
 
   const { status, label, pesoActual, pesoReferencia, diff } = semaforo;
@@ -164,6 +164,32 @@ function HeaderSemaforoIndicator({ semaforo, centered = false }) {
   };
 
   const cfg = statusConfigMap[status] || statusConfigMap.verde;
+
+  if (compact) {
+    return (
+      <Tooltip
+        withArrow
+        radius="md"
+        label={`${label} · ${pesoActual} kg (${formattedDiff})`}
+      >
+        <Group gap={4} align="center" wrap="nowrap" style={{ cursor: 'pointer' }}>
+          <Box
+            style={{
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              backgroundColor: cfg.dotColor,
+              boxShadow: `0 0 4px ${cfg.dotColor}`,
+              flexShrink: 0,
+            }}
+          />
+          <Text fz="xs" fw={700} style={{ color: cfg.color }}>
+            {formattedDiff}
+          </Text>
+        </Group>
+      </Tooltip>
+    );
+  }
 
   return (
     <Tooltip
@@ -224,7 +250,7 @@ function HeaderSemaforoIndicator({ semaforo, centered = false }) {
   );
 }
 
-function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
+export function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
   const [loading, setLoading] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState(() => {
     if (jugador?.avatar_url) return jugador.avatar_url;
@@ -287,12 +313,12 @@ function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
         radius="xl"
         color="blue"
         style={{
-          border: '3px solid white',
+          border: size > 50 ? '3px solid white' : '2px solid white',
           boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
           backgroundColor: 'var(--mantine-color-blue-1)',
           color: 'var(--mantine-color-blue-8)',
           fontWeight: 700,
-          fontSize: size > 80 ? '24px' : '16px',
+          fontSize: size > 80 ? '24px' : (size <= 50 ? '14px' : '16px'),
         }}
       >
         {initialsText}
@@ -307,7 +333,7 @@ function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
                 variant="filled"
                 color="dark"
                 radius="xl"
-                size={size > 80 ? 28 : 24}
+                size={size > 80 ? 28 : (size <= 50 ? 18 : 24)}
                 loading={loading}
                 style={{
                   position: 'absolute',
@@ -319,7 +345,7 @@ function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
                   zIndex: 3,
                 }}
               >
-                <IconCamera size={size > 80 ? 14 : 12} stroke={2} />
+                <IconCamera size={size > 80 ? 14 : (size <= 50 ? 10 : 12)} stroke={2} />
               </ActionIcon>
             </Tooltip>
           )}
@@ -339,7 +365,7 @@ function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
   );
 }
 
-function PlayerIdentity({ jugador, isAdmin, isPlayer, hasCredentials, avatarSize = 84, titleSize = 26, centered = false }) {
+export function PlayerIdentity({ jugador, isAdmin, isPlayer, hasCredentials, avatarSize = 84, titleSize = 26, centered = false }) {
   return (
     <>
       <PlayerAvatarUploader
@@ -371,6 +397,48 @@ function PlayerIdentity({ jugador, isAdmin, isPlayer, hasCredentials, avatarSize
     </>
   );
 }
+
+export function JugadorHeaderCompactMobile({ jugador, user, onEdit }) {
+  const isAdmin = user?.role === 'admin';
+  const isPlayer = user?.role === 'jugador';
+
+  return (
+    <Group justify="space-between" align="center" wrap="nowrap" gap="xs" style={{ width: '100%' }}>
+      <Group gap="xs" align="center" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+        {!isPlayer && (
+          <BackButton size={36} iconSize={20} equipoId={jugador?.equipo_id} />
+        )}
+        <PlayerAvatarUploader
+          jugador={jugador}
+          isAdmin={isAdmin}
+          isPlayer={isPlayer}
+          size={44}
+        />
+        <Stack gap={2} style={{ minWidth: 0, flex: 1 }}>
+          <Title order={3} fw={800} c="dark.4" truncate>
+            {jugador?.nombre} {jugador?.apellidos}
+          </Title>
+          <Group gap={6} align="center" wrap="nowrap">
+            <Text c="dimmed" size="sm" truncate fw={500}>
+              {jugador?.posicion || 'Sin posición'}
+            </Text>
+            {jugador?.semaforo?.hasPesajes && (
+              <>
+                <Text c="dimmed" size="xs" style={{ opacity: 0.4 }}>•</Text>
+                <HeaderSemaforoIndicator semaforo={jugador.semaforo} compact />
+              </>
+            )}
+          </Group>
+        </Stack>
+      </Group>
+
+      <Box style={{ flexShrink: 0 }}>
+        <HeaderActions jugador={jugador} isAdmin={isAdmin} isPlayer={isPlayer} onEdit={onEdit} compact />
+      </Box>
+    </Group>
+  );
+}
+
 
 
 function JugadorHeaderDesktop({ jugador, isAdmin, isPlayer, hasCredentials, onEdit }) {

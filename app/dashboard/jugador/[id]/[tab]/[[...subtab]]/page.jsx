@@ -73,12 +73,16 @@ export default async function JugadorTabPage({ params }) {
 
   try {
     if (activeTab === 'resumen') {
-      const [resEvoluciones, resPesajes] = await Promise.all([
+      const [resEvoluciones, resPesajes, resHidratacion, resMenus] = await Promise.all([
         getEvolutionsByPlayerId(supabase, id),
         getPesajesByPlayerId(supabase, id),
+        getHydrationRecordsByPlayerId(supabase, id),
+        rawJugador?.equipo_id ? getMenusByTeam(supabase, rawJugador.equipo_id) : [],
       ]);
       evoluciones = resEvoluciones;
       pesajes = resPesajes;
+      registrosHidratacion = resHidratacion;
+      menus = (resMenus || []).slice(0, 10);
       jugador = withLatestMeasurement(rawJugador, evoluciones, pesajes);
       if (jugador?.equipo_id) {
         messages = await getMessages(supabase, jugador.equipo_id, id);

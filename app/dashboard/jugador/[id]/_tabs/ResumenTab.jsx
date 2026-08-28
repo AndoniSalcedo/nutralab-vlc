@@ -8,7 +8,18 @@ import MensajesSubtab from './resumen/MensajesSubtab';
 import PerfilSubtab from './resumen/PerfilSubtab';
 import DiarioComidasSubtab from './resumen/DiarioComidasSubtab';
 
-export default function ResumenTab({ jugador, evoluciones = [], messages = [], activeSubtab, onSubtabChange, readOnly = false, isPlayer = false }) {
+export default function ResumenTab({
+  jugador,
+  evoluciones = [],
+  messages = [],
+  pesajes = [],
+  registrosHidratacion = [],
+  menus = [],
+  activeSubtab,
+  onSubtabChange,
+  readOnly = false,
+  isPlayer = false,
+}) {
   return (
     <Stack gap={0}>
       <Paper
@@ -36,7 +47,18 @@ export default function ResumenTab({ jugador, evoluciones = [], messages = [], a
       </Paper>
 
       <Box mt={0}>
-        {activeSubtab === 'perfil' && <PerfilSubtab jugador={jugador} evoluciones={evoluciones} readOnly={readOnly} />}
+        {activeSubtab === 'perfil' && (
+          <PerfilSubtab
+            jugador={jugador}
+            evoluciones={evoluciones}
+            pesajes={pesajes}
+            messages={messages}
+            registrosHidratacion={registrosHidratacion}
+            menus={menus}
+            readOnly={readOnly}
+            isPlayer={isPlayer}
+          />
+        )}
         {activeSubtab === 'diario' && <DiarioComidasSubtab jugador={jugador} readOnly={!isPlayer} />}
         {activeSubtab === 'mensajes' && <MensajesSubtab jugador={jugador} messages={messages} readOnly={readOnly} />}
       </Box>
