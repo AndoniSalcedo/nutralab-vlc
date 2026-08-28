@@ -17,7 +17,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconChevronLeft, IconEdit, IconLogout, IconMenu2, IconCamera, IconDotsVertical } from '@tabler/icons-react';
+import { IconChevronLeft, IconEdit, IconLogout, IconCamera, IconDotsVertical } from '@tabler/icons-react';
 import { FileButton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { compressAvatar, initials } from '@/lib/avatar';

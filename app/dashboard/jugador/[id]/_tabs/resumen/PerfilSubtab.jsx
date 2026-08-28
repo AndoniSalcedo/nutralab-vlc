@@ -1,64 +1,26 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   Box,
   Group,
   Paper,
-  Grid,
   SimpleGrid,
   Stack,
   Text,
   ThemeIcon,
   Title,
-  ActionIcon,
-  RingProgress,
-  Progress,
-  Flex,
-  Popover,
-  UnstyledButton,
-  Timeline,
 } from '@mantine/core';
-import { DatePicker } from '@mantine/dates';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 
-import {
-  IconClipboardList,
-  IconChevronLeft,
-  IconChevronRight,
-  IconFlame,
-  IconEgg,
-  IconApple,
-  IconDroplet,
-  IconCalendar,
-  IconChevronDown,
-  IconScale,
-  IconBrain,
-  IconChefHat,
-  IconMail,
-  IconPlus,
-  IconClock,
-  IconRuler2,
-  IconPill,
-  IconActivity,
-  IconCheck,
-  IconToolsKitchen,
-  IconRun,
-  IconCoffee,
-  IconBatteryCharging,
-  IconFlag,
-  IconBed,
-  IconMeat,
-} from '@tabler/icons-react';
+import { IconClipboardList } from '@tabler/icons-react';
 
 import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/lib/calculations';
 import { CampoEditable, ComidasEditable, PrepartidoEditable } from '../editable';
-import { latestMetricValue, latestPesoMuscularPct } from '@/lib/player-metrics';
+import { latestMetricValue } from '@/lib/player-metrics';
 import { listPlayerMeals } from '@/services/meal';
 import { getAiPlans } from '@/services/plan';
-import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import { getSubtabHeader } from '../subtab-config';
 import { useFoods } from '@/lib/use-foods';
 import { JugadorHeaderCompactMobile } from '@/components/JugadorHeader';
@@ -153,17 +115,14 @@ function getDayInfo(date) {
 export default function PerfilSubtab({
   jugador,
   evoluciones = [],
-  pesajes = [],
   messages = [],
   registrosHidratacion = [],
   menus = [],
   readOnly = false,
 }) {
-  const router = useRouter();
   const { foods } = useFoods();
   const { user } = usePlayerDashboard();
   const [meals, setMeals] = useState([]);
-  const [loadingMeals, setLoadingMeals] = useState(true);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [editModalOpen, setEditModalOpen] = useState(false);
 
@@ -173,7 +132,6 @@ export default function PerfilSubtab({
   useEffect(() => {
     if (!jugador?.id) return;
     let active = true;
-    setLoadingMeals(true);
 
     const { mondayStr, dayKey } = getDayInfo(selectedDate);
     const dateStr = new Date(selectedDate).toLocaleDateString('sv-SE', { timeZone: 'Europe/Madrid' });
@@ -188,7 +146,6 @@ export default function PerfilSubtab({
       if (!active) return;
 
       setMeals(mealsData || []);
-      setLoadingMeals(false);
 
       const matchingPlan = plansData.planes?.[0] || null;
 
@@ -204,7 +161,6 @@ export default function PerfilSubtab({
       console.error('Error in Resumen tab load:', err);
       if (active) {
         setMeals([]);
-        setLoadingMeals(false);
         setActiveDayType('entreno');
       }
     });
@@ -268,8 +224,6 @@ export default function PerfilSubtab({
 
   // Métricas antropométricas con redondeo a 1 decimal para evitar overflow
   const porcentajeGrasa = latestMetricValue(evoluciones, 'porcentaje_grasa', jugador?.porcentaje_grasa);
-  const pesoMuscularPct = latestPesoMuscularPct(evoluciones, jugador?.peso_muscular_pct);
-  const sumaPliegues = latestMetricValue(evoluciones, 'suma_6_pliegues', jugador?.suma_6_pliegues || jugador?.suma_8_pliegues);
 
   const latestHydration = useMemo(() => {
     if (!registrosHidratacion || registrosHidratacion.length === 0) return null;
@@ -280,18 +234,6 @@ export default function PerfilSubtab({
   }, [registrosHidratacion]);
 
   const semaforo = jugador?.semaforo;
-  const semaforoColorMap = {
-    verde: '#2e7d32',
-    amarillo: '#f59f00',
-    rojo: '#e03131',
-    sin_datos: '#868e96',
-  };
-  const semaforoColor = semaforoColorMap[semaforo?.status] || semaforoColorMap.verde;
-  const weightDiff = semaforo?.diff;
-  const isDiffPositive = weightDiff > 0;
-  const formattedWeightDiff = weightDiff !== null && weightDiff !== undefined
-    ? (isDiffPositive ? `+${weightDiff.toFixed(2)} kg` : `${weightDiff.toFixed(2)} kg`)
-    : '0.00 kg';
   return (
     <Stack gap={0}>
       {/* Header Banner: En escritorio conserva la cabecera original; en móvil se muestra la barra compacta de una línea */}

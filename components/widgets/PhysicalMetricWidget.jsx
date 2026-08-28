@@ -13,14 +13,6 @@ export default function PhysicalMetricWidget({
 }) {
   const router = useRouter();
 
-  const semaforoColorMap = {
-    verde: '#2e7d32',
-    amarillo: '#f59f00',
-    rojo: '#e03131',
-    sin_datos: '#868e96',
-  };
-
-  const semaforoColor = semaforoColorMap[semaforo?.status] || null;
   const weightDiff = semaforo?.diff;
   const hasDiff = weightDiff !== null && weightDiff !== undefined && Number.isFinite(weightDiff);
   const formattedDiff = hasDiff
