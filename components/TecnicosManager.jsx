@@ -40,6 +40,7 @@ import {
 } from '@/services/tecnico';
 import { compressAvatar, initials } from '@/lib/avatar';
 import ConfirmModal from '@/components/modals/ConfirmModal';
+import ImageCropModal from '@/components/modals/ImageCropModal';
 
 
 export default function TecnicosManager({ teams = [] }) {
@@ -55,6 +56,10 @@ export default function TecnicosManager({ teams = [] }) {
   });
   const [deletingTecnico, setDeletingTecnico] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [tempImageSrc, setTempImageSrc] = useState('');
+  const [tempFileName, setTempFileName] = useState('');
+  const [cropTargetTecnicoId, setCropTargetTecnicoId] = useState(null);
 
   const filteredTeamsGrouped = useMemo(() => {
     const needle = assignSearch.toLowerCase().trim();
@@ -118,11 +123,29 @@ export default function TecnicosManager({ teams = [] }) {
     }
   }
 
-  async function handleUploadAvatar(tecnicoId, file) {
+  function handleSelectAvatarFile(tecnicoId, file) {
     if (!file) return;
+    setCropTargetTecnicoId(tecnicoId);
+    setTempFileName(file.name || 'tecnico-avatar.jpg');
+    const localUrl = URL.createObjectURL(file);
+    setTempImageSrc(localUrl);
+    setCropModalOpen(true);
+  }
+
+  function handleCloseCropModal() {
+    setCropModalOpen(false);
+    setCropTargetTecnicoId(null);
+    if (tempImageSrc) {
+      URL.revokeObjectURL(tempImageSrc);
+      setTempImageSrc('');
+    }
+  }
+
+  async function handleCropConfirmed(croppedFile) {
+    if (!cropTargetTecnicoId) return;
     try {
-      const compressed = await compressAvatar(file);
-      await uploadTecnicoAvatar(tecnicoId, compressed);
+      const compressed = await compressAvatar(croppedFile);
+      await uploadTecnicoAvatar(cropTargetTecnicoId, compressed);
       notifications.show({
         color: 'green',
         title: 'Foto actualizada',
@@ -259,7 +282,7 @@ export default function TecnicosManager({ teams = [] }) {
                           >
                             {initials(`${tecnico.nombre || ''} ${tecnico.apellidos || ''}`)}
                           </Avatar>
-                          <FileButton onChange={(file) => handleUploadAvatar(tecnico.id, file)} accept="image/*">
+                          <FileButton onChange={(file) => handleSelectAvatarFile(tecnico.id, file)} accept="image/*">
                             {(props) => (
                               <Tooltip label="Cambiar foto" position="top" withArrow>
                                 <ActionIcon
@@ -526,6 +549,16 @@ export default function TecnicosManager({ teams = [] }) {
         message={`¿Estás seguro de que deseas eliminar al técnico ${deletingTecnico?.nombre || ''} ${deletingTecnico?.apellidos || ''}? Se eliminará su acceso por completo.`}
         confirmLabel="Eliminar"
         loading={deleting}
+      />
+
+      <ImageCropModal
+        opened={cropModalOpen}
+        onClose={handleCloseCropModal}
+        imageSrc={tempImageSrc}
+        fileName={tempFileName}
+        cropShape="round"
+        title="Ajustar foto de técnico"
+        onCropConfirmed={handleCropConfirmed}
       />
     </Stack>
   );

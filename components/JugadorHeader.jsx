@@ -22,6 +22,7 @@ import { FileButton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { compressAvatar, initials } from '@/lib/avatar';
 import { uploadPlayerAvatar } from '@/services/player';
+import ImageCropModal from '@/components/modals/ImageCropModal';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
@@ -231,14 +232,32 @@ function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
     if (typeof jugador?.avatar === 'string' && jugador.avatar.startsWith('data:')) return jugador.avatar;
     return '';
   });
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [tempImageSrc, setTempImageSrc] = useState('');
+  const [tempFileName, setTempFileName] = useState('');
 
   const canEditPhoto = isAdmin || isPlayer;
 
-  async function handleFileChange(file) {
+  function handleFileSelected(file) {
     if (!file) return;
+    setTempFileName(file.name || 'player-avatar.jpg');
+    const objectUrl = URL.createObjectURL(file);
+    setTempImageSrc(objectUrl);
+    setCropModalOpen(true);
+  }
+
+  function handleCloseCropModal() {
+    setCropModalOpen(false);
+    if (tempImageSrc) {
+      URL.revokeObjectURL(tempImageSrc);
+      setTempImageSrc('');
+    }
+  }
+
+  async function handleCropConfirmed(croppedFile) {
     setLoading(true);
     try {
-      const compressed = await compressAvatar(file);
+      const compressed = await compressAvatar(croppedFile);
       await uploadPlayerAvatar(jugador.id, compressed);
       const localUrl = URL.createObjectURL(compressed);
       setAvatarSrc(localUrl);
@@ -280,7 +299,7 @@ function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
       </Avatar>
 
       {canEditPhoto && (
-        <FileButton onChange={handleFileChange} accept="image/*">
+        <FileButton onChange={handleFileSelected} accept="image/*">
           {(props) => (
             <Tooltip label="Cambiar foto de perfil" position="bottom" withArrow>
               <ActionIcon
@@ -306,6 +325,16 @@ function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
           )}
         </FileButton>
       )}
+
+      <ImageCropModal
+        opened={cropModalOpen}
+        onClose={handleCloseCropModal}
+        imageSrc={tempImageSrc}
+        fileName={tempFileName}
+        cropShape="round"
+        title="Ajustar foto de jugador"
+        onCropConfirmed={handleCropConfirmed}
+      />
     </Box>
   );
 }

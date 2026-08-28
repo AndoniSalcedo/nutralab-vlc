@@ -22,6 +22,7 @@ import {
 import { IconSearch, IconCamera, IconTrash } from '@tabler/icons-react';
 import { playerFullName } from '@/lib/utils';
 import { initials } from '@/lib/avatar';
+import ImageCropModal from '@/components/modals/ImageCropModal';
 
 export default function TeamForm({
   submitTeam,
@@ -42,18 +43,36 @@ export default function TeamForm({
 }) {
   const [filterTeamId, setFilterTeamId] = useState(sourceTeam ? String(sourceTeam.id) : '');
   const [search, setSearch] = useState('');
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [tempImageSrc, setTempImageSrc] = useState('');
+  const [tempFileName, setTempFileName] = useState('');
 
   useEffect(() => {
     setFilterTeamId(sourceTeam ? String(sourceTeam.id) : '');
     setSearch('');
   }, [sourceTeam, isImportingPlayers]);
 
-  const handleFotoChange = (file) => {
+  const handleFotoSelected = (file) => {
     if (!file) return;
-    const previewUrl = URL.createObjectURL(file);
+    setTempFileName(file.name || 'team-crest.jpg');
+    const localUrl = URL.createObjectURL(file);
+    setTempImageSrc(localUrl);
+    setCropModalOpen(true);
+  };
+
+  const handleCloseCropModal = () => {
+    setCropModalOpen(false);
+    if (tempImageSrc) {
+      URL.revokeObjectURL(tempImageSrc);
+      setTempImageSrc('');
+    }
+  };
+
+  const handleCropConfirmed = (croppedFile) => {
+    const previewUrl = URL.createObjectURL(croppedFile);
     setForm((current) => ({
       ...current,
-      fotoFile: file,
+      fotoFile: croppedFile,
       fotoPreview: previewUrl,
       removeFoto: false,
     }));
@@ -132,7 +151,7 @@ export default function TeamForm({
               {initials(form.nombre || 'Equipo')}
             </Avatar>
 
-            <FileButton onChange={handleFotoChange} accept="image/*">
+            <FileButton onChange={handleFotoSelected} accept="image/*">
               {(props) => (
                 <Tooltip label="Subir escudo/foto" position="top" withArrow>
                   <ActionIcon
@@ -322,6 +341,17 @@ export default function TeamForm({
             {submitLabel}
           </Button>
         </Group>
+
+        <ImageCropModal
+          opened={cropModalOpen}
+          onClose={handleCloseCropModal}
+          imageSrc={tempImageSrc}
+          fileName={tempFileName}
+          cropShape="rect"
+          aspect={1}
+          title="Ajustar escudo / foto del equipo"
+          onCropConfirmed={handleCropConfirmed}
+        />
       </Stack>
     </form>
   );

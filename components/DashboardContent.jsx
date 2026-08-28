@@ -15,6 +15,7 @@ import NothingFound from '@/components/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import { calculateByObjective, getTeamNutritionDayTypes } from '@/lib/calculations';
 import { useRouter } from 'next/navigation';
+import ImageCropModal from '@/components/modals/ImageCropModal';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import NewPlayerModal from '@/components/modals/NewPlayerModal';
 import ImportDataModal from '@/components/modals/ImportDataModal';
@@ -282,11 +283,30 @@ export default function DashboardContent({ players = [], team, readOnly = false 
   const router = useRouter();
   const [playersState, setPlayersState] = useState(players);
   const [teamPhotoVersion, setTeamPhotoVersion] = useState(() => team?.updated_at || Date.now());
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [tempImageSrc, setTempImageSrc] = useState('');
+  const [tempFileName, setTempFileName] = useState('');
 
-  async function handleTeamPhotoUpload(file) {
+  function handleSelectTeamPhoto(file) {
     if (!file || !team?.id) return;
+    setTempFileName(file.name || 'team-crest.jpg');
+    const localUrl = URL.createObjectURL(file);
+    setTempImageSrc(localUrl);
+    setCropModalOpen(true);
+  }
+
+  function handleCloseCropModal() {
+    setCropModalOpen(false);
+    if (tempImageSrc) {
+      URL.revokeObjectURL(tempImageSrc);
+      setTempImageSrc('');
+    }
+  }
+
+  async function handleCropConfirmed(croppedFile) {
+    if (!team?.id) return;
     try {
-      const compressed = await compressAvatar(file);
+      const compressed = await compressAvatar(croppedFile);
       await uploadTeamPhoto(team.id, compressed);
       setTeamPhotoVersion(Date.now());
       notifications.show({
@@ -741,7 +761,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                         {initials(team?.nombre || 'Equipo')}
                       </Avatar>
                       {!readOnly && team?.id && (
-                        <FileButton onChange={handleTeamPhotoUpload} accept="image/*">
+                        <FileButton onChange={handleSelectTeamPhoto} accept="image/*">
                           {(props) => (
                             <Tooltip label="Cambiar escudo/foto" position="top" withArrow>
                               <ActionIcon
@@ -1192,6 +1212,17 @@ export default function DashboardContent({ players = [], team, readOnly = false 
           team={team} 
           players={playersState}
           initialSelectedIds={transferModal.initialSelectedIds}
+        />
+
+        <ImageCropModal
+          opened={cropModalOpen}
+          onClose={handleCloseCropModal}
+          imageSrc={tempImageSrc}
+          fileName={tempFileName}
+          cropShape="rect"
+          aspect={1}
+          title="Ajustar escudo / foto del equipo"
+          onCropConfirmed={handleCropConfirmed}
         />
       </Stack>
     </BoneyardSkeleton>

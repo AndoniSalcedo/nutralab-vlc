@@ -15,6 +15,7 @@ import DayTypeModal from '@/components/modals/DayTypeModal';
 import ProtocolEditorModal from '@/components/modals/ProtocolEditorModal';
 import ProtocolTransferModal from '@/components/modals/ProtocolTransferModal';
 import ProtocolImportModal from '@/components/modals/ProtocolImportModal';
+import ImageCropModal from '@/components/modals/ImageCropModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
@@ -23,11 +24,30 @@ export default function TeamConfigClient({ team, readOnly = false }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [teamPhotoVersion, setTeamPhotoVersion] = useState(() => team.updated_at || Date.now());
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [tempImageSrc, setTempImageSrc] = useState('');
+  const [tempFileName, setTempFileName] = useState('');
 
-  async function handleUploadPhoto(file) {
+  function handleSelectPhoto(file) {
     if (!file || !team?.id) return;
+    setTempFileName(file.name || 'team-crest.jpg');
+    const localUrl = URL.createObjectURL(file);
+    setTempImageSrc(localUrl);
+    setCropModalOpen(true);
+  }
+
+  function handleCloseCropModal() {
+    setCropModalOpen(false);
+    if (tempImageSrc) {
+      URL.revokeObjectURL(tempImageSrc);
+      setTempImageSrc('');
+    }
+  }
+
+  async function handleCropConfirmed(croppedFile) {
+    if (!team?.id) return;
     try {
-      const compressed = await compressAvatar(file);
+      const compressed = await compressAvatar(croppedFile);
       await uploadTeamPhoto(team.id, compressed);
       setTeamPhotoVersion(Date.now());
       notifications.show({
@@ -297,7 +317,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                   {initials(teamName || team.nombre || 'Equipo')}
                 </Avatar>
                 {!readOnly && team?.id && (
-                  <FileButton onChange={handleUploadPhoto} accept="image/*">
+                  <FileButton onChange={handleSelectPhoto} accept="image/*">
                     {(props) => (
                       <Tooltip label="Cambiar escudo/foto" position="top" withArrow>
                         <ActionIcon
@@ -786,6 +806,17 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           onImported={(imported) => {
             setProtocols(current => [...current, ...imported]);
           }}
+        />
+
+        <ImageCropModal
+          opened={cropModalOpen}
+          onClose={handleCloseCropModal}
+          imageSrc={tempImageSrc}
+          fileName={tempFileName}
+          cropShape="rect"
+          aspect={1}
+          title="Ajustar escudo / foto del equipo"
+          onCropConfirmed={handleCropConfirmed}
         />
       </Stack>
     </BoneyardSkeleton>

@@ -30,6 +30,7 @@ import { deletePlayer, savePlayer } from '@/services/player';
 import { PLAYER_OBJECTIVES } from '@/lib/calculations';
 import { AVAILABLE_MEALS } from '@/lib/nutrition-day-types';
 import { compressAvatar, avatarFromRecord, initials as getInitials } from '@/lib/avatar';
+import ImageCropModal from '@/components/modals/ImageCropModal';
 
 function dateInputToIso(value) {
   if (!value) return '';
@@ -54,6 +55,9 @@ export default function PlayerForm({ initial, team }) {
     return '';
   });
   const [removeAvatar, setRemoveAvatar] = useState(false);
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [tempImageSrc, setTempImageSrc] = useState('');
+  const [tempFileName, setTempFileName] = useState('');
 
   useEffect(() => {
     if (initial?.avatar && (typeof initial.avatar === 'object' || String(initial.avatar).startsWith('\\x'))) {
@@ -63,11 +67,26 @@ export default function PlayerForm({ initial, team }) {
     }
   }, [initial]);
 
-  const handleAvatarChange = (file) => {
+  const handleAvatarFileSelected = (file) => {
     if (!file) return;
-    setAvatarFile(file);
-    setRemoveAvatar(false);
+    setTempFileName(file.name || 'player-avatar.jpg');
     const localUrl = URL.createObjectURL(file);
+    setTempImageSrc(localUrl);
+    setCropModalOpen(true);
+  };
+
+  const handleCloseCropModal = () => {
+    setCropModalOpen(false);
+    if (tempImageSrc) {
+      URL.revokeObjectURL(tempImageSrc);
+      setTempImageSrc('');
+    }
+  };
+
+  const handleCropConfirmed = (croppedFile) => {
+    setAvatarFile(croppedFile);
+    setRemoveAvatar(false);
+    const localUrl = URL.createObjectURL(croppedFile);
     setAvatarPreview(localUrl);
   };
 
@@ -206,7 +225,7 @@ export default function PlayerForm({ initial, team }) {
                     {getInitials(`${nombre || ''} ${apellidos || ''}`)}
                   </Avatar>
 
-                  <FileButton onChange={handleAvatarChange} accept="image/*">
+                  <FileButton onChange={handleAvatarFileSelected} accept="image/*">
                     {(props) => (
                       <Tooltip label="Subir foto" position="top" withArrow>
                         <ActionIcon
@@ -230,6 +249,16 @@ export default function PlayerForm({ initial, team }) {
                     )}
                   </FileButton>
                 </Box>
+
+                <ImageCropModal
+                  opened={cropModalOpen}
+                  onClose={handleCloseCropModal}
+                  imageSrc={tempImageSrc}
+                  fileName={tempFileName}
+                  cropShape="round"
+                  title="Ajustar foto de jugador"
+                  onCropConfirmed={handleCropConfirmed}
+                />
 
                 {avatarPreview && (
                   <Button
