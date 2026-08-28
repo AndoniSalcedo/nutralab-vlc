@@ -43,7 +43,7 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes,
 
       <Box mt={0}>
         {activeSubtab === 'pesos' && (
-          <PesosSubtab jugador={jugador} pesajes={pesajes} readOnly={readOnly} />
+          <PesosSubtab jugador={jugador} pesajes={pesajes} evoluciones={evoluciones} readOnly={readOnly} />
         )}
         {activeSubtab === 'mediciones' && (
           <MedicionesSubtab jugador={jugador} evoluciones={evoluciones} readOnly={readOnly} />

@@ -106,6 +106,9 @@ export default function PlayerForm({ initial, team }) {
 
   // Form states - Pautas Nutricionales
   const [objetivo, setObjetivo] = useState(initial?.objetivo || 'mejora_rendimiento');
+  const [porcentajeGrasaObjetivo, setPorcentajeGrasaObjetivo] = useState(
+    initial?.porcentaje_grasa_objetivo ? String(initial.porcentaje_grasa_objetivo) : '10'
+  );
   const [numComidas, setNumComidas] = useState(() => {
     if (initial?.num_comidas) {
       return initial.num_comidas.split(',').map((s) => s.trim()).filter(Boolean);
@@ -154,6 +157,7 @@ export default function PlayerForm({ initial, team }) {
         formData.append('intolerancias', intolerancias);
         formData.append('alergias', alergias);
         formData.append('objetivo', objetivo);
+        formData.append('porcentaje_grasa_objetivo', String(porcentajeGrasaObjetivo || '10'));
 
         if (removeAvatar) {
           formData.append('remove_avatar', 'true');
@@ -316,14 +320,27 @@ export default function PlayerForm({ initial, team }) {
 
               <Divider mb="md" />
               <Stack gap="md">
-                <Select
-                  label="Objetivo Corporal"
-                  placeholder="Selecciona un objetivo..."
-                  data={PLAYER_OBJECTIVES}
-                  value={objetivo || null}
-                  onChange={(value) => setObjetivo(value || '')}
-                  clearable
-                />
+                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                  <Select
+                    label="Objetivo Corporal"
+                    placeholder="Selecciona un objetivo..."
+                    data={PLAYER_OBJECTIVES}
+                    value={objetivo || null}
+                    onChange={(value) => setObjetivo(value || '')}
+                    clearable
+                  />
+                  <Select
+                    label="% Grasa Objetivo (Semáforo)"
+                    placeholder="Selecciona % de grasa objetivo..."
+                    data={[
+                      { value: '10', label: '10% (Defecto)' },
+                      { value: '9', label: '9%' },
+                      { value: '8', label: '8%' },
+                    ]}
+                    value={porcentajeGrasaObjetivo}
+                    onChange={(value) => setPorcentajeGrasaObjetivo(value || '10')}
+                  />
+                </SimpleGrid>
 
                 <MultiSelect
                   label="Distribución de comidas por defecto"

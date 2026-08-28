@@ -65,6 +65,9 @@ export async function POST(request) {
     intolerancias: String(form.get('intolerancias') || ''),
     alergias: String(form.get('alergias') || ''),
     objetivo: String(form.get('objetivo') || ''),
+    porcentaje_grasa_objetivo: form.has('porcentaje_grasa_objetivo') && form.get('porcentaje_grasa_objetivo')
+      ? (Number(form.get('porcentaje_grasa_objetivo')) || 10)
+      : 10,
   };
 
   if (form.has('config_prepartido')) {

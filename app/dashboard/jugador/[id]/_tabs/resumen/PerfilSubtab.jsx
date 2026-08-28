@@ -352,6 +352,19 @@ export default function PerfilSubtab({
                 <ComidasEditable label="Comidas diarias" numComidas={jugador.num_comidas} postentreno={jugador.postentreno} preentreno={jugador.preentreno} jugadorId={jugador.id} recomendacionesDefecto={jugador.recomendaciones_defecto} readOnly={readOnly} />
                 <PrepartidoEditable label="Rutinas pre-partido" configPrepartido={jugador.config_prepartido} numComidas={jugador.num_comidas} postentreno={jugador.postentreno} jugadorId={jugador.id} readOnly={readOnly} />
                 <CampoEditable label="Objetivo nutricional" campo="objetivo" valor={jugador.objetivo || ''} jugadorId={jugador.id} tipo="select" opciones={PLAYER_OBJECTIVES} readOnly={readOnly} />
+                <CampoEditable
+                  label="% Grasa Objetivo (Semáforo)"
+                  campo="porcentaje_grasa_objetivo"
+                  valor={jugador.porcentaje_grasa_objetivo ? String(jugador.porcentaje_grasa_objetivo) : '10'}
+                  jugadorId={jugador.id}
+                  tipo="select"
+                  opciones={[
+                    { value: '10', label: '10% (Defecto)' },
+                    { value: '9', label: '9%' },
+                    { value: '8', label: '8%' },
+                  ]}
+                  readOnly={readOnly}
+                />
                 <CampoEditable label="Gustos y preferencias" campo="gustos_preferencias" valor={jugador.gustos_preferencias || ''} jugadorId={jugador.id} readOnly={readOnly} />
                 <CampoEditable label="Aversiones" campo="aversiones" valor={jugador.aversiones || ''} jugadorId={jugador.id} readOnly={readOnly} />
                 <CampoEditable label="Intolerancias" campo="intolerancias" valor={jugador.intolerancias || ''} jugadorId={jugador.id} readOnly={readOnly} />

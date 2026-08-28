@@ -56,7 +56,7 @@ function dateInputToIso(value) {
   return `${year}-${month}-${day}`;
 }
 
-export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], readOnly = false }) {
+export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], evoluciones = [], readOnly = false }) {
   const jugadorId = jugador.id;
   const [pesajes, setPesajes] = useState(pesajesIniciales || []);
   const [currentId, setCurrentId] = useState(pesajesIniciales.length ? String(pesajesIniciales[pesajesIniciales.length - 1].id) : null);
@@ -164,7 +164,15 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], r
     }
   }
 
-  const semaforo = useMemo(() => calculateSemaforo(pesajes), [pesajes]);
+  const semaforo = useMemo(
+    () =>
+      calculateSemaforo(pesajes, null, {
+        evoluciones: evoluciones && evoluciones.length ? evoluciones : jugador?.evoluciones,
+        jugador,
+        porcentajeGrasaObjetivo: jugador?.porcentaje_grasa_objetivo,
+      }),
+    [pesajes, evoluciones, jugador]
+  );
 
   return (
     <Stack gap={0}>
@@ -202,17 +210,23 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], r
                   </Title>
                 </Box>
 
-                {semaforo.hasPesajes && (
+                {(semaforo.hasPesajes || semaforo.hasReference) && (
                   <MantineTooltip
                     withArrow
                     multiline
-                    w={240}
+                    w={250}
                     label={
                       <Box p={2}>
                         <Text size="xs" fw={700}>Semáforo: {semaforo.label}</Text>
                         <Text size="xs">Peso Actual: {semaforo.pesoActual} kg</Text>
-                        <Text size="xs">Peso Ref (Media): {semaforo.pesoReferencia} kg</Text>
+                        <Text size="xs">Peso Ref ({semaforo.porcentajeGrasaObjetivo || 10}% grasa): {semaforo.pesoReferencia} kg</Text>
+                        {semaforo.masaMagra && (
+                          <Text size="xs">Masa Magra (Antropo): {semaforo.masaMagra} kg</Text>
+                        )}
                         <Text size="xs">Variación: {semaforo.diff > 0 ? `+${semaforo.diff}` : semaforo.diff} kg</Text>
+                        <Text size="10px" c="dimmed" mt={4} style={{ fontStyle: 'italic' }}>
+                          Margen verde (±0,50 kg) · Amarillo (±1,00 kg)
+                        </Text>
                       </Box>
                     }
                   >
@@ -233,7 +247,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], r
                         </Text>
                       </Group>
                       <Text size="xs" c="dimmed" mt={2}>
-                        Peso Ref (Media): <b>{semaforo.pesoReferencia} kg</b>
+                        Peso Ref ({semaforo.porcentajeGrasaObjetivo || 10}% gr): <b>{semaforo.pesoReferencia} kg</b>
                       </Text>
                     </Box>
                   </MantineTooltip>

@@ -139,11 +139,12 @@ export function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, compact = fa
 }
 
 export function HeaderSemaforoIndicator({ semaforo, centered = false, compact = false }) {
-  if (!semaforo?.hasPesajes) return null;
+  if (!semaforo?.hasPesajes && !semaforo?.hasReference) return null;
 
-  const { status, label, pesoActual, pesoReferencia, diff } = semaforo;
+  const { status, label, pesoActual, pesoReferencia, diff, masaMagra, porcentajeGrasaObjetivo } = semaforo;
   const isPositive = diff > 0;
   const formattedDiff = diff !== null ? (isPositive ? `+${diff.toFixed(2)} kg` : `${diff.toFixed(2)} kg`) : '0.00 kg';
+  const fatPctLabel = porcentajeGrasaObjetivo ? `${porcentajeGrasaObjetivo}%` : '10%';
 
   const statusConfigMap = {
     verde: {
@@ -170,7 +171,7 @@ export function HeaderSemaforoIndicator({ semaforo, centered = false, compact = 
       <Tooltip
         withArrow
         radius="md"
-        label={`${label} · ${pesoActual} kg (${formattedDiff})`}
+        label={`${label} · ${pesoActual} kg (${formattedDiff}) · Ref: ${pesoReferencia} kg (${fatPctLabel})`}
       >
         <Group gap={4} align="center" wrap="nowrap" style={{ cursor: 'pointer' }}>
           <Box
@@ -196,7 +197,7 @@ export function HeaderSemaforoIndicator({ semaforo, centered = false, compact = 
       withArrow
       radius="md"
       multiline
-      w={240}
+      w={250}
       label={
         <Stack gap={4} p={4}>
           <Group justify="space-between" align="center">
@@ -213,9 +214,15 @@ export function HeaderSemaforoIndicator({ semaforo, centered = false, compact = 
             <Text size="xs" fw={700}>{pesoActual} kg</Text>
           </Group>
           <Group justify="space-between">
-            <Text size="xs" c="dimmed">Peso Ref (Media):</Text>
+            <Text size="xs" c="dimmed">Peso Ref ({fatPctLabel} grasa):</Text>
             <Text size="xs" fw={700}>{pesoReferencia} kg</Text>
           </Group>
+          {masaMagra && (
+            <Group justify="space-between">
+              <Text size="xs" c="dimmed">Masa Magra (Antropo):</Text>
+              <Text size="xs" fw={700}>{masaMagra} kg</Text>
+            </Group>
+          )}
           <Group justify="space-between">
             <Text size="xs" c="dimmed">Variación:</Text>
             <Text size="xs" fw={700} c={cfg.color}>
@@ -223,7 +230,7 @@ export function HeaderSemaforoIndicator({ semaforo, centered = false, compact = 
             </Text>
           </Group>
           <Text size="10px" c="dimmed" mt={2} style={{ fontStyle: 'italic' }}>
-            Margen verde (±0,75 kg) · Amarillo (±1,50 kg)
+            Margen verde (±0,50 kg) · Amarillo (±1,00 kg)
           </Text>
         </Stack>
       }
@@ -243,7 +250,7 @@ export function HeaderSemaforoIndicator({ semaforo, centered = false, compact = 
           {pesoActual} kg ({formattedDiff})
         </Text>
         <Text fz="xs" c="dimmed">
-          · {cfg.title} (Media: {pesoReferencia} kg)
+          · {cfg.title} (Ref: {pesoReferencia} kg)
         </Text>
       </Group>
     </Tooltip>

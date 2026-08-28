@@ -44,9 +44,9 @@ function PlayerPositionText({ position }) {
 }
 
 function PlayerSemaforoIndicator({ semaforo }) {
-  if (!semaforo?.hasPesajes) {
+  if (!semaforo?.hasPesajes && !semaforo?.hasReference) {
     return (
-      <Tooltip label="Sin registros de pesaje para calcular peso de referencia" withArrow radius="md">
+      <Tooltip label="Sin registros para calcular peso objetivo de referencia" withArrow radius="md">
         <Text fz="xs" c="dimmed" style={{ fontStyle: 'italic' }}>
           Sin pesajes
         </Text>
@@ -54,9 +54,10 @@ function PlayerSemaforoIndicator({ semaforo }) {
     );
   }
 
-  const { status, label, pesoActual, pesoReferencia, diff } = semaforo;
+  const { status, label, pesoActual, pesoReferencia, diff, masaMagra, porcentajeGrasaObjetivo } = semaforo;
   const isPositive = diff > 0;
   const formattedDiff = diff !== null ? (isPositive ? `+${diff.toFixed(2)} kg` : `${diff.toFixed(2)} kg`) : '0.00 kg';
+  const fatPctLabel = porcentajeGrasaObjetivo ? `${porcentajeGrasaObjetivo}%` : '10%';
 
   const statusConfigMap = {
     verde: {
@@ -83,7 +84,7 @@ function PlayerSemaforoIndicator({ semaforo }) {
       withArrow
       radius="md"
       multiline
-      w={240}
+      w={250}
       label={
         <Stack gap={4} p={4}>
           <Group justify="space-between" align="center">
@@ -100,9 +101,15 @@ function PlayerSemaforoIndicator({ semaforo }) {
             <Text size="xs" fw={700}>{pesoActual} kg</Text>
           </Group>
           <Group justify="space-between">
-            <Text size="xs" c="dimmed">Peso Ref (Media):</Text>
+            <Text size="xs" c="dimmed">Peso Ref ({fatPctLabel} grasa):</Text>
             <Text size="xs" fw={700}>{pesoReferencia} kg</Text>
           </Group>
+          {masaMagra && (
+            <Group justify="space-between">
+              <Text size="xs" c="dimmed">Masa Magra (Antropo):</Text>
+              <Text size="xs" fw={700}>{masaMagra} kg</Text>
+            </Group>
+          )}
           <Group justify="space-between">
             <Text size="xs" c="dimmed">Variación:</Text>
             <Text size="xs" fw={700} c={cfg.color}>
@@ -110,7 +117,7 @@ function PlayerSemaforoIndicator({ semaforo }) {
             </Text>
           </Group>
           <Text size="10px" c="dimmed" mt={2} style={{ fontStyle: 'italic' }}>
-            Margen verde (±0,75 kg) · Amarillo (±1,50 kg)
+            Margen verde (±0,50 kg) · Amarillo (±1,00 kg)
           </Text>
         </Stack>
       }

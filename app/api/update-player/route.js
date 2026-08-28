@@ -8,6 +8,7 @@ const CAMPOS_PERMITIDOS = [
   'notas_hidratacion', 'notas_suplementacion', 'notas_protocolos',
   'gustos_preferencias', 'aversiones', 'intolerancias', 'alergias',
   'contexto_clinico', 'objetivo', 'posicion', 'num_comidas', 'preentreno', 'postentreno', 'recomendaciones_defecto', 'config_prepartido',
+  'porcentaje_grasa_objetivo',
 ];
 
 export async function POST(req) {
@@ -23,7 +24,8 @@ export async function POST(req) {
     const ownedPlayer = await getOwnedPlayer(supabase, user, id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
-    await updatePlayer(supabase, id, { [field]: value });
+    const parsedValue = field === 'porcentaje_grasa_objetivo' ? (Number(value) || 10) : value;
+    await updatePlayer(supabase, id, { [field]: parsedValue });
     return NextResponse.json({ ok: true });
   } catch (e) {
     return NextResponse.json({ error: e.message }, { status: 500 });

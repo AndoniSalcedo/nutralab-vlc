@@ -176,6 +176,14 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
+  tableHeaderCellCenter: {
+    fontSize: 6.8,
+    fontWeight: 'bold',
+    color: '#475569',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+  },
   tableRow: {
     flexDirection: 'row',
     borderBottomWidth: 0.5,
@@ -187,16 +195,17 @@ const styles = StyleSheet.create({
   tableRowAlt: {
     backgroundColor: '#f8fafc',
   },
-  colIndex: { width: '5%' },
-  colPlayer: { width: '33%' },
-  colPos: { width: '14%' },
-  colWeight: { width: '12%', textAlign: 'right' },
-  colRef: { width: '12%', textAlign: 'right' },
-  colDiff: { width: '11%', textAlign: 'right' },
-  colStatus: { width: '13%', paddingLeft: 6 },
+  colIndex: { width: '4%', textAlign: 'center' },
+  colPlayer: { width: '22%' },
+  colWeight: { width: '12%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
+  colP10: { width: '12.5%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
+  colP9: { width: '12.5%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
+  colP8: { width: '12.5%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
+  colDiff: { width: '11.5%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
+  colStatus: { width: '13%', alignItems: 'center', justifyContent: 'center' },
 
   playerName: {
-    fontSize: 7.8,
+    fontSize: 8,
     fontWeight: 'bold',
     color: '#0f172a',
   },
@@ -214,9 +223,18 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
     fontStyle: 'italic',
   },
-  refText: {
-    fontSize: 7.5,
-    color: '#475569',
+  refTextUnselected: {
+    fontSize: 7.2,
+    color: '#64748b',
+  },
+  refTextSelected: {
+    fontSize: 7.6,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    backgroundColor: '#e2e8f0',
+    borderRadius: 3,
+    paddingVertical: 1,
+    paddingHorizontal: 3,
   },
   diffPositive: {
     fontSize: 7.8,
@@ -332,7 +350,7 @@ export default function WeightExportDocument({
                   </Text>
                 )}
               </View>
-              <Text style={styles.metricCaption}>Desviación ≤ ±0,75 kg</Text>
+              <Text style={styles.metricCaption}>Desviación ≤ ±0,50 kg</Text>
             </View>
 
             {/* Col 3: Precaución */}
@@ -349,7 +367,7 @@ export default function WeightExportDocument({
                   </Text>
                 )}
               </View>
-              <Text style={styles.metricCaption}>Desviación ±0,76 a ±1,50 kg</Text>
+              <Text style={styles.metricCaption}>Desviación ±0,51 a ±1,00 kg</Text>
             </View>
 
             {/* Col 4: Alerta */}
@@ -366,7 +384,7 @@ export default function WeightExportDocument({
                   </Text>
                 )}
               </View>
-              <Text style={styles.metricCaption}>Desviación &gt; ±1,50 kg</Text>
+              <Text style={styles.metricCaption}>Desviación &gt; ±1,00 kg</Text>
             </View>
           </View>
 
@@ -391,19 +409,26 @@ export default function WeightExportDocument({
         {/* Table */}
         <View style={styles.table}>
           <View style={styles.tableHeader}>
-            <Text style={[styles.tableHeaderCell, styles.colIndex]}>#</Text>
+            <Text style={[styles.tableHeaderCellCenter, styles.colIndex]}>#</Text>
             <Text style={[styles.tableHeaderCell, styles.colPlayer]}>Jugador</Text>
-            <Text style={[styles.tableHeaderCell, styles.colPos]}>Posición</Text>
-            <Text style={[styles.tableHeaderCell, styles.colWeight]}>Peso (kg)</Text>
-            <Text style={[styles.tableHeaderCell, styles.colRef]}>Ref. Media</Text>
-            <Text style={[styles.tableHeaderCell, styles.colDiff]}>Variación</Text>
-            <Text style={[styles.tableHeaderCell, styles.colStatus]}>Semáforo</Text>
+            <Text style={[styles.tableHeaderCellCenter, styles.colWeight]}>Peso Actual</Text>
+            <Text style={[styles.tableHeaderCellCenter, styles.colP10]}>Peso a 10%</Text>
+            <Text style={[styles.tableHeaderCellCenter, styles.colP9]}>Peso a 9%</Text>
+            <Text style={[styles.tableHeaderCellCenter, styles.colP8]}>Peso a 8%</Text>
+            <Text style={[styles.tableHeaderCellCenter, styles.colDiff]}>Variación</Text>
+            <Text style={[styles.tableHeaderCellCenter, styles.colStatus]}>Semáforo</Text>
           </View>
 
           {records.map((r, index) => {
             const isAlt = index % 2 === 1;
             const statusCfg = STATUS_COLORS[r.status] || STATUS_COLORS.sin_registro;
             const hasWeight = r.hasWeight;
+
+            const targetFat = Number(r.porcentajeGrasaObjetivo) || 10;
+            const masaMagra = r.masaMagra || (r.pesoReferencia && r.porcentajeGrasaObjetivo ? Math.round(r.pesoReferencia * (1 - r.porcentajeGrasaObjetivo / 100) * 100) / 100 : null);
+            const p10 = r.peso10 !== null && r.peso10 !== undefined ? r.peso10 : (masaMagra ? Math.round((masaMagra / 0.90) * 100) / 100 : null);
+            const p9 = r.peso9 !== null && r.peso9 !== undefined ? r.peso9 : (masaMagra ? Math.round((masaMagra / 0.91) * 100) / 100 : null);
+            const p8 = r.peso8 !== null && r.peso8 !== undefined ? r.peso8 : (masaMagra ? Math.round((masaMagra / 0.92) * 100) / 100 : null);
 
             let diffStyle = styles.diffOptimal;
             if (r.status === 'amarillo') {
@@ -422,15 +447,12 @@ export default function WeightExportDocument({
                 style={[styles.tableRow, isAlt && styles.tableRowAlt]}
                 wrap={false}
               >
-                <Text style={[styles.colIndex, { fontSize: 7, color: '#64748b' }]}>{index + 1}</Text>
+                <Text style={[styles.colIndex, { fontSize: 7, color: '#64748b', textAlign: 'center' }]}>{index + 1}</Text>
                 <View style={styles.colPlayer}>
                   <Text style={styles.playerName}>
                     {r.nombre} {r.apellidos || ''}
                   </Text>
                 </View>
-                <Text style={[styles.colPos, styles.playerPosition]}>
-                  {r.posicion || '—'}
-                </Text>
                 <View style={styles.colWeight}>
                   {hasWeight ? (
                     <Text style={styles.weightText}>{r.peso ? `${r.peso} kg` : '—'}</Text>
@@ -438,13 +460,27 @@ export default function WeightExportDocument({
                     <Text style={styles.weightDimmed}>Sin registro</Text>
                   )}
                 </View>
-                <Text style={[styles.colRef, styles.refText]}>
-                  {r.pesoReferencia ? `${r.pesoReferencia} kg` : '—'}
-                </Text>
-                <Text style={[styles.colDiff, hasWeight ? diffStyle : styles.weightDimmed]}>
-                  {hasWeight ? formattedDiff : '—'}
-                </Text>
-                <View style={[styles.colStatus, styles.statusWrap]}>
+                <View style={styles.colP10}>
+                  <Text style={targetFat === 10 ? styles.refTextSelected : styles.refTextUnselected}>
+                    {p10 ? `${p10} kg` : '—'}
+                  </Text>
+                </View>
+                <View style={styles.colP9}>
+                  <Text style={targetFat === 9 ? styles.refTextSelected : styles.refTextUnselected}>
+                    {p9 ? `${p9} kg` : '—'}
+                  </Text>
+                </View>
+                <View style={styles.colP8}>
+                  <Text style={targetFat === 8 ? styles.refTextSelected : styles.refTextUnselected}>
+                    {p8 ? `${p8} kg` : '—'}
+                  </Text>
+                </View>
+                <View style={styles.colDiff}>
+                  <Text style={[hasWeight ? diffStyle : styles.weightDimmed, { textAlign: 'center' }]}>
+                    {hasWeight ? formattedDiff : '—'}
+                  </Text>
+                </View>
+                <View style={[styles.colStatus, styles.statusWrap, { justifyContent: 'center' }]}>
                   <View style={[styles.statusDot, { backgroundColor: statusCfg.dot }]} />
                   <Text style={[styles.statusText, { color: statusCfg.text }]}>
                     {r.statusLabel || (hasWeight ? 'Registrado' : 'Sin registro')}

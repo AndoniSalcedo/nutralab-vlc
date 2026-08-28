@@ -34,7 +34,7 @@ export default async function TeamDashboard({ params }) {
     const resJugadores = await getPlayersByTeamSelect(
       supabase,
       team.id,
-      'id,nombre,apellidos,posicion,objetivo,auth_user_id,auth_email,credentials_created_at,equipo_id'
+      'id,nombre,apellidos,posicion,objetivo,porcentaje_grasa_objetivo,auth_user_id,auth_email,credentials_created_at,equipo_id'
     );
 
     const playerIds = (resJugadores || []).map((player) => player.id);

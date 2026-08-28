@@ -101,11 +101,18 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
       );
       const pesoVal = hasWeight ? Number(pesajeOnDate.peso_kg) : null;
 
+      const calcOptions = {
+        masaMagra: player.masa_magra_kg,
+        porcentajeGrasaObjetivo: player.porcentaje_grasa_objetivo,
+        evoluciones: player.evoluciones,
+        jugador: player,
+      };
+
       let semaforo;
       if (hasWeight) {
-        semaforo = calculateSemaforo(pPesajes, pesoVal);
+        semaforo = calculateSemaforo(pPesajes, pesoVal, calcOptions);
       } else {
-        const refCalc = calculateSemaforo(pPesajes);
+        const refCalc = calculateSemaforo(pPesajes, null, calcOptions);
         semaforo = {
           hasPesajes: false,
           pesoReferencia: refCalc.pesoReferencia,
@@ -138,11 +145,29 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
         }
       }
 
+      const masaMagra = semaforo.masaMagra || player.masa_magra_kg;
+      const targetFatPct = Number(player.porcentaje_grasa_objetivo) || 10;
+
+      const peso8 = masaMagra && Number.isFinite(masaMagra) && masaMagra > 0
+        ? Math.round((masaMagra / 0.92) * 100) / 100
+        : null;
+      const peso9 = masaMagra && Number.isFinite(masaMagra) && masaMagra > 0
+        ? Math.round((masaMagra / 0.91) * 100) / 100
+        : null;
+      const peso10 = masaMagra && Number.isFinite(masaMagra) && masaMagra > 0
+        ? Math.round((masaMagra / 0.90) * 100) / 100
+        : null;
+
       return {
         ...player,
         hasWeight,
         peso: pesoVal,
         pesoReferencia: semaforo.pesoReferencia,
+        porcentajeGrasaObjetivo: targetFatPct,
+        masaMagra,
+        peso8,
+        peso9,
+        peso10,
         diff: semaforo.diff,
         status: semaforo.status,
         statusTitle: title,
