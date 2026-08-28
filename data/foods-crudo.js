@@ -277,6 +277,14 @@ export const FOODS_CRUDO = [
     "fat": 0.6
   },
   {
+    "name": "Arroz con leche",
+    "category": "cereales_y_tuberculos",
+    "kcal": 135,
+    "cho": 22,
+    "pro": 3.5,
+    "fat": 2.8
+  },
+  {
     "name": "Arroz integral",
     "originalName": "Arroz integral - crudo",
     "category": "cereales_y_tuberculos",
@@ -1537,6 +1545,14 @@ export const FOODS_CRUDO = [
     "fat": 0
   },
   {
+    "name": "Helado",
+    "category": "otros_y_suplementos",
+    "kcal": 200,
+    "cho": 25,
+    "pro": 3.5,
+    "fat": 10
+  },
+  {
     "name": "Mejiilon en conserva (escabeche)",
     "originalName": "mejiilon en conserva (escabeche)",
     "category": "otros_y_suplementos",
@@ -2075,6 +2091,14 @@ export const FOODS_CRUDO = [
     "cho": 12,
     "pro": 5,
     "fat": 5.5
+  },
+  {
+    "name": "Judías verdes",
+    "category": "verduras_y_hortalizas",
+    "kcal": 31,
+    "cho": 4.2,
+    "pro": 1.8,
+    "fat": 0.1
   },
   {
     "name": "Lechuga romana",

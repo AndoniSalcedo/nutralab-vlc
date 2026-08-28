@@ -173,7 +173,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
         setSelectedPlayerIds(new Set(preparedExportPlayers.map((p) => String(p.id))));
       }
     }
-  }, [opened, exportDateIso, preparedExportPlayers.length]);
+  }, [opened, exportDateIso, preparedExportPlayers]);
 
   // Export summary stats
   const exportSummary = useMemo(() => {

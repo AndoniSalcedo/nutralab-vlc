@@ -28,14 +28,13 @@ export async function POST(request) {
       return NextResponse.json({ error: 'No hay registros para exportar' }, { status: 400 });
     }
 
-    const stream = await renderToStream(
-      <WeightExportDocument
-        teamName={teamName}
-        fechaFormatted={fechaFormatted || fecha}
-        records={records}
-        summary={summary}
-      />
-    );
+    const docElement = React.createElement(WeightExportDocument, {
+      teamName,
+      fechaFormatted: fechaFormatted || fecha,
+      records,
+      summary,
+    });
+    const stream = await renderToStream(docElement);
 
     const chunks = [];
     for await (const chunk of stream) {

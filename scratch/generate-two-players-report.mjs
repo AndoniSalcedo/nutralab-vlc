@@ -4,7 +4,6 @@ import ReactPDF from "@react-pdf/renderer";
 import fs from "node:fs";
 import path from "node:path";
 import { withLatestMeasurement } from "../lib/player-metrics.js";
-import { planDataToLegacyContent } from "../lib/nutrition-plan-card.js";
 import { generarDatosPlan } from "../lib/ai-plan-generator.js";
 import WeeklySquadReportDocument from "../lib/reports/WeeklySquadReportDocument.jsx";
 
@@ -65,7 +64,7 @@ async function main() {
     });
 
     console.log(`Plan generado con éxito en ${((Date.now() - t0)/1000).toFixed(1)}s!`);
-    for (const [dk, d] of Object.entries(planDatos.dias)) {
+    for (const [, d] of Object.entries(planDatos.dias)) {
       console.log(`  [${d.label.toUpperCase()} - ${d.tipoDia}]`);
       for (const ing of d.ingestas) {
         console.log(`    * ${ing.nombre}: ${ing.detalle}`);
