@@ -39,7 +39,7 @@ export async function POST(req) {
 
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
     const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
@@ -111,7 +111,7 @@ export async function DELETE(req) {
 
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     const analitica = await getAnalyticsById(supabase, id);
     if (!analitica) return NextResponse.json({ error: 'Analítica no encontrada' }, { status: 404 });
@@ -136,7 +136,7 @@ export async function PATCH(req) {
 
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     const analitica = await getAnalyticsById(supabase, id);
     if (!analitica) return NextResponse.json({ error: 'Analítica no encontrada' }, { status: 404 });

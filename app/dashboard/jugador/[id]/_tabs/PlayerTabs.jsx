@@ -48,7 +48,7 @@ export default function PlayerTabs({
 
   const validSubtabs = {
     resumen: ['perfil', 'diario', 'mensajes'],
-    metricas: readOnly
+    metricas: isPlayer
       ? ['mediciones', 'pesos', 'hidratacion']
       : ['mediciones', 'pesos', 'analiticas', 'hidratacion'],
     nutricion: ['plan', 'suplementacion', 'menu', 'protocolos'],

@@ -202,7 +202,7 @@ export async function POST(request) {
 
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     const team = await getOwnedTeam(supabase, user, teamId);
     if (!team) return forbidden('Debes importar dentro de un equipo propio');

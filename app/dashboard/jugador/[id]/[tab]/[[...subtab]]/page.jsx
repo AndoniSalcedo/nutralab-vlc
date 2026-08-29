@@ -1,7 +1,7 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
 import { withLatestMeasurement } from '@/lib/player-metrics';
-import { getOwnedPlayer } from '@/lib/team-access';
+import { getAccessiblePlayer } from '@/lib/team-access';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
 import { getAnalyticsByPlayerId } from '@/repositories/analyticsRepository';
 import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
@@ -37,8 +37,8 @@ export default async function JugadorTabPage({ params }) {
   }
 
   if (!isPlayer) {
-    const ownedPlayer = await getOwnedPlayer(supabase, user, id);
-    if (!ownedPlayer) {
+    const accessiblePlayer = await getAccessiblePlayer(supabase, user, id);
+    if (!accessiblePlayer) {
       return (
         <NothingFound
           title="Sin acceso"

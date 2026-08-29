@@ -962,7 +962,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                       <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Semáforo Peso</Table.Th>
                       <Table.Th visibleFrom="sm" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Plan Nutricional</Table.Th>
                       <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Posición</Table.Th>
-                      <Table.Th w={70} />
+                      {!readOnly && <Table.Th w={70} />}
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
@@ -1055,50 +1055,46 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                         </Table.Td>
 
                         {/* COLUMNA 5: ACCIONES */}
-                        <Table.Td>
-                          <Group gap={4} justify="flex-end" wrap="nowrap">
-                            <Menu shadow="md" width={220} position="bottom-end" withArrow radius="md" keepMounted>
-                              <Menu.Target>
-                                <ActionIcon
-                                  variant="subtle"
-                                  color="gray"
-                                  radius="xl"
-                                  loading={deletingId === player.id}
-                                  onClick={(event) => event.stopPropagation()}
-                                >
-                                  <IconDots size={18} stroke={1.5} />
-                                </ActionIcon>
-                              </Menu.Target>
-                              <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
-                                {!readOnly && (
+                        {!readOnly && (
+                          <Table.Td>
+                            <Group gap={4} justify="flex-end" wrap="nowrap">
+                              <Menu shadow="md" width={220} position="bottom-end" withArrow radius="md" keepMounted>
+                                <Menu.Target>
+                                  <ActionIcon
+                                    variant="subtle"
+                                    color="gray"
+                                    radius="xl"
+                                    loading={deletingId === player.id}
+                                    onClick={(event) => event.stopPropagation()}
+                                  >
+                                    <IconDots size={18} stroke={1.5} />
+                                  </ActionIcon>
+                                </Menu.Target>
+                                <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
                                   <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => setEditingPlayer(player)}>
                                     Editar
                                   </Menu.Item>
-                                )}
-                                <Menu.Item leftSection={<IconFileTypePdf size={14} />} onClick={() => openReportModal(player)}>
-                                  Generar informe
-                                </Menu.Item>
-                                {!readOnly && (
-                                  <>
-                                    <Menu.Divider />
-                                    <Menu.Item leftSection={<IconExchange size={14} />} onClick={() => setTransferModal({ opened: true, initialSelectedIds: [player.id] })}>
-                                      Transferir a otro equipo
-                                    </Menu.Item>
-                                    <PlayerCredentialsButton
-                                      jugador={player}
-                                      menuItem
-                                      onSaved={(credentials) => updateCredentials(player.id, credentials)}
-                                    />
-                                    <Menu.Divider />
-                                    <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeletePlayer(player)}>
-                                      Eliminar
-                                    </Menu.Item>
-                                  </>
-                                )}
-                              </Menu.Dropdown>
-                            </Menu>
-                          </Group>
-                        </Table.Td>
+                                  <Menu.Item leftSection={<IconFileTypePdf size={14} />} onClick={() => openReportModal(player)}>
+                                    Generar informe
+                                  </Menu.Item>
+                                  <Menu.Divider />
+                                  <Menu.Item leftSection={<IconExchange size={14} />} onClick={() => setTransferModal({ opened: true, initialSelectedIds: [player.id] })}>
+                                    Transferir a otro equipo
+                                  </Menu.Item>
+                                  <PlayerCredentialsButton
+                                    jugador={player}
+                                    menuItem
+                                    onSaved={(credentials) => updateCredentials(player.id, credentials)}
+                                  />
+                                  <Menu.Divider />
+                                  <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeletePlayer(player)}>
+                                    Eliminar
+                                  </Menu.Item>
+                                </Menu.Dropdown>
+                              </Menu>
+                            </Group>
+                          </Table.Td>
+                        )}
                       </Table.Tr>
                     ))}
                   </Table.Tbody>

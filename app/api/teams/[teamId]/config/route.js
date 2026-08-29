@@ -8,8 +8,8 @@ export async function POST(request, { params }) {
   try {
     const user = await getUser();
     const ownerId = getOwnerId(user);
-    if (!ownerId) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    if (!user || user.role !== 'admin' || !ownerId) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
     }
 
     const { teamId } = await params;

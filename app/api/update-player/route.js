@@ -20,7 +20,7 @@ export async function POST(req) {
     }
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
     const ownedPlayer = await getOwnedPlayer(supabase, user, id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 

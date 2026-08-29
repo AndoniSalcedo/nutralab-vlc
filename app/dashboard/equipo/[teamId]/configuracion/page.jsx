@@ -1,6 +1,6 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { getUser } from '@/lib/auth';
-import { getOwnedTeam } from '@/lib/team-access';
+import { getAccessibleTeam } from '@/lib/team-access';
 import TeamConfigClient from './TeamConfigClient';
 import NothingFound from '@/components/NothingFound';
 
@@ -11,7 +11,7 @@ export default async function TeamConfigPage({ params }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
   const { teamId } = await params;
-  const team = await getOwnedTeam(supabase, user, teamId);
+  const team = await getAccessibleTeam(supabase, user, teamId);
 
   if (!team) {
     return (

@@ -716,7 +716,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
           </SimpleGrid>
 
           {/* Historical Hydration Entries Table */}
-          {!readOnly && registros.length > 0 && (
+          {registros.length > 0 && (
             <BentoCard title="Historial detallado de hidratación y sudoración" icon={IconCalendarStats} color="blue">
               <ScrollArea h={300}>
                 <Table striped highlightOnHover verticalSpacing="xs">

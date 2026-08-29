@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getAccessibleTeam, forbidden } from '@/lib/team-access';
+import { getOwnedTeam, forbidden } from '@/lib/team-access';
 import { updateTeamConfig } from '@/repositories/teamRepository';
 
 export async function POST(request) {
   try {
     const user = await getUser();
-    if (!user) return forbidden('No autenticado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     const body = await request.json();
     const { action, sourceTeamId, targetTeamId, protocol, protocols, targetDayTypeKey } = body;
@@ -18,8 +18,8 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Parámetros de importación incompletos' }, { status: 400 });
       }
 
-      const sourceTeam = await getAccessibleTeam(supabase, user, sourceTeamId);
-      const targetTeam = await getAccessibleTeam(supabase, user, targetTeamId);
+      const sourceTeam = await getOwnedTeam(supabase, user, sourceTeamId);
+      const targetTeam = await getOwnedTeam(supabase, user, targetTeamId);
 
       if (!sourceTeam || !targetTeam) {
         return forbidden('No tienes acceso a los equipos seleccionados');
@@ -56,8 +56,8 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Parámetros incompletos para transferir el protocolo' }, { status: 400 });
       }
 
-      const sourceTeam = await getAccessibleTeam(supabase, user, sourceTeamId);
-      const targetTeam = await getAccessibleTeam(supabase, user, targetTeamId);
+      const sourceTeam = await getOwnedTeam(supabase, user, sourceTeamId);
+      const targetTeam = await getOwnedTeam(supabase, user, targetTeamId);
 
       if (!sourceTeam || !targetTeam) {
         return forbidden('No tienes acceso a los equipos seleccionados');

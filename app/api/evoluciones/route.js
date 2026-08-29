@@ -75,7 +75,7 @@ export async function POST(req) {
     if (!jugador_id || !fecha) return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
     const ownedPlayer = await getOwnedPlayer(supabase, user, jugador_id);
     if (!ownedPlayer) return forbidden('No tienes acceso a este jugador');
 
@@ -110,7 +110,7 @@ export async function DELETE(req) {
 
     const supabase = getSupabaseAdmin();
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     const evolucion = await getEvolutionById(supabase, id);
     if (!evolucion) return NextResponse.json({ error: 'Medición no encontrada' }, { status: 404 });

@@ -1,7 +1,7 @@
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import TeamAnalyticsDashboard from '@/components/TeamAnalyticsDashboard';
 import { getUser } from '@/lib/auth';
-import { getOwnedTeam } from '@/lib/team-access';
+import { getAccessibleTeam } from '@/lib/team-access';
 import { getPlayersByTeamSelectSimple } from '@/repositories/playerRepository';
 import { getAnalyticsByPlayerIds } from '@/repositories/analyticsRepository';
 import NothingFound from '@/components/NothingFound';
@@ -13,7 +13,7 @@ export default async function TeamAnalyticsPage({ params }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
   const { teamId } = await params;
-  const team = await getOwnedTeam(supabase, user, teamId);
+  const team = await getAccessibleTeam(supabase, user, teamId);
 
   if (!team) {
     return (

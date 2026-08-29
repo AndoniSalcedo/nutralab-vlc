@@ -22,7 +22,7 @@ export async function POST(request) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
 
-  if (!user || user.role === 'jugador') {
+  if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     return forbidden('No autorizado');
   }
 

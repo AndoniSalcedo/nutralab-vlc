@@ -5,14 +5,14 @@ import { getOwnedTeam, forbidden } from '@/lib/team-access';
 import { getOwnedPlayersByIds, insertPlayersBulk, updatePlayer } from '@/repositories/playerRepository';
 
 function getOwnerId(user) {
-  if (!user || user.role === 'jugador') return null;
+  if (!user || user.role === 'jugador' || user.role === 'tecnico') return null;
   return String(user.external_admin_id || user.id || user.email || user.username || '').trim() || null;
 }
 
 export async function POST(request) {
   try {
     const user = await getUser();
-    if (!user || user.role === 'jugador') {
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') {
       return forbidden('No autorizado');
     }
 

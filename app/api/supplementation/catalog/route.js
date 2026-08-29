@@ -22,7 +22,7 @@ import {
 } from '@/repositories/supplementationRepository';
 
 function canManage(user) {
-  return user && user.role !== 'jugador';
+  return user && user.role === 'admin';
 }
 
 const slugify = (value) => sharedSlugify(value).slice(0, 80);
@@ -30,7 +30,7 @@ const slugify = (value) => sharedSlugify(value).slice(0, 80);
 
 export async function GET() {
   const user = await getUser();
-  if (!canManage(user)) {
+  if (!user || user.role === 'jugador') {
     return NextResponse.json({ error: 'Sin permisos' }, { status: 403 });
   }
 

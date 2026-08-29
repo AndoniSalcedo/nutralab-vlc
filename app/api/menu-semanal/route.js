@@ -47,7 +47,7 @@ function extractMenuData(message) {
 export async function POST(req) {
   try {
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     const contentType = req.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
@@ -177,7 +177,7 @@ Si en un servicio (comida o cena) hay varias opciones o platos, inclúyelos sepa
 export async function PUT(req) {
   try {
     const user = await getUser();
-    if (!user || user.role === 'jugador') return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     const body = await req.json();
     const { id, dias } = body;

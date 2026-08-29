@@ -51,7 +51,7 @@ export async function GET(req) {
 export async function POST(req) {
   try {
     const user = await getUser();
-    if (!user) return forbidden('No autorizado');
+    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
 
     const formData = await req.formData();
     const id = formData.get('id');
