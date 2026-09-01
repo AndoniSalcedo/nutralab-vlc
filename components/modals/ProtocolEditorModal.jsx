@@ -4,7 +4,8 @@ import {
   IconPlus, 
   IconTrash, 
   IconArrowUp,
-  IconArrowDown
+  IconArrowDown,
+  IconFlag
 } from '@tabler/icons-react';
 import { PROTOCOL_AVAILABLE_ICONS as AVAILABLE_ICONS } from '@/components/ProtocolIcon';
 

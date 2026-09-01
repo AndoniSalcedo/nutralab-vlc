@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Badge, Box, Group, Paper, SimpleGrid, Stack, Text, Timeline, Select, Title, Button } from '@mantine/core';
-import { IconPencil, IconCalendar } from '@tabler/icons-react';
+import { IconPencil, IconCalendar, IconFlag, IconClipboardList } from '@tabler/icons-react';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import { EditableSection } from '../editable';

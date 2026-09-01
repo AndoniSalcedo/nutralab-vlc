@@ -28,6 +28,7 @@ import { notifications } from '@mantine/notifications';
 import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPlanPdf, deleteAiPlan } from '@/services/plan';
 import { getWeeklyMenus } from '@/services/menu';
 import { getPlayerSupplementation } from '@/services/supplement';
+import { resolvePlayerSupplementsData } from '@/lib/supplementation-helper';
 import { IconDownload, IconArrowsLeftRight, IconPlus, IconSparkles, IconEdit, IconCheck, IconTrash, IconChevronDown, IconBrain, IconPalette } from '@tabler/icons-react';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
@@ -80,8 +81,7 @@ function MetricCard({ label, value, color, bg, border }) {
 }
 
 function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
-  const plan = sanitizePlanData(data);
-  if (!plan) return null;
+  const plan = useMemo(() => sanitizePlanData(data), [data]);
 
   const rawColors = themeColors || data?.meta?.planColors || data?.planColors || jugador?.equipos?.configuracion_nutricional?.planColors || {};
   const colors = {
@@ -99,17 +99,19 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
   const leftDays = ['lunes', 'martes', 'miercoles', 'jueves'];
   const rightDays = ['viernes', 'sabado', 'domingo'];
 
-  const supplementsToShow = (plan.suplementacion && plan.suplementacion.length > 0)
+  const supplementsToShow = (plan?.suplementacion && plan.suplementacion.length > 0)
     ? plan.suplementacion
     : activeSupplements;
 
-  const teamProtocols = jugador?.equipos?.configuracion_nutricional?.protocols || [];
-  const customProtocols = jugador?.protocolos_custom || {};
+  const teamProtocols = useMemo(() => jugador?.equipos?.configuracion_nutricional?.protocols || [], [jugador?.equipos?.configuracion_nutricional?.protocols]);
+  const customProtocols = useMemo(() => jugador?.protocolos_custom || {}, [jugador?.protocolos_custom]);
   const activeDayTypes = useMemo(() => {
-    return new Set(Object.values(plan.dias || {}).map((d) => d.tipoDia).filter(Boolean));
-  }, [plan.dias]);
+    if (!plan?.dias) return new Set();
+    return new Set(Object.values(plan.dias).map((d) => d.tipoDia).filter(Boolean));
+  }, [plan?.dias]);
 
   const protocolsToShow = useMemo(() => {
+    if (!plan) return [];
     if (Array.isArray(plan.protocolos) && plan.protocolos.length > 0) {
       return plan.protocolos;
     }
@@ -123,7 +125,9 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
         }
         return true;
       });
-  }, [plan.protocolos, teamProtocols, customProtocols, activeDayTypes]);
+  }, [plan, teamProtocols, customProtocols, activeDayTypes]);
+
+  if (!plan) return null;;
 
   const renderDayBox = (dayKey) => {
     const dayData = plan.dias[dayKey];
@@ -144,7 +148,7 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
           </Group>
         </Group>
 
-        <Box py={3} px={7} mb="xs" style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: `1px solid ${colors.boxBorder}`, borderRadius: '5px' }}>
+        <Box py={3} px={7} mb="xs" style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}>
           <Group gap={6} justify="space-between" wrap="nowrap">
             <Text size="11px" fw={800} style={{ color: colors.cardBodyText }}>
               {formatInt(dayData.kcal)} <span style={{ fontWeight: 400, opacity: 0.65, fontSize: '10px' }}>kcal</span>
@@ -223,16 +227,15 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
                 </Group>
                 <Stack gap={5}>
                   {supplementsToShow.map((supp, index) => (
-                    <Paper key={index} p={7} style={{ backgroundColor: colors.itemBg, borderRadius: '5px', border: `1px solid ${colors.boxBorder}` }}>
+                    <Box key={index} p={7} style={{ backgroundColor: colors.itemBg, borderRadius: '6px' }}>
                       <Group justify="space-between" align="flex-start" wrap="nowrap">
                         <Text size="xs" fw={800} style={{ color: colors.cardBodyText }}>{supp.nombre}</Text>
                         {supp.dosis && (
                           <Text size="11px" fw={800} style={{ 
                             color: colors.accentText, 
-                            border: `1px solid ${colors.boxBorder}`, 
                             borderRadius: '4px', 
                             padding: '1px 6px',
-                            backgroundColor: 'rgba(255,255,255,0.03)',
+                            backgroundColor: 'rgba(255,255,255,0.06)',
                             letterSpacing: '0.2px'
                           }}>
                             {supp.dosis}
@@ -249,7 +252,7 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
                           {supp.notas}
                         </Text>
                       )}
-                    </Paper>
+                    </Box>
                   ))}
                 </Stack>
               </Paper>
@@ -272,7 +275,7 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
                     {prot.timeline?.length > 0 && (
                       <Stack gap={5} mb={prot.checklist?.length > 0 ? 'xs' : 0}>
                         {prot.timeline.map((step, sIdx) => (
-                          <Paper key={step.id || sIdx} p={7} style={{ backgroundColor: colors.itemBg, borderRadius: '5px', border: `1px solid ${colors.boxBorder}` }}>
+                          <Box key={step.id || sIdx} p={7} style={{ backgroundColor: colors.itemBg, borderRadius: '6px' }}>
                             <Group justify="space-between" align="center" wrap="nowrap" mb={2}>
                               <Group gap={6} wrap="nowrap" align="center">
                                 <ProtocolIcon iconName={step.icon} size={14} color={colors.accentText} />
@@ -283,10 +286,9 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
                               {step.timeLabel && (
                                 <Text size="11px" fw={800} style={{ 
                                   color: colors.accentText, 
-                                  border: `1px solid ${colors.boxBorder}`, 
                                   borderRadius: '4px',
                                   padding: '1px 6px',
-                                  backgroundColor: 'rgba(255,255,255,0.03)',
+                                  backgroundColor: 'rgba(255,255,255,0.06)',
                                   whiteSpace: 'nowrap'
                                 }}>
                                   {step.timeLabel}
@@ -298,18 +300,18 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
                                 {step.description}
                               </Text>
                             )}
-                          </Paper>
+                          </Box>
                         ))}
                       </Stack>
                     )}
 
                     {prot.checklist?.length > 0 && (
-                      <Stack gap={4} mt="xs" pt="xs" style={{ borderTop: `1px dashed ${colors.boxBorder}` }}>
+                      <Stack gap={4} mt="xs" pt="xs" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                         <Text size="11px" fw={800} tt="uppercase" style={{ color: colors.accentText, letterSpacing: '0.5px' }}>
                           Checklist
                         </Text>
                         {prot.checklist.map((item, cIdx) => (
-                          <Box key={item.id || cIdx} p={6} style={{ backgroundColor: colors.itemBg, borderRadius: '5px', border: `1px solid ${colors.boxBorder}` }}>
+                          <Box key={item.id || cIdx} p={6} style={{ backgroundColor: colors.itemBg, borderRadius: '6px' }}>
                             <Group gap={6} align="flex-start" wrap="nowrap">
                               <Text size="11px" style={{ color: colors.accentText, lineHeight: 1.2 }}>✓</Text>
                               <Box style={{ flex: 1 }}>
@@ -467,21 +469,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [mode, setMode] = useState('view');
   const [intercambiosOpened, setIntercambiosOpened] = useState(false);
   const [activeSupplements, setActiveSupplements] = useState([]);
-
-  const planColors = jugador?.equipos?.configuracion_nutricional?.planColors || {
-    dayBoxBg: '#151932',
-    dayBoxBorder: '#2d335a',
-    mealBoxBg: '#1d1f46',
-    suppBoxBg: '#131e3a',
-    suppBoxBorder: '#23345e',
-    suppItemBg: '#1d264a',
-    notesBoxBg: '#071e36',
-    notesBoxBorder: '#1e3a8a',
-    cardTopBg: '#254d5c',
-    cardTopText: '#cad6df',
-    cardBodyBg: '#101229',
-    cardBodyText: '#ffffff'
-  };
 
   const [nombre, setNombre] = useState('');
   const [contextoAdicional, setContextoAdicional] = useState('');

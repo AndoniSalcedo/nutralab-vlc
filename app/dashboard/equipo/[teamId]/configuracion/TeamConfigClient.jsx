@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 import { slugify } from '@/lib/utils';
-import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea, Anchor, Box, ColorInput, SimpleGrid, Avatar, FileButton, UnstyledButton, Divider, Modal } from '@mantine/core';
+import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea, Anchor, Box, ColorInput, SimpleGrid, Avatar, FileButton, UnstyledButton, Modal } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft, IconBook, IconClipboardList, IconPalette, IconCamera, IconFolderShare, IconDownload } from '@tabler/icons-react';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
@@ -23,9 +23,8 @@ import ProtocolIcon from '@/components/ProtocolIcon';
 
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
 
-export default function TeamConfigClient({ team, user, availableTeams = [], readOnly = false }) {
+export default function TeamConfigClient({ team, user: _user, availableTeams: _availableTeams = [], readOnly = false }) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const [teamPhotoVersion, setTeamPhotoVersion] = useState(() => team.updated_at || Date.now());
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [tempImageSrc, setTempImageSrc] = useState('');
@@ -145,6 +144,83 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
     };
   });
 
+  const [savingSection, setSavingSection] = useState(null);
+
+  const initialInfo = useMemo(() => ({
+    nombre: team.nombre || '',
+    temporada: team.temporada || ''
+  }), [team.nombre, team.temporada]);
+
+  const initialPdf = useMemo(() => ({
+    pdfMicrocycle: team.configuracion_nutricional?.pdfMicrocycle || '',
+    pdfRules: team.configuracion_nutricional?.pdfRules || '',
+    pdfBuffet: team.configuracion_nutricional?.pdfBuffet || ''
+  }), [team.configuracion_nutricional]);
+
+  const initialDayTypes = useMemo(() => {
+    let list = [];
+    if (team.configuracion_nutricional?.dayTypes) {
+      list = team.configuracion_nutricional.dayTypes;
+    } else {
+      list = JSON.parse(JSON.stringify(NUTRITION_DAY_TYPES));
+    }
+    return list.map((d) => ({
+      ...d,
+      tienePostentreno: d.tienePostentreno !== undefined
+        ? d.tienePostentreno
+        : (d.tienePreentreno !== undefined ? d.tienePreentreno : ['doble', 'entreno', 'partido'].includes(d.key)),
+      tienePreentreno: d.tienePreentreno !== undefined ? d.tienePreentreno : ['doble', 'entreno', 'partido'].includes(d.key)
+    }));
+  }, [team.configuracion_nutricional]);
+
+  const initialObjectiveMacros = useMemo(() => {
+    if (team.configuracion_nutricional?.objectiveMacros) return team.configuracion_nutricional.objectiveMacros;
+    return JSON.parse(JSON.stringify(OBJECTIVE_DAY_TYPE_MACROS));
+  }, [team.configuracion_nutricional]);
+
+  const initialProtocols = useMemo(() => {
+    return team.configuracion_nutricional?.protocols || [];
+  }, [team.configuracion_nutricional]);
+
+  const initialColors = useMemo(() => {
+    const raw = team.configuracion_nutricional?.planColors || {};
+    return {
+      cardTopBg: raw.cardTopBg || '#254d5c',
+      cardTopText: raw.cardTopText || '#cad6df',
+      cardBodyBg: raw.cardBodyBg || '#101229',
+      cardBodyText: raw.cardBodyText || '#ffffff',
+      boxBg: raw.boxBg || raw.dayBoxBg || raw.suppBoxBg || '#151932',
+      boxBorder: raw.boxBorder || raw.dayBoxBorder || raw.suppBoxBorder || '#1f2444',
+      itemBg: raw.itemBg || raw.mealBoxBg || raw.suppItemBg || '#1d1f46',
+      accentText: raw.accentText || raw.mealTitleText || raw.suppTitleText || '#ffa94d',
+      itemText: raw.itemText || raw.mealDescText || raw.notesDescText || '#dee2e6'
+    };
+  }, [team]);
+
+  const hasInfoChanges = useMemo(() => {
+    return teamName !== initialInfo.nombre || teamSeason !== initialInfo.temporada;
+  }, [teamName, teamSeason, initialInfo]);
+
+  const hasPdfChanges = useMemo(() => {
+    return pdfMicrocycle !== initialPdf.pdfMicrocycle || pdfRules !== initialPdf.pdfRules || pdfBuffet !== initialPdf.pdfBuffet;
+  }, [pdfMicrocycle, pdfRules, pdfBuffet, initialPdf]);
+
+  const hasColorChanges = useMemo(() => {
+    return JSON.stringify(planColors) !== JSON.stringify(initialColors);
+  }, [planColors, initialColors]);
+
+  const hasDayTypeChanges = useMemo(() => {
+    return JSON.stringify(dayTypes) !== JSON.stringify(initialDayTypes);
+  }, [dayTypes, initialDayTypes]);
+
+  const hasProtocolChanges = useMemo(() => {
+    return JSON.stringify(protocols) !== JSON.stringify(initialProtocols);
+  }, [protocols, initialProtocols]);
+
+  const hasMacroChanges = useMemo(() => {
+    return JSON.stringify(objectiveMacros) !== JSON.stringify(initialObjectiveMacros);
+  }, [objectiveMacros, initialObjectiveMacros]);
+
   const handleColorChange = (field, value) => {
     setPlanColors(prev => ({ ...prev, [field]: value }));
   };
@@ -203,27 +279,38 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
     });
   };
 
-  const saveConfig = async () => {
-    if (!teamName) {
-      notifications.show({ title: 'Error', message: 'El nombre del equipo no puede estar vacío', color: 'red' });
+  const saveSection = async (sectionKey) => {
+    if (sectionKey === 'info') {
+      if (!teamName) {
+        notifications.show({ title: 'Error', message: 'El nombre del equipo no puede estar vacío', color: 'red' });
+        return;
+      }
+      setSavingSection('info');
+      try {
+        const teamRes = await fetch('/api/teams', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'update',
+            team_id: team.id,
+            nombre: teamName,
+            temporada: teamSeason,
+            descripcion: team.descripcion,
+          })
+        });
+        if (!teamRes.ok) throw new Error('Error actualizando la información del equipo');
+        notifications.show({ title: 'Guardado exitoso', message: 'Información básica del equipo actualizada.', color: 'green' });
+        router.refresh();
+      } catch (e) {
+        notifications.show({ title: 'Error', message: e.message, color: 'red' });
+      } finally {
+        setSavingSection(null);
+      }
       return;
     }
 
-    setLoading(true);
+    setSavingSection(sectionKey);
     try {
-      const teamRes = await fetch('/api/teams', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'update',
-          team_id: team.id,
-          nombre: teamName,
-          temporada: teamSeason,
-          descripcion: team.descripcion,
-        })
-      });
-      if (!teamRes.ok) throw new Error('Error actualizando los datos básicos del equipo');
-
       const res = await fetch(`/api/teams/${team.id}/config`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -240,20 +327,33 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
         })
       });
 
-      if (!res.ok) throw new Error('Error guardando configuración nutricional');
-      notifications.show({ title: 'Guardado exitoso', message: 'Los ajustes del equipo se han actualizado.', color: 'green' });
+      if (!res.ok) throw new Error('Error guardando la configuración');
+
+      const labels = {
+        pdf: 'Textos de PDF guardados',
+        colors: 'Colores del plan guardados',
+        dayTypes: 'Tipos de día guardados',
+        protocols: 'Protocolos guardados',
+        macros: 'Multiplicadores de macros guardados'
+      };
+
+      notifications.show({
+        title: 'Guardado exitoso',
+        message: labels[sectionKey] || 'Sección guardada correctamente.',
+        color: 'green'
+      });
       router.refresh();
     } catch (e) {
       notifications.show({ title: 'Error', message: e.message, color: 'red' });
     } finally {
-      setLoading(false);
+      setSavingSection(null);
     }
   };
 
   return (
     <BoneyardSkeleton name="team-config" loading={false}>
       <Stack gap="lg">
-        {/* Cabecera integrada con el botón de guardar */}
+        {/* Cabecera integrada */}
         <Paper
           p={{ base: 'sm', sm: 'md' }}
           shadow="xs"
@@ -279,27 +379,43 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
                   Configuración Nutricional
                 </Title>
                 <Text size="xs" c="dimmed" mt={2}>
-                  {teamName || team.nombre || 'Equipo'} · Personaliza tipos de día y multiplicadores de macros
+                  {teamName || team.nombre || 'Equipo'} · Ajusta y guarda cada sección individualmente
                 </Text>
               </Box>
-            </Group>
-
-            <Group gap="xs" wrap="wrap" justify="flex-end">
-              {!readOnly && (
-                <Button loading={loading} onClick={saveConfig} leftSection={<IconDeviceFloppy size={18} />} size="sm" radius="xl" color="blue">
-                  Guardar Cambios
-                </Button>
-              )}
             </Group>
           </Group>
         </Paper>
 
         <Paper p="md" radius="lg" shadow="sm" withBorder bg="white">
-          <Group gap="sm" mb="lg">
-            <ThemeIcon size="md" radius="xl" variant="light" color="blue">
-              <IconSettings size={18} />
-            </ThemeIcon>
-            <Title order={4} c="dark.4">Información del Equipo</Title>
+          <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm">
+            <Group gap="sm">
+              <ThemeIcon size="md" radius="xl" variant="light" color="blue">
+                <IconSettings size={18} />
+              </ThemeIcon>
+              <Box>
+                <Group gap="xs" align="center">
+                  <Title order={4} c="dark.4">Información del Equipo</Title>
+                  {hasInfoChanges && (
+                    <Group gap={4} align="center" wrap="nowrap">
+                      <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
+                      <Text size="xs" fw={700} c="orange.7">Cambios sin guardar</Text>
+                    </Group>
+                  )}
+                </Group>
+              </Box>
+            </Group>
+            {!readOnly && hasInfoChanges && (
+              <Button
+                size="xs"
+                radius="xl"
+                color="teal"
+                loading={savingSection === 'info'}
+                leftSection={<IconDeviceFloppy size={14} />}
+                onClick={() => saveSection('info')}
+              >
+                Guardar Información
+              </Button>
+            )}
           </Group>
           <Group align="center" wrap="wrap" gap="xl">
             <Stack align="center" gap="xs">
@@ -389,11 +505,35 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
 
 
         <Paper p="md" radius="lg" shadow="sm" withBorder>
-          <Group gap="sm" mb="lg">
-            <ThemeIcon size="md" radius="xl" variant="light" color="gray">
-              <IconBook size={18} />
-            </ThemeIcon>
-            <Title order={4} c="dark.4">Textos Base para PDF</Title>
+          <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm">
+            <Group gap="sm">
+              <ThemeIcon size="md" radius="xl" variant="light" color="gray">
+                <IconBook size={18} />
+              </ThemeIcon>
+              <Box>
+                <Group gap="xs" align="center">
+                  <Title order={4} c="dark.4">Textos Base para PDF</Title>
+                  {hasPdfChanges && (
+                    <Group gap={4} align="center" wrap="nowrap">
+                      <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
+                      <Text size="xs" fw={700} c="orange.7">Cambios sin guardar</Text>
+                    </Group>
+                  )}
+                </Group>
+              </Box>
+            </Group>
+            {!readOnly && hasPdfChanges && (
+              <Button
+                size="xs"
+                radius="xl"
+                color="teal"
+                loading={savingSection === 'pdf'}
+                leftSection={<IconDeviceFloppy size={14} />}
+                onClick={() => saveSection('pdf')}
+              >
+                Guardar Textos PDF
+              </Button>
+            )}
           </Group>
           <Stack gap="md">
             <Textarea
@@ -427,24 +567,48 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
         </Paper>
 
         <Paper p="md" radius="lg" shadow="sm" withBorder>
-          <Group justify="space-between" align="center" mb="lg">
+          <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm">
             <Group gap="sm">
               <ThemeIcon size="md" radius="xl" variant="light" color="pink">
                 <IconPalette size={18} />
               </ThemeIcon>
-              <Title order={4} c="dark.4">Colores del Plan Nutricional</Title>
+              <Box>
+                <Group gap="xs" align="center">
+                  <Title order={4} c="dark.4">Colores del Plan Nutricional</Title>
+                  {hasColorChanges && (
+                    <Group gap={4} align="center" wrap="nowrap">
+                      <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
+                      <Text size="xs" fw={700} c="orange.7">Cambios sin guardar</Text>
+                    </Group>
+                  )}
+                </Group>
+              </Box>
             </Group>
             {!readOnly && (
-              <Button
-                variant="light"
-                size="xs"
-                radius="xl"
-                color="pink"
-                leftSection={<IconPalette size={14} />}
-                onClick={() => setThemesModalOpen(true)}
-              >
-                Temas Predefinidos
-              </Button>
+              <Group gap="xs">
+                <Button
+                  variant="light"
+                  size="xs"
+                  radius="xl"
+                  color="pink"
+                  leftSection={<IconPalette size={14} />}
+                  onClick={() => setThemesModalOpen(true)}
+                >
+                  Temas Predefinidos
+                </Button>
+                {hasColorChanges && (
+                  <Button
+                    size="xs"
+                    radius="xl"
+                    color="teal"
+                    loading={savingSection === 'colors'}
+                    leftSection={<IconDeviceFloppy size={14} />}
+                    onClick={() => saveSection('colors')}
+                  >
+                    Guardar Colores
+                  </Button>
+                )}
+              </Group>
             )}
           </Group>
 
@@ -515,7 +679,7 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
                             <Text size="11px" fw={700} tt="uppercase" c="teal.4">Partido</Text>
                           </Group>
                         </Group>
-                        <Box py={2} px={6} mb={6} style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: `1px solid ${planColors.boxBorder}`, borderRadius: '4px' }}>
+                        <Box py={2} px={6} mb={6} style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '4px' }}>
                           <Group gap={4} justify="space-between" wrap="nowrap">
                             <Text size="10px" fw={800} style={{ color: planColors.cardBodyText }}>
                               3.150 <span style={{ fontWeight: 400, opacity: 0.65, fontSize: '9px' }}>kcal</span>
@@ -539,7 +703,7 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
                             <Text size="11px" fw={700} tt="uppercase" c="blue.4">Descanso</Text>
                           </Group>
                         </Group>
-                        <Box py={2} px={6} mb={6} style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: `1px solid ${planColors.boxBorder}`, borderRadius: '4px' }}>
+                        <Box py={2} px={6} mb={6} style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '4px' }}>
                           <Group gap={4} justify="space-between" wrap="nowrap">
                             <Text size="10px" fw={800} style={{ color: planColors.cardBodyText }}>
                               2.450 <span style={{ fontWeight: 400, opacity: 0.65, fontSize: '9px' }}>kcal</span>
@@ -557,30 +721,30 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
 
                       <Paper p="sm" radius="md" style={{ backgroundColor: planColors.boxBg, border: `1px solid ${planColors.boxBorder}`, transition: 'all 0.3s ease' }}>
                         <Title order={6} tt="uppercase" mb="xs" style={{ color: planColors.accentText, fontSize: '11px' }}>Suplementación Pautada</Title>
-                        <Paper p="xs" style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', border: `1px solid ${planColors.boxBorder}`, transition: 'background-color 0.3s ease' }}>
+                        <Box p="xs" style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', transition: 'background-color 0.3s ease' }}>
                           <Group justify="space-between" wrap="nowrap" align="flex-start">
                             <Text size="xs" fw={800} style={{ color: planColors.cardBodyText }}>Cafeína</Text>
-                            <Text size="11px" fw={800} style={{ color: planColors.accentText, border: `1px solid ${planColors.boxBorder}`, borderRadius: '4px', padding: '1px 5px' }}>200mg</Text>
+                            <Text size="11px" fw={800} style={{ color: planColors.accentText, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '4px', padding: '1px 5px' }}>200mg</Text>
                           </Group>
                           <Text size="xs" mt={2} style={{ color: planColors.itemText }}>Momento: 45m antes</Text>
-                        </Paper>
+                        </Box>
                       </Paper>
                     </Stack>
 
                     <Stack gap="sm">
                       <Paper p="sm" radius="md" style={{ backgroundColor: planColors.boxBg, border: `1px solid ${planColors.boxBorder}`, transition: 'all 0.3s ease' }}>
                         <Title order={6} tt="uppercase" mb="xs" style={{ color: planColors.accentText, fontSize: '11px' }}>Protocolo de Partido</Title>
-                        <Paper p="xs" style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', border: `1px solid ${planColors.boxBorder}`, transition: 'background-color 0.3s ease' }} mb={6}>
+                        <Box p="xs" style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', transition: 'background-color 0.3s ease' }} mb={6}>
                           <Group justify="space-between" wrap="nowrap" align="center">
                             <Group gap={6} align="center" wrap="nowrap">
                               <ProtocolIcon iconName="IconApple" size={13} color={planColors.accentText} />
                               <Text size="xs" fw={800} style={{ color: planColors.cardBodyText }}>Comida Pre-partido</Text>
                             </Group>
-                            <Text size="11px" fw={800} style={{ color: planColors.accentText, border: `1px solid ${planColors.boxBorder}`, borderRadius: '4px', padding: '1px 5px' }}>-3h</Text>
+                            <Text size="11px" fw={800} style={{ color: planColors.accentText, backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '4px', padding: '1px 5px' }}>-3h</Text>
                           </Group>
                           <Text size="xs" mt={2} style={{ color: planColors.itemText }}>Pasta blanca + pollo magro</Text>
-                        </Paper>
-                        <Box p={6} style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', border: `1px solid ${planColors.boxBorder}` }}>
+                        </Box>
+                        <Box p={6} style={{ backgroundColor: planColors.itemBg, borderRadius: '4px' }}>
                           <Group gap={6} align="flex-start" wrap="nowrap">
                             <Text size="11px" style={{ color: planColors.accentText }}>✓</Text>
                             <Text size="xs" fw={700} style={{ color: planColors.cardBodyText }}>Hidratación electrolítica</Text>
@@ -610,7 +774,7 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
         >
           <Stack gap="md">
             <Text size="xs" c="dimmed">
-              Selecciona una paleta prediseñada para aplicar instantáneamente todos sus colores al equipo.
+              Haz clic en un tema para cargarlo en la vista previa y editarlo. Pulsa luego <strong>Guardar Colores</strong> para aplicar los cambios permanentemente en el equipo.
             </Text>
             <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
               {PLAN_THEME_PRESETS.map((preset) => {
@@ -626,9 +790,9 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
                         setPlanColors(preset.colors);
                         setThemesModalOpen(false);
                         notifications.show({
-                          color: 'green',
-                          title: 'Tema aplicado',
-                          message: `Se aplicó el tema ${preset.name}.`,
+                          color: 'blue',
+                          title: 'Tema cargado en vista previa',
+                          message: `Has seleccionado ${preset.name}. Haz clic en "Guardar Colores" para confirmar los cambios.`,
                         });
                       }
                     }}
@@ -671,26 +835,51 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
         </Modal>
 
         <Paper p="md" radius="lg" shadow="sm" withBorder>
-          <Group justify="space-between" mb="lg">
+          <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm">
             <Group gap="sm">
               <ThemeIcon size="md" radius="xl" variant="light" color="grape">
                 <IconCalendarStats size={18} />
               </ThemeIcon>
-              <Title order={4} c="dark.4">Tipos de Día</Title>
+              <Box>
+                <Group gap="xs" align="center">
+                  <Title order={4} c="dark.4">Tipos de Día</Title>
+                  {hasDayTypeChanges && (
+                    <Group gap={4} align="center" wrap="nowrap">
+                      <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
+                      <Text size="xs" fw={700} c="orange.7">Cambios sin guardar</Text>
+                    </Group>
+                  )}
+                </Group>
+              </Box>
             </Group>
             {!readOnly && (
-              <Button
-                leftSection={<IconPlus size={14} />}
-                size="sm"
-                radius="xl"
-                color="blue"
-                onClick={() => {
-                  setEditingDayType({ label: '', key: '', color: 'blue', tienePreentreno: true, tienePostentreno: true });
-                  setModalOpen(true);
-                }}
-              >
-                Nuevo Tipo de Día
-              </Button>
+              <Group gap="xs">
+                <Button
+                  leftSection={<IconPlus size={14} />}
+                  size="xs"
+                  radius="xl"
+                  color="blue"
+                  variant="light"
+                  onClick={() => {
+                    setEditingDayType({ label: '', key: '', color: 'blue', tienePreentreno: true, tienePostentreno: true });
+                    setModalOpen(true);
+                  }}
+                >
+                  Nuevo Tipo de Día
+                </Button>
+                {hasDayTypeChanges && (
+                  <Button
+                    size="xs"
+                    radius="xl"
+                    color="teal"
+                    loading={savingSection === 'dayTypes'}
+                    leftSection={<IconDeviceFloppy size={14} />}
+                    onClick={() => saveSection('dayTypes')}
+                  >
+                    Guardar Tipos de Día
+                  </Button>
+                )}
+              </Group>
             )}
           </Group>
 
@@ -740,24 +929,48 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
         </Paper>
 
         <Paper p="md" radius="lg" shadow="sm" withBorder>
-          <Group justify="space-between" mb="lg">
+          <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm">
             <Group gap="sm">
               <ThemeIcon size="md" radius="xl" variant="light" color="cyan">
                 <IconClipboardList size={18} />
               </ThemeIcon>
-              <Title order={4} c="dark.4">Protocolos por Tipo de Día</Title>
+              <Box>
+                <Group gap="xs" align="center">
+                  <Title order={4} c="dark.4">Protocolos por Tipo de Día</Title>
+                  {hasProtocolChanges && (
+                    <Group gap={4} align="center" wrap="nowrap">
+                      <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
+                      <Text size="xs" fw={700} c="orange.7">Cambios sin guardar</Text>
+                    </Group>
+                  )}
+                </Group>
+              </Box>
             </Group>
             {!readOnly && (
-              <Button
-                variant="light"
-                color="blue"
-                size="xs"
-                radius="xl"
-                leftSection={<IconDownload size={14} />}
-                onClick={() => setImportModalOpen(true)}
-              >
-                Importar de otro equipo
-              </Button>
+              <Group gap="xs">
+                <Button
+                  variant="light"
+                  color="blue"
+                  size="xs"
+                  radius="xl"
+                  leftSection={<IconDownload size={14} />}
+                  onClick={() => setImportModalOpen(true)}
+                >
+                  Importar de otro equipo
+                </Button>
+                {hasProtocolChanges && (
+                  <Button
+                    size="xs"
+                    radius="xl"
+                    color="teal"
+                    loading={savingSection === 'protocols'}
+                    leftSection={<IconDeviceFloppy size={14} />}
+                    onClick={() => saveSection('protocols')}
+                  >
+                    Guardar Protocolos
+                  </Button>
+                )}
+              </Group>
             )}
           </Group>
 
@@ -858,7 +1071,31 @@ export default function TeamConfigClient({ team, user, availableTeams = [], read
         </Paper>
 
         <Paper p="md" radius="lg" shadow="sm" withBorder>
-          <Title order={4} mb="md" c="dark.4">Multiplicadores por Objetivo</Title>
+          <Group justify="space-between" align="center" mb="md" wrap="wrap" gap="sm">
+            <Box>
+              <Group gap="xs" align="center">
+                <Title order={4} c="dark.4">Multiplicadores por Objetivo</Title>
+                {hasMacroChanges && (
+                  <Group gap={4} align="center" wrap="nowrap">
+                    <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
+                    <Text size="xs" fw={700} c="orange.7">Cambios sin guardar</Text>
+                  </Group>
+                )}
+              </Group>
+            </Box>
+            {!readOnly && hasMacroChanges && (
+              <Button
+                size="xs"
+                radius="xl"
+                color="teal"
+                loading={savingSection === 'macros'}
+                leftSection={<IconDeviceFloppy size={14} />}
+                onClick={() => saveSection('macros')}
+              >
+                Guardar Multiplicadores
+              </Button>
+            )}
+          </Group>
           <Accordion variant="separated" radius="md">
             {PLAYER_OBJECTIVES.map(obj => (
               <Accordion.Item key={obj.value} value={obj.value} style={{ backgroundColor: 'white' }}>

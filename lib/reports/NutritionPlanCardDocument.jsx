@@ -99,8 +99,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottomWidth: 0.5,
-    paddingBottom: 3,
     marginBottom: 4,
   },
   dayName: {
@@ -153,8 +151,6 @@ const styles = StyleSheet.create({
     fontWeight: 700,
     textTransform: 'uppercase',
     marginBottom: 4,
-    borderBottomWidth: 0.5,
-    paddingBottom: 2,
   },
   noteItem: {
     fontSize: 6.2,
@@ -172,14 +168,11 @@ const styles = StyleSheet.create({
     fontWeight: 700,
     textTransform: 'uppercase',
     marginBottom: 4,
-    borderBottomWidth: 0.5,
-    paddingBottom: 2,
   },
   supplementRow: {
     marginBottom: 3,
     padding: 2.5,
     borderRadius: 3,
-    borderBottomWidth: 0.2,
   },
   supplementHeader: {
     flexDirection: 'row',
@@ -196,7 +189,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3.5,
     paddingVertical: 0.8,
     borderRadius: 2.5,
-    borderWidth: 0.5,
   },
   supplementMeta: {
     fontSize: 5.5,
@@ -214,8 +206,6 @@ const styles = StyleSheet.create({
     fontWeight: 700,
     textTransform: 'uppercase',
     marginBottom: 4,
-    borderBottomWidth: 0.5,
-    paddingBottom: 2,
   },
   protocolRow: {
     marginBottom: 3,
@@ -238,7 +228,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3.5,
     paddingVertical: 0.8,
     borderRadius: 2.5,
-    borderWidth: 0.5,
   },
   protocolStepDesc: {
     fontSize: 5.8,
@@ -277,6 +266,7 @@ function formatNumber(value, unit = '') {
 }
 
 export function PlanCardPage({ plan, teamConfig }) {
+  const clubName = teamConfig?.nombre || 'Club';
   const planColors = teamConfig?.planColors || {
     cardTopBg: '#254d5c',
     cardTopText: '#cad6df',
@@ -424,7 +414,7 @@ export function PlanCardPage({ plan, teamConfig }) {
 
           {notes.length > 0 && (
             <View style={[styles.notesBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
-              <Text style={[styles.notesTitle, { color: planColors.accentText, borderBottomColor: planColors.boxBorder }]}>Indicaciones de la semana</Text>
+              <Text style={[styles.notesTitle, { color: planColors.accentText }]}>Indicaciones de la semana</Text>
               {notes.map((note, index) => (
                 <Text key={index} style={[styles.noteItem, { color: planColors.itemText }]}>• {note}</Text>
               ))}
@@ -433,7 +423,7 @@ export function PlanCardPage({ plan, teamConfig }) {
         </View>
       </View>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { borderTopColor: planColors.boxBorder }]}>
         <Text>{clubName} · Nutrición Deportiva y Rendimiento</Text>
         <Text>Generado automáticamente por Nutralab</Text>
       </View>
