@@ -102,6 +102,28 @@ function PlanFicha({ data, activeSupplements = [], jugador }) {
     ? plan.suplementacion
     : activeSupplements;
 
+  const teamProtocols = jugador?.equipos?.configuracion_nutricional?.protocols || [];
+  const customProtocols = jugador?.protocolos_custom || {};
+  const activeDayTypes = useMemo(() => {
+    return new Set(Object.values(plan.dias || {}).map((d) => d.tipoDia).filter(Boolean));
+  }, [plan.dias]);
+
+  const protocolsToShow = useMemo(() => {
+    if (Array.isArray(plan.protocolos) && plan.protocolos.length > 0) {
+      return plan.protocolos;
+    }
+    return teamProtocols
+      .map((p) => customProtocols[p.id] || p)
+      .filter((p) => {
+        const isIncluded = p.incluirEnPlan !== false && (p.incluirEnPlan === true || p.dayTypeKey === 'partido' || p.dayTypeKey === 'match_day' || (typeof p.dayTypeKey === 'string' && p.dayTypeKey.includes('partido')));
+        if (!isIncluded) return false;
+        if (p.dayTypeKey && activeDayTypes.size > 0) {
+          return activeDayTypes.has(p.dayTypeKey);
+        }
+        return true;
+      });
+  }, [plan.protocolos, teamProtocols, customProtocols, activeDayTypes]);
+
   const renderDayBox = (dayKey) => {
     const dayData = plan.dias[dayKey];
     if (!dayData) return null;
@@ -148,9 +170,6 @@ function PlanFicha({ data, activeSupplements = [], jugador }) {
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
           <Stack gap={0}>
             {leftDays.map(renderDayBox)}
-          </Stack>
-          <Stack gap={0}>
-            {rightDays.map(renderDayBox)}
 
             {supplementsToShow?.length > 0 && (
               <Paper p="md" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }} mb="sm">
@@ -182,6 +201,67 @@ function PlanFicha({ data, activeSupplements = [], jugador }) {
                   ))}
                 </Stack>
               </Paper>
+            )}
+          </Stack>
+          <Stack gap={0}>
+            {rightDays.map(renderDayBox)}
+
+            {protocolsToShow?.length > 0 && (
+              <Stack gap="sm" mb="sm">
+                {protocolsToShow.map((prot, pIdx) => (
+                  <Paper key={prot.id || pIdx} p="md" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }}>
+                    <Group justify="space-between" align="center" mb="xs">
+                      <Title order={5} tt="uppercase" style={{ color: colors.accentText }}>
+                        {prot.name || 'Protocolo de Partido'}
+                      </Title>
+                    </Group>
+                    
+                    {prot.timeline?.length > 0 && (
+                      <Stack gap="xs" mb={prot.checklist?.length > 0 ? 'xs' : 0}>
+                        {prot.timeline.map((step, sIdx) => (
+                          <Paper key={step.id || sIdx} p="xs" style={{ backgroundColor: colors.itemBg, borderRadius: '4px' }}>
+                            <Group justify="space-between" align="flex-start" wrap="nowrap" mb={2}>
+                              <Text size="xs" fw={800} style={{ color: colors.cardBodyText }}>
+                                {step.title}
+                              </Text>
+                              {step.timeLabel && (
+                                <Text size="xs" fw={800} style={{ color: colors.accentText, whiteSpace: 'nowrap' }}>
+                                  {step.timeLabel}
+                                </Text>
+                              )}
+                            </Group>
+                            {step.description && (
+                              <Text size="xs" style={{ color: colors.itemText, lineHeight: 1.35 }}>
+                                {step.description}
+                              </Text>
+                            )}
+                          </Paper>
+                        ))}
+                      </Stack>
+                    )}
+
+                    {prot.checklist?.length > 0 && (
+                      <Stack gap={4} mt="xs" pt="xs" style={{ borderTop: `1px dashed ${colors.boxBorder}` }}>
+                        <Text size="xs" fw={800} tt="uppercase" style={{ color: colors.accentText, letterSpacing: '0.5px' }}>
+                          Checklist
+                        </Text>
+                        {prot.checklist.map((item, cIdx) => (
+                          <Box key={item.id || cIdx} p="xs" style={{ backgroundColor: colors.itemBg, borderRadius: '4px' }}>
+                            <Text size="xs" fw={700} style={{ color: colors.cardBodyText }}>
+                              • {item.title}
+                            </Text>
+                            {item.description && (
+                              <Text size="xs" mt={2} style={{ color: colors.itemText, opacity: 0.85, paddingLeft: 8 }}>
+                                {item.description}
+                              </Text>
+                            )}
+                          </Box>
+                        ))}
+                      </Stack>
+                    )}
+                  </Paper>
+                ))}
+              </Stack>
             )}
 
             {plan.notas?.length > 0 && (

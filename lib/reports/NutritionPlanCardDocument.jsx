@@ -4,26 +4,18 @@ import { sanitizePlanData } from '@/lib/nutrition-plan-card';
 import { getTeamDayTypeColor, getTeamDayTypeLabel } from '@/lib/calculations';
 import { formatNumberDecimal } from '@/lib/utils';
 
-const COLORS = {
-  top: '#10142f',
-  bg: '#0a0d1e',
-  panel: '#151932',
-  panelAlt: '#1f2448',
-  text: '#ffffff',
-  muted: '#a5adcb',
+const DAY_TYPE_COLORS = {
   teal: '#1fb5a9',
   orange: '#ff7e40',
   purple: '#b86ff6',
   green: '#54d38a',
   blue: '#3b82f6',
   red: '#ef4444',
-  line: '#2d335a',
+  muted: '#a5adcb',
 };
 
 const styles = StyleSheet.create({
   page: {
-    backgroundColor: COLORS.bg,
-    color: COLORS.text,
     fontFamily: 'Helvetica',
     fontSize: 6.8,
     paddingHorizontal: 22,
@@ -33,7 +25,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderBottomWidth: 1.5,
-    borderBottomColor: COLORS.teal,
+    borderBottomColor: '#1fb5a9',
     paddingBottom: 6,
     marginBottom: 8,
   },
@@ -44,10 +36,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 700,
     textTransform: 'uppercase',
-    color: COLORS.text,
   },
   subtitle: {
-    color: COLORS.orange,
     fontSize: 8.5,
     fontWeight: 700,
     textTransform: 'uppercase',
@@ -60,11 +50,11 @@ const styles = StyleSheet.create({
   teamText: {
     fontSize: 8,
     fontWeight: 700,
-    color: COLORS.muted,
+    color: '#a5adcb',
   },
   metaText: {
     fontSize: 6.5,
-    color: COLORS.muted,
+    color: '#a5adcb',
     marginTop: 2,
   },
   metricsBand: {
@@ -74,15 +64,13 @@ const styles = StyleSheet.create({
   },
   metricBox: {
     flex: 1,
-    backgroundColor: COLORS.panel,
     borderWidth: 0.5,
-    borderColor: COLORS.line,
     borderRadius: 4,
     paddingVertical: 4,
     alignItems: 'center',
   },
   metricLabel: {
-    color: COLORS.muted,
+    color: '#a5adcb',
     fontSize: 5.5,
     textTransform: 'uppercase',
     marginBottom: 1,
@@ -102,10 +90,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   dayBox: {
-    backgroundColor: COLORS.panel,
     borderRadius: 6,
     borderWidth: 0.5,
-    borderColor: COLORS.line,
     padding: 6,
     flex: 1,
   },
@@ -114,7 +100,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 0.5,
-    borderBottomColor: COLORS.line,
     paddingBottom: 3,
     marginBottom: 4,
   },
@@ -133,7 +118,7 @@ const styles = StyleSheet.create({
   },
   macrosLine: {
     fontSize: 6.2,
-    color: COLORS.muted,
+    color: '#a5adcb',
     marginBottom: 4,
     fontWeight: 700,
   },
@@ -144,23 +129,22 @@ const styles = StyleSheet.create({
   mealRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
+    borderRadius: 3,
+    padding: 2.5,
+    marginBottom: 1.5,
   },
   mealName: {
     fontWeight: 700,
-    width: 60,
-    color: COLORS.orange,
+    width: 58,
     fontSize: 6.2,
     textTransform: 'uppercase',
   },
   mealDetail: {
     flex: 1,
-    color: '#e2e8f0',
     fontSize: 6.2,
     lineHeight: 1.15,
   },
   notesBox: {
-    backgroundColor: '#0a1628',
-    borderColor: '#1e3a8a',
     borderWidth: 0.5,
     borderRadius: 6,
     padding: 6,
@@ -169,22 +153,17 @@ const styles = StyleSheet.create({
   notesTitle: {
     fontSize: 8,
     fontWeight: 700,
-    color: COLORS.teal,
     textTransform: 'uppercase',
     marginBottom: 4,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#1e3a8a',
     paddingBottom: 2,
   },
   noteItem: {
     fontSize: 6.2,
-    color: '#dbeafe',
     lineHeight: 1.2,
     marginBottom: 3,
   },
   supplementsBox: {
-    backgroundColor: '#111827',
-    borderColor: '#374151',
     borderWidth: 0.5,
     borderRadius: 6,
     padding: 6,
@@ -193,18 +172,16 @@ const styles = StyleSheet.create({
   supplementsTitle: {
     fontSize: 8,
     fontWeight: 700,
-    color: COLORS.orange,
     textTransform: 'uppercase',
     marginBottom: 4,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#374151',
     paddingBottom: 2,
   },
   supplementRow: {
     marginBottom: 3,
-    paddingBottom: 2,
+    padding: 2.5,
+    borderRadius: 3,
     borderBottomWidth: 0.2,
-    borderBottomColor: '#1f2937',
   },
   supplementHeader: {
     flexDirection: 'row',
@@ -214,26 +191,70 @@ const styles = StyleSheet.create({
   supplementName: {
     fontSize: 6.5,
     fontWeight: 700,
-    color: COLORS.text,
   },
   supplementDose: {
     fontSize: 6.2,
     fontWeight: 700,
-    color: COLORS.teal,
+    color: '#1fb5a9',
   },
   supplementMeta: {
     fontSize: 5.5,
-    color: COLORS.muted,
     marginTop: 1,
+  },
+  protocolsBox: {
+    borderWidth: 0.5,
+    borderRadius: 6,
+    padding: 6,
+    flex: 1,
+    marginBottom: 4,
+  },
+  protocolTitle: {
+    fontSize: 8,
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    marginBottom: 4,
+    borderBottomWidth: 0.5,
+    paddingBottom: 2,
+  },
+  protocolRow: {
+    marginBottom: 3,
+    padding: 2.5,
+    borderRadius: 3,
+    borderBottomWidth: 0.2,
+  },
+  protocolStepHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  protocolStepTitle: {
+    fontSize: 6.5,
+    fontWeight: 700,
+  },
+  protocolTimeBadge: {
+    fontSize: 6.2,
+    fontWeight: 700,
+  },
+  protocolStepDesc: {
+    fontSize: 5.8,
+    marginTop: 1,
+    lineHeight: 1.15,
+  },
+  protocolChecklistTitle: {
+    fontSize: 6,
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    marginTop: 3,
+    marginBottom: 2,
   },
   footer: {
     marginTop: 8,
     borderTopWidth: 0.5,
-    borderTopColor: COLORS.line,
+    borderTopColor: '#2d335a',
     paddingTop: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    color: COLORS.muted,
+    color: '#a5adcb',
     fontSize: 6,
   },
 });
@@ -251,37 +272,50 @@ function formatNumber(value, unit = '') {
 }
 
 export function PlanCardPage({ plan, teamConfig }) {
+  const planColors = teamConfig?.planColors || {
+    cardTopBg: '#254d5c',
+    cardTopText: '#cad6df',
+    cardBodyBg: '#101229',
+    cardBodyText: '#ffffff',
+    boxBg: '#151932',
+    boxBorder: '#2d335a',
+    itemBg: '#1d1f46',
+    accentText: '#ffa94d',
+    itemText: '#dee2e6',
+  };
+
   const notes = plan?.notas?.length ? plan.notas : [];
   const supplements = Array.isArray(plan?.suplementacion) ? plan.suplementacion : [];
+  const protocols = Array.isArray(plan?.protocolos) ? plan.protocolos : [];
 
   const leftDays = ['lunes', 'martes', 'miercoles', 'jueves'];
   const rightDays = ['viernes', 'sabado', 'domingo'];
 
   return (
-    <Page size="A4" style={styles.page} wrap={false}>
+    <Page size="A4" style={[styles.page, { backgroundColor: planColors.cardBodyBg, color: planColors.cardBodyText }]} wrap={false}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={styles.title}>{plan?.jugador?.nombre || 'Jugador'}</Text>
-          <Text style={styles.subtitle}>{plan?.jugador?.posicion || 'Sin posición'}</Text>
+          <Text style={[styles.title, { color: planColors.cardBodyText }]}>{plan?.jugador?.nombre || 'Jugador'}</Text>
+          <Text style={[styles.subtitle, { color: planColors.accentText }]}>{plan?.jugador?.posicion || 'Sin posición'}</Text>
         </View>
         <View style={styles.headerRight}>
-          <Text style={styles.teamText}>VALENCIA CF · NUTRICIÓN DEPORTIVA</Text>
+          <Text style={styles.teamText}>{teamConfig?.nombre?.toUpperCase() || 'VALENCIA CF'} · NUTRICIÓN DEPORTIVA</Text>
           <Text style={styles.metaText}>{plan?.meta?.nombre || 'Plan de Nutrición'}</Text>
         </View>
       </View>
 
       <View style={styles.metricsBand}>
-        <View style={styles.metricBox}>
+        <View style={[styles.metricBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
           <Text style={styles.metricLabel}>Peso</Text>
-          <Text style={[styles.metricValue, { color: COLORS.orange }]}>{formatWeight(plan?.metricas?.peso)}</Text>
+          <Text style={[styles.metricValue, { color: planColors.accentText }]}>{formatWeight(plan?.metricas?.peso)}</Text>
         </View>
-        <View style={styles.metricBox}>
+        <View style={[styles.metricBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
           <Text style={styles.metricLabel}>Grasa</Text>
-          <Text style={styles.metricValue}>{formatGrasa(plan?.metricas?.grasa)}</Text>
+          <Text style={[styles.metricValue, { color: planColors.cardBodyText }]}>{formatGrasa(plan?.metricas?.grasa)}</Text>
         </View>
-        <View style={styles.metricBox}>
+        <View style={[styles.metricBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
           <Text style={styles.metricLabel}>% P. Muscular Lee&cols</Text>
-          <Text style={[styles.metricValue, { color: COLORS.green }]}>{formatGrasa(plan?.metricas?.pesoMuscular)}</Text>
+          <Text style={[styles.metricValue, { color: DAY_TYPE_COLORS.green }]}>{formatGrasa(plan?.metricas?.pesoMuscular)}</Text>
         </View>
       </View>
 
@@ -289,12 +323,12 @@ export function PlanCardPage({ plan, teamConfig }) {
         <View style={styles.column}>
           {leftDays.map((dayKey) => {
             const dayData = plan.dias[dayKey];
-            const color = COLORS[getTeamDayTypeColor(dayData.tipoDia, teamConfig)] || COLORS.green;
+            const color = DAY_TYPE_COLORS[getTeamDayTypeColor(dayData.tipoDia, teamConfig)] || DAY_TYPE_COLORS.green;
             const label = getTeamDayTypeLabel(dayData.tipoDia, teamConfig);
             return (
-              <View key={dayKey} style={styles.dayBox}>
-                <View style={styles.dayHeader}>
-                  <Text style={styles.dayName}>{dayData.label}</Text>
+              <View key={dayKey} style={[styles.dayBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
+                <View style={[styles.dayHeader, { borderBottomColor: planColors.boxBorder }]}>
+                  <Text style={[styles.dayName, { color: planColors.cardBodyText }]}>{dayData.label}</Text>
                   <Text style={[styles.dayBadge, { backgroundColor: `${color}22`, color }]}>{label}</Text>
                 </View>
                 <Text style={styles.macrosLine}>
@@ -302,36 +336,9 @@ export function PlanCardPage({ plan, teamConfig }) {
                 </Text>
                 <View style={styles.mealsList}>
                   {dayData.ingestas.map((meal, index) => (
-                    <View key={index} style={styles.mealRow}>
-                      <Text style={styles.mealName}>{meal.nombre}</Text>
-                      <Text style={styles.mealDetail}>{meal.detalle}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            );
-          })}
-        </View>
-
-        <View style={styles.column}>
-          {rightDays.map((dayKey) => {
-            const dayData = plan.dias[dayKey];
-            const color = COLORS[getTeamDayTypeColor(dayData.tipoDia, teamConfig)] || COLORS.green;
-            const label = getTeamDayTypeLabel(dayData.tipoDia, teamConfig);
-            return (
-              <View key={dayKey} style={styles.dayBox}>
-                <View style={styles.dayHeader}>
-                  <Text style={styles.dayName}>{dayData.label}</Text>
-                  <Text style={[styles.dayBadge, { backgroundColor: `${color}22`, color }]}>{label}</Text>
-                </View>
-                <Text style={styles.macrosLine}>
-                  {formatNumber(dayData.kcal, ' kcal')} · P {formatNumber(dayData.proteina, 'g')} · HC {formatNumber(dayData.hidratos, 'g')} · G {formatNumber(dayData.grasa, 'g')}
-                </Text>
-                <View style={styles.mealsList}>
-                  {dayData.ingestas.map((meal, index) => (
-                    <View key={index} style={styles.mealRow}>
-                      <Text style={styles.mealName}>{meal.nombre}</Text>
-                      <Text style={styles.mealDetail}>{meal.detalle}</Text>
+                    <View key={index} style={[styles.mealRow, { backgroundColor: planColors.itemBg }]}>
+                      <Text style={[styles.mealName, { color: planColors.accentText }]}>{meal.nombre}</Text>
+                      <Text style={[styles.mealDetail, { color: planColors.itemText }]}>{meal.detalle}</Text>
                     </View>
                   ))}
                 </View>
@@ -340,27 +347,82 @@ export function PlanCardPage({ plan, teamConfig }) {
           })}
 
           {supplements.length > 0 && (
-            <View style={styles.supplementsBox}>
-              <Text style={styles.supplementsTitle}>Suplementación Pautada</Text>
+            <View style={[styles.supplementsBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
+              <Text style={[styles.supplementsTitle, { color: planColors.accentText, borderBottomColor: planColors.boxBorder }]}>Suplementación Pautada</Text>
               {supplements.map((supp, index) => (
-                <View key={index} style={styles.supplementRow}>
+                <View key={index} style={[styles.supplementRow, { backgroundColor: planColors.itemBg, borderBottomColor: planColors.boxBorder }]}>
                   <View style={styles.supplementHeader}>
-                    <Text style={styles.supplementName}>{supp.nombre}</Text>
+                    <Text style={[styles.supplementName, { color: planColors.cardBodyText }]}>{supp.nombre}</Text>
                     {supp.dosis ? <Text style={styles.supplementDose}>{supp.dosis}</Text> : null}
                   </View>
-                  {supp.timing ? <Text style={styles.supplementMeta}>Momento: {supp.timing}</Text> : null}
-                  {supp.notas ? <Text style={styles.supplementMeta}>{supp.notas}</Text> : null}
+                  {supp.timing ? <Text style={[styles.supplementMeta, { color: planColors.itemText }]}>Momento: {supp.timing}</Text> : null}
+                  {supp.notas ? <Text style={[styles.supplementMeta, { color: planColors.itemText }]}>{supp.notas}</Text> : null}
                 </View>
               ))}
             </View>
           )}
+        </View>
 
-          <View style={styles.notesBox}>
-            <Text style={styles.notesTitle}>Indicaciones de la semana</Text>
-            {notes.map((note, index) => (
-              <Text key={index} style={styles.noteItem}>• {note}</Text>
-            ))}
-          </View>
+        <View style={styles.column}>
+          {rightDays.map((dayKey) => {
+            const dayData = plan.dias[dayKey];
+            const color = DAY_TYPE_COLORS[getTeamDayTypeColor(dayData.tipoDia, teamConfig)] || DAY_TYPE_COLORS.green;
+            const label = getTeamDayTypeLabel(dayData.tipoDia, teamConfig);
+            return (
+              <View key={dayKey} style={[styles.dayBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
+                <View style={[styles.dayHeader, { borderBottomColor: planColors.boxBorder }]}>
+                  <Text style={[styles.dayName, { color: planColors.cardBodyText }]}>{dayData.label}</Text>
+                  <Text style={[styles.dayBadge, { backgroundColor: `${color}22`, color }]}>{label}</Text>
+                </View>
+                <Text style={styles.macrosLine}>
+                  {formatNumber(dayData.kcal, ' kcal')} · P {formatNumber(dayData.proteina, 'g')} · HC {formatNumber(dayData.hidratos, 'g')} · G {formatNumber(dayData.grasa, 'g')}
+                </Text>
+                <View style={styles.mealsList}>
+                  {dayData.ingestas.map((meal, index) => (
+                    <View key={index} style={[styles.mealRow, { backgroundColor: planColors.itemBg }]}>
+                      <Text style={[styles.mealName, { color: planColors.accentText }]}>{meal.nombre}</Text>
+                      <Text style={[styles.mealDetail, { color: planColors.itemText }]}>{meal.detalle}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            );
+          })}
+
+          {protocols.length > 0 && protocols.map((prot, pIdx) => (
+            <View key={prot.id || pIdx} style={[styles.protocolsBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
+              <Text style={[styles.protocolTitle, { color: planColors.accentText, borderBottomColor: planColors.boxBorder }]}>{prot.name || 'Protocolo de Partido'}</Text>
+              {prot.timeline?.map((step, sIdx) => (
+                <View key={step.id || sIdx} style={[styles.protocolRow, { backgroundColor: planColors.itemBg, borderBottomColor: planColors.boxBorder }]}>
+                  <View style={styles.protocolStepHeader}>
+                    <Text style={[styles.protocolStepTitle, { color: planColors.cardBodyText }]}>{step.title}</Text>
+                    {step.timeLabel ? <Text style={[styles.protocolTimeBadge, { color: planColors.accentText }]}>{step.timeLabel}</Text> : null}
+                  </View>
+                  {step.description ? <Text style={[styles.protocolStepDesc, { color: planColors.itemText }]}>{step.description}</Text> : null}
+                </View>
+              ))}
+              {prot.checklist?.length > 0 && (
+                <View style={{ marginTop: 2 }}>
+                  <Text style={[styles.protocolChecklistTitle, { color: planColors.accentText }]}>Checklist</Text>
+                  {prot.checklist.map((item, cIdx) => (
+                    <View key={item.id || cIdx} style={[styles.protocolRow, { backgroundColor: planColors.itemBg, borderBottomColor: planColors.boxBorder }]}>
+                      <Text style={[styles.protocolStepTitle, { color: planColors.cardBodyText }]}>• {item.title}</Text>
+                      {item.description ? <Text style={[styles.protocolStepDesc, { color: planColors.itemText }]}>{item.description}</Text> : null}
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+          ))}
+
+          {notes.length > 0 && (
+            <View style={[styles.notesBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
+              <Text style={[styles.notesTitle, { color: planColors.accentText, borderBottomColor: planColors.boxBorder }]}>Indicaciones de la semana</Text>
+              {notes.map((note, index) => (
+                <Text key={index} style={[styles.noteItem, { color: planColors.itemText }]}>• {note}</Text>
+              ))}
+            </View>
+          )}
         </View>
       </View>
 
@@ -400,7 +462,7 @@ const coverStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.teal,
+    borderBottomColor: '#1fb5a9',
     paddingBottom: 10,
     marginBottom: 12,
   },
@@ -411,7 +473,7 @@ const coverStyles = StyleSheet.create({
     maxWidth: 310,
   },
   subtitle: {
-    color: COLORS.teal,
+    color: '#1fb5a9',
     textTransform: 'uppercase',
     letterSpacing: 1.6,
     fontSize: 8.5,
@@ -420,12 +482,12 @@ const coverStyles = StyleSheet.create({
   },
   rightHeader: {
     textAlign: 'right',
-    color: COLORS.muted,
+    color: '#a5adcb',
     paddingTop: 10,
     maxWidth: 205,
   },
   rightStrong: {
-    color: COLORS.text,
+    color: '#ffffff',
     fontSize: 9.5,
     fontWeight: 700,
     marginBottom: 2,
@@ -434,7 +496,7 @@ const coverStyles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionTitle: {
-    color: COLORS.teal,
+    color: '#1fb5a9',
     textTransform: 'uppercase',
     letterSpacing: 1.8,
     fontSize: 8.2,
@@ -447,7 +509,7 @@ const coverStyles = StyleSheet.create({
   },
   lineItem: {
     borderBottomWidth: 0.5,
-    borderBottomColor: COLORS.line,
+    borderBottomColor: '#2d335a',
     paddingBottom: 3,
     marginBottom: 3,
     lineHeight: 1.2,
@@ -475,11 +537,11 @@ const coverStyles = StyleSheet.create({
     right: 36,
     bottom: 20,
     borderTopWidth: 0.5,
-    borderTopColor: COLORS.line,
+    borderTopColor: '#2d335a',
     paddingTop: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    color: COLORS.muted,
+    color: '#a5adcb',
     fontSize: 6.7,
   },
 });

@@ -388,13 +388,13 @@ export function PlayerIdentity({ jugador, isAdmin, isPlayer, hasCredentials, ava
         </Title>
 
         <Group gap="xs" align="center" justify={centered ? 'center' : undefined}>
-          <Text c="dimmed" size="sm" truncate>
+          <Text c="dimmed" size="sm" truncate="end">
             {jugador.posicion || 'Sin posición'}
           </Text>
           {jugador.club && (
             <>
               <Text c="dimmed" size="xs">•</Text>
-              <Text c="dimmed" size="sm" truncate>{jugador.club}</Text>
+              <Text c="dimmed" size="sm" truncate="end">{jugador.club}</Text>
             </>
           )}
         </Group>
@@ -422,11 +422,11 @@ export function JugadorHeaderCompactMobile({ jugador, user, onEdit }) {
           size={44}
         />
         <Stack gap={2} style={{ minWidth: 0, flex: 1 }}>
-          <Title order={3} fw={800} c="dark.4" truncate>
+          <Title order={3} fw={800} c="dark.4" truncate="end">
             {jugador?.nombre} {jugador?.apellidos}
           </Title>
           <Group gap={6} align="center" wrap="nowrap">
-            <Text c="dimmed" size="sm" truncate fw={500}>
+            <Text c="dimmed" size="sm" truncate="end" fw={500}>
               {jugador?.posicion || 'Sin posición'}
             </Text>
             {jugador?.semaforo?.hasPesajes && (

@@ -53,6 +53,25 @@ export async function GET(_request, { params }) {
       }
     }
 
+    if (!Array.isArray(planData.protocolos) || planData.protocolos.length === 0) {
+      const teamProtocols = teamConfig?.protocols || [];
+      const customProtocols = jugador?.protocolos_custom || {};
+      const activeDayTypes = new Set(Object.values(planData.dias || {}).map((d) => d.tipoDia).filter(Boolean));
+      const resolvedProtocols = teamProtocols
+        .map((p) => customProtocols[p.id] || p)
+        .filter((p) => {
+          const isIncluded = p.incluirEnPlan !== false && (p.incluirEnPlan === true || p.dayTypeKey === 'partido' || p.dayTypeKey === 'match_day' || (typeof p.dayTypeKey === 'string' && p.dayTypeKey.includes('partido')));
+          if (!isIncluded) return false;
+          if (p.dayTypeKey && activeDayTypes.size > 0) {
+            return activeDayTypes.has(p.dayTypeKey);
+          }
+          return true;
+        });
+      if (resolvedProtocols.length > 0) {
+        planData.protocolos = resolvedProtocols;
+      }
+    }
+
     let semana = planData.meta?.semanaMenu;
     if (!semana && planData.meta?.fecha) {
       const d = new Date(planData.meta.fecha);

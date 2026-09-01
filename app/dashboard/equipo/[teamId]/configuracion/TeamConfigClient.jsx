@@ -494,9 +494,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                           <Text size="xs" mt={2} style={{ color: planColors.itemText, lineHeight: 1.3 }}>Tostadas integrales con aguacate y huevo</Text>
                         </Box>
                       </Paper>
-                    </Stack>
 
-                    <Stack gap="sm">
                       <Paper p="sm" radius="md" style={{ backgroundColor: planColors.boxBg, border: `1px solid ${planColors.boxBorder}`, transition: 'all 0.3s ease' }}>
                         <Title order={6} tt="uppercase" mb="xs" style={{ color: planColors.accentText, fontSize: '11px' }}>Suplementación</Title>
                         <Paper p="xs" style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', transition: 'background-color 0.3s ease' }}>
@@ -505,6 +503,19 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                             <Badge color="teal" size="xs" variant="filled" radius="xs">200mg</Badge>
                           </Group>
                           <Text size="xs" mt={2} style={{ color: planColors.itemText }}>Momento: 45m antes</Text>
+                        </Paper>
+                      </Paper>
+                    </Stack>
+
+                    <Stack gap="sm">
+                      <Paper p="sm" radius="md" style={{ backgroundColor: planColors.boxBg, border: `1px solid ${planColors.boxBorder}`, transition: 'all 0.3s ease' }}>
+                        <Title order={6} tt="uppercase" mb="xs" style={{ color: planColors.accentText, fontSize: '11px' }}>Protocolo Partido</Title>
+                        <Paper p="xs" style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', transition: 'background-color 0.3s ease' }}>
+                          <Group justify="space-between" wrap="nowrap" align="flex-start">
+                            <Text size="xs" fw={800} style={{ color: planColors.cardBodyText }}>Comida Pre-partido</Text>
+                            <Text size="xs" fw={800} style={{ color: planColors.accentText }}>-3h</Text>
+                          </Group>
+                          <Text size="xs" mt={2} style={{ color: planColors.itemText }}>Pasta blanca + pollo magro</Text>
                         </Paper>
                       </Paper>
 
@@ -534,37 +545,47 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                 leftSection={<IconPlus size={14} />}
                 size="sm"
                 radius="xl"
-                variant="light"
                 color="blue"
                 onClick={() => {
-                  const randomColor = COLORS[dayTypes.length % COLORS.length];
-                  setEditingDayType({ key: '', label: '', planLabel: '', color: randomColor, tienePostentreno: false, tienePreentreno: false });
+                  setEditingDayType({ label: '', key: '', color: 'blue', tienePreentreno: true, tienePostentreno: true });
                   setModalOpen(true);
                 }}
               >
-                Nuevo Tipo
+                Nuevo Tipo de Día
               </Button>
             )}
           </Group>
 
-          <Table verticalSpacing="md" horizontalSpacing="md" striped highlightOnHover style={{ borderRadius: 'var(--mantine-radius-md)', overflow: 'hidden' }}>
+          <Table verticalSpacing="sm" striped highlightOnHover>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Tipo de Día</Table.Th>
+                <Table.Th>Color</Table.Th>
+                <Table.Th>Batido de proteínas</Table.Th>
+                {!readOnly && <Table.Th w={100} style={{ textAlign: 'right' }}>Acciones</Table.Th>}
+              </Table.Tr>
+            </Table.Thead>
             <Table.Tbody>
               {dayTypes.map(d => (
                 <Table.Tr key={d.key}>
                   <Table.Td>
-                    <Group gap="sm">
+                    <Group gap="xs">
                       <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: `var(--mantine-color-${d.color}-6)` }} />
-                      <Text fw={600} size="sm" c="dark.4">{d.label}</Text>
+                      <Text fw={500} size="sm">{d.label}</Text>
+                      <Text size="xs" c="dimmed">({d.key})</Text>
                     </Group>
                   </Table.Td>
                   <Table.Td>
-                    <Badge variant="light" color={(d.tienePostentreno !== undefined ? d.tienePostentreno : d.tienePreentreno) ? 'teal' : 'gray'}>
-                      {(d.tienePostentreno !== undefined ? d.tienePostentreno : d.tienePreentreno) ? 'Post-entreno' : 'Sin Post-entreno'}
-                    </Badge>
+                    <Text size="sm" tt="capitalize" c={d.color}>{d.color}</Text>
+                  </Table.Td>
+                  <Table.Td>
+                    <Text size="sm" c={(d.tienePostentreno !== undefined ? d.tienePostentreno : d.tienePreentreno) ? 'teal' : 'dimmed'} fw={500}>
+                      {(d.tienePostentreno !== undefined ? d.tienePostentreno : d.tienePreentreno) ? 'Sí' : 'No'}
+                    </Text>
                   </Table.Td>
                   {!readOnly && (
-                    <Table.Td w={120}>
-                      <Group gap="xs" justify="flex-end" wrap="nowrap">
+                    <Table.Td>
+                      <Group gap="xs" justify="flex-end">
                         <ActionIcon variant="light" color="blue" radius="xl" size="md" onClick={() => { setEditingDayType(d); setModalOpen(true); }}>
                           <IconPencil size={16} />
                         </ActionIcon>
@@ -623,7 +644,8 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                           size="xs"
                           leftSection={<IconPlus size={14} />}
                           onClick={() => {
-                            setEditingProtocol({ dayTypeKey: d.key, name: '', timeline: [], checklist: [] });
+                            const isMatch = d.key === 'partido' || d.key === 'match_day' || (typeof d.key === 'string' && d.key.includes('partido'));
+                            setEditingProtocol({ dayTypeKey: d.key, name: '', timeline: [], checklist: [], incluirEnPlan: isMatch });
                             setProtocolModalOpen(true);
                           }}
                           style={{ alignSelf: 'flex-start' }}
@@ -637,44 +659,55 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                       ) : (
                         <Table verticalSpacing="sm" striped highlightOnHover>
                           <Table.Tbody>
-                            {dayProtocols.map(p => (
-                              <Table.Tr key={p.id}>
-                                <Table.Td>
-                                  <Text fw={500} size="sm">{p.name}</Text>
-                                  <Text size="xs" c="dimmed">{p.timeline?.length || 0} pasos · {p.checklist?.length || 0} checks</Text>
-                                </Table.Td>
-                                {!readOnly && (
-                                  <Table.Td w={150}>
-                                    <Group gap="xs" justify="flex-end" wrap="nowrap">
-                                      <Tooltip label="Copiar o mover a otro equipo" withArrow>
-                                        <ActionIcon 
-                                          variant="light" 
-                                          color="cyan" 
-                                          radius="xl" 
-                                          size="md" 
-                                          onClick={() => { 
-                                            setTransferProtocol(p); 
-                                            setTransferModalOpen(true); 
-                                          }}
-                                        >
-                                          <IconFolderShare size={16} />
-                                        </ActionIcon>
-                                      </Tooltip>
-                                      <Tooltip label="Editar protocolo" withArrow>
-                                        <ActionIcon variant="light" color="blue" radius="xl" size="md" onClick={() => { setEditingProtocol(p); setProtocolModalOpen(true); }}>
-                                          <IconPencil size={16} />
-                                        </ActionIcon>
-                                      </Tooltip>
-                                      <Tooltip label="Eliminar protocolo" withArrow>
-                                        <ActionIcon variant="light" color="red" radius="xl" size="md" onClick={() => setDeleteProtocolId(p.id)}>
-                                          <IconTrash size={16} />
-                                        </ActionIcon>
-                                      </Tooltip>
+                            {dayProtocols.map(p => {
+                              const isIncludedInPlan = p.incluirEnPlan !== false && (p.incluirEnPlan === true || p.dayTypeKey === 'partido' || p.dayTypeKey === 'match_day' || (typeof p.dayTypeKey === 'string' && p.dayTypeKey.includes('partido')));
+                              return (
+                                <Table.Tr key={p.id}>
+                                  <Table.Td>
+                                    <Group gap="xs" align="center">
+                                      <Text fw={500} size="sm">{p.name}</Text>
+                                      {isIncludedInPlan && (
+                                        <Group gap={4} align="center">
+                                          <span style={{ color: 'var(--mantine-color-teal-6)', fontSize: 10 }}>●</span>
+                                          <Text size="xs" c="teal.7" fw={600}>En planificación</Text>
+                                        </Group>
+                                      )}
                                     </Group>
+                                    <Text size="xs" c="dimmed">{p.timeline?.length || 0} pasos · {p.checklist?.length || 0} checks</Text>
                                   </Table.Td>
-                                )}
-                              </Table.Tr>
-                            ))}
+                                  {!readOnly && (
+                                    <Table.Td w={150}>
+                                      <Group gap="xs" justify="flex-end" wrap="nowrap">
+                                        <Tooltip label="Copiar o mover a otro equipo" withArrow>
+                                          <ActionIcon 
+                                            variant="light" 
+                                            color="cyan" 
+                                            radius="xl" 
+                                            size="md" 
+                                            onClick={() => { 
+                                              setTransferProtocol(p); 
+                                              setTransferModalOpen(true); 
+                                            }}
+                                          >
+                                            <IconFolderShare size={16} />
+                                          </ActionIcon>
+                                        </Tooltip>
+                                        <Tooltip label="Editar protocolo" withArrow>
+                                          <ActionIcon variant="light" color="blue" radius="xl" size="md" onClick={() => { setEditingProtocol(p); setProtocolModalOpen(true); }}>
+                                            <IconPencil size={16} />
+                                          </ActionIcon>
+                                        </Tooltip>
+                                        <Tooltip label="Eliminar protocolo" withArrow>
+                                          <ActionIcon variant="light" color="red" radius="xl" size="md" onClick={() => setDeleteProtocolId(p.id)}>
+                                            <IconTrash size={16} />
+                                          </ActionIcon>
+                                        </Tooltip>
+                                      </Group>
+                                    </Table.Td>
+                                  )}
+                                </Table.Tr>
+                              );
+                            })}
                           </Table.Tbody>
                         </Table>
                       )}

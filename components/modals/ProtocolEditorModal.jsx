@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Stack, TextInput, Button, Group, ActionIcon, Text, Textarea, Select, Divider, Paper, ScrollArea, Box, Timeline, Tooltip } from '@mantine/core';
+import { Modal, Stack, TextInput, Button, Group, ActionIcon, Text, Textarea, Select, Divider, Paper, ScrollArea, Box, Timeline, Tooltip, Switch } from '@mantine/core';
 import { 
   IconPlus, 
   IconTrash, 
@@ -36,16 +36,20 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave 
   const [name, setName] = useState('');
   const [timeline, setTimeline] = useState([]);
   const [checklist, setChecklist] = useState([]);
+  const [incluirEnPlan, setIncluirEnPlan] = useState(false);
 
   useEffect(() => {
     if (opened && protocol) {
       setName(protocol.name || '');
       setTimeline(protocol.timeline || []);
       setChecklist(protocol.checklist || []);
+      const isMatch = protocol.dayTypeKey === 'partido' || protocol.dayTypeKey === 'match_day' || (typeof protocol.dayTypeKey === 'string' && protocol.dayTypeKey.includes('partido'));
+      setIncluirEnPlan(protocol.incluirEnPlan !== undefined ? Boolean(protocol.incluirEnPlan) : isMatch);
     } else if (opened && !protocol) {
       setName('');
       setTimeline([]);
       setChecklist([]);
+      setIncluirEnPlan(false);
     }
   }, [opened, protocol]);
 
@@ -55,7 +59,8 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave 
       dayTypeKey: protocol?.dayTypeKey,
       name,
       timeline,
-      checklist
+      checklist,
+      incluirEnPlan,
     });
     onClose();
   };
@@ -145,6 +150,16 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave 
             size="md"
             radius="md"
           />
+
+          <Paper p="sm" radius="md" withBorder bg="gray.0">
+            <Switch
+              label="Incluir en la planificación nutricional"
+              description="Muestra este protocolo en la ficha y resumen de la planificación nutricional de los días correspondientes"
+              checked={incluirEnPlan}
+              onChange={(e) => setIncluirEnPlan(e.currentTarget.checked)}
+              color="blue"
+            />
+          </Paper>
 
           <Box>
             <Group justify="space-between" mb="lg">

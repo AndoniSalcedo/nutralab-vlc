@@ -120,6 +120,12 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
                     <Badge color={dayTypeObj.color || 'gray'} variant="light">{dayTypeObj.label}</Badge>
                   )}
                   <Title order={4} c="dark.3">{activeProtocol.name}</Title>
+                  {(activeProtocol.incluirEnPlan !== false && (activeProtocol.incluirEnPlan === true || activeProtocol.dayTypeKey === 'partido' || activeProtocol.dayTypeKey === 'match_day' || (typeof activeProtocol.dayTypeKey === 'string' && activeProtocol.dayTypeKey.includes('partido')))) && (
+                    <Group gap={4} align="center">
+                      <span style={{ color: 'var(--mantine-color-teal-6)', fontSize: 10 }}>●</span>
+                      <Text size="xs" c="teal.7" fw={600}>En planificación</Text>
+                    </Group>
+                  )}
                 </Group>
                 {!readOnly && (
                   <Button variant="light" size="xs" leftSection={<IconPencil size={14} />} onClick={() => setEditorOpen(true)} radius="xl">
