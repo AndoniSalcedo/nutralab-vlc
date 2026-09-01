@@ -3,34 +3,10 @@ import { Modal, Stack, TextInput, Button, Group, ActionIcon, Text, Textarea, Sel
 import { 
   IconPlus, 
   IconTrash, 
-  IconApple, 
-  IconRun, 
-  IconCoffee, 
-  IconDroplet, 
-  IconBatteryCharging, 
-  IconFlag, 
-  IconBed, 
-  IconActivity, 
-  IconMeat, 
-  IconPill, 
-  IconClipboardList,
   IconArrowUp,
   IconArrowDown
 } from '@tabler/icons-react';
-
-const AVAILABLE_ICONS = {
-  IconApple: <IconApple size={16} />,
-  IconRun: <IconRun size={16} />,
-  IconCoffee: <IconCoffee size={16} />,
-  IconDroplet: <IconDroplet size={16} />,
-  IconBatteryCharging: <IconBatteryCharging size={16} />,
-  IconFlag: <IconFlag size={16} />,
-  IconBed: <IconBed size={16} />,
-  IconActivity: <IconActivity size={16} />,
-  IconMeat: <IconMeat size={16} />,
-  IconPill: <IconPill size={16} />,
-  IconClipboardList: <IconClipboardList size={16} />
-};
+import { PROTOCOL_AVAILABLE_ICONS as AVAILABLE_ICONS } from '@/components/ProtocolIcon';
 
 export default function ProtocolEditorModal({ opened, onClose, protocol, onSave }) {
   const [name, setName] = useState('');

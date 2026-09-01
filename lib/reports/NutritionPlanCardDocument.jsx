@@ -1,8 +1,8 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
-import { sanitizePlanData } from '@/lib/nutrition-plan-card';
-import { getTeamDayTypeColor, getTeamDayTypeLabel } from '@/lib/calculations';
-import { formatNumberDecimal } from '@/lib/utils';
+import { sanitizePlanData } from '../nutrition-plan-card.js';
+import { getTeamDayTypeColor, getTeamDayTypeLabel } from '../calculations.js';
+import { formatNumberDecimal } from '../utils.js';
 
 const DAY_TYPE_COLORS = {
   teal: '#1fb5a9',
@@ -108,13 +108,11 @@ const styles = StyleSheet.create({
     fontWeight: 700,
     textTransform: 'uppercase',
   },
-  dayBadge: {
+  dayIndicator: {
     fontSize: 5.8,
     fontWeight: 700,
     textTransform: 'uppercase',
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    borderRadius: 3,
+    letterSpacing: 0.3,
   },
   macrosLine: {
     fontSize: 6.2,
@@ -130,8 +128,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     borderRadius: 3,
-    padding: 2.5,
-    marginBottom: 1.5,
+    padding: 3,
+    marginBottom: 2,
   },
   mealName: {
     fontWeight: 700,
@@ -193,9 +191,12 @@ const styles = StyleSheet.create({
     fontWeight: 700,
   },
   supplementDose: {
-    fontSize: 6.2,
+    fontSize: 5.6,
     fontWeight: 700,
-    color: '#1fb5a9',
+    paddingHorizontal: 3.5,
+    paddingVertical: 0.8,
+    borderRadius: 2.5,
+    borderWidth: 0.5,
   },
   supplementMeta: {
     fontSize: 5.5,
@@ -218,22 +219,26 @@ const styles = StyleSheet.create({
   },
   protocolRow: {
     marginBottom: 3,
-    padding: 2.5,
+    padding: 3,
     borderRadius: 3,
-    borderBottomWidth: 0.2,
   },
   protocolStepHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 1,
   },
   protocolStepTitle: {
     fontSize: 6.5,
     fontWeight: 700,
   },
   protocolTimeBadge: {
-    fontSize: 6.2,
+    fontSize: 5.6,
     fontWeight: 700,
+    paddingHorizontal: 3.5,
+    paddingVertical: 0.8,
+    borderRadius: 2.5,
+    borderWidth: 0.5,
   },
   protocolStepDesc: {
     fontSize: 5.8,
@@ -329,7 +334,7 @@ export function PlanCardPage({ plan, teamConfig }) {
               <View key={dayKey} style={[styles.dayBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
                 <View style={[styles.dayHeader, { borderBottomColor: planColors.boxBorder }]}>
                   <Text style={[styles.dayName, { color: planColors.cardBodyText }]}>{dayData.label}</Text>
-                  <Text style={[styles.dayBadge, { backgroundColor: `${color}22`, color }]}>{label}</Text>
+                  <Text style={[styles.dayIndicator, { color }]}>● {label}</Text>
                 </View>
                 <Text style={styles.macrosLine}>
                   {formatNumber(dayData.kcal, ' kcal')} · P {formatNumber(dayData.proteina, 'g')} · HC {formatNumber(dayData.hidratos, 'g')} · G {formatNumber(dayData.grasa, 'g')}
@@ -353,7 +358,7 @@ export function PlanCardPage({ plan, teamConfig }) {
                 <View key={index} style={[styles.supplementRow, { backgroundColor: planColors.itemBg, borderBottomColor: planColors.boxBorder }]}>
                   <View style={styles.supplementHeader}>
                     <Text style={[styles.supplementName, { color: planColors.cardBodyText }]}>{supp.nombre}</Text>
-                    {supp.dosis ? <Text style={styles.supplementDose}>{supp.dosis}</Text> : null}
+                    {supp.dosis ? <Text style={[styles.supplementDose, { color: planColors.accentText, borderColor: planColors.boxBorder }]}>{supp.dosis}</Text> : null}
                   </View>
                   {supp.timing ? <Text style={[styles.supplementMeta, { color: planColors.itemText }]}>Momento: {supp.timing}</Text> : null}
                   {supp.notas ? <Text style={[styles.supplementMeta, { color: planColors.itemText }]}>{supp.notas}</Text> : null}
@@ -372,7 +377,7 @@ export function PlanCardPage({ plan, teamConfig }) {
               <View key={dayKey} style={[styles.dayBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
                 <View style={[styles.dayHeader, { borderBottomColor: planColors.boxBorder }]}>
                   <Text style={[styles.dayName, { color: planColors.cardBodyText }]}>{dayData.label}</Text>
-                  <Text style={[styles.dayBadge, { backgroundColor: `${color}22`, color }]}>{label}</Text>
+                  <Text style={[styles.dayIndicator, { color }]}>● {label}</Text>
                 </View>
                 <Text style={styles.macrosLine}>
                   {formatNumber(dayData.kcal, ' kcal')} · P {formatNumber(dayData.proteina, 'g')} · HC {formatNumber(dayData.hidratos, 'g')} · G {formatNumber(dayData.grasa, 'g')}
@@ -395,8 +400,10 @@ export function PlanCardPage({ plan, teamConfig }) {
               {prot.timeline?.map((step, sIdx) => (
                 <View key={step.id || sIdx} style={[styles.protocolRow, { backgroundColor: planColors.itemBg, borderBottomColor: planColors.boxBorder }]}>
                   <View style={styles.protocolStepHeader}>
-                    <Text style={[styles.protocolStepTitle, { color: planColors.cardBodyText }]}>{step.title}</Text>
-                    {step.timeLabel ? <Text style={[styles.protocolTimeBadge, { color: planColors.accentText }]}>{step.timeLabel}</Text> : null}
+                    <Text style={[styles.protocolStepTitle, { color: planColors.cardBodyText }]}>
+                      {step.icon && !step.icon.startsWith('Icon') ? `${step.icon} ` : ''}{step.title}
+                    </Text>
+                    {step.timeLabel ? <Text style={[styles.protocolTimeBadge, { color: planColors.accentText, borderColor: planColors.boxBorder }]}>{step.timeLabel}</Text> : null}
                   </View>
                   {step.description ? <Text style={[styles.protocolStepDesc, { color: planColors.itemText }]}>{step.description}</Text> : null}
                 </View>
@@ -406,7 +413,7 @@ export function PlanCardPage({ plan, teamConfig }) {
                   <Text style={[styles.protocolChecklistTitle, { color: planColors.accentText }]}>Checklist</Text>
                   {prot.checklist.map((item, cIdx) => (
                     <View key={item.id || cIdx} style={[styles.protocolRow, { backgroundColor: planColors.itemBg, borderBottomColor: planColors.boxBorder }]}>
-                      <Text style={[styles.protocolStepTitle, { color: planColors.cardBodyText }]}>• {item.title}</Text>
+                      <Text style={[styles.protocolStepTitle, { color: planColors.cardBodyText }]}>✓ {item.title}</Text>
                       {item.description ? <Text style={[styles.protocolStepDesc, { color: planColors.itemText }]}>{item.description}</Text> : null}
                     </View>
                   ))}
@@ -427,7 +434,7 @@ export function PlanCardPage({ plan, teamConfig }) {
       </View>
 
       <View style={styles.footer}>
-        <Text>Carlos Ferrando · Valencia CF · Clínico y Deportivo</Text>
+        <Text>{clubName} · Nutrición Deportiva y Rendimiento</Text>
         <Text>Generado automáticamente por Nutralab</Text>
       </View>
     </Page>

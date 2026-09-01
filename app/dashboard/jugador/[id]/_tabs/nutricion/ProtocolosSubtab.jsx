@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Badge, Box, Group, Paper, SimpleGrid, Stack, Text, Timeline, Select, Title, Button } from '@mantine/core';
-import { IconClipboardList, IconDroplet, IconApple, IconRun, IconCoffee, IconBatteryCharging, IconFlag, IconBed, IconActivity, IconMeat, IconPill, IconPencil, IconCalendar } from '@tabler/icons-react';
+import { IconPencil, IconCalendar } from '@tabler/icons-react';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import { EditableSection } from '../editable';
@@ -10,20 +10,7 @@ import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/services/player';
 import ProtocolEditorModal from '@/components/modals/ProtocolEditorModal';
 import NothingFound from '@/components/NothingFound';
-
-const AVAILABLE_ICONS = {
-  IconApple: IconApple,
-  IconRun: IconRun,
-  IconCoffee: IconCoffee,
-  IconDroplet: IconDroplet,
-  IconBatteryCharging: IconBatteryCharging,
-  IconFlag: IconFlag,
-  IconBed: IconBed,
-  IconActivity: IconActivity,
-  IconMeat: IconMeat,
-  IconPill: IconPill,
-  IconClipboardList: IconClipboardList
-};
+import { PROTOCOL_ICON_MAP as AVAILABLE_ICONS } from '@/components/ProtocolIcon';
 
 export default function ProtocolosSubtab({ jugador, readOnly = false }) {
   const teamConfig = jugador.equipos?.configuracion_nutricional || {};

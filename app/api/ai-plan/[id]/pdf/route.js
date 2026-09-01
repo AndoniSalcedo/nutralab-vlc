@@ -91,8 +91,13 @@ export async function GET(_request, { params }) {
       }
     }
 
+    const effectiveTeamConfig = {
+      ...teamConfig,
+      planColors: planData.meta?.planColors || planData.planColors || teamConfig?.planColors,
+    };
+
     const stream = await renderToStream(
-      <NutritionPlanCardDocument data={planData} weeklyReportMeta={weeklyReportMeta} teamConfig={teamConfig} />
+      <NutritionPlanCardDocument data={planData} weeklyReportMeta={weeklyReportMeta} teamConfig={effectiveTeamConfig} />
     );
     const chunks = [];
     for await (const chunk of stream) {

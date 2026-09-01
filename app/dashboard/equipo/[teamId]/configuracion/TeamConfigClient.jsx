@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { slugify } from '@/lib/utils';
-import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea, Anchor, Box, ColorInput, SimpleGrid, Avatar, FileButton } from '@mantine/core';
+import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea, Anchor, Box, ColorInput, SimpleGrid, Avatar, FileButton, UnstyledButton, Divider, Modal } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft, IconBook, IconClipboardList, IconPalette, IconCamera, IconFolderShare, IconDownload } from '@tabler/icons-react';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
@@ -18,9 +18,12 @@ import ProtocolImportModal from '@/components/modals/ProtocolImportModal';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
+import { PLAN_THEME_PRESETS } from '@/lib/nutrition-plan-card';
+import ProtocolIcon from '@/components/ProtocolIcon';
+
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
 
-export default function TeamConfigClient({ team, readOnly = false }) {
+export default function TeamConfigClient({ team, user, availableTeams = [], readOnly = false }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [teamPhotoVersion, setTeamPhotoVersion] = useState(() => team.updated_at || Date.now());
@@ -125,6 +128,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
   const [transferModalOpen, setTransferModalOpen] = useState(false);
   const [transferProtocol, setTransferProtocol] = useState(null);
   const [importModalOpen, setImportModalOpen] = useState(false);
+  const [themesModalOpen, setThemesModalOpen] = useState(false);
 
   const [planColors, setPlanColors] = useState(() => {
     const raw = team.configuracion_nutricional?.planColors || {};
@@ -423,12 +427,27 @@ export default function TeamConfigClient({ team, readOnly = false }) {
         </Paper>
 
         <Paper p="md" radius="lg" shadow="sm" withBorder>
-          <Group gap="sm" mb="lg">
-            <ThemeIcon size="md" radius="xl" variant="light" color="pink">
-              <IconPalette size={18} />
-            </ThemeIcon>
-            <Title order={4} c="dark.4">Colores del Plan Nutricional</Title>
+          <Group justify="space-between" align="center" mb="lg">
+            <Group gap="sm">
+              <ThemeIcon size="md" radius="xl" variant="light" color="pink">
+                <IconPalette size={18} />
+              </ThemeIcon>
+              <Title order={4} c="dark.4">Colores del Plan Nutricional</Title>
+            </Group>
+            {!readOnly && (
+              <Button
+                variant="light"
+                size="xs"
+                radius="xl"
+                color="pink"
+                leftSection={<IconPalette size={14} />}
+                onClick={() => setThemesModalOpen(true)}
+              >
+                Temas Predefinidos
+              </Button>
+            )}
           </Group>
+
           <Stack gap="md">
             <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
               <Box>
@@ -464,20 +483,48 @@ export default function TeamConfigClient({ team, readOnly = false }) {
               
               <Paper shadow="sm" radius="md" withBorder style={{ backgroundColor: planColors.cardBodyBg, overflow: 'hidden', transition: 'background-color 0.3s ease', width: '100%' }}>
                 <Box style={{ backgroundColor: planColors.cardTopBg, color: planColors.cardTopText, padding: '14px 10px', textAlign: 'center', fontSize: '9px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', transition: 'all 0.3s ease' }}>
-                  Valencia CF · Nutrición Deportiva
+                  {teamName || team?.nombre || 'Club'} · Nutrición Deportiva
                 </Box>
                 <Box p="lg">
                   <Title order={3} style={{ color: planColors.cardBodyText, textAlign: 'center', fontSize: '20px', lineHeight: 1, textTransform: 'uppercase', transition: 'color 0.3s ease' }}>JUGADOR EJEMPLO</Title>
-                  <Text style={{ color: '#ff8b52', textAlign: 'center', textTransform: 'uppercase', fontWeight: 800, marginTop: '4px', fontSize: '10px' }}>CENTROCAMPISTA</Text>
-                  <div style={{ height: '2px', background: '#ff785f', margin: '10px auto 20px', maxWidth: '80%' }} />
+                  <Text style={{ color: planColors.accentText, textAlign: 'center', textTransform: 'uppercase', fontWeight: 800, marginTop: '4px', fontSize: '10px' }}>CENTROCAMPISTA</Text>
+                  <div style={{ height: '2px', background: planColors.accentText, margin: '10px auto 16px', maxWidth: '75%', opacity: 0.8 }} />
                   
+                  <SimpleGrid cols={3} spacing="xs" mb="md">
+                    <Paper p="xs" radius="sm" style={{ backgroundColor: planColors.boxBg, border: `1px solid ${planColors.boxBorder}`, textAlign: 'center' }}>
+                      <Text size="9px" fw={800} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.6px' }}>PESO</Text>
+                      <Text size="xs" fw={850} style={{ color: planColors.accentText }}>77.4 kg</Text>
+                    </Paper>
+                    <Paper p="xs" radius="sm" style={{ backgroundColor: planColors.boxBg, border: `1px solid ${planColors.boxBorder}`, textAlign: 'center' }}>
+                      <Text size="9px" fw={800} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.6px' }}>GRASA</Text>
+                      <Text size="xs" fw={850} style={{ color: planColors.cardBodyText }}>9.8 %</Text>
+                    </Paper>
+                    <Paper p="xs" radius="sm" style={{ backgroundColor: planColors.boxBg, border: `1px solid ${planColors.boxBorder}`, textAlign: 'center' }}>
+                      <Text size="9px" fw={800} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.6px' }}>% MÚSCULO</Text>
+                      <Text size="xs" fw={850} style={{ color: planColors.accentText }}>48.2 %</Text>
+                    </Paper>
+                  </SimpleGrid>
+
                   <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
                     <Stack gap="sm">
                       <Paper p="sm" radius="md" style={{ backgroundColor: planColors.boxBg, border: `1px solid ${planColors.boxBorder}`, transition: 'all 0.3s ease' }}>
-                        <Group justify="space-between" mb="xs">
+                        <Group justify="space-between" align="center" mb={6}>
                           <Text fw={900} size="xs" style={{ color: planColors.cardBodyText, transition: 'color 0.3s ease' }}>LUNES</Text>
-                          <Badge size="xs" color="teal" variant="light">Partido</Badge>
+                          <Group gap={4} align="center" wrap="nowrap">
+                            <span style={{ fontSize: '7px', color: 'var(--mantine-color-teal-5)' }}>●</span>
+                            <Text size="11px" fw={700} tt="uppercase" c="teal.4">Partido</Text>
+                          </Group>
                         </Group>
+                        <Box py={2} px={6} mb={6} style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: `1px solid ${planColors.boxBorder}`, borderRadius: '4px' }}>
+                          <Group gap={4} justify="space-between" wrap="nowrap">
+                            <Text size="10px" fw={800} style={{ color: planColors.cardBodyText }}>
+                              3.150 <span style={{ fontWeight: 400, opacity: 0.65, fontSize: '9px' }}>kcal</span>
+                            </Text>
+                            <Text size="10px" style={{ color: planColors.itemText }}>
+                              P 160g · HC 430g · G 65g
+                            </Text>
+                          </Group>
+                        </Box>
                         <Box p="xs" style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', transition: 'background-color 0.3s ease' }}>
                           <Text size="xs" fw={800} tt="uppercase" lh={1.1} style={{ color: planColors.accentText }}>PRE-PARTIDO</Text>
                           <Text size="xs" mt={2} style={{ color: planColors.itemText, lineHeight: 1.3 }}>Pasta blanca con pollo a la plancha</Text>
@@ -485,10 +532,23 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                       </Paper>
                       
                       <Paper p="sm" radius="md" style={{ backgroundColor: planColors.boxBg, border: `1px solid ${planColors.boxBorder}`, transition: 'all 0.3s ease' }}>
-                        <Group justify="space-between" mb="xs">
+                        <Group justify="space-between" align="center" mb={6}>
                           <Text fw={900} size="xs" style={{ color: planColors.cardBodyText, transition: 'color 0.3s ease' }}>MARTES</Text>
-                          <Badge size="xs" color="blue" variant="light">Descanso</Badge>
+                          <Group gap={4} align="center" wrap="nowrap">
+                            <span style={{ fontSize: '7px', color: 'var(--mantine-color-blue-5)' }}>●</span>
+                            <Text size="11px" fw={700} tt="uppercase" c="blue.4">Descanso</Text>
+                          </Group>
                         </Group>
+                        <Box py={2} px={6} mb={6} style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: `1px solid ${planColors.boxBorder}`, borderRadius: '4px' }}>
+                          <Group gap={4} justify="space-between" wrap="nowrap">
+                            <Text size="10px" fw={800} style={{ color: planColors.cardBodyText }}>
+                              2.450 <span style={{ fontWeight: 400, opacity: 0.65, fontSize: '9px' }}>kcal</span>
+                            </Text>
+                            <Text size="10px" style={{ color: planColors.itemText }}>
+                              P 170g · HC 220g · G 70g
+                            </Text>
+                          </Group>
+                        </Box>
                         <Box p="xs" style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', transition: 'background-color 0.3s ease' }}>
                           <Text size="xs" fw={800} tt="uppercase" lh={1.1} style={{ color: planColors.accentText }}>DESAYUNO</Text>
                           <Text size="xs" mt={2} style={{ color: planColors.itemText, lineHeight: 1.3 }}>Tostadas integrales con aguacate y huevo</Text>
@@ -496,11 +556,11 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                       </Paper>
 
                       <Paper p="sm" radius="md" style={{ backgroundColor: planColors.boxBg, border: `1px solid ${planColors.boxBorder}`, transition: 'all 0.3s ease' }}>
-                        <Title order={6} tt="uppercase" mb="xs" style={{ color: planColors.accentText, fontSize: '11px' }}>Suplementación</Title>
-                        <Paper p="xs" style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', transition: 'background-color 0.3s ease' }}>
+                        <Title order={6} tt="uppercase" mb="xs" style={{ color: planColors.accentText, fontSize: '11px' }}>Suplementación Pautada</Title>
+                        <Paper p="xs" style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', border: `1px solid ${planColors.boxBorder}`, transition: 'background-color 0.3s ease' }}>
                           <Group justify="space-between" wrap="nowrap" align="flex-start">
                             <Text size="xs" fw={800} style={{ color: planColors.cardBodyText }}>Cafeína</Text>
-                            <Badge color="teal" size="xs" variant="filled" radius="xs">200mg</Badge>
+                            <Text size="11px" fw={800} style={{ color: planColors.accentText, border: `1px solid ${planColors.boxBorder}`, borderRadius: '4px', padding: '1px 5px' }}>200mg</Text>
                           </Group>
                           <Text size="xs" mt={2} style={{ color: planColors.itemText }}>Momento: 45m antes</Text>
                         </Paper>
@@ -509,18 +569,27 @@ export default function TeamConfigClient({ team, readOnly = false }) {
 
                     <Stack gap="sm">
                       <Paper p="sm" radius="md" style={{ backgroundColor: planColors.boxBg, border: `1px solid ${planColors.boxBorder}`, transition: 'all 0.3s ease' }}>
-                        <Title order={6} tt="uppercase" mb="xs" style={{ color: planColors.accentText, fontSize: '11px' }}>Protocolo Partido</Title>
-                        <Paper p="xs" style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', transition: 'background-color 0.3s ease' }}>
-                          <Group justify="space-between" wrap="nowrap" align="flex-start">
-                            <Text size="xs" fw={800} style={{ color: planColors.cardBodyText }}>Comida Pre-partido</Text>
-                            <Text size="xs" fw={800} style={{ color: planColors.accentText }}>-3h</Text>
+                        <Title order={6} tt="uppercase" mb="xs" style={{ color: planColors.accentText, fontSize: '11px' }}>Protocolo de Partido</Title>
+                        <Paper p="xs" style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', border: `1px solid ${planColors.boxBorder}`, transition: 'background-color 0.3s ease' }} mb={6}>
+                          <Group justify="space-between" wrap="nowrap" align="center">
+                            <Group gap={6} align="center" wrap="nowrap">
+                              <ProtocolIcon iconName="IconApple" size={13} color={planColors.accentText} />
+                              <Text size="xs" fw={800} style={{ color: planColors.cardBodyText }}>Comida Pre-partido</Text>
+                            </Group>
+                            <Text size="11px" fw={800} style={{ color: planColors.accentText, border: `1px solid ${planColors.boxBorder}`, borderRadius: '4px', padding: '1px 5px' }}>-3h</Text>
                           </Group>
                           <Text size="xs" mt={2} style={{ color: planColors.itemText }}>Pasta blanca + pollo magro</Text>
                         </Paper>
+                        <Box p={6} style={{ backgroundColor: planColors.itemBg, borderRadius: '4px', border: `1px solid ${planColors.boxBorder}` }}>
+                          <Group gap={6} align="flex-start" wrap="nowrap">
+                            <Text size="11px" style={{ color: planColors.accentText }}>✓</Text>
+                            <Text size="xs" fw={700} style={{ color: planColors.cardBodyText }}>Hidratación electrolítica</Text>
+                          </Group>
+                        </Box>
                       </Paper>
 
                       <Paper p="sm" radius="md" style={{ backgroundColor: planColors.boxBg, border: `1px solid ${planColors.boxBorder}`, transition: 'all 0.3s ease' }}>
-                        <Title order={6} tt="uppercase" mb="xs" style={{ color: planColors.accentText, fontSize: '11px' }}>Indicaciones</Title>
+                        <Title order={6} tt="uppercase" mb="xs" style={{ color: planColors.accentText, fontSize: '11px' }}>Indicaciones de la semana</Title>
                         <Text size="xs" style={{ color: planColors.itemText, lineHeight: 1.3 }}>• Mantener buena hidratación</Text>
                         <Text size="xs" style={{ color: planColors.itemText, lineHeight: 1.3 }}>• Pesar antes y después del partido</Text>
                       </Paper>
@@ -531,6 +600,75 @@ export default function TeamConfigClient({ team, readOnly = false }) {
             </Box>
           </Stack>
         </Paper>
+
+        <Modal
+          opened={themesModalOpen}
+          onClose={() => setThemesModalOpen(false)}
+          title="Temas Predefinidos del Plan Nutricional"
+          size="lg"
+          radius="md"
+        >
+          <Stack gap="md">
+            <Text size="xs" c="dimmed">
+              Selecciona una paleta prediseñada para aplicar instantáneamente todos sus colores al equipo.
+            </Text>
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+              {PLAN_THEME_PRESETS.map((preset) => {
+                const isSelected = planColors.cardBodyBg === preset.colors.cardBodyBg &&
+                                   planColors.cardTopBg === preset.colors.cardTopBg &&
+                                   planColors.boxBg === preset.colors.boxBg &&
+                                   planColors.accentText === preset.colors.accentText;
+                return (
+                  <UnstyledButton
+                    key={preset.id}
+                    onClick={() => {
+                      if (!readOnly) {
+                        setPlanColors(preset.colors);
+                        setThemesModalOpen(false);
+                        notifications.show({
+                          color: 'green',
+                          title: 'Tema aplicado',
+                          message: `Se aplicó el tema ${preset.name}.`,
+                        });
+                      }
+                    }}
+                    style={{
+                      padding: '12px 14px',
+                      borderRadius: '8px',
+                      border: isSelected ? '2px solid var(--mantine-color-teal-6)' : '1px solid var(--mantine-color-gray-3)',
+                      backgroundColor: isSelected ? 'var(--mantine-color-teal-0)' : 'var(--mantine-color-gray-0)',
+                      cursor: readOnly ? 'default' : 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <Group justify="space-between" align="center" wrap="nowrap" mb={4}>
+                      <Text size="xs" fw={700} c={isSelected ? 'teal.9' : 'dark.5'}>
+                        {preset.name}
+                      </Text>
+                      <Group gap={3}>
+                        {preset.swatches.map((s, idx) => (
+                          <Box
+                            key={idx}
+                            style={{
+                              width: 10,
+                              height: 10,
+                              borderRadius: '50%',
+                              backgroundColor: s,
+                              border: '1px solid rgba(0,0,0,0.15)',
+                            }}
+                          />
+                        ))}
+                      </Group>
+                    </Group>
+                    <Text size="11px" c="dimmed" lh={1.3}>
+                      {preset.description}
+                    </Text>
+                  </UnstyledButton>
+                );
+              })}
+            </SimpleGrid>
+          </Stack>
+        </Modal>
 
         <Paper p="md" radius="lg" shadow="sm" withBorder>
           <Group justify="space-between" mb="lg">

@@ -20,6 +20,7 @@ import {
   Title,
   Collapse,
   ActionIcon,
+  Menu,
 } from '@mantine/core';
 import CreateNutritionPlanModal from '@/components/modals/CreateNutritionPlanModal';
 import { useMediaQuery, useDisclosure } from '@mantine/hooks';
@@ -27,16 +28,16 @@ import { notifications } from '@mantine/notifications';
 import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPlanPdf, deleteAiPlan } from '@/services/plan';
 import { getWeeklyMenus } from '@/services/menu';
 import { getPlayerSupplementation } from '@/services/supplement';
-import { resolvePlayerSupplementsData } from '@/lib/supplementation-helper';
-import { IconDownload, IconArrowsLeftRight, IconPlus, IconSparkles, IconEdit, IconCheck, IconTrash, IconChevronDown, IconBrain } from '@tabler/icons-react';
+import { IconDownload, IconArrowsLeftRight, IconPlus, IconSparkles, IconEdit, IconCheck, IconTrash, IconChevronDown, IconBrain, IconPalette } from '@tabler/icons-react';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
-import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/nutrition-plan-card';
+import { buildBasePlanData, sanitizePlanData, getDefaultCalendar, PLAN_THEME_PRESETS } from '@/lib/nutrition-plan-card';
 import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getTeamNutritionDayTypes } from '@/lib/calculations';
 import { getUserMeals } from '@/lib/nutrition-day-types';
 import IntercambiosModal from '@/components/modals/IntercambiosModal';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
+import ProtocolIcon from '@/components/ProtocolIcon';
 
 
 
@@ -69,20 +70,20 @@ function clonePlan(data) {
   return data ? JSON.parse(JSON.stringify(data)) : null;
 }
 
-function MetricCard({ label, value, color = 'orange' }) {
+function MetricCard({ label, value, color, bg, border }) {
   return (
-    <Paper className="ficha-metric" p="md" radius="sm">
-      <Text size="xs" c="dimmed" tt="uppercase" fw={700}>{label}</Text>
-      <Title order={3} c={color} mt={4}>{value}</Title>
+    <Paper p="sm" radius="md" style={{ backgroundColor: bg, border: `1px solid ${border}`, textAlign: 'center' }}>
+      <Text size="10px" fw={800} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.8px' }}>{label}</Text>
+      <Title order={3} style={{ color, fontSize: '20px', fontWeight: 850, marginTop: '2px', letterSpacing: '-0.3px' }}>{value}</Title>
     </Paper>
   );
 }
 
-function PlanFicha({ data, activeSupplements = [], jugador }) {
+function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
   const plan = sanitizePlanData(data);
   if (!plan) return null;
 
-  const rawColors = jugador?.equipos?.configuracion_nutricional?.planColors || {};
+  const rawColors = themeColors || data?.meta?.planColors || data?.planColors || jugador?.equipos?.configuracion_nutricional?.planColors || {};
   const colors = {
     cardTopBg: rawColors.cardTopBg || '#254d5c',
     cardTopText: rawColors.cardTopText || '#cad6df',
@@ -130,19 +131,57 @@ function PlanFicha({ data, activeSupplements = [], jugador }) {
     const color = getDayTypeColor(dayData.tipoDia);
     const label = getDayTypeLabel(dayData.tipoDia);
     return (
-      <Paper key={dayKey} p="md" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }} mb="sm">
-        <Group justify="space-between" align="center" mb="xs">
-          <Text size="md" fw={900} tt="uppercase" style={{ color: colors.cardBodyText }}>{dayData.label}</Text>
-          <Badge variant="light" color={color}>{label}</Badge>
+      <Paper key={dayKey} p="sm" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }} mb="sm">
+        <Group justify="space-between" align="center" mb={6}>
+          <Text size="sm" fw={900} tt="uppercase" style={{ color: colors.cardBodyText, letterSpacing: '0.3px' }}>
+            {dayData.label}
+          </Text>
+          <Group gap={5} align="center" wrap="nowrap">
+            <span style={{ fontSize: '7px', color: `var(--mantine-color-${color}-5)` }}>●</span>
+            <Text size="11px" fw={700} tt="uppercase" style={{ color: `var(--mantine-color-${color}-4)`, letterSpacing: '0.5px' }}>
+              {label}
+            </Text>
+          </Group>
         </Group>
-        <Text size="xs" fw={700} c="dimmed" mb="sm">
-          {formatInt(dayData.kcal)} kcal · P: {formatInt(dayData.proteina)}g · HC: {formatInt(dayData.hidratos)}g · G: {formatInt(dayData.grasa)}g
-        </Text>
-        <Stack gap="xs">
+
+        <Box py={3} px={7} mb="xs" style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: `1px solid ${colors.boxBorder}`, borderRadius: '5px' }}>
+          <Group gap={6} justify="space-between" wrap="nowrap">
+            <Text size="11px" fw={800} style={{ color: colors.cardBodyText }}>
+              {formatInt(dayData.kcal)} <span style={{ fontWeight: 400, opacity: 0.65, fontSize: '10px' }}>kcal</span>
+            </Text>
+            <Group gap={5} wrap="nowrap" style={{ fontSize: '11px' }}>
+              <Text size="11px" style={{ color: colors.itemText }}>
+                P <strong style={{ color: colors.cardBodyText }}>{formatInt(dayData.proteina)}g</strong>
+              </Text>
+              <Text size="11px" c="dimmed">·</Text>
+              <Text size="11px" style={{ color: colors.itemText }}>
+                HC <strong style={{ color: colors.cardBodyText }}>{formatInt(dayData.hidratos)}g</strong>
+              </Text>
+              <Text size="11px" c="dimmed">·</Text>
+              <Text size="11px" style={{ color: colors.itemText }}>
+                G <strong style={{ color: colors.cardBodyText }}>{formatInt(dayData.grasa)}g</strong>
+              </Text>
+            </Group>
+          </Group>
+        </Box>
+
+        <Stack gap={5}>
           {dayData.ingestas.map((meal, mealIndex) => (
-            <Box key={mealIndex} p="xs" style={{ backgroundColor: colors.itemBg, borderRadius: '4px' }}>
-              <Text size="xs" fw={800} tt="uppercase" lh={1.1} style={{ color: colors.accentText }}>{meal.nombre}</Text>
-              <Text size="sm" mt={2} style={{ color: colors.itemText, lineHeight: 1.35 }}>{meal.detalle || '-'}</Text>
+            <Box 
+              key={mealIndex} 
+              p={8} 
+              style={{ 
+                backgroundColor: colors.itemBg, 
+                borderRadius: '6px',
+                transition: 'background-color 0.2s ease'
+              }}
+            >
+              <Text size="11px" fw={800} tt="uppercase" lh={1.1} style={{ color: colors.accentText, letterSpacing: '0.4px' }}>
+                {meal.nombre}
+              </Text>
+              <Text size="xs" mt={3} style={{ color: colors.itemText, lineHeight: 1.4 }}>
+                {meal.detalle || '-'}
+              </Text>
             </Box>
           ))}
         </Stack>
@@ -151,20 +190,24 @@ function PlanFicha({ data, activeSupplements = [], jugador }) {
   };
 
   return (
-    <Paper className="ficha" radius="sm" shadow="sm">
-      <Box className="ficha-top">
-        <Text>Valencia CF · Nutrición Deportiva · Temporada 2025/26</Text>
+    <Paper radius="md" shadow="sm" style={{ overflow: 'hidden', backgroundColor: colors.cardBodyBg, color: colors.cardBodyText, transition: 'all 0.2s ease' }}>
+      <Box style={{ backgroundColor: colors.cardTopBg, color: colors.cardTopText, textAlign: 'center', padding: '16px 12px', textTransform: 'uppercase', fontSize: '11px', letterSpacing: '1.4px', fontWeight: 700, transition: 'all 0.2s ease' }}>
+        <Text>{jugador?.equipos?.nombre || 'Club'} · Nutrición Deportiva · Temporada 2025/26</Text>
       </Box>
 
-      <Box className="ficha-body">
-        <Title className="ficha-title">{plan.jugador.nombre}</Title>
-        <Text className="ficha-position">{plan.jugador.posicion}</Text>
-        <Box className="ficha-rule" />
+      <Box p={{ base: 'md', sm: 'xl' }}>
+        <Title style={{ color: colors.cardBodyText, textAlign: 'center', fontSize: 'clamp(26px, 4.5vw, 40px)', lineHeight: 1, textTransform: 'uppercase', letterSpacing: 0, transition: 'color 0.2s ease' }}>
+          {plan.jugador.nombre}
+        </Title>
+        <Text style={{ color: colors.accentText, textAlign: 'center', textTransform: 'uppercase', fontWeight: 800, marginTop: '6px', fontSize: '12px', letterSpacing: '1px', transition: 'color 0.2s ease' }}>
+          {plan.jugador.posicion}
+        </Text>
+        <Box style={{ height: '2px', backgroundColor: colors.accentText, margin: '10px auto 0', maxWidth: '75%', opacity: 0.85, transition: 'background-color 0.2s ease' }} />
 
-        <SimpleGrid cols={{ base: 2, md: 3 }} spacing="sm" mt="xl" mb="xl">
-          <MetricCard label="Peso" value={formatNumber(plan.metricas.peso, ' kg')} color="orange.4" />
-          <MetricCard label="Grasa" value={formatNumber(plan.metricas.grasa, ' %')} color="orange.4" />
-          <MetricCard label="% P. Muscular Lee&cols" value={formatNumber(plan.metricas.pesoMuscular, ' %')} color="green.4" />
+        <SimpleGrid cols={{ base: 2, md: 3 }} spacing="sm" mt="lg" mb="lg">
+          <MetricCard label="Peso" value={formatNumber(plan.metricas.peso, ' kg')} color={colors.accentText} bg={colors.boxBg} border={colors.boxBorder} />
+          <MetricCard label="Grasa" value={formatNumber(plan.metricas.grasa, ' %')} color={colors.cardBodyText} bg={colors.boxBg} border={colors.boxBorder} />
+          <MetricCard label="% P. Muscular Lee&cols" value={formatNumber(plan.metricas.pesoMuscular, ' %')} color={colors.accentText} bg={colors.boxBg} border={colors.boxBorder} />
         </SimpleGrid>
 
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
@@ -172,28 +215,37 @@ function PlanFicha({ data, activeSupplements = [], jugador }) {
             {leftDays.map(renderDayBox)}
 
             {supplementsToShow?.length > 0 && (
-              <Paper p="md" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }} mb="sm">
-                <Group justify="space-between" align="center" mb="xs">
-                  <Title order={5} tt="uppercase" style={{ color: colors.accentText }}>Suplementación Pautada</Title>
+              <Paper p="sm" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }} mb="sm">
+                <Group justify="space-between" align="center" mb={8}>
+                  <Title order={5} tt="uppercase" style={{ color: colors.accentText, fontSize: '12px', letterSpacing: '0.6px' }}>
+                    Suplementación Pautada
+                  </Title>
                 </Group>
-                <Stack gap="xs">
+                <Stack gap={5}>
                   {supplementsToShow.map((supp, index) => (
-                    <Paper key={index} p="xs" style={{ backgroundColor: colors.itemBg, borderRadius: '4px' }}>
+                    <Paper key={index} p={7} style={{ backgroundColor: colors.itemBg, borderRadius: '5px', border: `1px solid ${colors.boxBorder}` }}>
                       <Group justify="space-between" align="flex-start" wrap="nowrap">
                         <Text size="xs" fw={800} style={{ color: colors.cardBodyText }}>{supp.nombre}</Text>
                         {supp.dosis && (
-                          <Badge color="teal" variant="filled" size="xs" radius="xs">
+                          <Text size="11px" fw={800} style={{ 
+                            color: colors.accentText, 
+                            border: `1px solid ${colors.boxBorder}`, 
+                            borderRadius: '4px', 
+                            padding: '1px 6px',
+                            backgroundColor: 'rgba(255,255,255,0.03)',
+                            letterSpacing: '0.2px'
+                          }}>
                             {supp.dosis}
-                          </Badge>
+                          </Text>
                         )}
                       </Group>
                       {supp.timing && (
-                        <Text size="xs" fw={700} mt={2} style={{ color: colors.itemText }}>
+                        <Text size="11px" fw={700} mt={2} style={{ color: colors.itemText }}>
                           Momento: {supp.timing}
                         </Text>
                       )}
                       {supp.notas && (
-                        <Text size="xs" fs="italic" mt={2} style={{ color: colors.itemText, opacity: 0.8 }}>
+                        <Text size="11px" fs="italic" mt={1} style={{ color: colors.itemText, opacity: 0.85 }}>
                           {supp.notas}
                         </Text>
                       )}
@@ -203,29 +255,40 @@ function PlanFicha({ data, activeSupplements = [], jugador }) {
               </Paper>
             )}
           </Stack>
+
           <Stack gap={0}>
             {rightDays.map(renderDayBox)}
 
             {protocolsToShow?.length > 0 && (
               <Stack gap="sm" mb="sm">
                 {protocolsToShow.map((prot, pIdx) => (
-                  <Paper key={prot.id || pIdx} p="md" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }}>
-                    <Group justify="space-between" align="center" mb="xs">
-                      <Title order={5} tt="uppercase" style={{ color: colors.accentText }}>
+                  <Paper key={prot.id || pIdx} p="sm" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }}>
+                    <Group justify="space-between" align="center" mb={8}>
+                      <Title order={5} tt="uppercase" style={{ color: colors.accentText, fontSize: '12px', letterSpacing: '0.6px' }}>
                         {prot.name || 'Protocolo de Partido'}
                       </Title>
                     </Group>
                     
                     {prot.timeline?.length > 0 && (
-                      <Stack gap="xs" mb={prot.checklist?.length > 0 ? 'xs' : 0}>
+                      <Stack gap={5} mb={prot.checklist?.length > 0 ? 'xs' : 0}>
                         {prot.timeline.map((step, sIdx) => (
-                          <Paper key={step.id || sIdx} p="xs" style={{ backgroundColor: colors.itemBg, borderRadius: '4px' }}>
-                            <Group justify="space-between" align="flex-start" wrap="nowrap" mb={2}>
-                              <Text size="xs" fw={800} style={{ color: colors.cardBodyText }}>
-                                {step.title}
-                              </Text>
+                          <Paper key={step.id || sIdx} p={7} style={{ backgroundColor: colors.itemBg, borderRadius: '5px', border: `1px solid ${colors.boxBorder}` }}>
+                            <Group justify="space-between" align="center" wrap="nowrap" mb={2}>
+                              <Group gap={6} wrap="nowrap" align="center">
+                                <ProtocolIcon iconName={step.icon} size={14} color={colors.accentText} />
+                                <Text size="xs" fw={800} style={{ color: colors.cardBodyText }}>
+                                  {step.title}
+                                </Text>
+                              </Group>
                               {step.timeLabel && (
-                                <Text size="xs" fw={800} style={{ color: colors.accentText, whiteSpace: 'nowrap' }}>
+                                <Text size="11px" fw={800} style={{ 
+                                  color: colors.accentText, 
+                                  border: `1px solid ${colors.boxBorder}`, 
+                                  borderRadius: '4px',
+                                  padding: '1px 6px',
+                                  backgroundColor: 'rgba(255,255,255,0.03)',
+                                  whiteSpace: 'nowrap'
+                                }}>
                                   {step.timeLabel}
                                 </Text>
                               )}
@@ -242,19 +305,24 @@ function PlanFicha({ data, activeSupplements = [], jugador }) {
 
                     {prot.checklist?.length > 0 && (
                       <Stack gap={4} mt="xs" pt="xs" style={{ borderTop: `1px dashed ${colors.boxBorder}` }}>
-                        <Text size="xs" fw={800} tt="uppercase" style={{ color: colors.accentText, letterSpacing: '0.5px' }}>
+                        <Text size="11px" fw={800} tt="uppercase" style={{ color: colors.accentText, letterSpacing: '0.5px' }}>
                           Checklist
                         </Text>
                         {prot.checklist.map((item, cIdx) => (
-                          <Box key={item.id || cIdx} p="xs" style={{ backgroundColor: colors.itemBg, borderRadius: '4px' }}>
-                            <Text size="xs" fw={700} style={{ color: colors.cardBodyText }}>
-                              • {item.title}
-                            </Text>
-                            {item.description && (
-                              <Text size="xs" mt={2} style={{ color: colors.itemText, opacity: 0.85, paddingLeft: 8 }}>
-                                {item.description}
-                              </Text>
-                            )}
+                          <Box key={item.id || cIdx} p={6} style={{ backgroundColor: colors.itemBg, borderRadius: '5px', border: `1px solid ${colors.boxBorder}` }}>
+                            <Group gap={6} align="flex-start" wrap="nowrap">
+                              <Text size="11px" style={{ color: colors.accentText, lineHeight: 1.2 }}>✓</Text>
+                              <Box style={{ flex: 1 }}>
+                                <Text size="xs" fw={700} style={{ color: colors.cardBodyText }}>
+                                  {item.title}
+                                </Text>
+                                {item.description && (
+                                  <Text size="xs" mt={1} style={{ color: colors.itemText, opacity: 0.85, lineHeight: 1.3 }}>
+                                    {item.description}
+                                  </Text>
+                                )}
+                              </Box>
+                            </Group>
                           </Box>
                         ))}
                       </Stack>
@@ -265,11 +333,15 @@ function PlanFicha({ data, activeSupplements = [], jugador }) {
             )}
 
             {plan.notas?.length > 0 && (
-              <Paper p="md" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }}>
-                <Title order={5} tt="uppercase" mb="xs" style={{ color: colors.accentText }}>Indicaciones de la semana</Title>
+              <Paper p="sm" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }}>
+                <Title order={5} tt="uppercase" mb={6} style={{ color: colors.accentText, fontSize: '12px', letterSpacing: '0.6px' }}>
+                  Indicaciones de la semana
+                </Title>
                 <Stack gap={4}>
                   {plan.notas.map((note, index) => (
-                    <Text key={index} size="sm" style={{ color: colors.itemText }}>• {note}</Text>
+                    <Text key={index} size="xs" style={{ color: colors.itemText, lineHeight: 1.4 }}>
+                      • {note}
+                    </Text>
                   ))}
                 </Stack>
               </Paper>
@@ -277,7 +349,9 @@ function PlanFicha({ data, activeSupplements = [], jugador }) {
           </Stack>
         </SimpleGrid>
 
-        <Text className="ficha-footer" mt="xl">Carlos Ferrando · Valencia CF · @c.ferrando · Nutricionista Deportivo y Clínico</Text>
+        <Text mt="lg" style={{ color: colors.itemText, opacity: 0.65, textAlign: 'center', fontSize: '10px' }}>
+          {jugador?.equipos?.nombre || 'Club'} · Nutrición Deportiva y Rendimiento
+        </Text>
       </Box>
     </Paper>
   );
@@ -469,6 +543,12 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [deleting, setDeleting] = useState(false);
   const [deletePlanId, setDeletePlanId] = useState(null);
 
+  const [themeOverride, setThemeOverride] = useState(null);
+
+  useEffect(() => {
+    setThemeOverride(null);
+  }, [currentId]);
+
   const currentPlan = useMemo(
     () => planes.find((plan) => String(plan.id) === String(currentId)) || null,
     [planes, currentId]
@@ -481,6 +561,109 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     marked.setOptions({ breaks: true, gfm: true });
     return marked(currentPlan.contenido);
   }, [currentPlan, currentDatos, mode]);
+
+  const handleSelectTheme = async (presetColors, presetName) => {
+    setThemeOverride(presetColors);
+    if (mode === 'edit') {
+      updateDatos((draft) => {
+        if (!draft.meta) draft.meta = {};
+        draft.meta.planColors = presetColors;
+      });
+    } else if (currentPlan && !readOnly) {
+      try {
+        const updatedDatos = {
+          ...currentDatos,
+          meta: {
+            ...currentDatos?.meta,
+            planColors: presetColors,
+          },
+        };
+        await updateAiPlan(currentPlan.id, { datos: updatedDatos });
+        setPlanes((prev) =>
+          prev.map((p) => (p.id === currentPlan.id ? { ...p, datos: updatedDatos } : p))
+        );
+        notifications.show({
+          color: 'green',
+          title: 'Tema del plan actualizado',
+          message: presetColors ? `Se aplicó el tema ${presetName || ''} a este plan.` : 'Se restableció el tema por defecto del equipo.',
+        });
+      } catch (err) {
+        notifications.show({
+          color: 'red',
+          title: 'Error al actualizar el tema',
+          message: err.message,
+        });
+      }
+    }
+  };
+
+  const renderThemeMenu = (fullWidth = false) => {
+    if (!currentDatos && !datos) return null;
+    const activeData = currentDatos || datos;
+    const currentActiveColors = themeOverride || activeData?.meta?.planColors || activeData?.planColors;
+
+    return (
+      <Menu position="bottom-end" shadow="md" width={240} radius="md">
+        <Menu.Target>
+          <Button
+            size="xs"
+            radius="xl"
+            variant="light"
+            color="gray"
+            leftSection={<IconPalette size={16} />}
+            fullWidth={fullWidth}
+          >
+            Tema
+          </Button>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Label>Temas del Plan Nutricional</Menu.Label>
+          {PLAN_THEME_PRESETS.map((preset) => {
+            const isSelected = currentActiveColors?.cardBodyBg === preset.colors.cardBodyBg &&
+                               currentActiveColors?.cardTopBg === preset.colors.cardTopBg &&
+                               currentActiveColors?.boxBg === preset.colors.boxBg;
+            return (
+              <Menu.Item
+                key={preset.id}
+                onClick={() => handleSelectTheme(preset.colors, preset.name)}
+                leftSection={
+                  <Group gap={3}>
+                    {preset.swatches.map((s, idx) => (
+                      <Box
+                        key={idx}
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          backgroundColor: s,
+                          border: '1px solid rgba(0,0,0,0.15)',
+                        }}
+                      />
+                    ))}
+                  </Group>
+                }
+                rightSection={isSelected ? <IconCheck size={14} color="var(--mantine-color-teal-6)" /> : null}
+              >
+                <Text size="xs" fw={isSelected ? 700 : 500}>
+                  {preset.name}
+                </Text>
+              </Menu.Item>
+            );
+          })}
+          <Menu.Divider />
+          <Menu.Item
+            onClick={() => handleSelectTheme(null)}
+            color="dimmed"
+            rightSection={!currentActiveColors ? <IconCheck size={14} color="var(--mantine-color-teal-6)" /> : null}
+          >
+            <Text size="xs" fw={!currentActiveColors ? 700 : 400}>
+              Tema por defecto del equipo
+            </Text>
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+    );
+  };
 
   useEffect(() => {
     let active = true;
@@ -913,16 +1096,19 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                   Intercambios
                 </Button>
                 {currentDatos && mode === 'view' && (
-                  <Button
-                    size="xs"
-                    radius="xl"
-                    variant="light"
-                    leftSection={<IconDownload size={16} />}
-                    onClick={downloadPdf}
-                    loading={actionType === 'download'}
-                  >
-                    Descargar
-                  </Button>
+                  <>
+                    {renderThemeMenu()}
+                    <Button
+                      size="xs"
+                      radius="xl"
+                      variant="light"
+                      leftSection={<IconDownload size={16} />}
+                      onClick={downloadPdf}
+                      loading={actionType === 'download'}
+                    >
+                      Descargar
+                    </Button>
+                  </>
                 )}
                 {!readOnly && (
                   <>
@@ -980,17 +1166,20 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                     Intercambios
                   </Button>
                   {currentDatos && mode === 'view' && (
-                    <Button
-                      size="xs"
-                      radius="xl"
-                      variant="light"
-                      leftSection={<IconDownload size={16} />}
-                      onClick={downloadPdf}
-                      loading={actionType === 'download'}
-                      fullWidth
-                    >
-                      Descargar
-                    </Button>
+                    <>
+                      {renderThemeMenu(true)}
+                      <Button
+                        size="xs"
+                        radius="xl"
+                        variant="light"
+                        leftSection={<IconDownload size={16} />}
+                        onClick={downloadPdf}
+                        loading={actionType === 'download'}
+                        fullWidth
+                      >
+                        Descargar
+                      </Button>
+                    </>
                   )}
                   {!readOnly && (
                     <>
@@ -1309,7 +1498,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
             />
           </Box>
         ) : currentDatos ? (
-          <PlanFicha data={currentDatos} jugador={jugador} activeSupplements={activeSupplements} />
+          <PlanFicha data={currentDatos} jugador={jugador} activeSupplements={activeSupplements} themeColors={themeOverride} />
         ) : planHtml ? (
           <Paper p={{ base: 'sm', sm: 'xl' }} radius="lg" withBorder shadow="sm">
             <Badge mb="md" color="gray" variant="light">Plan legado</Badge>
@@ -1325,23 +1514,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       <IntercambiosModal opened={intercambiosOpened} onClose={() => setIntercambiosOpened(false)} />
 
       <style>{`
-        .ficha { overflow: hidden; background: ${planColors.cardBodyBg}; color: ${planColors.cardBodyText}; }
-        .ficha-top { background: ${planColors.cardTopBg}; color: ${planColors.cardTopText}; text-align: center; padding: 18px 12px; text-transform: uppercase; font-size: 11px; letter-spacing: 1.4px; }
-        .ficha-body { padding: 28px clamp(16px, 4vw, 42px) 32px; }
-        .ficha-title { color: white; text-align: center; font-size: clamp(28px, 5vw, 44px); line-height: 1; text-transform: uppercase; letter-spacing: 0; }
-        .ficha-position { color: #ff8b52; text-align: center; text-transform: uppercase; font-weight: 800; margin-top: 6px; }
-        .ficha-rule { height: 2px; background: #ff785f; margin: 12px auto 0; max-width: 82%; }
-        .ficha-metric { background: #161839; text-align: center; border: 1px solid #1d2145; }
-        .ficha-macro { background: #292b5c; text-align: center; border: 1px solid #343963; min-height: 132px; }
-        .ficha-macro.is-middle { background: #1d1f46; }
-        .ficha-section { text-align: center; color: #b9c7df; text-transform: uppercase; font-size: 13px; font-weight: 800; margin: 28px 0 12px; }
-        .ficha-day-header { background: #254d5c; color: #38c6b4; text-align: center; padding: 8px; text-transform: uppercase; font-size: 11px; font-weight: 800; border-radius: 2px; }
-        .ficha-day-header[data-match="true"] { color: #ff8b52; }
-        .ficha-meal { background: #1d1f46; min-height: 54px; padding: 8px; border-radius: 2px; }
-        .ficha-meal-name { color: #ff8b52; text-transform: uppercase; font-size: 11px; font-weight: 800; line-height: 1.1; }
-        .ficha-meal-detail { color: #aab0c8; font-size: 12px; line-height: 1.35; margin-top: 3px; }
-        .ficha-notes { background: #071e36; color: #d8e9f8; text-align: center; margin-top: 18px; padding: 12px; font-size: 12px; line-height: 1.45; }
-        .ficha-footer { color: #aab0c8; text-align: center; font-size: 11px; margin-top: 18px; }
         @media (min-width: 62em) { .meal-detail-field { grid-column: span 3; } }
         .plan-md h1 { font-size: 24px; font-weight: 800; color: var(--mantine-color-dark-4); margin: 0 0 12px; letter-spacing: 0; }
         .plan-md h2 { font-size: 14px; font-weight: 700; color: var(--mantine-color-blue-filled); text-transform: uppercase; letter-spacing: 1px; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--mantine-color-blue-light); }
