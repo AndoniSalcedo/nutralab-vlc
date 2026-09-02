@@ -309,7 +309,7 @@ export function PlanCardPage({ plan, teamConfig }) {
           <Text style={[styles.metricValue, { color: planColors.cardBodyText }]}>{formatGrasa(plan?.metricas?.grasa)}</Text>
         </View>
         <View style={[styles.metricBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
-          <Text style={styles.metricLabel}>% P. Muscular Lee&cols</Text>
+          <Text style={styles.metricLabel}>Músculo</Text>
           <Text style={[styles.metricValue, { color: DAY_TYPE_COLORS.green }]}>{formatGrasa(plan?.metricas?.pesoMuscular)}</Text>
         </View>
       </View>

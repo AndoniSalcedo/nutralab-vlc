@@ -73,9 +73,9 @@ function clonePlan(data) {
 
 function MetricCard({ label, value, color, bg, border }) {
   return (
-    <Paper p="sm" radius="md" style={{ backgroundColor: bg, border: `1px solid ${border}`, textAlign: 'center' }}>
-      <Text size="10px" fw={800} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.8px' }}>{label}</Text>
-      <Title order={3} style={{ color, fontSize: '20px', fontWeight: 850, marginTop: '2px', letterSpacing: '-0.3px' }}>{value}</Title>
+    <Paper p={{ base: 'xs', sm: 'sm' }} radius="md" style={{ backgroundColor: bg, border: `1px solid ${border}`, textAlign: 'center', overflow: 'hidden' }}>
+      <Text size="10px" fw={800} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</Text>
+      <Title order={3} style={{ color, fontSize: 'clamp(13px, 2.2vw, 20px)', fontWeight: 850, marginTop: '2px', letterSpacing: '-0.3px', whiteSpace: 'nowrap' }}>{value}</Title>
     </Paper>
   );
 }
@@ -208,10 +208,10 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
         </Text>
         <Box style={{ height: '2px', backgroundColor: colors.accentText, margin: '10px auto 0', maxWidth: '75%', opacity: 0.85, transition: 'background-color 0.2s ease' }} />
 
-        <SimpleGrid cols={{ base: 2, md: 3 }} spacing="sm" mt="lg" mb="lg">
+        <SimpleGrid cols={3} spacing={{ base: 'xs', sm: 'sm' }} mt="lg" mb="lg">
           <MetricCard label="Peso" value={formatNumber(plan.metricas.peso, ' kg')} color={colors.accentText} bg={colors.boxBg} border={colors.boxBorder} />
           <MetricCard label="Grasa" value={formatNumber(plan.metricas.grasa, ' %')} color={colors.cardBodyText} bg={colors.boxBg} border={colors.boxBorder} />
-          <MetricCard label="% P. Muscular Lee&cols" value={formatNumber(plan.metricas.pesoMuscular, ' %')} color={colors.accentText} bg={colors.boxBg} border={colors.boxBorder} />
+          <MetricCard label="Músculo" value={formatNumber(plan.metricas.pesoMuscular, ' %')} color={colors.accentText} bg={colors.boxBg} border={colors.boxBorder} />
         </SimpleGrid>
 
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
