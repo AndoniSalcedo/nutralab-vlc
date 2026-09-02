@@ -71,7 +71,7 @@ export default function MeasurementModal({
 
         <Divider my="xs" label="Métricas del Jugador" labelPosition="center" />
 
-        <ScrollArea.Autosize maxHeight="50vh" offsetScrollbars>
+        <ScrollArea.Autosize mah="50vh" offsetScrollbars>
           <Stack gap="xl" pr="xs">
             {MEASUREMENT_DETAIL_SECTIONS.map((section) => (
               <Stack gap="xs" key={section.title}>

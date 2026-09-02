@@ -257,9 +257,27 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         });
       });
 
-      // Keep legacy fallback columns in sync
-      payload.perimetro_pantorrilla = payload.perimetro_pantorrilla_derecha;
-      payload.perimetro_muslo = payload.perimetro_muslo_derecho;
+      // Synchronize fat, muscle and lean mass
+      if (payload.peso_graso !== null && payload.peso_kg !== null && payload.peso_kg > 0 && payload.porcentaje_grasa === null) {
+        payload.porcentaje_grasa = Number(((payload.peso_graso / payload.peso_kg) * 100).toFixed(2));
+      } else if (payload.porcentaje_grasa !== null && payload.peso_kg !== null && payload.peso_graso === null) {
+        payload.peso_graso = Number((payload.peso_kg * (payload.porcentaje_grasa / 100)).toFixed(2));
+      }
+
+      if (payload.porcentaje_grasa !== null) {
+        payload.porcentaje_grasa_faulkner = payload.porcentaje_grasa;
+      }
+
+      if (payload.porcentaje_musculo !== null && payload.peso_kg !== null && payload.peso_muscular === null) {
+        payload.peso_muscular = Number((payload.peso_kg * (payload.porcentaje_musculo / 100)).toFixed(2));
+      } else if (payload.peso_muscular !== null && payload.peso_kg !== null && payload.peso_kg > 0 && payload.porcentaje_musculo === null) {
+        payload.porcentaje_musculo = Number(((payload.peso_muscular / payload.peso_kg) * 100).toFixed(2));
+      }
+
+      if (payload.masa_magra_kg === null && payload.peso_kg !== null && payload.porcentaje_grasa !== null) {
+        payload.masa_magra_kg = Number((payload.peso_kg * (1 - payload.porcentaje_grasa / 100)).toFixed(2));
+      }
+      payload.peso_magro = payload.masa_magra_kg;
 
       const data = await saveEvolution(payload);
 

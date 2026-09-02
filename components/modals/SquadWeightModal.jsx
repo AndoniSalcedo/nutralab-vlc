@@ -443,7 +443,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
 
             <Divider label="Lista de Jugadores" labelPosition="center" />
 
-            <ScrollArea.Autosize maxHeight="42vh" offsetScrollbars>
+            <ScrollArea.Autosize mah="42vh" offsetScrollbars>
               <Stack gap="xs" pr="xs">
                 {filteredPlayers.length > 0 ? (
                   filteredPlayers.map((player) => {
@@ -665,7 +665,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
             <Divider />
 
             {/* Players List with clean typography and status dots (NO Mantine Badges as per rules) */}
-            <ScrollArea.Autosize maxHeight="38vh" offsetScrollbars>
+            <ScrollArea.Autosize mah="38vh" offsetScrollbars>
               <Stack gap={4} pr="xs">
                 {filteredExportPlayers.length > 0 ? (
                   filteredExportPlayers.map((player) => {
