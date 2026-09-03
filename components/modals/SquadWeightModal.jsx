@@ -102,7 +102,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
       const pesoVal = hasWeight ? Number(pesajeOnDate.peso_kg) : null;
 
       const calcOptions = {
-        masaMagra: player.masa_magra_kg,
+        masaMagra: player.peso_magro || player.masa_magra_kg,
         porcentajeGrasaObjetivo: player.porcentaje_grasa_objetivo,
         evoluciones: player.evoluciones,
         jugador: player,
@@ -145,7 +145,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
         }
       }
 
-      const masaMagra = semaforo.masaMagra || player.masa_magra_kg;
+      const masaMagra = semaforo.masaMagra || player.peso_magro || player.masa_magra_kg;
       const targetFatPct = Number(player.porcentaje_grasa_objetivo) || 10;
 
       const peso8 = masaMagra && Number.isFinite(masaMagra) && masaMagra > 0

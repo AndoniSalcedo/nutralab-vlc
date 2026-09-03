@@ -274,10 +274,12 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         payload.porcentaje_musculo = Number(((payload.peso_muscular / payload.peso_kg) * 100).toFixed(2));
       }
 
-      if (payload.masa_magra_kg === null && payload.peso_kg !== null && payload.porcentaje_grasa !== null) {
-        payload.masa_magra_kg = Number((payload.peso_kg * (1 - payload.porcentaje_grasa / 100)).toFixed(2));
+      // Autocalculate peso_magro (lean mass = peso - grasa)
+      if (payload.peso_kg !== null && payload.porcentaje_grasa !== null) {
+        payload.peso_magro = Number((payload.peso_kg * (1 - payload.porcentaje_grasa / 100)).toFixed(2));
+      } else if (payload.peso_kg !== null && payload.peso_graso !== null) {
+        payload.peso_magro = Number((payload.peso_kg - payload.peso_graso).toFixed(2));
       }
-      payload.peso_magro = payload.masa_magra_kg;
 
       const data = await saveEvolution(payload);
 

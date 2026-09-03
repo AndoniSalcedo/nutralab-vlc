@@ -464,7 +464,7 @@ export function PlayerDetailBreakdownPage({ player, plan, meta, teamConfig }) {
   const metrics = plan?.metricas || {
     peso: p.peso_kg,
     grasa: p.porcentaje_grasa,
-    masaMagra: p.masa_magra_kg,
+    masaMagra: p.peso_magro ?? p.masa_magra_kg,
     pesoMuscular: p.peso_muscular_pct,
   };
 

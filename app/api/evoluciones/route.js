@@ -37,7 +37,6 @@ const EVOLUTION_FIELDS = [
   'peso_kg',
   'porcentaje_grasa',
   'porcentaje_musculo',
-  'masa_magra_kg',
   'pliegue_biceps',
   'pliegue_triceps',
   'pliegue_subescapular',

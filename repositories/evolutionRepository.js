@@ -23,7 +23,7 @@ export async function getEvolutionsByPlayerIdOrdered(supabase, playerId) {
 export async function getEvolutionsByPlayerIdsSimple(supabase, playerIds) {
   const { data, error } = await supabase
     .from('evoluciones')
-    .select('jugador_id,fecha,peso_kg,porcentaje_grasa,masa_magra_kg')
+    .select('jugador_id,fecha,peso_kg,porcentaje_grasa,peso_magro')
     .in('jugador_id', playerIds);
 
   if (error) throw error;
