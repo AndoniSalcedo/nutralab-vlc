@@ -151,12 +151,15 @@ function normalize(value) {
 }
 
 function DashboardStat({ title, icon: Icon, color = 'blue', value, description, href, onClick }) {
+  const router = useRouter();
   const isClickable = Boolean(href || onClick);
-  const content = (
+  const handleClick = onClick || (href ? () => router.push(href) : undefined);
+
+  return (
     <Box
-      component={onClick ? 'button' : 'div'}
-      type={onClick ? 'button' : undefined}
-      onClick={onClick}
+      component="button"
+      type="button"
+      onClick={handleClick}
       px={{ base: 'sm', sm: 'md' }}
       py={6}
       style={{
@@ -200,14 +203,6 @@ function DashboardStat({ title, icon: Icon, color = 'blue', value, description, 
         )}
       </Group>
     </Box>
-  );
-
-  if (!href) return content;
-
-  return (
-    <Anchor href={href} underline="never" c="inherit">
-      {content}
-    </Anchor>
   );
 }
 
