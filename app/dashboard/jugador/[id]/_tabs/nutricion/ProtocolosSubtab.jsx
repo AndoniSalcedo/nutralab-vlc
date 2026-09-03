@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Badge, Box, Group, Paper, SimpleGrid, Stack, Text, Timeline, Select, Title, Button } from '@mantine/core';
+import { Box, Group, Paper, SimpleGrid, Stack, Text, Timeline, Select, Title, Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPencil, IconCalendar, IconFlag, IconClipboardList, IconRotate } from '@tabler/icons-react';
 import SubtabHeader from '../SubtabHeader';
@@ -95,7 +95,6 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
     return <IconComponent size={15} />;
   };
 
-  const dayTypeObj = dayTypes.find(d => d.key === selectedDayType);
 
   return (
     <Stack gap={0}>
