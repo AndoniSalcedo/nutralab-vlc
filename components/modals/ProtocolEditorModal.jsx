@@ -5,11 +5,12 @@ import {
   IconTrash, 
   IconArrowUp,
   IconArrowDown,
-  IconFlag
+  IconFlag,
+  IconCheck
 } from '@tabler/icons-react';
 import { PROTOCOL_AVAILABLE_ICONS as AVAILABLE_ICONS } from '@/components/ProtocolIcon';
 
-export default function ProtocolEditorModal({ opened, onClose, protocol, onSave }) {
+export default function ProtocolEditorModal({ opened, onClose, protocol, onSave, saveLabel = 'Aceptar', helpText }) {
   const [name, setName] = useState('');
   const [timeline, setTimeline] = useState([]);
   const [checklist, setChecklist] = useState([]);
@@ -418,9 +419,18 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave 
         </Stack>
       </ScrollArea>
       
-      <Group justify="flex-end" mt="md" pt="md" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
-        <Button variant="default" onClick={onClose} radius="xl">Cancelar</Button>
-        <Button color="blue" onClick={handleSave} radius="xl" disabled={!name}>Guardar Protocolo</Button>
+      <Group justify={helpText ? 'space-between' : 'flex-end'} mt="md" pt="md" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+        {helpText && (
+          <Text size="xs" c="dimmed" style={{ maxWidth: '60%' }}>
+            {helpText}
+          </Text>
+        )}
+        <Group gap="xs">
+          <Button variant="default" onClick={onClose} radius="xl">Cancelar</Button>
+          <Button color="blue" onClick={handleSave} radius="xl" disabled={!name} leftSection={<IconCheck size={16} />}>
+            {saveLabel}
+          </Button>
+        </Group>
       </Group>
     </Modal>
   );

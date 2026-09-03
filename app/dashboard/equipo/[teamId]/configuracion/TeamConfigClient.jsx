@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 import { slugify } from '@/lib/utils';
 import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea, Anchor, Box, ColorInput, SimpleGrid, Avatar, FileButton, UnstyledButton, Modal } from '@mantine/core';
@@ -22,6 +22,37 @@ import { PLAN_THEME_PRESETS } from '@/lib/nutrition-plan-card';
 import ProtocolIcon from '@/components/ProtocolIcon';
 
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
+
+function getInitialDayTypes(config) {
+  let list = [];
+  if (config?.dayTypes) {
+    list = config.dayTypes;
+  } else {
+    list = JSON.parse(JSON.stringify(NUTRITION_DAY_TYPES));
+  }
+  return list.map((d) => ({
+    ...d,
+    tienePostentreno: d.tienePostentreno !== undefined
+      ? d.tienePostentreno
+      : (d.tienePreentreno !== undefined ? d.tienePreentreno : ['doble', 'entreno', 'partido'].includes(d.key)),
+    tienePreentreno: d.tienePreentreno !== undefined ? d.tienePreentreno : ['doble', 'entreno', 'partido'].includes(d.key)
+  }));
+}
+
+function getInitialColors(teamData) {
+  const raw = teamData?.configuracion_nutricional?.planColors || {};
+  return {
+    cardTopBg: raw.cardTopBg || '#254d5c',
+    cardTopText: raw.cardTopText || '#cad6df',
+    cardBodyBg: raw.cardBodyBg || '#101229',
+    cardBodyText: raw.cardBodyText || '#ffffff',
+    boxBg: raw.boxBg || raw.dayBoxBg || raw.suppBoxBg || '#151932',
+    boxBorder: raw.boxBorder || raw.dayBoxBorder || raw.suppBoxBorder || '#1f2444',
+    itemBg: raw.itemBg || raw.mealBoxBg || raw.suppItemBg || '#1d1f46',
+    accentText: raw.accentText || raw.mealTitleText || raw.suppTitleText || '#ffa94d',
+    itemText: raw.itemText || raw.mealDescText || raw.notesDescText || '#dee2e6'
+  };
+}
 
 export default function TeamConfigClient({ team, user: _user, availableTeams: _availableTeams = [], readOnly = false }) {
   const router = useRouter();
@@ -146,80 +177,63 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
 
   const [savingSection, setSavingSection] = useState(null);
 
-  const initialInfo = useMemo(() => ({
-    nombre: team.nombre || '',
-    temporada: team.temporada || ''
-  }), [team.nombre, team.temporada]);
+  const [savedBaselines, setSavedBaselines] = useState(() => ({
+    info: {
+      nombre: team.nombre || '',
+      temporada: team.temporada || ''
+    },
+    pdf: {
+      pdfMicrocycle: team.configuracion_nutricional?.pdfMicrocycle || '',
+      pdfRules: team.configuracion_nutricional?.pdfRules || '',
+      pdfBuffet: team.configuracion_nutricional?.pdfBuffet || ''
+    },
+    dayTypes: getInitialDayTypes(team.configuracion_nutricional),
+    macros: team.configuracion_nutricional?.objectiveMacros || JSON.parse(JSON.stringify(OBJECTIVE_DAY_TYPE_MACROS)),
+    protocols: team.configuracion_nutricional?.protocols || [],
+    colors: getInitialColors(team)
+  }));
 
-  const initialPdf = useMemo(() => ({
-    pdfMicrocycle: team.configuracion_nutricional?.pdfMicrocycle || '',
-    pdfRules: team.configuracion_nutricional?.pdfRules || '',
-    pdfBuffet: team.configuracion_nutricional?.pdfBuffet || ''
-  }), [team.configuracion_nutricional]);
-
-  const initialDayTypes = useMemo(() => {
-    let list = [];
-    if (team.configuracion_nutricional?.dayTypes) {
-      list = team.configuracion_nutricional.dayTypes;
-    } else {
-      list = JSON.parse(JSON.stringify(NUTRITION_DAY_TYPES));
-    }
-    return list.map((d) => ({
-      ...d,
-      tienePostentreno: d.tienePostentreno !== undefined
-        ? d.tienePostentreno
-        : (d.tienePreentreno !== undefined ? d.tienePreentreno : ['doble', 'entreno', 'partido'].includes(d.key)),
-      tienePreentreno: d.tienePreentreno !== undefined ? d.tienePreentreno : ['doble', 'entreno', 'partido'].includes(d.key)
-    }));
-  }, [team.configuracion_nutricional]);
-
-  const initialObjectiveMacros = useMemo(() => {
-    if (team.configuracion_nutricional?.objectiveMacros) return team.configuracion_nutricional.objectiveMacros;
-    return JSON.parse(JSON.stringify(OBJECTIVE_DAY_TYPE_MACROS));
-  }, [team.configuracion_nutricional]);
-
-  const initialProtocols = useMemo(() => {
-    return team.configuracion_nutricional?.protocols || [];
-  }, [team.configuracion_nutricional]);
-
-  const initialColors = useMemo(() => {
-    const raw = team.configuracion_nutricional?.planColors || {};
-    return {
-      cardTopBg: raw.cardTopBg || '#254d5c',
-      cardTopText: raw.cardTopText || '#cad6df',
-      cardBodyBg: raw.cardBodyBg || '#101229',
-      cardBodyText: raw.cardBodyText || '#ffffff',
-      boxBg: raw.boxBg || raw.dayBoxBg || raw.suppBoxBg || '#151932',
-      boxBorder: raw.boxBorder || raw.dayBoxBorder || raw.suppBoxBorder || '#1f2444',
-      itemBg: raw.itemBg || raw.mealBoxBg || raw.suppItemBg || '#1d1f46',
-      accentText: raw.accentText || raw.mealTitleText || raw.suppTitleText || '#ffa94d',
-      itemText: raw.itemText || raw.mealDescText || raw.notesDescText || '#dee2e6'
-    };
+  useEffect(() => {
+    setSavedBaselines({
+      info: {
+        nombre: team.nombre || '',
+        temporada: team.temporada || ''
+      },
+      pdf: {
+        pdfMicrocycle: team.configuracion_nutricional?.pdfMicrocycle || '',
+        pdfRules: team.configuracion_nutricional?.pdfRules || '',
+        pdfBuffet: team.configuracion_nutricional?.pdfBuffet || ''
+      },
+      dayTypes: getInitialDayTypes(team.configuracion_nutricional),
+      macros: team.configuracion_nutricional?.objectiveMacros || JSON.parse(JSON.stringify(OBJECTIVE_DAY_TYPE_MACROS)),
+      protocols: team.configuracion_nutricional?.protocols || [],
+      colors: getInitialColors(team)
+    });
   }, [team]);
 
   const hasInfoChanges = useMemo(() => {
-    return teamName !== initialInfo.nombre || teamSeason !== initialInfo.temporada;
-  }, [teamName, teamSeason, initialInfo]);
+    return teamName !== savedBaselines.info.nombre || teamSeason !== savedBaselines.info.temporada;
+  }, [teamName, teamSeason, savedBaselines.info]);
 
   const hasPdfChanges = useMemo(() => {
-    return pdfMicrocycle !== initialPdf.pdfMicrocycle || pdfRules !== initialPdf.pdfRules || pdfBuffet !== initialPdf.pdfBuffet;
-  }, [pdfMicrocycle, pdfRules, pdfBuffet, initialPdf]);
+    return pdfMicrocycle !== savedBaselines.pdf.pdfMicrocycle || pdfRules !== savedBaselines.pdf.pdfRules || pdfBuffet !== savedBaselines.pdf.pdfBuffet;
+  }, [pdfMicrocycle, pdfRules, pdfBuffet, savedBaselines.pdf]);
 
   const hasColorChanges = useMemo(() => {
-    return JSON.stringify(planColors) !== JSON.stringify(initialColors);
-  }, [planColors, initialColors]);
+    return JSON.stringify(planColors) !== JSON.stringify(savedBaselines.colors);
+  }, [planColors, savedBaselines.colors]);
 
   const hasDayTypeChanges = useMemo(() => {
-    return JSON.stringify(dayTypes) !== JSON.stringify(initialDayTypes);
-  }, [dayTypes, initialDayTypes]);
+    return JSON.stringify(dayTypes) !== JSON.stringify(savedBaselines.dayTypes);
+  }, [dayTypes, savedBaselines.dayTypes]);
 
   const hasProtocolChanges = useMemo(() => {
-    return JSON.stringify(protocols) !== JSON.stringify(initialProtocols);
-  }, [protocols, initialProtocols]);
+    return JSON.stringify(protocols) !== JSON.stringify(savedBaselines.protocols);
+  }, [protocols, savedBaselines.protocols]);
 
   const hasMacroChanges = useMemo(() => {
-    return JSON.stringify(objectiveMacros) !== JSON.stringify(initialObjectiveMacros);
-  }, [objectiveMacros, initialObjectiveMacros]);
+    return JSON.stringify(objectiveMacros) !== JSON.stringify(savedBaselines.macros);
+  }, [objectiveMacros, savedBaselines.macros]);
 
   const handleColorChange = (field, value) => {
     setPlanColors(prev => ({ ...prev, [field]: value }));
@@ -233,6 +247,7 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
     if (!finalKey || !editingDayType.label) return;
 
     const finalDayType = { ...editingDayType, key: finalKey };
+    const isEditing = Boolean(editingDayType.key && dayTypes.some(d => d.key === editingDayType.key));
 
     setDayTypes(current => {
       const exists = current.findIndex(d => d.key === finalKey);
@@ -257,6 +272,11 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
     });
 
     setModalOpen(false);
+    notifications.show({
+      title: isEditing ? 'Tipo de día preparado en la lista' : 'Tipo de día añadido a la lista',
+      message: 'Pulsa "Guardar Tipos de Día" para confirmar los cambios en el equipo.',
+      color: 'blue'
+    });
   };
 
   const removeDayType = (key) => {
@@ -267,6 +287,11 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
     if (!deleteDayTypeKey) return;
     setDayTypes(current => current.filter(d => d.key !== deleteDayTypeKey));
     setDeleteDayTypeKey(null);
+    notifications.show({
+      title: 'Tipo de día eliminado de la lista',
+      message: 'Pulsa "Guardar Tipos de Día" para confirmar la eliminación.',
+      color: 'orange'
+    });
   };
 
   const updateMacro = (objective, dayTypeKey, field, value) => {
@@ -299,6 +324,10 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
           })
         });
         if (!teamRes.ok) throw new Error('Error actualizando la información del equipo');
+        setSavedBaselines(prev => ({
+          ...prev,
+          info: { nombre: teamName, temporada: teamSeason }
+        }));
         notifications.show({ title: 'Guardado exitoso', message: 'Información básica del equipo actualizada.', color: 'green' });
         router.refresh();
       } catch (e) {
@@ -328,6 +357,23 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
       });
 
       if (!res.ok) throw new Error('Error guardando la configuración');
+
+      // Actualizar inmediatamente la línea base de la sección guardada para limpiar "Cambios sin guardar"
+      setSavedBaselines(prev => {
+        const next = { ...prev };
+        if (sectionKey === 'pdf') {
+          next.pdf = { pdfMicrocycle, pdfRules, pdfBuffet };
+        } else if (sectionKey === 'colors') {
+          next.colors = JSON.parse(JSON.stringify(planColors));
+        } else if (sectionKey === 'dayTypes') {
+          next.dayTypes = JSON.parse(JSON.stringify(dayTypes));
+        } else if (sectionKey === 'protocols') {
+          next.protocols = JSON.parse(JSON.stringify(protocols));
+        } else if (sectionKey === 'macros') {
+          next.macros = JSON.parse(JSON.stringify(objectiveMacros));
+        }
+        return next;
+      });
 
       const labels = {
         pdf: 'Textos de PDF guardados',
@@ -926,6 +972,27 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
               ))}
             </Table.Tbody>
           </Table>
+
+          {hasDayTypeChanges && !readOnly && (
+            <Group justify="flex-end" mt="md" pt="sm" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+              <Group gap="xs">
+                <Group gap={4} align="center" wrap="nowrap">
+                  <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
+                  <Text size="xs" fw={700} c="orange.7">Tienes cambios sin guardar en los tipos de día</Text>
+                </Group>
+                <Button
+                  size="xs"
+                  radius="xl"
+                  color="teal"
+                  loading={savingSection === 'dayTypes'}
+                  leftSection={<IconDeviceFloppy size={14} />}
+                  onClick={() => saveSection('dayTypes')}
+                >
+                  Guardar Tipos de Día
+                </Button>
+              </Group>
+            </Group>
+          )}
         </Paper>
 
         <Paper p="md" radius="lg" shadow="sm" withBorder>
@@ -1068,6 +1135,27 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
               );
             })}
           </Accordion>
+
+          {hasProtocolChanges && !readOnly && (
+            <Group justify="flex-end" mt="md" pt="sm" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+              <Group gap="xs">
+                <Group gap={4} align="center" wrap="nowrap">
+                  <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
+                  <Text size="xs" fw={700} c="orange.7">Tienes cambios sin guardar en los protocolos</Text>
+                </Group>
+                <Button
+                  size="xs"
+                  radius="xl"
+                  color="teal"
+                  loading={savingSection === 'protocols'}
+                  leftSection={<IconDeviceFloppy size={14} />}
+                  onClick={() => saveSection('protocols')}
+                >
+                  Guardar Protocolos
+                </Button>
+              </Group>
+            </Group>
+          )}
         </Paper>
 
         <Paper p="md" radius="lg" shadow="sm" withBorder>
@@ -1145,6 +1233,27 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
               </Accordion.Item>
             ))}
           </Accordion>
+
+          {hasMacroChanges && !readOnly && (
+            <Group justify="flex-end" mt="md" pt="sm" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+              <Group gap="xs">
+                <Group gap={4} align="center" wrap="nowrap">
+                  <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
+                  <Text size="xs" fw={700} c="orange.7">Tienes cambios sin guardar en los multiplicadores</Text>
+                </Group>
+                <Button
+                  size="xs"
+                  radius="xl"
+                  color="teal"
+                  loading={savingSection === 'macros'}
+                  leftSection={<IconDeviceFloppy size={14} />}
+                  onClick={() => saveSection('macros')}
+                >
+                  Guardar Multiplicadores
+                </Button>
+              </Group>
+            </Group>
+          )}
         </Paper>
 
         <DayTypeModal
@@ -1169,6 +1278,11 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
           onConfirm={() => {
             setProtocols(current => current.filter(p => p.id !== deleteProtocolId));
             setDeleteProtocolId(null);
+            notifications.show({
+              title: 'Protocolo eliminado de la lista',
+              message: 'Pulsa "Guardar Protocolos" para confirmar la eliminación.',
+              color: 'orange'
+            });
           }}
           title="Eliminar protocolo"
           message="¿Seguro que quieres eliminar este protocolo? Los jugadores que ya lo hayan personalizado mantendrán su copia local."
@@ -1178,7 +1292,10 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
           opened={protocolModalOpen}
           onClose={() => setProtocolModalOpen(false)}
           protocol={editingProtocol}
+          saveLabel="Aceptar"
+          helpText="Al aceptar, se aplicarán los cambios a la lista. Recuerda pulsar &quot;Guardar Protocolos&quot; para guardarlos en el equipo."
           onSave={(savedProtocol) => {
+            const isEditing = Boolean(editingProtocol?.id && editingProtocol.name);
             setProtocols(current => {
               const exists = current.findIndex(p => p.id === savedProtocol.id);
               if (exists >= 0) {
@@ -1187,6 +1304,11 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
                 return next;
               }
               return [...current, savedProtocol];
+            });
+            notifications.show({
+              title: isEditing ? 'Protocolo preparado en la lista' : 'Protocolo añadido a la lista',
+              message: 'Pulsa "Guardar Protocolos" para guardar los cambios en el equipo.',
+              color: 'blue'
             });
           }}
         />
@@ -1202,7 +1324,15 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
           currentDayTypes={dayTypes}
           onTransferred={({ action, protocol }) => {
             if (action === 'move') {
-              setProtocols(current => current.filter(p => p.id !== protocol.id));
+              setProtocols(current => {
+                const next = current.filter(p => p.id !== protocol.id);
+                setSavedBaselines(prev => ({
+                  ...prev,
+                  protocols: JSON.parse(JSON.stringify(next))
+                }));
+                return next;
+              });
+              router.refresh();
             }
           }}
         />
@@ -1212,7 +1342,15 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
           currentTeamId={team.id}
           currentDayTypes={dayTypes}
           onImported={(imported) => {
-            setProtocols(current => [...current, ...imported]);
+            setProtocols(current => {
+              const next = [...current, ...imported];
+              setSavedBaselines(prev => ({
+                ...prev,
+                protocols: JSON.parse(JSON.stringify(next))
+              }));
+              return next;
+            });
+            router.refresh();
           }}
         />
 

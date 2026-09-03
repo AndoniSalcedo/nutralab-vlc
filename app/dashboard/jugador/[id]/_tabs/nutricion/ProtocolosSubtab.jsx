@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Badge, Box, Group, Paper, SimpleGrid, Stack, Text, Timeline, Select, Title, Button } from '@mantine/core';
-import { IconPencil, IconCalendar, IconFlag, IconClipboardList } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
+import { IconPencil, IconCalendar, IconFlag, IconClipboardList, IconRotate } from '@tabler/icons-react';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import { EditableSection } from '../editable';
@@ -13,10 +15,15 @@ import NothingFound from '@/components/NothingFound';
 import { PROTOCOL_ICON_MAP as AVAILABLE_ICONS } from '@/components/ProtocolIcon';
 
 export default function ProtocolosSubtab({ jugador, readOnly = false }) {
+  const router = useRouter();
   const teamConfig = jugador.equipos?.configuracion_nutricional || {};
   const dayTypes = teamConfig.dayTypes || [];
   const baseProtocols = teamConfig.protocols || [];
-  const customProtocols = jugador.protocolos_custom || {};
+  const [customProtocols, setCustomProtocols] = useState(() => jugador.protocolos_custom || {});
+
+  useEffect(() => {
+    setCustomProtocols(jugador.protocolos_custom || {});
+  }, [jugador.protocolos_custom]);
 
   const [selectedDayType, setSelectedDayType] = useState(dayTypes.length > 0 ? dayTypes[0].key : null);
 
@@ -40,10 +47,47 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
   }
 
   async function handleSaveCustomProtocol(updatedProtocol) {
-    const newCustoms = { ...customProtocols, [updatedProtocol.id]: updatedProtocol };
-    await updatePlayerField(jugador.id, 'protocolos_custom', newCustoms);
-    // Locally mutate for instant UI update (or wait for SWR/Next to revalidate)
-    jugador.protocolos_custom = newCustoms;
+    try {
+      const newCustoms = { ...customProtocols, [updatedProtocol.id]: updatedProtocol };
+      await updatePlayerField(jugador.id, 'protocolos_custom', newCustoms);
+      setCustomProtocols(newCustoms);
+      jugador.protocolos_custom = newCustoms;
+      notifications.show({
+        title: 'Protocolo guardado',
+        message: 'El protocolo personalizado se ha guardado correctamente para este jugador.',
+        color: 'green'
+      });
+      router.refresh();
+    } catch (e) {
+      notifications.show({
+        title: 'Error al guardar',
+        message: e.message || 'No se pudo guardar el protocolo personalizado.',
+        color: 'red'
+      });
+    }
+  }
+
+  async function handleResetCustomProtocol() {
+    if (!baseProtocol?.id) return;
+    try {
+      const newCustoms = { ...customProtocols };
+      delete newCustoms[baseProtocol.id];
+      await updatePlayerField(jugador.id, 'protocolos_custom', newCustoms);
+      setCustomProtocols(newCustoms);
+      jugador.protocolos_custom = newCustoms;
+      notifications.show({
+        title: 'Protocolo restablecido',
+        message: 'Se han restablecido los valores por defecto del equipo para este protocolo.',
+        color: 'blue'
+      });
+      router.refresh();
+    } catch (e) {
+      notifications.show({
+        title: 'Error al restablecer',
+        message: e.message || 'No se pudo restablecer el protocolo.',
+        color: 'red'
+      });
+    }
   }
 
   const renderTimelineIcon = (iconName) => {
@@ -99,25 +143,31 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
           {activeProtocol ? (
             <Stack gap="md">
               <Group justify="space-between">
-                <Group gap="sm">
-                  {customProtocols[activeProtocol.id] && (
-                    <Badge color="blue" variant="light">Personalizado</Badge>
-                  )}
-                  {dayTypeObj && (
-                    <Badge color={dayTypeObj.color || 'gray'} variant="light">{dayTypeObj.label}</Badge>
-                  )}
-                  <Title order={4} c="dark.3">{activeProtocol.name}</Title>
-                  {(activeProtocol.incluirEnPlan !== false && (activeProtocol.incluirEnPlan === true || activeProtocol.dayTypeKey === 'partido' || activeProtocol.dayTypeKey === 'match_day' || (typeof activeProtocol.dayTypeKey === 'string' && activeProtocol.dayTypeKey.includes('partido')))) && (
-                    <Group gap={4} align="center">
-                      <span style={{ color: 'var(--mantine-color-teal-6)', fontSize: 10 }}>●</span>
-                      <Text size="xs" c="teal.7" fw={600}>En planificación</Text>
-                    </Group>
-                  )}
-                </Group>
+                <Title order={4} c="dark.3">{activeProtocol.name}</Title>
                 {!readOnly && (
-                  <Button variant="light" size="xs" leftSection={<IconPencil size={14} />} onClick={() => setEditorOpen(true)} radius="xl">
-                    Personalizar
-                  </Button>
+                  <Group gap="xs">
+                    {baseProtocol && customProtocols[baseProtocol.id] && (
+                      <Button
+                        variant="subtle"
+                        color="gray"
+                        size="xs"
+                        leftSection={<IconRotate size={14} />}
+                        onClick={handleResetCustomProtocol}
+                        radius="xl"
+                      >
+                        Restablecer del equipo
+                      </Button>
+                    )}
+                    <Button
+                      variant="light"
+                      size="xs"
+                      leftSection={<IconPencil size={14} />}
+                      onClick={() => setEditorOpen(true)}
+                      radius="xl"
+                    >
+                      Personalizar
+                    </Button>
+                  </Group>
                 )}
               </Group>
 
@@ -175,6 +225,8 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
           opened={editorOpen}
           onClose={() => setEditorOpen(false)}
           protocol={activeProtocol}
+          saveLabel="Guardar Protocolo"
+          helpText="Los cambios se guardarán directamente en la ficha del jugador."
           onSave={handleSaveCustomProtocol}
         />
       )}

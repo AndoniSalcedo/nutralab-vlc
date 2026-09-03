@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, Stack, TextInput, Select, Button, Switch } from '@mantine/core';
+import { Modal, Stack, TextInput, Select, Button, Switch, Group, Text } from '@mantine/core';
+import { IconCheck } from '@tabler/icons-react';
 
 export default function DayTypeModal({
   opened,
@@ -50,9 +51,19 @@ export default function DayTypeModal({
             })}
             mt="xs"
           />
-          <Button onClick={handleSaveDayType} fullWidth mt="md" radius="xl" color="blue">
-            Guardar Tipo de Día
-          </Button>
+          <Group justify="space-between" mt="md" pt="sm" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+            <Text size="xs" c="dimmed" style={{ maxWidth: '60%' }}>
+              Al aceptar, se aplican a la lista. Pulsa &quot;Guardar Tipos de Día&quot; para confirmar.
+            </Text>
+            <Group gap="xs">
+              <Button variant="default" onClick={onClose} radius="xl">
+                Cancelar
+              </Button>
+              <Button onClick={handleSaveDayType} radius="xl" color="blue" leftSection={<IconCheck size={16} />}>
+                Aceptar
+              </Button>
+            </Group>
+          </Group>
         </Stack>
       )}
     </Modal>
