@@ -13,7 +13,6 @@ export default function NutricionTab({ jugador, menus = [], activeSubtab, onSubt
   return (
     <Stack gap={0}>
       <Paper
-        data-boneyard-ignore="true"
         p="xs"
         bg="white"
         radius={0}

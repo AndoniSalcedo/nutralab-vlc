@@ -23,12 +23,7 @@ import _player_dashboard_nutricion_plan from './player-dashboard-nutricion-plan.
 import _player_dashboard_nutricion_suplementacion from './player-dashboard-nutricion-suplementacion.bones.json';
 import _player_dashboard_nutricion_menu from './player-dashboard-nutricion-menu.bones.json';
 import _player_dashboard_nutricion_protocolos from './player-dashboard-nutricion-protocolos.bones.json';
-
-import _player_dashboard_resumen from './player-dashboard-resumen.bones.json';
-import _player_dashboard_metricas from './player-dashboard-metricas.bones.json';
-import _player_dashboard_nutricion from './player-dashboard-nutricion.bones.json';
 import _diario_comidas from './diario-comidas.bones.json';
-import _balance_nutricional from './balance-nutricional.bones.json';
 
 const bonesMap = {
   'teams-list': _teams_list,
@@ -52,12 +47,11 @@ const bonesMap = {
   'player-dashboard-nutricion-menu': _player_dashboard_nutricion_menu,
   'player-dashboard-nutricion-protocolos': _player_dashboard_nutricion_protocolos,
 
-  'player-dashboard-resumen': _player_dashboard_resumen_perfil || _player_dashboard_resumen,
-  'player-dashboard-metricas': _player_dashboard_metricas_mediciones || _player_dashboard_metricas,
-  'player-dashboard-nutricion': _player_dashboard_nutricion_plan || _player_dashboard_nutricion,
+  'player-dashboard-resumen': _player_dashboard_resumen_perfil,
+  'player-dashboard-metricas': _player_dashboard_metricas_mediciones,
+  'player-dashboard-nutricion': _player_dashboard_nutricion_plan,
 
   'diario-comidas': _diario_comidas,
-  'balance-nutricional': _balance_nutricional,
 };
 
 function normalizeBone(b) {
@@ -90,7 +84,10 @@ export default function BoneyardSkeleton({ name, loading = true, minY = 0, child
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setWidth(window.innerWidth);
+      const updateWidth = () => setWidth(window.innerWidth);
+      updateWidth();
+      window.addEventListener('resize', updateWidth);
+      return () => window.removeEventListener('resize', updateWidth);
     }
   }, []);
 

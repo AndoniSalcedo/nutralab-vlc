@@ -124,7 +124,7 @@ function AssignedProtocol({ items, peso, onDelete, canManage }) {
   return (
     <BentoCard title="Protocolo asignado" icon={IconBottle} color="blue">
       {items.length ? (
-        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
+        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm" suppressHydrationWarning>
           {items.map((item) => (
             <SupplementCard
               key={item.key}
@@ -456,7 +456,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
             </Alert>
           )}
 
-          <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md" verticalSpacing="md" style={{ alignItems: 'start' }}>
+          <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md" verticalSpacing="md" style={{ alignItems: 'start' }} suppressHydrationWarning>
             <AssignedProtocol
               items={assignedItems}
               peso={peso}

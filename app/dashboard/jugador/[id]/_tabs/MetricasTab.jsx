@@ -18,7 +18,6 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes,
   return (
     <Stack gap={0}>
       <Paper
-        data-boneyard-ignore="true"
         p="xs"
         bg="white"
         radius={0}

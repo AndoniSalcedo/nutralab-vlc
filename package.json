@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "bones:build": "boneyard-js build --no-scan",
+    "bones:force": "boneyard-js build --no-scan --force",
     "db:migrate": "node scripts/db-migrate.js",
     "db:migrate:status": "node scripts/db-migrate.js --status",
     "db:teams": "node scripts/db-migrate.js --schema=teams"
