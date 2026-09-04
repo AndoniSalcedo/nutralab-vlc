@@ -209,9 +209,9 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
         <Box style={{ height: '2px', backgroundColor: colors.accentText, margin: '10px auto 0', maxWidth: '75%', opacity: 0.85, transition: 'background-color 0.2s ease' }} />
 
         <SimpleGrid cols={3} spacing={{ base: 'xs', sm: 'sm' }} mt="lg" mb="lg">
-          <MetricCard label="Peso" value={formatNumber(plan.metricas.peso, ' kg')} color={colors.accentText} bg={colors.boxBg} border={colors.boxBorder} />
-          <MetricCard label="Grasa" value={formatNumber(plan.metricas.grasa, ' %')} color={colors.cardBodyText} bg={colors.boxBg} border={colors.boxBorder} />
-          <MetricCard label="Músculo" value={formatNumber(plan.metricas.pesoMuscular, ' %')} color={colors.accentText} bg={colors.boxBg} border={colors.boxBorder} />
+          <MetricCard label="Peso" value={formatNumber(plan.metricas?.peso, ' kg')} color={colors.accentText} bg={colors.boxBg} border={colors.boxBorder} />
+          <MetricCard label="Grasa" value={formatNumber(plan.metricas?.grasa, ' %')} color={colors.cardBodyText} bg={colors.boxBg} border={colors.boxBorder} />
+          <MetricCard label="Músculo" value={formatNumber(plan.metricas?.pesoMuscular, ' %')} color={colors.accentText} bg={colors.boxBg} border={colors.boxBorder} />
         </SimpleGrid>
 
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
