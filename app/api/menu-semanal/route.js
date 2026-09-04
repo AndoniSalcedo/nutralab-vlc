@@ -17,24 +17,74 @@ const client = new Anthropic({ apiKey: env.AI_API_KEY });
 const MENU_TOOL_NAME = 'extraer_menu_semanal';
 const MENU_MAX_TOKENS = 8192;
 
+function parseDias(input) {
+  if (!input) return null;
+  if (Array.isArray(input)) return input;
+  if (typeof input === 'string') {
+    try {
+      const parsed = JSON.parse(input);
+      return parseDias(parsed);
+    } catch {
+      return null;
+    }
+  }
+  if (typeof input === 'object') {
+    if (Array.isArray(input.dias)) return input.dias;
+    if (input.dias) return parseDias(input.dias);
+  }
+  return null;
+}
+
+function extractSemanaInicio(input) {
+  if (!input) return null;
+  if (typeof input === 'string') {
+    try {
+      const parsed = JSON.parse(input);
+      return extractSemanaInicio(parsed);
+    } catch {
+      return null;
+    }
+  }
+  if (typeof input === 'object') {
+    if (input.semana_inicio && typeof input.semana_inicio === 'string') {
+      return input.semana_inicio.trim();
+    }
+    if (input.semana && typeof input.semana === 'string') {
+      return input.semana.trim();
+    }
+    if (input.dias && typeof input.dias === 'object' && !Array.isArray(input.dias)) {
+      return extractSemanaInicio(input.dias);
+    }
+  }
+  return null;
+}
+
 function extractMenuData(message) {
   if (message.stop_reason === 'max_tokens') {
     throw new Error('La extracción del menú se cortó por límite de tokens. Prueba a intentarlo de nuevo o usa un documento más conciso.');
   }
 
-  const toolUse = message.content.find((item) => item.type === 'tool_use' && item.name === MENU_TOOL_NAME);
-  if (toolUse?.input?.dias && Array.isArray(toolUse.input.dias)) {
-    return toolUse.input.dias;
+  const toolUse = message.content?.find((item) => item.type === 'tool_use' && item.name === MENU_TOOL_NAME);
+  if (toolUse?.input) {
+    const dias = parseDias(toolUse.input);
+    const semanaInicio = extractSemanaInicio(toolUse.input);
+    if (dias && Array.isArray(dias) && dias.length > 0) {
+      return { dias, semanaInicio };
+    }
   }
 
-  // Fallback if tool call wasn't generated
-  const textBlock = message.content.find((item) => item.type === 'text');
+  // Fallback if tool call wasn't generated or input was in text
+  const textBlock = message.content?.find((item) => item.type === 'text');
   if (textBlock?.text) {
-    const jsonMatch = textBlock.text.match(/\{[\s\S]*\}/);
+    const jsonMatch = textBlock.text.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
     if (jsonMatch) {
       try {
         const parsed = JSON.parse(jsonMatch[0]);
-        if (parsed.dias && Array.isArray(parsed.dias)) return parsed.dias;
+        const dias = parseDias(parsed);
+        const semanaInicio = extractSemanaInicio(parsed);
+        if (dias && Array.isArray(dias) && dias.length > 0) {
+          return { dias, semanaInicio };
+        }
       } catch {
         // Fallthrough to error
       }
@@ -95,6 +145,10 @@ export async function POST(req) {
           type: 'object',
           additionalProperties: false,
           properties: {
+            semana_inicio: {
+              type: ['string', 'null'],
+              description: 'Fecha del lunes de inicio de la semana en formato YYYY-MM-DD si figura explícitamente en el documento (ej: "2026-09-07"). Si no figura, null.',
+            },
             dias: {
               type: 'array',
               description: 'Lista de días de la semana con sus menús correspondientes.',
@@ -141,15 +195,17 @@ export async function POST(req) {
           {
             type: 'text',
             text: `Extrae el menú de comedor de este documento y llama a la herramienta ${MENU_TOOL_NAME}.
-La fecha de inicio de la semana (Lunes) es: ${semana}.
-Extrae la información para cada día de la semana (Lunes a Domingo). Si el documento usa fechas o números de día (por ejemplo DÍA 27, DÍA 28...), deduce a qué día de la semana corresponde.
-Si en un servicio (comida o cena) hay varias opciones o platos, inclúyelos separados por ' / '. Si no hay postre o algún plato no figura, usa null.`
+IMPORTANTE:
+1. Extrae la fecha del lunes de inicio de la semana si figura en el documento (ej: "7 de septiembre al 13 de septiembre de 2026" -> semana_inicio: "2026-09-07"). Si no figura fecha en el documento, usa "${semana}".
+2. Para el campo 'dias', devuelve un array nativo de objetos con los días de la semana (Lunes a Domingo).
+3. Si en un servicio (comida o cena) hay varias opciones o platos (cremas, arroces, pastas, carnes, pescados, guarniciones, ensaladas del día), inclúyelos separados por ' / '.
+4. Si el documento indica postres generales (ej: "De postre, fruta y yogures proteicos"), incluye ese postre en la comida y/o cena según corresponda. Si algún plato no figura o es descanso/partido, indica el texto correspondiente (ej: "COMIDA PREPARTIDO EN HOTEL", "PARTIDO SEVILLA - VALENCIA CF") o usa null.`
           }
         ]
       }]
     });
 
-    const extractedDias = extractMenuData(message);
+    const { dias: extractedDias, semanaInicio } = extractMenuData(message);
 
     // Sanitize and format parsed dias to ensure all days are represented cleanly
     const formattedDias = extractedDias.map((d) => ({
@@ -166,7 +222,9 @@ Si en un servicio (comida o cena) hay varias opciones o platos, inclúyelos sepa
       },
     }));
 
-    const data = await upsertMenu(supabase, { semana, equipo_id: equipoId, dias: formattedDias, updated_at: new Date().toISOString() });
+    const finalSemana = (semanaInicio && /^\d{4}-\d{2}-\d{2}$/.test(semanaInicio)) ? semanaInicio : semana;
+
+    const data = await upsertMenu(supabase, { semana: finalSemana, equipo_id: equipoId, dias: formattedDias, updated_at: new Date().toISOString() });
     return NextResponse.json({ ok: true, menu: data });
   } catch (e) {
     console.error('Error en POST /api/menu-semanal:', e);

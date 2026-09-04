@@ -20,8 +20,16 @@ function extractAnalitica(message) {
     throw new Error('La extracción se cortó por límite de tokens. Prueba con un PDF más corto o vuelve a intentarlo.');
   }
 
-  const toolUse = message.content.find((item) => item.type === 'tool_use' && item.name === ANALITICA_TOOL_NAME);
-  const parametros = toolUse?.input?.parametros;
+  const toolUse = message.content?.find((item) => item.type === 'tool_use' && item.name === ANALITICA_TOOL_NAME);
+  let parametros = toolUse?.input?.parametros;
+  if (typeof parametros === 'string') {
+    try {
+      const parsed = JSON.parse(parametros);
+      parametros = Array.isArray(parsed) ? parsed : (parsed?.parametros || parsed);
+    } catch {
+      // ignore
+    }
+  }
   if (!Array.isArray(parametros)) {
     throw new Error('No se pudieron extraer parámetros válidos de la analítica.');
   }

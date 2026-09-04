@@ -190,6 +190,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
         const sorted = [data.menu, ...filtered].sort((a, b) => b.semana.localeCompare(a.semana));
         return sorted;
       });
+      setSelectedMenu(data.menu);
 
       notifications.update({
         id: notificationId,
