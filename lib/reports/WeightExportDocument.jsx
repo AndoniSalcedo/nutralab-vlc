@@ -195,14 +195,26 @@ const styles = StyleSheet.create({
   tableRowAlt: {
     backgroundColor: '#f8fafc',
   },
-  colIndex: { width: '4%', textAlign: 'center' },
-  colPlayer: { width: '22%' },
-  colWeight: { width: '12%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
-  colP10: { width: '12.5%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
-  colP9: { width: '12.5%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
-  colP8: { width: '12.5%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
-  colDiff: { width: '11.5%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
-  colStatus: { width: '13%', alignItems: 'center', justifyContent: 'center' },
+  colIndex: { width: '3.5%', textAlign: 'center' },
+  colPlayer: { width: '20.5%' },
+  colWeight: { width: '11%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
+  colTarget: { width: '13%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
+  colP10: { width: '10.5%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
+  colP9: { width: '10.5%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
+  colP8: { width: '10.5%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
+  colDiff: { width: '9.5%', alignItems: 'center', justifyContent: 'center', textAlign: 'center' },
+  colStatus: { width: '11%', alignItems: 'center', justifyContent: 'center' },
+
+  targetWeightText: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    color: '#0f172a',
+  },
+  targetFatSub: {
+    fontSize: 6.5,
+    color: '#64748b',
+    marginTop: 1,
+  },
 
   playerName: {
     fontSize: 8,
@@ -412,6 +424,7 @@ export default function WeightExportDocument({
             <Text style={[styles.tableHeaderCellCenter, styles.colIndex]}>#</Text>
             <Text style={[styles.tableHeaderCell, styles.colPlayer]}>Jugador</Text>
             <Text style={[styles.tableHeaderCellCenter, styles.colWeight]}>Peso Actual</Text>
+            <Text style={[styles.tableHeaderCellCenter, styles.colTarget]}>Peso Objetivo</Text>
             <Text style={[styles.tableHeaderCellCenter, styles.colP10]}>Peso a 10%</Text>
             <Text style={[styles.tableHeaderCellCenter, styles.colP9]}>Peso a 9%</Text>
             <Text style={[styles.tableHeaderCellCenter, styles.colP8]}>Peso a 8%</Text>
@@ -452,8 +465,8 @@ export default function WeightExportDocument({
                   <Text style={styles.playerName}>
                     {r.nombre} {r.apellidos || ''}
                   </Text>
-                  {targetFat !== 10 && targetFat !== 9 && targetFat !== 8 ? (
-                    <Text style={{ fontSize: 6.2, color: '#64748b' }}>Obj: {targetFat}% ({r.pesoReferencia ? `${r.pesoReferencia} kg` : '—'})</Text>
+                  {r.posicion ? (
+                    <Text style={styles.playerPosition}>{r.posicion}</Text>
                   ) : null}
                 </View>
                 <View style={styles.colWeight}>
@@ -461,6 +474,16 @@ export default function WeightExportDocument({
                     <Text style={styles.weightText}>{r.peso ? `${r.peso} kg` : '—'}</Text>
                   ) : (
                     <Text style={styles.weightDimmed}>Sin registro</Text>
+                  )}
+                </View>
+                <View style={styles.colTarget}>
+                  {r.pesoReferencia ? (
+                    <View style={{ alignItems: 'center' }}>
+                      <Text style={styles.targetWeightText}>{r.pesoReferencia} kg</Text>
+                      <Text style={styles.targetFatSub}>Obj: {targetFat}%</Text>
+                    </View>
+                  ) : (
+                    <Text style={styles.weightDimmed}>—</Text>
                   )}
                 </View>
                 <View style={styles.colP10}>
