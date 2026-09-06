@@ -2,4 +2,4 @@
 
 - **UI & Badges Directive**: Do NOT use Badges (`<Badge>`) in the player list or team dashboard tables. Use clean, elegant typographic layouts, subtle status dots/indicators (`●`), and crisp font hierarchy instead.
 
-- Cada cambio que hagas en la aplicacion antes de quitar hacer el npm run lint
+- Cada cambio que hagas en la aplicacion antes de quitar hacer el npm run lint y npm run build

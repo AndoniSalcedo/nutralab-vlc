@@ -48,7 +48,7 @@ import {
   metricValue,
   getSeason,
   formatMetricNumber,
-} from '@/lib/measurement-metrics';
+} from '@/lib/metrics/measurements';
 
 const METRICAS = TREND_MEASUREMENT_METRICS;
 

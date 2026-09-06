@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getUser } from '@/lib/auth';
-import { forbidden, getAccessiblePlayer } from '@/lib/team-access';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getUser } from '@/lib/auth/session';
+import { forbidden, getAccessiblePlayer } from '@/lib/auth/team-access';
 import { getMealPhotoWithMeta } from '@/repositories/mealsRepository';
 
 export const dynamic = 'force-dynamic';

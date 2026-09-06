@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getUser } from '@/lib/auth';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { forbidden, getOwnedTeam, getOwnerId } from '@/lib/team-access';
+import { getUser } from '@/lib/auth/session';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { forbidden, getOwnedTeam, getOwnerId } from '@/lib/auth/team-access';
 import { insertTeam, deleteTeam, updateTeam, getTeamsByOwner } from '@/repositories/teamRepository';
 import { getPlayersByTeam, insertPlayer, getOwnedPlayersByIds } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIdOrdered, insertEvolutionsBulk } from '@/repositories/evolutionRepository';

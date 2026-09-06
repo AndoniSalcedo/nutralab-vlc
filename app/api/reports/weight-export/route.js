@@ -1,9 +1,9 @@
 import React from 'react';
 import { NextResponse } from 'next/server';
 import { renderToStream } from '@react-pdf/renderer';
-import { getUser } from '@/lib/auth';
+import { getUser } from '@/lib/auth/session';
 import { sanitizeFilename, pdfHeaders } from '@/lib/utils';
-import WeightExportDocument from '@/lib/reports/WeightExportDocument';
+import WeightExportDocument from '@/components/reports/WeightExportDocument';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';

@@ -35,9 +35,9 @@ import {
 } from '@tabler/icons-react';
 
 import { savePlayerMeal } from '@/services/meal';
-import { compressFoodPhoto } from '@/lib/compress';
+import { compressFoodPhoto } from '@/lib/utils/compress';
 import { notifications } from '@mantine/notifications';
-import { useFoods } from '@/lib/use-foods';
+import { useFoods } from '@/hooks/use-foods';
 
 const MEAL_TYPES = [
   { value: 'breakfast', label: 'Desayuno' },

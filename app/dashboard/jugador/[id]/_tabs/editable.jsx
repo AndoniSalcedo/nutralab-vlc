@@ -22,7 +22,7 @@ import { IconEdit } from '@tabler/icons-react';
 import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/services/player';
 import { useRouter } from 'next/navigation';
-import { AVAILABLE_MEALS, STANDARD_MEALS, sortMeals } from '@/lib/nutrition-day-types';
+import { AVAILABLE_MEALS, STANDARD_MEALS, sortMeals } from '@/config/nutrition-days';
 
 export function CampoEditable({
   label,

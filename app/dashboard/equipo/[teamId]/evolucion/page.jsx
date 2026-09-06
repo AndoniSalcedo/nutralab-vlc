@@ -1,7 +1,7 @@
-import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 import TeamEvolutionDashboard from '@/components/TeamEvolutionDashboard';
-import { getUser } from '@/lib/auth';
-import { getAccessibleTeam } from '@/lib/team-access';
+import { getUser } from '@/lib/auth/session';
+import { getAccessibleTeam } from '@/lib/auth/team-access';
 import { getPlayersByTeamSelectSimple } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIds } from '@/repositories/evolutionRepository';
 import NothingFound from '@/components/NothingFound';

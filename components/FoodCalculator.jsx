@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Card, Text, Group, Select, NumberInput, Grid, ThemeIcon, Stack, Title, Badge, Paper } from '@mantine/core';
 import { IconFlame, IconMeat, IconWheat, IconDroplet, IconScale } from '@tabler/icons-react';
-import { useFoods } from '@/lib/use-foods';
+import { useFoods } from '@/hooks/use-foods';
 
 const EMPTY_FOOD = { kcal: 0, cho: 0, pro: 0, fat: 0 };
 

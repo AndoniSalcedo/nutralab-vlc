@@ -35,7 +35,7 @@ import { savePesaje, deletePesaje } from '@/services/pesaje';
 import { IconEdit, IconPlus, IconScale, IconTrash } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
-import { calculateSemaforo } from '@/lib/player-metrics';
+import { calculateSemaforo } from '@/lib/metrics/player';
 
 function fechaLabel(fecha) {
   if (!fecha) return 'Sin fecha';

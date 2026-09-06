@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedTeam } from '@/lib/team-access';
-import { normalizeName, playerFullName, partialCandidates, previewCandidate } from '@/lib/player-excel-import';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getUser } from '@/lib/auth/session';
+import { forbidden, getOwnedTeam } from '@/lib/auth/team-access';
+import { normalizeName, playerFullName, partialCandidates, previewCandidate } from '@/lib/io/player-excel-import';
 import { toNumber as parseCsvNumber, parseDate as parseCsvDate, normalizeKey } from '@/lib/utils';
 import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
 import { upsertHydrationRecords } from '@/repositories/hydrationRepository';

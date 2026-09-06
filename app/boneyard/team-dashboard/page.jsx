@@ -1,6 +1,6 @@
 import DashboardContent from '@/components/DashboardContent';
 import { mockPlayers, mockEvolutions, mockPesajes, mockTeam } from '@/lib/boneyardMockData';
-import { withLatestMeasurement } from '@/lib/player-metrics';
+import { withLatestMeasurement } from '@/lib/metrics/player';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getUser } from '@/lib/auth';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getOwnedTeam, forbidden } from '@/lib/team-access';
+import { getUser } from '@/lib/auth/session';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getOwnedTeam, forbidden } from '@/lib/auth/team-access';
 import { updateTeamConfig } from '@/repositories/teamRepository';
 
 export async function POST(request) {

@@ -1,5 +1,5 @@
 import DashboardShell from '@/components/DashboardShell';
-import { getUser } from '@/lib/auth';
+import { getUser } from '@/lib/auth/session';
 import { Box, Container } from '@mantine/core';
 import { redirect } from 'next/navigation';
 

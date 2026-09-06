@@ -10,7 +10,7 @@ import {
   mockMessages,
   mockMenus
 } from '@/lib/boneyardMockData';
-import { withLatestMeasurement } from '@/lib/player-metrics';
+import { withLatestMeasurement } from '@/lib/metrics/player';
 
 export const dynamic = 'force-dynamic';
 

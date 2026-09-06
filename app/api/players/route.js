@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedPlayer, getOwnedTeam } from '@/lib/team-access';
-import { DEFAULT_PLAYER_MEALS_STRING } from '@/lib/nutrition-day-types';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getUser } from '@/lib/auth/session';
+import { forbidden, getOwnedPlayer, getOwnedTeam } from '@/lib/auth/team-access';
+import { DEFAULT_PLAYER_MEALS_STRING } from '@/config/nutrition-days';
 import { toPositiveNumber as toNumber } from '@/lib/utils';
 import {
   getPlayerAuthUserId,

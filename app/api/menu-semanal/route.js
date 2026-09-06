@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { env } from '@/config/env';
-import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedTeam, getAccessibleTeam } from '@/lib/team-access';
+import { getUser } from '@/lib/auth/session';
+import { forbidden, getOwnedTeam, getAccessibleTeam } from '@/lib/auth/team-access';
 import {
   upsertMenu,
   getMenuById,

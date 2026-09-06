@@ -21,7 +21,7 @@ import {
 } from '@mantine/core';
 import { IconSearch, IconCamera, IconTrash } from '@tabler/icons-react';
 import { playerFullName } from '@/lib/utils';
-import { initials } from '@/lib/avatar';
+import { initials } from '@/lib/utils/avatar';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 
 export default function TeamForm({

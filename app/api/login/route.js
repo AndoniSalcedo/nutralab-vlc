@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '@/config/env';
-import { buildSessionValue, COOKIE_NAME } from '@/lib/auth';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { buildSessionValue, COOKIE_NAME } from '@/lib/auth/session';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getPlayerByAuthUserIdSingle } from '@/repositories/playerRepository';
 
 export async function POST(request) {

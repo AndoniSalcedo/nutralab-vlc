@@ -1,8 +1,8 @@
-import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 import DashboardContent from '@/components/DashboardContent';
-import { getUser } from '@/lib/auth';
-import { withLatestMeasurement } from '@/lib/player-metrics';
-import { getAccessibleTeam } from '@/lib/team-access';
+import { getUser } from '@/lib/auth/session';
+import { withLatestMeasurement } from '@/lib/metrics/player';
+import { getAccessibleTeam } from '@/lib/auth/team-access';
 import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIdsSimple } from '@/repositories/evolutionRepository';
 import { getPesajesByPlayerIdsSimple } from '@/repositories/pesajeRepository';

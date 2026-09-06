@@ -38,7 +38,7 @@ import {
   getTecnicos,
   uploadTecnicoAvatar,
 } from '@/services/tecnico';
-import { compressAvatar, initials } from '@/lib/avatar';
+import { compressAvatar, initials } from '@/lib/utils/avatar';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 

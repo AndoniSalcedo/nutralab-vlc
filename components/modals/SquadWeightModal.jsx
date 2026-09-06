@@ -30,13 +30,13 @@ import { savePesaje } from '@/services/pesaje';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 import { initials } from '@/lib/utils';
-import { calculateSemaforo } from '@/lib/player-metrics';
+import { calculateSemaforo } from '@/lib/metrics/player';
 import {
   formatFullDate,
   dateToIso,
   exportWeightExcel,
   downloadWeightPdf,
-} from '@/lib/weight-export';
+} from '@/lib/io/weight-export';
 
 export default function SquadWeightModal({ opened, onClose, players = [], team }) {
   const router = useRouter();

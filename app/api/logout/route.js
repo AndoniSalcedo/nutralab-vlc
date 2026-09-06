@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { COOKIE_NAME, getUser } from '@/lib/auth';
+import { COOKIE_NAME, getUser } from '@/lib/auth/session';
 import { env } from '@/config/env';
 
 export async function POST(request) {

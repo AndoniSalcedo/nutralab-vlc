@@ -1697,15 +1697,6 @@ export const FOODS_CRUDO = [
     "fat": 49.7
   },
   {
-    "name": "Steak tartar",
-    "originalName": "Steak tartar",
-    "category": "otros_y_suplementos",
-    "kcal": 204,
-    "cho": 1.5,
-    "pro": 20.5,
-    "fat": 12.5
-  },
-  {
     "name": "Té verde (infusión)",
     "originalName": "Té verde (infusión)",
     "category": "otros_y_suplementos",

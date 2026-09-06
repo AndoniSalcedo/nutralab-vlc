@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { AspectRatio, Badge, Box, Group, Image, Paper, Stack, Text, ActionIcon, Tooltip, Collapse, useMantineTheme, useComputedColorScheme } from "@mantine/core";
 import { IconClock, IconEdit, IconTrash } from "@tabler/icons-react";
-import { useFoods } from '@/lib/use-foods';
+import { useFoods } from '@/hooks/use-foods';
 
 const calcNutrient = (food, grams, key) => {
   const value = Number(food?.[key]);

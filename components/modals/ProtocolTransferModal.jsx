@@ -18,7 +18,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconFolderShare, IconArrowsExchange, IconClipboardList, IconShield } from '@tabler/icons-react';
 import { getTeams } from '@/services/team';
-import { NUTRITION_DAY_TYPES } from '@/lib/calculations';
+import { NUTRITION_DAY_TYPES } from '@/lib/metrics/anthropometry';
 
 export default function ProtocolTransferModal({ 
   opened, 

@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedPlayer, getAccessiblePlayer } from '@/lib/team-access';
-import { planDataToLegacyContent, sanitizePlanData } from '@/lib/nutrition-plan-card';
-import { withLatestMeasurement } from '@/lib/player-metrics';
-import { generarDatosPlan } from '@/lib/ai-plan-generator';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getUser } from '@/lib/auth/session';
+import { forbidden, getOwnedPlayer, getAccessiblePlayer } from '@/lib/auth/team-access';
+import { planDataToLegacyContent, sanitizePlanData } from '@/lib/nutrition/plan-card';
+import { withLatestMeasurement } from '@/lib/metrics/player';
+import { generarDatosPlan } from '@/lib/ai/plan-generator';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
 import { getPesajesByPlayerId } from '@/repositories/pesajeRepository';

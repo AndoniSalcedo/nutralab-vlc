@@ -21,7 +21,7 @@ import {
   IconX,
   IconRefresh,
 } from '@tabler/icons-react';
-import { getCroppedImg } from '@/lib/cropImage';
+import { getCroppedImg } from '@/lib/utils/cropImage';
 
 export default function ImageCropModal({
   opened,

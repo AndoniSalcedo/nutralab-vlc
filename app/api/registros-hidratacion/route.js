@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedPlayer, getAccessiblePlayer } from '@/lib/team-access';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getUser } from '@/lib/auth/session';
+import { forbidden, getOwnedPlayer, getAccessiblePlayer } from '@/lib/auth/team-access';
 import { toNumber as parseCsvNumber, parseDate as parseCsvDate, normalizeKey } from '@/lib/utils';
 import {
   getHydrationRecordsByPlayerId,

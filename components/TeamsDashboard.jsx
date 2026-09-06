@@ -19,7 +19,7 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { createTeam, deleteTeam, updateTeam, uploadTeamPhoto, removeTeamPhoto } from '@/services/team';
-import { compressAvatar, initials } from '@/lib/avatar';
+import { compressAvatar, initials } from '@/lib/utils/avatar';
 import {
   IconCalendarStats,
   IconCopy,

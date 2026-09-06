@@ -1,4 +1,4 @@
-import { resolvePlayerSupplementsData } from '@/lib/supplementation-helper';
+import { resolvePlayerSupplementsData } from '@/lib/nutrition/supplementation';
 
 export async function getAllSuplementos(supabase) {
   const { data, error } = await supabase

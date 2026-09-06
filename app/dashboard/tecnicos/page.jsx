@@ -1,6 +1,6 @@
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getUser } from '@/lib/auth';
-import { getOwnerId } from '@/lib/team-access';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getUser } from '@/lib/auth/session';
+import { getOwnerId } from '@/lib/auth/team-access';
 import { redirect } from 'next/navigation';
 import TecnicosManager from '@/components/TecnicosManager';
 

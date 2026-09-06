@@ -58,7 +58,7 @@ import {
   hasMetricValue,
   metricValue,
   getSeason,
-} from '@/lib/measurement-metrics';
+} from '@/lib/metrics/measurements';
 
 const METRICS = TREND_MEASUREMENT_METRICS;
 

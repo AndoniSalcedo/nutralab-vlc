@@ -13,7 +13,7 @@ import {
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { IconRuler2, IconEdit, IconCheck, IconCalendar } from '@tabler/icons-react';
-import { MEASUREMENT_DETAIL_SECTIONS } from '@/lib/measurement-metrics';
+import { MEASUREMENT_DETAIL_SECTIONS } from '@/lib/metrics/measurements';
 
 function dateValue(value) {
   return value ? new Date(`${value}T00:00:00`) : null;

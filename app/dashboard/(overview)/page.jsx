@@ -1,7 +1,7 @@
-import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 import TeamsDashboard from '@/components/TeamsDashboard';
-import { getUser } from '@/lib/auth';
-import { getOwnerId } from '@/lib/team-access';
+import { getUser } from '@/lib/auth/session';
+import { getOwnerId } from '@/lib/auth/team-access';
 import { redirect } from 'next/navigation';
 import { getPlayerById, getPlayersByOwner } from '@/repositories/playerRepository';
 import { getTeamsByOwner } from '@/repositories/teamRepository';

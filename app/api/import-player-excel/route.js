@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getUser } from '@/lib/auth';
-import { forbidden, getOwnedTeam } from '@/lib/team-access';
-import { DEFAULT_PLAYER_MEALS_STRING } from '@/lib/nutrition-day-types';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getUser } from '@/lib/auth/session';
+import { forbidden, getOwnedTeam } from '@/lib/auth/team-access';
+import { DEFAULT_PLAYER_MEALS_STRING } from '@/config/nutrition-days';
 import { cleanText } from '@/lib/utils';
 import {
   TYPED_MEASUREMENT_FIELDS,
   buildImportPlan,
   parsePlayerExcel,
   toPreviewResponse,
-} from '@/lib/player-excel-import';
+} from '@/lib/io/player-excel-import';
 import { getPlayersByTeamSelect, insertPlayer, updatePlayer } from '@/repositories/playerRepository';
 import {
   getEvolutionByPlayerAndDate,

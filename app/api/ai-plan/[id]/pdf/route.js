@@ -1,10 +1,10 @@
 import React from 'react';
 import { NextResponse } from 'next/server';
 import { renderToStream } from '@react-pdf/renderer';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getUser } from '@/lib/auth';
-import { forbidden, getAccessiblePlayer } from '@/lib/team-access';
-import NutritionPlanCardDocument from '@/lib/reports/NutritionPlanCardDocument';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getUser } from '@/lib/auth/session';
+import { forbidden, getAccessiblePlayer } from '@/lib/auth/team-access';
+import NutritionPlanCardDocument from '@/components/reports/NutritionPlanCardDocument';
 import { sanitizeFilename, pdfHeaders } from '@/lib/utils';
 import { getAiPlanById } from '@/repositories/aiPlanRepository';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';

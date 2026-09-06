@@ -16,13 +16,13 @@ import 'dayjs/locale/es';
 
 import { IconClipboardList } from '@tabler/icons-react';
 
-import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/lib/calculations';
+import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/lib/metrics/anthropometry';
 import { CampoEditable, ComidasEditable, PrepartidoEditable } from '../editable';
-import { latestMetricValue } from '@/lib/player-metrics';
+import { latestMetricValue } from '@/lib/metrics/player';
 import { listPlayerMeals } from '@/services/meal';
 import { getAiPlans } from '@/services/plan';
 import { getSubtabHeader } from '../subtab-config';
-import { useFoods } from '@/lib/use-foods';
+import { useFoods } from '@/hooks/use-foods';
 import { JugadorHeaderCompactMobile } from '@/components/JugadorHeader';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import { usePlayerDashboard } from '../PlayerDashboardContext';

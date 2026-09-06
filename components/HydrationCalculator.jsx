@@ -18,7 +18,7 @@ import {
 import { useMediaQuery } from '@mantine/hooks';
 import { IconDroplet, IconBottle, IconCup, IconCheck, IconRotate, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { BentoCard } from './BentoItem';
-import { calculateHydration, getTeamNutritionDayTypes } from '@/lib/calculations';
+import { calculateHydration, getTeamNutritionDayTypes } from '@/lib/metrics/anthropometry';
 
 
 export default function HydrationCalculator({ jugador }) {

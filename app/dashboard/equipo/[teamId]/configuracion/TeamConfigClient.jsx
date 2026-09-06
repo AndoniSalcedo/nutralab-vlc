@@ -6,8 +6,8 @@ import { slugify } from '@/lib/utils';
 import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Badge, Textarea, Anchor, Box, ColorInput, SimpleGrid, Avatar, FileButton, UnstyledButton, Modal } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconArrowLeft, IconBook, IconClipboardList, IconPalette, IconCamera, IconFolderShare, IconDownload } from '@tabler/icons-react';
-import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/calculations';
-import { compressAvatar, initials } from '@/lib/avatar';
+import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/metrics/anthropometry';
+import { compressAvatar, initials } from '@/lib/utils/avatar';
 import { uploadTeamPhoto, removeTeamPhoto } from '@/services/team';
 import { useRouter } from 'next/navigation';
 import ConfirmModal from '@/components/modals/ConfirmModal';
@@ -18,7 +18,7 @@ import ProtocolImportModal from '@/components/modals/ProtocolImportModal';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
-import { PLAN_THEME_PRESETS } from '@/lib/nutrition-plan-card';
+import { PLAN_THEME_PRESETS } from '@/lib/nutrition/plan-card';
 import ProtocolIcon from '@/components/ProtocolIcon';
 
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];

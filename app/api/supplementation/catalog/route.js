@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getUser } from '@/lib/auth';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getOwnedTeam } from '@/lib/team-access';
+import { getUser } from '@/lib/auth/session';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getOwnedTeam } from '@/lib/auth/team-access';
 import { cleanText, toPositiveNumber, slugify as sharedSlugify } from '@/lib/utils';
 import { getPlayersByTeam, getPlayersByTeamIds } from '@/repositories/playerRepository';
 import {

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getUser } from '@/lib/auth';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getOwnedPlayer } from '@/lib/team-access';
+import { getUser } from '@/lib/auth/session';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getOwnedPlayer } from '@/lib/auth/team-access';
 import { getPlayerById, updatePlayer } from '@/repositories/playerRepository';
 
 function isValidPassword(password) {

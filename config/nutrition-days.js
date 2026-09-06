@@ -1,5 +1,3 @@
-export const DEFAULT_NUTRITION_DAY_TYPE_KEY = 'entreno';
-
 export const NUTRITION_DAY_TYPES = [
   {
     key: 'descanso',
@@ -71,7 +69,6 @@ export const PLAN_CONTEXTS = [
   { value: 'vacaciones', label: 'Vacaciones / fuera de temporada', promptDescription: 'periodo vacacional fuera de temporada' },
   { value: 'pretemporada', label: 'Pretemporada (alta carga)', promptDescription: 'pretemporada (alta carga de trabajo)' },
 ];
-
 
 export const AVAILABLE_MEALS = [
   { value: 'Desayuno', label: 'Desayuno' },

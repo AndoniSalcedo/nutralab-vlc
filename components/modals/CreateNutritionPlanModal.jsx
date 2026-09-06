@@ -15,7 +15,7 @@ import {
   Badge,
 } from '@mantine/core';
 import { IconBrain, IconSparkles, IconTrophy } from '@tabler/icons-react';
-import { getUserMeals } from '@/lib/nutrition-day-types';
+import { getUserMeals } from '@/config/nutrition-days';
 
 const MATCH_SCHEDULE_OPTIONS = [
   { label: 'Mañana', value: 'manana' },

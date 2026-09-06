@@ -1,6 +1,6 @@
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getUser } from '@/lib/auth';
-import { getAccessibleTeam } from '@/lib/team-access';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getUser } from '@/lib/auth/session';
+import { getAccessibleTeam } from '@/lib/auth/team-access';
 import TeamMenuDashboard from '@/components/TeamMenuDashboard';
 import { getMenusByTeam } from '@/repositories/menuRepository';
 import NothingFound from '@/components/NothingFound';

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
-import { sanitizePlanData } from '../nutrition-plan-card.js';
-import { getTeamDayTypeColor, getTeamDayTypeLabel } from '../calculations.js';
-import { formatNumberDecimal } from '../utils.js';
+import { sanitizePlanData } from '@/lib/nutrition/plan-card';
+import { getTeamDayTypeColor, getTeamDayTypeLabel } from '@/lib/metrics/anthropometry';
+import { formatNumberDecimal } from '@/lib/utils';
 
 const DAY_TYPE_COLORS = {
   teal: '#1fb5a9',

@@ -27,9 +27,9 @@ import { notifications } from '@mantine/notifications';
 import { IconUser, IconCheck, IconCamera, IconTrash } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { deletePlayer, savePlayer } from '@/services/player';
-import { PLAYER_OBJECTIVES } from '@/lib/calculations';
-import { AVAILABLE_MEALS } from '@/lib/nutrition-day-types';
-import { compressAvatar, avatarFromRecord, initials as getInitials } from '@/lib/avatar';
+import { PLAYER_OBJECTIVES } from '@/lib/metrics/anthropometry';
+import { AVAILABLE_MEALS } from '@/config/nutrition-days';
+import { compressAvatar, avatarFromRecord, initials as getInitials } from '@/lib/utils/avatar';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 
 function dateInputToIso(value) {

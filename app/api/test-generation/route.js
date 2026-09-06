@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { withLatestMeasurement } from '@/lib/player-metrics';
-import { generarDatosPlan } from '@/lib/ai-plan-generator';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { withLatestMeasurement } from '@/lib/metrics/player';
+import { generarDatosPlan } from '@/lib/ai/plan-generator';
 import { getPlayersByTeam } from '@/repositories/playerRepository';
 import { getTeamById } from '@/repositories/teamRepository';
 import { getEvolutionsByPlayerIdOrdered } from '@/repositories/evolutionRepository';

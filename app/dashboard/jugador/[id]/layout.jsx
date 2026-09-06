@@ -1,6 +1,6 @@
-import { getSupabaseAdmin } from '@/lib/supabase-server';
-import { getUser } from '@/lib/auth';
-import { getAccessiblePlayer } from '@/lib/team-access';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getUser } from '@/lib/auth/session';
+import { getAccessiblePlayer } from '@/lib/auth/team-access';
 import JugadorHeader from '@/components/JugadorHeader';
 import PlayerTabs from './_tabs/PlayerTabs';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
