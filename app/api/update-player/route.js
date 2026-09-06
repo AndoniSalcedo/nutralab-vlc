@@ -26,7 +26,8 @@ export async function POST(req) {
 
     let parsedValue = value;
     if (field === 'porcentaje_grasa_objetivo') {
-      parsedValue = Number(value) || 10;
+      const num = Number(value);
+      parsedValue = Number.isFinite(num) && num > 0 ? Math.round(num * 100) / 100 : 10;
     } else if (field === 'protocolos_custom') {
       parsedValue = typeof value === 'object' && value !== null ? value : {};
     }

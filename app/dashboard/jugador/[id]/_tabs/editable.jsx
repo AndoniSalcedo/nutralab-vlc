@@ -15,6 +15,7 @@ import {
   MultiSelect,
   Checkbox,
   Divider,
+  NumberInput,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconEdit } from '@tabler/icons-react';
@@ -23,7 +24,20 @@ import { updatePlayerField } from '@/services/player';
 import { useRouter } from 'next/navigation';
 import { AVAILABLE_MEALS, STANDARD_MEALS, sortMeals } from '@/lib/nutrition-day-types';
 
-export function CampoEditable({ label, campo, valor, jugadorId, tipo = 'textarea', opciones, readOnly = false }) {
+export function CampoEditable({
+  label,
+  campo,
+  valor,
+  jugadorId,
+  tipo = 'textarea',
+  opciones,
+  min,
+  max,
+  step = 0.1,
+  decimalScale = 2,
+  suffix = '',
+  readOnly = false,
+}) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(valor || '');
@@ -36,7 +50,12 @@ export function CampoEditable({ label, campo, valor, jugadorId, tipo = 'textarea
   async function save() {
     setSaving(true);
     try {
-      await updatePlayerField(jugadorId, campo, val);
+      let finalVal = val;
+      if (tipo === 'number') {
+        const num = Number(val);
+        finalVal = Number.isFinite(num) ? Math.round(num * 100) / 100 : val;
+      }
+      await updatePlayerField(jugadorId, campo, finalVal);
       setEditing(false);
       router.refresh();
       notifications.show({
@@ -63,15 +82,29 @@ export function CampoEditable({ label, campo, valor, jugadorId, tipo = 'textarea
             {editing ? (
               tipo === 'select' ? (
                 <Select data={opciones} value={val} onChange={setVal} size="sm" />
+              ) : tipo === 'number' ? (
+                <NumberInput
+                  value={val === '' ? '' : Number(val)}
+                  onChange={(v) => setVal(v === '' ? '' : (typeof v === 'number' ? Math.round(v * 100) / 100 : v))}
+                  min={min}
+                  max={max}
+                  step={step}
+                  decimalScale={decimalScale}
+                  allowNegative={false}
+                  suffix={suffix}
+                  size="sm"
+                />
               ) : tipo === 'text' ? (
                 <TextInput value={val} onChange={(e) => setVal(e.target.value)} size="sm" />
               ) : (
                 <Textarea value={val} onChange={(e) => setVal(e.target.value)} rows={3} size="sm" />
               )
             ) : (
-              <Text size="sm" c={val ? 'dark' : 'dimmed'}>
+              <Text size="sm" c={val !== '' && val !== null && val !== undefined ? 'dark' : 'dimmed'}>
                 {tipo === 'select' && val && opciones
                   ? (opciones.find((o) => (o.value || o) === val)?.label || val)
+                  : tipo === 'number' && val !== '' && val !== null && val !== undefined
+                  ? `${val}${suffix}`
                   : (val || 'Sin especificar')}
               </Text>
             )}

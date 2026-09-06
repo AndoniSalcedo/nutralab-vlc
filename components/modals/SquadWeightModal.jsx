@@ -746,7 +746,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
                             </Text>
                           )}
                           <Text size="10px" c="dimmed">
-                            Ref: {player.pesoReferencia ? `${player.pesoReferencia} kg` : '—'}
+                            Ref ({player.porcentajeGrasaObjetivo || 10}%): {player.pesoReferencia ? `${player.pesoReferencia} kg` : '—'}
                           </Text>
                         </Box>
 

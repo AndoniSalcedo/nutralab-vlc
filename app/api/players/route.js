@@ -66,7 +66,7 @@ export async function POST(request) {
     alergias: String(form.get('alergias') || ''),
     objetivo: String(form.get('objetivo') || ''),
     porcentaje_grasa_objetivo: form.has('porcentaje_grasa_objetivo') && form.get('porcentaje_grasa_objetivo')
-      ? (Number(form.get('porcentaje_grasa_objetivo')) || 10)
+      ? Math.round((Number(form.get('porcentaje_grasa_objetivo')) || 10) * 100) / 100
       : 10,
   };
 

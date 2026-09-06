@@ -107,7 +107,9 @@ export default function PlayerForm({ initial, team }) {
   // Form states - Pautas Nutricionales
   const [objetivo, setObjetivo] = useState(initial?.objetivo || 'mejora_rendimiento');
   const [porcentajeGrasaObjetivo, setPorcentajeGrasaObjetivo] = useState(
-    initial?.porcentaje_grasa_objetivo ? String(initial.porcentaje_grasa_objetivo) : '10'
+    initial?.porcentaje_grasa_objetivo !== null && initial?.porcentaje_grasa_objetivo !== undefined
+      ? Number(initial.porcentaje_grasa_objetivo)
+      : 10
   );
   const [numComidas, setNumComidas] = useState(() => {
     if (initial?.num_comidas) {
@@ -157,7 +159,10 @@ export default function PlayerForm({ initial, team }) {
         formData.append('intolerancias', intolerancias);
         formData.append('alergias', alergias);
         formData.append('objetivo', objetivo);
-        formData.append('porcentaje_grasa_objetivo', String(porcentajeGrasaObjetivo || '10'));
+        const fatVal = porcentajeGrasaObjetivo !== '' && porcentajeGrasaObjetivo !== null && porcentajeGrasaObjetivo !== undefined
+          ? Math.round(Number(porcentajeGrasaObjetivo) * 100) / 100
+          : 10;
+        formData.append('porcentaje_grasa_objetivo', String(fatVal));
 
         if (removeAvatar) {
           formData.append('remove_avatar', 'true');
@@ -329,16 +334,17 @@ export default function PlayerForm({ initial, team }) {
                     onChange={(value) => setObjetivo(value || '')}
                     clearable
                   />
-                  <Select
+                  <NumberInput
                     label="% Grasa Objetivo (Semáforo)"
-                    placeholder="Selecciona % de grasa objetivo..."
-                    data={[
-                      { value: '10', label: '10% (Defecto)' },
-                      { value: '9', label: '9%' },
-                      { value: '8', label: '8%' },
-                    ]}
+                    placeholder="Ej. 10 o 10.5"
                     value={porcentajeGrasaObjetivo}
-                    onChange={(value) => setPorcentajeGrasaObjetivo(value || '10')}
+                    onChange={(value) => setPorcentajeGrasaObjetivo(value === '' ? '' : value)}
+                    min={3}
+                    max={35}
+                    step={0.1}
+                    decimalScale={2}
+                    allowNegative={false}
+                    suffix=" %"
                   />
                 </SimpleGrid>
 

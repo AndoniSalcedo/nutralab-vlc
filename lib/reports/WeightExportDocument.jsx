@@ -452,6 +452,9 @@ export default function WeightExportDocument({
                   <Text style={styles.playerName}>
                     {r.nombre} {r.apellidos || ''}
                   </Text>
+                  {targetFat !== 10 && targetFat !== 9 && targetFat !== 8 ? (
+                    <Text style={{ fontSize: 6.2, color: '#64748b' }}>Obj: {targetFat}% ({r.pesoReferencia ? `${r.pesoReferencia} kg` : '—'})</Text>
+                  ) : null}
                 </View>
                 <View style={styles.colWeight}>
                   {hasWeight ? (
