@@ -519,7 +519,7 @@ export default function WeightExportDocument({
 
         {/* Footer */}
         <View style={styles.footer} fixed>
-          <Text>Nutralab VLC · Departamento de Nutrición y Rendimiento</Text>
+          <Text>Nutralab · Departamento de Nutrición y Rendimiento</Text>
           <Text
             render={({ pageNumber, totalPages }) =>
               `Página ${pageNumber} de ${totalPages}`

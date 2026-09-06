@@ -123,9 +123,8 @@ export default function SuplementacionWidget({
                       width: 20,
                       height: 20,
                       borderRadius: '6px',
-                      border: `1.5px solid ${
-                        isChecked ? 'var(--mantine-color-teal-6)' : 'var(--mantine-color-gray-4)'
-                      }`,
+                      border: `1.5px solid ${isChecked ? 'var(--mantine-color-teal-6)' : 'var(--mantine-color-gray-4)'
+                        }`,
                       backgroundColor: isChecked ? 'var(--mantine-color-teal-6)' : 'white',
                       display: 'flex',
                       alignItems: 'center',

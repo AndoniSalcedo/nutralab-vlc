@@ -1,5 +1,5 @@
 /**
- * Catálogo Oficial de Alimentos Limpios en Crudo para Nutralab VLC
+ * Catálogo Oficial de Alimentos Limpios en Crudo para Nutralab
  * Fuente base: data/foods.js (filtrado sin cocinados, procesados ni alcohol)
  * Nombres naturales en español para integración con IA y cálculo exacto.
  * Valores por 100g de alimento en crudo o ración indicada.

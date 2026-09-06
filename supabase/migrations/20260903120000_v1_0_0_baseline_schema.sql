@@ -1,5 +1,5 @@
 -- ==============================================================================
--- NUTRALAB VLC - BASELINE ESQUEMA V1.0.0
+-- NUTRALAB - BASELINE ESQUEMA V1.0.0
 -- Consolidación total de la base de datos para la versión 1.0.0
 -- ==============================================================================
 

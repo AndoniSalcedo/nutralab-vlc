@@ -132,7 +132,7 @@ async function main() {
     subtitle: "Plan Nutricional y Validación Clínica · Fútbol Élite",
     team: "Fútbol élite",
     author: "Carlos Ferrando",
-    handle: "Nutralab VLC",
+    handle: "Nutralab",
     microcycle: "Lunes: Entrenamiento / Descanso individualizado\nMartes: Partido Oficial / Descanso individualizado\nMiércoles: Doble sesión / Entrenamiento técnico\nJueves: Entrenamiento táctico\nViernes: Entrenamiento pre-partido\nSábado: Partido Oficial (21:00)\nDomingo: Recuperación",
     rules: "Respetar timing en días de partido\nCarga de hidratos 24h previas en cena de Lunes y Viernes según planificación\nPriorizar alimentos antiinflamatorios e hidratación continua",
     buffet: "Buffet Ciudad Deportiva disponible según planificación individual"
