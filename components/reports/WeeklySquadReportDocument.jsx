@@ -473,12 +473,17 @@ export function PlayerDetailBreakdownPage({ player, plan, meta, teamConfig }) {
 
   const preMatchConfig = p.config_prepartido || plan?.meta?.preMatchConfig || {};
   const preMatchSummary = [];
-  if (preMatchConfig.noche?.ingestas) {
-    preMatchSummary.push(`Partido noche: ${preMatchConfig.noche.ingestas.join(', ')}`);
-  }
-  if (preMatchConfig.noche?.dia_anterior) {
-    preMatchSummary.push(`24h previas: ${preMatchConfig.noche.dia_anterior}`);
-  }
+  ['manana', 'tarde', 'noche'].forEach((sch) => {
+    const label = sch === 'manana' ? 'mañana' : sch;
+    const cfg = preMatchConfig[sch];
+    if (cfg?.ingestas?.length) {
+      preMatchSummary.push(`Partido ${label}: ${cfg.ingestas.join(', ')}`);
+    }
+    const cena24h = cfg?.recomendaciones?.Cena || cfg?.dia_anterior;
+    if (cena24h) {
+      preMatchSummary.push(`24h previas (${label}): ${cena24h}`);
+    }
+  });
 
   return (
     <Page size="A4" style={detailStyles.page} wrap={false}>

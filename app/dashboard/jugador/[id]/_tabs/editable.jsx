@@ -446,10 +446,12 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
     }));
   }
 
-  async function save(scheduleLabel) {
+  async function save(scheduleLabel, customConfig = null) {
     setSaving(true);
     try {
-      await updatePlayerField(jugadorId, 'config_prepartido', config);
+      const toSave = customConfig || config;
+      await updatePlayerField(jugadorId, 'config_prepartido', toSave);
+      if (customConfig) setConfig(customConfig);
       setEditingSchedule(null);
       router.refresh();
       notifications.show({
@@ -468,6 +470,12 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
     }
   }
 
+  async function handleResetSchedule(scheduleKey, scheduleLabel) {
+    const next = { ...config };
+    delete next[scheduleKey];
+    await save(scheduleLabel, next);
+  }
+
   function handleCancel() {
     try {
       setConfig(JSON.parse(configStr));
@@ -481,24 +489,67 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
     <BentoCard title={label} icon={IconEdit} color="gray" style={{ height: 'auto' }}>
       <Stack gap="sm">
         {scheduleOptions.map((opt) => {
-          const cfg = config?.[opt.value] || {};
+          const cfg = config?.[opt.value];
+          const hasCustomMeals = Array.isArray(cfg?.ingestas) && cfg.ingestas.length > 0;
+          const hasRecs = Boolean(cfg?.recomendaciones && Object.values(cfg.recomendaciones).some((v) => Boolean(v && String(v).trim())));
+          const hasLegacy = Boolean(cfg?.dia_anterior && String(cfg.dia_anterior).trim());
+          const isConfigured = Boolean(cfg && (hasCustomMeals || hasRecs || hasLegacy));
+
           const isEditingThis = editingSchedule === opt.value;
-          const currentMeals = sortPreMatchMealsChronological(opt.value, Array.isArray(cfg.ingestas) ? cfg.ingestas : defaultMeals);
-          const currentPost = cfg.postentreno !== undefined ? Boolean(cfg.postentreno) : defaultPost;
-          const currentRecs = { ...(cfg.recomendaciones || {}) };
+          const currentMeals = sortPreMatchMealsChronological(opt.value, Array.isArray(cfg?.ingestas) ? cfg.ingestas : defaultMeals);
+          const currentPost = cfg?.postentreno !== undefined ? Boolean(cfg.postentreno) : defaultPost;
+          const currentRecs = { ...(cfg?.recomendaciones || {}) };
           // Fallback legacy dia_anterior into Cena recommendation if present and not overwritten
-          if (cfg.dia_anterior && !currentRecs.Cena && !currentRecs.cena) {
+          if (cfg?.dia_anterior && !currentRecs.Cena && !currentRecs.cena) {
             currentRecs.Cena = cfg.dia_anterior;
           }
-          const mealsList = cfg.ingestas && cfg.ingestas.length > 0 ? sortPreMatchMealsChronological(opt.value, cfg.ingestas).join(', ') : 'Habituales';
+          const mealsList = cfg?.ingestas && cfg.ingestas.length > 0 ? sortPreMatchMealsChronological(opt.value, cfg.ingestas).join(', ') : 'Habituales';
 
           if (!isEditingThis) {
+            if (!isConfigured) {
+              return (
+                <Paper key={opt.value} p="sm" withBorder radius="md">
+                  <Group justify="space-between" align="center" mb={4}>
+                    <Group gap="xs" align="center">
+                      <Text size="sm" fw={700} c="dark.7">
+                        Partido por la {opt.label}
+                      </Text>
+                      <Text size="xs" c="dimmed">
+                        ● Sin configurar
+                      </Text>
+                    </Group>
+
+                    {!readOnly && (
+                      <Button
+                        variant="subtle"
+                        size="xs"
+                        radius="xl"
+                        disabled={editingSchedule !== null && editingSchedule !== opt.value}
+                        onClick={() => setEditingSchedule(opt.value)}
+                      >
+                        Configurar
+                      </Button>
+                    )}
+                  </Group>
+
+                  <Text size="xs" c="dimmed">
+                    Sin protocolo específico configurado. En días de partido por la {opt.label.toLowerCase()} se aplicará el menú del comedor de la ciudad deportiva o sus ingestas y preferencias habituales.
+                  </Text>
+                </Paper>
+              );
+            }
+
             return (
               <Paper key={opt.value} p="sm" withBorder radius="md">
                 <Group justify="space-between" align="center" mb={6}>
-                  <Text size="sm" fw={700} c="dark.7">
-                    Partido por la {opt.label}
-                  </Text>
+                  <Group gap="xs" align="center">
+                    <Text size="sm" fw={700} c="dark.7">
+                      Partido por la {opt.label}
+                    </Text>
+                    <Text size="xs" c="teal.7" fw={600}>
+                      ● Configurado ({currentMeals.length} {currentMeals.length === 1 ? 'ingesta' : 'ingestas'})
+                    </Text>
+                  </Group>
 
                   {!readOnly && (
                     <Button
@@ -540,10 +591,29 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
           return (
             <Paper key={opt.value} p="sm" withBorder radius="md" bg="gray.0">
               <Group justify="space-between" align="center" mb="sm" wrap="wrap">
-                <Text size="sm" fw={700} c="dark.8">
-                  Editando: Partidos por la {opt.label}
-                </Text>
+                <Group gap="xs" align="center">
+                  <Text size="sm" fw={700} c="dark.8">
+                    Editando: Partidos por la {opt.label}
+                  </Text>
+                  {isConfigured ? (
+                    <Text size="xs" c="teal.7" fw={600}>● Configurado</Text>
+                  ) : (
+                    <Text size="xs" c="dimmed">● Sin configurar</Text>
+                  )}
+                </Group>
                 <Group gap={6}>
+                  {isConfigured && (
+                    <Button
+                      variant="subtle"
+                      color="red"
+                      size="xs"
+                      radius="xl"
+                      onClick={() => handleResetSchedule(opt.value, opt.label)}
+                      disabled={saving}
+                    >
+                      Desactivar
+                    </Button>
+                  )}
                   <Button variant="filled" size="xs" radius="xl" onClick={() => save(opt.label)} loading={saving}>
                     Guardar
                   </Button>
