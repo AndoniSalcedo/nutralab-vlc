@@ -53,7 +53,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Chuletón de ternera",
-    "originalName": "Chuletón de ternera - crudo",
+    "originalName": "Chuletón de ternera crudo",
     "category": "carnes_y_aves",
     "kcal": 250,
     "cho": 0,
@@ -89,7 +89,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Hamburguesa de cerdo",
-    "originalName": "Hamburguesa de cerdo - crudo",
+    "originalName": "Hamburguesa de cerdo crudo",
     "category": "carnes_y_aves",
     "kcal": 210,
     "cho": 1,
@@ -98,7 +98,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Hamburguesa de pavo",
-    "originalName": "Hamburguesa de pavo - crudo",
+    "originalName": "Hamburguesa de pavo crudo",
     "category": "carnes_y_aves",
     "kcal": 135,
     "cho": 1,
@@ -107,7 +107,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Hamburguesa de pollo",
-    "originalName": "Hamburguesa de pollo - crudo",
+    "originalName": "Hamburguesa de pollo crudo",
     "category": "carnes_y_aves",
     "kcal": 143,
     "cho": 1,
@@ -116,7 +116,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Hamburguesa de ternera",
-    "originalName": "Hamburguesa de ternera - crudo",
+    "originalName": "Hamburguesa de ternera crudo",
     "category": "carnes_y_aves",
     "kcal": 215,
     "cho": 1,
@@ -134,7 +134,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Jamón cocido",
-    "originalName": "Jamón cocido - lonchas",
+    "originalName": "Jamón cocido lonchas",
     "category": "carnes_y_aves",
     "kcal": 145,
     "cho": 1,
@@ -161,7 +161,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Jamón serrano",
-    "originalName": "Jamón serrano - lonchas",
+    "originalName": "Jamón serrano lonchas",
     "category": "carnes_y_aves",
     "kcal": 240,
     "cho": 0,
@@ -197,7 +197,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Muslo de pollo",
-    "originalName": "Muslo de pollo - cruda",
+    "originalName": "Muslo de pollo cruda",
     "category": "carnes_y_aves",
     "kcal": 177,
     "cho": 0,
@@ -224,7 +224,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Solomillo de cerdo",
-    "originalName": "Solomillo de cerdo - cruda",
+    "originalName": "Solomillo de cerdo cruda",
     "category": "carnes_y_aves",
     "kcal": 143,
     "cho": 0,
@@ -242,21 +242,12 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Ternera magra",
-    "originalName": "Ternera magra - cruda",
+    "originalName": "Ternera magra cruda",
     "category": "carnes_y_aves",
     "kcal": 137,
     "cho": 0,
     "pro": 21,
     "fat": 5
-  },
-  {
-    "name": "Arroz al horno",
-    "originalName": "Arroz al horno",
-    "category": "cereales_y_tuberculos",
-    "kcal": 145,
-    "cho": 22,
-    "pro": 6,
-    "fat": 3.5
   },
   {
     "originalName": "Arroz basmati",
@@ -269,7 +260,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Arroz blanco",
-    "originalName": "Arroz blanco - crudo",
+    "originalName": "Arroz blanco crudo",
     "category": "cereales_y_tuberculos",
     "kcal": 365,
     "cho": 78,
@@ -286,7 +277,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Arroz integral",
-    "originalName": "Arroz integral - crudo",
+    "originalName": "Arroz integral crudo",
     "category": "cereales_y_tuberculos",
     "kcal": 370,
     "cho": 77,
@@ -304,7 +295,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Boniato",
-    "originalName": "Batata boniato - crudo",
+    "originalName": "Batata boniato crudo",
     "category": "cereales_y_tuberculos",
     "kcal": 86,
     "cho": 20.1,
@@ -313,7 +304,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Bulgur",
-    "originalName": "Bulgur - crudo",
+    "originalName": "Bulgur crudo",
     "category": "cereales_y_tuberculos",
     "kcal": 342,
     "cho": 75.9,
@@ -322,7 +313,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Copos de avena",
-    "originalName": "Avena en copos - crudo",
+    "originalName": "Avena en copos crudo",
     "category": "cereales_y_tuberculos",
     "kcal": 389,
     "cho": 66.3,
@@ -331,7 +322,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Cuscús",
-    "originalName": "Cuscús - crudo",
+    "originalName": "Cuscús crudo",
     "category": "cereales_y_tuberculos",
     "kcal": 376,
     "cho": 77.4,
@@ -358,7 +349,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Maíz dulce",
-    "originalName": "Maíz dulce - crudo",
+    "originalName": "Maíz dulce crudo",
     "category": "cereales_y_tuberculos",
     "kcal": 86,
     "cho": 19,
@@ -457,7 +448,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Pasta de lenteja roja",
-    "originalName": "pasta de lenteja roja - cruda",
+    "originalName": "pasta de lenteja roja cruda",
     "category": "cereales_y_tuberculos",
     "kcal": 338,
     "cho": 49,
@@ -466,7 +457,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Pasta de trigo",
-    "originalName": "Pasta de trigo - crudo",
+    "originalName": "Pasta de trigo crudo",
     "category": "cereales_y_tuberculos",
     "kcal": 371,
     "cho": 75,
@@ -484,7 +475,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Patata",
-    "originalName": "Patata - crudo",
+    "originalName": "Patata crudo",
     "category": "cereales_y_tuberculos",
     "kcal": 77,
     "cho": 17.5,
@@ -502,7 +493,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Quinoa",
-    "originalName": "Quinoa - crudo",
+    "originalName": "Quinoa crudo",
     "category": "cereales_y_tuberculos",
     "kcal": 368,
     "cho": 64.2,
@@ -556,7 +547,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Trigo sarraceno",
-    "originalName": "Trigo sarraceno - crudo",
+    "originalName": "Trigo sarraceno crudo",
     "category": "cereales_y_tuberculos",
     "kcal": 343,
     "cho": 71.5,
@@ -564,8 +555,8 @@ export const FOODS_CRUDO = [
     "fat": 3.4
   },
   {
-    "name": "Trigo sarraceno - hinchado",
-    "originalName": "Trigo sarraceno - hinchado",
+    "name": "Trigo sarraceno hinchado",
+    "originalName": "Trigo sarraceno hinchado",
     "category": "cereales_y_tuberculos",
     "kcal": 360.2,
     "cho": 67.92,
@@ -574,7 +565,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Yuca",
-    "originalName": "Yuca - crudo",
+    "originalName": "Yuca crudo",
     "category": "cereales_y_tuberculos",
     "kcal": 160,
     "cho": 38,
@@ -582,8 +573,8 @@ export const FOODS_CRUDO = [
     "fat": 0.3
   },
   {
-    "name": "Arándano - congelada",
-    "originalName": "Arándano - congelada",
+    "name": "Arándano congelada",
+    "originalName": "Arándano congelada",
     "category": "frutas",
     "kcal": 55.9,
     "cho": 14.21,
@@ -591,8 +582,8 @@ export const FOODS_CRUDO = [
     "fat": 0.29
   },
   {
-    "name": "Arándano - desecada",
-    "originalName": "Arándano - desecada",
+    "name": "Arándano desecada",
+    "originalName": "Arándano desecada",
     "category": "frutas",
     "kcal": 171,
     "cho": 40.6,
@@ -601,7 +592,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Arándanos",
-    "originalName": "Arándano - cruda",
+    "originalName": "Arándano cruda",
     "category": "frutas",
     "kcal": 57,
     "cho": 14.5,
@@ -636,8 +627,8 @@ export const FOODS_CRUDO = [
     "fat": 0.7
   },
   {
-    "name": "Frambuesa - congelada",
-    "originalName": "Frambuesa - congelada",
+    "name": "Frambuesa congelada",
+    "originalName": "Frambuesa congelada",
     "category": "frutas",
     "kcal": 51,
     "cho": 11.76,
@@ -645,8 +636,8 @@ export const FOODS_CRUDO = [
     "fat": 0.69
   },
   {
-    "name": "Fresa - congelada",
-    "originalName": "Fresa - congelada",
+    "name": "Fresa congelada",
+    "originalName": "Fresa congelada",
     "category": "frutas",
     "kcal": 31.4,
     "cho": 7.55,
@@ -654,8 +645,8 @@ export const FOODS_CRUDO = [
     "fat": 0.29
   },
   {
-    "name": "Fresa - desecada",
-    "originalName": "Fresa - desecada",
+    "name": "Fresa desecada",
+    "originalName": "Fresa desecada",
     "category": "frutas",
     "kcal": 96,
     "cho": 21.56,
@@ -681,8 +672,8 @@ export const FOODS_CRUDO = [
     "fat": 0.9
   },
   {
-    "name": "Higo seco - desecada",
-    "originalName": "Higo seco - desecada",
+    "name": "Higo seco desecada",
+    "originalName": "Higo seco desecada",
     "category": "frutas",
     "kcal": 747,
     "cho": 179.2,
@@ -717,8 +708,8 @@ export const FOODS_CRUDO = [
     "fat": 0.4
   },
   {
-    "name": "Mango - congelada",
-    "originalName": "Mango - congelada",
+    "name": "Mango congelada",
+    "originalName": "Mango congelada",
     "category": "frutas",
     "kcal": 58.8,
     "cho": 14.7,
@@ -726,8 +717,8 @@ export const FOODS_CRUDO = [
     "fat": 0.39
   },
   {
-    "name": "Mango - desecada",
-    "originalName": "Mango - desecada",
+    "name": "Mango desecada",
+    "originalName": "Mango desecada",
     "category": "frutas",
     "kcal": 180,
     "cho": 42,
@@ -744,8 +735,8 @@ export const FOODS_CRUDO = [
     "fat": 0.2
   },
   {
-    "name": "Manzana - compota sin azúcar",
-    "originalName": "Manzana - compota sin azúcar",
+    "name": "Manzana compota sin azúcar",
+    "originalName": "Manzana compota sin azúcar",
     "category": "frutas",
     "kcal": 42.6,
     "cho": 11.73,
@@ -753,8 +744,8 @@ export const FOODS_CRUDO = [
     "fat": 0.17
   },
   {
-    "name": "Manzana - desecada",
-    "originalName": "Manzana - desecada",
+    "name": "Manzana desecada",
+    "originalName": "Manzana desecada",
     "category": "frutas",
     "kcal": 156,
     "cho": 38.64,
@@ -789,8 +780,8 @@ export const FOODS_CRUDO = [
     "fat": 0.1
   },
   {
-    "name": "Naranja - desecada",
-    "originalName": "Naranja - desecada",
+    "name": "Naranja desecada",
+    "originalName": "Naranja desecada",
     "category": "frutas",
     "kcal": 141,
     "cho": 33.04,
@@ -825,8 +816,8 @@ export const FOODS_CRUDO = [
     "fat": 0.1
   },
   {
-    "name": "Pera - compota sin azúcar",
-    "originalName": "Pera - compota sin azúcar",
+    "name": "Pera compota sin azúcar",
+    "originalName": "Pera compota sin azúcar",
     "category": "frutas",
     "kcal": 46.7,
     "cho": 12.92,
@@ -834,8 +825,8 @@ export const FOODS_CRUDO = [
     "fat": 0.09
   },
   {
-    "name": "Piña - congelada",
-    "originalName": "Piña - congelada",
+    "name": "Piña congelada",
+    "originalName": "Piña congelada",
     "category": "frutas",
     "kcal": 49,
     "cho": 12.84,
@@ -843,8 +834,8 @@ export const FOODS_CRUDO = [
     "fat": 0.1
   },
   {
-    "name": "Piña - desecada",
-    "originalName": "Piña - desecada",
+    "name": "Piña desecada",
+    "originalName": "Piña desecada",
     "category": "frutas",
     "kcal": 150,
     "cho": 36.68,
@@ -852,8 +843,8 @@ export const FOODS_CRUDO = [
     "fat": 0.28
   },
   {
-    "name": "Piña - pelada",
-    "originalName": "Piña - pelada",
+    "name": "Piña pelada",
+    "originalName": "Piña pelada",
     "category": "frutas",
     "kcal": 47.5,
     "cho": 12.58,
@@ -870,8 +861,8 @@ export const FOODS_CRUDO = [
     "fat": 0.3
   },
   {
-    "name": "Plátano - desecada",
-    "originalName": "Plátano - desecada",
+    "name": "Plátano desecada",
+    "originalName": "Plátano desecada",
     "category": "frutas",
     "kcal": 267,
     "cho": 63.84,
@@ -888,8 +879,8 @@ export const FOODS_CRUDO = [
     "fat": 0.2
   },
   {
-    "name": "Uva - desecada",
-    "originalName": "Uva - desecada",
+    "name": "Uva desecada",
+    "originalName": "Uva desecada",
     "category": "frutas",
     "kcal": 207,
     "cho": 50.4,
@@ -1042,7 +1033,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Claras de huevo",
-    "originalName": "Clara de huevo - crudo",
+    "originalName": "Clara de huevo crudo",
     "category": "huevos_y_lacteos",
     "kcal": 52,
     "cho": 0.7,
@@ -1050,8 +1041,8 @@ export const FOODS_CRUDO = [
     "fat": 0.2
   },
   {
-    "name": "Huevo entero - tortilla",
-    "originalName": "Huevo entero - tortilla",
+    "name": "Huevo entero tortilla",
+    "originalName": "Huevo entero tortilla",
     "category": "huevos_y_lacteos",
     "kcal": 193.8,
     "cho": 1.1,
@@ -1060,7 +1051,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Huevo entero (unidad 50g)",
-    "originalName": "Huevo entero - crudo",
+    "originalName": "Huevo entero crudo",
     "category": "huevos_y_lacteos",
     "kcal": 155,
     "cho": 1.1,
@@ -1104,8 +1095,8 @@ export const FOODS_CRUDO = [
     "fat": 1.8
   },
   {
-    "name": "Leche desnatado",
-    "originalName": "Leche desnatado",
+    "name": "Leche desnatada",
+    "originalName": "Leche desnatada",
     "category": "huevos_y_lacteos",
     "kcal": 39,
     "cho": 5.28,
@@ -1122,8 +1113,8 @@ export const FOODS_CRUDO = [
     "fat": 3.3
   },
   {
-    "name": "Leche entera - alto proteína",
-    "originalName": "Leche entera - alto proteína",
+    "name": "Leche entera alto proteína",
+    "originalName": "Leche entera alto proteína",
     "category": "huevos_y_lacteos",
     "kcal": 69,
     "cho": 8.64,
@@ -1131,8 +1122,8 @@ export const FOODS_CRUDO = [
     "fat": 3.79
   },
   {
-    "name": "Leche entera - sin lactosa",
-    "originalName": "Leche entera - sin lactosa",
+    "name": "Leche entera sin lactosa",
+    "originalName": "Leche entera sin lactosa",
     "category": "huevos_y_lacteos",
     "kcal": 60,
     "cho": 4.8,
@@ -1194,8 +1185,8 @@ export const FOODS_CRUDO = [
     "fat": 4
   },
   {
-    "name": "Queso fresco - alto proteína",
-    "originalName": "Queso fresco - alto proteína",
+    "name": "Queso fresco alto proteína",
+    "originalName": "Queso fresco alto proteína",
     "category": "huevos_y_lacteos",
     "kcal": 112.7,
     "cho": 5.4,
@@ -1203,8 +1194,8 @@ export const FOODS_CRUDO = [
     "fat": 4.6
   },
   {
-    "name": "Queso fresco - desnatado",
-    "originalName": "Queso fresco - desnatado",
+    "name": "Queso fresco desnatado",
+    "originalName": "Queso fresco desnatado",
     "category": "huevos_y_lacteos",
     "kcal": 63.7,
     "cho": 3.3,
@@ -1212,8 +1203,8 @@ export const FOODS_CRUDO = [
     "fat": 2.6
   },
   {
-    "name": "Queso fresco - sin lactosa",
-    "originalName": "Queso fresco - sin lactosa",
+    "name": "Queso fresco sin lactosa",
+    "originalName": "Queso fresco sin lactosa",
     "category": "huevos_y_lacteos",
     "kcal": 98,
     "cho": 3,
@@ -1293,8 +1284,8 @@ export const FOODS_CRUDO = [
     "fat": 5
   },
   {
-    "name": "Yogur griego natural - desnatado",
-    "originalName": "Yogur griego natural - desnatado",
+    "name": "Yogur griego natural desnatado",
+    "originalName": "Yogur griego natural desnatado",
     "category": "huevos_y_lacteos",
     "kcal": 63.1,
     "cho": 3.96,
@@ -1329,8 +1320,8 @@ export const FOODS_CRUDO = [
     "fat": 3.3
   },
   {
-    "name": "Yogur natural - alto proteína",
-    "originalName": "Yogur natural - alto proteína",
+    "name": "Yogur natural alto proteína",
+    "originalName": "Yogur natural alto proteína",
     "category": "huevos_y_lacteos",
     "kcal": 70.1,
     "cho": 8.46,
@@ -1338,8 +1329,8 @@ export const FOODS_CRUDO = [
     "fat": 3.79
   },
   {
-    "name": "Yogur natural - desnatado",
-    "originalName": "Yogur natural - desnatado",
+    "name": "Yogur natural desnatado",
+    "originalName": "Yogur natural desnatado",
     "category": "huevos_y_lacteos",
     "kcal": 39.6,
     "cho": 5.17,
@@ -1347,8 +1338,8 @@ export const FOODS_CRUDO = [
     "fat": 2.15
   },
   {
-    "name": "Yogur natural - sin lactosa",
-    "originalName": "Yogur natural - sin lactosa",
+    "name": "Yogur natural sin lactosa",
+    "originalName": "Yogur natural sin lactosa",
     "category": "huevos_y_lacteos",
     "kcal": 61,
     "cho": 4.7,
@@ -1393,7 +1384,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Alubia blanca",
-    "originalName": "Alubia blanca - seca",
+    "originalName": "Alubia blanca seca",
     "category": "legumbres",
     "kcal": 333,
     "cho": 60,
@@ -1402,7 +1393,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Garbanzo",
-    "originalName": "Garbanzo - seca",
+    "originalName": "Garbanzo seca",
     "category": "legumbres",
     "kcal": 364,
     "cho": 61,
@@ -1411,7 +1402,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Lenteja",
-    "originalName": "Lenteja - seca",
+    "originalName": "Lenteja seca",
     "category": "legumbres",
     "kcal": 353,
     "cho": 60,
@@ -1420,7 +1411,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Soja texturizada",
-    "originalName": "Soja texturizada - seca",
+    "originalName": "Soja texturizada seca",
     "category": "legumbres",
     "kcal": 336,
     "cho": 31,
@@ -1652,9 +1643,9 @@ export const FOODS_CRUDO = [
     "fat": 0.6
   },
   {
-    "name": "Secreto de cerd",
-    "originalName": "Secreto de cerd",
-    "category": "otros_y_suplementos",
+    "name": "Secreto de cerdo",
+    "originalName": "Secreto de cerdo",
+    "category": "carnes_y_aves",
     "kcal": 290,
     "cho": 0,
     "pro": 17.5,
@@ -1707,7 +1698,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Atún natural",
-    "originalName": "Atún natural - crudo",
+    "originalName": "Atún natural crudo",
     "category": "pescados_y_mariscos",
     "kcal": 116,
     "cho": 0,
@@ -1715,8 +1706,8 @@ export const FOODS_CRUDO = [
     "fat": 1
   },
   {
-    "name": "Atún natural - conserva aceite",
-    "originalName": "Atún natural - conserva aceite",
+    "name": "Atún natural conserva aceite",
+    "originalName": "Atún natural conserva aceite",
     "category": "pescados_y_mariscos",
     "kcal": 220.4,
     "cho": 0,
@@ -1724,8 +1715,8 @@ export const FOODS_CRUDO = [
     "fat": 1.05
   },
   {
-    "name": "Atún natural - conserva natural",
-    "originalName": "Atún natural - conserva natural",
+    "name": "Atún natural conserva natural",
+    "originalName": "Atún natural conserva natural",
     "category": "pescados_y_mariscos",
     "kcal": 133.4,
     "cho": 0,
@@ -1779,7 +1770,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Caballa",
-    "originalName": "Caballa - crudo",
+    "originalName": "Caballa crudo",
     "category": "pescados_y_mariscos",
     "kcal": 205,
     "cho": 0,
@@ -1806,7 +1797,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Corvina",
-    "originalName": "Corvina - crudo",
+    "originalName": "Corvina crudo",
     "category": "pescados_y_mariscos",
     "kcal": 100,
     "cho": 0,
@@ -1824,7 +1815,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Emperador (pez espada)",
-    "originalName": "Emperador (pez espada) - crudo",
+    "originalName": "Emperador (pez espada) crudo",
     "category": "pescados_y_mariscos",
     "kcal": 121,
     "cho": 0,
@@ -1833,7 +1824,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Gambas",
-    "originalName": "Gamba - cruda",
+    "originalName": "Gamba cruda",
     "category": "pescados_y_mariscos",
     "kcal": 99,
     "cho": 0.2,
@@ -1868,8 +1859,8 @@ export const FOODS_CRUDO = [
     "fat": 2.2
   },
   {
-    "originalName": "Merluza",
     "name": "Merluza",
+    "originalName": "Merluza",
     "category": "pescados_y_mariscos",
     "kcal": 90,
     "cho": 0,
@@ -1877,8 +1868,17 @@ export const FOODS_CRUDO = [
     "fat": 1.5
   },
   {
+    "name": "Rape",
+    "originalName": "Rape crudo",
+    "category": "pescados_y_mariscos",
+    "kcal": 82,
+    "cho": 0,
+    "pro": 18.7,
+    "fat": 0.8
+  },
+  {
     "name": "Pulpo",
-    "originalName": "Pulpo - crudo",
+    "originalName": "Pulpo crudo",
     "category": "pescados_y_mariscos",
     "kcal": 82,
     "cho": 2.2,
@@ -1896,7 +1896,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Salmón",
-    "originalName": "Salmón - crudo",
+    "originalName": "Salmón crudo",
     "category": "pescados_y_mariscos",
     "kcal": 208,
     "cho": 0,
@@ -1904,8 +1904,8 @@ export const FOODS_CRUDO = [
     "fat": 13
   },
   {
-    "name": "Salmón - conserva aceite",
-    "originalName": "Salmón - conserva aceite",
+    "name": "Salmón conserva aceite",
+    "originalName": "Salmón conserva aceite",
     "category": "pescados_y_mariscos",
     "kcal": 395.2,
     "cho": 0,
@@ -1913,8 +1913,8 @@ export const FOODS_CRUDO = [
     "fat": 24.7
   },
   {
-    "name": "Salmón - conserva natural",
-    "originalName": "Salmón - conserva natural",
+    "name": "Salmón conserva natural",
+    "originalName": "Salmón conserva natural",
     "category": "pescados_y_mariscos",
     "kcal": 239.2,
     "cho": 0,
@@ -1941,7 +1941,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Sardina",
-    "originalName": "Sardina - crudo",
+    "originalName": "Sardina crudo",
     "category": "pescados_y_mariscos",
     "kcal": 208,
     "cho": 0,
@@ -1949,8 +1949,8 @@ export const FOODS_CRUDO = [
     "fat": 11
   },
   {
-    "name": "Sardina - conserva aceite",
-    "originalName": "Sardina - conserva aceite",
+    "name": "Sardina conserva aceite",
+    "originalName": "Sardina conserva aceite",
     "category": "pescados_y_mariscos",
     "kcal": 395.2,
     "cho": 0,
@@ -1968,7 +1968,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Acelga",
-    "originalName": "Acelga - cruda",
+    "originalName": "Acelga cruda",
     "category": "verduras_y_hortalizas",
     "kcal": 19,
     "cho": 3.7,
@@ -1995,7 +1995,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Berenjena",
-    "originalName": "Berenjena - cruda",
+    "originalName": "Berenjena cruda",
     "category": "verduras_y_hortalizas",
     "kcal": 25,
     "cho": 5.9,
@@ -2004,7 +2004,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Brócoli",
-    "originalName": "Brócoli - crudo",
+    "originalName": "Brócoli crudo",
     "category": "verduras_y_hortalizas",
     "kcal": 34,
     "cho": 6.6,
@@ -2013,7 +2013,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Calabacín",
-    "originalName": "Calabacín - crudo",
+    "originalName": "Calabacín crudo",
     "category": "verduras_y_hortalizas",
     "kcal": 17,
     "cho": 3.1,
@@ -2022,7 +2022,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Cebolla",
-    "originalName": "Cebolla - cruda",
+    "originalName": "Cebolla cruda",
     "category": "verduras_y_hortalizas",
     "kcal": 40,
     "cho": 9.3,
@@ -2031,7 +2031,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Champiñón",
-    "originalName": "Champiñón - crudo",
+    "originalName": "Champiñón crudo",
     "category": "verduras_y_hortalizas",
     "kcal": 22,
     "cho": 3.3,
@@ -2040,7 +2040,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Coliflor",
-    "originalName": "Coliflor - cruda",
+    "originalName": "Coliflor cruda",
     "category": "verduras_y_hortalizas",
     "kcal": 25,
     "cho": 5,
@@ -2048,8 +2048,8 @@ export const FOODS_CRUDO = [
     "fat": 0.3
   },
   {
-    "name": "Espárragos blancos - conserva",
-    "originalName": "espárragos blancos - conserva",
+    "name": "Espárragos blancos conserva",
+    "originalName": "espárragos blancos conserva",
     "category": "verduras_y_hortalizas",
     "kcal": 20,
     "cho": 2.5,
@@ -2066,8 +2066,26 @@ export const FOODS_CRUDO = [
     "fat": 0.2
   },
   {
+    "name": "Guisantes",
+    "originalName": "Guisantes crudos",
+    "category": "verduras_y_hortalizas",
+    "kcal": 81,
+    "cho": 14.5,
+    "pro": 5.4,
+    "fat": 0.4
+  },
+  {
+    "name": "Puerro",
+    "originalName": "Puerro crudo",
+    "category": "verduras_y_hortalizas",
+    "kcal": 31,
+    "cho": 5.7,
+    "pro": 1.5,
+    "fat": 0.3
+  },
+  {
     "name": "Espinaca",
-    "originalName": "Espinaca - cruda",
+    "originalName": "Espinaca cruda",
     "category": "verduras_y_hortalizas",
     "kcal": 23,
     "cho": 3.6,
@@ -2076,7 +2094,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Hamburguesa de espinacas",
-    "originalName": "Hamburguesa de espinacas - crudo",
+    "originalName": "Hamburguesa de espinacas crudo",
     "category": "verduras_y_hortalizas",
     "kcal": 120,
     "cho": 12,
@@ -2093,7 +2111,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Lechuga romana",
-    "originalName": "Lechuga romana - cruda",
+    "originalName": "Lechuga romana cruda",
     "category": "verduras_y_hortalizas",
     "kcal": 17,
     "cho": 3.3,
@@ -2111,7 +2129,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Pimiento",
-    "originalName": "Pimiento - cruda",
+    "originalName": "Pimiento cruda",
     "category": "verduras_y_hortalizas",
     "kcal": 31,
     "cho": 6,
@@ -2120,7 +2138,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Remolacha",
-    "originalName": "Remolacha - cruda",
+    "originalName": "Remolacha cruda",
     "category": "verduras_y_hortalizas",
     "kcal": 43,
     "cho": 9.6,
@@ -2129,7 +2147,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Rúcula",
-    "originalName": "Rúcula - cruda",
+    "originalName": "Rúcula cruda",
     "category": "verduras_y_hortalizas",
     "kcal": 25,
     "cho": 3.7,
@@ -2138,7 +2156,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Tomate",
-    "originalName": "Tomate - crudo",
+    "originalName": "Tomate crudo",
     "category": "verduras_y_hortalizas",
     "kcal": 18,
     "cho": 3.9,
@@ -2156,7 +2174,7 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Zanahoria",
-    "originalName": "Zanahoria - cruda",
+    "originalName": "Zanahoria cruda",
     "category": "verduras_y_hortalizas",
     "kcal": 41,
     "cho": 9.6,
@@ -2165,6 +2183,28 @@ export const FOODS_CRUDO = [
   }
 ];
 
-export const FOOD_NAMES_LIST = FOODS_CRUDO.map(f => f.name);
+export function normalizeFoodName(str) {
+  return String(str || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[(),.]/g, ' ')
+    .replace(/[-_]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Precomputar normalizedName en cada elemento del catálogo para acceso O(1)
+FOODS_CRUDO.forEach((f) => {
+  f.normalizedName = normalizeFoodName(f.name);
+});
+
+export const FOODS_BY_NORMALIZED_NAME = new Map(
+  FOODS_CRUDO.map((f) => [f.normalizedName, f])
+);
+
+export const FOOD_NAMES_LIST = FOODS_CRUDO.map((f) => f.name);
+export const FOOD_NORMALIZED_NAMES_LIST = FOODS_CRUDO.map((f) => f.normalizedName);
 
 export default FOODS_CRUDO;
+
