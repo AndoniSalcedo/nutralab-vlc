@@ -40,12 +40,25 @@ export function CampoEditable({
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
-  const [val, setVal] = useState(valor || '');
+  const [val, setVal] = useState(() => {
+    if (tipo === 'multiselect') {
+      if (Array.isArray(valor)) return valor;
+      if (typeof valor === 'string') return valor.split(/[,|;]/).map((s) => s.trim()).filter(Boolean);
+      return [];
+    }
+    return valor || '';
+  });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setVal(valor || '');
-  }, [valor]);
+    if (tipo === 'multiselect') {
+      if (Array.isArray(valor)) setVal(valor);
+      else if (typeof valor === 'string') setVal(valor.split(/[,|;]/).map((s) => s.trim()).filter(Boolean));
+      else setVal([]);
+    } else {
+      setVal(valor || '');
+    }
+  }, [valor, tipo]);
 
   async function save() {
     setSaving(true);
@@ -54,6 +67,8 @@ export function CampoEditable({
       if (tipo === 'number') {
         const num = Number(val);
         finalVal = Number.isFinite(num) ? Math.round(num * 100) / 100 : val;
+      } else if (tipo === 'multiselect') {
+        finalVal = Array.isArray(val) ? val.join(', ') : String(val || '');
       }
       await updatePlayerField(jugadorId, campo, finalVal);
       setEditing(false);
@@ -82,6 +97,15 @@ export function CampoEditable({
             {editing ? (
               tipo === 'select' ? (
                 <Select data={opciones} value={val} onChange={setVal} size="sm" />
+              ) : tipo === 'multiselect' ? (
+                <MultiSelect
+                  data={opciones}
+                  value={Array.isArray(val) ? val : []}
+                  onChange={setVal}
+                  searchable
+                  clearable
+                  size="sm"
+                />
               ) : tipo === 'number' ? (
                 <NumberInput
                   value={val === '' ? '' : Number(val)}
@@ -100,12 +124,14 @@ export function CampoEditable({
                 <Textarea value={val} onChange={(e) => setVal(e.target.value)} rows={3} size="sm" />
               )
             ) : (
-              <Text size="sm" c={val !== '' && val !== null && val !== undefined ? 'dark' : 'dimmed'}>
+              <Text size="sm" c={(val !== '' && val !== null && val !== undefined && (!Array.isArray(val) || val.length > 0)) ? 'dark' : 'dimmed'}>
                 {tipo === 'select' && val && opciones
                   ? (opciones.find((o) => (o.value || o) === val)?.label || val)
+                  : tipo === 'multiselect' && Array.isArray(val) && val.length > 0
+                  ? val.map((v) => opciones?.find((o) => (o.value || o) === v)?.label || v).join(', ')
                   : tipo === 'number' && val !== '' && val !== null && val !== undefined
                   ? `${val}${suffix}`
-                  : (val || 'Sin especificar')}
+                  : (typeof val === 'string' && val ? val : 'Sin especificar')}
               </Text>
             )}
           </Box>

@@ -7,6 +7,8 @@ import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { withLatestMeasurement } from '@/lib/metrics/player';
 import { generarDatosPlan } from '@/lib/ai/plan-generator';
 import { findFoodInCatalog, parseMealItem } from '@/lib/nutrition/calculator';
+import { getClinicalCatalogForPlayer } from '@/lib/nutrition/clinical-catalog';
+import { formatClinicalTags } from '@/config/clinical-tags';
 import WeeklySquadReportDocument from '@/components/reports/WeeklySquadReportDocument';
 
 import { getPlayersByTeam } from '@/repositories/playerRepository';
@@ -274,11 +276,8 @@ async function runSquadAudit() {
       name: fullName,
       peso_kg: player.peso_kg,
       objetivo: player.objetivo,
-      alergias_intolerancias: [
-        player.alergias ? `Alergias: ${player.alergias}` : null,
-        player.intolerancias ? `Intolerancias: ${player.intolerancias}` : null,
-        player.aversiones ? `Aversiones: ${player.aversiones}` : null,
-      ].filter(Boolean).join(' | '),
+      alergias_intolerancias: formatClinicalTags(player.intolerancias || player.alergias),
+      aversiones: player.aversiones || '',
       issues: [],
       metricsOk: true,
       dayAudits: {},
@@ -294,11 +293,12 @@ async function runSquadAudit() {
       continue;
     }
 
-    const intoleranciasLower = (playerAudit.alergias_intolerancias || '').toLowerCase();
-    const isLactose = intoleranciasLower.includes('lactosa') || intoleranciasLower.includes('leche');
-    const isPork = intoleranciasLower.includes('cerdo') || intoleranciasLower.includes('pork');
-    const isFish = intoleranciasLower.includes('pescado') || intoleranciasLower.includes('marisco');
-    const isGluten = intoleranciasLower.includes('gluten') || intoleranciasLower.includes('celiac');
+    const clinicalCatalog = getClinicalCatalogForPlayer(player);
+    const activeTagsSet = new Set(clinicalCatalog.activeTags);
+    const isLactose = activeTagsSet.has('sin_lactosa');
+    const isPork = activeTagsSet.has('sin_cerdo');
+    const isFish = activeTagsSet.has('sin_pescado') || activeTagsSet.has('sin_marisco');
+    const isGluten = activeTagsSet.has('sin_gluten');
 
     // Revisar cada día de la semana
     for (const dayKey of daysOfWeek) {
@@ -418,7 +418,7 @@ async function runSquadAudit() {
             cerealBasesInMeal.push(cBase);
           }
 
-          // Check seguridad clínica
+          // Check seguridad clínica bidireccional
           const itemLower = item.name.toLowerCase();
           if (isPork && (itemLower.includes('cerdo') || itemLower.includes('jamón') || itemLower.includes('jamon') || itemLower.includes('secreto') || itemLower.includes('lomo de cerdo'))) {
             daySummary.clinicalAlerts.push({ meal: mealName, food: item.name, violation: 'cerdo' });
@@ -438,7 +438,8 @@ async function runSquadAudit() {
               message: `Violación de alergia a pescado/marisco en ${dayKey} (${mealName}): servido "${item.name}"`,
             });
           }
-          if (isLactose && (itemLower.includes('queso') || itemLower.includes('leche') || itemLower.includes('yogur')) && !itemLower.includes('sin lactosa')) {
+          const isPlantMilk = itemLower.includes('de almendra') || itemLower.includes('de soja') || itemLower.includes('de avena') || itemLower.includes('de coco');
+          if (isLactose && (itemLower.includes('queso') || itemLower.includes('leche') || itemLower.includes('yogur')) && !itemLower.includes('sin lactosa') && !isPlantMilk) {
             daySummary.clinicalAlerts.push({ meal: mealName, food: item.name, violation: 'lactosa' });
             auditReport.globalFindings.totalClinicalViolations++;
             playerAudit.issues.push({
@@ -454,6 +455,22 @@ async function runSquadAudit() {
               severity: 'HIGH',
               category: 'SEGURIDAD_CLINICA',
               message: `Alimento con gluten para celiaco/intolerante en ${dayKey} (${mealName}): servido "${item.name}"`,
+            });
+          }
+          if (!isGluten && itemLower.includes('sin gluten')) {
+            auditReport.globalFindings.totalClinicalViolations++;
+            playerAudit.issues.push({
+              severity: 'HIGH',
+              category: 'SEGURIDAD_CLINICA',
+              message: `Producto "sin gluten" prescrito innecesariamente a jugador tolerante en ${dayKey} (${mealName}): "${item.name}"`,
+            });
+          }
+          if (!isLactose && itemLower.includes('sin lactosa')) {
+            auditReport.globalFindings.totalClinicalViolations++;
+            playerAudit.issues.push({
+              severity: 'HIGH',
+              category: 'SEGURIDAD_CLINICA',
+              message: `Producto "sin lactosa" prescrito innecesariamente a jugador tolerante en ${dayKey} (${mealName}): "${item.name}"`,
             });
           }
         }

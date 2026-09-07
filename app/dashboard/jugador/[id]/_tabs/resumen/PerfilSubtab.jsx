@@ -17,6 +17,7 @@ import 'dayjs/locale/es';
 import { IconClipboardList } from '@tabler/icons-react';
 
 import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/lib/metrics/anthropometry';
+import { CLINICAL_TAGS } from '@/config/clinical-tags';
 import { CampoEditable, ComidasEditable, PrepartidoEditable } from '../editable';
 import { latestMetricValue } from '@/lib/metrics/player';
 import { listPlayerMeals } from '@/services/meal';
@@ -367,9 +368,16 @@ export default function PerfilSubtab({
                 />
                 <CampoEditable label="Gustos y preferencias" campo="gustos_preferencias" valor={jugador.gustos_preferencias || ''} jugadorId={jugador.id} readOnly={readOnly} />
                 <CampoEditable label="Aversiones" campo="aversiones" valor={jugador.aversiones || ''} jugadorId={jugador.id} readOnly={readOnly} />
-                <CampoEditable label="Intolerancias" campo="intolerancias" valor={jugador.intolerancias || ''} jugadorId={jugador.id} readOnly={readOnly} />
-                <CampoEditable label="Alergias" campo="alergias" valor={jugador.alergias || ''} jugadorId={jugador.id} readOnly={readOnly} />
-                <CampoEditable label="Contexto clínico" campo="contexto_clinico" valor={jugador.contexto_clinico || ''} jugadorId={jugador.id} readOnly={readOnly} />
+                <CampoEditable
+                  label="Restricciones Clínicas / Alergias / Intolerancias"
+                  campo="intolerancias"
+                  valor={jugador.intolerancias || ''}
+                  jugadorId={jugador.id}
+                  tipo="multiselect"
+                  opciones={CLINICAL_TAGS.map((t) => ({ value: t.value, label: t.label }))}
+                  readOnly={readOnly}
+                />
+                <CampoEditable label="Contexto clínico / Notas médicas" campo="contexto_clinico" valor={jugador.contexto_clinico || ''} jugadorId={jugador.id} readOnly={readOnly} />
               </SimpleGrid>
             </Paper>
           )}

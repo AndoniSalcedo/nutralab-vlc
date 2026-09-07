@@ -29,6 +29,7 @@ import { useRouter } from 'next/navigation';
 import { deletePlayer, savePlayer } from '@/services/player';
 import { PLAYER_OBJECTIVES } from '@/lib/metrics/anthropometry';
 import { AVAILABLE_MEALS } from '@/config/nutrition-days';
+import { CLINICAL_TAGS, parsePlayerClinicalTags } from '@/config/clinical-tags';
 import { compressAvatar, avatarFromRecord, initials as getInitials } from '@/lib/utils/avatar';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 
@@ -120,8 +121,9 @@ export default function PlayerForm({ initial, team }) {
   const [postentreno, setPostentreno] = useState(initial?.postentreno ?? false);
 
   // Form states - Salud y Preferencias
-  const [alergias, setAlergias] = useState(initial?.alergias ?? '');
-  const [intolerancias, setIntolerancias] = useState(initial?.intolerancias ?? '');
+  const [selectedClinicalTags, setSelectedClinicalTags] = useState(() =>
+    parsePlayerClinicalTags(initial?.intolerancias || initial?.alergias || [])
+  );
   const [aversiones, setAversiones] = useState(initial?.aversiones ?? '');
   const [gustos, setGustos] = useState(initial?.gustos_preferencias ?? '');
   const [contexto, setContexto] = useState(initial?.contexto_clinico ?? '');
@@ -156,8 +158,8 @@ export default function PlayerForm({ initial, team }) {
         formData.append('gustos_preferencias', gustos);
         formData.append('contexto_clinico', contexto);
         formData.append('aversiones', aversiones);
-        formData.append('intolerancias', intolerancias);
-        formData.append('alergias', alergias);
+        formData.append('intolerancias', selectedClinicalTags.join(', '));
+        formData.append('alergias', '');
         formData.append('objetivo', objetivo);
         const fatVal = porcentajeGrasaObjetivo !== '' && porcentajeGrasaObjetivo !== null && porcentajeGrasaObjetivo !== undefined
           ? Math.round(Number(porcentajeGrasaObjetivo) * 100) / 100
@@ -380,31 +382,25 @@ export default function PlayerForm({ initial, team }) {
               <Text fw={700} size="sm" c="blue.8" mb="xs">Salud y Preferencias</Text>
               <Divider mb="md" />
               <Stack gap="md">
+                <MultiSelect 
+                  label="Restricciones Clínicas / Alergias / Intolerancias"
+                  description="Selecciona las condiciones médicas o restricciones fijas del jugador (filtrado 100% determinista en el catálogo oficial)"
+                  placeholder="Ej. Celíaco / Sin Gluten, Sin Lactosa, Sin Cerdo, SIBO..."
+                  data={CLINICAL_TAGS.map((t) => ({ value: t.value, label: t.label }))}
+                  value={selectedClinicalTags}
+                  onChange={setSelectedClinicalTags}
+                  searchable
+                  clearable
+                />
+
                 <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
                   <Textarea 
-                    label="Alergias"
-                    placeholder="Ej. Nueces, Mariscos..."
-                    rows={3}
-                    value={alergias}
-                    onChange={(e) => setAlergias(e.target.value)}
-                  />
-                  <Textarea 
-                    label="Intolerancias"
-                    placeholder="Ej. Lactosa, Gluten..."
-                    rows={3}
-                    value={intolerancias}
-                    onChange={(e) => setIntolerancias(e.target.value)}
-                  />
-                  <Textarea 
                     label="Aversiones"
-                    placeholder="Alimentos que no le gustan..."
+                    placeholder="Alimentos que no le gustan (texto libre para la IA)..."
                     rows={3}
                     value={aversiones}
                     onChange={(e) => setAversiones(e.target.value)}
                   />
-                </SimpleGrid>
-
-                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                   <Textarea 
                     label="Gustos y Preferencias"
                     placeholder="Alimentos preferidos..."
@@ -414,7 +410,7 @@ export default function PlayerForm({ initial, team }) {
                   />
                   <Textarea 
                     label="Lesión / Contexto Clínico"
-                    placeholder="Ej. Saliendo de esguince de tobillo..."
+                    placeholder="Ej. Hipotiroidismo, pautas de suplementación o prepartido..."
                     rows={3}
                     value={contexto}
                     onChange={(e) => setContexto(e.target.value)}

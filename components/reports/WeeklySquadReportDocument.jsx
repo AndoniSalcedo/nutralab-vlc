@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { PlanCardPage } from './NutritionPlanCardDocument';
+import { formatClinicalTags } from '@/config/clinical-tags';
 
 const COLORS = {
   bg: '#10142f',
@@ -515,9 +516,9 @@ export function PlayerDetailBreakdownPage({ player, plan, meta, teamConfig }) {
               <Text style={detailStyles.value}>{p.contexto_clinico || 'Sin particularidades'}</Text>
             </View>
             <View style={detailStyles.labelValue}>
-              <Text style={detailStyles.label}>Intolerancias/Alergias:</Text>
+              <Text style={detailStyles.label}>Restricciones Clínicas:</Text>
               <Text style={[detailStyles.value, (p.intolerancias || p.alergias) ? { color: '#ff7e40', fontWeight: 700 } : {}]}>
-                {[p.alergias ? `Alergias: ${p.alergias}` : null, p.intolerancias ? `Intolerancias: ${p.intolerancias}` : null].filter(Boolean).join(' | ') || 'Ninguna registrada'}
+                {formatClinicalTags(p.intolerancias || p.alergias, { noIcons: true })}
               </Text>
             </View>
           </View>
