@@ -1,3 +1,4 @@
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import '@mantine/core/styles.css';
 import '@mantine/dropzone/styles.css';
 import '@mantine/notifications/styles.css';
@@ -5,6 +6,12 @@ import '@mantine/dates/styles.css';
 import { ColorSchemeScript } from '@mantine/core';
 import Providers from '@/components/Providers';
 import '@/components/bones/registry';
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-plus-jakarta',
+});
 
 export const metadata = {
   title: 'Nutralab - Cuídate y disfruta',
@@ -30,11 +37,11 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" className={plusJakartaSans.variable} suppressHydrationWarning>
       <head>
         <ColorSchemeScript defaultColorScheme="light" />
       </head>
-      <body>
+      <body className={plusJakartaSans.className}>
         <Providers>{children}</Providers>
       </body>
     </html>

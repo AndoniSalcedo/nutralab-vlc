@@ -5,7 +5,6 @@ import { playerFullName as playerName } from '@/lib/utils';
 import {
   ActionIcon,
   Anchor,
-  Badge,
   Box,
   Button,
   Group,
@@ -19,7 +18,6 @@ import {
   Table,
   Text,
   TextInput,
-  ThemeIcon,
   Title,
   Tooltip,
 } from '@mantine/core';
@@ -27,6 +25,7 @@ import MeasurementDetailModal from '@/components/modals/MeasurementDetailModal';
 import { DateInput } from '@mantine/dates';
 import { useRouter } from 'next/navigation';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
+import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
 import {
   ComposedChart,
   Bar,
@@ -38,7 +37,6 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import {
-  IconArrowLeft,
   IconCalendarStats,
   IconChartLine,
   IconDownload,
@@ -284,7 +282,7 @@ function checkFilterMatch(val, operator, filterVal) {
   }
 }
 
-export default function TeamEvolutionDashboard({ players = [], evolutions = [], team }) {
+export default function TeamEvolutionDashboard({ players = [], evolutions = [], team: _team }) {
   const router = useRouter();
   const [viewMode, setViewMode] = useState('trends');
   const [position, setPosition] = useState('');
@@ -686,106 +684,83 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
   return (
     <BoneyardSkeleton name="team-evolution" loading={false}>
-      <Stack gap="lg">
-        <Paper
-          p={{ base: 'sm', sm: 'md' }}
-          shadow="xs"
-          radius={24}
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
-            zIndex: 10,
-            position: 'relative',
-          }}
+      {/* 1. BOTÓN DE CSV INTEGRADO EN LA CABECERA */}
+      <TeamHeaderRightSection>
+        <Button
+          radius="xl"
+          size="xs"
+          variant="light"
+          color="gray"
+          leftSection={<IconDownload size={14} />}
+          onClick={handleDownloadCsv}
+          disabled={viewMode === 'day' ? measuredDayRows.length === 0 : rows.length === 0}
         >
-          <Stack gap="sm">
-            <Group justify="space-between" align="center" wrap="wrap" gap="md">
-              <Group gap="sm" wrap="nowrap">
-                <Tooltip label="Volver al panel" withArrow>
-                  <ActionIcon component={Anchor} href={team?.id ? `/dashboard/equipo/${team.id}` : '/dashboard'} variant="light" color="gray" radius="xl" size={42}>
-                    <IconArrowLeft size={20} />
-                  </ActionIcon>
-                </Tooltip>
-                <ThemeIcon color={viewMode === 'day' ? 'teal' : viewMode === 'ranking' ? 'grape' : 'blue'} variant="light" radius="xl" size={42}>
-                  {viewMode === 'day' ? <IconCalendarStats size={21} /> : viewMode === 'ranking' ? <IconFilter size={21} /> : <IconChartLine size={21} />}
-                </ThemeIcon>
-                <Box>
-                  <Title order={3} fw={850} c="#24291f" lh={1.1}>
-                    Evolución de {team?.nombre || 'equipo'}
-                  </Title>
-                  <Text size="xs" c="dimmed" mt={2}>
-                    {team?.temporada ? `${team.temporada} · ` : ''}
-                    {viewMode === 'day'
-                      ? 'Mediciones por jornada'
-                      : viewMode === 'ranking'
-                        ? 'Comparativas, umbrales y alertas'
-                        : 'Tendencias corporales y cambios recientes'}
-                  </Text>
-                </Box>
-              </Group>
+          CSV
+        </Button>
+      </TeamHeaderRightSection>
 
-              <Group gap="xs" wrap="wrap" justify="flex-end">
-                <SegmentedControl
-                  value={viewMode}
-                  onChange={handleViewModeChange}
-                  data={[
-                    {
-                      value: 'trends',
-                      label: (
-                        <Group component="span" gap={6} justify="center" wrap="nowrap">
-                          <IconChartLine size={16} />
-                          <Text component="span" size="sm" fw={700}>Histórico</Text>
-                        </Group>
-                      ),
-                    },
-                    {
-                      value: 'day',
-                      label: (
-                        <Group component="span" gap={6} justify="center" wrap="nowrap">
-                          <IconCalendarStats size={16} />
-                          <Text component="span" size="sm" fw={700}>Jornada</Text>
-                        </Group>
-                      ),
-                    },
-                    {
-                      value: 'ranking',
-                      label: (
-                        <Group component="span" gap={6} justify="center" wrap="nowrap">
-                          <IconFilter size={16} />
-                          <Text component="span" size="sm" fw={700}>Filtros</Text>
-                        </Group>
-                      ),
-                    },
-                  ]}
-                  aria-label="Modo de visualización"
-                  color={viewMode === 'day' ? 'teal' : viewMode === 'ranking' ? 'grape' : 'blue'}
-                  radius="xl"
-                  size="sm"
-                  styles={{
-                    root: { minWidth: 380 },
-                    control: { minWidth: 124 },
-                    label: { minHeight: 34, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-                  }}
-                />
-                <Button
-                  radius="xl"
-                  size="sm"
-                  variant="light"
-                  color="gray"
-                  leftSection={<IconDownload size={16} />}
-                  onClick={handleDownloadCsv}
-                  disabled={viewMode === 'day' ? measuredDayRows.length === 0 : rows.length === 0}
-                >
-                  CSV
-                </Button>
-              </Group>
-            </Group>
+      {/* 2. BARRA DE HERRAMIENTAS Y FILTROS INTEGRADOS EN LA CABECERA */}
+      <TeamHeaderFilters>
+        <Paper
+          p={6}
+          radius={24}
+          shadow="xs"
+          withBorder
+          bg="white"
+          style={{ borderColor: 'rgba(222, 226, 230, 0.85)' }}
+          w="100%"
+        >
+          <Stack gap="xs" style={{ width: '100%', minWidth: 0 }}>
+            <Group justify="space-between" align="center" wrap="wrap" gap="xs" w="100%">
+              <SegmentedControl
+                value={viewMode}
+                onChange={handleViewModeChange}
+                data={[
+                  {
+                    value: 'trends',
+                    label: (
+                      <Group component="span" gap={6} justify="center" wrap="nowrap">
+                        <IconChartLine size={16} />
+                        <Text component="span" size="sm" fw={700}>Histórico</Text>
+                      </Group>
+                    ),
+                  },
+                  {
+                    value: 'day',
+                    label: (
+                      <Group component="span" gap={6} justify="center" wrap="nowrap">
+                        <IconCalendarStats size={16} />
+                        <Text component="span" size="sm" fw={700}>Jornada</Text>
+                      </Group>
+                    ),
+                  },
+                  {
+                    value: 'ranking',
+                    label: (
+                      <Group component="span" gap={6} justify="center" wrap="nowrap">
+                        <IconFilter size={16} />
+                        <Text component="span" size="sm" fw={700}>Filtros</Text>
+                      </Group>
+                    ),
+                  },
+                ]}
+                aria-label="Modo de visualización"
+                color={viewMode === 'day' ? 'teal' : viewMode === 'ranking' ? 'grape' : 'blue'}
+                radius="xl"
+                size="sm"
+                w={{ base: '100%', sm: 'auto' }}
+                styles={{
+                  root: { maxWidth: '100%' },
+                  control: { minWidth: 0 },
+                  label: { minHeight: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+                }}
+              />
 
-            <Paper p={6} radius="xl" shadow="xs" withBorder bg="white" w="100%">
-              <Group gap={8} w="100%" wrap="wrap" align="center">
+              <Group gap={8} wrap="wrap" align="center" w={{ base: '100%', sm: 'auto' }} style={{ flex: 1, minWidth: 0 }}>
                 <Select
                   placeholder="Posición"
                   leftSection={<IconUsers size={16} style={{ opacity: 0.7 }} />}
-                  data={positionOptions}
+                  data={positionOptions || []}
                   value={position}
                   onChange={(value) => setPosition(value || '')}
                   variant="filled"
@@ -793,13 +768,13 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                   size="sm"
                   searchable
                   allowDeselect={false}
-                  style={{ flex: 1, minWidth: 170 }}
+                  style={{ flex: '1 1 130px', minWidth: 0 }}
                 />
 
                 <Select
                   placeholder="Temporada"
                   leftSection={<IconCalendarStats size={16} style={{ opacity: 0.7 }} />}
-                  data={seasonOptions}
+                  data={seasonOptions || []}
                   value={selectedSeason}
                   onChange={(value) => setSelectedSeason(value || '')}
                   variant="filled"
@@ -807,7 +782,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                   size="sm"
                   searchable
                   allowDeselect={false}
-                  style={{ flex: 1, minWidth: 180 }}
+                  style={{ flex: '1 1 130px', minWidth: 0 }}
                 />
 
                 {viewMode === 'trends' ? (
@@ -822,7 +797,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                       size="sm"
                       valueFormat="DD/MM/YYYY"
                       clearable
-                      style={{ flex: 1, minWidth: 160 }}
+                      style={{ flex: '1 1 130px', minWidth: 0 }}
                     />
                     <DateInput
                       placeholder="Fecha de fin"
@@ -834,30 +809,31 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                       size="sm"
                       valueFormat="DD/MM/YYYY"
                       clearable
-                      style={{ flex: 1, minWidth: 160 }}
+                      style={{ flex: '1 1 130px', minWidth: 0 }}
                     />
                   </>
                 ) : (
-                  <>
-                    <Select
-                      placeholder="Fecha de medición"
-                      leftSection={<IconCalendarStats size={16} style={{ opacity: 0.7 }} />}
-                      data={dateOptions}
-                      value={daySelectValue}
-                      onChange={handleDateChange}
-                      variant="filled"
-                      radius="xl"
-                      size="sm"
-                      searchable
-                      nothingFoundMessage="Sin jornadas"
-                      style={{ flex: 1.2, minWidth: 240 }}
-                    />
-                  </>
+                  <Select
+                    placeholder="Fecha de medición"
+                    leftSection={<IconCalendarStats size={16} style={{ opacity: 0.7 }} />}
+                    data={dateOptions || []}
+                    value={daySelectValue}
+                    onChange={handleDateChange}
+                    variant="filled"
+                    radius="xl"
+                    size="sm"
+                    searchable
+                    nothingFoundMessage="Sin jornadas"
+                    style={{ flex: '1.2 1 180px', minWidth: 0 }}
+                  />
                 )}
               </Group>
-            </Paper>
+            </Group>
           </Stack>
         </Paper>
+      </TeamHeaderFilters>
+
+      <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
 
         {viewMode === 'trends' && (
           <>
@@ -903,9 +879,9 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                           <Title order={4} fw={800} c="dark.4">{item.label}</Title>
                           <Text size="xs" c="dimmed">Tendencia media del equipo</Text>
                         </Box>
-                        <Badge color={item.goodDown === true ? 'red' : item.goodDown === false ? 'green' : 'blue'} variant="light" radius="sm">
+                        <Text fz="xs" fw={700} c={item.goodDown === true ? 'red.7' : item.goodDown === false ? 'teal.7' : 'blue.7'}>
                           Media: {avg === null ? '-' : `${avg} ${item.unit}`}
-                        </Badge>
+                        </Text>
                       </Group>
 
                       <Stack gap="md">
@@ -996,8 +972,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
             )}
 
             {rows.length > 0 && (
-              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
-                <ScrollArea>
+              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
+                <ScrollArea style={{ width: '100%', minWidth: 0 }}>
                   <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 760 + METRICS.length * 128 }}>
                     <Table.Thead bg="gray.0">
                       <Table.Tr>
@@ -1033,15 +1009,14 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                                       {metricDisplay(val, item.unit)}
                                     </Text>
                                     {delta !== null && delta !== 0 && (
-                                      <Badge
-                                        color={deltaColor(delta, item)}
-                                        variant="light"
-                                        size="xs"
-                                        radius="sm"
-                                        style={{ padding: '0 4px', height: 16 }}
+                                      <Text
+                                        fz="xs"
+                                        fw={700}
+                                        c={`${deltaColor(delta, item)}.7`}
+                                        style={{ fontVariantNumeric: 'tabular-nums' }}
                                       >
                                         {delta > 0 ? `+${delta}` : delta}
-                                      </Badge>
+                                      </Text>
                                     )}
                                   </Group>
                                 </Table.Td>
@@ -1093,7 +1068,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                         <Text size="xs" c="dimmed" tt="uppercase" fw={750}>{metric.label}</Text>
                         <Title order={3} c="dark.4" mt={4}>{metricDisplay(metric.avg, metric.unit)}</Title>
                       </Box>
-                      <Badge variant="light" color="gray">{metric.count}/{measuredDayRows.length}</Badge>
+                      <Text fz="xs" fw={700} c="dimmed">{metric.count}/{measuredDayRows.length}</Text>
                     </Group>
                   </Paper>
                 ))}
@@ -1108,15 +1083,18 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
             )}
 
             {measuredDayRows.length > 0 && (
-              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
+              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
                 <Group justify="space-between" p="md" pb="xs" align="center">
                   <Box>
                     <Title order={4} fw={800} c="dark.4">Mediciones del día</Title>
                     <Text size="xs" c="dimmed">{formatDate(currentDay)} · {measuredDayRows.length} jugadores</Text>
                   </Box>
-                  <Badge variant="light" color="teal">{dayMeasuredPct}% cobertura</Badge>
+                  <Group gap={6} align="center" wrap="nowrap">
+                    <span style={{ fontSize: '8px', color: 'var(--mantine-color-teal-6)' }}>●</span>
+                    <Text fz="xs" fw={700} c="teal.8">{dayMeasuredPct}% cobertura</Text>
+                  </Group>
                 </Group>
-                <ScrollArea>
+                <ScrollArea style={{ width: '100%', minWidth: 0 }}>
                   <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 880 + METRICS.length * 132 }}>
                     <Table.Thead bg="gray.0">
                       <Table.Tr>
@@ -1149,15 +1127,14 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                                 <Stack gap={3}>
                                   <Text fz="sm" fw={650} c="dark.4">{metricDisplay(value, item.unit)}</Text>
                                   {delta !== null && delta !== 0 && (
-                                    <Badge
-                                      color={deltaColor(delta, item)}
-                                      variant="light"
-                                      size="xs"
-                                      radius="sm"
-                                      w="fit-content"
+                                    <Text
+                                      fz="xs"
+                                      fw={700}
+                                      c={`${deltaColor(delta, item)}.7`}
+                                      style={{ fontVariantNumeric: 'tabular-nums' }}
                                     >
                                       {delta > 0 ? `+${delta}` : delta}
-                                    </Badge>
+                                    </Text>
                                   )}
                                 </Stack>
                               </Table.Td>
@@ -1209,7 +1186,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     <Title order={4} fw={800} c="dark.4">Sin medición ese día</Title>
                     <Text size="xs" c="dimmed">{missingDayRows.length} jugadores sin registro en {formatDate(currentDay)}</Text>
                   </Box>
-                  <Badge variant="light" color="gray">{missingDayRows.length}</Badge>
+                  <Text fz="xs" fw={700} c="dimmed">{missingDayRows.length} jugadores</Text>
                 </Group>
                 <ScrollArea.Autosize mah={260}>
                   <Table verticalSpacing="sm" highlightOnHover>
@@ -1401,31 +1378,31 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                         const label = config ? config.label : filter.metric;
                         const unit = config?.unit ? ` ${config.unit}` : '';
                         return (
-                          <Badge
+                          <Group
                             key={filter.id}
-                            variant="light"
-                            color="red"
-                            size="lg"
-                            radius="xl"
-                            pr={3}
-                            rightSection={
-                              <ActionIcon
-                                size="xs"
-                                color="red"
-                                radius="xl"
-                                variant="subtle"
-                                onClick={() =>
-                                  setActiveFilters(
-                                    activeFilters.filter((f) => f.id !== filter.id)
-                                  )
-                                }
-                              >
-                                <IconX size={10} />
-                              </ActionIcon>
-                            }
+                            gap={4}
+                            px={10}
+                            py={3}
+                            bg="red.0"
+                            style={{ borderRadius: 16, border: '1px solid var(--mantine-color-red-2)' }}
                           >
-                            {`${label} ${filter.operator} ${filter.value}${unit}`}
-                          </Badge>
+                            <Text size="xs" fw={700} c="red.8">
+                              {`${label} ${filter.operator} ${filter.value}${unit}`}
+                            </Text>
+                            <ActionIcon
+                              size="xs"
+                              color="red"
+                              radius="xl"
+                              variant="subtle"
+                              onClick={() =>
+                                setActiveFilters(
+                                  activeFilters.filter((f) => f.id !== filter.id)
+                                )
+                              }
+                            >
+                              <IconX size={10} />
+                            </ActionIcon>
+                          </Group>
                         );
                       })}
                     </Group>
@@ -1439,7 +1416,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
             </Paper>
 
             {sortedTableData.length > 0 ? (
-              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
+              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
                 <Group justify="space-between" p="md" pb="xs" align="center">
                   <Box>
                     <Title order={4} fw={800} c="dark.4">
@@ -1459,13 +1436,16 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     </Text>
                   </Box>
                   {activeFilters.length > 0 && (
-                    <Badge variant="light" color="red" size="lg">
-                      {sortedTableData.filter((r) => r.totalAlerts > 0).length} de {sortedTableData.length} con alertas
-                    </Badge>
+                    <Group gap={6} align="center" wrap="nowrap">
+                      <span style={{ fontSize: '8px', color: 'var(--mantine-color-red-6)' }}>●</span>
+                      <Text fz="xs" fw={700} c="red.8">
+                        {sortedTableData.filter((r) => r.totalAlerts > 0).length} de {sortedTableData.length} con alertas
+                      </Text>
+                    </Group>
                   )}
                 </Group>
 
-                <ScrollArea>
+                <ScrollArea style={{ width: '100%', minWidth: 0 }}>
                   <Table
                     verticalSpacing="sm"
                     highlightOnHover
@@ -1588,15 +1568,17 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                           </Table.Td>
 
                           <Table.Td style={{ textAlign: 'center' }}>
-                            {row.totalAlerts > 0 ? (
-                              <Badge color="red" variant="filled" size="sm" radius="xl">
+                            <Group gap={4} justify="center" align="center">
+                              <Text size="7px" c={row.totalAlerts > 0 ? 'red.6' : 'gray.4'}>●</Text>
+                              <Text
+                                fz="xs"
+                                fw={700}
+                                c={row.totalAlerts > 0 ? 'red.7' : 'dimmed'}
+                                style={{ fontVariantNumeric: 'tabular-nums' }}
+                              >
                                 {row.totalAlerts}
-                              </Badge>
-                            ) : (
-                              <Badge color="gray" variant="light" size="sm" radius="xl">
-                                0
-                              </Badge>
-                            )}
+                              </Text>
+                            </Group>
                           </Table.Td>
 
                           {displayedMetrics.map((item) => {

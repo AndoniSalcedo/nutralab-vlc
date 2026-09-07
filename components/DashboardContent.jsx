@@ -3,19 +3,16 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { initials, filenameFromResponse } from '@/lib/utils';
-import { Anchor, Group, Paper, SimpleGrid, Stack, Text, Title, ThemeIcon, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Grid, Modal, Divider, FileButton } from '@mantine/core';
+import { Button, Group, Paper, Stack, Text, ThemeIcon, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Modal, Divider } from '@mantine/core';
 import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
-import { uploadTeamPhoto } from '@/services/team';
-import { compressAvatar } from '@/lib/utils/avatar';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconArrowLeft, IconArrowRight, IconCalendarEvent, IconChartLine, IconDots, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconSettings, IconBottle, IconPlus, IconFileSpreadsheet, IconReportMedical, IconScale, IconUserCheck, IconExchange, IconCamera } from '@tabler/icons-react';
+import { IconAlertTriangle, IconChevronDown, IconDots, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconSettings, IconPlus, IconFileSpreadsheet, IconScale, IconUserCheck, IconExchange } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import { calculateByObjective, getTeamNutritionDayTypes } from '@/lib/metrics/anthropometry';
 import { useRouter } from 'next/navigation';
-import ImageCropModal from '@/components/modals/ImageCropModal';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import NewPlayerModal from '@/components/modals/NewPlayerModal';
 import ImportDataModal from '@/components/modals/ImportDataModal';
@@ -27,6 +24,7 @@ import SquadReportReviewModal from '@/components/modals/SquadReportReviewModal';
 import SquadWeightModal from '@/components/modals/SquadWeightModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import TeamTecnicosConfig from '@/components/TeamTecnicosConfig';
+import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
 
 
 const PAGE_SIZE = 8;
@@ -150,61 +148,6 @@ function normalize(value) {
   return String(value || '').toLowerCase().trim();
 }
 
-function DashboardStat({ title, icon: Icon, color = 'blue', value, description, href, onClick }) {
-  const router = useRouter();
-  const isClickable = Boolean(href || onClick);
-  const handleClick = onClick || (href ? () => router.push(href) : undefined);
-
-  return (
-    <Box
-      component="button"
-      type="button"
-      onClick={handleClick}
-      px={{ base: 'sm', sm: 'md' }}
-      py={6}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        width: '100%',
-        textAlign: 'left',
-        cursor: isClickable ? 'pointer' : 'default',
-        font: 'inherit',
-        height: '100%',
-        minHeight: 56,
-        borderRadius: 'var(--mantine-radius-xl)',
-        background: 'rgba(248,249,245,0.82)',
-        border: '1px solid rgba(222,226,230,0.9)',
-        transition: 'border-color 120ms ease, transform 120ms ease',
-      }}
-    >
-      <Group gap="xs" wrap="nowrap" align="center" style={{ width: '100%' }}>
-        <ThemeIcon color={color} variant="light" radius="md" size={32} style={{ flex: '0 0 auto' }}>
-          <Icon size={16} stroke={1.6} />
-        </ThemeIcon>
-        <Box style={{ minWidth: 0, flex: 1 }}>
-          <Text fw={400} c="dimmed" fz={10} tt="uppercase" lts={0.6} truncate style={{ whiteSpace: 'nowrap' }}>
-            {title}
-          </Text>
-          <Group gap={6} align="baseline" wrap="nowrap" style={{ minWidth: 0, width: '100%' }}>
-            <Text fw={700} fz={{ base: 11, xs: 12, sm: 14 }} c="#24291f" lh={1.2} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 1 }}>
-              {value}
-            </Text>
-            {description && (
-              <Text size="xs" c="dimmed" visibleFrom="sm" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 2 }}>
-                {description}
-              </Text>
-            )}
-          </Group>
-        </Box>
-        {isClickable && (
-          <ThemeIcon color={color} variant="subtle" radius="xl" size={24} style={{ flex: '0 0 auto' }}>
-            <IconArrowRight size={14} stroke={1.8} />
-          </ThemeIcon>
-        )}
-      </Group>
-    </Box>
-  );
-}
 
 
 
@@ -284,46 +227,6 @@ function getPlayerPlan(player, teamConfig) {
 export default function DashboardContent({ players = [], team, readOnly = false }) {
   const router = useRouter();
   const [playersState, setPlayersState] = useState(players);
-  const [teamPhotoVersion, setTeamPhotoVersion] = useState(() => team?.updated_at || Date.now());
-  const [cropModalOpen, setCropModalOpen] = useState(false);
-  const [tempImageSrc, setTempImageSrc] = useState('');
-  const [tempFileName, setTempFileName] = useState('');
-
-  function handleSelectTeamPhoto(file) {
-    if (!file || !team?.id) return;
-    setTempFileName(file.name || 'team-crest.jpg');
-    const localUrl = URL.createObjectURL(file);
-    setTempImageSrc(localUrl);
-    setCropModalOpen(true);
-  }
-
-  function handleCloseCropModal() {
-    setCropModalOpen(false);
-    if (tempImageSrc) {
-      URL.revokeObjectURL(tempImageSrc);
-      setTempImageSrc('');
-    }
-  }
-
-  async function handleCropConfirmed(croppedFile) {
-    if (!team?.id) return;
-    try {
-      const compressed = await compressAvatar(croppedFile);
-      await uploadTeamPhoto(team.id, compressed);
-      setTeamPhotoVersion(Date.now());
-      notifications.show({
-        color: 'green',
-        title: 'Escudo actualizado',
-        message: 'La imagen del equipo se ha guardado correctamente.',
-      });
-    } catch (err) {
-      notifications.show({
-        color: 'red',
-        title: 'Error al subir imagen',
-        message: err.message,
-      });
-    }
-  }
 
   useEffect(() => {
     setPlayersState(players);
@@ -360,8 +263,8 @@ export default function DashboardContent({ players = [], team, readOnly = false 
   const [selectedMenuWeek, setSelectedMenuWeek] = useState('');
   const [filters, setFilters] = useState({ name: '', email: '', position: '' });
   const [page, setPage] = useState(1);
-  const totalPlayers = playersState.length;
   const playersWithPlan = playersState.map((player) => ({ ...player, plan: getPlayerPlan(player, team?.configuracion_nutricional) }));
+
   const positionOptions = useMemo(() => {
     const positions = Array.from(new Set(playersState.map((player) => player.posicion).filter(Boolean))).sort();
     return [
@@ -720,244 +623,151 @@ export default function DashboardContent({ players = [], team, readOnly = false 
 
   return (
     <BoneyardSkeleton name="team-dashboard" loading={false}>
-      <Stack gap="lg">
-        {/* 1. RESUMEN / ACCIONES */}
+      {/* 1. BOTONES DE ACCIÓN INTEGRADOS EN LA CABECERA */}
+      <TeamHeaderRightSection>
+        {!readOnly && (
+          <Group gap="xs" wrap="wrap" w={{ base: '100%', sm: 'auto' }} style={{ flexShrink: 0 }}>
+            <Button
+              size="xs"
+              radius="xl"
+              color="dark"
+              leftSection={<IconPlus size={14} />}
+              onClick={() => setActiveModal('new-player')}
+              style={{ flex: '1 1 auto' }}
+            >
+              Nuevo jugador
+            </Button>
+
+            <Menu shadow="md" width={240} position="bottom-end" withArrow radius="md">
+              <Menu.Target>
+                <Button
+                  variant="default"
+                  size="xs"
+                  radius="xl"
+                  leftSection={<IconSettings size={14} />}
+                  rightSection={<IconChevronDown size={14} />}
+                  style={{ flex: '1 1 auto' }}
+                >
+                  Acciones de equipo
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Label>Mediciones y Reportes</Menu.Label>
+                <Menu.Item
+                  leftSection={<IconScale size={15} color="var(--mantine-color-orange-6)" />}
+                  onClick={() => setActiveModal('weight')}
+                >
+                  Registrar pesajes
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconFileTypePdf size={15} color="var(--mantine-color-blue-6)" />}
+                  onClick={() => openReportModal()}
+                >
+                  Generar informe PDF
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Label>Plantilla y Datos</Menu.Label>
+                <Menu.Item
+                  leftSection={<IconFileSpreadsheet size={15} color="var(--mantine-color-teal-6)" />}
+                  onClick={() => setActiveModal('import')}
+                >
+                  Importar datos (Excel/CSV)
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconExchange size={15} color="var(--mantine-color-violet-6)" />}
+                  onClick={() => setTransferModal({ opened: true, initialSelectedIds: [] })}
+                >
+                  Transferir o copiar jugadores
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Label>Staff y Comunicación</Menu.Label>
+                <Menu.Item
+                  leftSection={<IconMail size={15} color="var(--mantine-color-blue-6)" />}
+                  onClick={() => setActiveModal('message')}
+                >
+                  Enviar mensaje colectivo
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconUserCheck size={15} color="var(--mantine-color-cyan-6)" />}
+                  onClick={() => setActiveModal('tecnicos')}
+                >
+                  Cuerpo técnico
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </Group>
+        )}
+      </TeamHeaderRightSection>
+
+      {/* 2. FILTROS Y BÚSQUEDA INTEGRADOS EN LA CABECERA */}
+      <TeamHeaderFilters>
         <Paper
-          p={{ base: 'sm', sm: 'md' }}
-          shadow="xs"
+          p={6}
           radius={24}
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
-            zIndex: 10,
-            position: 'relative'
-          }}
+          shadow="xs"
+          withBorder
+          bg="white"
+          style={{ borderColor: 'rgba(222, 226, 230, 0.85)' }}
+          w="100%"
         >
-          <Stack gap="sm">
-            <Grid align="center" gutter="md">
-              {/* Left part: Back arrow and Team Stack */}
-              <Grid.Col span={{ base: 12, md: 'content' }}>
-                <Group gap={0} justify="center" align="center" wrap="nowrap" style={{ height: '100%' }}>
-                  <Tooltip label="Volver a equipos" withArrow>
-                    <ActionIcon component={Anchor} href="/dashboard" variant="light" color="gray" radius="xl" size={42}>
-                      <IconArrowLeft size={20} />
-                    </ActionIcon>
-                  </Tooltip>
-
-                  <Stack gap="xs" align="center" style={{ flex: 1 }}>
-                    <Box style={{ position: 'relative', display: 'inline-block' }}>
-                      <Avatar
-                        src={team?.id ? `/api/teams/avatar?id=${team.id}&t=${teamPhotoVersion}` : undefined}
-                        size={56}
-                        radius="md"
-                        color="blue"
-                        style={{
-                          border: '2.5px solid white',
-                          boxShadow: '0 3px 8px rgba(0,0,0,0.12)',
-                          backgroundColor: 'var(--mantine-color-blue-1)',
-                          color: 'var(--mantine-color-blue-8)',
-                          fontWeight: 700,
-                          fontSize: '18px',
-                        }}
-                      >
-                        {initials(team?.nombre || 'Equipo')}
-                      </Avatar>
-                      {!readOnly && team?.id && (
-                        <FileButton onChange={handleSelectTeamPhoto} accept="image/*">
-                          {(props) => (
-                            <Tooltip label="Cambiar escudo/foto" position="top" withArrow>
-                              <ActionIcon
-                                {...props}
-                                variant="filled"
-                                color="dark"
-                                radius="xl"
-                                size={20}
-                                style={{
-                                  position: 'absolute',
-                                  bottom: -3,
-                                  right: -3,
-                                  border: '1.5px solid white',
-                                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                                  cursor: 'pointer',
-                                }}
-                              >
-                                <IconCamera size={11} stroke={2} />
-                              </ActionIcon>
-                            </Tooltip>
-                          )}
-                        </FileButton>
-                      )}
-                    </Box>
-                    <Stack gap={2} align="center">
-                      <Title order={3} fw={850} c="#24291f" lh={1.1} style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                        {team?.nombre || 'Equipo'}
-                      </Title>
-                      <Text size="xs" c="dimmed" style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
-                        {team?.temporada ? `${team.temporada}` : ''}
-                      </Text>
-                    </Stack>
-                  </Stack>
-
-                </Group>
-              </Grid.Col>
-
-              {/* Right part: Grid of buttons */}
-              <Grid.Col span={{ base: 12, md: 'auto' }}>
-                <SimpleGrid cols={{ base: 2, sm: 3, lg: 4 }} spacing="xs">
-                  {/* Row 1: Modals */}
-                  {!readOnly && (
-                    <>
-                      <DashboardStat
-                        title="Plantilla"
-                        icon={IconUsers}
-                        color="blue"
-                        value={`${totalPlayers} jugadores`}
-                        onClick={() => openReportModal()}
-                      />
-                      <DashboardStat
-                        title="Importar datos"
-                        icon={IconFileSpreadsheet}
-                        color="teal"
-                        value="Excel / CSV"
-                        onClick={() => setActiveModal('import')}
-                      />
-                      <DashboardStat
-                        title="Transferir jugadores"
-                        icon={IconExchange}
-                        color="violet"
-                        value="Mover o copiar"
-                        onClick={() => setTransferModal({ opened: true, initialSelectedIds: [] })}
-                      />
-                      <DashboardStat
-                        title="Mensaje"
-                        icon={IconMail}
-                        color="blue"
-                        value="Enviar mensaje"
-                        onClick={() => setActiveModal('message')}
-                      />
-                      <DashboardStat
-                        title="Nuevo jugador"
-                        icon={IconPlus}
-                        color="blue"
-                        value="Añadir jugador"
-                        onClick={() => setActiveModal('new-player')}
-                      />
-                      <DashboardStat
-                        title="Peso"
-                        icon={IconScale}
-                        color="orange"
-                        value="Registrar peso"
-                        onClick={() => setActiveModal('weight')}
-                      />
-                      <DashboardStat
-                        title="Gestionar técnicos"
-                        icon={IconUserCheck}
-                        color="cyan"
-                        value="Cuerpo técnico"
-                        onClick={() => setActiveModal('tecnicos')}
-                      />
-                    </>
-                  )}
-
-                  {/* Row 2: Redirects */}
-                  <DashboardStat
-                    title="Suplementación"
-                    icon={IconBottle}
-                    color="grape"
-                    value="Ver suplementos"
-                    href={team?.id ? `/dashboard/equipo/${team.id}/suplementacion` : '#'}
-                  />
-                  <DashboardStat
-                    title="Evolución equipo"
-                    icon={IconChartLine}
-                    color="blue"
-                    value="Ver análisis"
-                    href={team?.id ? `/dashboard/equipo/${team.id}/evolucion` : '#'}
-                  />
-                  <DashboardStat
-                    title="Analíticas equipo"
-                    icon={IconReportMedical}
-                    color="red"
-                    value="Ver analíticas"
-                    href={team?.id ? `/dashboard/equipo/${team.id}/analiticas` : '#'}
-                  />
-                  <DashboardStat
-                    title="Menú esta semana"
-                    icon={IconCalendarEvent}
-                    color="teal"
-                    value="Ver menú"
-                    href={team?.id ? `/dashboard/equipo/${team.id}/menu` : '#'}
-                  />
-                  <DashboardStat
-                    title="Configuración"
-                    icon={IconSettings}
-                    color="gray"
-                    value="Ajustes de equipo"
-                    href={team?.id ? `/dashboard/equipo/${team.id}/configuracion` : '#'}
-                  />
-                </SimpleGrid>
-              </Grid.Col>
-            </Grid>
-
-            <Paper p={6} radius="xl" shadow="xs" withBorder bg="white" w="100%">
-              <Group gap={8} w="100%" wrap="wrap" align="center">
-                <TextInput
-                  placeholder="Buscar por nombre"
-                  leftSection={<IconSearch size={16} style={{ opacity: 0.7 }} />}
-                  variant="filled"
-                  radius="xl"
-                  size="sm"
-                  value={filters.name}
-                  onChange={(event) => {
-                    const { value } = event.currentTarget;
-                    setFilters((current) => ({ ...current, name: value }));
-                  }}
-                  style={{ flex: 2, minWidth: 190 }}
-                />
-                <TextInput
-                  placeholder="Buscar por email"
-                  leftSection={<IconMail size={16} style={{ opacity: 0.7 }} />}
-                  variant="filled"
-                  radius="xl"
-                  size="sm"
-                  value={filters.email}
-                  onChange={(event) => {
-                    const { value } = event.currentTarget;
-                    setFilters((current) => ({ ...current, email: value }));
-                  }}
-                  style={{ flex: 2, minWidth: 190 }}
-                />
-                <Select
-                  placeholder="Posición"
-                  leftSection={<IconUsers size={16} style={{ opacity: 0.7 }} />}
-                  data={positionOptions}
-                  value={filters.position}
-                  onChange={(value) => setFilters((current) => ({ ...current, position: value || '' }))}
-                  variant="filled"
-                  radius="xl"
-                  size="sm"
-                  allowDeselect={false}
-                  style={{ flex: 1, minWidth: 150 }}
-                />
-              </Group>
-            </Paper>
-          </Stack>
+          <Group gap={8} wrap="wrap" align="center" w="100%">
+            <TextInput
+              placeholder="Buscar jugador por nombre..."
+              leftSection={<IconSearch size={16} style={{ opacity: 0.6 }} />}
+              variant="filled"
+              radius="xl"
+              size="sm"
+              value={filters.name}
+              onChange={(event) => {
+                const { value } = event.currentTarget;
+                setFilters((current) => ({ ...current, name: value }));
+              }}
+              style={{ flex: '2 1 180px', minWidth: 0 }}
+            />
+            <Select
+              placeholder="Filtrar por posición"
+              leftSection={<IconUsers size={16} style={{ opacity: 0.6 }} />}
+              data={positionOptions || []}
+              value={filters.position}
+              onChange={(value) => setFilters((current) => ({ ...current, position: value || '' }))}
+              variant="filled"
+              radius="xl"
+              size="sm"
+              allowDeselect={false}
+              style={{ flex: '1 1 140px', minWidth: 0 }}
+            />
+            <TextInput
+              placeholder="Buscar por email..."
+              leftSection={<IconMail size={16} style={{ opacity: 0.6 }} />}
+              variant="filled"
+              radius="xl"
+              size="sm"
+              value={filters.email}
+              onChange={(event) => {
+                const { value } = event.currentTarget;
+                setFilters((current) => ({ ...current, email: value }));
+              }}
+              style={{ flex: '1.5 1 160px', minWidth: 0 }}
+            />
+          </Group>
         </Paper>
+      </TeamHeaderFilters>
 
+      <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
         {/* 3. LISTADO DE JUGADORES (TABLA) */}
-        <Box>
+        <Box style={{ width: '100%', minWidth: 0 }}>
           {filteredPlayers.length > 0 ? (
-            <Paper radius="xl" p={0} bg="white" shadow="xs" withBorder style={{ overflow: 'hidden', borderColor: 'rgba(222,226,230,0.8)' }}>
-              <ScrollArea>
-                <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 850 }}>
+            <Paper radius="xl" p={0} bg="white" shadow="xs" withBorder style={{ overflow: 'hidden', borderColor: 'rgba(222,226,230,0.8)', width: '100%', minWidth: 0 }}>
+              <ScrollArea style={{ width: '100%', minWidth: 0 }}>
+                <Table verticalSpacing="sm" highlightOnHover w="100%" miw={{ base: '100%', sm: 760 }}>
                   <Table.Thead bg="rgba(248, 249, 250, 0.95)">
                     <Table.Tr>
-                      <Table.Th style={{ paddingLeft: 24, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Jugador</Table.Th>
+                      <Table.Th style={{ paddingLeft: 16, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Jugador</Table.Th>
                       <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Métricas</Table.Th>
                       <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Semáforo Peso</Table.Th>
                       <Table.Th visibleFrom="sm" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Plan Nutricional</Table.Th>
                       <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Posición</Table.Th>
-                      {!readOnly && <Table.Th w={70} />}
+                      {!readOnly && <Table.Th w={50} />}
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
@@ -969,18 +779,18 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                         style={{ cursor: 'pointer', transition: 'background-color 120ms ease' }}
                       >
                         {/* COLUMNA 1: JUGADOR */}
-                        <Table.Td style={{ paddingLeft: 24 }}>
+                        <Table.Td style={{ paddingLeft: 16 }}>
                           <Group gap="sm" wrap="nowrap">
                             <Avatar
                               src={player.avatar_url || (player.avatar_size ? `/api/players/avatar?id=${player.id}` : undefined)}
                               size={42}
                               radius="xl"
                               color="initials"
-                              style={{ border: '1.5px solid rgba(222, 226, 230, 0.7)' }}
+                              style={{ border: '1.5px solid rgba(222, 226, 230, 0.7)', flexShrink: 0 }}
                             >
                               {initials(`${player.nombre} ${player.apellidos || ''}`)}
                             </Avatar>
-                            <Box style={{ minWidth: 0 }}>
+                            <Box style={{ minWidth: 0, flex: 1 }}>
 
                               <Group gap={6} wrap="nowrap">
                                 <Text fz="sm" fw={650} c="dark.4" truncate>
@@ -997,6 +807,30 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                               <Text c="dimmed" fz="xs" style={{ lineHeight: 1.2 }} truncate>
                                 {player.auth_email || 'Sin credenciales de acceso'}
                               </Text>
+
+                              {/* Indicadores en móvil sin necesidad de columnas adicionales */}
+                              <Group gap={6} align="center" hiddenFrom="xs" mt={3}>
+                                {player.peso_kg ? (
+                                  <Text fz="11px" fw={600} c="dark.3">
+                                    {player.peso_kg} kg
+                                  </Text>
+                                ) : null}
+                                {player.semaforo?.diff !== null && player.semaforo?.diff !== undefined && (
+                                  <Text
+                                    fz="11px"
+                                    fw={700}
+                                    c={
+                                      player.semaforo.status === 'verde'
+                                        ? '#2e7d32'
+                                        : player.semaforo.status === 'amarillo'
+                                        ? '#b45309'
+                                        : '#c92a2a'
+                                    }
+                                  >
+                                    ● {player.semaforo.diff > 0 ? `+${player.semaforo.diff.toFixed(1)}` : player.semaforo.diff.toFixed(1)} kg
+                                  </Text>
+                                )}
+                              </Group>
                             </Box>
                           </Group>
                         </Table.Td>
@@ -1210,17 +1044,6 @@ export default function DashboardContent({ players = [], team, readOnly = false 
           team={team} 
           players={playersState}
           initialSelectedIds={transferModal.initialSelectedIds}
-        />
-
-        <ImageCropModal
-          opened={cropModalOpen}
-          onClose={handleCloseCropModal}
-          imageSrc={tempImageSrc}
-          fileName={tempFileName}
-          cropShape="rect"
-          aspect={1}
-          title="Ajustar escudo / foto del equipo"
-          onCropConfirmed={handleCropConfirmed}
         />
       </Stack>
     </BoneyardSkeleton>

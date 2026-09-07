@@ -283,30 +283,36 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
 
   return (
     <BoneyardSkeleton name="teams-list" loading={false}>
-      <Stack gap="lg">
-        <Paper p={{ base: 'sm', sm: 'md' }} shadow="xs" radius={24} bg="white">
-          <Group justify="space-between" align="center" wrap="wrap" gap="md">
-            <Group gap="sm">
-              <ThemeIcon color="dark" variant="light" radius="md" size={42}>
+      <Stack gap="lg" style={{ width: '100%', minWidth: 0 }} px={{ base: 'xs', sm: 0 }}>
+        <Paper p={{ base: 'sm', sm: 'md' }} shadow="xs" radius={24} bg="white" style={{ width: '100%', minWidth: 0 }}>
+          <Group justify="space-between" align="center" wrap="wrap" gap="md" style={{ width: '100%', minWidth: 0 }}>
+            <Group gap="sm" style={{ minWidth: 0, flex: 1 }}>
+              <ThemeIcon color="dark" variant="light" radius="md" size={42} style={{ flexShrink: 0 }}>
                 <IconUsersGroup size={21} />
               </ThemeIcon>
-              <Box>
+              <Box style={{ minWidth: 0, flex: 1 }}>
                 <Title order={3} fw={850} c="#24291f" lh={1.1}>
                   Equipos
                 </Title>
-                <Text size="xs" c="dimmed" mt={2}>
+                <Text size="xs" c="dimmed" mt={2} lineClamp={1}>
                   Selecciona un equipo para abrir su dashboard.
                 </Text>
               </Box>
             </Group>
             {!readOnly && (
-              <Button radius="xl" size="xs" leftSection={<IconPlus size={14} />} onClick={openCreate}>
+              <Button
+                radius="xl"
+                size="xs"
+                leftSection={<IconPlus size={14} />}
+                onClick={openCreate}
+                w={{ base: '100%', sm: 'auto' }}
+              >
                 Nuevo equipo
               </Button>
             )}
           </Group>
 
-          <Group gap="xs" mt="md" wrap="wrap">
+          <Group gap="xs" mt="md" wrap="wrap" w="100%">
             <TextInput
               placeholder="Buscar equipo"
               leftSection={<IconSearch size={16} />}
@@ -314,7 +320,8 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
               onChange={(event) => setSearch(event.currentTarget.value)}
               radius="xl"
               variant="filled"
-              style={{ flex: 2, minWidth: 220 }}
+              style={{ flex: '1 1 200px', minWidth: 0 }}
+              w={{ base: '100%', sm: 'auto' }}
             />
             <Select
               placeholder="Temporada"
@@ -325,7 +332,8 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
               radius="xl"
               variant="filled"
               allowDeselect={false}
-              style={{ flex: 1, minWidth: 190 }}
+              style={{ flex: '1 1 180px', minWidth: 0 }}
+              w={{ base: '100%', sm: 'auto' }}
             />
           </Group>
         </Paper>

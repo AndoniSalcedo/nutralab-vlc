@@ -3,27 +3,24 @@
 import { useState, useEffect } from 'react';
 import {
   ActionIcon,
-  Paper,
   Stack,
   Group,
-  Title,
-  Text,
   Button,
-  ThemeIcon,
   Tooltip,
   Box,
   Select,
+  Paper,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconArrowLeft, IconChefHat, IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX } from '@tabler/icons-react';
+import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX } from '@tabler/icons-react';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import MenuSemanal, { formatWeek, WEEKDAY_ORDER } from '@/components/MenuSemanal';
 import { uploadWeeklyMenu, deleteWeeklyMenu, updateWeeklyMenu } from '@/services/menu';
-import Link from 'next/link';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import CreateMenuModal from '@/components/modals/CreateMenuModal';
+import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
 
-export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly = false }) {
+export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _team, readOnly = false }) {
   const [menus, setMenus] = useState(initialMenus);
   const [selectedMenu, setSelectedMenu] = useState(initialMenus[0] || null);
   const [viewMode, setViewMode] = useState('diaria'); // 'diaria' or 'semanal'
@@ -252,166 +249,145 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
 
   return (
     <BoneyardSkeleton name="team-menu" loading={false}>
-      <Stack gap={0}>
-        <Paper
-          p={{ base: 'sm', sm: 'md' }}
-          shadow="xs"
-          radius={24}
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
-            zIndex: 10,
-            position: 'relative',
-          }}
-        >
-          <Stack gap="md">
-            <Group justify="space-between" align="center" wrap="wrap" gap="md">
-              <Group gap="sm" wrap="nowrap">
-                <Tooltip label="Volver al panel" withArrow>
-                  <ActionIcon
-                    component={Link}
-                    href={teamId ? `/dashboard/equipo/${teamId}` : '/dashboard'}
-                    variant="light"
-                    color="gray"
-                    radius="xl"
-                    size={42}
-                  >
-                    <IconArrowLeft size={20} />
-                  </ActionIcon>
-                </Tooltip>
-                <ThemeIcon color="teal" variant="light" radius="xl" size="lg">
-                  <IconChefHat size={20} />
-                </ThemeIcon>
-                <Stack gap={2}>
-                  <Title order={3} fw={800} c="dark.4">Menú comedor</Title>
-                  <Text size="sm" c="dimmed">
-                    Comedor del equipo, comida y cena.
-                  </Text>
-                </Stack>
-              </Group>
-
-              <Group align="center" gap="xs">
-                {isEditing ? (
-                  <Group gap="xs">
-                    <Button
-                      color="green"
-                      radius="xl"
-                      size="sm"
-                      onClick={handleSaveMenu}
-                      loading={saving}
-                      leftSection={<IconCheck size={16} />}
-                    >
-                      Guardar
-                    </Button>
-                    <Button
-                      variant="light"
-                      color="gray"
-                      radius="xl"
-                      size="sm"
-                      onClick={handleCancelEdit}
-                      disabled={saving}
-                      leftSection={<IconX size={16} />}
-                    >
-                      Cancelar
-                    </Button>
-                  </Group>
-                ) : (
-                  /* Premium Micro-segmented Pill Switcher */
-                  <Group gap={4} p={3} bg="gray.1" style={{ borderRadius: 'var(--mantine-radius-xl)', border: '1px solid var(--mantine-color-gray-2)' }}>
-                    <Tooltip label="Día a Día (Vista diaria)" withArrow>
-                      <ActionIcon
-                        onClick={() => setViewMode('diaria')}
-                        variant={viewMode === 'diaria' ? 'filled' : 'transparent'}
-                        color={viewMode === 'diaria' ? 'dark' : 'gray'}
-                        radius="xl"
-                        size="md"
-                        style={{ width: 32, height: 32 }}
-                      >
-                        <IconCalendar size={16} />
-                      </ActionIcon>
-                    </Tooltip>
-
-                    <Tooltip label="Semana completa (Vista general)" withArrow>
-                      <ActionIcon
-                        onClick={() => setViewMode('semanal')}
-                        variant={viewMode === 'semanal' ? 'filled' : 'transparent'}
-                        color={viewMode === 'semanal' ? 'dark' : 'gray'}
-                        radius="xl"
-                        size="md"
-                        style={{ width: 32, height: 32 }}
-                      >
-                        <IconList size={16} />
-                      </ActionIcon>
-                    </Tooltip>
-                  </Group>
-                )}
-              </Group>
+      {/* 1. CONTROLES Y ACCIONES INTEGRADOS EN LA CABECERA */}
+      <TeamHeaderRightSection>
+        <Group align="center" gap="xs">
+          {isEditing ? (
+            <Group gap="xs">
+              <Button
+                color="green"
+                radius="xl"
+                size="sm"
+                onClick={handleSaveMenu}
+                loading={saving}
+                leftSection={<IconCheck size={16} />}
+              >
+                Guardar
+              </Button>
+              <Button
+                variant="light"
+                color="gray"
+                radius="xl"
+                size="sm"
+                onClick={handleCancelEdit}
+                disabled={saving}
+                leftSection={<IconX size={16} />}
+              >
+                Cancelar
+              </Button>
             </Group>
+          ) : (
+            /* Micro-segmented Pill Switcher */
+            <Group gap={4} p={3} bg="gray.1" style={{ borderRadius: 'var(--mantine-radius-xl)', border: '1px solid var(--mantine-color-gray-2)' }}>
+              <Tooltip label="Día a Día (Vista diaria)" withArrow>
+                <ActionIcon
+                  onClick={() => setViewMode('diaria')}
+                  variant={viewMode === 'diaria' ? 'filled' : 'transparent'}
+                  color={viewMode === 'diaria' ? 'dark' : 'gray'}
+                  radius="xl"
+                  size="md"
+                  style={{ width: 32, height: 32 }}
+                >
+                  <IconCalendar size={16} />
+                </ActionIcon>
+              </Tooltip>
 
-            {!isEditing && (
-              <Paper p={6} radius="xl" shadow="xs" withBorder bg="white" w="100%">
-                <Group gap={8} w="100%" wrap="wrap" align="center">
-                  <Select
-                    placeholder="Selecciona una semana"
-                    leftSection={<IconCalendar size={16} style={{ opacity: 0.7 }} />}
-                    data={weekOptions}
-                    value={selectedMenu?.semana || null}
-                    onChange={(value) => {
-                      const next = menus.find((menu) => menu.semana === value);
-                      if (next) setSelectedMenu(next);
-                    }}
-                    disabled={menus.length === 0}
-                    variant="filled"
+              <Tooltip label="Semana completa (Vista general)" withArrow>
+                <ActionIcon
+                  onClick={() => setViewMode('semanal')}
+                  variant={viewMode === 'semanal' ? 'filled' : 'transparent'}
+                  color={viewMode === 'semanal' ? 'dark' : 'gray'}
+                  radius="xl"
+                  size="md"
+                  style={{ width: 32, height: 32 }}
+                >
+                  <IconList size={16} />
+                </ActionIcon>
+              </Tooltip>
+            </Group>
+          )}
+        </Group>
+      </TeamHeaderRightSection>
+
+      {/* 2. SELECTOR DE SEMANA Y ACCIONES DE MENÚ INTEGRADOS EN LA CABECERA */}
+      <TeamHeaderFilters>
+        {!isEditing && (
+          <Paper
+            p={6}
+            radius={24}
+            shadow="xs"
+            withBorder
+            bg="white"
+            style={{ borderColor: 'rgba(222, 226, 230, 0.85)' }}
+            w="100%"
+          >
+            <Group gap={8} w="100%" wrap="wrap" align="center">
+              <Select
+                placeholder="Selecciona una semana"
+                leftSection={<IconCalendar size={16} style={{ opacity: 0.7 }} />}
+                data={weekOptions || []}
+                value={selectedMenu?.semana || null}
+                onChange={(value) => {
+                  const next = menus.find((menu) => menu.semana === value);
+                  if (next) setSelectedMenu(next);
+                }}
+                disabled={!menus || menus.length === 0}
+                variant="filled"
+                radius="xl"
+                size="sm"
+                allowDeselect={false}
+                style={{ flex: '1 1 200px', minWidth: 0 }}
+              />
+
+              {!readOnly && (
+                <Group gap={8} wrap="wrap" w={{ base: '100%', sm: 'auto' }}>
+                  <Button
+                    color="blue"
                     radius="xl"
                     size="sm"
-                    allowDeselect={false}
-                    style={{ flex: 1, minWidth: 260 }}
-                  />
+                    onClick={() => setCreateModalOpen(true)}
+                    leftSection={<IconPlus size={16} />}
+                    style={{ flex: '1 1 auto' }}
+                  >
+                    Nuevo Menú
+                  </Button>
 
-                  {!readOnly && (
-                    <Group gap={8}>
+                  {selectedMenu && (
+                    <>
                       <Button
-                        color="blue"
+                        variant="light"
+                        color="teal"
                         radius="xl"
                         size="sm"
-                        onClick={() => setCreateModalOpen(true)}
-                        leftSection={<IconPlus size={16} />}
+                        onClick={handleStartEdit}
+                        leftSection={<IconEdit size={16} />}
+                        style={{ flex: '1 1 auto' }}
                       >
-                        Nuevo Menú
+                        Editar Menú
                       </Button>
 
-                      {selectedMenu && (
-                        <>
-                          <Button
-                            variant="light"
-                            color="teal"
-                            radius="xl"
-                            size="sm"
-                            onClick={handleStartEdit}
-                            leftSection={<IconEdit size={16} />}
-                          >
-                            Editar Menú
-                          </Button>
-
-                          <Button
-                            variant="light"
-                            color="red"
-                            radius="xl"
-                            size="sm"
-                            onClick={() => handleDeleteMenu(selectedMenu.id)}
-                            loading={deleting}
-                            leftSection={<IconTrash size={16} />}
-                          >
-                            Eliminar Menú
-                          </Button>
-                        </>
-                      )}
-                    </Group>
+                      <Button
+                        variant="light"
+                        color="red"
+                        radius="xl"
+                        size="sm"
+                        onClick={() => handleDeleteMenu(selectedMenu.id)}
+                        loading={deleting}
+                        leftSection={<IconTrash size={16} />}
+                        style={{ flex: '1 1 auto' }}
+                      >
+                        Eliminar Menú
+                      </Button>
+                    </>
                   )}
                 </Group>
-              </Paper>
-            )}
-          </Stack>
-        </Paper>
+              )}
+            </Group>
+          </Paper>
+        )}
+      </TeamHeaderFilters>
+
+      <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
 
         <Box py={{ base: 'sm', sm: 'md' }}>
           <Stack gap="md">

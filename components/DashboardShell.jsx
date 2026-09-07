@@ -42,7 +42,7 @@ export default function DashboardShell({ children, user }) {
         : undefined);
 
   return (
-    <div className={classes.header}>
+    <div className={classes.header} style={{ overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
       <Container size="lg" px={{ base: 'xs', sm: 'md' }}>
         <Group justify="space-between">
           <Logo />
@@ -169,7 +169,12 @@ export default function DashboardShell({ children, user }) {
 
       <form id="logout-form" method="post" action="/api/logout" />
 
-      <Container size="xl" px={{ base: 0, sm: 'md' }} pt={{ base: 'xs', sm: 'md' }} pb="md">
+      <Container
+        size="xl"
+        px={{ base: 0, sm: 'md' }}
+        pt={{ base: 'xs', sm: 'md' }}
+        pb="md"
+      >
         {children}
       </Container>
     </div>

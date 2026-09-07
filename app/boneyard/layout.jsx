@@ -1,4 +1,5 @@
 import DashboardShell from '@/components/DashboardShell';
+import { TeamHeaderSlotProvider } from '@/components/TeamHeaderContext';
 
 export default function BoneyardLayout({ children }) {
   const mockUser = {
@@ -8,5 +9,9 @@ export default function BoneyardLayout({ children }) {
     name: 'Boneyard Crawler',
   };
 
-  return <DashboardShell user={mockUser}>{children}</DashboardShell>;
+  return (
+    <DashboardShell user={mockUser}>
+      <TeamHeaderSlotProvider>{children}</TeamHeaderSlotProvider>
+    </DashboardShell>
+  );
 }

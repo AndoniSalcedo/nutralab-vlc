@@ -1,14 +1,15 @@
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
 import { getAccessibleTeam } from '@/lib/auth/team-access';
-import TeamMenuDashboard from '@/components/TeamMenuDashboard';
-import { getMenusByTeam } from '@/repositories/menuRepository';
 import NothingFound from '@/components/NothingFound';
+import TeamHeaderTabs from '@/components/TeamHeaderTabs';
+import { TeamHeaderSlotProvider } from '@/components/TeamHeaderContext';
+import { Stack } from '@mantine/core';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export default async function TeamMenuPage({ params }) {
+export default async function TeamDashboardLayout({ children, params }) {
   const supabase = getSupabaseAdmin();
   const user = await getUser();
   const { teamId } = await params;
@@ -26,19 +27,12 @@ export default async function TeamMenuPage({ params }) {
     );
   }
 
-  let menus = [];
-  try {
-    menus = await getMenusByTeam(supabase, team.id);
-  } catch (error) {
-    console.error('Error fetching weekly menus:', error);
-  }
-
   return (
-    <TeamMenuDashboard 
-      initialMenus={menus} 
-      teamId={team.id}
-      team={team}
-      readOnly={user?.role === 'tecnico'}
-    />
+    <TeamHeaderSlotProvider>
+      <Stack gap="lg" style={{ width: '100%', minWidth: 0, maxWidth: '100%' }} pb={{ base: 76, sm: 0 }} px={{ base: 'xs', sm: 0 }}>
+        <TeamHeaderTabs team={team} readOnly={user?.role === 'tecnico'} />
+        {children}
+      </Stack>
+    </TeamHeaderSlotProvider>
   );
 }

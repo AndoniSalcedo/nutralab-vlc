@@ -17,6 +17,10 @@ const nutralabColor = [
 ];
 
 const theme = createTheme({
+  fontFamily: 'var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  headings: {
+    fontFamily: 'var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  },
   components: {
     ActionIcon: ActionIcon.extend({
       defaultProps: {

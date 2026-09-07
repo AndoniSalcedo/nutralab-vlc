@@ -1,6 +1,8 @@
 import DashboardContent from '@/components/DashboardContent';
+import TeamHeaderTabs from '@/components/TeamHeaderTabs';
 import { mockPlayers, mockEvolutions, mockPesajes, mockTeam } from '@/lib/boneyardMockData';
 import { withLatestMeasurement } from '@/lib/metrics/player';
+import { Stack } from '@mantine/core';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,5 +15,10 @@ export default function BoneyardTeamDashboard() {
     )
   );
 
-  return <DashboardContent players={players} team={mockTeam} />;
+  return (
+    <Stack gap="lg">
+      <TeamHeaderTabs team={mockTeam} />
+      <DashboardContent players={players} team={mockTeam} />
+    </Stack>
+  );
 }

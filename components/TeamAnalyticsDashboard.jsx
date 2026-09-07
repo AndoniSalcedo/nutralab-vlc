@@ -2,10 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import {
-  ActionIcon,
-  Anchor,
   Avatar,
-  Badge,
   Box,
   Grid,
   Group,
@@ -39,8 +36,6 @@ import {
   Line,
 } from 'recharts';
 import {
-  IconArrowLeft,
-  IconReportMedical,
   IconAlertTriangle,
   IconSearch,
   IconFilter,
@@ -82,7 +77,7 @@ function rangeLabel(p) {
   return `< ${p.rango_max} ${p.unidad || ''}`.trim();
 }
 
-export default function TeamAnalyticsDashboard({ players = [], analiticas = [], team }) {
+export default function TeamAnalyticsDashboard({ players = [], analiticas = [], team: _team }) {
   const router = useRouter();
   const [filterName, setFilterName] = useState('');
   const [filterPosition, setFilterPosition] = useState('');
@@ -340,102 +335,86 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
 
   return (
     <BoneyardSkeleton name="team-analytics" loading={false}>
-      <Stack gap="lg">
-      {/* Cabecera */}
-      <Paper
-        p={{ base: 'sm', sm: 'md' }}
-        shadow="xs"
-        radius={24}
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,249,245,0.94))',
-          zIndex: 10,
-          position: 'relative',
-        }}
-      >
-        <Group justify="space-between" align="center" wrap="wrap" gap="md">
-          <Group gap="sm" wrap="nowrap">
-            <Tooltip label="Volver al panel" withArrow>
-              <ActionIcon component={Anchor} href={team?.id ? `/dashboard/equipo/${team.id}` : '/dashboard'} variant="light" color="gray" radius="xl" size={42}>
-                <IconArrowLeft size={20} />
-              </ActionIcon>
-            </Tooltip>
-            <ThemeIcon color="red" variant="light" radius="xl" size={42}>
-              <IconReportMedical size={21} />
-            </ThemeIcon>
-            <Box>
-              <Title order={3} fw={850} c="#24291f" lh={1.1}>
-                Analíticas de {team?.nombre || 'equipo'}
+      <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
+        {/* Resumen de analíticas en 1 sola fila compacta */}
+        <Paper p={{ base: 10, sm: 'md' }} radius="lg" withBorder shadow="xs" bg="white">
+          <SimpleGrid cols={4} spacing={{ base: 6, sm: 'md' }}>
+            {/* 1. Subidas */}
+            <Box style={{ minWidth: 0, textAlign: 'center' }}>
+              <Group gap={4} justify="center" wrap="nowrap">
+                <ThemeIcon size={18} radius="xl" color="blue" variant="light" style={{ flexShrink: 0 }}>
+                  <IconUsers size={11} />
+                </ThemeIcon>
+                <Text size="11px" c="dimmed" tt="uppercase" fw={750} truncate>
+                  Subidas
+                </Text>
+              </Group>
+              <Title order={3} fw={850} c="dark.4" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+                {stats.playersWithRecords}/{stats.totalPlayers}
               </Title>
-              <Text size="xs" c="dimmed" mt={2}>
-                Panel clínico de rendimiento y alertas biológicas del grupo
+              <Text size="10px" c="dimmed" visibleFrom="xs" mt={2} truncate>
+                {stats.totalPlayers ? Math.round((stats.playersWithRecords / stats.totalPlayers) * 100) : 0}% plantilla
               </Text>
             </Box>
-          </Group>
-        </Group>
-      </Paper>
 
-      {/* Tarjetas de estadísticas */}
-      <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
-        <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-          <Group justify="space-between" wrap="nowrap">
-            <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Analíticas Subidas</Text>
-            <ThemeIcon size="sm" radius="md" color="blue" variant="light">
-              <IconUsers size={14} />
-            </ThemeIcon>
-          </Group>
-          <Title order={2} c="dark.4" mt={4}>
-            {stats.playersWithRecords} / {stats.totalPlayers}
-          </Title>
-          <Text size="xs" c="dimmed">
-            {stats.totalPlayers ? Math.round((stats.playersWithRecords / stats.totalPlayers) * 100) : 0}% de la plantilla
-          </Text>
-        </Paper>
+            {/* 2. Con Alertas */}
+            <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
+              <Group gap={4} justify="center" wrap="nowrap">
+                <ThemeIcon size={18} radius="xl" color="red" variant="light" style={{ flexShrink: 0 }}>
+                  <IconAlertTriangle size={11} />
+                </ThemeIcon>
+                <Text size="11px" c="dimmed" tt="uppercase" fw={750} truncate>
+                  Alertas
+                </Text>
+              </Group>
+              <Title order={3} fw={850} c={stats.activeAlertsCount > 0 ? 'red.6' : 'green.6'} mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+                {stats.activeAlertsCount}
+              </Title>
+              <Text size="10px" c="dimmed" visibleFrom="xs" mt={2} truncate>
+                con alertas
+              </Text>
+            </Box>
 
-        <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-          <Group justify="space-between" wrap="nowrap">
-            <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Con Alertas</Text>
-            <ThemeIcon size="sm" radius="md" color="red" variant="light">
-              <IconAlertTriangle size={14} />
-            </ThemeIcon>
-          </Group>
-          <Title order={2} c={stats.activeAlertsCount > 0 ? 'red.6' : 'green.6'} mt={4}>
-            {stats.activeAlertsCount}
-          </Title>
-          <Text size="xs" c="dimmed">jugadores con parámetros fuera de rango</Text>
-        </Paper>
+            {/* 3. Parámetros Bajo */}
+            <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
+              <Group gap={4} justify="center" wrap="nowrap">
+                <ThemeIcon size={18} radius="xl" color="orange" variant="light" style={{ flexShrink: 0 }}>
+                  <IconActivity size={11} />
+                </ThemeIcon>
+                <Text size="11px" c="dimmed" tt="uppercase" fw={750} truncate>
+                  Bajos
+                </Text>
+              </Group>
+              <Title order={3} fw={850} c={stats.totalLowParams > 0 ? 'orange.6' : 'green.6'} mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+                {stats.totalLowParams}
+              </Title>
+              <Text size="10px" c="dimmed" visibleFrom="xs" mt={2} truncate>
+                bajo mín.{stats.totalHighParams > 0 ? ` · ${stats.totalHighParams} altos` : ''}
+              </Text>
+            </Box>
 
-        <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-          <Group justify="space-between" wrap="nowrap">
-            <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Parámetros Bajo</Text>
-            <ThemeIcon size="sm" radius="md" color="orange" variant="light">
-              <IconActivity size={14} />
-            </ThemeIcon>
-          </Group>
-          <Title order={2} c={stats.totalLowParams > 0 ? 'orange.6' : 'green.6'} mt={4}>
-            {stats.totalLowParams}
-          </Title>
-          <Text size="xs" c="dimmed">
-            valores por debajo del rango mínimo
-            {stats.totalHighParams > 0 && <Text span c="red.5" fw={600}> · {stats.totalHighParams} altos</Text>}
-          </Text>
+            {/* 4. Total Registros */}
+            <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
+              <Group gap={4} justify="center" wrap="nowrap">
+                <ThemeIcon size={18} radius="xl" color="grape" variant="light" style={{ flexShrink: 0 }}>
+                  <IconHistory size={11} />
+                </ThemeIcon>
+                <Text size="11px" c="dimmed" tt="uppercase" fw={750} truncate>
+                  Total
+                </Text>
+              </Group>
+              <Title order={3} fw={850} c="dark.4" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+                {stats.totalRecords}
+              </Title>
+              <Text size="10px" c="dimmed" visibleFrom="xs" mt={2} truncate>
+                registros
+              </Text>
+            </Box>
+          </SimpleGrid>
         </Paper>
-
-        <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-          <Group justify="space-between" wrap="nowrap">
-            <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Total Registros</Text>
-            <ThemeIcon size="sm" radius="md" color="grape" variant="light">
-              <IconHistory size={14} />
-            </ThemeIcon>
-          </Group>
-          <Title order={2} c="dark.4" mt={4}>
-            {stats.totalRecords}
-          </Title>
-          <Text size="xs" c="dimmed">analíticas registradas en el historial</Text>
-        </Paper>
-      </SimpleGrid>
 
       {/* Sección 2: Análisis de Parámetro Clínico (Comparativa / Historial) */}
-      <Paper p="md" radius="lg" withBorder bg="white">
+      <Paper p="md" radius="lg" withBorder bg="white" style={{ width: '100%', minWidth: 0, overflow: 'hidden' }}>
         <Stack gap="md">
           <Group justify="space-between" align="center" wrap="wrap" gap="sm">
             <div>
@@ -447,7 +426,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
                 value={chartMode}
                 onChange={setChartMode}
                 size="xs"
-                radius="xl"
+                radius="md"
                 data={[
                   { value: 'comparativa', label: 'Comparativa' },
                   { value: 'historial', label: 'Historial' },
@@ -461,9 +440,10 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
                 allowDeselect={false}
                 searchable
                 variant="filled"
-                radius="xl"
+                radius="md"
                 size="sm"
-                style={{ minWidth: 240 }}
+                style={{ flex: '1 1 200px', minWidth: 0 }}
+                w={{ base: '100%', sm: 'auto' }}
                 leftSection={<IconFilter size={16} />}
               />
             </Group>
@@ -554,21 +534,21 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
                       <Stack gap={6}>
                         <Group justify="space-between" wrap="nowrap">
                           <Group gap="xs" wrap="nowrap">
-                            <Badge color="orange" size="xs" variant="filled" circle />
+                            <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--mantine-color-orange-6)', flexShrink: 0 }} />
                             <Text size="xs" fw={500}>Por debajo del rango</Text>
                           </Group>
                           <Text size="xs" fw={700} c="orange.6">{paramStats.lowCount} jugadores</Text>
                         </Group>
                         <Group justify="space-between" wrap="nowrap">
                           <Group gap="xs" wrap="nowrap">
-                            <Badge color="green" size="xs" variant="filled" circle />
+                            <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--mantine-color-green-6)', flexShrink: 0 }} />
                             <Text size="xs" fw={500}>En rango normal</Text>
                           </Group>
                           <Text size="xs" fw={700} c="green.6">{paramStats.normalCount} jugadores</Text>
                         </Group>
                         <Group justify="space-between" wrap="nowrap">
                           <Group gap="xs" wrap="nowrap">
-                            <Badge color="red" size="xs" variant="filled" circle />
+                            <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--mantine-color-red-6)', flexShrink: 0 }} />
                             <Text size="xs" fw={500}>Por encima del rango</Text>
                           </Group>
                           <Text size="xs" fw={700} c="red.6">{paramStats.highCount} jugadores</Text>
@@ -655,11 +635,11 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
       </Paper>
 
       {/* Sección 3: Listado general de la plantilla */}
-      <Paper radius="lg" p="md" bg="white" shadow="sm" withBorder>
-        <Stack gap="md">
-          <Group justify="space-between" align="center" wrap="wrap" gap="sm">
+      <Paper radius="lg" p="md" bg="white" shadow="sm" withBorder style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
+        <Stack gap="md" style={{ width: '100%', minWidth: 0 }}>
+          <Group justify="space-between" align="center" wrap="wrap" gap="sm" w="100%">
             <Title order={4} fw={800} c="dark.4">Listado Clínico General</Title>
-            <Group gap="xs" wrap="wrap">
+            <Group gap="xs" wrap="wrap" w={{ base: '100%', sm: 'auto' }} style={{ flex: 1, minWidth: 0 }}>
               <TextInput
                 placeholder="Buscar por jugador..."
                 leftSection={<IconSearch size={16} style={{ opacity: 0.7 }} />}
@@ -668,7 +648,8 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
                 size="sm"
                 value={filterName}
                 onChange={(e) => setFilterName(e.currentTarget.value)}
-                style={{ width: 200 }}
+                style={{ flex: '1 1 180px', minWidth: 0 }}
+                w={{ base: '100%', sm: 'auto' }}
               />
               <Select
                 placeholder="Filtrar por posición"
@@ -679,7 +660,8 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
                 radius="xl"
                 size="sm"
                 allowDeselect={false}
-                style={{ width: 170 }}
+                style={{ flex: '1 1 150px', minWidth: 0 }}
+                w={{ base: '100%', sm: 'auto' }}
               />
               <Select
                 placeholder="Ordenar por"
@@ -690,29 +672,36 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
                 radius="xl"
                 size="sm"
                 allowDeselect={false}
-                style={{ width: 155 }}
+                style={{ flex: '1 1 140px', minWidth: 0 }}
+                w={{ base: '100%', sm: 'auto' }}
                 leftSection={<IconSortDescending size={14} />}
               />
             </Group>
           </Group>
 
           {/* Filtro por gravedad */}
-          <SegmentedControl
-            value={filterSeverity}
-            onChange={setFilterSeverity}
-            size="xs"
-            radius="xl"
-            fullWidth
-            data={[
-              { value: 'todos', label: `Todos (${playersWithAnaliticas.length})` },
-              { value: 'alertas', label: `Con Alertas (${playersWithAnaliticas.filter((p) => p.latest && (p.latest.parametros || []).some((param) => param.fuera_rango)).length})` },
-              { value: 'normal', label: `Sin Alertas (${playersWithAnaliticas.filter((p) => p.latest && !(p.latest.parametros || []).some((param) => param.fuera_rango)).length})` },
-              { value: 'sin_datos', label: `Sin Datos (${playersWithAnaliticas.filter((p) => !p.latest).length})` },
-            ]}
-          />
+          <Box style={{ width: '100%', minWidth: 0, overflowX: 'auto' }}>
+            <SegmentedControl
+              value={filterSeverity}
+              onChange={setFilterSeverity}
+              size="xs"
+              radius="xl"
+              fullWidth
+              styles={{
+                root: { minWidth: 280 },
+                label: { whiteSpace: 'nowrap' },
+              }}
+              data={[
+                { value: 'todos', label: `Todos (${playersWithAnaliticas.length})` },
+                { value: 'alertas', label: `Con Alertas (${playersWithAnaliticas.filter((p) => p.latest && (p.latest.parametros || []).some((param) => param.fuera_rango)).length})` },
+                { value: 'normal', label: `Sin Alertas (${playersWithAnaliticas.filter((p) => p.latest && !(p.latest.parametros || []).some((param) => param.fuera_rango)).length})` },
+                { value: 'sin_datos', label: `Sin Datos (${playersWithAnaliticas.filter((p) => !p.latest).length})` },
+              ]}
+            />
+          </Box>
 
           {filteredPlayers.length > 0 ? (
-            <ScrollArea>
+            <ScrollArea style={{ width: '100%', minWidth: 0 }}>
               <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 800 }}>
                 <Table.Thead bg="gray.0">
                   <Table.Tr>
@@ -769,18 +758,29 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
                         <Table.Td>
                           {hasLatest ? (
                             outOfRange.length > 0 ? (
-                              <Group gap={4} wrap="wrap">
-                                {outOfRange.map((param, i) => (
-                                  <Tooltip key={`${player.id}-alert-${param.nombre}-${i}`} label={`Rango: ${rangeLabel(param)}`}>
-                                    <Badge variant="light" color={parameterStatus(param).color} size="sm">
-                                      {param.nombre}: {param.valor} {param.unidad} ({parameterStatus(param).label})
-                                    </Badge>
-                                  </Tooltip>
-                                ))
-                                }
+                              <Group gap={8} wrap="wrap">
+                                {outOfRange.map((param, i) => {
+                                  const status = parameterStatus(param);
+                                  return (
+                                    <Tooltip key={`${player.id}-alert-${param.nombre}-${i}`} label={`Rango de referencia: ${rangeLabel(param)}`} withArrow>
+                                      <Group gap={5} align="center" wrap="nowrap" style={{ cursor: 'pointer' }}>
+                                        <Text size="7px" style={{ color: status.hex }}>●</Text>
+                                        <Text size="xs" fw={600} style={{ color: status.hex }}>
+                                          {param.nombre}: {param.valor} {param.unidad}
+                                        </Text>
+                                        <Text size="11px" c="dimmed">
+                                          ({status.label.toLowerCase()})
+                                        </Text>
+                                      </Group>
+                                    </Tooltip>
+                                  );
+                                })}
                               </Group>
                             ) : (
-                              <Text size="xs" c="dimmed">Todos en rango</Text>
+                              <Group gap={5} align="center" wrap="nowrap">
+                                <Text size="7px" c="green.6">●</Text>
+                                <Text size="xs" c="dimmed">Todos en rango</Text>
+                              </Group>
                             )
                           ) : (
                             <Text size="xs" c="dimmed">—</Text>
