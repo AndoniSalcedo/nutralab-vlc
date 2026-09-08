@@ -115,6 +115,48 @@
 }
 
 /* ==========================================================================
+   DROPDOWNS & MENUS (When USE_3D_IN_DROPDOWNS is false)
+   Applies to Mantine Menu.Dropdown, Menu.Item, Menu.itemSection, Menu.label,
+   Popover.dropdown, and any container with [data-dropdown] or [data-menu-dropdown]
+   ========================================================================== */
+.mantine-Menu-dropdown .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-3d,
+.mantine-Menu-item .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-3d,
+.mantine-Menu-itemSection .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-3d,
+.mantine-Menu-label .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-3d,
+.mantine-Popover-dropdown .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-3d,
+[data-menu-dropdown] .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-3d,
+[data-dropdown] .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-3d,
+.icon-normal-dropdown .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-3d {
+  display: none !important;
+}
+
+.mantine-Menu-dropdown .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-normal,
+.mantine-Menu-item .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-normal,
+.mantine-Menu-itemSection .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-normal,
+.mantine-Menu-label .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-normal,
+.mantine-Popover-dropdown .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-normal,
+[data-menu-dropdown] .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-normal,
+[data-dropdown] .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-normal,
+.icon-normal-dropdown .nutra-icon-root[data-3d-dropdowns="false"] .nutra-icon-normal {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* When USE_3D_IN_DROPDOWNS is true: ensure 3D icons are displayed */
+.mantine-Menu-dropdown .nutra-icon-root[data-3d-dropdowns="true"] .nutra-icon-3d,
+.mantine-Menu-item .nutra-icon-root[data-3d-dropdowns="true"] .nutra-icon-3d,
+.mantine-Menu-itemSection .nutra-icon-root[data-3d-dropdowns="true"] .nutra-icon-3d {
+  display: inline-flex !important;
+}
+
+.mantine-Menu-dropdown .nutra-icon-root[data-3d-dropdowns="true"] .nutra-icon-normal,
+.mantine-Menu-item .nutra-icon-root[data-3d-dropdowns="true"] .nutra-icon-normal,
+.mantine-Menu-itemSection .nutra-icon-root[data-3d-dropdowns="true"] .nutra-icon-normal {
+  display: none !important;
+}
+
+/* ==========================================================================
    EXPLICIT ZONES & OVERRIDES
    ========================================================================== */
 /* Force normal icons across any container wrapped with data-icon-normal */

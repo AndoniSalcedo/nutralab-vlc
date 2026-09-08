@@ -17,6 +17,8 @@ export * as NormalIcons from '@tabler/icons-react';
  * - USE_3D_IN_INPUTS: When false, inputs, selects, search bars, datepickers, and form controls
  *   automatically use clean, crisp normal Tabler vector icons.
  * - USE_3D_IN_BUTTONS: When false, buttons and action icons automatically use normal vector icons.
+ * - USE_3D_IN_TABS: When false, navigation tabs and segmented controls use normal vector icons.
+ * - USE_3D_IN_DROPDOWNS: When false, menus, dropdowns, and menu items automatically use normal vector icons.
  * 
  * Individual override props on any icon component:
  * - normal / flat / variant="normal": Forces normal Tabler vector icon.
@@ -26,12 +28,16 @@ export const USE_3D_ICONS = true;
 export const USE_3D_IN_INPUTS = false;
 export const USE_3D_IN_BUTTONS = false;
 export const USE_3D_IN_TABS = true;
+export const USE_3D_IN_DROPDOWNS = false;
+export const USE_3D_IN_MENUS = USE_3D_IN_DROPDOWNS;
 
 export const ICON_CONFIG = {
   use3D: USE_3D_ICONS,
   use3DInInputs: USE_3D_IN_INPUTS,
   use3DInButtons: USE_3D_IN_BUTTONS,
   use3DInTabs: USE_3D_IN_TABS,
+  use3DInDropdowns: USE_3D_IN_DROPDOWNS,
+  use3DInMenus: USE_3D_IN_MENUS,
 };
 
 export const ICONS_3D_AVAILABLE = [
@@ -356,6 +362,7 @@ export const Icon3D = React.forwardRef(function Icon3D({
   normal = false,
   flat = false,
   force3d = false,
+  dropdown = false,
   variant, // 'normal' | '3d' | 'auto'
   tablerComponent,
   ...props
@@ -363,8 +370,8 @@ export const Icon3D = React.forwardRef(function Icon3D({
   if (!name) return null;
 
   const resolvedName = ALIASES[name] || name;
-  const isExplicitNormal = normal || flat || variant === 'normal';
-  const isExplicit3D = force3d || variant === '3d';
+  const isExplicitNormal = normal || flat || variant === 'normal' || (dropdown && !USE_3D_IN_DROPDOWNS);
+  const isExplicit3D = force3d || variant === '3d' || (dropdown && USE_3D_IN_DROPDOWNS);
   const TablerComponent = tablerComponent || TABLER_ICON_MAP[resolvedName] || TablerIcons.IconFileText;
   const tablerSize = resolveTablerSize(size);
 
@@ -465,6 +472,7 @@ export const Icon3D = React.forwardRef(function Icon3D({
       data-3d-inputs={USE_3D_IN_INPUTS ? 'true' : 'false'}
       data-3d-buttons={USE_3D_IN_BUTTONS ? 'true' : 'false'}
       data-3d-tabs={USE_3D_IN_TABS ? 'true' : 'false'}
+      data-3d-dropdowns={USE_3D_IN_DROPDOWNS ? 'true' : 'false'}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -532,6 +540,14 @@ export default Icon3D;
 export function IconNormalZone({ children, className = '', ...props }) {
   return (
     <span data-icon-normal="true" className={`icon-normal-zone ${className}`.trim()} {...props}>
+      {children}
+    </span>
+  );
+}
+
+export function IconDropdownZone({ children, className = '', ...props }) {
+  return (
+    <span data-icon-dropdown="true" className={`icon-normal-dropdown ${className}`.trim()} {...props}>
       {children}
     </span>
   );
