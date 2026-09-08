@@ -7,11 +7,10 @@ import {
   Divider,
   Grid,
   Paper,
-  ThemeIcon,
   FileButton,
   Button
 } from '@mantine/core';
-import { IconCalendar, IconUpload, IconEdit } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 
 export default function CreateMenuModal({
   opened,
@@ -53,7 +52,7 @@ export default function CreateMenuModal({
           type="date"
           value={weekDate}
           onChange={(e) => setWeekDate(e.target.value)}
-          leftSection={<IconCalendar size={14} style={{ opacity: 0.7 }} />}
+          leftSection={<Icon3D name="calendar" size={18} />}
           radius="xl"
           size="sm"
           variant="filled"
@@ -77,9 +76,7 @@ export default function CreateMenuModal({
               }}
             >
               <Stack gap={4} style={{ flexGrow: 1 }}>
-                <ThemeIcon color="blue" variant="light" radius="md">
-                  <IconUpload size={16} />
-                </ThemeIcon>
+                <Icon3D name="outbox" size={32} />
                 <Text fw={700} size="sm" mt="xs">
                   Subir con IA
                 </Text>
@@ -126,9 +123,7 @@ export default function CreateMenuModal({
               }}
             >
               <Stack gap={4} style={{ flexGrow: 1 }}>
-                <ThemeIcon color="teal" variant="light" radius="md">
-                  <IconEdit size={16} />
-                </ThemeIcon>
+                <Icon3D name="edit" size={32} />
                 <Text fw={700} size="sm" mt="xs">
                   Crear Vacío
                 </Text>

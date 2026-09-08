@@ -18,7 +18,7 @@ import {
   IconFlame,
   IconDownload,
   IconCheck
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 
 export default function ImportCsvModal({
   opened,

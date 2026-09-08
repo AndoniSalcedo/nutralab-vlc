@@ -7,11 +7,9 @@ import {
   ActionIcon,
   Avatar,
   Box,
-  Divider,
   FileButton,
   Group,
   Paper,
-  ScrollArea,
   Stack,
   Tabs,
   Text,
@@ -20,9 +18,11 @@ import {
 } from '@mantine/core';
 import {
   IconArrowLeft,
+  IconCamera,
+} from '@/components/icons3d';
+import {
   IconBottle,
   IconCalendarEvent,
-  IconCamera,
   IconChartLine,
   IconReportMedical,
   IconSettings,
@@ -30,14 +30,15 @@ import {
 } from '@tabler/icons-react';
 import { initials } from '@/lib/utils/avatar';
 import { useTeamHeaderSlot } from '@/components/TeamHeaderContext';
+import Icon3D from '@/components/Icon3D';
 
 const TABS = [
-  { value: 'plantilla', label: 'Plantilla', href: (id) => `/dashboard/equipo/${id}`, icon: IconUsers },
-  { value: 'evolucion', label: 'Evolución', href: (id) => `/dashboard/equipo/${id}/evolucion`, icon: IconChartLine },
-  { value: 'analiticas', label: 'Analíticas', href: (id) => `/dashboard/equipo/${id}/analiticas`, icon: IconReportMedical },
-  { value: 'suplementacion', label: 'Suplementación', href: (id) => `/dashboard/equipo/${id}/suplementacion`, icon: IconBottle },
-  { value: 'menu', label: 'Menú semanal', href: (id) => `/dashboard/equipo/${id}/menu`, icon: IconCalendarEvent },
-  { value: 'configuracion', label: 'Configuración', href: (id) => `/dashboard/equipo/${id}/configuracion`, icon: IconSettings },
+  { value: 'plantilla', label: 'Plantilla', href: (id) => `/dashboard/equipo/${id}`, icon3d: 'plantilla', mobileIcon: IconUsers },
+  { value: 'evolucion', label: 'Evolución', href: (id) => `/dashboard/equipo/${id}/evolucion`, icon3d: 'evolucion', mobileIcon: IconChartLine },
+  { value: 'analiticas', label: 'Analíticas', href: (id) => `/dashboard/equipo/${id}/analiticas`, icon3d: 'analiticas', mobileIcon: IconReportMedical },
+  { value: 'suplementacion', label: 'Suplementación', href: (id) => `/dashboard/equipo/${id}/suplementacion`, icon3d: 'suplementacion', mobileIcon: IconBottle },
+  { value: 'menu', label: 'Menú semanal', href: (id) => `/dashboard/equipo/${id}/menu`, icon3d: 'menu', mobileIcon: IconCalendarEvent },
+  { value: 'configuracion', label: 'Configuración', href: (id) => `/dashboard/equipo/${id}/configuracion`, icon3d: 'configuracion', mobileIcon: IconSettings },
 ];
 
 const MOBILE_LABELS = {
@@ -56,7 +57,6 @@ export default function TeamHeaderTabs({
   subtitle: _subtitle,
   avatarSlot,
   rightSection,
-  children,
   teamPhotoVersion,
   onSelectTeamPhoto,
   readOnly = false,
@@ -103,7 +103,8 @@ export default function TeamHeaderTabs({
         bg="white"
         withBorder
         style={{
-          borderColor: 'rgba(222,226,230,0.85)',
+          border: '1px solid rgba(222,226,230,0.85)',
+          boxShadow: '0 2px 10px rgba(31, 35, 28, 0.08)',
           width: '100%',
           minWidth: 0,
           maxWidth: '100%',
@@ -177,7 +178,7 @@ export default function TeamHeaderTabs({
               )}
 
               <Box style={{ minWidth: 0, flex: 1 }}>
-                <Title order={3} fw={700} c="dark.5" lh={1.1} truncate fz={{ base: 16, sm: 20 }}>
+                <Title order={3} fw={700} c="dark.5" lh={1.1} lineClamp={1} fz={{ base: 16, sm: 20 }}>
                   {team?.nombre || 'Equipo'}
                 </Title>
                 {team?.temporada && (
@@ -205,72 +206,82 @@ export default function TeamHeaderTabs({
             )}
           </Group>
 
-          {/* FILA 2: Pestañas para Escritorio y Tablets (visibleFrom="sm") */}
-          <Divider color="gray.2" visibleFrom="sm" />
+          <Box
+            hiddenFrom="sm"
+            ref={slotContext?.setMobileFiltersSlotEl}
+            style={{
+              width: '100%',
+              minWidth: 0,
+              display: slotContext?.hasMobileFilters ? undefined : 'none',
+            }}
+          />
 
-          <Box visibleFrom="sm" style={{ width: '100%', minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
-            <ScrollArea
-              type="hover"
-              offsetScrollbars={false}
-              scrollbarSize={4}
-              styles={{
-                viewport: { WebkitOverflowScrolling: 'touch' },
-              }}
-            >
-              <Tabs
-                value={tabValue}
-                onChange={handleTabChange}
-                variant="pills"
-                radius="xl"
-                color="dark"
-                styles={{
-                  list: { flexWrap: 'nowrap', gap: 6, width: 'max-content' },
-                  tab: {
-                    fontSize: 13,
-                    fontWeight: 600,
-                    padding: '7px 16px',
-                    whiteSpace: 'nowrap',
-                    transition: 'all 140ms ease',
-                  },
-                }}
-              >
-                <Tabs.List>
-                  {TABS.map((tab) => {
-                    const Icon = tab.icon;
-                    const href = teamId ? tab.href(teamId) : '#';
-
-                    return (
-                      <Tabs.Tab
-                        key={tab.value}
-                        value={tab.value}
-                        component={Link}
-                        href={href}
-                        leftSection={<Icon size={15} />}
-                      >
-                        {tab.label}
-                      </Tabs.Tab>
-                    );
-                  })}
-                </Tabs.List>
-              </Tabs>
-            </ScrollArea>
-          </Box>
-
-          {/* FILA 3: Filtros, selectores y herramientas integrados en el header */}
-          {children ? (
-            children
-          ) : (
-            <Box
-              ref={slotContext?.setFiltersSlotEl}
-              style={{
-                width: '100%',
-                minWidth: 0,
-                display: slotContext?.hasFilters ? undefined : 'none',
-              }}
-            />
-          )}
         </Stack>
       </Paper>
+
+      {/* Header flotante de navegación y controles de la vista activa. */}
+      <Box
+        visibleFrom="sm"
+        style={{
+          width: '100%',
+          minWidth: 0,
+          maxWidth: '100%',
+        }}
+      >
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          variant="outline"
+          radius="md"
+          color="dark"
+          style={{ width: '100%' }}
+          styles={{
+            list: {
+              backgroundColor: 'transparent',
+              borderBottomColor: 'var(--mantine-color-gray-3)',
+            },
+            tab: {
+              fontSize: 15,
+              fontWeight: 600,
+              padding: '10px 16px',
+            },
+          }}
+        >
+          <Tabs.List grow visibleFrom="sm">
+            {TABS.map((tab) => {
+              const href = teamId ? tab.href(teamId) : '#';
+
+              return (
+                <Tabs.Tab
+                  key={tab.value}
+                  value={tab.value}
+                  component={Link}
+                  href={href}
+                  leftSection={<Icon3D name={tab.icon3d} size={18} />}
+                >
+                  {tab.label}
+                </Tabs.Tab>
+              );
+            })}
+          </Tabs.List>
+        </Tabs>
+
+        <Box
+          visibleFrom="sm"
+          ref={slotContext?.setDesktopFiltersSlotEl}
+          style={{
+            width: '100%',
+            minWidth: 0,
+            padding: slotContext?.hasDesktopFilters ? '12px 16px 16px' : 0,
+            display: slotContext?.hasDesktopFilters ? undefined : 'none',
+            backgroundColor: 'var(--mantine-color-white)',
+            border: slotContext?.hasDesktopFilters ? '1px solid rgba(222,226,230,0.85)' : 'none',
+            borderTop: slotContext?.hasDesktopFilters ? 'none' : undefined,
+            borderRadius: slotContext?.hasDesktopFilters ? '0 0 16px 16px' : 0,
+            boxShadow: slotContext?.hasDesktopFilters ? '0 2px 10px rgba(31, 35, 28, 0.08)' : 'none',
+          }}
+        />
+      </Box>
 
       {/* BARRA DE NAVEGACIÓN INFERIOR FIJA PARA MÓVILES (Estilo App / Twitter / Instagram) */}
       <Box
@@ -291,10 +302,10 @@ export default function TeamHeaderTabs({
       >
         <Group justify="space-around" align="center" gap={0} wrap="nowrap" h={58} px={4}>
           {TABS.map((tab) => {
-            const Icon = tab.icon;
             const href = teamId ? tab.href(teamId) : '#';
             const isActive = tab.value === tabValue;
             const mobileLabel = MOBILE_LABELS[tab.value] || tab.label;
+            const MobileIcon = tab.mobileIcon;
 
             return (
               <Box
@@ -327,7 +338,7 @@ export default function TeamHeaderTabs({
                     }}
                   />
                 )}
-                <Icon
+                <MobileIcon
                   size={20}
                   stroke={isActive ? 2.4 : 1.6}
                   style={{

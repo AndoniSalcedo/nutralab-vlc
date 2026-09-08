@@ -12,7 +12,7 @@ import {
   Text,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX } from '@tabler/icons-react';
+import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX } from '@/components/icons3d';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import MenuSemanal, { formatWeek, WEEKDAY_ORDER } from '@/components/MenuSemanal';
 import { uploadWeeklyMenu, deleteWeeklyMenu, updateWeeklyMenu } from '@/services/menu';

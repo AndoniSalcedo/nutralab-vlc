@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Button, Group, MultiSelect, SegmentedControl, Stack, Textarea, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconSend } from '@tabler/icons-react';
+import { IconSend } from '@/components/icons3d';
 import { useRouter } from 'next/navigation';
 import { sendMessage } from '@/services/message';
 

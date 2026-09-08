@@ -36,7 +36,7 @@ import MeasurementModal from '@/components/modals/MeasurementModal';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { saveEvolution, deleteEvolution } from '@/services/evolution';
-import { IconCalendarStats, IconEdit, IconPlus, IconRuler2, IconTrash, IconFilter, IconChevronDown } from '@tabler/icons-react';
+import { IconCalendarStats, IconEdit, IconPlus, IconRuler2, IconTrash, IconFilter, IconChevronDown } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';

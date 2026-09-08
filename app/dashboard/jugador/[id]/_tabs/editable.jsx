@@ -18,7 +18,7 @@ import {
   NumberInput,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconEdit } from '@tabler/icons-react';
+import { IconEdit } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/services/player';
 import { useRouter } from 'next/navigation';
@@ -37,6 +37,7 @@ export function CampoEditable({
   decimalScale = 2,
   suffix = '',
   readOnly = false,
+  icon3d,
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
@@ -90,7 +91,7 @@ export function CampoEditable({
   }
 
   return (
-    <BentoCard title={label} icon={IconEdit} color="gray" style={{ height: 'auto' }}>
+    <BentoCard title={label} icon3d={icon3d} style={{ height: 'auto' }}>
       <Stack gap="xs">
         <Group justify="space-between" align="center">
           <Box style={{ flex: 1 }}>
@@ -169,7 +170,7 @@ function parseMeals(val) {
   return sortMeals(val.split(',').map((s) => s.trim()).filter(Boolean));
 }
 
-export function ComidasEditable({ label, numComidas, postentreno, preentreno, jugadorId, recomendacionesDefecto = {}, readOnly = false }) {
+export function ComidasEditable({ label, numComidas, postentreno, preentreno, jugadorId, recomendacionesDefecto = {}, readOnly = false, icon3d = 'bowl' }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [meals, setMeals] = useState(() => parseMeals(numComidas));
@@ -221,7 +222,7 @@ export function ComidasEditable({ label, numComidas, postentreno, preentreno, ju
   const displayMeals = meals.length > 0 ? meals.join(', ') : 'Ninguna seleccionada';
 
   return (
-    <BentoCard title={label} icon={IconEdit} color="gray" style={{ height: 'auto' }}>
+    <BentoCard title={label} icon3d={icon3d} style={{ height: 'auto' }}>
       <Stack gap="sm">
         <Group justify="space-between" align="flex-start" wrap="nowrap">
           <Box style={{ flex: 1 }}>
@@ -512,7 +513,7 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
   }
 
   return (
-    <BentoCard title={label} icon={IconEdit} color="gray" style={{ height: 'auto' }}>
+    <BentoCard title={label} icon3d="flag" style={{ height: 'auto' }}>
       <Stack gap="sm">
         {scheduleOptions.map((opt) => {
           const cfg = config?.[opt.value];
@@ -719,4 +720,3 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
     </BentoCard>
   );
 }
-

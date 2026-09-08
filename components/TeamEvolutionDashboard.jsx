@@ -11,14 +11,12 @@ import {
   MultiSelect,
   Paper,
   ScrollArea,
-  SegmentedControl,
   Select,
   SimpleGrid,
   Stack,
   Table,
   Text,
   TextInput,
-  ThemeIcon,
   Title,
   Tooltip,
 } from '@mantine/core';
@@ -50,8 +48,10 @@ import {
   IconUserCheck,
   IconUsers,
   IconX,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import NothingFound from '@/components/NothingFound';
+import PlayerSubtabControl from '@/app/dashboard/jugador/[id]/_tabs/PlayerSubtabControl';
+import { tabLabel } from '@/app/dashboard/jugador/[id]/_tabs/tab-label';
 import {
   MEASUREMENT_DETAIL_SECTIONS,
   TREND_MEASUREMENT_METRICS,
@@ -706,52 +706,17 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
       <TeamHeaderFilters>
         <Box w="100%" style={{ minWidth: 0 }}>
           <Stack gap="xs" style={{ width: '100%', minWidth: 0 }}>
-            <Group justify="space-between" align="center" wrap="wrap" gap="xs" w="100%">
-              <SegmentedControl
-                value={viewMode}
-                onChange={handleViewModeChange}
-                data={[
-                  {
-                    value: 'trends',
-                    label: (
-                      <Group component="span" gap={6} justify="center" wrap="nowrap">
-                        <IconChartLine size={16} />
-                        <Text component="span" size="sm" fw={700}>Histórico</Text>
-                      </Group>
-                    ),
-                  },
-                  {
-                    value: 'day',
-                    label: (
-                      <Group component="span" gap={6} justify="center" wrap="nowrap">
-                        <IconCalendarStats size={16} />
-                        <Text component="span" size="sm" fw={700}>Jornada</Text>
-                      </Group>
-                    ),
-                  },
-                  {
-                    value: 'ranking',
-                    label: (
-                      <Group component="span" gap={6} justify="center" wrap="nowrap">
-                        <IconFilter size={16} />
-                        <Text component="span" size="sm" fw={700}>Filtros</Text>
-                      </Group>
-                    ),
-                  },
-                ]}
-                aria-label="Modo de visualización"
-                color={viewMode === 'day' ? 'teal' : viewMode === 'ranking' ? 'grape' : 'nutralabColor'}
-                radius="xl"
-                size="sm"
-                w={{ base: '100%', sm: 400 }}
-                styles={{
-                  root: { maxWidth: '100%' },
-                  control: { minWidth: 0 },
-                  label: { minHeight: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-                }}
-              />
+            <PlayerSubtabControl
+              value={viewMode}
+              onChange={handleViewModeChange}
+              data={[
+                { value: 'trends', label: tabLabel(IconChartLine, 'Histórico') },
+                { value: 'day', label: tabLabel(IconCalendarStats, 'Jornada') },
+                { value: 'ranking', label: tabLabel(IconFilter, 'Filtros') },
+              ]}
+            />
 
-              <Group gap={8} wrap="wrap" align="center" w={{ base: '100%', sm: 'auto' }} style={{ flex: 1, minWidth: 0 }}>
+            <Group gap={8} wrap="wrap" align="center" w="100%" style={{ minWidth: 0 }}>
                 <Select
                   placeholder="Posición"
                   leftSection={<IconUsers size={16} style={{ opacity: 0.7 }} />}
@@ -822,7 +787,6 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     style={{ flex: '1.2 1 180px', minWidth: 0 }}
                   />
                 )}
-              </Group>
             </Group>
           </Stack>
         </Box>
@@ -837,10 +801,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               <SimpleGrid cols={4} spacing={{ base: 6, sm: 'md' }}>
                 {/* 1. Plantilla total */}
                 <Box style={{ minWidth: 0, textAlign: 'center' }}>
-                  <Group gap={4} justify="center" wrap="nowrap">
-                    <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
-                      <IconUsers size={11} />
-                    </ThemeIcon>
+                  <Group gap={6} justify="center" wrap="nowrap">
+                    <IconUsers size={18} />
                     <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                       Plantilla total
                     </Text>
@@ -855,10 +817,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
                 {/* 2. Jugadores medidos */}
                 <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
-                  <Group gap={4} justify="center" wrap="nowrap">
-                    <ThemeIcon size={18} radius="xl" color="teal" variant="light" style={{ flexShrink: 0 }}>
-                      <IconUserCheck size={11} />
-                    </ThemeIcon>
+                  <Group gap={6} justify="center" wrap="nowrap">
+                    <IconUserCheck size={18} />
                     <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                       Jugadores medidos
                     </Text>
@@ -873,10 +833,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
                 {/* 3. Registros filtrados */}
                 <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
-                  <Group gap={4} justify="center" wrap="nowrap">
-                    <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
-                      <IconHistory size={11} />
-                    </ThemeIcon>
+                  <Group gap={6} justify="center" wrap="nowrap">
+                    <IconHistory size={18} />
                     <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                       Registros filtrados
                     </Text>
@@ -891,10 +849,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
                 {/* 4. Última fecha */}
                 <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
-                  <Group gap={4} justify="center" wrap="nowrap">
-                    <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
-                      <IconCalendarStats size={11} />
-                    </ThemeIcon>
+                  <Group gap={6} justify="center" wrap="nowrap">
+                    <IconCalendarStats size={18} />
                     <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                       Última fecha
                     </Text>
@@ -1090,10 +1046,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               <SimpleGrid cols={4} spacing={{ base: 6, sm: 'md' }}>
                 {/* 1. Fecha */}
                 <Box style={{ minWidth: 0, textAlign: 'center' }}>
-                  <Group gap={4} justify="center" wrap="nowrap">
-                    <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
-                      <IconCalendarStats size={11} />
-                    </ThemeIcon>
+                  <Group gap={6} justify="center" wrap="nowrap">
+                    <IconCalendarStats size={18} />
                     <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                       Fecha
                     </Text>
@@ -1108,10 +1062,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
                 {/* 2. Medidos ese día */}
                 <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
-                  <Group gap={4} justify="center" wrap="nowrap">
-                    <ThemeIcon size={18} radius="xl" color="teal" variant="light" style={{ flexShrink: 0 }}>
-                      <IconUserCheck size={11} />
-                    </ThemeIcon>
+                  <Group gap={6} justify="center" wrap="nowrap">
+                    <IconUserCheck size={18} />
                     <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                       Medidos ese día
                     </Text>
@@ -1126,10 +1078,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
                 {/* 3. Importadas */}
                 <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
-                  <Group gap={4} justify="center" wrap="nowrap">
-                    <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
-                      <IconDownload size={11} />
-                    </ThemeIcon>
+                  <Group gap={6} justify="center" wrap="nowrap">
+                    <IconDownload size={18} />
                     <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                       Importadas
                     </Text>
@@ -1144,10 +1094,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
                 {/* 4. Columnas Excel */}
                 <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
-                  <Group gap={4} justify="center" wrap="nowrap">
-                    <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
-                      <IconDatabase size={11} />
-                    </ThemeIcon>
+                  <Group gap={6} justify="center" wrap="nowrap">
+                    <IconDatabase size={18} />
                     <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                       Columnas Excel
                     </Text>

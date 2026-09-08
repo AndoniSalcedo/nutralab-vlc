@@ -1,11 +1,13 @@
 import { Box, Button, Group, Paper, Stack, Text, ThemeIcon } from '@mantine/core';
-import { IconInbox } from '@tabler/icons-react';
+import { IconInbox, USE_3D_ICONS } from '@/components/icons3d';
 import Link from 'next/link';
+import Icon3D from '@/components/Icon3D';
 
 export default function NothingFound({
   title = 'Sin resultados',
   description,
-  icon: Icon = IconInbox,
+  icon: Icon = null,
+  icon3d = 'folder',
   actionLabel,
   onAction,
   actionHref,
@@ -17,23 +19,30 @@ export default function NothingFound({
   compact = false,
   withPaper = false,
 }) {
-  const PIcon = Icon;
+  const resolved3dName = typeof icon3d === 'string' ? icon3d : 'folder';
+  const PIcon = Icon || IconInbox;
   const iconSize = compact ? 24 : 42;
   const themeIconSize = compact ? 40 : 70;
   const titleSize = compact ? 'sm' : 'md';
 
   const content = (
     <Stack align="center" gap={compact ? 4 : 'xs'}>
-      <ThemeIcon
-        size={themeIconSize}
-        radius="xl"
-        variant="light"
-        color="gray"
-        mb={compact ? 0 : 4}
-        style={{ opacity: 0.6 }}
-      >
-        <PIcon size={iconSize} stroke={1.5} />
-      </ThemeIcon>
+      {USE_3D_ICONS && icon3d !== false ? (
+        <Box mb={compact ? 2 : 'xs'}>
+          <Icon3D name={resolved3dName} size={compact ? 64 : 96} />
+        </Box>
+      ) : (
+        <ThemeIcon
+          size={themeIconSize}
+          radius="xl"
+          variant="light"
+          color="gray"
+          mb={compact ? 0 : 4}
+          style={{ opacity: 0.6 }}
+        >
+          {Icon ? <PIcon size={iconSize} stroke={1.5} /> : <Icon3D name={resolved3dName} size={iconSize} />}
+        </ThemeIcon>
+      )}
 
       <Stack gap={0} align="center">
         <Text fw={700} size={titleSize} c="dark.3" ta="center">

@@ -1,8 +1,8 @@
 import React from 'react';
-import { useMantineTheme, Modal, Stack, Group, Text } from '@mantine/core';
+import { Modal, Stack, Group, Text } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { Dropzone } from '@mantine/dropzone';
-import { IconUpload, IconDownload, IconX, IconCloudUpload } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 
 export default function UploadAnaliticaModal({
   opened,
@@ -12,7 +12,6 @@ export default function UploadAnaliticaModal({
   handleUpload,
   uploading
 }) {
-  const theme = useMantineTheme();
 
   return (
     <Modal
@@ -20,7 +19,7 @@ export default function UploadAnaliticaModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconUpload size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+          <Icon3D name="analiticas" size={26} />
           <Text fw={700}>Subir analítica</Text>
         </Group>
       }
@@ -57,13 +56,13 @@ export default function UploadAnaliticaModal({
           <div style={{ pointerEvents: 'none' }}>
             <Group justify="center">
               <Dropzone.Accept>
-                <IconDownload size={50} color={theme.colors.blue[6]} stroke={1.5} />
+                <Icon3D name="inbox" size={54} />
               </Dropzone.Accept>
               <Dropzone.Reject>
-                <IconX size={50} color={theme.colors.red[6]} stroke={1.5} />
+                <Icon3D name="cross" size={54} />
               </Dropzone.Reject>
               <Dropzone.Idle>
-                <IconCloudUpload size={50} stroke={1.5} color="var(--mantine-color-dimmed)" />
+                <Icon3D name="outbox" size={54} />
               </Dropzone.Idle>
             </Group>
 

@@ -6,7 +6,6 @@ import {
   Stack,
   Text,
   Title,
-  ThemeIcon,
   RingProgress,
   Center,
   ActionIcon,
@@ -16,7 +15,8 @@ import {
   Paper
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconDroplet, IconBottle, IconCup, IconCheck, IconRotate, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { IconChevronLeft, IconChevronRight } from '@/components/icons3d';
+import Icon3D from '@/components/Icon3D';
 import { BentoCard } from './BentoItem';
 import { calculateHydration, getTeamNutritionDayTypes } from '@/lib/metrics/anthropometry';
 
@@ -106,7 +106,7 @@ export default function HydrationCalculator({ jugador }) {
   if (!isClient) return null; // Evitar hydration mismatch (Next.js SSR)
 
   return (
-    <BentoCard title="Control de Hidratación" icon={IconDroplet} color="blue">
+    <BentoCard title="Control de Hidratación" icon3d="glass">
       <Stack gap="lg" mt="sm">
 
         <Paper withBorder p="md" radius="xl" bg="var(--mantine-color-white)">
@@ -199,9 +199,7 @@ export default function HydrationCalculator({ jugador }) {
               <Center>
                 <Stack gap={0} align="center">
                   {isGoalReached ? (
-                    <ThemeIcon color="teal" variant="light" radius="xl" size="xl">
-                      <IconCheck size={26} />
-                    </ThemeIcon>
+                    <Icon3D name="check" size={36} />
                   ) : (
                     <>
                       <Title order={2} c="dark.5" fw={700} lh={1}>{percentage}%</Title>
@@ -231,7 +229,7 @@ export default function HydrationCalculator({ jugador }) {
           <Group justify="space-between" align="center" mb="xs">
             <Text size="sm" fw={600} c="dark.4">Añadir consumo rápido</Text>
             <ActionIcon variant="subtle" color="gray" onClick={reset} size="sm" title="Reiniciar contador">
-              <IconRotate size={16} />
+              <Icon3D name="refresh" size={18} />
             </ActionIcon>
           </Group>
 
@@ -242,7 +240,7 @@ export default function HydrationCalculator({ jugador }) {
               size="xs"
               radius="xl"
               onClick={() => addWater(250)}
-              leftSection={<IconCup size={16} />}
+              leftSection={<Icon3D name="glass" size={18} />}
               style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
             >
               +250 ml
@@ -253,7 +251,7 @@ export default function HydrationCalculator({ jugador }) {
               size="xs"
               radius="xl"
               onClick={() => addWater(500)}
-              leftSection={<IconBottle size={16} />}
+              leftSection={<Icon3D name="glass" size={22} />}
               style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
             >
               +500 ml
@@ -264,7 +262,7 @@ export default function HydrationCalculator({ jugador }) {
               size="xs"
               radius="xl"
               onClick={() => addWater(1000)}
-              leftSection={<IconBottle size={18} />}
+              leftSection={<Icon3D name="glass" size={26} />}
               style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
             >
               +1 L

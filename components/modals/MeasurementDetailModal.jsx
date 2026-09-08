@@ -12,7 +12,7 @@ import {
   ScrollArea,
   Anchor
 } from '@mantine/core';
-import { IconEye, IconExternalLink } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 
 export default function MeasurementDetailModal({
   opened,
@@ -39,7 +39,7 @@ export default function MeasurementDetailModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconEye size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+          <Icon3D name="eye" size={26} />
           <Text fw={700}>
             {detailRow ? `${playerName(detailRow)} · ${formatDate(detailMeasurement?.fecha)}` : 'Detalle de medición'}
           </Text>
@@ -63,7 +63,7 @@ export default function MeasurementDetailModal({
               size="xs"
               radius="xl"
               variant="light"
-              leftSection={<IconExternalLink size={14} />}
+              leftSection={<Icon3D name="link" size={18} />}
             >
               Abrir ficha
             </Button>

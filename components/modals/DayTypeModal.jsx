@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Stack, TextInput, Select, Button, Switch, Group, Text } from '@mantine/core';
-import { IconCheck } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 
 export default function DayTypeModal({
   opened,
@@ -59,7 +59,7 @@ export default function DayTypeModal({
               <Button variant="default" onClick={onClose} radius="xl">
                 Cancelar
               </Button>
-              <Button onClick={handleSaveDayType} radius="xl" color="blue" leftSection={<IconCheck size={16} />}>
+              <Button onClick={handleSaveDayType} radius="xl" color="blue" leftSection={<Icon3D name="check" size={20} />}>
                 Aceptar
               </Button>
             </Group>

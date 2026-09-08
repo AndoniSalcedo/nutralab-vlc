@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { Badge, Box, Button, Group, Paper, Stack, Text, Title, Collapse, ActionIcon } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { IconInbox, IconPlus, IconChevronDown } from '@tabler/icons-react';
+import { IconInbox, IconPlus, IconChevronDown } from '@/components/icons3d';
 import SendMessageModal from '@/components/modals/SendMessageModal';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';

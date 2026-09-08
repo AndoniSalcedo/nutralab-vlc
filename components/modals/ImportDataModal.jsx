@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Group, Text, Tabs } from '@mantine/core';
-import { IconFileSpreadsheet, IconDroplet } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 import PlayerExcelImporter from '@/components/PlayerExcelImporter';
 import TeamOsmolarityImporter from '@/components/TeamOsmolarityImporter';
 
@@ -11,7 +11,7 @@ export default function ImportDataModal({ opened, onClose, team }) {
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconFileSpreadsheet size={20} style={{ color: 'var(--mantine-color-teal-6)' }} />
+          <Icon3D name="inbox" size={26} />
           <Text fw={700}>Importar datos</Text>
         </Group>
       }
@@ -21,10 +21,10 @@ export default function ImportDataModal({ opened, onClose, team }) {
     >
       <Tabs defaultValue="metrics" variant="outline" radius="md">
         <Tabs.List grow mb="md">
-          <Tabs.Tab value="metrics" leftSection={<IconFileSpreadsheet size={16} />}>
+          <Tabs.Tab value="metrics" leftSection={<Icon3D name="document" size={20} />}>
             Métricas (Excel de jugadores)
           </Tabs.Tab>
-          <Tabs.Tab value="osmolarity" leftSection={<IconDroplet size={16} />}>
+          <Tabs.Tab value="osmolarity" leftSection={<Icon3D name="droplet" size={20} />}>
             Osmolaridad (CSV de equipo)
           </Tabs.Tab>
         </Tabs.List>

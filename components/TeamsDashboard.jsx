@@ -14,7 +14,6 @@ import {
   Stack,
   Text,
   TextInput,
-  ThemeIcon,
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -27,19 +26,14 @@ import {
   IconPlus,
   IconSearch,
   IconTrash,
-  IconUsersGroup,
   IconPencil,
-  IconChartLine,
-  IconReportMedical,
-  IconBottle,
-  IconCalendarEvent,
-  IconSettings,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import { useRouter } from 'next/navigation';
 import NothingFound from './NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import TeamFormModal from '@/components/modals/TeamFormModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
+import Icon3D from '@/components/Icon3D';
 
 
 function nextSeasonLabel() {
@@ -287,9 +281,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
         <Paper p={{ base: 'sm', sm: 'md' }} shadow="xs" radius={24} bg="white" style={{ width: '100%', minWidth: 0 }}>
           <Group justify="space-between" align="center" wrap="wrap" gap="md" style={{ width: '100%', minWidth: 0 }}>
             <Group gap="sm" style={{ minWidth: 0, flex: 1 }}>
-              <ThemeIcon color="dark" variant="light" radius="md" size={42} style={{ flexShrink: 0 }}>
-                <IconUsersGroup size={21} />
-              </ThemeIcon>
+              <Icon3D name="soccer" size={44} style={{ flexShrink: 0 }} />
               <Box style={{ minWidth: 0, flex: 1 }}>
                 <Title order={2} size="h3" fw={700} c="dark.5" lh={1.2}>
                   Equipos
@@ -412,19 +404,19 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                           </Menu.Item>
                           <Menu.Divider />
                           <Menu.Label>Accesos rápidos</Menu.Label>
-                          <Menu.Item leftSection={<IconChartLine size={14} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/evolucion`)}>
+                          <Menu.Item leftSection={<Icon3D name="evolucion" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/evolucion`)}>
                             Evolución equipo
                           </Menu.Item>
-                          <Menu.Item leftSection={<IconReportMedical size={14} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/analiticas`)}>
+                          <Menu.Item leftSection={<Icon3D name="analiticas" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/analiticas`)}>
                             Analíticas equipo
                           </Menu.Item>
-                          <Menu.Item leftSection={<IconBottle size={14} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/suplementacion`)}>
+                          <Menu.Item leftSection={<Icon3D name="suplementacion" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/suplementacion`)}>
                             Suplementación
                           </Menu.Item>
-                          <Menu.Item leftSection={<IconCalendarEvent size={14} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/menu`)}>
+                          <Menu.Item leftSection={<Icon3D name="menu" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/menu`)}>
                             Menú semanal
                           </Menu.Item>
-                          <Menu.Item leftSection={<IconSettings size={14} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/configuracion`)}>
+                          <Menu.Item leftSection={<Icon3D name="configuracion" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/configuracion`)}>
                             Configuración
                           </Menu.Item>
                           <Menu.Divider />
@@ -452,7 +444,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
         ) : (
           <NothingFound
             withPaper
-            icon={IconUsersGroup}
+            icon3d="soccer"
             title={teamsState.length ? 'Sin equipos en esta búsqueda' : 'Sin equipos'}
             description={teamsState.length ? 'Cambia los filtros para ver otros equipos.' : 'Crea tu primer equipo para empezar.'}
           />

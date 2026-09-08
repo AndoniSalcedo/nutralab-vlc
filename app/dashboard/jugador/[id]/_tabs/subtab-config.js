@@ -1,7 +1,7 @@
-import { IconUser, IconCalendar, IconMail } from '@tabler/icons-react';
-import { IconChartLine, IconReportAnalytics, IconDroplet, IconClipboardList } from '@tabler/icons-react';
-import { IconBrain, IconBottle, IconChefHat } from '@tabler/icons-react';
-import { IconRuler2, IconReportMedical, IconScale } from '@tabler/icons-react';
+import { IconUser, IconCalendar, IconMail } from '@/components/icons3d';
+import { IconChartLine, IconReportAnalytics, IconDroplet, IconClipboardList } from '@/components/icons3d';
+import { IconBrain, IconBottle, IconChefHat } from '@/components/icons3d';
+import { IconRuler2, IconReportMedical, IconScale } from '@/components/icons3d';
 
 /**
  * Single source of truth for all player dashboard subtab configs.

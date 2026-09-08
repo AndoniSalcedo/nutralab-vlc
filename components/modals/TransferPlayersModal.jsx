@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, Group, Text, Button, Select, Radio, Stack, Checkbox, Avatar, Box, ScrollArea } from '@mantine/core';
-import { IconExchange } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 import { notifications } from '@mantine/notifications';
 import { getTeams } from '@/services/team';
 import { transferPlayers } from '@/services/player';
@@ -89,8 +89,8 @@ export default function TransferPlayersModal({ opened, onClose, team, players = 
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconExchange size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
-          <Text fw={700}>Transferir jugadores</Text>
+          <Icon3D name="refresh" size={26} />
+          <Text fw={700}>Transferir o copiar jugadores</Text>
         </Group>
       }
       size="lg"

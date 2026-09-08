@@ -13,10 +13,10 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  ThemeIcon,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
-import { IconCalendar, IconFlame, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import { IconCalendar, IconChevronLeft, IconChevronRight } from '@/components/icons3d';
+import Icon3D from '@/components/Icon3D';
 
 function CompactMacroLine({ label, color, consumed = 0, target = 0 }) {
   const targetNum = target && Number(target) > 0 ? Number(target) : 0;
@@ -74,9 +74,7 @@ export default function BalanceNutricionalWidget({
       {/* Cabecera: Título con icono unificado + Icono de Calendario a la derecha */}
       <Group justify="space-between" align="center" mb="sm">
         <Group gap="xs" align="center">
-          <ThemeIcon color="nutralabColor" variant="light" size="sm" radius="md">
-            <IconFlame size={14} />
-          </ThemeIcon>
+          <Icon3D name="fire" size={28} />
           <Text fw={700} fz="sm" c="dark.5">
             Balance Nutricional
           </Text>

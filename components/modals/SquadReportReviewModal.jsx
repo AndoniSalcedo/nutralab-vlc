@@ -18,7 +18,7 @@ import {
   IconCheck,
   IconShieldCheck,
   IconUserCheck,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 
 const DAYS_OF_WEEK = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
 

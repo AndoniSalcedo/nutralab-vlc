@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Group, Text } from '@mantine/core';
-import { IconUsersGroup } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 import TeamForm from '@/components/forms/TeamForm';
 
 export default function TeamFormModal({
@@ -28,7 +28,7 @@ export default function TeamFormModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconUsersGroup size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+          <Icon3D name="soccer" size={26} />
           <Text fw={700}>
             {modal.type === 'copy'
               ? 'Copiar equipo a temporada'

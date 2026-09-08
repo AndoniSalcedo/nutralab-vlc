@@ -29,7 +29,7 @@ import {
   IconRefresh,
   IconUsers,
   IconX,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import { useRouter } from 'next/navigation';
 
 const CSV_TYPES = ['text/csv', 'application/vnd.ms-excel'];

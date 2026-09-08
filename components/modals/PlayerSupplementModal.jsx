@@ -11,7 +11,7 @@ import {
   SimpleGrid,
   Button
 } from '@mantine/core';
-import { IconBottle, IconPill, IconCirclePlus } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 
 export default function PlayerSupplementModal({
   opened,
@@ -33,9 +33,9 @@ export default function PlayerSupplementModal({
       title={
         <Group gap="xs">
           {modalMode === 'lista' ? (
-            <IconBottle size={20} style={{ color: 'var(--mantine-color-grape-6)' }} />
+            <Icon3D name="suplementacion" size={26} />
           ) : (
-            <IconPill size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Icon3D name="pill" size={26} />
           )}
           <Text fw={700}>{modalTitle}</Text>
         </Group>
@@ -126,7 +126,7 @@ export default function PlayerSupplementModal({
             </SimpleGrid>
 
             <Group justify="flex-end">
-              <Button radius="xl" size="xs" leftSection={<IconCirclePlus size={15} />} onClick={handleAddExtra} loading={saving}>
+              <Button radius="xl" size="xs" leftSection={<Icon3D name="plus" size={18} />} onClick={handleAddExtra} loading={saving}>
                 Añadir suplemento
               </Button>
             </Group>

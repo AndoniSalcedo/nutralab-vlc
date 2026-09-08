@@ -24,7 +24,7 @@ import {
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
-import { IconUser, IconCheck, IconCamera, IconTrash } from '@tabler/icons-react';
+import { IconUser, IconCheck, IconCamera, IconTrash } from '@/components/icons3d';
 import { useRouter } from 'next/navigation';
 import { deletePlayer, savePlayer } from '@/services/player';
 import { PLAYER_OBJECTIVES } from '@/lib/metrics/anthropometry';

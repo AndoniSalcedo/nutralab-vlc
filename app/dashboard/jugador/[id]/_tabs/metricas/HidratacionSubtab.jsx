@@ -37,7 +37,7 @@ import {
   IconAlertCircle,
   IconClock,
   IconChevronDown,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import {
   ComposedChart,

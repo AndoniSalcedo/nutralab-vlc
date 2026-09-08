@@ -20,7 +20,7 @@ import {
   IconCheck,
   IconX,
   IconRefresh,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import { getCroppedImg } from '@/lib/utils/cropImage';
 
 export default function ImageCropModal({

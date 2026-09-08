@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Stack, Box, Image, ActionIcon, Paper, Text } from '@mantine/core';
-import { IconX } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 
 export default function ImageViewerModal({ opened, onClose, viewer }) {
   return (
@@ -30,7 +30,7 @@ export default function ImageViewerModal({ opened, onClose, viewer }) {
             onClick={onClose}
             style={{ position: 'absolute', top: 10, right: 10, zIndex: 10 }}
           >
-            <IconX size={20} />
+            <Icon3D name="cross" size={20} />
           </ActionIcon>
         </Box>
 

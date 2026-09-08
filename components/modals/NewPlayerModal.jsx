@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Group, Text } from '@mantine/core';
-import { IconUserPlus } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 import PlayerForm from '@/components/forms/PlayerForm';
 
 export default function NewPlayerModal({ opened, onClose, team }) {
@@ -10,7 +10,7 @@ export default function NewPlayerModal({ opened, onClose, team }) {
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconUserPlus size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+          <Icon3D name="user" size={26} />
           <Text fw={700}>Añadir jugador</Text>
         </Group>
       }

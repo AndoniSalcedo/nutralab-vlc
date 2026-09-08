@@ -15,9 +15,11 @@ import {
   Text,
   Title,
   Tooltip,
+  UnstyledButton,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconChevronLeft, IconEdit, IconLogout, IconCamera, IconDotsVertical } from '@tabler/icons-react';
+import { IconArrowLeft, IconLogout, IconDotsVertical } from '@/components/icons3d';
+import Icon3D from '@/components/Icon3D';
 import { FileButton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { compressAvatar, initials } from '@/lib/utils/avatar';
@@ -27,13 +29,13 @@ import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
 
-export function BackButton({ size = 42, iconSize = 24, equipoId }) {
+export function BackButton({ size = 42, iconSize = 26, equipoId }) {
   const url = equipoId ? `/dashboard/equipo/${equipoId}` : '/dashboard';
   return (
     <Tooltip label="Volver al listado" position="right" withArrow>
       <Anchor href={url} style={{ textDecoration: 'none' }}>
-        <ActionIcon variant="light" color="gray" size={size} radius="xl">
-          <IconChevronLeft size={iconSize} />
+        <ActionIcon variant="subtle" color="gray" size={size} radius="xl" style={{ transition: 'transform 140ms ease' }}>
+          <IconArrowLeft size={iconSize} />
         </ActionIcon>
       </Anchor>
     </Tooltip>
@@ -44,11 +46,12 @@ function CredentialsWarning({ show }) {
   if (!show) return null;
 
   return (
-    <Box>
+    <Group gap={6} align="center">
+      <Icon3D name="warning" size={16} />
       <Text size="xs" c="orange.7" fw={600}>
-        ⚠️ Sin credenciales
+        Sin credenciales
       </Text>
-    </Box>
+    </Group>
   );
 }
 
@@ -102,7 +105,7 @@ export function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, compact = fa
           {isAdmin && (
             <>
               <PlayerCredentialsButton jugador={jugador} menuItem />
-              <Menu.Item leftSection={<IconEdit size={14} />} onClick={onEdit}>
+              <Menu.Item leftSection={<Icon3D name="configuracion" size={18} />} onClick={onEdit}>
                 Editar ficha
               </Menu.Item>
             </>
@@ -127,10 +130,10 @@ export function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, compact = fa
             variant="default"
             radius="xl"
             size="xs"
-            leftSection={<IconEdit size={16} />}
+            leftSection={<Icon3D name="configuracion" size={18} />}
             onClick={onEdit}
           >
-            Editar Ficha
+            Editar ficha
           </Button>
         </>
       )}
@@ -335,25 +338,26 @@ export function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) 
         <FileButton onChange={handleFileSelected} accept="image/*">
           {(props) => (
             <Tooltip label="Cambiar foto de perfil" position="bottom" withArrow>
-              <ActionIcon
+              <UnstyledButton
                 {...props}
-                variant="filled"
-                color="dark"
-                radius="xl"
-                size={size > 80 ? 28 : (size <= 50 ? 18 : 24)}
-                loading={loading}
+                disabled={loading}
                 style={{
                   position: 'absolute',
                   bottom: -2,
                   right: -2,
-                  border: '2px solid white',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-                  cursor: 'pointer',
-                  zIndex: 3,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.6 : 1,
+                  zIndex: 4,
+                  overflow: 'visible',
+                  lineHeight: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'transform 150ms ease, opacity 150ms ease',
                 }}
               >
-                <IconCamera size={size > 80 ? 14 : (size <= 50 ? 10 : 12)} stroke={2} />
-              </ActionIcon>
+                <Icon3D name="camera" size={size > 80 ? 28 : 20} />
+              </UnstyledButton>
             </Tooltip>
           )}
         </FileButton>

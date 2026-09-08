@@ -1,6 +1,6 @@
 import React from 'react';
-import { Modal, Text, Group, Button, Stack, ThemeIcon } from '@mantine/core';
-import { IconAlertTriangle } from '@tabler/icons-react';
+import { Modal, Text, Group, Button, Stack } from '@mantine/core';
+import Icon3D from '@/components/Icon3D';
 
 export default function ConfirmModal({
   opened,
@@ -19,9 +19,7 @@ export default function ConfirmModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <ThemeIcon color={color} variant="light" size="md" radius="md">
-            <IconAlertTriangle size={18} />
-          </ThemeIcon>
+          <Icon3D name="warning" size={26} />
           <Text fw={700} size="md">{title}</Text>
         </Group>
       }

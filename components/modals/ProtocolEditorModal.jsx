@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Stack, TextInput, Button, Group, ActionIcon, Text, Textarea, Select, Divider, Paper, ScrollArea, Box, Timeline, Tooltip, Switch } from '@mantine/core';
 import { 
-  IconPlus, 
-  IconTrash, 
   IconArrowUp,
   IconArrowDown,
-  IconFlag,
-  IconCheck
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
+import Icon3D from '@/components/Icon3D';
 import { PROTOCOL_AVAILABLE_ICONS as AVAILABLE_ICONS } from '@/components/ProtocolIcon';
 
 export default function ProtocolEditorModal({ opened, onClose, protocol, onSave, saveLabel = 'Aceptar', helpText }) {
@@ -145,7 +142,7 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
                 <Text fw={600} size="sm" c="dark.3">Fases del Timeline</Text>
                 <Text size="xs" c="dimmed">Añade o inserta fases cronológicas y ordénalas según el protocolo</Text>
               </div>
-              <Button size="xs" variant="light" leftSection={<IconPlus size={14} />} onClick={() => addTimelineItem(-1)} radius="xl">
+              <Button size="xs" variant="light" leftSection={<Icon3D name="plus" size={16} />} onClick={() => addTimelineItem(-1)} radius="xl">
                 Añadir Fase al Final
               </Button>
             </Group>
@@ -156,7 +153,7 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
               ) : (
                 <Timeline active={timeline.length} bulletSize={32} lineWidth={2} color="gray">
                   {timeline.map((item, index) => (
-                    <Timeline.Item key={item.id} bullet={AVAILABLE_ICONS[item.icon] || <IconFlag size={16} />}>
+                    <Timeline.Item key={item.id} bullet={AVAILABLE_ICONS[item.icon] || <Icon3D name="flag" size={16} />}>
                       <Paper withBorder p="sm" radius="md" bg="gray.0" mb="md" mt="-xs">
                         <Group align="flex-start" wrap="nowrap" gap="sm">
                           <Stack style={{ flexGrow: 1 }} gap="xs">
@@ -269,7 +266,7 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
                                 radius="md"
                                 onClick={() => addTimelineItem(index)}
                               >
-                                <IconPlus size={15} />
+                                <Icon3D name="plus" size={15} />
                               </ActionIcon>
                             </Tooltip>
 
@@ -281,7 +278,7 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
                                 radius="md"
                                 onClick={() => removeTimelineItem(index)}
                               >
-                                <IconTrash size={15} />
+                                <Icon3D name="trash" size={15} />
                               </ActionIcon>
                             </Tooltip>
                           </Stack>
@@ -292,7 +289,7 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
                             variant="subtle"
                             color="blue"
                             size="compact-xs"
-                            leftSection={<IconPlus size={12} />}
+                            leftSection={<Icon3D name="plus" size={14} />}
                             onClick={() => addTimelineItem(index)}
                             radius="xl"
                           >
@@ -315,7 +312,7 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
                 <Text fw={600} size="sm" c="dark.3">Checklist Operativo</Text>
                 <Text size="xs" c="dimmed">Puntos de control y comprobaciones</Text>
               </div>
-              <Button size="xs" variant="light" color="blue" leftSection={<IconPlus size={14} />} onClick={() => addChecklistItem(-1)} radius="xl">
+              <Button size="xs" variant="light" color="blue" leftSection={<Icon3D name="plus" size={16} />} onClick={() => addChecklistItem(-1)} radius="xl">
                 Añadir Item al Final
               </Button>
             </Group>
@@ -395,7 +392,7 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
                           radius="md"
                           onClick={() => addChecklistItem(index)}
                         >
-                          <IconPlus size={15} />
+                          <Icon3D name="plus" size={15} />
                         </ActionIcon>
                       </Tooltip>
 
@@ -407,7 +404,7 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
                           radius="md"
                           onClick={() => removeChecklistItem(index)}
                         >
-                          <IconTrash size={15} />
+                          <Icon3D name="trash" size={15} />
                         </ActionIcon>
                       </Tooltip>
                     </Stack>
@@ -427,7 +424,7 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
         )}
         <Group gap="xs">
           <Button variant="default" onClick={onClose} radius="xl">Cancelar</Button>
-          <Button color="blue" onClick={handleSave} radius="xl" disabled={!name} leftSection={<IconCheck size={16} />}>
+          <Button color="blue" onClick={handleSave} radius="xl" disabled={!name} leftSection={<Icon3D name="check" size={20} />}>
             {saveLabel}
           </Button>
         </Group>

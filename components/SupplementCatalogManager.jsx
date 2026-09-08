@@ -37,7 +37,7 @@ import {
   IconSearch,
   IconTrash,
   IconUsers,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
 
 function emptySupplementForm() {
@@ -71,7 +71,8 @@ export default function SupplementCatalogManager({
   team,
   activeTab = 'assign',
   onTabChange,
-  initialSelectedPlayerIds = null
+  initialSelectedPlayerIds = null,
+  hideTabs = false,
 }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -332,11 +333,13 @@ export default function SupplementCatalogManager({
       <LoadingOverlay visible={loading} />
 
       <Tabs value={activeTab} onChange={onTabChange} variant="outline" radius="md" keepMounted={false}>
-        <Tabs.List grow>
-          <Tabs.Tab value="assign" leftSection={<IconUsers size={15} />}>Asignar</Tabs.Tab>
-          <Tabs.Tab value="catalogs" leftSection={<IconBottle size={15} />}>Catálogos</Tabs.Tab>
-          <Tabs.Tab value="supplements" leftSection={<IconPill size={15} />}>Suplementos</Tabs.Tab>
-        </Tabs.List>
+        {!hideTabs && (
+          <Tabs.List grow>
+            <Tabs.Tab value="assign" leftSection={<IconUsers size={15} />}>Asignar</Tabs.Tab>
+            <Tabs.Tab value="catalogs" leftSection={<IconBottle size={15} />}>Catálogos</Tabs.Tab>
+            <Tabs.Tab value="supplements" leftSection={<IconPill size={15} />}>Suplementos</Tabs.Tab>
+          </Tabs.List>
+        )}
 
         <Tabs.Panel value="assign" pt="md">
           <BentoCard title="Asignar a jugadores" icon={IconUsers} color="grape">

@@ -3,7 +3,8 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Group, Paper, Stack, Text, ThemeIcon } from '@mantine/core';
-import { IconChefHat, IconClock, IconToolsKitchen } from '@tabler/icons-react';
+import { IconClock, IconToolsKitchen } from '@/components/icons3d';
+import Icon3D from '@/components/Icon3D';
 
 export default function ComedorWidget({
   jugadorId,
@@ -54,9 +55,7 @@ export default function ComedorWidget({
       {/* Cabecera con fondo blanco y acento naranja */}
       <Group justify="space-between" align="center" mb="sm">
         <Group gap="xs" align="center">
-          <ThemeIcon color="nutralabColor" variant="light" size="sm" radius="md">
-            <IconChefHat size={14} />
-          </ThemeIcon>
+          <Icon3D name="cup" size={28} />
           <Text fw={700} fz="sm" c="dark.5">
             Comedor Ciudad Deportiva
           </Text>

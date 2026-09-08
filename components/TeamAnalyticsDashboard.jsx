@@ -14,7 +14,6 @@ import {
   Stack,
   Table,
   Text,
-  ThemeIcon,
   Title,
   Tooltip,
   TextInput,
@@ -45,7 +44,7 @@ import {
   IconHistory,
   IconSortDescending,
   IconChartLine,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import NothingFound from '@/components/NothingFound';
 import { initials } from '@/lib/utils';
 
@@ -341,10 +340,8 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
           <SimpleGrid cols={4} spacing={{ base: 6, sm: 'md' }}>
             {/* 1. Subidas */}
             <Box style={{ minWidth: 0, textAlign: 'center' }}>
-              <Group gap={4} justify="center" wrap="nowrap">
-                <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
-                  <IconUsers size={11} />
-                </ThemeIcon>
+              <Group gap={6} justify="center" wrap="nowrap">
+                <IconUsers size={18} />
                 <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                   Subidas
                 </Text>
@@ -359,10 +356,8 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
 
             {/* 2. Con Alertas */}
             <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
-              <Group gap={4} justify="center" wrap="nowrap">
-                <ThemeIcon size={18} radius="xl" color="red" variant="light" style={{ flexShrink: 0 }}>
-                  <IconAlertTriangle size={11} />
-                </ThemeIcon>
+              <Group gap={6} justify="center" wrap="nowrap">
+                <IconAlertTriangle size={18} />
                 <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                   Alertas
                 </Text>
@@ -377,10 +372,8 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
 
             {/* 3. Parámetros Bajo */}
             <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
-              <Group gap={4} justify="center" wrap="nowrap">
-                <ThemeIcon size={18} radius="xl" color="orange" variant="light" style={{ flexShrink: 0 }}>
-                  <IconActivity size={11} />
-                </ThemeIcon>
+              <Group gap={6} justify="center" wrap="nowrap">
+                <IconActivity size={18} />
                 <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                   Bajos
                 </Text>
@@ -395,10 +388,8 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
 
             {/* 4. Total Registros */}
             <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
-              <Group gap={4} justify="center" wrap="nowrap">
-                <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
-                  <IconHistory size={11} />
-                </ThemeIcon>
+              <Group gap={6} justify="center" wrap="nowrap">
+                <IconHistory size={18} />
                 <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                   Total
                 </Text>

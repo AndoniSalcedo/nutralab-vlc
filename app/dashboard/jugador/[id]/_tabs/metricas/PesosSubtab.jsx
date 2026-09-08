@@ -32,7 +32,7 @@ import classes from '../SubtabSectionHeader.module.css';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { savePesaje, deletePesaje } from '@/services/pesaje';
-import { IconEdit, IconPlus, IconScale, IconTrash } from '@tabler/icons-react';
+import { IconEdit, IconPlus, IconScale, IconTrash } from '@/components/icons3d';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import { calculateSemaforo } from '@/lib/metrics/player';

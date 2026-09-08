@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { slugify } from '@/lib/utils';
 import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Textarea, Box, ColorInput, SimpleGrid, Avatar, FileButton, UnstyledButton, Modal, ScrollArea } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconBook, IconClipboardList, IconPalette, IconCamera, IconFolderShare, IconDownload, IconCalculator } from '@tabler/icons-react';
+import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconBook, IconClipboardList, IconPalette, IconCamera, IconFolderShare, IconDownload, IconCalculator } from '@/components/icons3d';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/metrics/anthropometry';
 import { compressAvatar, initials } from '@/lib/utils/avatar';
 import { uploadTeamPhoto, removeTeamPhoto } from '@/services/team';

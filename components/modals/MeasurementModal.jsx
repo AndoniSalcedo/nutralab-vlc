@@ -12,7 +12,7 @@ import {
   Divider
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
-import { IconRuler2, IconEdit, IconCheck, IconCalendar } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 import { MEASUREMENT_DETAIL_SECTIONS } from '@/lib/metrics/measurements';
 
 function dateValue(value) {
@@ -45,9 +45,9 @@ export default function MeasurementModal({
       title={
         <Group gap="xs">
           {modalMode === 'new' ? (
-            <IconRuler2 size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Icon3D name="gym" size={26} />
           ) : (
-            <IconEdit size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+            <Icon3D name="edit" size={26} />
           )}
           <Text fw={700}>
             {modalMode === 'new' ? 'Registrar medición' : 'Editar medición'}
@@ -66,7 +66,7 @@ export default function MeasurementModal({
           onChange={(value) => updateFormField('fecha', dateInputToIso(value))}
           placeholder="Selecciona la fecha"
           valueFormat="DD/MM/YYYY"
-          leftSection={<IconCalendar size={16} />}
+          leftSection={<Icon3D name="calendar" size={20} />}
         />
 
         <Divider my="xs" label="Métricas del Jugador" labelPosition="center" />
@@ -117,7 +117,7 @@ export default function MeasurementModal({
           <Button
             size="xs"
             radius="xl"
-            leftSection={<IconCheck size={16} />}
+            leftSection={<Icon3D name="check" size={20} />}
             onClick={handleSave}
             loading={saving}
             disabled={!form.fecha}

@@ -1,7 +1,7 @@
 'use client';
 
-import { Box, Group, Paper, Stack, Tabs, Text, UnstyledButton, rem } from '@mantine/core';
-import { IconChartBar, IconInfoCircle, IconSalad } from '@tabler/icons-react';
+import { Box, Group, Tabs, Text, rem } from '@mantine/core';
+import { IconChartBar, IconClipboardList, IconSalad } from '@/components/icons3d';
 import { useParams, useRouter } from 'next/navigation';
 import MetricasTab from './MetricasTab';
 import NutricionTab from './NutricionTab';
@@ -69,7 +69,7 @@ export default function PlayerTabs({
   });
 
   const mobileTabs = [
-    { value: 'resumen', label: 'Resumen', icon: IconInfoCircle },
+    { value: 'resumen', label: 'Resumen', icon: IconClipboardList },
     { value: 'nutricion', label: 'Nutrición', icon: IconSalad },
     { value: 'metricas', label: 'Métricas', icon: IconChartBar },
   ];
@@ -94,7 +94,7 @@ export default function PlayerTabs({
         }}
       >
         <Tabs.List grow visibleFrom="sm">
-          <Tabs.Tab value="resumen" leftSection={<IconInfoCircle size={18} />} style={activeTabStyle('resumen')}>Resumen</Tabs.Tab>
+          <Tabs.Tab value="resumen" leftSection={<IconClipboardList size={18} />} style={activeTabStyle('resumen')}>Resumen</Tabs.Tab>
           <Tabs.Tab value="metricas" leftSection={<IconChartBar size={18} />} style={activeTabStyle('metricas')}>Métricas</Tabs.Tab>
           <Tabs.Tab value="nutricion" leftSection={<IconSalad size={18} />} style={activeTabStyle('nutricion')}>Nutrición</Tabs.Tab>
         </Tabs.List>
@@ -140,31 +140,86 @@ export default function PlayerTabs({
           )}
         </Box>
 
-        <Paper
+        {/* BARRA DE NAVEGACIÓN INFERIOR FIJA PARA MÓVILES (Idéntica en tamaño y diseño a la del equipo) */}
+        <Box
           hiddenFrom="sm"
-          className={classes.mobileDock}
-          shadow="md"
-          radius={0}
-          withBorder
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 300,
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            borderTop: '1px solid rgba(222, 226, 230, 0.85)',
+            boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.06)',
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 8px) + 2px)',
+          }}
         >
-          <Group gap={0} grow preventGrowOverflow={false} className={classes.mobileDockInner}>
-            {mobileTabs.map(({ value, label, icon: Icon }) => (
-              <UnstyledButton
-                key={value}
-                onClick={() => navigate(value)}
-                className={classes.mobileTab}
-                data-active={activeTab === value || undefined}
-              >
-                <Stack gap={4} align="center">
-                  <Icon size={24} stroke={activeTab === value ? 2 : 1.5} />
-                  <Text size="xs" fw={activeTab === value ? 700 : 500} lh={1}>
+          <Group justify="space-around" align="center" gap={0} wrap="nowrap" h={58} px={4}>
+            {mobileTabs.map(({ value, label, icon: Icon }) => {
+              const isActive = activeTab === value;
+              return (
+                <Box
+                  key={value}
+                  component="button"
+                  onClick={() => navigate(value)}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: 1,
+                    height: '100%',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    color: isActive ? '#1c1f1a' : 'var(--mantine-color-gray-6)',
+                    position: 'relative',
+                    paddingTop: 4,
+                    transition: 'color 140ms ease, transform 100ms ease',
+                  }}
+                >
+                  {isActive && (
+                    <Box
+                      style={{
+                        position: 'absolute',
+                        top: 3,
+                        width: 20,
+                        height: 3,
+                        borderRadius: 3,
+                        backgroundColor: '#24291f',
+                      }}
+                    />
+                  )}
+                  <Icon
+                    size={isActive ? 22 : 20}
+                    style={{
+                      opacity: isActive ? 1 : 0.75,
+                      transform: isActive ? 'scale(1.04)' : 'scale(1)',
+                      transition: 'transform 160ms ease, opacity 160ms ease',
+                      marginBottom: 2,
+                    }}
+                  />
+                  <Text
+                    fz={10}
+                    fw={isActive ? 750 : 500}
+                    lh={1.2}
+                    mt={3}
+                    c={isActive ? '#1c1f1a' : 'dimmed'}
+                    style={{
+                      letterSpacing: '-0.2px',
+                    }}
+                  >
                     {label}
                   </Text>
-                </Stack>
-              </UnstyledButton>
-            ))}
+                </Box>
+              );
+            })}
           </Group>
-        </Paper>
+        </Box>
       </Tabs>
     </PlayerDashboardProvider>
   );

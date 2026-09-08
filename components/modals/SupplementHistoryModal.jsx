@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Group, Text, Box, Timeline, Paper } from '@mantine/core';
-import { IconHistory, IconBottle, IconCalendar } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 import dayjs from 'dayjs';
 
 export default function SupplementHistoryModal({
@@ -15,7 +15,7 @@ export default function SupplementHistoryModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconHistory size={20} style={{ color: 'var(--mantine-color-grape-6)' }} />
+          <Icon3D name="alarmclock" size={26} />
           <Text fw={700}>Historial de Suplementación</Text>
         </Group>
       }
@@ -35,11 +35,11 @@ export default function SupplementHistoryModal({
               return (
                 <Timeline.Item
                   key={event.id}
-                  bullet={<IconBottle size={12} />}
+                  bullet={<Icon3D name="suplementacion" size={14} />}
                   title={catalog ? catalog.nombre : 'Catálogo eliminado'}
                 >
                   <Text c="dimmed" size="xs" mt={4}>
-                    <IconCalendar size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
+                    <Icon3D name="calendar" size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
                     {dayjs(event.created_at).format('DD MMM YYYY, HH:mm')}
                   </Text>
                 </Timeline.Item>
@@ -48,7 +48,7 @@ export default function SupplementHistoryModal({
           </Timeline>
         ) : (
           <Paper p="xl" radius="md" bg="gray.0" style={{ textAlign: 'center' }}>
-            <IconHistory size={32} style={{ color: 'var(--mantine-color-gray-4)' }} />
+            <Icon3D name="alarmclock" size={40} />
             <Text c="dimmed" size="sm" mt="sm">No hay registros en el historial de este jugador.</Text>
           </Paper>
         )}

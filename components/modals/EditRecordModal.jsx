@@ -10,7 +10,7 @@ import {
   Textarea,
   Button
 } from '@mantine/core';
-import { IconEdit, IconCheck } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 
 export default function EditRecordModal({
   opened,
@@ -26,7 +26,7 @@ export default function EditRecordModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconEdit size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+          <Icon3D name="edit" size={26} />
           <Text fw={700}>Editar Registro</Text>
         </Group>
       }
@@ -98,7 +98,7 @@ export default function EditRecordModal({
           <Button variant="light" color="gray" radius="xl" size="xs" onClick={onClose}>
             Cancelar
           </Button>
-          <Button color="blue" radius="xl" size="xs" leftSection={<IconCheck size={16} />} onClick={saveEditedRecord} loading={savingEdit}>
+          <Button color="blue" radius="xl" size="xs" leftSection={<Icon3D name="check" size={18} />} onClick={saveEditedRecord} loading={savingEdit}>
             Guardar Cambios
           </Button>
         </Group>

@@ -2,21 +2,29 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { Box } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 const TeamHeaderSlotContext = createContext(null);
 
 export function TeamHeaderSlotProvider({ children }) {
   const [rightSlotEl, setRightSlotElState] = useState(null);
-  const [filtersSlotEl, setFiltersSlotElState] = useState(null);
+  const [desktopFiltersSlotEl, setDesktopFiltersSlotElState] = useState(null);
+  const [mobileFiltersSlotEl, setMobileFiltersSlotElState] = useState(null);
   const [hasRightSection, setHasRightSection] = useState(false);
-  const [hasFilters, setHasFilters] = useState(false);
+  const [hasDesktopFilters, setHasDesktopFilters] = useState(false);
+  const [hasMobileFilters, setHasMobileFilters] = useState(false);
 
   const setRightSlotEl = useCallback((el) => {
     setRightSlotElState(el);
   }, []);
 
-  const setFiltersSlotEl = useCallback((el) => {
-    setFiltersSlotElState(el);
+  const setDesktopFiltersSlotEl = useCallback((el) => {
+    setDesktopFiltersSlotElState(el);
+  }, []);
+
+  const setMobileFiltersSlotEl = useCallback((el) => {
+    setMobileFiltersSlotElState(el);
   }, []);
 
   useEffect(() => {
@@ -31,25 +39,39 @@ export function TeamHeaderSlotProvider({ children }) {
   }, [rightSlotEl]);
 
   useEffect(() => {
-    if (!filtersSlotEl) return;
+    if (!desktopFiltersSlotEl) return;
     const checkFilters = () => {
-      setHasFilters(filtersSlotEl.childNodes.length > 0);
+      setHasDesktopFilters(desktopFiltersSlotEl.childNodes.length > 0);
     };
     checkFilters();
     const observer = new MutationObserver(checkFilters);
-    observer.observe(filtersSlotEl, { childList: true });
+    observer.observe(desktopFiltersSlotEl, { childList: true });
     return () => observer.disconnect();
-  }, [filtersSlotEl]);
+  }, [desktopFiltersSlotEl]);
+
+  useEffect(() => {
+    if (!mobileFiltersSlotEl) return;
+    const checkFilters = () => {
+      setHasMobileFilters(mobileFiltersSlotEl.childNodes.length > 0);
+    };
+    checkFilters();
+    const observer = new MutationObserver(checkFilters);
+    observer.observe(mobileFiltersSlotEl, { childList: true });
+    return () => observer.disconnect();
+  }, [mobileFiltersSlotEl]);
 
   return (
     <TeamHeaderSlotContext.Provider
       value={{
         rightSlotEl,
-        filtersSlotEl,
+        desktopFiltersSlotEl,
+        mobileFiltersSlotEl,
         setRightSlotEl,
-        setFiltersSlotEl,
+        setDesktopFiltersSlotEl,
+        setMobileFiltersSlotEl,
         hasRightSection,
-        hasFilters,
+        hasDesktopFilters,
+        hasMobileFilters,
       }}
     >
       {children}
@@ -76,12 +98,14 @@ export function TeamHeaderRightSection({ children }) {
 export function TeamHeaderFilters({ children }) {
   const context = useTeamHeaderSlot();
   const [mounted, setMounted] = useState(false);
+  const isDesktop = useMediaQuery('(min-width: 48em)', false);
+  const target = isDesktop ? context?.desktopFiltersSlotEl : context?.mobileFiltersSlotEl;
+  const content = <Box style={{ width: '100%', minWidth: 0 }}>{children}</Box>;
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted || !context?.filtersSlotEl) return null;
-  return createPortal(children, context.filtersSlotEl);
+  if (!mounted || !target) return null;
+  return createPortal(content, target);
 }
-

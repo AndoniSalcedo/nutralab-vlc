@@ -15,7 +15,7 @@ import {
 import {
   IconCalendar,
   IconList,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import MenuSemanal, { formatWeek } from '@/components/MenuSemanal';
 
 export default function MenuSemanalSubtab({ menus = [] }) {

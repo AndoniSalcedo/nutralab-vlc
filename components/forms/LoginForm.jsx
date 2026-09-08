@@ -27,7 +27,7 @@ import {
   IconMail,
   IconSalad,
   IconShieldCheck,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 import { login } from '@/services/auth';

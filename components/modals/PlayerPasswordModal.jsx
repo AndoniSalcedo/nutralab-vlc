@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Stack, PasswordInput, Group, Button, Text } from '@mantine/core';
-import { IconLock } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 
 export default function PlayerPasswordModal({
   opened,
@@ -18,7 +18,7 @@ export default function PlayerPasswordModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconLock size={20} style={{ color: 'var(--mantine-color-gray-6)' }} />
+          <Icon3D name="lock" size={26} />
           <Text fw={700}>Cambiar contraseña</Text>
         </Group>
       }

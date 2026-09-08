@@ -1,14 +1,14 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Card, Text, Group, Select, NumberInput, Grid, ThemeIcon, Stack, Title, Badge, Paper } from '@mantine/core';
-import { IconFlame, IconMeat, IconWheat, IconDroplet, IconScale } from '@tabler/icons-react';
+import { Card, Text, Group, Select, NumberInput, Grid, Stack, Title, Badge, Paper, Box } from '@mantine/core';
+import Icon3D from '@/components/Icon3D';
 import { useFoods } from '@/hooks/use-foods';
 
 const EMPTY_FOOD = { kcal: 0, cho: 0, pro: 0, fat: 0 };
 
 export default function FoodCalculator() {
-  const { foods, loading } = useFoods();
+  const { foods } = useFoods();
   const foodOptions = useMemo(
     () => foods.map((food) => ({ value: food.id, label: food.name })),
     [foods]
@@ -37,7 +37,10 @@ export default function FoodCalculator() {
       <Stack gap="xl">
         <div>
           <Group justify="space-between" align="center" mb="xs">
-            <Title order={3}>Calculadora de Alimentos</Title>
+            <Group gap="xs" align="center">
+              <Icon3D name="apple" size={30} />
+              <Title order={3}>Calculadora de Alimentos</Title>
+            </Group>
             <Badge color="blue" variant="light" size="lg" radius="sm">BEDCA</Badge>
           </Group>
           <Text c="dimmed" size="sm">
@@ -45,18 +48,16 @@ export default function FoodCalculator() {
           </Text>
         </div>
 
-        <Grid align="flex-end">
+        <Grid gutter="md">
           <Grid.Col span={{ base: 12, sm: 8 }}>
             <Select
               label="Alimento"
-              placeholder="Escribe para buscar un alimento o plato"
+              placeholder="Buscar un alimento..."
               data={foodOptions}
               value={foodId}
               onChange={setFoodId}
               searchable
-              limit={50}
-              disabled={loading}
-              nothingFoundMessage={loading ? 'Cargando alimentos…' : 'No hay alimentos con ese nombre'}
+              clearable
               radius="md"
               size="md"
             />
@@ -69,7 +70,7 @@ export default function FoodCalculator() {
               min={0}
               radius="md"
               size="md"
-              rightSection={<IconScale size={18} stroke={1.5} color="gray" />}
+              rightSection={<Icon3D name="scale" size={18} />}
             />
           </Grid.Col>
         </Grid>
@@ -82,9 +83,7 @@ export default function FoodCalculator() {
                 <Text size="sm" c="dimmed" tt="uppercase" fw={700}>
                   Energía
                 </Text>
-                <ThemeIcon color="orange" variant="light" size="lg" radius="xl">
-                  <IconFlame size={20} />
-                </ThemeIcon>
+                <Icon3D name="fire" size={34} />
               </Group>
               <Group align="flex-end" gap="xs" mt="sm">
                 <Text fz={32} fw={700} lh={1} c="dark.5">
@@ -100,9 +99,9 @@ export default function FoodCalculator() {
           {/* Bento Box: Macros */}
           <Grid.Col span={{ base: 4, sm: 2 }}>
             <Paper withBorder p="sm" radius="xl" ta="center" h="100%" display="flex" style={{ flexDirection: 'column', justifyContent: 'center' }}>
-              <ThemeIcon color="blue" variant="light" size="lg" radius="xl" mx="auto" mb="xs">
-                <IconWheat size={18} />
-              </ThemeIcon>
+              <Box mx="auto" mb="xs">
+                <Icon3D name="bread" size={32} />
+              </Box>
               <Text fz={18} fw={700} c="dark.5">{result.cho}g</Text>
               <Text fz="xs" c="dimmed" tt="uppercase" fw={600}>Carbos</Text>
             </Paper>
@@ -110,9 +109,9 @@ export default function FoodCalculator() {
 
           <Grid.Col span={{ base: 4, sm: 2 }}>
             <Paper withBorder p="sm" radius="xl" ta="center" h="100%" display="flex" style={{ flexDirection: 'column', justifyContent: 'center' }}>
-              <ThemeIcon color="green" variant="light" size="lg" radius="xl" mx="auto" mb="xs">
-                <IconMeat size={18} />
-              </ThemeIcon>
+              <Box mx="auto" mb="xs">
+                <Icon3D name="meat" size={32} />
+              </Box>
               <Text fz={18} fw={700} c="dark.5">{result.pro}g</Text>
               <Text fz="xs" c="dimmed" tt="uppercase" fw={600}>Proteína</Text>
             </Paper>
@@ -120,9 +119,9 @@ export default function FoodCalculator() {
 
           <Grid.Col span={{ base: 4, sm: 2 }}>
             <Paper withBorder p="sm" radius="xl" ta="center" h="100%" display="flex" style={{ flexDirection: 'column', justifyContent: 'center' }}>
-              <ThemeIcon color="yellow" variant="light" size="lg" radius="xl" mx="auto" mb="xs">
-                <IconDroplet size={18} />
-              </ThemeIcon>
+              <Box mx="auto" mb="xs">
+                <Icon3D name="avocado" size={32} />
+              </Box>
               <Text fz={18} fw={700} c="dark.5">{result.fat}g</Text>
               <Text fz="xs" c="dimmed" tt="uppercase" fw={600}>Grasas</Text>
             </Paper>

@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Box, Paper, Stack, Text, ThemeIcon } from '@mantine/core';
-import { IconScale } from '@tabler/icons-react';
+import { Box, Paper, Stack, Text } from '@mantine/core';
+import Icon3D from '@/components/Icon3D';
 
 export default function PhysicalMetricWidget({
   jugadorId,
@@ -38,9 +38,7 @@ export default function PhysicalMetricWidget({
       }}
     >
       <Stack align="center" justify="center" gap={4} w="100%" ta="center">
-        <ThemeIcon color="nutralabColor" variant="light" size={28} radius="md">
-          <IconScale size={16} />
-        </ThemeIcon>
+        <Icon3D name="gym" size={44} style={{ marginBottom: 2 }} />
 
         <Box>
           <Text fz={{ base: 14, sm: 18 }} fw={700} c="dark.5" lh={1.1}>

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Icon3D from '@/components/Icon3D';
 import { 
   IconApple, 
   IconRun, 
@@ -13,7 +14,7 @@ import {
   IconMeat, 
   IconPill, 
   IconClipboardList 
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 
 export const PROTOCOL_ICON_MAP = {
   IconApple,
@@ -29,18 +30,32 @@ export const PROTOCOL_ICON_MAP = {
   IconClipboardList,
 };
 
+export const PROTOCOL_3D_MAP = {
+  IconApple: 'apple',
+  IconRun: 'running',
+  IconCoffee: 'coffee',
+  IconDroplet: 'glass',
+  IconBatteryCharging: 'battery',
+  IconFlag: 'flag',
+  IconBed: 'bed',
+  IconActivity: 'stopwatch',
+  IconMeat: 'meat',
+  IconPill: 'suplementacion',
+  IconClipboardList: 'target',
+};
+
 export const PROTOCOL_AVAILABLE_ICONS = {
-  IconApple: <IconApple size={16} />,
-  IconRun: <IconRun size={16} />,
-  IconCoffee: <IconCoffee size={16} />,
-  IconDroplet: <IconDroplet size={16} />,
-  IconBatteryCharging: <IconBatteryCharging size={16} />,
-  IconFlag: <IconFlag size={16} />,
-  IconBed: <IconBed size={16} />,
-  IconActivity: <IconActivity size={16} />,
-  IconMeat: <IconMeat size={16} />,
-  IconPill: <IconPill size={16} />,
-  IconClipboardList: <IconClipboardList size={16} />
+  IconApple: <Icon3D name="apple" size={22} />,
+  IconRun: <Icon3D name="running" size={22} />,
+  IconCoffee: <Icon3D name="coffee" size={22} />,
+  IconDroplet: <Icon3D name="glass" size={22} />,
+  IconBatteryCharging: <Icon3D name="battery" size={22} />,
+  IconFlag: <Icon3D name="flag" size={22} />,
+  IconBed: <Icon3D name="bed" size={22} />,
+  IconActivity: <Icon3D name="stopwatch" size={22} />,
+  IconMeat: <Icon3D name="meat" size={22} />,
+  IconPill: <Icon3D name="suplementacion" size={22} />,
+  IconClipboardList: <Icon3D name="target" size={22} />
 };
 
 export const PROTOCOL_ICON_OPTIONS = [
@@ -57,8 +72,12 @@ export const PROTOCOL_ICON_OPTIONS = [
   { value: 'IconClipboardList', label: 'Tareas / Checklist' },
 ];
 
-export default function ProtocolIcon({ iconName, size = 14, color, style = {} }) {
+export default function ProtocolIcon({ iconName, size = 20, color, style = {} }) {
   if (!iconName) return null;
+  const name3d = PROTOCOL_3D_MAP[iconName];
+  if (name3d) {
+    return <Icon3D name={name3d} size={size} style={{ flexShrink: 0, ...style }} />;
+  }
   const IconComponent = PROTOCOL_ICON_MAP[iconName];
   if (IconComponent) {
     return <IconComponent size={size} style={{ color: color || 'inherit', flexShrink: 0, ...style }} />;

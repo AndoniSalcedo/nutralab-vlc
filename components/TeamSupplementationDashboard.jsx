@@ -15,11 +15,10 @@ import {
   Stack,
   Table,
   Text,
-  ThemeIcon,
   Tooltip,
 } from '@mantine/core';
 import { TeamHeaderRightSection } from '@/components/TeamHeaderContext';
-import { IconBottle, IconHistory, IconUsers, IconPill, IconList } from '@tabler/icons-react';
+import { IconBottle, IconHistory, IconUsers, IconPill, IconList } from '@/components/icons3d';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import SupplementManagerModal from '@/components/modals/SupplementManagerModal';
@@ -63,7 +62,6 @@ export default function TeamSupplementationDashboard({
       <TeamHeaderRightSection>
         {!readOnly && (
           <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
-            {/* Móvil: botón pastilla (💊) compacto con menú desplegable */}
             <Box hiddenFrom="sm">
               <Menu shadow="md" width={200} position="bottom-end" withArrow radius="md">
                 <Menu.Target>
@@ -101,7 +99,6 @@ export default function TeamSupplementationDashboard({
               </Menu>
             </Box>
 
-            {/* Escritorio: Los 3 botones completos */}
             <Group visibleFrom="sm" gap="xs" wrap="nowrap">
               <Button
                 size="xs"
@@ -140,9 +137,9 @@ export default function TeamSupplementationDashboard({
 
       <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
 
-      <Paper radius="xl" p={0} bg="white" shadow="xs" withBorder style={{ overflow: 'hidden', borderColor: 'rgba(222,226,230,0.8)', width: '100%', minWidth: 0, maxWidth: '100%' }}>
-        <ScrollArea style={{ width: '100%', minWidth: 0 }}>
-          <Table verticalSpacing="sm" highlightOnHover w="100%" miw={{ base: '100%', sm: 600 }}>
+          <Paper radius="xl" p={0} bg="white" shadow="xs" withBorder style={{ overflow: 'hidden', borderColor: 'rgba(222,226,230,0.8)', width: '100%', minWidth: 0, maxWidth: '100%' }}>
+            <ScrollArea style={{ width: '100%', minWidth: 0 }}>
+              <Table verticalSpacing="sm" highlightOnHover w="100%" miw={{ base: '100%', sm: 600 }}>
             <Table.Thead bg="rgba(248, 249, 250, 0.95)">
               <Table.Tr>
                 <Table.Th style={{ paddingLeft: 16, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Jugador</Table.Th>
@@ -183,9 +180,7 @@ export default function TeamSupplementationDashboard({
                           <Group gap={6} align="center" wrap="wrap" hiddenFrom="sm" mt={3}>
                             {catalog ? (
                               <Group gap={4} align="center">
-                                <ThemeIcon size={16} radius="xl" color="grape" variant="light">
-                                  <IconBottle size={10} />
-                                </ThemeIcon>
+                                <IconBottle size={16} />
                                 <Text size="11px" fw={600} c="grape.8">{catalog.nombre}</Text>
                               </Group>
                             ) : (
@@ -207,9 +202,7 @@ export default function TeamSupplementationDashboard({
                     <Table.Td visibleFrom="sm">
                       {catalog ? (
                         <Group gap={6}>
-                          <ThemeIcon size="sm" radius="xl" color="grape" variant="light">
-                            <IconBottle size={12} />
-                          </ThemeIcon>
+                          <IconBottle size={16} />
                           <Text size="sm" fw={500}>{catalog.nombre}</Text>
                         </Group>
                       ) : (
@@ -260,9 +253,9 @@ export default function TeamSupplementationDashboard({
                 );
               })}
             </Table.Tbody>
-          </Table>
-        </ScrollArea>
-      </Paper>
+              </Table>
+            </ScrollArea>
+          </Paper>
 
       <SupplementManagerModal
         opened={!!managerModal}

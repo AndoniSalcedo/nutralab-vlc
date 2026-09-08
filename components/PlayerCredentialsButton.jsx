@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { slugify } from '@/lib/utils';
 import { Button, Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconKey, IconShieldCheck } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 
 import { updatePlayerCredentials } from '@/services/player';
 import PlayerCredentialsModal from '@/components/modals/PlayerCredentialsModal';
@@ -71,7 +71,7 @@ export default function PlayerCredentialsButton({ jugador, compact = false, menu
   return (
     <>
       {menuItem ? (
-        <Menu.Item leftSection={hasCredentials ? <IconShieldCheck size={14} /> : <IconKey size={14} />} onClick={openModal}>
+        <Menu.Item leftSection={<Icon3D name={hasCredentials ? "shield" : "key"} size={18} />} onClick={openModal}>
           {buttonLabel}
         </Menu.Item>
       ) : (
@@ -80,7 +80,7 @@ export default function PlayerCredentialsButton({ jugador, compact = false, menu
           radius="xl"
           variant={hasCredentials ? 'light' : 'filled'}
           color={hasCredentials ? 'gray' : 'yellow'}
-          leftSection={hasCredentials ? <IconShieldCheck size={14} /> : <IconKey size={14} />}
+          leftSection={<Icon3D name={hasCredentials ? "shield" : "key"} size={18} />}
           onClick={openModal}
         >
           {compact ? (hasCredentials ? 'Acceso' : 'Sin acceso') : buttonLabel}

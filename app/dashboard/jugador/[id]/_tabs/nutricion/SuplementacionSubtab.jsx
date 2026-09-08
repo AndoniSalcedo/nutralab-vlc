@@ -32,7 +32,7 @@ import {
   IconSparkles,
   IconTrash,
   IconChevronDown,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
 

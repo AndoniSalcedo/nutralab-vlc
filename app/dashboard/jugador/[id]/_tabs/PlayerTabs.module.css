@@ -23,18 +23,20 @@
 }
 
 .mobileTab {
-  padding: 6px 4px;
+  padding: 4px 2px;
   color: var(--mantine-color-gray-5);
-  transition: color 150ms ease, transform 150ms ease;
+  transition: color 150ms ease;
 
   &[data-active] {
     color: var(--mantine-color-dark-filled);
   }
 
+  &[data-active] span,
   &[data-active] svg {
-    transform: scale(1.1);
+    transform: scale(1.04);
   }
 
+  span,
   svg {
     transition: transform 150ms ease;
   }

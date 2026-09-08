@@ -32,7 +32,7 @@ import {
   IconEye,
   IconEyeOff,
   IconChevronDown,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';

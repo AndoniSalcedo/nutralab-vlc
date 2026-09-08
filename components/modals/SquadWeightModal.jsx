@@ -25,7 +25,7 @@ import {
   IconDownload,
   IconFileSpreadsheet,
   IconFileTypePdf,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import { savePesaje } from '@/services/pesaje';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';

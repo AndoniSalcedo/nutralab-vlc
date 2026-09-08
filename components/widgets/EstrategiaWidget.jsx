@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Group, Paper, Text, ThemeIcon, Timeline } from '@mantine/core';
+import Icon3D from '@/components/Icon3D';
 import {
   IconActivity,
   IconApple,
@@ -15,7 +16,7 @@ import {
   IconMeat,
   IconPill,
   IconRun,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 
 const AVAILABLE_ICONS = {
   IconApple,
@@ -72,9 +73,7 @@ export default function EstrategiaWidget({
     >
       <Group justify="space-between" align="center" mb="sm">
         <Group gap="xs" align="center">
-          <ThemeIcon color="nutralabColor" variant="light" size="sm" radius="md">
-            <IconClipboardList size={14} />
-          </ThemeIcon>
+          <Icon3D name="target" size={28} />
           <Text fw={700} fz="sm" c="dark.5">
             {activeProtocol ? `Estrategia: ${activeProtocol.name}` : 'Estrategia del día'}
           </Text>

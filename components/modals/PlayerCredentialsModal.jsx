@@ -9,7 +9,7 @@ import {
   Button,
   Alert
 } from '@mantine/core';
-import { IconShieldCheck, IconKey, IconRefresh, IconCheck } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 
 export default function PlayerCredentialsModal({
   opened,
@@ -33,9 +33,9 @@ export default function PlayerCredentialsModal({
       title={
         <Group gap="xs">
           {hasCredentials ? (
-            <IconShieldCheck size={20} style={{ color: 'var(--mantine-color-green-6)' }} />
+            <Icon3D name="shield" size={26} />
           ) : (
-            <IconKey size={20} style={{ color: 'var(--mantine-color-yellow-6)' }} />
+            <Icon3D name="key" size={26} />
           )}
           <Text fw={700}>{buttonLabel}</Text>
         </Group>
@@ -46,7 +46,7 @@ export default function PlayerCredentialsModal({
     >
       <Stack gap="md">
         {savedPassword && (
-          <Alert color="green" icon={<IconShieldCheck size={16} />} radius="md" title="Credenciales listas">
+          <Alert color="green" icon={<Icon3D name="shield" size={20} />} radius="md" title="Credenciales listas">
             <Stack gap={2}>
               <Text size="xs"><strong>Correo:</strong> {email}</Text>
               <Text size="xs"><strong>Contraseña:</strong> {savedPassword}</Text>
@@ -74,7 +74,7 @@ export default function PlayerCredentialsModal({
             radius="xl"
             variant="light"
             color="gray"
-            leftSection={<IconRefresh size={14} />}
+            leftSection={<Icon3D name="refresh" size={18} />}
             onClick={() => setPassword(generatePassword())}
           >
             Autogenerar
@@ -83,7 +83,7 @@ export default function PlayerCredentialsModal({
             <Button size="xs" radius="xl" variant="subtle" color="gray" onClick={onClose} disabled={saving}>
               Cerrar
             </Button>
-            <Button size="xs" radius="xl" leftSection={<IconCheck size={14} />} onClick={saveCredentials} loading={saving} disabled={!email.trim()}>
+            <Button size="xs" radius="xl" leftSection={<Icon3D name="check" size={18} />} onClick={saveCredentials} loading={saving} disabled={!email.trim()}>
               Guardar acceso
             </Button>
           </Group>

@@ -8,13 +8,12 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  ThemeIcon,
   Title,
 } from '@mantine/core';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 
-import { IconClipboardList } from '@tabler/icons-react';
+import { IconClipboardList } from '@/components/icons3d';
 
 import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/lib/metrics/anthropometry';
 import { CLINICAL_TAGS } from '@/config/clinical-tags';
@@ -250,13 +249,11 @@ export default function PerfilSubtab({
         {/* Desktop Header */}
         <Box visibleFrom="sm">
           <Group justify="space-between" align="center" wrap="wrap" gap="sm">
-            <Group gap="xs">
-              <ThemeIcon color={headerConfig.iconColor} variant="light" radius="xl" size="lg">
-                <HeaderIcon size={20} />
-              </ThemeIcon>
-              <Box>
-                <Title order={3} fw={700} c="dark.5">{headerConfig.title}</Title>
-                <Text size="sm" c="dimmed">
+            <Group gap="sm" align="center" wrap="nowrap">
+              <HeaderIcon size={28} />
+              <Box style={{ minWidth: 0 }}>
+                <Title order={3} fw={700} c="dark.5" fz={{ base: 16, sm: 18 }} lineClamp={1}>{headerConfig.title}</Title>
+                <Text size="sm" c="dimmed" lineClamp={1}>
                   {readOnly ? (headerConfig.subtitleReadOnly || headerConfig.subtitle) : headerConfig.subtitle}
                 </Text>
               </Box>
@@ -337,13 +334,11 @@ export default function PerfilSubtab({
              ========================================================================= */}
           {!readOnly && (
             <Paper p={{ base: 'md', sm: 'lg' }} bg="white" shadow="xs" radius="lg" withBorder>
-              <Group gap="xs" mb="md">
-                <ThemeIcon color="teal" variant="light" radius="xl" size="lg">
-                  <IconClipboardList size={20} />
-                </ThemeIcon>
-                <Box>
-                  <Title order={3} fw={700} c="dark.5">Preferencias y contexto</Title>
-                  <Text size="sm" c="dimmed">
+              <Group gap="sm" align="center" mb="md" wrap="nowrap">
+                <IconClipboardList size={28} />
+                <Box style={{ minWidth: 0 }}>
+                  <Title order={3} fw={700} c="dark.5" fz={{ base: 16, sm: 18 }} lineClamp={1}>Preferencias y contexto</Title>
+                  <Text size="sm" c="dimmed" lineClamp={1}>
                     Información que condiciona el plan nutricional.
                   </Text>
                 </Box>
@@ -352,8 +347,9 @@ export default function PerfilSubtab({
               <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
                 <ComidasEditable label="Comidas diarias" numComidas={jugador.num_comidas} postentreno={jugador.postentreno} preentreno={jugador.preentreno} jugadorId={jugador.id} recomendacionesDefecto={jugador.recomendaciones_defecto} readOnly={readOnly} />
                 <PrepartidoEditable label="Rutinas pre-partido" configPrepartido={jugador.config_prepartido} numComidas={jugador.num_comidas} postentreno={jugador.postentreno} jugadorId={jugador.id} readOnly={readOnly} />
-                <CampoEditable label="Objetivo nutricional" campo="objetivo" valor={jugador.objetivo || ''} jugadorId={jugador.id} tipo="select" opciones={PLAYER_OBJECTIVES} readOnly={readOnly} />
+                <CampoEditable icon3d="target" label="Objetivo nutricional" campo="objetivo" valor={jugador.objetivo || ''} jugadorId={jugador.id} tipo="select" opciones={PLAYER_OBJECTIVES} readOnly={readOnly} />
                 <CampoEditable
+                  icon3d="scale"
                   label="% Grasa Objetivo (Semáforo)"
                   campo="porcentaje_grasa_objetivo"
                   valor={jugador.porcentaje_grasa_objetivo !== null && jugador.porcentaje_grasa_objetivo !== undefined ? Number(jugador.porcentaje_grasa_objetivo) : 10}
@@ -366,9 +362,10 @@ export default function PerfilSubtab({
                   suffix=" %"
                   readOnly={readOnly}
                 />
-                <CampoEditable label="Gustos y preferencias" campo="gustos_preferencias" valor={jugador.gustos_preferencias || ''} jugadorId={jugador.id} readOnly={readOnly} />
-                <CampoEditable label="Aversiones" campo="aversiones" valor={jugador.aversiones || ''} jugadorId={jugador.id} readOnly={readOnly} />
+                <CampoEditable icon3d="apple" label="Gustos y preferencias" campo="gustos_preferencias" valor={jugador.gustos_preferencias || ''} jugadorId={jugador.id} readOnly={readOnly} />
+                <CampoEditable icon3d="warning" label="Aversiones" campo="aversiones" valor={jugador.aversiones || ''} jugadorId={jugador.id} readOnly={readOnly} />
                 <CampoEditable
+                  icon3d="shield"
                   label="Restricciones Clínicas / Alergias / Intolerancias"
                   campo="intolerancias"
                   valor={jugador.intolerancias || ''}
@@ -377,7 +374,7 @@ export default function PerfilSubtab({
                   opciones={CLINICAL_TAGS.map((t) => ({ value: t.value, label: t.label }))}
                   readOnly={readOnly}
                 />
-                <CampoEditable label="Contexto clínico / Notas médicas" campo="contexto_clinico" valor={jugador.contexto_clinico || ''} jugadorId={jugador.id} readOnly={readOnly} />
+                <CampoEditable icon3d="stethoscope" label="Contexto clínico / Notas médicas" campo="contexto_clinico" valor={jugador.contexto_clinico || ''} jugadorId={jugador.id} readOnly={readOnly} />
               </SimpleGrid>
             </Paper>
           )}

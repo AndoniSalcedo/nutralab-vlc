@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Group, Text } from '@mantine/core';
-import { IconPencil } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 import PlayerForm from '@/components/forms/PlayerForm';
 
 export default function PlayerEditModal({
@@ -16,7 +16,7 @@ export default function PlayerEditModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconPencil size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+          <Icon3D name="edit" size={26} />
           <Text fw={700}>{title}</Text>
         </Group>
       }

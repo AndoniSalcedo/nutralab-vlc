@@ -14,7 +14,7 @@ import {
   SegmentedControl,
   Badge,
 } from '@mantine/core';
-import { IconBrain, IconSparkles, IconTrophy } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 import { getUserMeals } from '@/config/nutrition-days';
 
 const MATCH_SCHEDULE_OPTIONS = [
@@ -67,7 +67,7 @@ export default function CreateNutritionPlanModal({
       fullScreen={isMobile}
       title={
         <Group gap="xs">
-          <IconBrain size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+          <Icon3D name="brain" size={26} />
           <Text fw={700}>Crear Ficha Nutricional</Text>
         </Group>
       }
@@ -148,7 +148,7 @@ export default function CreateNutritionPlanModal({
           <Paper p="sm" radius="md" withBorder bg="gray.0" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
             <Group justify="space-between" mb="xs">
               <Group gap="xs">
-                <IconTrophy size={18} style={{ color: 'var(--mantine-color-nutralabColor-8)' }} />
+                <Icon3D name="trophy" size={22} />
                 <Text size="sm" fw={700} c="dark.5">Comidas 24h Pre-Partido</Text>
               </Group>
               <Switch
@@ -232,7 +232,7 @@ export default function CreateNutritionPlanModal({
             Crear vacío (Manual)
           </Button>
           <Button
-            leftSection={<IconSparkles size={16} />}
+            leftSection={<Icon3D name="sparkles" size={20} />}
             onClick={generatePlanFromModal}
             disabled={!modalNombre.trim() || actionType === 'generate'}
             loading={actionType === 'generate'}

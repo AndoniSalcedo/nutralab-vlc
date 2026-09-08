@@ -16,7 +16,7 @@ import {
 import {
   IconFlame,
   IconToolsKitchen,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import NothingFound from '@/components/NothingFound';
 import { BentoCard } from '@/components/BentoItem';
 

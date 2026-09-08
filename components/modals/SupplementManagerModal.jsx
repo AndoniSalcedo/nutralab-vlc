@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Group, Text } from '@mantine/core';
-import { IconBottle } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 import SupplementCatalogManager from '@/components/SupplementCatalogManager';
 
 export default function SupplementManagerModal({
@@ -18,7 +18,7 @@ export default function SupplementManagerModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconBottle size={20} style={{ color: 'var(--mantine-color-grape-6)' }} />
+          <Icon3D name="suplementacion" size={26} />
           <Text fw={700}>Gestión de suplementación</Text>
         </Group>
       }

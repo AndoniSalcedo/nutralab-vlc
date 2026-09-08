@@ -9,10 +9,10 @@ import {
   Progress,
   Stack,
   Text,
-  ThemeIcon,
   UnstyledButton,
 } from '@mantine/core';
-import { IconCheck, IconPill } from '@tabler/icons-react';
+import { IconCheck } from '@/components/icons3d';
+import Icon3D from '@/components/Icon3D';
 
 const DEFAULT_SUPPLEMENTS = [
   { id: 'cafeina', name: 'Cafeína Anhidra', dose: '200 mg', timing: '45m pre-partido / sesión intensa' },
@@ -77,9 +77,7 @@ export default function SuplementacionWidget({
       {/* Cabecera del widget */}
       <Group justify="space-between" align="center" mb={6}>
         <Group gap="xs" align="center">
-          <ThemeIcon color="nutralabColor" variant="light" size="sm" radius="md">
-            <IconPill size={14} />
-          </ThemeIcon>
+          <Icon3D name="suplementacion" size={28} />
           <Text fw={700} fz="sm" c="dark.5">
             Suplementación diaria
           </Text>

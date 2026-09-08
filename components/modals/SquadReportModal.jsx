@@ -29,7 +29,7 @@ import {
   IconSettings,
   IconSparkles,
   IconTrophy,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 
 const MATCH_SCHEDULE_OPTIONS = [
   { label: 'Mañana', value: 'manana' },

@@ -32,7 +32,7 @@ import {
   IconCamera,
   IconCalculator,
   IconScale,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 
 import { savePlayerMeal } from '@/services/meal';
 import { compressFoodPhoto } from '@/lib/utils/compress';

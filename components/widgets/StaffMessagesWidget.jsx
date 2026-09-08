@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Box, Paper, Stack, Text, ThemeIcon } from '@mantine/core';
-import { IconMail } from '@tabler/icons-react';
+import { Box, Paper, Stack, Text } from '@mantine/core';
+import Icon3D from '@/components/Icon3D';
 
 export default function StaffMessagesWidget({
   jugadorId,
@@ -32,9 +32,7 @@ export default function StaffMessagesWidget({
       }}
     >
       <Stack align="center" justify="center" gap={4} w="100%" ta="center">
-        <ThemeIcon color={hasMessages ? 'pink' : 'nutralabColor'} variant="light" size={28} radius="md">
-          <IconMail size={16} />
-        </ThemeIcon>
+        <Icon3D name="chat" size={44} style={{ marginBottom: 2 }} />
 
         <Box>
           <Text fz={{ base: 14, sm: 18 }} fw={700} c="dark.5" lh={1.1}>

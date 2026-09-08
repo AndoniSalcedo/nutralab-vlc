@@ -16,7 +16,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { DatePickerInput } from '@mantine/dates';
 import { useMediaQuery, useDisclosure } from '@mantine/hooks';
-import { IconPlus, IconPhoto, IconCalendar, IconChevronDown } from '@tabler/icons-react';
+import { IconPlus, IconPhoto, IconCalendar, IconChevronDown } from '@/components/icons3d';
 
 import NothingFound from '@/components/NothingFound';
 import { deletePlayerMeal, listPlayerMeals } from '@/services/meal';

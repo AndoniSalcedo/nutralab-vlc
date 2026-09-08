@@ -6,13 +6,9 @@ import { env } from '@/config/env';
 import {
   IconChevronDown,
   IconLogout,
-  IconReceipt,
-  IconSettings,
   IconUserCog,
   IconUserStar,
-  IconBook,
-  IconUsersGroup,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import {
   Avatar,
   Container,
@@ -25,6 +21,7 @@ import cx from 'clsx';
 
 import classes from './DashboardShell.module.css';
 import Logo from './Logo';
+import Icon3D from '@/components/Icon3D';
 
 
 export default function DashboardShell({ children, user }) {
@@ -77,7 +74,7 @@ export default function DashboardShell({ children, user }) {
 
             <Menu.Dropdown>
               <Menu.Item
-                leftSection={<IconUsersGroup size={16} stroke={1.5} />}
+                leftSection={<Icon3D name="soccer" size={20} />}
                 onClick={() => {
                   router.push('/dashboard');
                   setOpened(false);
@@ -121,7 +118,7 @@ export default function DashboardShell({ children, user }) {
               {user?.role !== 'tecnico' && (
                 <>
                   <Menu.Item
-                    leftSection={<IconReceipt size={16} stroke={1.5} />}
+                    leftSection={<Icon3D name="apple" size={20} />}
                     component="a"
                     href={`${frontendUrl}/recipes`}
                     onClick={() => setOpened(false)}
@@ -130,7 +127,7 @@ export default function DashboardShell({ children, user }) {
                   </Menu.Item>
 
                   <Menu.Item
-                    leftSection={<IconBook size={16} stroke={1.5} />}
+                    leftSection={<Icon3D name="folder" size={20} />}
                     component="a"
                     href={`${frontendUrl}/catalogs`}
                     onClick={() => setOpened(false)}
@@ -143,7 +140,7 @@ export default function DashboardShell({ children, user }) {
               <Menu.Divider />
               {user?.role !== 'tecnico' && (
                 <Menu.Item
-                  leftSection={<IconSettings size={16} stroke={1.5} />}
+                  leftSection={<Icon3D name="configuracion" size={20} />}
                   component="a"
                   href={`${frontendUrl}/settings`}
                   onClick={() => setOpened(false)}

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Group, Paper, SimpleGrid, Stack, Text, Timeline, Select, Title, Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconPencil, IconCalendar, IconFlag, IconClipboardList, IconRotate } from '@tabler/icons-react';
+import { IconPencil, IconCalendar, IconFlag, IconClipboardList, IconRotate } from '@/components/icons3d';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import { EditableSection } from '../editable';

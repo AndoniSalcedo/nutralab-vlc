@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Group, Text } from '@mantine/core';
-import { IconMail } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 import MessageComposerForm from '@/components/forms/MessageComposerForm';
 
 export default function SendMessageModal({
@@ -18,7 +18,7 @@ export default function SendMessageModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconMail size={20} style={{ color: 'var(--mantine-color-blue-6)' }} />
+          <Icon3D name="chat" size={26} />
           <Text fw={700}>Enviar mensaje</Text>
         </Group>
       }

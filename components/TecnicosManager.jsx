@@ -30,7 +30,7 @@ import {
   IconUserCheck,
   IconUserPlus,
   IconUsersGroup,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import {
   createTecnico,
   deleteTecnico,

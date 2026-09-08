@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button, Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconLock } from '@tabler/icons-react';
+import Icon3D from '@/components/Icon3D';
 import { updatePlayerPassword } from '@/services/player';
 import PlayerPasswordModal from '@/components/modals/PlayerPasswordModal';
 
@@ -40,11 +40,11 @@ export default function PlayerPasswordButton({ compact = false, menuItem = false
   return (
     <>
       {menuItem ? (
-        <Menu.Item leftSection={<IconLock size={14} />} onClick={() => setOpened(true)}>
+        <Menu.Item leftSection={<Icon3D name="lock" size={18} />} onClick={() => setOpened(true)}>
           Cambiar contraseña
         </Menu.Item>
       ) : (
-        <Button size="xs" radius="xl" variant="light" color="gray" leftSection={<IconLock size={14} />} onClick={() => setOpened(true)}>
+        <Button size="xs" radius="xl" variant="light" color="gray" leftSection={<Icon3D name="lock" size={18} />} onClick={() => setOpened(true)}>
           {compact ? 'Clave' : 'Cambiar contraseña'}
         </Button>
       )}

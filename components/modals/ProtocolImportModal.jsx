@@ -18,7 +18,7 @@ import {
   Table
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconDownload, IconShield } from '@tabler/icons-react';
+import { IconDownload, IconShield } from '@/components/icons3d';
 import { getTeams } from '@/services/team';
 
 const EMPTY_DAY_TYPES = [];

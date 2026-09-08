@@ -29,7 +29,7 @@ import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPl
 import { getWeeklyMenus } from '@/services/menu';
 import { getPlayerSupplementation } from '@/services/supplement';
 import { resolvePlayerSupplementsData } from '@/lib/nutrition/supplementation';
-import { IconDownload, IconArrowsLeftRight, IconPlus, IconSparkles, IconEdit, IconCheck, IconTrash, IconChevronDown, IconBrain, IconPalette } from '@tabler/icons-react';
+import { IconDownload, IconArrowsLeftRight, IconPlus, IconSparkles, IconEdit, IconCheck, IconTrash, IconChevronDown, IconBrain, IconPalette } from '@/components/icons3d';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import { buildBasePlanData, sanitizePlanData, getDefaultCalendar, PLAN_THEME_PRESETS } from '@/lib/nutrition/plan-card';

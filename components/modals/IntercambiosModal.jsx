@@ -27,7 +27,7 @@ import {
   IconArrowsLeftRight,
   IconInfoCircle,
   IconRefresh,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import FoodCalculator from '@/components/FoodCalculator';
 
 const INTERCAMBIOS_DATA = {

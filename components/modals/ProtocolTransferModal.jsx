@@ -16,7 +16,7 @@ import {
   Box
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconFolderShare, IconArrowsExchange, IconClipboardList, IconShield } from '@tabler/icons-react';
+import { IconFolderShare, IconArrowsExchange, IconClipboardList, IconShield } from '@/components/icons3d';
 import { getTeams } from '@/services/team';
 import { NUTRITION_DAY_TYPES } from '@/lib/metrics/anthropometry';
 

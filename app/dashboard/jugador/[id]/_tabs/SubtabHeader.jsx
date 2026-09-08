@@ -1,4 +1,4 @@
-import { Group, ThemeIcon, Title, Text, Box } from '@mantine/core';
+import { Group, Title, Text, Box } from '@mantine/core';
 import { getSubtabHeader } from './subtab-config';
 
 /**
@@ -19,13 +19,11 @@ export default function SubtabHeader({ tab, subtab, readOnly = false }) {
     : config.subtitle;
 
   return (
-    <Group gap="xs">
-      <ThemeIcon color={config.iconColor} variant="light" radius="xl" size="lg">
-        <HeaderIcon size={20} />
-      </ThemeIcon>
-      <Box>
-        <Title order={3} fw={700} c="dark.5">{config.title}</Title>
-        <Text size="sm" c="dimmed">{subtitle}</Text>
+    <Group gap="sm" align="center" wrap="nowrap">
+      <HeaderIcon size={28} />
+      <Box style={{ minWidth: 0 }}>
+        <Title order={3} fw={700} c="dark.5" fz={{ base: 16, sm: 18 }} lineClamp={1}>{config.title}</Title>
+        <Text size="sm" c="dimmed" lineClamp={1}>{subtitle}</Text>
       </Box>
     </Group>
   );

@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { initials, filenameFromResponse } from '@/lib/utils';
-import { Button, Group, Paper, Stack, Text, ThemeIcon, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Modal, Divider } from '@mantine/core';
+import { Button, Group, Paper, Stack, Text, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Modal, Divider } from '@mantine/core';
 import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconChevronDown, IconDots, IconFileTypePdf, IconFlame, IconMail, IconSearch, IconTrash, IconUsers, IconUserPlus, IconPencil, IconSettings, IconPlus, IconFileSpreadsheet, IconScale, IconUserCheck, IconExchange } from '@tabler/icons-react';
+import { IconChevronDown, IconDots } from '@/components/icons3d';
+import Icon3D from '@/components/Icon3D';
 import NothingFound from '@/components/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import { calculateByObjective, getTeamNutritionDayTypes } from '@/lib/metrics/anthropometry';
@@ -625,41 +626,41 @@ export default function DashboardContent({ players = [], team, readOnly = false 
     <Menu.Dropdown>
       <Menu.Label>Mediciones y Reportes</Menu.Label>
       <Menu.Item
-        leftSection={<IconScale size={15} color="var(--mantine-color-orange-6)" />}
+        leftSection={<Icon3D name="scale" size={20} />}
         onClick={() => setActiveModal('weight')}
       >
         Registrar pesajes
       </Menu.Item>
       <Menu.Item
-        leftSection={<IconFileTypePdf size={15} color="var(--mantine-color-blue-6)" />}
+        leftSection={<Icon3D name="document" size={20} />}
         onClick={() => openReportModal()}
       >
-        Generar informe PDF
+        Generar informe
       </Menu.Item>
       <Menu.Divider />
       <Menu.Label>Plantilla y Datos</Menu.Label>
       <Menu.Item
-        leftSection={<IconFileSpreadsheet size={15} color="var(--mantine-color-teal-6)" />}
+        leftSection={<Icon3D name="outbox" size={20} />}
         onClick={() => setActiveModal('import')}
       >
-        Importar datos (Excel/CSV)
+        Importar datos
       </Menu.Item>
       <Menu.Item
-        leftSection={<IconExchange size={15} color="var(--mantine-color-violet-6)" />}
+        leftSection={<Icon3D name="refresh" size={20} />}
         onClick={() => setTransferModal({ opened: true, initialSelectedIds: [] })}
       >
-        Transferir o copiar jugadores
+        Transferir o copiar
       </Menu.Item>
       <Menu.Divider />
       <Menu.Label>Staff y Comunicación</Menu.Label>
       <Menu.Item
-        leftSection={<IconMail size={15} color="var(--mantine-color-blue-6)" />}
+        leftSection={<Icon3D name="chat" size={20} />}
         onClick={() => setActiveModal('message')}
       >
-        Enviar mensaje colectivo
+        Enviar mensaje
       </Menu.Item>
       <Menu.Item
-        leftSection={<IconUserCheck size={15} color="var(--mantine-color-cyan-6)" />}
+        leftSection={<Icon3D name="shield" size={20} />}
         onClick={() => setActiveModal('tecnicos')}
       >
         Cuerpo técnico
@@ -683,7 +684,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                 onClick={() => setActiveModal('new-player')}
                 aria-label="Nuevo jugador"
               >
-                <IconPlus size={18} />
+                <Icon3D name="plus" size={18} />
               </ActionIcon>
             </Tooltip>
 
@@ -693,7 +694,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
               size="xs"
               radius="xl"
               color="dark"
-              leftSection={<IconPlus size={14} />}
+              leftSection={<Icon3D name="plus" size={18} />}
               onClick={() => setActiveModal('new-player')}
             >
               Nuevo jugador
@@ -709,7 +710,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                     radius="xl"
                     aria-label="Acciones de equipo"
                   >
-                    <IconSettings size={18} />
+                    <Icon3D name="configuracion" size={20} />
                   </ActionIcon>
                 </Menu.Target>
                 {teamActionsDropdown}
@@ -724,7 +725,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                     variant="default"
                     size="xs"
                     radius="xl"
-                    leftSection={<IconSettings size={14} />}
+                    leftSection={<Icon3D name="configuracion" size={18} />}
                     rightSection={<IconChevronDown size={14} />}
                   >
                     Acciones de equipo
@@ -743,7 +744,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
           <Group gap={8} wrap="wrap" align="center" w="100%">
             <TextInput
               placeholder="Buscar jugador por nombre..."
-              leftSection={<IconSearch size={16} style={{ opacity: 0.6 }} />}
+              leftSection={<Icon3D name="search" size={18} />}
               variant="filled"
               radius="xl"
               size="sm"
@@ -756,7 +757,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
             />
             <Select
               placeholder="Filtrar por posición"
-              leftSection={<IconUsers size={16} style={{ opacity: 0.6 }} />}
+              leftSection={<Icon3D name="soccer" size={18} />}
               data={positionOptions || []}
               value={filters.position}
               onChange={(value) => setFilters((current) => ({ ...current, position: value || '' }))}
@@ -768,7 +769,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
             />
             <TextInput
               placeholder="Buscar por email..."
-              leftSection={<IconMail size={16} style={{ opacity: 0.6 }} />}
+              leftSection={<Icon3D name="envelope" size={18} />}
               variant="filled"
               radius="xl"
               size="sm"
@@ -828,9 +829,9 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                                 </Text>
                                 {!player.auth_user_id && (
                                   <Tooltip label="El usuario no tiene credenciales para entrar" withArrow>
-                                    <ThemeIcon color="yellow" variant="light" radius="xl" size="xs" style={{ flex: '0 0 auto' }}>
-                                      <IconAlertTriangle size={12} />
-                                    </ThemeIcon>
+                                    <Box component="span" style={{ display: 'inline-flex', verticalAlign: 'middle', flexShrink: 0 }}>
+                                      <Icon3D name="warning" size={16} />
+                                    </Box>
                                   </Tooltip>
                                 )}
                               </Group>
@@ -891,9 +892,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                         <Table.Td visibleFrom="sm">
                           {player.plan?.kcal ? (
                             <Group gap={8} wrap="nowrap" align="center">
-                              <ThemeIcon color="orange" variant="light" radius="xl" size={28}>
-                                <IconFlame size={15} color="var(--mantine-color-orange-6)" />
-                              </ThemeIcon>
+                              <Icon3D name="fire" size={24} />
                               <Box>
                                 <Text fz="sm" fw={600} c="dark.5" lh={1.1}>
                                   {player.plan.kcal} kcal
@@ -930,14 +929,14 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                                   </ActionIcon>
                                 </Menu.Target>
                                 <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
-                                  <Menu.Item leftSection={<IconPencil size={14} />} onClick={() => setEditingPlayer(player)}>
+                                  <Menu.Item leftSection={<Icon3D name="edit" size={18} />} onClick={() => setEditingPlayer(player)}>
                                     Editar
                                   </Menu.Item>
-                                  <Menu.Item leftSection={<IconFileTypePdf size={14} />} onClick={() => openReportModal(player)}>
+                                  <Menu.Item leftSection={<Icon3D name="memo" size={18} />} onClick={() => openReportModal(player)}>
                                     Generar informe
                                   </Menu.Item>
                                   <Menu.Divider />
-                                  <Menu.Item leftSection={<IconExchange size={14} />} onClick={() => setTransferModal({ opened: true, initialSelectedIds: [player.id] })}>
+                                  <Menu.Item leftSection={<Icon3D name="refresh" size={18} />} onClick={() => setTransferModal({ opened: true, initialSelectedIds: [player.id] })}>
                                     Transferir a otro equipo
                                   </Menu.Item>
                                   <PlayerCredentialsButton
@@ -946,7 +945,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                                     onSaved={(credentials) => updateCredentials(player.id, credentials)}
                                   />
                                   <Menu.Divider />
-                                  <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeletePlayer(player)}>
+                                  <Menu.Item color="red" leftSection={<Icon3D name="trash" size={18} />} onClick={() => handleDeletePlayer(player)}>
                                     Eliminar
                                   </Menu.Item>
                                 </Menu.Dropdown>
@@ -972,7 +971,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
           ) : (
             <NothingFound
               withPaper
-              icon={IconUserPlus}
+              icon3d="user"
               title={playersState.length ? 'Sin resultados' : 'Sin jugadores'}
               description={playersState.length ? 'No hay jugadores que coincidan con los filtros.' : 'Importa un Excel o añade un jugador manualmente para empezar.'}
             />

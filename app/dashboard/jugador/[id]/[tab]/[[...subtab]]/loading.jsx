@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { Paper, Stack, Box, Group, ThemeIcon, Title, Text } from '@mantine/core';
+import { Paper, Stack, Box, Group, Title, Text } from '@mantine/core';
 import { tabLabel } from '@/app/dashboard/jugador/[id]/_tabs/tab-label';
 import { getSubtabControlData, resolveSubtab, getSubtabHeader } from '@/app/dashboard/jugador/[id]/_tabs/subtab-config';
 import PlayerSubtabControl from '@/app/dashboard/jugador/[id]/_tabs/PlayerSubtabControl';
@@ -56,14 +56,12 @@ export default function PlayerSubtabLoading() {
           withBorder
           style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
         >
-          <Group justify="space-between" align="center" wrap="wrap" gap="sm">
-            <Group gap="xs">
-              <ThemeIcon color={header.iconColor} variant="light" radius="xl" size="lg">
-                <HeaderIcon size={20} />
-              </ThemeIcon>
-              <Box>
-                <Title order={3} fw={700} c="dark.5">{header.title}</Title>
-                <Text size="sm" c="dimmed">{header.subtitle}</Text>
+            <Group justify="space-between" align="center" wrap="wrap" gap="sm">
+              <Group gap="sm" align="center" wrap="nowrap">
+                <HeaderIcon size={28} />
+              <Box style={{ minWidth: 0 }}>
+                <Title order={3} fw={700} c="dark.5" fz={{ base: 16, sm: 18 }} lineClamp={1}>{header.title}</Title>
+                <Text size="sm" c="dimmed" lineClamp={1}>{header.subtitle}</Text>
               </Box>
             </Group>
           </Group>
