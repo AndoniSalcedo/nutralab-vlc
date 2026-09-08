@@ -172,9 +172,7 @@ export default function ProtocolImportModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <ThemeIcon color="blue" variant="light" radius="xl" size="md">
-            <IconDownload size={18} />
-          </ThemeIcon>
+          <IconDownload size={24} />
           <Text fw={700} size="md">Importar Protocolos de Otro Equipo</Text>
         </Group>
       }

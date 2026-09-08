@@ -130,7 +130,7 @@ export async function getPlayersByTeamSelect(supabase, teamId, selectFields = '*
 export async function getPlayersByTeamSelectSimple(supabase, teamId) {
   const { data, error } = await supabase
     .from('jugadores')
-    .select('id,nombre,apellidos,posicion')
+    .select('id,nombre,apellidos,posicion,avatar_size,updated_at')
     .eq('equipo_id', teamId)
     .order('nombre');
 

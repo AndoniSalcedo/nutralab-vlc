@@ -13,7 +13,6 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  ThemeIcon,
   Collapse,
 } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
@@ -23,19 +22,30 @@ import PlayerSupplementModal from '@/components/modals/PlayerSupplementModal';
 import { notifications } from '@mantine/notifications';
 import { getPlayerSupplementation, postPlayerSupplementation } from '@/services/supplement';
 import { updatePlayerField } from '@/services/player';
+import Icon3D from '@/components/Icon3D';
 import {
   IconAlertCircle,
   IconBottle,
-  IconCalendarStats,
   IconCirclePlus,
-  IconPill,
-  IconSparkles,
   IconTrash,
   IconChevronDown,
 } from '@/components/icons3d';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
 
+
+function getSupplementIcon(suplemento) {
+  if (suplemento?.icon) return suplemento.icon;
+  const name = (suplemento?.nombre || '').toLowerCase();
+  const cat = (suplemento?.categoria || '').toLowerCase();
+  if (cat.includes('recuper') || name.includes('prote')) return 'gym';
+  if (cat.includes('salud') || name.includes('omega') || name.includes('vitam')) return 'apple';
+  if (cat.includes('rendim') || name.includes('creatin') || name.includes('cafe')) return 'bolt';
+  if (cat.includes('descans') || name.includes('melaton')) return 'bed';
+  if (cat.includes('inmuno')) return 'shield';
+  if (cat.includes('articul') || name.includes('colagen')) return 'bone';
+  return 'pill';
+}
 
 function byId(items) {
   return new Map((items || []).map((item) => [Number(item.id), item]));
@@ -99,9 +109,7 @@ function SupplementCard({ item, peso, onDelete, readOnly }) {
         </Group>
 
         <Group gap="xs" align="center">
-          <ThemeIcon color={dose.needsWeight ? 'orange' : 'teal'} variant="light" radius="xl" size="md">
-            <IconPill size={16} />
-          </ThemeIcon>
+          <Icon3D name={getSupplementIcon(suplemento)} size={30} style={{ flexShrink: 0 }} />
           <Stack gap={0}>
             <Text size="lg" fw={700} c="dark.5">{dose.value}</Text>
             <Text size="xs" c="dimmed">{timing}</Text>
@@ -137,10 +145,8 @@ function AssignedProtocol({ items, peso, onDelete, canManage }) {
         </SimpleGrid>
       ) : (
         <Paper p="md" radius="md" withBorder bg="gray.0">
-          <Group gap="xs" align="flex-start" wrap="nowrap">
-            <ThemeIcon color="gray" variant="light" radius="xl">
-              <IconSparkles size={18} />
-            </ThemeIcon>
+          <Group gap="sm" align="flex-start" wrap="nowrap">
+            <Icon3D name="sparkles" size={24} style={{ flexShrink: 0 }} />
             <Stack gap={2}>
               <Text fw={600} c="dark.5">Sin suplementos asignados</Text>
               <Text size="sm" c="dimmed">
@@ -407,9 +413,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
               <SimpleGrid cols={{ base: 1, sm: 3 }} spacing={6}>
                 <Paper py={6} px="xs" radius="md" bg="gray.0" withBorder>
                   <Group gap="xs" wrap="nowrap">
-                    <ThemeIcon color="nutralabColor" variant="light" radius="xl" size="sm">
-                      <IconCalendarStats size={14} />
-                    </ThemeIcon>
+                    <Icon3D name="card_file_box" size={20} style={{ flexShrink: 0 }} />
                     <Group gap={4} wrap="nowrap" style={{ minWidth: 0 }}>
                       <Text size="xs" c="dimmed" fw={600}>Catálogo</Text>
                       <Text size="sm" fw={700} c="dark.5" truncate>{activeList ? activeList.nombre : 'Sin asignar'}</Text>
@@ -420,9 +424,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
 
                 <Paper py={6} px="xs" radius="md" bg="gray.0" withBorder>
                   <Group gap="xs" wrap="nowrap">
-                    <ThemeIcon color="grape" variant="light" radius="xl" size="sm">
-                      <IconCirclePlus size={14} />
-                    </ThemeIcon>
+                    <Icon3D name="plus" size={20} style={{ flexShrink: 0 }} />
                     <Group gap={4} wrap="nowrap">
                       <Text size="xs" c="dimmed" fw={600}>Extras</Text>
                       <Text size="sm" fw={700} c="dark.5">{data.extras.length}</Text>
@@ -432,9 +434,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
 
                 <Paper py={6} px="xs" radius="md" bg="gray.0" withBorder>
                   <Group gap="xs" wrap="nowrap">
-                    <ThemeIcon color={peso ? 'teal' : 'orange'} variant="light" radius="xl" size="sm">
-                      <IconPill size={14} />
-                    </ThemeIcon>
+                    <Icon3D name="scale" size={20} style={{ flexShrink: 0 }} />
                     <Group gap={4} wrap="nowrap">
                       <Text size="xs" c="dimmed" fw={600}>Peso</Text>
                       <Text size="sm" fw={700} c="dark.5">{peso ? `${peso} kg` : 'Pendiente'}</Text>

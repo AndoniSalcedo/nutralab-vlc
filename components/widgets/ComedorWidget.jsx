@@ -2,8 +2,8 @@
 
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Group, Paper, Stack, Text, ThemeIcon } from '@mantine/core';
-import { IconClock, IconToolsKitchen } from '@/components/icons3d';
+import { Box, Group, Paper, Stack, Text } from '@mantine/core';
+import { IconClock } from '@/components/icons3d';
 import Icon3D from '@/components/Icon3D';
 
 export default function ComedorWidget({
@@ -55,7 +55,7 @@ export default function ComedorWidget({
       {/* Cabecera con fondo blanco y acento naranja */}
       <Group justify="space-between" align="center" mb="sm">
         <Group gap="xs" align="center">
-          <Icon3D name="cup" size={28} />
+          <Icon3D name="fork_and_knife" size={28} />
           <Text fw={700} fz="sm" c="dark.5">
             Comedor Ciudad Deportiva
           </Text>
@@ -150,9 +150,9 @@ export default function ComedorWidget({
           my="xs"
           style={{ borderColor: 'var(--mantine-color-gray-2)' }}
         >
-          <ThemeIcon color="nutralabColor" variant="light" size={32} radius="md" mx="auto" mb={6}>
-            <IconToolsKitchen size={18} />
-          </ThemeIcon>
+          <Box mx="auto" mb={6}>
+            <Icon3D name="fork_and_knife" size={32} />
+          </Box>
           <Text fz="xs" fw={700} c="dark.5">
             {!hasMenus ? 'Sin servicio de comedor' : 'Sin menú registrado para hoy'}
           </Text>

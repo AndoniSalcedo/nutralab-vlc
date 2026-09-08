@@ -119,7 +119,8 @@ export default function ImageCropModal({
             position: 'relative',
             width: '100%',
             height: 320,
-            background: '#141517',
+            background: '#f8f9fa',
+            border: '1px solid var(--mantine-color-gray-3)',
             borderRadius: 8,
             overflow: 'hidden',
           }}

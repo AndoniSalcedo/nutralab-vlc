@@ -187,9 +187,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
     <Paper p="md" radius="lg" shadow="sm" withBorder bg="white">
       <Group justify="space-between" align="center" wrap="wrap" gap="md" mb="lg">
         <Group gap="sm">
-          <ThemeIcon size="md" radius="xl" variant="light" color="nutralabColor">
-            <IconUserCheck size={18} />
-          </ThemeIcon>
+          <IconUserCheck size={28} style={{ flexShrink: 0 }} />
           <Box>
             <Title order={3} size="h4" fw={700} c="dark.5">
               Cuerpo Técnico del Equipo

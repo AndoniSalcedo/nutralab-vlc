@@ -351,15 +351,22 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                     <Group gap="sm" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
                       <Avatar
                         src={team.foto_size ? `/api/teams/avatar?id=${team.id}&t=${team.updated_at || ''}` : undefined}
-                        size={46}
+                        size={48}
                         radius="md"
                         color="nutralabColor"
                         style={{
                           border: '1.5px solid rgba(222, 226, 230, 0.7)',
                           fontWeight: 600,
-                          backgroundColor: 'var(--mantine-color-nutralabColor-0)',
+                          backgroundColor: '#ffffff',
                           color: 'var(--mantine-color-nutralabColor-9)',
                           flexShrink: 0,
+                        }}
+                        imageProps={{
+                          style: {
+                            objectFit: 'contain',
+                            backgroundColor: '#ffffff',
+                            padding: '2px',
+                          },
                         }}
                       >
                         {initials(team.nombre)}
@@ -407,7 +414,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                           <Menu.Item leftSection={<Icon3D name="evolucion" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/evolucion`)}>
                             Evolución equipo
                           </Menu.Item>
-                          <Menu.Item leftSection={<Icon3D name="analiticas" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/analiticas`)}>
+                          <Menu.Item leftSection={<Icon3D name="stethoscope" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/analiticas`)}>
                             Analíticas equipo
                           </Menu.Item>
                           <Menu.Item leftSection={<Icon3D name="suplementacion" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/suplementacion`)}>

@@ -33,7 +33,7 @@ export default function PlayerSupplementModal({
       title={
         <Group gap="xs">
           {modalMode === 'lista' ? (
-            <Icon3D name="suplementacion" size={26} />
+            <Icon3D name="card_file_box" size={26} />
           ) : (
             <Icon3D name="pill" size={26} />
           )}

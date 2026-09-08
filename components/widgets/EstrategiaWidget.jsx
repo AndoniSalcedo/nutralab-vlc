@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Group, Paper, Text, ThemeIcon, Timeline } from '@mantine/core';
+import { Box, Group, Paper, Text, Timeline } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import {
   IconActivity,
@@ -113,9 +113,9 @@ export default function EstrategiaWidget({
         </Timeline>
       ) : (
         <Paper p="md" radius="md" bg="gray.0" withBorder mt="xs" ta="center">
-          <ThemeIcon color="nutralabColor" variant="light" size={30} radius="md" mx="auto" mb={6}>
-            <IconClipboardList size={16} />
-          </ThemeIcon>
+          <Box mx="auto" mb={6}>
+            <IconClipboardList size={32} />
+          </Box>
           <Text fz="xs" fw={700} c="dark.5">
             Sin protocolo para {activeDayLabel}
           </Text>

@@ -13,8 +13,12 @@ export function BentoCard({ title, icon: Icon, icon3d, color = 'blue', children,
       {...props}
     >
       <Group mb={{ base: 'sm', sm: 'md' }} gap="xs">
-        {USE_3D_ICONS && icon3d ? (
-          <Icon3D name={icon3d} size={28} />
+        {USE_3D_ICONS ? (
+          icon3d ? (
+            <Icon3D name={icon3d} size={28} style={{ flexShrink: 0 }} />
+          ) : Icon ? (
+            <Icon size={28} style={{ flexShrink: 0 }} />
+          ) : null
         ) : Icon || icon3d ? (
           <ThemeIcon color={color} variant="light" radius="md" size="md">
             {Icon ? <Icon size={16} stroke={1.5} /> : <Icon3D name={icon3d} size={16} />}

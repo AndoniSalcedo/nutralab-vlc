@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import { initials, filenameFromResponse } from '@/lib/utils';
+import { initials, filenameFromResponse, getPlayerAvatarUrl } from '@/lib/utils';
 import { Button, Group, Paper, Stack, Text, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Modal, Divider } from '@mantine/core';
 import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
@@ -813,7 +813,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                         <Table.Td style={{ paddingLeft: 16 }}>
                           <Group gap="sm" wrap="nowrap">
                             <Avatar
-                              src={player.avatar_url || (player.avatar_size ? `/api/players/avatar?id=${player.id}` : undefined)}
+                              src={getPlayerAvatarUrl(player)}
                               size={42}
                               radius="xl"
                               color="initials"

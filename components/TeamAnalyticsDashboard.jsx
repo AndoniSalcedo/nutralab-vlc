@@ -46,7 +46,7 @@ import {
   IconChartLine,
 } from '@/components/icons3d';
 import NothingFound from '@/components/NothingFound';
-import { initials } from '@/lib/utils';
+import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 
 function formatDate(dateStr) {
   if (!dateStr) return 'Sin fecha';
@@ -717,7 +717,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
                         <Table.Td style={{ paddingLeft: 16 }}>
                           <Group gap="xs" wrap="nowrap">
                             <Avatar
-                              src={player.avatar_url || (player.avatar_size ? `/api/players/avatar?id=${player.id}` : undefined)}
+                              src={getPlayerAvatarUrl(player)}
                               size={36}
                               radius="xl"
                               color="initials"

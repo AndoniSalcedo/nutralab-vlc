@@ -9,10 +9,10 @@ import {
   Tooltip,
   Box,
   Select,
-  Text,
+  Menu,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX } from '@/components/icons3d';
+import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX, IconDots } from '@/components/icons3d';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import MenuSemanal, { formatWeek, WEEKDAY_ORDER } from '@/components/MenuSemanal';
 import { uploadWeeklyMenu, deleteWeeklyMenu, updateWeeklyMenu } from '@/services/menu';
@@ -249,73 +249,125 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
 
   return (
     <BoneyardSkeleton name="team-menu" loading={false}>
-      {/* 1. CONTROLES Y ACCIONES INTEGRADOS EN LA CABECERA */}
+      {/* 1. CONTROLES Y ACCIONES INTEGRADOS EN LA CABECERA (ESTILO SUPLEMENTACIÓN) */}
       <TeamHeaderRightSection>
-        <Group align="center" gap="xs">
-          {isEditing ? (
-            <Group gap="xs">
-              <Button
-                color="green"
-                radius="xl"
-                size="sm"
-                onClick={handleSaveMenu}
-                loading={saving}
-                leftSection={<IconCheck size={16} />}
-              >
-                Guardar
-              </Button>
-              <Button
-                variant="light"
-                color="gray"
-                radius="xl"
-                size="sm"
-                onClick={handleCancelEdit}
-                disabled={saving}
-                leftSection={<IconX size={16} />}
-              >
-                Cancelar
-              </Button>
-            </Group>
-          ) : (
-            /* Micro-segmented Pill Switcher (sin nombre, solo iconos a la altura del nombre del equipo) */
-            <Group gap={4} p={3} bg="gray.1" style={{ borderRadius: 'var(--mantine-radius-xl)', border: '1px solid var(--mantine-color-gray-2)' }}>
-              <Tooltip label="Día a Día (Vista diaria)" withArrow>
-                <ActionIcon
-                  onClick={() => setViewMode('diaria')}
-                  variant={viewMode === 'diaria' ? 'filled' : 'transparent'}
-                  color={viewMode === 'diaria' ? 'dark' : 'gray'}
-                  radius="xl"
-                  size="md"
-                  style={{ width: 32, height: 32 }}
-                  aria-label="Vista diaria"
-                >
-                  <IconCalendar size={16} />
-                </ActionIcon>
-              </Tooltip>
+        {isEditing ? (
+          <Group gap="xs" wrap="nowrap">
+            <Button
+              color="green"
+              radius="xl"
+              size="xs"
+              onClick={handleSaveMenu}
+              loading={saving}
+              leftSection={<IconCheck size={14} />}
+            >
+              Guardar
+            </Button>
+            <Button
+              variant="light"
+              color="gray"
+              radius="xl"
+              size="xs"
+              onClick={handleCancelEdit}
+              disabled={saving}
+              leftSection={<IconX size={14} />}
+            >
+              Cancelar
+            </Button>
+          </Group>
+        ) : (
+          !readOnly && (
+            <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
+              {/* Móvil: Menú desplegable compacto idéntico a Suplementación */}
+              <Box hiddenFrom="sm">
+                <Menu shadow="md" width={200} position="bottom-end" withArrow radius="md">
+                  <Menu.Target>
+                    <ActionIcon
+                      size={36}
+                      radius="xl"
+                      variant="light"
+                      color="nutralabColor"
+                      aria-label="Gestión de menú semanal"
+                    >
+                      <IconDots size={18} />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Label>Gestión de menú semanal</Menu.Label>
+                    <Menu.Item
+                      leftSection={<IconPlus size={16} color="var(--mantine-color-nutralabColor-8)" />}
+                      onClick={() => setCreateModalOpen(true)}
+                    >
+                      Nuevo menú
+                    </Menu.Item>
+                    {selectedMenu && (
+                      <>
+                        <Menu.Item
+                          leftSection={<IconEdit size={16} color="var(--mantine-color-teal-6)" />}
+                          onClick={handleStartEdit}
+                        >
+                          Editar menú
+                        </Menu.Item>
+                        <Menu.Item
+                          color="red"
+                          leftSection={<IconTrash size={16} />}
+                          onClick={() => handleDeleteMenu(selectedMenu.id)}
+                        >
+                          Eliminar menú
+                        </Menu.Item>
+                      </>
+                    )}
+                  </Menu.Dropdown>
+                </Menu>
+              </Box>
 
-              <Tooltip label="Semana completa (Vista general)" withArrow>
-                <ActionIcon
-                  onClick={() => setViewMode('semanal')}
-                  variant={viewMode === 'semanal' ? 'filled' : 'transparent'}
-                  color={viewMode === 'semanal' ? 'dark' : 'gray'}
+              {/* Escritorio: Botones visibles en cabecera */}
+              <Group visibleFrom="sm" gap="xs" wrap="nowrap">
+                <Button
+                  size="xs"
                   radius="xl"
-                  size="md"
-                  style={{ width: 32, height: 32 }}
-                  aria-label="Vista semanal"
+                  color="nutralabColor.8"
+                  onClick={() => setCreateModalOpen(true)}
+                  leftSection={<IconPlus size={14} />}
                 >
-                  <IconList size={16} />
-                </ActionIcon>
-              </Tooltip>
+                  Nuevo menú
+                </Button>
+                {selectedMenu && (
+                  <>
+                    <Button
+                      size="xs"
+                      radius="xl"
+                      variant="light"
+                      color="teal"
+                      onClick={handleStartEdit}
+                      leftSection={<IconEdit size={14} />}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      size="xs"
+                      radius="xl"
+                      variant="light"
+                      color="red"
+                      onClick={() => handleDeleteMenu(selectedMenu.id)}
+                      loading={deleting}
+                      leftSection={<IconTrash size={14} />}
+                    >
+                      Eliminar
+                    </Button>
+                  </>
+                )}
+              </Group>
             </Group>
-          )}
-        </Group>
+          )
+        )}
       </TeamHeaderRightSection>
 
-      {/* 2. SELECTOR DE SEMANA Y ACCIONES DE MENÚ INTEGRADOS EN LA CABECERA */}
+      {/* 2. SELECTOR DE SEMANA Y CONMUTADOR DÍA/SEMANA EN FILTROS */}
       <TeamHeaderFilters>
         {!isEditing && (
           <Box w="100%" style={{ minWidth: 0 }}>
-            <Group gap={8} w="100%" wrap="wrap" align="center">
+            <Group justify="space-between" align="center" w="100%" wrap="wrap" gap="sm">
               <Select
                 placeholder="Selecciona una semana"
                 leftSection={<IconCalendar size={16} style={{ opacity: 0.7 }} />}
@@ -330,64 +382,48 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
                 radius="xl"
                 size="sm"
                 allowDeselect={false}
-                style={{ flex: '1 1 200px', minWidth: 0 }}
+                style={{ flex: '1 1 220px', maxWidth: 320, minWidth: 180 }}
               />
 
-              {!readOnly && (
-                <Group gap={6} wrap="nowrap" w={{ base: '100%', sm: 'auto' }} style={{ flex: '1 1 auto', minWidth: 0 }}>
-                  <Button
-                    color="nutralabColor.8"
+              {/* Conmutador de vista día / semana */}
+              <Group
+                gap={4}
+                p={3}
+                bg="gray.1"
+                style={{
+                  borderRadius: 'var(--mantine-radius-xl)',
+                  border: '1px solid var(--mantine-color-gray-2)',
+                  flexShrink: 0,
+                }}
+              >
+                <Tooltip label="Día a Día (Vista diaria)" withArrow>
+                  <ActionIcon
+                    onClick={() => setViewMode('diaria')}
+                    variant={viewMode === 'diaria' ? 'filled' : 'transparent'}
+                    color={viewMode === 'diaria' ? 'dark' : 'gray'}
                     radius="xl"
-                    size="sm"
-                    onClick={() => setCreateModalOpen(true)}
-                    leftSection={<IconPlus size={15} />}
-                    style={{ flex: 1, minWidth: 0 }}
-                    px={{ base: 6, sm: 12 }}
+                    size="md"
+                    style={{ width: 32, height: 32 }}
+                    aria-label="Vista diaria"
                   >
-                    <Text span truncate fz="xs" fw={600}>
-                      <Text span hiddenFrom="xs">Crear</Text>
-                      <Text span visibleFrom="xs">Nuevo Menú</Text>
-                    </Text>
-                  </Button>
+                    <IconCalendar size={16} />
+                  </ActionIcon>
+                </Tooltip>
 
-                  {selectedMenu && (
-                    <>
-                      <Button
-                        variant="light"
-                        color="teal"
-                        radius="xl"
-                        size="sm"
-                        onClick={handleStartEdit}
-                        leftSection={<IconEdit size={15} />}
-                        style={{ flex: 1, minWidth: 0 }}
-                        px={{ base: 6, sm: 12 }}
-                      >
-                        <Text span truncate fz="xs" fw={600}>
-                          <Text span hiddenFrom="xs">Editar</Text>
-                          <Text span visibleFrom="xs">Editar Menú</Text>
-                        </Text>
-                      </Button>
-
-                      <Button
-                        variant="light"
-                        color="red"
-                        radius="xl"
-                        size="sm"
-                        onClick={() => handleDeleteMenu(selectedMenu.id)}
-                        loading={deleting}
-                        leftSection={<IconTrash size={15} />}
-                        style={{ flex: 1, minWidth: 0 }}
-                        px={{ base: 6, sm: 12 }}
-                      >
-                        <Text span truncate fz="xs" fw={600}>
-                          <Text span hiddenFrom="xs">Eliminar</Text>
-                          <Text span visibleFrom="xs">Eliminar Menú</Text>
-                        </Text>
-                      </Button>
-                    </>
-                  )}
-                </Group>
-              )}
+                <Tooltip label="Semana completa (Vista general)" withArrow>
+                  <ActionIcon
+                    onClick={() => setViewMode('semanal')}
+                    variant={viewMode === 'semanal' ? 'filled' : 'transparent'}
+                    color={viewMode === 'semanal' ? 'dark' : 'gray'}
+                    radius="xl"
+                    size="md"
+                    style={{ width: 32, height: 32 }}
+                    aria-label="Vista semanal"
+                  >
+                    <IconList size={16} />
+                  </ActionIcon>
+                </Tooltip>
+              </Group>
             </Group>
           </Box>
         )}

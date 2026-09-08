@@ -148,9 +148,7 @@ export default function ProtocolTransferModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <ThemeIcon color="blue" variant="light" radius="xl" size="md">
-            <IconFolderShare size={18} />
-          </ThemeIcon>
+          <IconFolderShare size={24} />
           <Text fw={700} size="md">Copiar / Mover Protocolo a Otro Equipo</Text>
         </Group>
       }

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export default function BoneyardTeamAnalytics() {
   return (
-    <Stack gap="lg">
+    <Stack>
       <TeamHeaderTabs team={mockTeam} />
       <TeamAnalyticsDashboard
         players={mockPlayers}

@@ -4,7 +4,7 @@ import { getAccessibleTeam } from '@/lib/auth/team-access';
 import NothingFound from '@/components/NothingFound';
 import TeamHeaderTabs from '@/components/TeamHeaderTabs';
 import { TeamHeaderSlotProvider } from '@/components/TeamHeaderContext';
-import { Stack } from '@mantine/core';
+import { Box, Stack } from '@mantine/core';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -29,10 +29,12 @@ export default async function TeamDashboardLayout({ children, params }) {
 
   return (
     <TeamHeaderSlotProvider>
-      <Stack gap={{ base: 'sm', sm: 'lg' }} style={{ width: '100%', minWidth: 0, maxWidth: '100%' }} pb={{ base: 76, sm: 0 }} px={{ base: 6, sm: 0 }}>
+      <Stack gap={0} style={{ width: '100%', minWidth: 0, maxWidth: '100%' }} pb={{ base: 76, sm: 0 }} px={{ base: 6, sm: 0 }}>
         <TeamHeaderTabs team={team} readOnly={user?.role === 'tecnico'} />
-        {children}
+        <Box mt="md" >
+          {children}
+        </Box>
       </Stack>
-    </TeamHeaderSlotProvider>
+    </TeamHeaderSlotProvider >
   );
 }

@@ -19,8 +19,7 @@ import {
   TextInput,
   Title,
   Collapse,
-  ActionIcon,
-  Menu,
+  ActionIcon
 } from '@mantine/core';
 import CreateNutritionPlanModal from '@/components/modals/CreateNutritionPlanModal';
 import { useMediaQuery, useDisclosure } from '@mantine/hooks';
@@ -29,10 +28,10 @@ import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPl
 import { getWeeklyMenus } from '@/services/menu';
 import { getPlayerSupplementation } from '@/services/supplement';
 import { resolvePlayerSupplementsData } from '@/lib/nutrition/supplementation';
-import { IconDownload, IconArrowsLeftRight, IconPlus, IconSparkles, IconEdit, IconCheck, IconTrash, IconChevronDown, IconBrain, IconPalette } from '@/components/icons3d';
+import { IconDownload, IconArrowsLeftRight, IconPlus, IconSparkles, IconEdit, IconCheck, IconTrash, IconChevronDown, IconBrain } from '@/components/icons3d';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
-import { buildBasePlanData, sanitizePlanData, getDefaultCalendar, PLAN_THEME_PRESETS } from '@/lib/nutrition/plan-card';
+import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/nutrition/plan-card';
 import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getTeamNutritionDayTypes } from '@/lib/metrics/anthropometry';
 import { getUserMeals } from '@/config/nutrition-days';
 import IntercambiosModal from '@/components/modals/IntercambiosModal';
@@ -171,11 +170,11 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
 
         <Stack gap={5}>
           {dayData.ingestas.map((meal, mealIndex) => (
-            <Box 
-              key={mealIndex} 
-              p={8} 
-              style={{ 
-                backgroundColor: colors.itemBg, 
+            <Box
+              key={mealIndex}
+              p={8}
+              style={{
+                backgroundColor: colors.itemBg,
                 borderRadius: '6px',
                 transition: 'background-color 0.2s ease'
               }}
@@ -231,9 +230,9 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
                       <Group justify="space-between" align="flex-start" wrap="nowrap">
                         <Text size="xs" fw={700} style={{ color: colors.cardBodyText }}>{supp.nombre}</Text>
                         {supp.dosis && (
-                          <Text size="xs" fw={600} style={{ 
-                            color: colors.accentText, 
-                            borderRadius: '4px', 
+                          <Text size="xs" fw={600} style={{
+                            color: colors.accentText,
+                            borderRadius: '4px',
                             padding: '1px 6px',
                             backgroundColor: 'rgba(255,255,255,0.06)',
                             letterSpacing: '0.2px'
@@ -271,7 +270,7 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
                         {prot.name || 'Protocolo de Partido'}
                       </Title>
                     </Group>
-                    
+
                     {prot.timeline?.length > 0 && (
                       <Stack gap={5} mb={prot.checklist?.length > 0 ? 'xs' : 0}>
                         {prot.timeline.map((step, sIdx) => (
@@ -284,9 +283,9 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
                                 </Text>
                               </Group>
                               {step.timeLabel && (
-                                <Text size="xs" fw={600} style={{ 
-                                  color: colors.accentText, 
-                                  borderRadius: '4px', 
+                                <Text size="xs" fw={600} style={{
+                                  color: colors.accentText,
+                                  borderRadius: '4px',
                                   padding: '1px 6px',
                                   backgroundColor: 'rgba(255,255,255,0.06)',
                                   whiteSpace: 'nowrap'
@@ -549,108 +548,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     return marked(currentPlan.contenido);
   }, [currentPlan, currentDatos, mode]);
 
-  const handleSelectTheme = async (presetColors, presetName) => {
-    setThemeOverride(presetColors);
-    if (mode === 'edit') {
-      updateDatos((draft) => {
-        if (!draft.meta) draft.meta = {};
-        draft.meta.planColors = presetColors;
-      });
-    } else if (currentPlan && !readOnly) {
-      try {
-        const updatedDatos = {
-          ...currentDatos,
-          meta: {
-            ...currentDatos?.meta,
-            planColors: presetColors,
-          },
-        };
-        await updateAiPlan(currentPlan.id, { datos: updatedDatos });
-        setPlanes((prev) =>
-          prev.map((p) => (p.id === currentPlan.id ? { ...p, datos: updatedDatos } : p))
-        );
-        notifications.show({
-          color: 'green',
-          title: 'Tema del plan actualizado',
-          message: presetColors ? `Se aplicó el tema ${presetName || ''} a este plan.` : 'Se restableció el tema por defecto del equipo.',
-        });
-      } catch (err) {
-        notifications.show({
-          color: 'red',
-          title: 'Error al actualizar el tema',
-          message: err.message,
-        });
-      }
-    }
-  };
-
-  const renderThemeMenu = (fullWidth = false) => {
-    if (!currentDatos && !datos) return null;
-    const activeData = currentDatos || datos;
-    const currentActiveColors = themeOverride || activeData?.meta?.planColors || activeData?.planColors;
-
-    return (
-      <Menu position="bottom-end" shadow="md" width={240} radius="md">
-        <Menu.Target>
-          <Button
-            size="xs"
-            radius="xl"
-            variant="light"
-            color="gray"
-            leftSection={<IconPalette size={16} />}
-            fullWidth={fullWidth}
-          >
-            Tema
-          </Button>
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Label>Temas del Plan Nutricional</Menu.Label>
-          {PLAN_THEME_PRESETS.map((preset) => {
-            const isSelected = currentActiveColors?.cardBodyBg === preset.colors.cardBodyBg &&
-                               currentActiveColors?.cardTopBg === preset.colors.cardTopBg &&
-                               currentActiveColors?.boxBg === preset.colors.boxBg;
-            return (
-              <Menu.Item
-                key={preset.id}
-                onClick={() => handleSelectTheme(preset.colors, preset.name)}
-                leftSection={
-                  <Group gap={3}>
-                    {preset.swatches.map((s, idx) => (
-                      <Box
-                        key={idx}
-                        style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: '50%',
-                          backgroundColor: s,
-                          border: '1px solid rgba(0,0,0,0.15)',
-                        }}
-                      />
-                    ))}
-                  </Group>
-                }
-                rightSection={isSelected ? <IconCheck size={14} color="var(--mantine-color-teal-6)" /> : null}
-              >
-                <Text size="xs" fw={isSelected ? 700 : 500}>
-                  {preset.name}
-                </Text>
-              </Menu.Item>
-            );
-          })}
-          <Menu.Divider />
-          <Menu.Item
-            onClick={() => handleSelectTheme(null)}
-            color="dimmed"
-            rightSection={!currentActiveColors ? <IconCheck size={14} color="var(--mantine-color-teal-6)" /> : null}
-          >
-            <Text size="xs" fw={!currentActiveColors ? 700 : 400}>
-              Tema por defecto del equipo
-            </Text>
-          </Menu.Item>
-        </Menu.Dropdown>
-      </Menu>
-    );
-  };
 
   useEffect(() => {
     let active = true;
@@ -1084,7 +981,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                 </Button>
                 {currentDatos && mode === 'view' && (
                   <>
-                    {renderThemeMenu()}
                     <Button
                       size="xs"
                       radius="xl"
@@ -1153,20 +1049,18 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                     Intercambios
                   </Button>
                   {currentDatos && mode === 'view' && (
-                    <>
-                      {renderThemeMenu(true)}
-                      <Button
-                        size="xs"
-                        radius="xl"
-                        variant="light"
-                        leftSection={<IconDownload size={16} />}
-                        onClick={downloadPdf}
-                        loading={actionType === 'download'}
-                        fullWidth
-                      >
-                        Descargar
-                      </Button>
-                    </>
+
+                    <Button
+                      size="xs"
+                      radius="xl"
+                      variant="light"
+                      leftSection={<IconDownload size={16} />}
+                      onClick={downloadPdf}
+                      loading={actionType === 'download'}
+                      fullWidth
+                    >
+                      Descargar
+                    </Button>
                   )}
                   {!readOnly && (
                     <>

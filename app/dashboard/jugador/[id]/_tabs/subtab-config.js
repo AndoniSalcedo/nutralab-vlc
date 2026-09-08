@@ -1,7 +1,7 @@
-import { IconUser, IconCalendar, IconMail } from '@/components/icons3d';
-import { IconChartLine, IconReportAnalytics, IconDroplet, IconClipboardList } from '@/components/icons3d';
-import { IconBrain, IconBottle, IconChefHat } from '@/components/icons3d';
-import { IconRuler2, IconReportMedical, IconScale } from '@/components/icons3d';
+import { IconUser, IconNotes, IconMail } from '@/components/icons3d';
+import { IconChartLine, IconReportMedical, IconDroplet, IconClipboardList } from '@/components/icons3d';
+import { IconBrain, IconBottle, IconToolsKitchen } from '@/components/icons3d';
+import { IconScale } from '@/components/icons3d';
 
 /**
  * Single source of truth for all player dashboard subtab configs.
@@ -17,7 +17,7 @@ export const SUBTAB_CONFIGS = {
     defaultSubtab: 'perfil',
     tabs: [
       { value: 'perfil', icon: IconUser, label: 'Perfil', mobileLabel: 'Perfil' },
-      { value: 'diario', icon: IconCalendar, label: 'Diario de comidas', mobileLabel: 'Diario' },
+      { value: 'diario', icon: IconNotes, label: 'Diario de comidas', mobileLabel: 'Diario' },
       { value: 'mensajes', icon: IconMail, label: 'Mensajes', mobileLabel: 'Mensajes' },
     ],
     headers: {
@@ -29,7 +29,7 @@ export const SUBTAB_CONFIGS = {
         subtitleReadOnly: 'Objetivos y pautas semanales.',
       },
       diario: {
-        icon: IconCalendar,
+        icon: IconNotes,
         iconColor: 'blue',
         title: 'Diario de Comidas',
         subtitle: 'Registro diario de ingestas.',
@@ -47,7 +47,7 @@ export const SUBTAB_CONFIGS = {
     tabs: [
       { value: 'mediciones', icon: IconChartLine, label: 'Mediciones', mobileLabel: 'Med.' },
       { value: 'pesos', icon: IconScale, label: 'Pesos', mobileLabel: 'Pesos' },
-      { value: 'analiticas', icon: IconReportAnalytics, label: 'Analíticas', mobileLabel: 'Anali.' },
+      { value: 'analiticas', icon: IconReportMedical, label: 'Analíticas', mobileLabel: 'Anali.' },
       { value: 'hidratacion', icon: IconDroplet, label: 'Hidratación', mobileLabel: 'Hidra.' },
     ],
     headers: {
@@ -58,9 +58,9 @@ export const SUBTAB_CONFIGS = {
         subtitle: 'Historial de peso corporal.',
       },
       mediciones: {
-        icon: IconRuler2,
+        icon: IconChartLine,
         iconColor: 'cyan',
-        title: 'Composición',
+        title: 'Mediciones',
         subtitle: 'Historial de medidas y evolución.',
       },
       analiticas: {
@@ -82,7 +82,7 @@ export const SUBTAB_CONFIGS = {
     tabs: [
       { value: 'plan', icon: IconBrain, label: 'Plan nutricional', mobileLabel: 'Plan' },
       { value: 'suplementacion', icon: IconBottle, label: 'Suplementación', mobileLabel: 'Supl.' },
-      { value: 'menu', icon: IconChefHat, label: 'Menú semanal', mobileLabel: 'Menú' },
+      { value: 'menu', icon: IconToolsKitchen, label: 'Menú semanal', mobileLabel: 'Menú' },
       { value: 'protocolos', icon: IconClipboardList, label: 'Protocolos', mobileLabel: 'Prot.' },
     ],
     headers: {
@@ -99,7 +99,7 @@ export const SUBTAB_CONFIGS = {
         subtitle: 'Asignación de catálogos.',
       },
       menu: {
-        icon: IconChefHat,
+        icon: IconToolsKitchen,
         iconColor: 'teal',
         title: 'Menú comedor',
         subtitle: 'Comedor del equipo.',

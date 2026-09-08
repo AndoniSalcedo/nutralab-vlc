@@ -136,16 +136,25 @@ export default function TeamForm({
           <Box style={{ position: 'relative', display: 'inline-block' }}>
             <Avatar
               src={form.fotoPreview || undefined}
-              size={90}
-              radius="md"
+              size={96}
+              radius="xl"
               color="blue"
               style={{
+                width: 96,
+                height: 96,
                 border: '3px solid white',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                backgroundColor: 'var(--mantine-color-blue-1)',
+                backgroundColor: '#ffffff',
                 color: 'var(--mantine-color-blue-8)',
                 fontWeight: 700,
-                fontSize: '22px',
+                fontSize: '24px',
+              }}
+              imageProps={{
+                style: {
+                  objectFit: 'contain',
+                  backgroundColor: '#ffffff',
+                  padding: '6px',
+                },
               }}
             >
               {initials(form.nombre || 'Equipo')}

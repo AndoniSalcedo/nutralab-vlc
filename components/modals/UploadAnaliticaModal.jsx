@@ -19,7 +19,7 @@ export default function UploadAnaliticaModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <Icon3D name="analiticas" size={26} />
+          <Icon3D name="stethoscope" size={26} />
           <Text fw={700}>Subir analítica</Text>
         </Group>
       }

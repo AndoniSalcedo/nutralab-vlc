@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export default function BoneyardTeamConfig() {
   return (
-    <Stack gap="lg">
+    <Stack >
       <TeamHeaderTabs team={mockTeam} />
       <TeamConfigClient team={mockTeam} readOnly={false} />
     </Stack>

@@ -7,18 +7,35 @@ import * as TablerIcons from '@tabler/icons-react';
 
 // Re-export all standard Tabler icons
 export * from '@tabler/icons-react';
+export * as TablerIcons from '@tabler/icons-react';
+export * as NormalIcons from '@tabler/icons-react';
 
 /**
- * Global Switch: 3D PNG Icons vs @tabler/icons-react.
+ * Icon System Configuration:
  * 
- * - false (current): Uses native Tabler vector icons across the entire app.
- * - true: Switches to 3D PNG icons from /public/icons-3d/.
+ * - USE_3D_ICONS: Master switch for 3D PNG icons vs standard vector Tabler icons.
+ * - USE_3D_IN_INPUTS: When false, inputs, selects, search bars, datepickers, and form controls
+ *   automatically use clean, crisp normal Tabler vector icons.
+ * - USE_3D_IN_BUTTONS: When false, buttons and action icons automatically use normal vector icons.
  * 
- * Changing this single constant switches icon rendering across all screens!
+ * Individual override props on any icon component:
+ * - normal / flat / variant="normal": Forces normal Tabler vector icon.
+ * - force3d / variant="3d": Forces 3D PNG icon.
  */
-export const USE_3D_ICONS = false;
+export const USE_3D_ICONS = true;
+export const USE_3D_IN_INPUTS = false;
+export const USE_3D_IN_BUTTONS = false;
+export const USE_3D_IN_TABS = true;
+
+export const ICON_CONFIG = {
+  use3D: USE_3D_ICONS,
+  use3DInInputs: USE_3D_IN_INPUTS,
+  use3DInButtons: USE_3D_IN_BUTTONS,
+  use3DInTabs: USE_3D_IN_TABS,
+};
 
 export const ICONS_3D_AVAILABLE = [
+  'adhesive_bandage',
   'alarmclock',
   'analiticas',
   'apple',
@@ -28,22 +45,29 @@ export const ICONS_3D_AVAILABLE = [
   'battery',
   'bed',
   'bell',
+  'bento_box',
   'blood',
   'bolt',
+  'bone',
   'book',
   'bowl',
+  'boxing_glove',
   'brain',
   'bread',
   'bulb',
   'butter',
   'calendar',
   'camera',
+  'canned_food',
+  'card_file_box',
+  'card_index',
   'chart',
   'chat',
   'check',
   'clipboard',
   'coffee',
   'configuracion',
+  'cooking',
   'cross',
   'cup',
   'dna',
@@ -56,11 +80,14 @@ export const ICONS_3D_AVAILABLE = [
   'fire',
   'flag',
   'folder',
+  'fork_and_knife',
   'glass',
   'gym',
   'heart',
+  'hourglass',
   'inbox',
   'info',
+  'jar',
   'key',
   'link',
   'lock',
@@ -81,18 +108,23 @@ export const ICONS_3D_AVAILABLE = [
   'refresh',
   'rice',
   'running',
+  'running_shoe',
   'salad',
+  'sandwich',
   'scale',
   'search',
   'shield',
   'soccer',
   'sparkles',
+  'spiral_notepad',
   'star',
   'stethoscope',
   'stopwatch',
   'suplementacion',
+  'syringe',
   'target',
   'testtube',
+  'timer_clock',
   'trash',
   'trophy',
   'user',
@@ -121,7 +153,8 @@ export const ALIASES = {
   suplementos: 'suplementacion',
   supplements: 'suplementacion',
   stats: 'barchart',
-  analytics: 'analiticas',
+  analiticas: 'stethoscope',
+  analytics: 'stethoscope',
   team: 'soccer',
   players: 'plantilla',
   player: 'user',
@@ -136,9 +169,25 @@ export const ALIASES = {
   overview: 'chart',
   trending: 'evolucion',
   calendar_event: 'calendar',
+  catalog: 'card_file_box',
+  catalogo: 'card_file_box',
+  catalogos: 'card_file_box',
+  bottle: 'jar',
+  jar: 'jar',
+  bento: 'bento_box',
+  cutlery: 'fork_and_knife',
+  dining: 'fork_and_knife',
+  menu: 'fork_and_knife',
+  cooking: 'cooking',
+  snack: 'sandwich',
+  timing: 'hourglass',
+  diario: 'spiral_notepad',
+  notepad: 'spiral_notepad',
+  bandage: 'adhesive_bandage',
 };
 
 export const TABLER_ICON_MAP = {
+  adhesive_bandage: TablerIcons.IconBandage || TablerIcons.IconFirstAidKit,
   alarmclock: TablerIcons.IconClock,
   analiticas: TablerIcons.IconReportAnalytics,
   apple: TablerIcons.IconApple,
@@ -151,10 +200,13 @@ export const TABLER_ICON_MAP = {
   battery: TablerIcons.IconBatteryCharging,
   bed: TablerIcons.IconBed,
   bell: TablerIcons.IconBell,
+  bento_box: TablerIcons.IconBox,
   blood: TablerIcons.IconDroplet,
   bolt: TablerIcons.IconBolt,
+  bone: TablerIcons.IconBone,
   book: TablerIcons.IconBook,
   bowl: TablerIcons.IconToolsKitchen,
+  boxing_glove: TablerIcons.IconBarbell,
   brain: TablerIcons.IconBrain,
   bread: TablerIcons.IconBread || TablerIcons.IconWheat,
   bulb: TablerIcons.IconBulb,
@@ -162,12 +214,16 @@ export const TABLER_ICON_MAP = {
   calendar: TablerIcons.IconCalendar,
   calendar_event: TablerIcons.IconCalendarEvent,
   camera: TablerIcons.IconCamera,
+  canned_food: TablerIcons.IconArchive,
+  card_file_box: TablerIcons.IconFolders || TablerIcons.IconFolder,
+  card_index: TablerIcons.IconId,
   chart: TablerIcons.IconChartLine,
   chat: TablerIcons.IconMessageCircle,
   check: TablerIcons.IconCheck,
   clipboard: TablerIcons.IconClipboardList,
   coffee: TablerIcons.IconCoffee,
   configuracion: TablerIcons.IconSettings,
+  cooking: TablerIcons.IconToolsKitchen,
   cross: TablerIcons.IconX,
   cup: TablerIcons.IconCup,
   dna: TablerIcons.IconDna,
@@ -180,11 +236,14 @@ export const TABLER_ICON_MAP = {
   fire: TablerIcons.IconFlame,
   flag: TablerIcons.IconFlag,
   folder: TablerIcons.IconFolder,
+  fork_and_knife: TablerIcons.IconToolsKitchen,
   glass: TablerIcons.IconGlassFull || TablerIcons.IconGlass,
   gym: TablerIcons.IconBarbell,
   heart: TablerIcons.IconHeart,
+  hourglass: TablerIcons.IconHourglass,
   inbox: TablerIcons.IconInbox,
   info: TablerIcons.IconInfoCircle,
+  jar: TablerIcons.IconBottle,
   key: TablerIcons.IconKey,
   link: TablerIcons.IconExternalLink,
   lock: TablerIcons.IconLock,
@@ -205,18 +264,23 @@ export const TABLER_ICON_MAP = {
   refresh: TablerIcons.IconArrowsExchange,
   rice: TablerIcons.IconSoup,
   running: TablerIcons.IconRun,
+  running_shoe: TablerIcons.IconShoe || TablerIcons.IconRun,
   salad: TablerIcons.IconSalad,
+  sandwich: TablerIcons.IconToolsKitchen2,
   scale: TablerIcons.IconScale,
   search: TablerIcons.IconSearch,
   shield: TablerIcons.IconShield,
   soccer: TablerIcons.IconBallFootball,
   sparkles: TablerIcons.IconSparkles,
+  spiral_notepad: TablerIcons.IconNotes,
   star: TablerIcons.IconStar,
   stethoscope: TablerIcons.IconStethoscope,
   stopwatch: TablerIcons.IconClock,
   suplementacion: TablerIcons.IconBottle,
+  syringe: TablerIcons.IconVaccine || TablerIcons.IconDroplet,
   target: TablerIcons.IconTarget,
   testtube: TablerIcons.IconTestPipe,
+  timer_clock: TablerIcons.IconClock,
   trash: TablerIcons.IconTrash,
   trophy: TablerIcons.IconTrophy,
   user: TablerIcons.IconUser,
@@ -281,29 +345,59 @@ function resolveTablerSize(size) {
   return 20;
 }
 
-export default function Icon3D({
+export const Icon3D = React.forwardRef(function Icon3D({
   name,
   size = 'md',
   alt,
-  className,
+  className = '',
   style = {},
   stroke = 1.5,
   color,
+  normal = false,
+  flat = false,
+  force3d = false,
+  variant, // 'normal' | '3d' | 'auto'
+  tablerComponent,
   ...props
-}) {
+}, ref) {
   if (!name) return null;
 
   const resolvedName = ALIASES[name] || name;
+  const isExplicitNormal = normal || flat || variant === 'normal';
+  const isExplicit3D = force3d || variant === '3d';
+  const TablerComponent = tablerComponent || TABLER_ICON_MAP[resolvedName] || TablerIcons.IconFileText;
+  const tablerSize = resolveTablerSize(size);
 
-  if (USE_3D_ICONS) {
+  // If 3D is disabled globally or explicitly forced to normal
+  if (!USE_3D_ICONS || isExplicitNormal) {
+    return (
+      <TablerComponent
+        ref={ref}
+        size={tablerSize}
+        stroke={stroke}
+        color={color}
+        className={`nutra-icon-root force-normal ${className}`.trim()}
+        style={{
+          verticalAlign: 'middle',
+          flexShrink: 0,
+          ...style,
+        }}
+        {...props}
+      />
+    );
+  }
+
+  // If explicitly forced 3D (even inside inputs or buttons)
+  if (isExplicit3D) {
     const pixelSize = resolvePixelSize(size);
     const src = `/icons-3d/${resolvedName}.png`;
     const shouldShowShadow = pixelSize >= 22;
 
     return (
       <Box
+        ref={ref}
         component="span"
-        className={className}
+        className={`nutra-icon-root force-3d ${className}`.trim()}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -336,39 +430,124 @@ export default function Icon3D({
     );
   }
 
-  // When 3D is disabled, render the corresponding Tabler icon
-  const TablerComponent = TABLER_ICON_MAP[resolvedName] || TablerIcons.IconFileText;
-  const tablerSize = resolveTablerSize(size);
+  // Check if 3D image exists for this name; if not, fallback to Tabler
+  const is3DAvailable = ICONS_3D_AVAILABLE.includes(resolvedName);
+  if (!is3DAvailable) {
+    return (
+      <TablerComponent
+        ref={ref}
+        size={tablerSize}
+        stroke={stroke}
+        color={color}
+        className={`nutra-icon-root ${className}`.trim()}
+        style={{
+          verticalAlign: 'middle',
+          flexShrink: 0,
+          ...style,
+        }}
+        {...props}
+      />
+    );
+  }
+
+  // Default dual-mode: Render both representations.
+  // CSS automatically displays the normal vector icon in inputs, selects, and buttons
+  // when USE_3D_IN_INPUTS / USE_3D_IN_BUTTONS are false.
+  const pixelSize = resolvePixelSize(size);
+  const src = `/icons-3d/${resolvedName}.png`;
+  const shouldShowShadow = pixelSize >= 22;
 
   return (
-    <TablerComponent
-      size={tablerSize}
-      stroke={stroke}
-      color={color}
-      className={className}
+    <span
+      ref={ref}
+      className={`nutra-icon-root ${className}`.trim()}
+      data-icon-name={resolvedName}
+      data-3d-inputs={USE_3D_IN_INPUTS ? 'true' : 'false'}
+      data-3d-buttons={USE_3D_IN_BUTTONS ? 'true' : 'false'}
+      data-3d-tabs={USE_3D_IN_TABS ? 'true' : 'false'}
       style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        lineHeight: 0,
         verticalAlign: 'middle',
         flexShrink: 0,
         ...style,
       }}
       {...props}
-    />
+    >
+      <span
+        className="nutra-icon-3d"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: 0,
+          filter: shouldShowShadow ? 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08))' : 'none',
+          transition: 'transform 160ms ease, filter 160ms ease',
+        }}
+      >
+        <Image
+          src={src}
+          alt={alt || `${name} 3D`}
+          width={pixelSize}
+          height={pixelSize}
+          unoptimized
+          style={{
+            width: pixelSize,
+            height: pixelSize,
+            objectFit: 'contain',
+            display: 'block',
+            pointerEvents: 'none',
+            userSelect: 'none',
+          }}
+        />
+      </span>
+      <span
+        className="nutra-icon-normal"
+        style={{
+          display: 'none',
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: 0,
+        }}
+      >
+        <TablerComponent
+          size={tablerSize}
+          stroke={stroke}
+          color={color}
+          style={{
+            verticalAlign: 'middle',
+            flexShrink: 0,
+          }}
+        />
+      </span>
+    </span>
+  );
+});
+
+export default Icon3D;
+
+// Helper component to wrap any section where normal icons are explicitly desired
+export function IconNormalZone({ children, className = '', ...props }) {
+  return (
+    <span data-icon-normal="true" className={`icon-normal-zone ${className}`.trim()} {...props}>
+      {children}
+    </span>
   );
 }
 
-export { Icon3D };
-
-const create3DIcon = (name) => {
-  const Component = (props) => <Icon3D name={name} {...props} />;
-  Component.displayName = `Icon3D_${name}`;
-  return Component;
-};
-
 const makeIcon = (name3d, TablerComponent) => {
-  if (USE_3D_ICONS) {
-    return create3DIcon(name3d);
-  }
-  return TablerComponent;
+  const Component = React.forwardRef((props, ref) => (
+    <Icon3D
+      ref={ref}
+      name={name3d}
+      tablerComponent={TablerComponent}
+      {...props}
+    />
+  ));
+  Component.displayName = `Icon_${name3d}`;
+  return Component;
 };
 
 // Activity, Health & Medical
@@ -391,11 +570,15 @@ export const IconApple = makeIcon('apple', TablerIcons.IconApple);
 export const IconChefHat = makeIcon('pot', TablerIcons.IconChefHat);
 export const IconMeat = makeIcon('meat', TablerIcons.IconMeat);
 export const IconSalad = makeIcon('salad', TablerIcons.IconSalad);
-export const IconToolsKitchen = makeIcon('plate', TablerIcons.IconToolsKitchen);
+export const IconToolsKitchen = makeIcon('fork_and_knife', TablerIcons.IconToolsKitchen);
 export const IconToolsKitchen2 = makeIcon('plate', TablerIcons.IconToolsKitchen2);
+export const IconPlate = makeIcon('plate', TablerIcons.IconToolsKitchen2);
 export const IconCoffee = makeIcon('coffee', TablerIcons.IconCoffee);
-export const IconBottle = makeIcon('suplementacion', TablerIcons.IconBottle);
+export const IconBottle = makeIcon('jar', TablerIcons.IconBottle);
+export const IconJar = makeIcon('jar', TablerIcons.IconBottle);
 export const IconPill = makeIcon('pill', TablerIcons.IconPill);
+export const IconBentoBox = makeIcon('bento_box', TablerIcons.IconBox);
+export const IconCooking = makeIcon('cooking', TablerIcons.IconToolsKitchen);
 export const IconWheat = TablerIcons.IconWheat;
 
 // Physical & Metrics
@@ -407,12 +590,13 @@ export const IconBed = makeIcon('bed', TablerIcons.IconBed);
 export const IconRun = makeIcon('running', TablerIcons.IconRun);
 export const IconBarbell = makeIcon('gym', TablerIcons.IconBarbell);
 export const IconBatteryCharging = makeIcon('battery', TablerIcons.IconBatteryCharging);
+export const IconHourglass = makeIcon('hourglass', TablerIcons.IconHourglass);
 
 // Charts & Analytics
 export const IconChartBar = makeIcon('barchart', TablerIcons.IconChartBar);
 export const IconChartLine = makeIcon('chart', TablerIcons.IconChartLine);
-export const IconReportAnalytics = makeIcon('analiticas', TablerIcons.IconReportAnalytics);
-export const IconFileAnalytics = makeIcon('analiticas', TablerIcons.IconFileAnalytics);
+export const IconReportAnalytics = makeIcon('stethoscope', TablerIcons.IconReportAnalytics);
+export const IconFileAnalytics = makeIcon('stethoscope', TablerIcons.IconFileAnalytics);
 export const IconTrendingUp = makeIcon('evolucion', TablerIcons.IconTrendingUp);
 export const IconTrophy = makeIcon('trophy', TablerIcons.IconTrophy);
 
@@ -460,7 +644,9 @@ export const IconFileText = makeIcon('document', TablerIcons.IconFileText);
 export const IconFileSpreadsheet = makeIcon('document', TablerIcons.IconFileSpreadsheet);
 export const IconFileTypePdf = makeIcon('document', TablerIcons.IconFileTypePdf);
 export const IconBook = makeIcon('book', TablerIcons.IconBook);
-export const IconNotes = makeIcon('memo', TablerIcons.IconNotes);
+export const IconNotes = makeIcon('spiral_notepad', TablerIcons.IconNotes);
+export const IconCardFile = makeIcon('card_file_box', TablerIcons.IconFolders || TablerIcons.IconFolder);
+export const IconFolders = makeIcon('card_file_box', TablerIcons.IconFolders);
 export const IconCopy = makeIcon('memo', TablerIcons.IconCopy);
 export const IconList = makeIcon('menu', TablerIcons.IconList);
 export const IconFolderShare = makeIcon('folder', TablerIcons.IconFolderShare);
@@ -493,7 +679,7 @@ export const IconSend = makeIcon('chat', TablerIcons.IconSend);
 export const IconBrain = makeIcon('brain', TablerIcons.IconBrain);
 export const IconSparkles = makeIcon('sparkles', TablerIcons.IconSparkles);
 export const IconPalette = makeIcon('sparkles', TablerIcons.IconPalette);
-export const IconCalculator = makeIcon('scale', TablerIcons.IconCalculator);
+export const IconCalculator = makeIcon('barchart', TablerIcons.IconCalculator);
 export const IconFlag = makeIcon('flag', TablerIcons.IconFlag);
 export const IconExternalLink = makeIcon('link', TablerIcons.IconExternalLink);
 export const IconEye = makeIcon('eye', TablerIcons.IconEye);

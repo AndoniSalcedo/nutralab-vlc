@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   ActionIcon,
+  Anchor,
   Avatar,
   Box,
   FileButton,
@@ -15,17 +16,17 @@ import {
   Text,
   Title,
   Tooltip,
+  UnstyledButton,
 } from '@mantine/core';
 import {
   IconArrowLeft,
-  IconCamera,
 } from '@/components/icons3d';
 import {
   IconBottle,
-  IconCalendarEvent,
   IconChartLine,
   IconReportMedical,
   IconSettings,
+  IconToolsKitchen,
   IconUsers,
 } from '@tabler/icons-react';
 import { initials } from '@/lib/utils/avatar';
@@ -35,9 +36,9 @@ import Icon3D from '@/components/Icon3D';
 const TABS = [
   { value: 'plantilla', label: 'Plantilla', href: (id) => `/dashboard/equipo/${id}`, icon3d: 'plantilla', mobileIcon: IconUsers },
   { value: 'evolucion', label: 'Evolución', href: (id) => `/dashboard/equipo/${id}/evolucion`, icon3d: 'evolucion', mobileIcon: IconChartLine },
-  { value: 'analiticas', label: 'Analíticas', href: (id) => `/dashboard/equipo/${id}/analiticas`, icon3d: 'analiticas', mobileIcon: IconReportMedical },
+  { value: 'analiticas', label: 'Analíticas', href: (id) => `/dashboard/equipo/${id}/analiticas`, icon3d: 'stethoscope', mobileIcon: IconReportMedical },
   { value: 'suplementacion', label: 'Suplementación', href: (id) => `/dashboard/equipo/${id}/suplementacion`, icon3d: 'suplementacion', mobileIcon: IconBottle },
-  { value: 'menu', label: 'Menú semanal', href: (id) => `/dashboard/equipo/${id}/menu`, icon3d: 'menu', mobileIcon: IconCalendarEvent },
+  { value: 'menu', label: 'Menú semanal', href: (id) => `/dashboard/equipo/${id}/menu`, icon3d: 'fork_and_knife', mobileIcon: IconToolsKitchen },
   { value: 'configuracion', label: 'Configuración', href: (id) => `/dashboard/equipo/${id}/configuracion`, icon3d: 'configuracion', mobileIcon: IconSettings },
 ];
 
@@ -97,126 +98,117 @@ export default function TeamHeaderTabs({
   return (
     <>
       <Paper
-        p={{ base: 12, sm: 'lg' }}
-        shadow="xs"
         radius={24}
+        p="lg"
+        shadow="xs"
         bg="white"
-        withBorder
-        style={{
-          border: '1px solid rgba(222,226,230,0.85)',
-          boxShadow: '0 2px 10px rgba(31, 35, 28, 0.08)',
-          width: '100%',
-          minWidth: 0,
-          maxWidth: '100%',
-          overflow: 'hidden',
-        }}
+        mb="md"
       >
-        <Stack gap={{ base: 'sm', sm: 'md' }} style={{ width: '100%', minWidth: 0 }}>
-          {/* FILA 1: Identidad del equipo y acciones principales */}
-          <Group justify="space-between" align="center" wrap="nowrap" gap="xs" style={{ width: '100%', minWidth: 0 }}>
-            <Group gap="xs" align="center" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
-              <Tooltip label="Volver a equipos" withArrow>
-                <ActionIcon
-                  component={Link}
-                  href="/dashboard"
-                  variant="light"
-                  color="gray"
-                  radius="xl"
-                  size={{ base: 36, sm: 42 }}
-                  style={{ flexShrink: 0 }}
-                >
-                  <IconArrowLeft size={18} />
+        <Group justify="space-between" align="center" wrap="wrap" gap="md">
+          <Group gap="md">
+            <Tooltip label="Volver a equipos" position="right" withArrow>
+              <Anchor component={Link} href="/dashboard" style={{ textDecoration: 'none' }}>
+                <ActionIcon variant="subtle" color="gray" size={42} radius="xl" style={{ transition: 'transform 140ms ease' }}>
+                  <IconArrowLeft size={26} />
                 </ActionIcon>
-              </Tooltip>
+              </Anchor>
+            </Tooltip>
 
-              {avatarSlot ? (
-                avatarSlot
-              ) : (
-                <Box style={{ position: 'relative', display: 'inline-block', flexShrink: 0 }}>
-                  <Avatar
-                    src={teamId ? `/api/teams/avatar?id=${teamId}&t=${teamPhotoVersion || team?.updated_at || ''}` : undefined}
-                    size={{ base: 40, sm: 52 }}
-                    radius="lg"
-                    color="dark"
-                    style={{
-                      border: '2px solid white',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                      backgroundColor: 'var(--mantine-color-nutralabColor-1)',
-                      color: 'var(--mantine-color-nutralabColor-9)',
-                      fontWeight: 700,
-                      fontSize: '16px',
-                    }}
-                  >
-                    {initials(team?.nombre || 'Equipo')}
-                  </Avatar>
-                  {!readOnly && teamId && onSelectTeamPhoto && (
-                    <FileButton onChange={onSelectTeamPhoto} accept="image/*">
-                      {(props) => (
-                        <Tooltip label="Cambiar escudo o foto" position="top" withArrow>
-                          <ActionIcon
-                            {...props}
-                            variant="filled"
-                            color="dark"
-                            radius="xl"
-                            size={20}
-                            style={{
-                              position: 'absolute',
-                              bottom: -3,
-                              right: -3,
-                              border: '1.5px solid white',
-                              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            <IconCamera size={11} stroke={2} />
-                          </ActionIcon>
-                        </Tooltip>
-                      )}
-                    </FileButton>
-                  )}
-                </Box>
-              )}
-
-              <Box style={{ minWidth: 0, flex: 1 }}>
-                <Title order={3} fw={700} c="dark.5" lh={1.1} lineClamp={1} fz={{ base: 16, sm: 20 }}>
-                  {team?.nombre || 'Equipo'}
-                </Title>
-                {team?.temporada && (
-                  <Text size="xs" c="dimmed" mt={3} lineClamp={1}>
-                    {team.temporada.toLowerCase().includes('temporada')
-                      ? team.temporada
-                      : `Temporada ${team.temporada}`}
-                  </Text>
+            {avatarSlot ? (
+              avatarSlot
+            ) : (
+              <Box style={{ position: 'relative', display: 'inline-block' }}>
+                <Avatar
+                  src={teamId ? `/api/teams/avatar?id=${teamId}&t=${teamPhotoVersion || team?.updated_at || ''}` : undefined}
+                  size={84}
+                  radius="xl"
+                  color="nutralabColor"
+                  style={{
+                    border: '3px solid white',
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+                    backgroundColor: '#ffffff',
+                    color: 'var(--mantine-color-nutralabColor-9)',
+                    fontWeight: 700,
+                    fontSize: '24px',
+                  }}
+                  imageProps={{
+                    style: {
+                      objectFit: 'contain',
+                      backgroundColor: '#ffffff',
+                      padding: '4px',
+                    },
+                  }}
+                >
+                  {initials(team?.nombre || 'Equipo')}
+                </Avatar>
+                {!readOnly && teamId && onSelectTeamPhoto && (
+                  <FileButton onChange={onSelectTeamPhoto} accept="image/*">
+                    {(props) => (
+                      <Tooltip label="Cambiar escudo o foto" position="bottom" withArrow>
+                        <UnstyledButton
+                          {...props}
+                          style={{
+                            position: 'absolute',
+                            bottom: -2,
+                            right: -2,
+                            cursor: 'pointer',
+                            zIndex: 4,
+                            overflow: 'visible',
+                            lineHeight: 0,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'transform 150ms ease, opacity 150ms ease',
+                          }}
+                        >
+                          <Icon3D name="camera" size={28} />
+                        </UnstyledButton>
+                      </Tooltip>
+                    )}
+                  </FileButton>
                 )}
               </Box>
-            </Group>
-
-            {rightSection ? (
-              <Box style={{ flexShrink: 0 }}>
-                {rightSection}
-              </Box>
-            ) : (
-              <Box
-                ref={slotContext?.setRightSlotEl}
-                style={{
-                  flexShrink: 0,
-                  display: slotContext?.hasRightSection ? undefined : 'none',
-                }}
-              />
             )}
+
+            <Stack gap={4} style={{ minWidth: 0 }}>
+              <Title order={2} c="dark.5" lh={1.1} fz={26} fw={700} lineClamp={2}>
+                {team?.nombre || 'Equipo'}
+              </Title>
+              {team?.temporada && (
+                <Text c="dimmed" size="sm" truncate="end">
+                  {team.temporada.toLowerCase().includes('temporada')
+                    ? team.temporada
+                    : `Temporada ${team.temporada}`}
+                </Text>
+              )}
+            </Stack>
           </Group>
 
-          <Box
-            hiddenFrom="sm"
-            ref={slotContext?.setMobileFiltersSlotEl}
-            style={{
-              width: '100%',
-              minWidth: 0,
-              display: slotContext?.hasMobileFilters ? undefined : 'none',
-            }}
-          />
+          {rightSection ? (
+            <Box style={{ flexShrink: 0 }}>
+              {rightSection}
+            </Box>
+          ) : (
+            <Box
+              ref={slotContext?.setRightSlotEl}
+              style={{
+                flexShrink: 0,
+                display: slotContext?.hasRightSection ? undefined : 'none',
+              }}
+            />
+          )}
+        </Group>
 
-        </Stack>
+        <Box
+          hiddenFrom="sm"
+          ref={slotContext?.setMobileFiltersSlotEl}
+          style={{
+            width: '100%',
+            minWidth: 0,
+            display: slotContext?.hasMobileFilters ? undefined : 'none',
+            marginTop: 8,
+          }}
+        />
       </Paper>
 
       {/* Header flotante de navegación y controles de la vista activa. */}

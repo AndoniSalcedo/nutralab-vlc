@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { initials } from '@/lib/utils';
+import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import {
   ActionIcon,
   Avatar,
@@ -159,7 +159,7 @@ export default function TeamSupplementationDashboard({
                     <Table.Td style={{ paddingLeft: 16 }}>
                       <Group gap="sm" wrap="nowrap">
                         <Avatar
-                          src={player.avatar_url || (player.avatar_size ? `/api/players/avatar?id=${player.id}` : undefined)}
+                          src={getPlayerAvatarUrl(player)}
                           size={42}
                           radius="xl"
                           color="initials"

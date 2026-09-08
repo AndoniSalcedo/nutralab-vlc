@@ -23,13 +23,14 @@ import {
   IconSearch,
   IconCheck,
   IconDownload,
+  IconEdit,
   IconFileSpreadsheet,
   IconFileTypePdf,
 } from '@/components/icons3d';
 import { savePesaje } from '@/services/pesaje';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
-import { initials } from '@/lib/utils';
+import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import { calculateSemaforo } from '@/lib/metrics/player';
 import {
   formatFullDate,
@@ -410,7 +411,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
         color="orange"
       >
         <Tabs.List grow mb="md">
-          <Tabs.Tab value="record" leftSection={<IconScale size={16} />}>
+          <Tabs.Tab value="record" leftSection={<IconEdit size={16} />}>
             Registrar peso
           </Tabs.Tab>
           <Tabs.Tab value="export" leftSection={<IconDownload size={16} />}>
@@ -460,12 +461,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
                       >
                         <Group gap="xs" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
                           <Avatar
-                            src={
-                              player.avatar_url ||
-                              (player.avatar_size
-                                ? `/api/players/avatar?id=${player.id}`
-                                : undefined)
-                            }
+                            src={getPlayerAvatarUrl(player)}
                             size={36}
                             radius="xl"
                             color="initials"
@@ -711,12 +707,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
                             size="sm"
                           />
                           <Avatar
-                            src={
-                              player.avatar_url ||
-                              (player.avatar_size
-                                ? `/api/players/avatar?id=${player.id}`
-                                : undefined)
-                            }
+                            src={getPlayerAvatarUrl(player)}
                             size={34}
                             radius="xl"
                             color="initials"

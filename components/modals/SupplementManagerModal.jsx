@@ -18,7 +18,7 @@ export default function SupplementManagerModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <Icon3D name="suplementacion" size={26} />
+          <Icon3D name="jar" size={28} />
           <Text fw={700}>Gestión de suplementación</Text>
         </Group>
       }

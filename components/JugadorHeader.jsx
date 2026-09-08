@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ActionIcon,
   Anchor,
@@ -268,6 +268,17 @@ export function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) 
     if (typeof jugador?.avatar === 'string' && jugador.avatar.startsWith('data:')) return jugador.avatar;
     return '';
   });
+
+  useEffect(() => {
+    if (jugador?.avatar_url) {
+      setAvatarSrc(jugador.avatar_url);
+    } else if (jugador?.avatar_size) {
+      setAvatarSrc(`/api/players/avatar?id=${jugador.id}&t=${jugador.updated_at || ''}`);
+    } else if (typeof jugador?.avatar === 'string' && jugador.avatar.startsWith('data:')) {
+      setAvatarSrc(jugador.avatar);
+    }
+  }, [jugador?.id, jugador?.avatar_size, jugador?.avatar_url, jugador?.updated_at, jugador?.avatar]);
+
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [tempImageSrc, setTempImageSrc] = useState('');
   const [tempFileName, setTempFileName] = useState('');

@@ -1,0 +1,149 @@
+/* ==========================================================================
+   Nutralab Icon System: 3D vs Normal Vector Icons
+   Enables 3D icons in navigation, tabs, metric widgets, and hero areas,
+   while automatically switching to crisp, native vector icons in inputs,
+   selects, buttons, and action icons.
+   ========================================================================== */
+
+/* Base icon container */
+.nutra-icon-root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* Default state: 3D is visible, normal is hidden */
+.nutra-icon-3d {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nutra-icon-normal {
+  display: none !important;
+}
+
+/* ==========================================================================
+   INPUTS & SELECTS (When USE_3D_IN_INPUTS is false)
+   Applies to Mantine TextInput, Select, MultiSelect, NumberInput, DateInput,
+   PasswordInput, Combobox options, and any container with [data-input-icon]
+   ========================================================================== */
+.mantine-Input-section .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-3d,
+.mantine-Select-section .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-3d,
+.mantine-Input-input .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-3d,
+.mantine-Combobox-option .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-3d,
+.mantine-Combobox-root .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-3d,
+[data-input-icon] .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-3d,
+.icon-normal-input .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-3d {
+  display: none !important;
+}
+
+.mantine-Input-section .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-normal,
+.mantine-Select-section .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-normal,
+.mantine-Input-input .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-normal,
+.mantine-Combobox-option .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-normal,
+.mantine-Combobox-root .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-normal,
+[data-input-icon] .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-normal,
+.icon-normal-input .nutra-icon-root[data-3d-inputs="false"] .nutra-icon-normal {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   BUTTONS & ACTION ICONS (When USE_3D_IN_BUTTONS is false)
+   Applies to Mantine Button, ActionIcon, CloseButton,
+   and any container with [data-button-icon]
+   ========================================================================== */
+.mantine-Button-root .nutra-icon-root[data-3d-buttons="false"] .nutra-icon-3d,
+.mantine-Button-section .nutra-icon-root[data-3d-buttons="false"] .nutra-icon-3d,
+.mantine-ActionIcon-root .nutra-icon-root[data-3d-buttons="false"] .nutra-icon-3d,
+.mantine-CloseButton-root .nutra-icon-root[data-3d-buttons="false"] .nutra-icon-3d,
+[data-button-icon] .nutra-icon-root[data-3d-buttons="false"] .nutra-icon-3d,
+.icon-normal-button .nutra-icon-root[data-3d-buttons="false"] .nutra-icon-3d {
+  display: none !important;
+}
+
+.mantine-Button-root .nutra-icon-root[data-3d-buttons="false"] .nutra-icon-normal,
+.mantine-Button-section .nutra-icon-root[data-3d-buttons="false"] .nutra-icon-normal,
+.mantine-ActionIcon-root .nutra-icon-root[data-3d-buttons="false"] .nutra-icon-normal,
+.mantine-CloseButton-root .nutra-icon-root[data-3d-buttons="false"] .nutra-icon-normal,
+[data-button-icon] .nutra-icon-root[data-3d-buttons="false"] .nutra-icon-normal,
+.icon-normal-button .nutra-icon-root[data-3d-buttons="false"] .nutra-icon-normal {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   TABS & SUBTABS (When USE_3D_IN_TABS is true / false)
+   Applies to Mantine Tabs.Tab, SegmentedControl (subtabs), and tab navigation
+   ========================================================================== */
+/* When USE_3D_IN_TABS is false: switch tabs and subtabs to normal vector icons */
+.mantine-Tabs-tab .nutra-icon-root[data-3d-tabs="false"] .nutra-icon-3d,
+.mantine-SegmentedControl-root .nutra-icon-root[data-3d-tabs="false"] .nutra-icon-3d,
+.player-tab-item .nutra-icon-root[data-3d-tabs="false"] .nutra-icon-3d,
+.team-tab-item .nutra-icon-root[data-3d-tabs="false"] .nutra-icon-3d {
+  display: none !important;
+}
+
+.mantine-Tabs-tab .nutra-icon-root[data-3d-tabs="false"] .nutra-icon-normal,
+.mantine-SegmentedControl-root .nutra-icon-root[data-3d-tabs="false"] .nutra-icon-normal,
+.player-tab-item .nutra-icon-root[data-3d-tabs="false"] .nutra-icon-normal,
+.team-tab-item .nutra-icon-root[data-3d-tabs="false"] .nutra-icon-normal {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* When USE_3D_IN_TABS is true (default): ensure 3D icons are displayed in tabs and subtabs */
+.mantine-Tabs-tab .nutra-icon-root[data-3d-tabs="true"] .nutra-icon-3d,
+.mantine-SegmentedControl-root .nutra-icon-root[data-3d-tabs="true"] .nutra-icon-3d,
+.player-tab-item .nutra-icon-root[data-3d-tabs="true"] .nutra-icon-3d,
+.team-tab-item .nutra-icon-root[data-3d-tabs="true"] .nutra-icon-3d {
+  display: inline-flex !important;
+}
+
+.mantine-Tabs-tab .nutra-icon-root[data-3d-tabs="true"] .nutra-icon-normal,
+.mantine-SegmentedControl-root .nutra-icon-root[data-3d-tabs="true"] .nutra-icon-normal,
+.player-tab-item .nutra-icon-root[data-3d-tabs="true"] .nutra-icon-normal,
+.team-tab-item .nutra-icon-root[data-3d-tabs="true"] .nutra-icon-normal {
+  display: none !important;
+}
+
+/* ==========================================================================
+   EXPLICIT ZONES & OVERRIDES
+   ========================================================================== */
+/* Force normal icons across any container wrapped with data-icon-normal */
+[data-icon-normal] .nutra-icon-root .nutra-icon-3d,
+.icon-normal-zone .nutra-icon-root .nutra-icon-3d {
+  display: none !important;
+}
+
+[data-icon-normal] .nutra-icon-root .nutra-icon-normal,
+.icon-normal-zone .nutra-icon-root .nutra-icon-normal {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Explicit component-level force-3d: always show 3D even inside inputs or buttons */
+.nutra-icon-root.force-3d .nutra-icon-3d {
+  display: inline-flex !important;
+}
+.nutra-icon-root.force-3d .nutra-icon-normal {
+  display: none !important;
+}
+
+/* Explicit component-level force-normal */
+.nutra-icon-root.force-normal .nutra-icon-3d {
+  display: none !important;
+}
+.nutra-icon-root.force-normal .nutra-icon-normal {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+}

@@ -11,7 +11,6 @@ import {
   Group,
   LoadingOverlay,
   Paper,
-  ThemeIcon,
   ScrollArea,
   Select,
   SimpleGrid,
@@ -27,9 +26,10 @@ import {
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import { notifications } from '@mantine/notifications';
 import { getSupplementationCatalog, updateSupplementationCatalog } from '@/services/supplement';
-import {
-  IconBottle,
-  IconCalendarStats,
+import Icon3D, {
+  IconJar,
+  IconCardFile,
+  IconClipboardList,
   IconCirclePlus,
   IconInfoCircle,
   IconPencil,
@@ -39,6 +39,21 @@ import {
   IconUsers,
 } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
+
+function getSupplementIcon(supp) {
+  const cat = (supp?.categoria || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const name = (supp?.nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (cat.includes('micronutriente') || cat.includes('vitamina') || name.includes('vit')) return 'apple';
+  if (cat.includes('rendimiento') || cat.includes('fuerza') || name.includes('creatina') || name.includes('alanina')) return 'bolt';
+  if (cat.includes('estres') || cat.includes('sueno') || cat.includes('descanso') || name.includes('ashwagandha') || name.includes('melatonina')) return 'bed';
+  if (cat.includes('matchday') || cat.includes('partido') || cat.includes('competicion')) return 'trophy';
+  if (cat.includes('intra') || cat.includes('carbohidrato') || name.includes('cafeina') || name.includes('gel')) return 'fire';
+  if (cat.includes('hidratacion') || cat.includes('sal') || cat.includes('sodio') || cat.includes('electrolito')) return 'droplet';
+  if (cat.includes('proteina') || cat.includes('articular') || name.includes('colageno') || name.includes('whey')) return 'bone';
+  if (cat.includes('salud') || cat.includes('inmune') || cat.includes('defensa')) return 'shield';
+  if (cat.includes('recuperacion')) return 'battery';
+  return 'jar';
+}
 
 function emptySupplementForm() {
   return {
@@ -335,9 +350,9 @@ export default function SupplementCatalogManager({
       <Tabs value={activeTab} onChange={onTabChange} variant="outline" radius="md" keepMounted={false}>
         {!hideTabs && (
           <Tabs.List grow>
-            <Tabs.Tab value="assign" leftSection={<IconUsers size={15} />}>Asignar</Tabs.Tab>
-            <Tabs.Tab value="catalogs" leftSection={<IconBottle size={15} />}>Catálogos</Tabs.Tab>
-            <Tabs.Tab value="supplements" leftSection={<IconPill size={15} />}>Suplementos</Tabs.Tab>
+            <Tabs.Tab value="assign" leftSection={<IconUsers size={16} />}>Asignar</Tabs.Tab>
+            <Tabs.Tab value="catalogs" leftSection={<IconCardFile size={16} />}>Catálogos</Tabs.Tab>
+            <Tabs.Tab value="supplements" leftSection={<IconPill size={16} />}>Suplementos</Tabs.Tab>
           </Tabs.List>
         )}
 
@@ -470,7 +485,7 @@ export default function SupplementCatalogManager({
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md" align="start">
             {/* Left Column: Selector & Creation */}
             <Stack gap="md">
-              <BentoCard title="Seleccionar catálogo" icon={IconBottle} color="teal">
+              <BentoCard title="Seleccionar catálogo" icon={IconCardFile} color="teal">
                 <Select
                   placeholder="Selecciona un catálogo para gestionar"
                   data={listOptions}
@@ -534,7 +549,7 @@ export default function SupplementCatalogManager({
             {/* Right Column: Catalog Content and Add Supplement */}
             <Box>
               {selectedList ? (
-                <BentoCard title={`Contenido · ${selectedList.nombre}`} icon={IconCalendarStats} color="gray">
+                <BentoCard title={`Contenido · ${selectedList.nombre}`} icon={IconClipboardList} color="gray">
                   <Text size="xs" fw={700} c="dimmed">AÑADIR SUPLEMENTO AL CATÁLOGO:</Text>
                   <Group gap="xs" align="flex-end" wrap="nowrap" style={{ width: '100%' }}>
                     <Select
@@ -591,10 +606,10 @@ export default function SupplementCatalogManager({
                   )}
                 </BentoCard>
               ) : (
-                <Paper p="xl" radius="lg" withBorder style={{ textAlign: 'center', minHeight: 300, display: 'flex', flexDirection: 'column', justifyContent: 'center' }} bg="gray.0">
-                  <ThemeIcon color="gray" variant="light" radius="xl" size="xl" mx="auto" mb="sm">
-                    <IconBottle size={24} />
-                  </ThemeIcon>
+                <Paper p="xl" radius="lg" withBorder style={{ textAlign: 'center', minHeight: 300, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }} bg="gray.0">
+                  <Box mb="sm">
+                    <IconCardFile size={44} />
+                  </Box>
                   <Text fw={600} c="dimmed">Ningún catálogo seleccionado</Text>
                   <Text size="sm" c="dimmed" mt={4}>
                     Selecciona un catálogo en la columna izquierda para gestionar su contenido.
@@ -608,7 +623,7 @@ export default function SupplementCatalogManager({
         <Tabs.Panel value="supplements" pt="md">
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md" align="start">
             {/* Left Column: Supplements List */}
-            <BentoCard title="Catálogo de suplementos" icon={IconPill} color="blue">
+            <BentoCard title="Catálogo de suplementos" icon={IconJar} color="blue">
               <TextInput
                 placeholder="Buscar por nombre o categoría..."
                 value={searchQuery}
@@ -619,51 +634,60 @@ export default function SupplementCatalogManager({
               />
 
               {filteredSupplements.length ? (
-                <ScrollArea h={380}>
+                <ScrollArea h={400}>
                   <Stack gap="xs">
-                    {filteredSupplements.map((supp) => (
-                      <Paper
-                        key={supp.id}
-                        p="xs"
-                        radius="md"
-                        bg={editingSupplementId === supp.id ? 'blue.0' : 'gray.0'}
-                        style={{ border: editingSupplementId === supp.id ? '1px solid var(--mantine-color-blue-3)' : '1px solid var(--mantine-color-gray-3)' }}
-                        withBorder
-                      >
-                        <Group justify="space-between" wrap="nowrap" align="center">
-                          <Stack gap={0} style={{ minWidth: 0 }}>
-                            <Group gap={6} wrap="nowrap">
-                              <Text size="sm" fw={600} c="dark.5" truncate>{supp.nombre}</Text>
-                              <Badge size="xs" radius="sm" variant="light" color={editingSupplementId === supp.id ? 'blue' : 'gray'}>
-                                {supp.categoria || 'Custom'}
-                              </Badge>
+                    {filteredSupplements.map((supp) => {
+                      const suppIcon = getSupplementIcon(supp);
+                      return (
+                        <Paper
+                          key={supp.id}
+                          p="xs"
+                          radius="md"
+                          bg={editingSupplementId === supp.id ? 'blue.0' : 'gray.0'}
+                          style={{
+                            border: editingSupplementId === supp.id ? '1.5px solid var(--mantine-color-blue-4)' : '1px solid var(--mantine-color-gray-3)',
+                            transition: 'all 0.15s ease',
+                          }}
+                          withBorder
+                        >
+                          <Group justify="space-between" wrap="nowrap" align="center">
+                            <Group gap="xs" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+                              <Icon3D name={suppIcon} size={28} />
+                              <Stack gap={1} style={{ minWidth: 0, flex: 1 }}>
+                                <Group gap={6} wrap="nowrap">
+                                  <Text size="sm" fw={600} c="dark.5" truncate>{supp.nombre}</Text>
+                                  <Badge size="xs" radius="sm" variant="light" color={editingSupplementId === supp.id ? 'blue' : 'gray'}>
+                                    {supp.categoria || 'Custom'}
+                                  </Badge>
+                                </Group>
+                                <Text size="xs" fw={700} c="teal.7" truncate>{supp.pauta || 'Según pauta'}</Text>
+                                <Text size="xs" c="dimmed" truncate>{supp.timing || 'Timing individual'}</Text>
+                              </Stack>
                             </Group>
-                            <Text size="xs" fw={700} c="teal.7" truncate>{supp.pauta || 'Según pauta'}</Text>
-                            <Text size="xs" c="dimmed" truncate>{supp.timing || 'Timing individual'}</Text>
-                          </Stack>
-                          <Group gap={4} style={{ flexShrink: 0 }}>
-                            <ActionIcon
-                              color="blue"
-                              variant="subtle"
-                              radius="xl"
-                              onClick={() => handleSelectEditSupplement(supp)}
-                              aria-label={`Editar ${supp.nombre}`}
-                            >
-                              <IconPencil size={16} />
-                            </ActionIcon>
-                            <ActionIcon
-                              color="red"
-                              variant="subtle"
-                              radius="xl"
-                              onClick={() => deleteSupplement(supp.id, supp.nombre)}
-                              aria-label={`Eliminar ${supp.nombre}`}
-                            >
-                              <IconTrash size={16} />
-                            </ActionIcon>
+                            <Group gap={4} style={{ flexShrink: 0 }}>
+                              <ActionIcon
+                                color="blue"
+                                variant="subtle"
+                                radius="xl"
+                                onClick={() => handleSelectEditSupplement(supp)}
+                                aria-label={`Editar ${supp.nombre}`}
+                              >
+                                <IconPencil size={16} />
+                              </ActionIcon>
+                              <ActionIcon
+                                color="red"
+                                variant="subtle"
+                                radius="xl"
+                                onClick={() => deleteSupplement(supp.id, supp.nombre)}
+                                aria-label={`Eliminar ${supp.nombre}`}
+                              >
+                                <IconTrash size={16} />
+                              </ActionIcon>
+                            </Group>
                           </Group>
-                        </Group>
-                      </Paper>
-                    ))}
+                        </Paper>
+                      );
+                    })}
                   </Stack>
                 </ScrollArea>
               ) : (
@@ -677,64 +701,78 @@ export default function SupplementCatalogManager({
               icon={editingSupplementId ? IconPencil : IconCirclePlus}
               color="teal"
             >
-              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                <TextInput
-                  label="Nombre"
-                  placeholder="Ej. Zinc"
-                  value={supplementForm.nombre}
-                  onChange={(event) => {
-                    const val = event.currentTarget.value;
-                    setSupplementForm((current) => ({ ...current, nombre: val }));
-                  }}
-                  required
-                />
-                <TextInput
-                  label="Categoría"
-                  placeholder="Ej. Micronutrientes"
-                  value={supplementForm.categoria}
-                  onChange={(event) => {
-                    const val = event.currentTarget.value;
-                    setSupplementForm((current) => ({ ...current, categoria: val }));
-                  }}
-                />
+              <Stack gap="sm">
+                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+                  <TextInput
+                    label="Nombre"
+                    placeholder="Ej. B-alanina"
+                    value={supplementForm.nombre}
+                    onChange={(event) => {
+                      const val = event.currentTarget.value;
+                      setSupplementForm((current) => ({ ...current, nombre: val }));
+                    }}
+                    required
+                  />
+                  <TextInput
+                    label="Categoría"
+                    placeholder="Ej. Rendimiento / Micronutrientes"
+                    value={supplementForm.categoria}
+                    onChange={(event) => {
+                      const val = event.currentTarget.value;
+                      setSupplementForm((current) => ({ ...current, categoria: val }));
+                    }}
+                  />
+                </SimpleGrid>
+
                 <Select
                   label="Tipo de dosificación"
                   data={[
                     { value: 'custom', label: 'Dosis estándar / Texto libre' },
-                    { value: 'per_kg_range', label: 'Cálculo por Kg de peso' },
+                    { value: 'per_kg_range', label: 'Cálculo por Kg de peso corporal' },
                   ]}
                   value={supplementForm.dose_type}
                   onChange={(value) => setSupplementForm((current) => ({ ...current, dose_type: value || 'custom' }))}
                 />
+
                 {supplementForm.dose_type === 'per_kg_range' ? (
-                  <Group grow gap="xs">
-                    <TextInput
-                      label="Mínimo (por kg)"
-                      placeholder="Ej. 1"
-                      type="number"
-                      step="0.1"
-                      value={supplementForm.dose_min}
-                      onChange={(event) => setSupplementForm((current) => ({ ...current, dose_min: event.currentTarget.value }))}
-                    />
-                    <TextInput
-                      label="Máximo (por kg)"
-                      placeholder="Ej. 6"
-                      type="number"
-                      step="0.1"
-                      value={supplementForm.dose_max}
-                      onChange={(event) => setSupplementForm((current) => ({ ...current, dose_max: event.currentTarget.value }))}
-                    />
-                    <TextInput
-                      label="Unidad"
-                      placeholder="Ej. mg"
-                      value={supplementForm.dose_unit}
-                      onChange={(event) => setSupplementForm((current) => ({ ...current, dose_unit: event.currentTarget.value }))}
-                    />
-                  </Group>
+                  <Paper p="xs" radius="md" bg="gray.0" withBorder>
+                    <Text size="xs" fw={700} c="dark.4" mb={6}>
+                      Dosificación relativa (por kg de peso)
+                    </Text>
+                    <SimpleGrid cols={3} spacing="xs">
+                      <TextInput
+                        label="Mínimo (por kg)"
+                        placeholder="Ej. 0.05"
+                        type="number"
+                        step="0.01"
+                        value={supplementForm.dose_min}
+                        onChange={(event) => setSupplementForm((current) => ({ ...current, dose_min: event.currentTarget.value }))}
+                      />
+                      <TextInput
+                        label="Máximo (por kg)"
+                        placeholder="Ej. 0.08"
+                        type="number"
+                        step="0.01"
+                        value={supplementForm.dose_max}
+                        onChange={(event) => setSupplementForm((current) => ({ ...current, dose_max: event.currentTarget.value }))}
+                      />
+                      <TextInput
+                        label="Unidad"
+                        placeholder="g, mg, ml..."
+                        value={supplementForm.dose_unit}
+                        onChange={(event) => setSupplementForm((current) => ({ ...current, dose_unit: event.currentTarget.value }))}
+                      />
+                    </SimpleGrid>
+                    {supplementForm.dose_min && (
+                      <Text size="xs" c="teal.7" fw={600} mt={6}>
+                        Ejemplo (jugador 75 kg): {(75 * parseFloat(supplementForm.dose_min || 0)).toFixed(2)} {supplementForm.dose_max ? `– ${(75 * parseFloat(supplementForm.dose_max || 0)).toFixed(2)}` : ''} {supplementForm.dose_unit || 'g'}
+                      </Text>
+                    )}
+                  </Paper>
                 ) : (
                   <TextInput
-                    label="Dosis / pauta"
-                    placeholder="Ej. 15 mg/día"
+                    label="Dosis / pauta estándar"
+                    placeholder="Ej. 15 mg/día o Según pauta médica"
                     value={supplementForm.pauta}
                     onChange={(event) => {
                       const val = event.currentTarget.value;
@@ -742,36 +780,42 @@ export default function SupplementCatalogManager({
                     }}
                   />
                 )}
+
                 <TextInput
                   label="Timing"
-                  placeholder="Ej. Con comida"
+                  placeholder="Ej. Diario, dividido en tomas / 45-60 min pre-entreno"
                   value={supplementForm.timing}
                   onChange={(event) => {
                     const val = event.currentTarget.value;
                     setSupplementForm((current) => ({ ...current, timing: val }));
                   }}
                 />
-                <Textarea
-                  label="Descripción"
-                  placeholder="Para qué se usa"
-                  minRows={2}
-                  value={supplementForm.descripcion || ''}
-                  onChange={(event) => {
-                    const val = event.currentTarget.value;
-                    setSupplementForm((current) => ({ ...current, descripcion: val }));
-                  }}
-                />
-                <Textarea
-                  label="Notas"
-                  placeholder="Opcional"
-                  minRows={2}
-                  value={supplementForm.notas || ''}
-                  onChange={(event) => {
-                    const val = event.currentTarget.value;
-                    setSupplementForm((current) => ({ ...current, notas: val }));
-                  }}
-                />
-              </SimpleGrid>
+
+                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+                  <Textarea
+                    label="Descripción"
+                    placeholder="Función, para qué se usa o beneficios"
+                    minRows={2}
+                    autosize
+                    value={supplementForm.descripcion || ''}
+                    onChange={(event) => {
+                      const val = event.currentTarget.value;
+                      setSupplementForm((current) => ({ ...current, descripcion: val }));
+                    }}
+                  />
+                  <Textarea
+                    label="Notas"
+                    placeholder="Advertencias, tolerancia o recomendaciones"
+                    minRows={2}
+                    autosize
+                    value={supplementForm.notas || ''}
+                    onChange={(event) => {
+                      const val = event.currentTarget.value;
+                      setSupplementForm((current) => ({ ...current, notas: val }));
+                    }}
+                  />
+                </SimpleGrid>
+              </Stack>
 
               <Divider my="sm" />
 

@@ -14,8 +14,8 @@ import {
   Textarea,
 } from '@mantine/core';
 import {
-  IconFlame,
-  IconToolsKitchen,
+  IconBentoBox,
+  IconCooking,
 } from '@/components/icons3d';
 import NothingFound from '@/components/NothingFound';
 import { BentoCard } from '@/components/BentoItem';
@@ -300,7 +300,7 @@ export default function MenuSemanal({
         <Grid gutter="md" align="stretch" mt="xs">
           {/* Comida Bento Card */}
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <BentoCard title="Almuerzo / Comida" icon={IconToolsKitchen} color="orange">
+            <BentoCard title="Almuerzo / Comida" icon={IconCooking} color="orange">
               <Stack gap="sm" mt="xs">
                 <Textarea
                   label="Primer Plato"
@@ -341,7 +341,7 @@ export default function MenuSemanal({
 
           {/* Cena Bento Card */}
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <BentoCard title="Cena del Equipo" icon={IconFlame} color="blue">
+            <BentoCard title="Cena del Equipo" icon={IconBentoBox} color="blue">
               <Stack gap="sm" mt="xs">
                 <Textarea
                   label="Primer Plato"
@@ -387,7 +387,7 @@ export default function MenuSemanal({
       <Grid gutter="md" align="stretch" mt="xs">
         {/* Comida Bento Card */}
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <BentoCard title="Almuerzo / Comida" icon={IconToolsKitchen} color="orange">
+          <BentoCard title="Almuerzo / Comida" icon={IconCooking} color="orange">
             <Stack gap="md" mt="xs">
               <HeroDishSection title="Primer Plato" label="1º" value={dayData.comida?.primero} color="orange" />
               <Divider style={{ borderColor: 'var(--mantine-color-gray-1)', borderStyle: 'dashed' }} />
@@ -404,7 +404,7 @@ export default function MenuSemanal({
 
         {/* Cena Bento Card */}
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <BentoCard title="Cena del Equipo" icon={IconFlame} color="blue">
+          <BentoCard title="Cena del Equipo" icon={IconBentoBox} color="blue">
             <Stack gap="md" mt="xs">
               <HeroDishSection title="Primer Plato" label="1º" value={dayData.cena?.primero} color="blue" />
               <Divider style={{ borderColor: 'var(--mantine-color-gray-1)', borderStyle: 'dashed' }} />
@@ -426,7 +426,7 @@ export default function MenuSemanal({
     return (
       <NothingFound
         withPaper
-        icon={IconToolsKitchen}
+        icon={IconCooking}
         title="Sin menús"
         description="No hay menús registrados. Sube la foto o PDF del menú de esta semana para empezar."
       />

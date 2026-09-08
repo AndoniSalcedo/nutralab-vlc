@@ -4,7 +4,7 @@ import Icon3D from '@/components/Icon3D';
 import { notifications } from '@mantine/notifications';
 import { getTeams } from '@/services/team';
 import { transferPlayers } from '@/services/player';
-import { initials } from '@/lib/utils';
+import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 
 export default function TransferPlayersModal({ opened, onClose, team, players = [], initialSelectedIds = [] }) {
@@ -154,7 +154,7 @@ export default function TransferPlayersModal({ opened, onClose, team, players = 
                       style={{ pointerEvents: 'none' }}
                     />
                     <Avatar
-                      src={player.avatar_url || (player.avatar_size ? `/api/players/avatar?id=${player.id}` : undefined)}
+                      src={getPlayerAvatarUrl(player)}
                       size={32}
                       radius="xl"
                       color="initials"

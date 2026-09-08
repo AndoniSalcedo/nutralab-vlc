@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 
 import { slugify } from '@/lib/utils';
-import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, ThemeIcon, Tooltip, Textarea, Box, ColorInput, SimpleGrid, Avatar, FileButton, UnstyledButton, Modal, ScrollArea } from '@mantine/core';
+import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, Tooltip, Textarea, Box, ColorInput, SimpleGrid, Avatar, FileButton, ScrollArea } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconBook, IconClipboardList, IconPalette, IconCamera, IconFolderShare, IconDownload, IconCalculator } from '@/components/icons3d';
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/metrics/anthropometry';
@@ -18,7 +18,6 @@ import ProtocolImportModal from '@/components/modals/ProtocolImportModal';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
-import { PLAN_THEME_PRESETS } from '@/lib/nutrition/plan-card';
 import ProtocolIcon from '@/components/ProtocolIcon';
 
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
@@ -158,7 +157,6 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
   const [transferModalOpen, setTransferModalOpen] = useState(false);
   const [transferProtocol, setTransferProtocol] = useState(null);
   const [importModalOpen, setImportModalOpen] = useState(false);
-  const [themesModalOpen, setThemesModalOpen] = useState(false);
 
   const [planColors, setPlanColors] = useState(() => {
     const raw = team.configuracion_nutricional?.planColors || {};
@@ -402,9 +400,7 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
         <Paper p="md" radius="lg" shadow="sm" withBorder>
           <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
           <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
-            <ThemeIcon size="md" radius="xl" variant="light" color="nutralabColor" style={{ flexShrink: 0 }}>
-              <IconSettings size={18} />
-            </ThemeIcon>
+            <IconSettings size={28} style={{ flexShrink: 0 }} />
             <Box style={{ minWidth: 0 }}>
               <Group gap="xs" align="center" wrap="wrap">
                 <Title order={3} size="h4" fw={700} c="dark.5">General</Title>
@@ -437,16 +433,25 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
             <Box style={{ position: 'relative', display: 'inline-block' }}>
               <Avatar
                 src={team?.id ? `/api/teams/avatar?id=${team.id}&t=${teamPhotoVersion}` : undefined}
-                size={72}
-                radius="md"
+                size={96}
+                radius="xl"
                 color="nutralabColor"
                 style={{
-                  border: '2.5px solid white',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
-                  backgroundColor: 'var(--mantine-color-nutralabColor-0)',
+                  width: 96,
+                  height: 96,
+                  border: '3px solid white',
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                  backgroundColor: '#ffffff',
                   color: 'var(--mantine-color-nutralabColor-9)',
                   fontWeight: 600,
-                  fontSize: '18px',
+                  fontSize: '24px',
+                }}
+                imageProps={{
+                  style: {
+                    objectFit: 'contain',
+                    backgroundColor: '#ffffff',
+                    padding: '6px',
+                  },
                 }}
               >
                 {initials(teamName || team.nombre || 'Equipo')}
@@ -523,9 +528,7 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
       <Paper p="md" radius="lg" shadow="sm" withBorder>
         <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
           <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
-            <ThemeIcon size="md" radius="xl" variant="light" color="nutralabColor" style={{ flexShrink: 0 }}>
-              <IconBook size={18} />
-            </ThemeIcon>
+            <IconBook size={28} style={{ flexShrink: 0 }} />
             <Box style={{ minWidth: 0 }}>
               <Group gap="xs" align="center" wrap="wrap">
                 <Title order={3} size="h4" fw={700} c="dark.5">Textos Base para PDF</Title>
@@ -586,9 +589,7 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
       <Paper p="md" radius="lg" shadow="sm" withBorder>
         <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
           <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
-            <ThemeIcon size="md" radius="xl" variant="light" color="nutralabColor" style={{ flexShrink: 0 }}>
-              <IconPalette size={18} />
-            </ThemeIcon>
+            <IconPalette size={28} style={{ flexShrink: 0 }} />
             <Box style={{ minWidth: 0 }}>
               <Group gap="xs" align="center" wrap="wrap">
                 <Title order={3} size="h4" fw={700} c="dark.5">Colores del Plan Nutricional</Title>
@@ -603,16 +604,6 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
           </Group>
           {!readOnly && (
             <Group gap="xs" wrap="wrap" w={{ base: '100%', sm: 'auto' }}>
-              <Button
-                variant="default"
-                size="xs"
-                radius="xl"
-                leftSection={<IconPalette size={14} />}
-                onClick={() => setThemesModalOpen(true)}
-                style={{ flex: '1 1 auto' }}
-              >
-                Temas Predefinidos
-              </Button>
               {hasColorChanges && (
                 <Button
                   size="xs"
@@ -783,81 +774,12 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
         </Stack>
       </Paper>
 
-      <Modal
-        opened={themesModalOpen}
-        onClose={() => setThemesModalOpen(false)}
-        title="Temas Predefinidos del Plan Nutricional"
-        size="lg"
-        radius="md"
-      >
-        <Stack gap="md">
-          <Text size="xs" c="dimmed">
-            Haz clic en un tema para cargarlo en la vista previa y editarlo. Pulsa luego <strong>Guardar Colores</strong> para aplicar los cambios permanentemente en el equipo.
-          </Text>
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-            {PLAN_THEME_PRESETS.map((preset) => {
-              const isSelected = planColors.cardBodyBg === preset.colors.cardBodyBg &&
-                planColors.cardTopBg === preset.colors.cardTopBg &&
-                planColors.boxBg === preset.colors.boxBg &&
-                planColors.accentText === preset.colors.accentText;
-              return (
-                <UnstyledButton
-                  key={preset.id}
-                  onClick={() => {
-                    if (!readOnly) {
-                      setPlanColors(preset.colors);
-                      setThemesModalOpen(false);
-                      notifications.show({
-                        color: 'blue',
-                        title: 'Tema cargado en vista previa',
-                        message: `Has seleccionado ${preset.name}. Haz clic en "Guardar Colores" para confirmar los cambios.`,
-                      });
-                    }
-                  }}
-                  style={{
-                    padding: '12px 14px',
-                    borderRadius: '8px',
-                    border: isSelected ? '2px solid var(--mantine-color-teal-6)' : '1px solid var(--mantine-color-gray-3)',
-                    backgroundColor: isSelected ? 'var(--mantine-color-nutralabColor-0)' : 'var(--mantine-color-gray-0)',
-                    cursor: readOnly ? 'default' : 'pointer',
-                    transition: 'all 0.2s ease',
-                  }}
-                >
-                  <Group justify="space-between" align="center" wrap="nowrap" mb={4}>
-                    <Text size="xs" fw={700} c={isSelected ? 'nutralabColor.8' : 'dark.5'}>
-                      {preset.name}
-                    </Text>
-                    <Group gap={3}>
-                      {preset.swatches.map((s, idx) => (
-                        <Box
-                          key={idx}
-                          style={{
-                            width: 10,
-                            height: 10,
-                            borderRadius: '50%',
-                            backgroundColor: s,
-                            border: '1px solid rgba(0,0,0,0.15)',
-                          }}
-                        />
-                      ))}
-                    </Group>
-                  </Group>
-                  <Text size="xs" c="dimmed" lh={1.3}>
-                    {preset.description}
-                  </Text>
-                </UnstyledButton>
-              );
-            })}
-          </SimpleGrid>
-        </Stack>
-      </Modal>
+
 
       <Paper p="md" radius="lg" shadow="sm" withBorder>
         <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
           <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
-            <ThemeIcon size="md" radius="xl" variant="light" color="nutralabColor" style={{ flexShrink: 0 }}>
-              <IconCalendarStats size={18} />
-            </ThemeIcon>
+            <IconCalendarStats size={28} style={{ flexShrink: 0 }} />
             <Box style={{ minWidth: 0 }}>
               <Group gap="xs" align="center" wrap="wrap">
                 <Title order={3} size="h4" fw={700} c="dark.5">Tipos de Día</Title>
@@ -980,9 +902,7 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
       <Paper p="md" radius="lg" shadow="sm" withBorder>
         <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
           <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
-            <ThemeIcon size="md" radius="xl" variant="light" color="nutralabColor" style={{ flexShrink: 0 }}>
-              <IconClipboardList size={18} />
-            </ThemeIcon>
+            <IconClipboardList size={28} style={{ flexShrink: 0 }} />
             <Box style={{ minWidth: 0 }}>
               <Group gap="xs" align="center" wrap="wrap">
                 <Title order={3} size="h4" fw={700} c="dark.5">Protocolos por Tipo de Día</Title>
@@ -1153,9 +1073,7 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
       <Paper p="md" radius="lg" shadow="sm" withBorder>
         <Group justify="space-between" align="center" mb="md" wrap="wrap" gap="sm" style={{ width: '100%' }}>
           <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
-            <ThemeIcon size="md" radius="xl" variant="light" color="nutralabColor" style={{ flexShrink: 0 }}>
-              <IconCalculator size={18} />
-            </ThemeIcon>
+            <IconCalculator size={28} style={{ flexShrink: 0 }} />
             <Box style={{ minWidth: 0 }}>
               <Group gap="xs" align="center" wrap="wrap">
                 <Title order={3} size="h4" fw={700} c="dark.5">Multiplicadores por Objetivo</Title>

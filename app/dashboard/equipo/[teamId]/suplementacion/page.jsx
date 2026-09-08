@@ -39,7 +39,7 @@ export default async function TeamSupplementationPage({ params, searchParams }) 
   let catalogs = [];
 
   try {
-    players = await getPlayersByTeamSelect(supabase, team.id, 'id,nombre,apellidos,posicion,auth_email');
+    players = await getPlayersByTeamSelect(supabase, team.id, 'id,nombre,apellidos,posicion,auth_email,avatar_size,updated_at');
 
     const playerIds = players.map((player) => player.id);
     
