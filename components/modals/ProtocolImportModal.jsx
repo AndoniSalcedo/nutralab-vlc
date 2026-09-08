@@ -10,7 +10,6 @@ import {
   Text, 
   Paper, 
   Checkbox, 
-  ThemeIcon, 
   Loader, 
   Center,
   Box,
@@ -185,9 +184,7 @@ export default function ProtocolImportModal({
         </Center>
       ) : teams.length === 0 ? (
         <Stack py="md" align="center" gap="sm">
-          <ThemeIcon color="gray" variant="light" size="xl" radius="xl">
-            <IconShield size={28} />
-          </ThemeIcon>
+          <IconShield size={44} />
           <Text size="sm" fw={600} c="dark.3" ta="center">
             No tienes otros equipos disponibles
           </Text>

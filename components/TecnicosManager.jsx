@@ -375,10 +375,8 @@ export default function TecnicosManager({ teams = [] }) {
             </Table>
           </Box>
         ) : (
-          <Stack align="center" gap="sm" py="xl">
-            <ThemeIcon color="gray" variant="light" radius="xl" size={48}>
-              <IconUsersGroup size={24} />
-            </ThemeIcon>
+          <Stack align="center" gap="xs" py="xl">
+            <IconUsersGroup size={44} />
             <Text fw={600} size="sm" c="dimmed">
               No tienes ningún técnico vinculado todavía.
             </Text>

@@ -14,7 +14,6 @@ import {
   Tabs,
   Text,
   TextInput,
-  ThemeIcon,
   Title,
   Tooltip,
 } from '@mantine/core';
@@ -241,9 +240,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
               <Table.Tr key={tecnico.id}>
                 <Table.Td>
                   <Group gap="sm" wrap="nowrap">
-                    <ThemeIcon color="nutralabColor" variant="light" radius="xl" size={32}>
-                      <IconUser size={16} />
-                    </ThemeIcon>
+                    <IconUser size={18} />
                     <Text fw={600} size="sm" c="dark.5">
                       {tecnico.nombre} {tecnico.apellidos || ''}
                     </Text>
@@ -279,9 +276,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
         </Table>
       ) : (
         <Stack align="center" gap="xs" py="xl">
-          <ThemeIcon color="gray" variant="light" radius="xl" size={42}>
-            <IconUsersGroup size={20} />
-          </ThemeIcon>
+          <IconUsersGroup size={44} />
           <Text fw={600} size="sm" c="dimmed">
             No hay ningún técnico asignado a este equipo.
           </Text>

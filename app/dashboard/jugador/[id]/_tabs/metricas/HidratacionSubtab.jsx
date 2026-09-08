@@ -10,7 +10,6 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  ThemeIcon,
   Title,
   Button,
   Table,
@@ -526,14 +525,14 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
 
     if (data.length === 0) {
       return (
-        <Paper p="xl" radius="lg" withBorder bg="white" shadow="sm" align="center">
-          <ThemeIcon size={44} radius="xl" color={isSweat ? 'orange' : 'blue'} variant="light" mb="xs">
-            <IconAlertCircle size={24} />
-          </ThemeIcon>
-          <Title order={4} c="dark.7">{metric.emptyTitle}</Title>
-          <Text size="xs" c="dimmed" maxW={400} mx="auto" mt={4}>
-            {metric.emptyText}
-          </Text>
+        <Paper p="xl" radius="lg" withBorder bg="white" shadow="sm">
+          <Stack align="center" gap="xs" ta="center">
+            <IconAlertCircle size={36} />
+            <Title order={4} c="dark.7">{metric.emptyTitle}</Title>
+            <Text size="xs" c="dimmed" maxW={400} mx="auto">
+              {metric.emptyText}
+            </Text>
+          </Stack>
         </Paper>
       );
     }

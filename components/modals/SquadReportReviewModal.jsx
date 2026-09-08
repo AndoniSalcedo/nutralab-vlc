@@ -11,7 +11,6 @@ import {
   Paper,
   Stack,
   Text,
-  ThemeIcon,
 } from '@mantine/core';
 import {
   IconAlertTriangle,
@@ -77,9 +76,7 @@ export default function SquadReportReviewModal({
       closeOnEscape={false}
       title={
         <Group gap="xs">
-          <ThemeIcon color="nutralabColor" variant="light" radius="xl">
-            <IconShieldCheck size={18} />
-          </ThemeIcon>
+          <IconShieldCheck size={20} color="var(--mantine-color-nutralabColor-6)" stroke={1.8} />
           <Stack gap={0}>
             <Text fw={700} size="md" c="dark.5">Validación previa del informe</Text>
             <Text size="xs" c="dimmed">Jugador {Math.min(index + 1, total)} de {total}</Text>
@@ -94,9 +91,7 @@ export default function SquadReportReviewModal({
         <Paper p="md" radius="md" withBorder bg="gray.0">
           <Group justify="space-between" align="flex-start" wrap="wrap">
             <Group gap="sm" wrap="nowrap">
-              <ThemeIcon color="nutralabColor" size="lg" radius="xl">
-                <IconUserCheck size={20} />
-              </ThemeIcon>
+              <IconUserCheck size={24} color="var(--mantine-color-nutralabColor-6)" stroke={1.8} />
               <Box>
                 <Text fw={700} size="lg" c="dark.5">{playerName}</Text>
                 <Text size="sm" c="dimmed">{preview?.posicion || 'Jugador'} · Plan semanal generado</Text>
@@ -108,9 +103,7 @@ export default function SquadReportReviewModal({
 
         <Paper p="sm" radius="md" withBorder>
           <Group gap="xs" mb="xs">
-            <ThemeIcon color="orange" variant="light" size="sm" radius="xl">
-              <IconAlertTriangle size={14} />
-            </ThemeIcon>
+            <IconAlertTriangle size={18} color="var(--mantine-color-orange-6)" stroke={1.8} />
             <Text size="sm" fw={700} c="dark.5">Revisa las ingestas y las indicaciones de los siete días</Text>
           </Group>
           <Text size="xs" c="dimmed">

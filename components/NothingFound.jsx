@@ -1,4 +1,4 @@
-import { Box, Button, Group, Paper, Stack, Text, ThemeIcon } from '@mantine/core';
+import { Box, Button, Group, Paper, Stack, Text } from '@mantine/core';
 import { IconInbox, USE_3D_ICONS } from '@/components/icons3d';
 import Link from 'next/link';
 import Icon3D from '@/components/Icon3D';
@@ -22,7 +22,6 @@ export default function NothingFound({
   const resolved3dName = typeof icon3d === 'string' ? icon3d : 'folder';
   const PIcon = Icon || IconInbox;
   const iconSize = compact ? 24 : 42;
-  const themeIconSize = compact ? 40 : 70;
   const titleSize = compact ? 'sm' : 'md';
 
   const content = (
@@ -32,16 +31,18 @@ export default function NothingFound({
           <Icon3D name={resolved3dName} size={compact ? 64 : 96} />
         </Box>
       ) : (
-        <ThemeIcon
-          size={themeIconSize}
-          radius="xl"
-          variant="light"
-          color="gray"
+        <Box
           mb={compact ? 0 : 4}
-          style={{ opacity: 0.6 }}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: 0.65,
+            color: 'var(--mantine-color-dimmed)',
+          }}
         >
-          {Icon ? <PIcon size={iconSize} stroke={1.5} /> : <Icon3D name={resolved3dName} size={iconSize} />}
-        </ThemeIcon>
+          {Icon ? <PIcon size={iconSize} stroke={1.5} /> : <Icon3D name={resolved3dName} size={iconSize} normal />}
+        </Box>
       )}
 
       <Stack gap={0} align="center">
