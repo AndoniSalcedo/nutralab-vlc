@@ -622,8 +622,8 @@ export default function DashboardContent({ players = [], team, readOnly = false 
     });
   }
 
-  const teamActionsDropdown = (
-    <Menu.Dropdown>
+  const teamActionsDropdownItems = (
+    <>
       <Menu.Label>Mediciones y Reportes</Menu.Label>
       <Menu.Item
         leftSection={<Icon3D name="scale" size={20} />}
@@ -665,7 +665,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       >
         Cuerpo técnico
       </Menu.Item>
-    </Menu.Dropdown>
+    </>
   );
 
   return (
@@ -674,51 +674,46 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       <TeamHeaderRightSection>
         {!readOnly && (
           <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
-            {/* Móvil: botón más (+) compacto */}
-            <Tooltip label="Nuevo jugador" withArrow>
-              <ActionIcon
-                hiddenFrom="sm"
-                size={36}
-                radius="xl"
-                color="dark"
-                onClick={() => setActiveModal('new-player')}
-                aria-label="Nuevo jugador"
-              >
-                <Icon3D name="plus" size={18} />
-              </ActionIcon>
-            </Tooltip>
-
-            {/* Escritorio: Botón completo */}
-            <Button
-              visibleFrom="sm"
-              size="xs"
-              radius="xl"
-              color="dark"
-              leftSection={<Icon3D name="plus" size={18} />}
-              onClick={() => setActiveModal('new-player')}
-            >
-              Nuevo jugador
-            </Button>
-
-            {/* Móvil: botón engranaje (⚙) compacto */}
+            {/* Móvil: Menú 3 puntos idéntico al del jugador */}
             <Box hiddenFrom="sm">
-              <Menu shadow="md" width={240} position="bottom-end" withArrow radius="md">
+              <Menu shadow="md" width={240} position="bottom-end" withArrow radius="md" keepMounted>
                 <Menu.Target>
                   <ActionIcon
-                    variant="default"
-                    size={36}
+                    variant="subtle"
+                    color="gray"
                     radius="xl"
-                    aria-label="Acciones de equipo"
+                    size={38}
+                    aria-label="Opciones de equipo"
                   >
-                    <Icon3D name="configuracion" size={20} />
+                    <IconDotsVertical size={20} stroke={1.8} />
                   </ActionIcon>
                 </Menu.Target>
-                {teamActionsDropdown}
+                <Menu.Dropdown>
+                  <Menu.Item
+                    leftSection={<Icon3D name="plus" size={18} />}
+                    onClick={() => setActiveModal('new-player')}
+                    fw={600}
+                  >
+                    Nuevo jugador
+                  </Menu.Item>
+                  <Menu.Divider />
+                  {teamActionsDropdownItems}
+                </Menu.Dropdown>
               </Menu>
             </Box>
 
-            {/* Escritorio: Botón completo */}
-            <Box visibleFrom="sm">
+            {/* Escritorio: Botón completo Nuevo jugador y Acciones de equipo */}
+            <Group visibleFrom="sm" gap="xs" wrap="nowrap">
+              <Button
+                size="xs"
+                radius="xl"
+                color="dark"
+                leftSection={<Icon3D name="plus" size={18} />}
+                onClick={() => setActiveModal('new-player')}
+              >
+                Nuevo jugador
+              </Button>
+
               <Menu shadow="md" width={240} position="bottom-end" withArrow radius="md">
                 <Menu.Target>
                   <Button
@@ -731,9 +726,11 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                     Acciones de equipo
                   </Button>
                 </Menu.Target>
-                {teamActionsDropdown}
+                <Menu.Dropdown>
+                  {teamActionsDropdownItems}
+                </Menu.Dropdown>
               </Menu>
-            </Box>
+            </Group>
           </Group>
         )}
       </TeamHeaderRightSection>

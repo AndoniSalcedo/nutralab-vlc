@@ -21,25 +21,18 @@ import {
 import {
   IconArrowLeft,
 } from '@/components/icons3d';
-import {
-  IconBottle,
-  IconChartLine,
-  IconReportMedical,
-  IconSettings,
-  IconToolsKitchen,
-  IconUsers,
-} from '@tabler/icons-react';
+
 import { initials } from '@/lib/utils/avatar';
 import { useTeamHeaderSlot } from '@/components/TeamHeaderContext';
 import Icon3D from '@/components/Icon3D';
 
 const TABS = [
-  { value: 'plantilla', label: 'Plantilla', href: (id) => `/dashboard/equipo/${id}`, icon3d: 'plantilla', mobileIcon: IconUsers },
-  { value: 'evolucion', label: 'Evolución', href: (id) => `/dashboard/equipo/${id}/evolucion`, icon3d: 'evolucion', mobileIcon: IconChartLine },
-  { value: 'analiticas', label: 'Analíticas', href: (id) => `/dashboard/equipo/${id}/analiticas`, icon3d: 'stethoscope', mobileIcon: IconReportMedical },
-  { value: 'suplementacion', label: 'Suplementación', href: (id) => `/dashboard/equipo/${id}/suplementacion`, icon3d: 'suplementacion', mobileIcon: IconBottle },
-  { value: 'menu', label: 'Menú semanal', href: (id) => `/dashboard/equipo/${id}/menu`, icon3d: 'fork_and_knife', mobileIcon: IconToolsKitchen },
-  { value: 'configuracion', label: 'Configuración', href: (id) => `/dashboard/equipo/${id}/configuracion`, icon3d: 'configuracion', mobileIcon: IconSettings },
+  { value: 'plantilla', label: 'Plantilla', href: (id) => `/dashboard/equipo/${id}`, icon3d: 'plantilla' },
+  { value: 'evolucion', label: 'Evolución', href: (id) => `/dashboard/equipo/${id}/evolucion`, icon3d: 'evolucion' },
+  { value: 'analiticas', label: 'Analíticas', href: (id) => `/dashboard/equipo/${id}/analiticas`, icon3d: 'stethoscope' },
+  { value: 'suplementacion', label: 'Suplementación', href: (id) => `/dashboard/equipo/${id}/suplementacion`, icon3d: 'suplementacion' },
+  { value: 'menu', label: 'Menú semanal', href: (id) => `/dashboard/equipo/${id}/menu`, icon3d: 'fork_and_knife' },
+  { value: 'configuracion', label: 'Configuración', href: (id) => `/dashboard/equipo/${id}/configuracion`, icon3d: 'configuracion' },
 ];
 
 const MOBILE_LABELS = {
@@ -346,7 +339,6 @@ export default function TeamHeaderTabs({
             const href = teamId ? tab.href(teamId) : '#';
             const isActive = tab.value === tabValue;
             const mobileLabel = MOBILE_LABELS[tab.value] || tab.label;
-            const MobileIcon = tab.mobileIcon;
 
             return (
               <Box
@@ -379,11 +371,13 @@ export default function TeamHeaderTabs({
                     }}
                   />
                 )}
-                <MobileIcon
-                  size={20}
-                  stroke={isActive ? 2.4 : 1.6}
+                <Icon3D
+                  name={tab.icon3d}
+                  size={22}
                   style={{
-                    color: isActive ? '#24291f' : 'inherit',
+                    opacity: isActive ? 1 : 0.75,
+                    transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                    transition: 'transform 140ms ease, opacity 140ms ease',
                   }}
                 />
                 <Text

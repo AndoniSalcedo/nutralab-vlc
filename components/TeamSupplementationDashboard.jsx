@@ -18,7 +18,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { TeamHeaderRightSection } from '@/components/TeamHeaderContext';
-import { IconBottle, IconHistory, IconUsers, IconPill, IconList } from '@/components/icons3d';
+import { IconBottle, IconHistory, IconUsers, IconPill, IconList, IconDotsVertical } from '@/components/icons3d';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import SupplementManagerModal from '@/components/modals/SupplementManagerModal';
@@ -66,13 +66,13 @@ export default function TeamSupplementationDashboard({
               <Menu shadow="md" width={200} position="bottom-end" withArrow radius="md">
                 <Menu.Target>
                   <ActionIcon
-                    size={36}
+                    size={38}
                     radius="xl"
-                    variant="light"
-                    color="grape"
+                    variant="subtle"
+                    color="gray"
                     aria-label="Gestión de suplementación"
                   >
-                    <IconPill size={18} />
+                    <IconDotsVertical size={20} stroke={1.8} />
                   </ActionIcon>
                 </Menu.Target>
                 <Menu.Dropdown>

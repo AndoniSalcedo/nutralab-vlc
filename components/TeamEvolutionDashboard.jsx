@@ -8,6 +8,7 @@ import {
   Box,
   Button,
   Group,
+  Menu,
   MultiSelect,
   Paper,
   ScrollArea,
@@ -48,6 +49,7 @@ import {
   IconUserCheck,
   IconUsers,
   IconX,
+  IconDotsVertical,
 } from '@/components/icons3d';
 import NothingFound from '@/components/NothingFound';
 import PlayerSubtabControl from '@/app/dashboard/jugador/[id]/_tabs/PlayerSubtabControl';
@@ -690,16 +692,44 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
     <BoneyardSkeleton name="team-evolution" loading={false}>
       {/* 1. BOTÓN DE CSV INTEGRADO EN LA CABECERA A LA ALTURA DEL NOMBRE */}
       <TeamHeaderRightSection>
-        <Button
-          radius="xl"
-          size="xs"
-          variant="default"
-          leftSection={<IconDownload size={14} />}
-          onClick={handleDownloadCsv}
-          disabled={viewMode === 'day' ? measuredDayRows.length === 0 : rows.length === 0}
-        >
-          CSV
-        </Button>
+        <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
+          <Box hiddenFrom="sm">
+            <Menu shadow="md" width={180} position="bottom-end" withArrow radius="md" keepMounted>
+              <Menu.Target>
+                <ActionIcon
+                  size={38}
+                  radius="xl"
+                  variant="subtle"
+                  color="gray"
+                  aria-label="Opciones"
+                >
+                  <IconDotsVertical size={20} stroke={1.8} />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<IconDownload size={16} />}
+                  onClick={handleDownloadCsv}
+                  disabled={viewMode === 'day' ? measuredDayRows.length === 0 : rows.length === 0}
+                >
+                  Descargar CSV
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </Box>
+
+          <Button
+            visibleFrom="sm"
+            radius="xl"
+            size="xs"
+            variant="default"
+            leftSection={<IconDownload size={14} />}
+            onClick={handleDownloadCsv}
+            disabled={viewMode === 'day' ? measuredDayRows.length === 0 : rows.length === 0}
+          >
+            CSV
+          </Button>
+        </Group>
       </TeamHeaderRightSection>
 
       {/* 2. BARRA DE HERRAMIENTAS Y FILTROS INTEGRADOS EN LA CABECERA */}

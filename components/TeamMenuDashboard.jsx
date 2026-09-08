@@ -12,7 +12,7 @@ import {
   Menu,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX, IconDots } from '@/components/icons3d';
+import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX, IconDotsVertical } from '@/components/icons3d';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import MenuSemanal, { formatWeek, WEEKDAY_ORDER } from '@/components/MenuSemanal';
 import { uploadWeeklyMenu, deleteWeeklyMenu, updateWeeklyMenu } from '@/services/menu';
@@ -283,13 +283,13 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
                 <Menu shadow="md" width={200} position="bottom-end" withArrow radius="md">
                   <Menu.Target>
                     <ActionIcon
-                      size={36}
+                      size={38}
                       radius="xl"
-                      variant="light"
-                      color="nutralabColor"
+                      variant="subtle"
+                      color="gray"
                       aria-label="Gestión de menú semanal"
                     >
-                      <IconDots size={18} />
+                      <IconDotsVertical size={20} stroke={1.8} />
                     </ActionIcon>
                   </Menu.Target>
                   <Menu.Dropdown>
