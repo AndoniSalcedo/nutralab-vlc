@@ -99,16 +99,21 @@ export default function TeamHeaderTabs({
     <>
       <Paper
         radius={24}
-        p="lg"
+        p={{ base: 'xs', sm: 'lg' }}
         shadow="xs"
         bg="white"
         mb="md"
       >
-        <Group justify="space-between" align="center" wrap="wrap" gap="md">
-          <Group gap="md">
+        <Group justify="space-between" align="center" wrap="nowrap" gap={{ base: 'xs', sm: 'md' }} style={{ width: '100%' }}>
+          <Group gap={{ base: 'xs', sm: 'md' }} align="center" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
             <Tooltip label="Volver a equipos" position="right" withArrow>
-              <Anchor component={Link} href="/dashboard" style={{ textDecoration: 'none' }}>
-                <ActionIcon variant="subtle" color="gray" size={42} radius="xl" style={{ transition: 'transform 140ms ease' }}>
+              <Anchor component={Link} href="/dashboard" style={{ textDecoration: 'none', flexShrink: 0 }}>
+                {/* En móvil: size 36, icono 20 */}
+                <ActionIcon hiddenFrom="sm" variant="subtle" color="gray" size={36} radius="xl">
+                  <IconArrowLeft size={20} />
+                </ActionIcon>
+                {/* En escritorio: size 42, icono 26 (idéntico al del jugador) */}
+                <ActionIcon visibleFrom="sm" variant="subtle" color="gray" size={42} radius="xl" style={{ transition: 'transform 140ms ease' }}>
                   <IconArrowLeft size={26} />
                 </ActionIcon>
               </Anchor>
@@ -117,65 +122,109 @@ export default function TeamHeaderTabs({
             {avatarSlot ? (
               avatarSlot
             ) : (
-              <Box style={{ position: 'relative', display: 'inline-block' }}>
-                <Avatar
-                  src={teamId ? `/api/teams/avatar?id=${teamId}&t=${teamPhotoVersion || team?.updated_at || ''}` : undefined}
-                  size={84}
-                  radius="xl"
-                  color="nutralabColor"
-                  style={{
-                    border: '3px solid white',
-                    boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
-                    backgroundColor: '#ffffff',
-                    color: 'var(--mantine-color-nutralabColor-9)',
-                    fontWeight: 700,
-                    fontSize: '24px',
-                  }}
-                  imageProps={{
-                    style: {
-                      objectFit: 'contain',
+              <Box style={{ position: 'relative', display: 'inline-block', flexShrink: 0 }}>
+                {/* Escudo Móvil (44px - idéntico al jugador en móvil) */}
+                <Box hiddenFrom="sm">
+                  <Avatar
+                    src={teamId ? `/api/teams/avatar?id=${teamId}&t=${teamPhotoVersion || team?.updated_at || ''}` : undefined}
+                    size={44}
+                    radius="xl"
+                    color="nutralabColor"
+                    style={{
+                      width: 44,
+                      height: 44,
+                      minWidth: 44,
+                      minHeight: 44,
+                      border: '2px solid white',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                       backgroundColor: '#ffffff',
-                      padding: '4px',
-                    },
-                  }}
-                >
-                  {initials(team?.nombre || 'Equipo')}
-                </Avatar>
-                {!readOnly && teamId && onSelectTeamPhoto && (
-                  <FileButton onChange={onSelectTeamPhoto} accept="image/*">
-                    {(props) => (
-                      <Tooltip label="Cambiar escudo o foto" position="bottom" withArrow>
-                        <UnstyledButton
-                          {...props}
-                          style={{
-                            position: 'absolute',
-                            bottom: -2,
-                            right: -2,
-                            cursor: 'pointer',
-                            zIndex: 4,
-                            overflow: 'visible',
-                            lineHeight: 0,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            transition: 'transform 150ms ease, opacity 150ms ease',
-                          }}
-                        >
-                          <Icon3D name="camera" size={28} />
-                        </UnstyledButton>
-                      </Tooltip>
-                    )}
-                  </FileButton>
-                )}
+                      color: 'var(--mantine-color-nutralabColor-9)',
+                      fontWeight: 700,
+                      fontSize: '14px',
+                    }}
+                    imageProps={{
+                      style: {
+                        objectFit: 'contain',
+                        backgroundColor: '#ffffff',
+                        padding: '2px',
+                      },
+                    }}
+                  >
+                    {initials(team?.nombre || 'Equipo')}
+                  </Avatar>
+                </Box>
+
+                {/* Escudo Escritorio (84px - idéntico al jugador en escritorio) */}
+                <Box visibleFrom="sm">
+                  <Avatar
+                    src={teamId ? `/api/teams/avatar?id=${teamId}&t=${teamPhotoVersion || team?.updated_at || ''}` : undefined}
+                    size={84}
+                    radius="xl"
+                    color="nutralabColor"
+                    style={{
+                      width: 84,
+                      height: 84,
+                      minWidth: 84,
+                      minHeight: 84,
+                      border: '3px solid white',
+                      boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+                      backgroundColor: '#ffffff',
+                      color: 'var(--mantine-color-nutralabColor-9)',
+                      fontWeight: 700,
+                      fontSize: '24px',
+                    }}
+                    imageProps={{
+                      style: {
+                        objectFit: 'contain',
+                        backgroundColor: '#ffffff',
+                        padding: '4px',
+                      },
+                    }}
+                  >
+                    {initials(team?.nombre || 'Equipo')}
+                  </Avatar>
+                  {!readOnly && teamId && onSelectTeamPhoto && (
+                    <FileButton onChange={onSelectTeamPhoto} accept="image/*">
+                      {(props) => (
+                        <Tooltip label="Cambiar escudo o foto" position="bottom" withArrow>
+                          <UnstyledButton
+                            {...props}
+                            style={{
+                              position: 'absolute',
+                              bottom: -2,
+                              right: -2,
+                              cursor: 'pointer',
+                              zIndex: 4,
+                              overflow: 'visible',
+                              lineHeight: 0,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              transition: 'transform 150ms ease, opacity 150ms ease',
+                            }}
+                          >
+                            <Icon3D name="camera" size={28} />
+                          </UnstyledButton>
+                        </Tooltip>
+                      )}
+                    </FileButton>
+                  )}
+                </Box>
               </Box>
             )}
 
-            <Stack gap={4} style={{ minWidth: 0 }}>
-              <Title order={2} c="dark.5" lh={1.1} fz={26} fw={700} lineClamp={2}>
+            <Stack gap={{ base: 2, sm: 4 }} style={{ minWidth: 0, flex: 1 }}>
+              {/* Título Móvil */}
+              <Title hiddenFrom="sm" order={3} fw={700} c="dark.5" truncate="end">
                 {team?.nombre || 'Equipo'}
               </Title>
+              {/* Título Escritorio */}
+              <Title visibleFrom="sm" order={2} c="dark.5" lh={1.1} fz={26} fw={700} lineClamp={2}>
+                {team?.nombre || 'Equipo'}
+              </Title>
+
               {team?.temporada && (
-                <Text c="dimmed" size="sm" truncate="end">
+                <Text c="dimmed" size="sm" truncate="end" fw={500}>
                   {team.temporada.toLowerCase().includes('temporada')
                     ? team.temporada
                     : `Temporada ${team.temporada}`}

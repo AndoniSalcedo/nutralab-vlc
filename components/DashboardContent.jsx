@@ -8,7 +8,7 @@ import { deletePlayer } from '@/services/player';
 import { getWeeklyMenus } from '@/services/menu';
 import { generateWeeklySquadReport } from '@/services/report';
 import { notifications } from '@mantine/notifications';
-import { IconChevronDown, IconDots } from '@/components/icons3d';
+import { IconChevronDown, IconDots, IconDotsVertical } from '@/components/icons3d';
 import Icon3D from '@/components/Icon3D';
 import NothingFound from '@/components/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
