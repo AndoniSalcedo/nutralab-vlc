@@ -28,7 +28,7 @@ export default function CreateMenuModal({
       opened={opened}
       onClose={onClose}
       title={
-        <Text fw={850} size="lg" c="dark.4">
+        <Text fw={700} size="md" c="dark.5">
           Nuevo Menú Semanal
         </Text>
       }

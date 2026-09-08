@@ -204,8 +204,8 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
             <Paper p="md" radius="lg" withBorder bg="white">
               <Group justify="space-between" align="flex-start" mb="xs">
                 <Box>
-                  <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Peso Corporal</Text>
-                  <Title order={2} mt={4}>
+                  <Text size="xs" c="dimmed" tt="uppercase" fw={600}>Peso Corporal</Text>
+                  <Title order={2} fw={700} c="dark.5" mt={4}>
                     {selected ? `${selected.peso_kg} kg` : '-'}
                   </Title>
                 </Box>
@@ -224,14 +224,14 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
                           <Text size="xs">Masa Magra (Antropo): {semaforo.masaMagra} kg</Text>
                         )}
                         <Text size="xs">Variación: {semaforo.diff > 0 ? `+${semaforo.diff}` : semaforo.diff} kg</Text>
-                        <Text size="10px" c="dimmed" mt={4} style={{ fontStyle: 'italic' }}>
+                        <Text size="xs" c="dimmed" mt={4} style={{ fontStyle: 'italic' }}>
                           Margen verde (±0,50 kg) · Amarillo (±1,00 kg)
                         </Text>
                       </Box>
                     }
                   >
                     <Box style={{ textAlign: 'right', cursor: 'pointer' }}>
-                      <Text size="xs" c="dimmed" tt="uppercase" fw={750} mb={4}>Estado Semáforo</Text>
+                      <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb={4}>Estado Semáforo</Text>
                       <Group gap={6} justify="flex-end" align="center">
                         <Box
                           style={{

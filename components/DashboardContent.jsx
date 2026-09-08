@@ -621,95 +621,125 @@ export default function DashboardContent({ players = [], team, readOnly = false 
     });
   }
 
+  const teamActionsDropdown = (
+    <Menu.Dropdown>
+      <Menu.Label>Mediciones y Reportes</Menu.Label>
+      <Menu.Item
+        leftSection={<IconScale size={15} color="var(--mantine-color-orange-6)" />}
+        onClick={() => setActiveModal('weight')}
+      >
+        Registrar pesajes
+      </Menu.Item>
+      <Menu.Item
+        leftSection={<IconFileTypePdf size={15} color="var(--mantine-color-blue-6)" />}
+        onClick={() => openReportModal()}
+      >
+        Generar informe PDF
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Label>Plantilla y Datos</Menu.Label>
+      <Menu.Item
+        leftSection={<IconFileSpreadsheet size={15} color="var(--mantine-color-teal-6)" />}
+        onClick={() => setActiveModal('import')}
+      >
+        Importar datos (Excel/CSV)
+      </Menu.Item>
+      <Menu.Item
+        leftSection={<IconExchange size={15} color="var(--mantine-color-violet-6)" />}
+        onClick={() => setTransferModal({ opened: true, initialSelectedIds: [] })}
+      >
+        Transferir o copiar jugadores
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Label>Staff y Comunicación</Menu.Label>
+      <Menu.Item
+        leftSection={<IconMail size={15} color="var(--mantine-color-blue-6)" />}
+        onClick={() => setActiveModal('message')}
+      >
+        Enviar mensaje colectivo
+      </Menu.Item>
+      <Menu.Item
+        leftSection={<IconUserCheck size={15} color="var(--mantine-color-cyan-6)" />}
+        onClick={() => setActiveModal('tecnicos')}
+      >
+        Cuerpo técnico
+      </Menu.Item>
+    </Menu.Dropdown>
+  );
+
   return (
     <BoneyardSkeleton name="team-dashboard" loading={false}>
       {/* 1. BOTONES DE ACCIÓN INTEGRADOS EN LA CABECERA */}
       <TeamHeaderRightSection>
         {!readOnly && (
-          <Group gap="xs" wrap="wrap" w={{ base: '100%', sm: 'auto' }} style={{ flexShrink: 0 }}>
+          <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
+            {/* Móvil: botón más (+) compacto */}
+            <Tooltip label="Nuevo jugador" withArrow>
+              <ActionIcon
+                hiddenFrom="sm"
+                size={36}
+                radius="xl"
+                color="dark"
+                onClick={() => setActiveModal('new-player')}
+                aria-label="Nuevo jugador"
+              >
+                <IconPlus size={18} />
+              </ActionIcon>
+            </Tooltip>
+
+            {/* Escritorio: Botón completo */}
             <Button
+              visibleFrom="sm"
               size="xs"
               radius="xl"
               color="dark"
               leftSection={<IconPlus size={14} />}
               onClick={() => setActiveModal('new-player')}
-              style={{ flex: '1 1 auto' }}
             >
               Nuevo jugador
             </Button>
 
-            <Menu shadow="md" width={240} position="bottom-end" withArrow radius="md">
-              <Menu.Target>
-                <Button
-                  variant="default"
-                  size="xs"
-                  radius="xl"
-                  leftSection={<IconSettings size={14} />}
-                  rightSection={<IconChevronDown size={14} />}
-                  style={{ flex: '1 1 auto' }}
-                >
-                  Acciones de equipo
-                </Button>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Label>Mediciones y Reportes</Menu.Label>
-                <Menu.Item
-                  leftSection={<IconScale size={15} color="var(--mantine-color-orange-6)" />}
-                  onClick={() => setActiveModal('weight')}
-                >
-                  Registrar pesajes
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={<IconFileTypePdf size={15} color="var(--mantine-color-blue-6)" />}
-                  onClick={() => openReportModal()}
-                >
-                  Generar informe PDF
-                </Menu.Item>
-                <Menu.Divider />
-                <Menu.Label>Plantilla y Datos</Menu.Label>
-                <Menu.Item
-                  leftSection={<IconFileSpreadsheet size={15} color="var(--mantine-color-teal-6)" />}
-                  onClick={() => setActiveModal('import')}
-                >
-                  Importar datos (Excel/CSV)
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={<IconExchange size={15} color="var(--mantine-color-violet-6)" />}
-                  onClick={() => setTransferModal({ opened: true, initialSelectedIds: [] })}
-                >
-                  Transferir o copiar jugadores
-                </Menu.Item>
-                <Menu.Divider />
-                <Menu.Label>Staff y Comunicación</Menu.Label>
-                <Menu.Item
-                  leftSection={<IconMail size={15} color="var(--mantine-color-blue-6)" />}
-                  onClick={() => setActiveModal('message')}
-                >
-                  Enviar mensaje colectivo
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={<IconUserCheck size={15} color="var(--mantine-color-cyan-6)" />}
-                  onClick={() => setActiveModal('tecnicos')}
-                >
-                  Cuerpo técnico
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
+            {/* Móvil: botón engranaje (⚙) compacto */}
+            <Box hiddenFrom="sm">
+              <Menu shadow="md" width={240} position="bottom-end" withArrow radius="md">
+                <Menu.Target>
+                  <ActionIcon
+                    variant="default"
+                    size={36}
+                    radius="xl"
+                    aria-label="Acciones de equipo"
+                  >
+                    <IconSettings size={18} />
+                  </ActionIcon>
+                </Menu.Target>
+                {teamActionsDropdown}
+              </Menu>
+            </Box>
+
+            {/* Escritorio: Botón completo */}
+            <Box visibleFrom="sm">
+              <Menu shadow="md" width={240} position="bottom-end" withArrow radius="md">
+                <Menu.Target>
+                  <Button
+                    variant="default"
+                    size="xs"
+                    radius="xl"
+                    leftSection={<IconSettings size={14} />}
+                    rightSection={<IconChevronDown size={14} />}
+                  >
+                    Acciones de equipo
+                  </Button>
+                </Menu.Target>
+                {teamActionsDropdown}
+              </Menu>
+            </Box>
           </Group>
         )}
       </TeamHeaderRightSection>
 
       {/* 2. FILTROS Y BÚSQUEDA INTEGRADOS EN LA CABECERA */}
       <TeamHeaderFilters>
-        <Paper
-          p={6}
-          radius={24}
-          shadow="xs"
-          withBorder
-          bg="white"
-          style={{ borderColor: 'rgba(222, 226, 230, 0.85)' }}
-          w="100%"
-        >
+        <Box w="100%" style={{ minWidth: 0 }}>
           <Group gap={8} wrap="wrap" align="center" w="100%">
             <TextInput
               placeholder="Buscar jugador por nombre..."
@@ -750,7 +780,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
               style={{ flex: '1.5 1 160px', minWidth: 0 }}
             />
           </Group>
-        </Paper>
+        </Box>
       </TeamHeaderFilters>
 
       <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
@@ -793,7 +823,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                             <Box style={{ minWidth: 0, flex: 1 }}>
 
                               <Group gap={6} wrap="nowrap">
-                                <Text fz="sm" fw={650} c="dark.4" truncate>
+                                <Text fz="sm" fw={600} c="dark.5" truncate>
                                   {player.nombre} {player.apellidos}
                                 </Text>
                                 {!player.auth_user_id && (
@@ -811,14 +841,14 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                               {/* Indicadores en móvil sin necesidad de columnas adicionales */}
                               <Group gap={6} align="center" hiddenFrom="xs" mt={3}>
                                 {player.peso_kg ? (
-                                  <Text fz="11px" fw={600} c="dark.3">
+                                  <Text fz="xs" fw={500} c="dimmed">
                                     {player.peso_kg} kg
                                   </Text>
                                 ) : null}
                                 {player.semaforo?.diff !== null && player.semaforo?.diff !== undefined && (
                                   <Text
-                                    fz="11px"
-                                    fw={700}
+                                    fz="xs"
+                                    fw={600}
                                     c={
                                       player.semaforo.status === 'verde'
                                         ? '#2e7d32'
@@ -839,13 +869,13 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                         <Table.Td visibleFrom="xs">
                           {player.peso_kg || player.porcentaje_grasa ? (
                             <Box>
-                              <Text fz="sm" fw={600} c="dark.4">
+                              <Text fz="sm" fw={600} c="dark.5">
                                 {player.peso_kg ? `${player.peso_kg} kg` : '—'}
                                 {player.porcentaje_grasa ? (
                                   <Text component="span" c="dimmed" fw={400} fz="xs"> · {player.porcentaje_grasa}% GC</Text>
                                 ) : ''}
                               </Text>
-                              <Text fz="11px" c="dimmed">Composición corporal</Text>
+                              <Text fz="xs" c="dimmed">Composición corporal</Text>
                             </Box>
                           ) : (
                             <Text fz="sm" c="dimmed">—</Text>
@@ -865,10 +895,10 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                                 <IconFlame size={15} color="var(--mantine-color-orange-6)" />
                               </ThemeIcon>
                               <Box>
-                                <Text fz="sm" fw={650} c="dark.4" lh={1.1}>
+                                <Text fz="sm" fw={600} c="dark.5" lh={1.1}>
                                   {player.plan.kcal} kcal
                                 </Text>
-                                <Text fz="11px" c="dimmed">
+                                <Text fz="xs" c="dimmed">
                                   {player.plan.calculated ? 'Estimado' : 'Objetivo'}
                                 </Text>
                               </Box>

@@ -7,7 +7,6 @@ import {
   Stack,
   Group,
   Text,
-  Badge,
   Box,
   Divider,
   ThemeIcon,
@@ -65,12 +64,12 @@ function AgendaDishLine({ label, value }) {
   const options = value.split(/\s*\/\s*/);
   return (
     <Group gap={6} align="flex-start" wrap="nowrap">
-      <Text size="xs" c="dimmed" fw={850} style={{ flex: '0 0 16px', fontSize: '9px', paddingTop: '2px' }}>
+      <Text size="xs" c="dimmed" fw={600} style={{ flex: '0 0 16px', paddingTop: '2px' }}>
         {label}
       </Text>
       <Stack gap={2} style={{ flex: 1 }}>
         {options.map((opt, idx) => (
-          <Text key={idx} size="xs" fw={600} c="dark.4" style={{ lineHeight: 1.3 }}>
+          <Text key={idx} size="xs" fw={500} c="dark.4" style={{ lineHeight: 1.3 }}>
             {opt}
           </Text>
         ))}
@@ -102,17 +101,17 @@ function AgendaDayRow({ dayData, weekStr }) {
               {isDayToday && (
                 <Box style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'var(--mantine-color-teal-5)', flexShrink: 0 }} />
               )}
-              <Text fw={800} size="sm" c={isDayToday ? 'teal.8' : 'dark.4'} lh={1.1}>
+              <Text fw={700} size="sm" c={isDayToday ? 'teal.7' : 'dark.5'} lh={1.1}>
                 {dayData.dia}
               </Text>
               {isDayToday && (
-                <Badge color="teal" variant="filled" size="xs" radius="xl" ml="auto">
+                <Text size="xs" fw={600} c="teal.7" ml="auto">
                   HOY
-                </Badge>
+                </Text>
               )}
             </Group>
             {dayCalendarDate && (
-              <Text size="xs" c="dimmed" fw={600} pl={isDayToday ? 14 : 0}>
+              <Text size="xs" c="dimmed" fw={500} pl={isDayToday ? 14 : 0}>
                 {dayCalendarDate}
               </Text>
             )}
@@ -122,7 +121,7 @@ function AgendaDayRow({ dayData, weekStr }) {
         {/* Comida Column */}
         <Grid.Col span={{ base: 12, sm: 6, md: 5 }}>
           <Stack gap={4}>
-            <Text size="xs" fw={700} c="orange.7" tt="uppercase" style={{ letterSpacing: '0.5px', fontSize: '9px' }}>
+            <Text size="xs" fw={600} c="nutralabColor.8" tt="uppercase" style={{ letterSpacing: '0.5px' }}>
               Comida
             </Text>
             <Stack gap={4}>
@@ -139,7 +138,7 @@ function AgendaDayRow({ dayData, weekStr }) {
         {/* Cena Column */}
         <Grid.Col span={{ base: 12, sm: 6, md: 5 }}>
           <Stack gap={4}>
-            <Text size="xs" fw={700} c="blue.7" tt="uppercase" style={{ letterSpacing: '0.5px', fontSize: '9px' }}>
+            <Text size="xs" fw={600} c="nutralabColor.8" tt="uppercase" style={{ letterSpacing: '0.5px' }}>
               Cena
             </Text>
             <Stack gap={4}>
@@ -177,9 +176,9 @@ function HeroDishSection({ title, label, value, color }) {
     <Stack gap={6}>
       <Group gap="xs" align="center">
         <ThemeIcon color={color} variant="light" size={18} radius="md">
-          <Text size="xs" fw={800} style={{ fontSize: '9px' }}>{label}</Text>
+          <Text size="xs" fw={600}>{label}</Text>
         </ThemeIcon>
-        <Text size="xs" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.5px', fontSize: '9px' }}>
+        <Text size="xs" fw={600} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.5px' }}>
           {title}
         </Text>
       </Group>
@@ -187,7 +186,7 @@ function HeroDishSection({ title, label, value, color }) {
       <Stack gap={4} pl={26}>
         {options.map((opt, idx) => (
           <Group key={idx} gap="xs" align="flex-start" wrap="nowrap">
-            <Text size="sm" fw={600} c="dark.4" style={{ overflowWrap: 'anywhere', lineHeight: 1.4 }}>
+            <Text size="sm" fw={500} c="dark.4" style={{ overflowWrap: 'anywhere', lineHeight: 1.4 }}>
               {opt}
             </Text>
           </Group>
@@ -232,16 +231,16 @@ function DaySelectorButton({ dayName, isSelected, isHoy, dateStr, onClick }) {
 
         <Text
           size="xs"
-          fw={700}
+          fw={600}
           tt="uppercase"
           c={isSelected ? 'gray.3' : 'dimmed'}
-          style={{ letterSpacing: '0.5px', fontSize: '9px' }}
+          style={{ letterSpacing: '0.5px' }}
         >
           {dayName.slice(0, 3)}
         </Text>
         <Text
           size="md"
-          fw={900}
+          fw={700}
           lh={1.1}
           c={isSelected ? 'white' : 'dark.4'}
         >
@@ -249,9 +248,8 @@ function DaySelectorButton({ dayName, isSelected, isHoy, dateStr, onClick }) {
         </Text>
         <Text
           size="xs"
-          fw={600}
+          fw={500}
           c={isSelected ? 'gray.4' : 'dimmed'}
-          style={{ fontSize: '9px' }}
         >
           {dateStr ? dateStr.split(' ')[1] : ''}
         </Text>

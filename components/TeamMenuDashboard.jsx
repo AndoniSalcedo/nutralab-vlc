@@ -9,7 +9,7 @@ import {
   Tooltip,
   Box,
   Select,
-  Paper,
+  Text,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX } from '@tabler/icons-react';
@@ -277,7 +277,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
               </Button>
             </Group>
           ) : (
-            /* Micro-segmented Pill Switcher */
+            /* Micro-segmented Pill Switcher (sin nombre, solo iconos a la altura del nombre del equipo) */
             <Group gap={4} p={3} bg="gray.1" style={{ borderRadius: 'var(--mantine-radius-xl)', border: '1px solid var(--mantine-color-gray-2)' }}>
               <Tooltip label="Día a Día (Vista diaria)" withArrow>
                 <ActionIcon
@@ -287,6 +287,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
                   radius="xl"
                   size="md"
                   style={{ width: 32, height: 32 }}
+                  aria-label="Vista diaria"
                 >
                   <IconCalendar size={16} />
                 </ActionIcon>
@@ -300,6 +301,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
                   radius="xl"
                   size="md"
                   style={{ width: 32, height: 32 }}
+                  aria-label="Vista semanal"
                 >
                   <IconList size={16} />
                 </ActionIcon>
@@ -312,15 +314,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
       {/* 2. SELECTOR DE SEMANA Y ACCIONES DE MENÚ INTEGRADOS EN LA CABECERA */}
       <TeamHeaderFilters>
         {!isEditing && (
-          <Paper
-            p={6}
-            radius={24}
-            shadow="xs"
-            withBorder
-            bg="white"
-            style={{ borderColor: 'rgba(222, 226, 230, 0.85)' }}
-            w="100%"
-          >
+          <Box w="100%" style={{ minWidth: 0 }}>
             <Group gap={8} w="100%" wrap="wrap" align="center">
               <Select
                 placeholder="Selecciona una semana"
@@ -340,16 +334,20 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
               />
 
               {!readOnly && (
-                <Group gap={8} wrap="wrap" w={{ base: '100%', sm: 'auto' }}>
+                <Group gap={6} wrap="nowrap" w={{ base: '100%', sm: 'auto' }} style={{ flex: '1 1 auto', minWidth: 0 }}>
                   <Button
-                    color="blue"
+                    color="nutralabColor.8"
                     radius="xl"
                     size="sm"
                     onClick={() => setCreateModalOpen(true)}
-                    leftSection={<IconPlus size={16} />}
-                    style={{ flex: '1 1 auto' }}
+                    leftSection={<IconPlus size={15} />}
+                    style={{ flex: 1, minWidth: 0 }}
+                    px={{ base: 6, sm: 12 }}
                   >
-                    Nuevo Menú
+                    <Text span truncate fz="xs" fw={600}>
+                      <Text span hiddenFrom="xs">Crear</Text>
+                      <Text span visibleFrom="xs">Nuevo Menú</Text>
+                    </Text>
                   </Button>
 
                   {selectedMenu && (
@@ -360,10 +358,14 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
                         radius="xl"
                         size="sm"
                         onClick={handleStartEdit}
-                        leftSection={<IconEdit size={16} />}
-                        style={{ flex: '1 1 auto' }}
+                        leftSection={<IconEdit size={15} />}
+                        style={{ flex: 1, minWidth: 0 }}
+                        px={{ base: 6, sm: 12 }}
                       >
-                        Editar Menú
+                        <Text span truncate fz="xs" fw={600}>
+                          <Text span hiddenFrom="xs">Editar</Text>
+                          <Text span visibleFrom="xs">Editar Menú</Text>
+                        </Text>
                       </Button>
 
                       <Button
@@ -373,17 +375,21 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
                         size="sm"
                         onClick={() => handleDeleteMenu(selectedMenu.id)}
                         loading={deleting}
-                        leftSection={<IconTrash size={16} />}
-                        style={{ flex: '1 1 auto' }}
+                        leftSection={<IconTrash size={15} />}
+                        style={{ flex: 1, minWidth: 0 }}
+                        px={{ base: 6, sm: 12 }}
                       >
-                        Eliminar Menú
+                        <Text span truncate fz="xs" fw={600}>
+                          <Text span hiddenFrom="xs">Eliminar</Text>
+                          <Text span visibleFrom="xs">Eliminar Menú</Text>
+                        </Text>
                       </Button>
                     </>
                   )}
                 </Group>
               )}
             </Group>
-          </Paper>
+          </Box>
         )}
       </TeamHeaderFilters>
 

@@ -213,7 +213,7 @@ export default function PlayerForm({ initial, team }) {
             
             {/* Sección 1: Datos Personales y Deportivos */}
             <div>
-              <Text fw={700} size="sm" c="blue.8" mb="xs">Datos Personales y Deportivos</Text>
+              <Text fw={700} size="sm" c="dark.5" mb="xs">Datos Personales y Deportivos</Text>
               <Divider mb="md" />
 
               {/* Avatar Uploader Centrado */}
@@ -223,12 +223,12 @@ export default function PlayerForm({ initial, team }) {
                     src={avatarPreview || undefined}
                     size={100}
                     radius="xl"
-                    color="blue"
+                    color="nutralabColor"
                     style={{
                       border: '3px solid white',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                      backgroundColor: 'var(--mantine-color-blue-1)',
-                      color: 'var(--mantine-color-blue-8)',
+                      backgroundColor: 'var(--mantine-color-nutralabColor-0)',
+                      color: 'var(--mantine-color-nutralabColor-9)',
                       fontWeight: 700,
                       fontSize: '24px',
                     }}
@@ -323,7 +323,7 @@ export default function PlayerForm({ initial, team }) {
 
             {/* Sección 2: Pautas Nutricionales */}
             <div>
-              <Text fw={700} size="sm" c="blue.8" mb="xs">Pautas Nutricionales</Text>
+              <Text fw={700} size="sm" c="dark.5" mb="xs">Pautas Nutricionales</Text>
 
               <Divider mb="md" />
               <Stack gap="md">
@@ -368,8 +368,8 @@ export default function PlayerForm({ initial, team }) {
                   />
                 </Group>
 
-                <Paper withBorder p="sm" radius="md" bg="blue.0" style={{ borderColor: 'var(--mantine-color-blue-3)' }}>
-                  <Text size="xs" fw={700} c="blue.9" mb={2}>Rutina 24h y Día de Partido</Text>
+                <Paper withBorder p="sm" radius="md" bg="gray.0" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
+                  <Text size="xs" fw={700} c="dark.5" mb={2}>Rutina 24h y Día de Partido</Text>
                   <Text size="xs" c="dimmed">
                     Una vez creado o guardado el jugador, podrás configurar sus ingestas específicas pre-partido para partidos por la Mañana, Tarde y Noche desde su ficha individual (pestaña Resumen &gt; Preferencias y contexto).
                   </Text>
@@ -379,7 +379,7 @@ export default function PlayerForm({ initial, team }) {
 
             {/* Sección 3: Salud y Preferencias */}
             <div>
-              <Text fw={700} size="sm" c="blue.8" mb="xs">Salud y Preferencias</Text>
+              <Text fw={700} size="sm" c="dark.5" mb="xs">Salud y Preferencias</Text>
               <Divider mb="md" />
               <Stack gap="md">
                 <MultiSelect 
@@ -422,7 +422,7 @@ export default function PlayerForm({ initial, team }) {
             {/* Sección 4: Mediciones Iniciales (solo al crear) */}
             {!initial?.id && (
               <div>
-                <Text fw={700} size="sm" c="blue.8" mb="xs">Mediciones Iniciales (Opcional)</Text>
+                <Text fw={700} size="sm" c="dark.5" mb="xs">Mediciones Iniciales (Opcional)</Text>
                 <Divider mb="md" />
                 <Paper withBorder p="md" radius="md" bg="gray.0">
                   <Text size="xs" c="dimmed" mb="md">

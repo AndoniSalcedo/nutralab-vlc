@@ -393,7 +393,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
       title={
         <Group gap="xs">
           <IconScale size={22} style={{ color: 'var(--mantine-color-orange-6)' }} />
-          <Text fw={800} size="lg">
+          <Text fw={700} size="lg" c="dark.5">
             Control de pesaje del equipo
           </Text>
         </Group>

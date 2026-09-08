@@ -25,11 +25,11 @@ function CompactMacroLine({ label, color, consumed = 0, target = 0 }) {
   return (
     <Stack gap={2}>
       <Group justify="space-between" align="baseline" wrap="nowrap">
-        <Text fz="11px" fw={700} c="dark.5" truncate>
+        <Text fz="xs" fw={600} c="dark.5" truncate>
           {label}
         </Text>
-        <Text fz="10px" fw={500} c="dimmed">
-          <Text span fw={750} c="dark.6">
+        <Text fz="xs" fw={500} c="dimmed">
+          <Text span fw={600} c="dark.5">
             {consumed}g
           </Text>
           /{target || '-'}g
@@ -71,10 +71,10 @@ export default function BalanceNutricionalWidget({
 
   return (
     <Paper shadow="xs" radius="lg" p="md" bg="white" withBorder>
-      {/* Cabecera: Título con icono rojo del mismo tamaño que los demás widgets + Icono de Calendario a la derecha */}
+      {/* Cabecera: Título con icono unificado + Icono de Calendario a la derecha */}
       <Group justify="space-between" align="center" mb="sm">
         <Group gap="xs" align="center">
-          <ThemeIcon color="red" variant="light" size="sm" radius="md">
+          <ThemeIcon color="nutralabColor" variant="light" size="sm" radius="md">
             <IconFlame size={14} />
           </ThemeIcon>
           <Text fw={700} fz="sm" c="dark.5">
@@ -84,7 +84,7 @@ export default function BalanceNutricionalWidget({
 
         {/* Icono de Calendario para abrir el selector de fecha en Popover */}
         <Group gap={6} align="center">
-          <Text fz="11px" fw={600} c="dimmed">
+          <Text fz="xs" fw={600} c="dimmed">
             {formattedDate}
           </Text>
           <Popover
@@ -97,8 +97,8 @@ export default function BalanceNutricionalWidget({
           >
             <Popover.Target>
               <ActionIcon
-                variant="light"
-                color="red"
+                variant="subtle"
+                color="gray"
                 size="sm"
                 radius="md"
                 onClick={() => setPopoverOpened((o) => !o)}
@@ -164,7 +164,7 @@ export default function BalanceNutricionalWidget({
                     backgroundColor: `var(--mantine-color-${activeDay.color || 'blue'}-6)`,
                   }}
                 />
-                <Text fz="11px" fw={750} c="dark.6">
+                <Text fz="xs" fw={600} c="dark.5">
                   {activeDay.label || 'Entreno'}
                 </Text>
               </Group>
@@ -229,13 +229,13 @@ export default function BalanceNutricionalWidget({
             ]}
             label={
               <Stack gap={0} align="center" justify="center" ta="center">
-                <Text fz="9px" c="dimmed" fw={800} tt="uppercase" lts={0.5}>
+                <Text fz="xs" c="dimmed" fw={600} tt="uppercase" lts={0.5}>
                   Kcal
                 </Text>
-                <Text fz="17px" fw={900} lh={1.1} c="dark.6">
+                <Text fz="md" fw={700} lh={1.1} c="dark.5">
                   {consumed.kcal}
                 </Text>
-                <Text fz="10px" c="dimmed" fw={600}>
+                <Text fz="xs" c="dimmed" fw={500}>
                   / {target.kcal || '-'}
                 </Text>
               </Stack>
@@ -274,13 +274,13 @@ export default function BalanceNutricionalWidget({
         pt="xs"
         style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
       >
-        <Text fz="10px" c="dimmed" fw={500}>
+        <Text fz="xs" c="dimmed" fw={500}>
           {mealsCount} comida(s) registrada(s)
         </Text>
         <Text
-          fz="10px"
-          fw={700}
-          c="blue.7"
+          fz="xs"
+          fw={600}
+          c="dark.4"
           style={{ cursor: 'pointer' }}
           onClick={() => router.push(`/dashboard/jugador/${jugadorId}/resumen/diario`)}
         >

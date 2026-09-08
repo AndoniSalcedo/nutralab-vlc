@@ -52,8 +52,8 @@ const MOBILE_LABELS = {
 export default function TeamHeaderTabs({
   team,
   activeTab,
-  totalPlayers,
-  subtitle,
+  totalPlayers: _totalPlayers,
+  subtitle: _subtitle,
   avatarSlot,
   rightSection,
   children,
@@ -97,7 +97,7 @@ export default function TeamHeaderTabs({
   return (
     <>
       <Paper
-        p={{ base: 'md', sm: 'lg' }}
+        p={{ base: 12, sm: 'lg' }}
         shadow="xs"
         radius={24}
         bg="white"
@@ -110,10 +110,10 @@ export default function TeamHeaderTabs({
           overflow: 'hidden',
         }}
       >
-        <Stack gap="md" style={{ width: '100%', minWidth: 0 }}>
+        <Stack gap={{ base: 'sm', sm: 'md' }} style={{ width: '100%', minWidth: 0 }}>
           {/* FILA 1: Identidad del equipo y acciones principales */}
-          <Group justify="space-between" align="center" wrap="wrap" gap="md" style={{ width: '100%', minWidth: 0 }}>
-            <Group gap="sm" align="center" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+          <Group justify="space-between" align="center" wrap="nowrap" gap="xs" style={{ width: '100%', minWidth: 0 }}>
+            <Group gap="xs" align="center" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
               <Tooltip label="Volver a equipos" withArrow>
                 <ActionIcon
                   component={Link}
@@ -121,10 +121,10 @@ export default function TeamHeaderTabs({
                   variant="light"
                   color="gray"
                   radius="xl"
-                  size={42}
+                  size={{ base: 36, sm: 42 }}
                   style={{ flexShrink: 0 }}
                 >
-                  <IconArrowLeft size={20} />
+                  <IconArrowLeft size={18} />
                 </ActionIcon>
               </Tooltip>
 
@@ -134,7 +134,7 @@ export default function TeamHeaderTabs({
                 <Box style={{ position: 'relative', display: 'inline-block', flexShrink: 0 }}>
                   <Avatar
                     src={teamId ? `/api/teams/avatar?id=${teamId}&t=${teamPhotoVersion || team?.updated_at || ''}` : undefined}
-                    size={52}
+                    size={{ base: 40, sm: 52 }}
                     radius="lg"
                     color="dark"
                     style={{
@@ -143,7 +143,7 @@ export default function TeamHeaderTabs({
                       backgroundColor: 'var(--mantine-color-nutralabColor-1)',
                       color: 'var(--mantine-color-nutralabColor-9)',
                       fontWeight: 700,
-                      fontSize: '18px',
+                      fontSize: '16px',
                     }}
                   >
                     {initials(team?.nombre || 'Equipo')}
@@ -177,42 +177,26 @@ export default function TeamHeaderTabs({
               )}
 
               <Box style={{ minWidth: 0, flex: 1 }}>
-                <Group gap={8} align="center" wrap="wrap">
-                  <Title order={3} fw={850} c="#24291f" lh={1.1}>
-                    {team?.nombre || 'Equipo'}
-                  </Title>
-                  {team?.temporada && (
-                    <Text
-                      fz="xs"
-                      fw={700}
-                      c="dimmed"
-                      style={{
-                        backgroundColor: 'var(--mantine-color-gray-1)',
-                        padding: '2px 8px',
-                        borderRadius: 12,
-                        border: '1px solid var(--mantine-color-gray-2)',
-                      }}
-                    >
-                      {team.temporada}
-                    </Text>
-                  )}
-                </Group>
-                <Text size="xs" c="dimmed" mt={3} lineClamp={1}>
-                  {subtitle || (totalPlayers !== undefined
-                    ? `${totalPlayers} ${totalPlayers === 1 ? 'jugador registrado' : 'jugadores registrados'} · Panel del equipo`
-                    : 'Panel nutricional y gestión del equipo')}
-                </Text>
+                <Title order={3} fw={700} c="dark.5" lh={1.1} truncate fz={{ base: 16, sm: 20 }}>
+                  {team?.nombre || 'Equipo'}
+                </Title>
+                {team?.temporada && (
+                  <Text size="xs" c="dimmed" mt={3} lineClamp={1}>
+                    {team.temporada.toLowerCase().includes('temporada')
+                      ? team.temporada
+                      : `Temporada ${team.temporada}`}
+                  </Text>
+                )}
               </Box>
             </Group>
 
             {rightSection ? (
-              <Box w={{ base: '100%', sm: 'auto' }} style={{ flexShrink: 0 }}>
+              <Box style={{ flexShrink: 0 }}>
                 {rightSection}
               </Box>
             ) : (
               <Box
                 ref={slotContext?.setRightSlotEl}
-                w={{ base: '100%', sm: 'auto' }}
                 style={{
                   flexShrink: 0,
                   display: slotContext?.hasRightSection ? undefined : 'none',
@@ -272,7 +256,7 @@ export default function TeamHeaderTabs({
             </ScrollArea>
           </Box>
 
-          {/* FILA 3 (Opcional): Filtros, selectores u otras herramientas específicas de sección */}
+          {/* FILA 3: Filtros, selectores y herramientas integrados en el header */}
           {children ? (
             children
           ) : (

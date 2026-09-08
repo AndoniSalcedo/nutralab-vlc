@@ -75,7 +75,7 @@ export default function MeasurementModal({
           <Stack gap="xl" pr="xs">
             {MEASUREMENT_DETAIL_SECTIONS.map((section) => (
               <Stack gap="xs" key={section.title}>
-                <Text fw={700} size="sm" c="blue.6" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', paddingBottom: 4 }}>
+                <Text fw={700} size="sm" c="dark.5" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', paddingBottom: 4 }}>
                   {section.title}
                 </Text>
                 <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
@@ -94,7 +94,7 @@ export default function MeasurementModal({
             ))}
 
             <Stack gap="xs">
-              <Text fw={700} size="sm" c="blue.6" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', paddingBottom: 4 }}>
+              <Text fw={700} size="sm" c="dark.5" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', paddingBottom: 4 }}>
                 Otros
               </Text>
               <Textarea

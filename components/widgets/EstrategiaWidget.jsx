@@ -72,20 +72,20 @@ export default function EstrategiaWidget({
     >
       <Group justify="space-between" align="center" mb="sm">
         <Group gap="xs" align="center">
-          <ThemeIcon color="indigo" variant="light" size="sm" radius="md">
+          <ThemeIcon color="nutralabColor" variant="light" size="sm" radius="md">
             <IconClipboardList size={14} />
           </ThemeIcon>
           <Text fw={700} fz="sm" c="dark.5">
             {activeProtocol ? `Estrategia: ${activeProtocol.name}` : 'Estrategia del día'}
           </Text>
         </Group>
-        <Text fz="xs" fw={700} c="indigo.7">
+        <Text fz="xs" fw={600} c="nutralabColor.8">
           ● {activeDayLabel}
         </Text>
       </Group>
 
       {hasTimeline ? (
-        <Timeline bulletSize={26} lineWidth={2} color="indigo" pl={4} my="xs">
+        <Timeline bulletSize={26} lineWidth={2} color="nutralabColor" pl={4} my="xs">
           {activeProtocol.timeline.map((item, idx) => {
             const IconComp = AVAILABLE_ICONS[item.icon] || IconFlag;
             return (
@@ -94,17 +94,17 @@ export default function EstrategiaWidget({
                 bullet={<IconComp size={13} />}
                 title={
                   <Group gap={8} align="center" wrap="nowrap">
-                    <Text fz="xs" fw={800} c="indigo.8" style={{ minWidth: 36, flexShrink: 0 }}>
+                    <Text fz="xs" fw={600} c="nutralabColor.8" style={{ minWidth: 36, flexShrink: 0 }}>
                       {item.timeLabel}
                     </Text>
-                    <Text fz="xs" fw={700} c="dark.6" truncate>
+                    <Text fz="xs" fw={600} c="dark.5" truncate>
                       {item.title}
                     </Text>
                   </Group>
                 }
               >
                 {item.description && (
-                  <Text fz="11px" c="dimmed" lh={1.3} mt={2}>
+                  <Text fz="xs" c="dimmed" lh={1.3} mt={2}>
                     {item.description}
                   </Text>
                 )}
@@ -114,13 +114,13 @@ export default function EstrategiaWidget({
         </Timeline>
       ) : (
         <Paper p="md" radius="md" bg="gray.0" withBorder mt="xs" ta="center">
-          <ThemeIcon color="indigo" variant="light" size={30} radius="md" mx="auto" mb={6}>
+          <ThemeIcon color="nutralabColor" variant="light" size={30} radius="md" mx="auto" mb={6}>
             <IconClipboardList size={16} />
           </ThemeIcon>
           <Text fz="xs" fw={700} c="dark.5">
             Sin protocolo para {activeDayLabel}
           </Text>
-          <Text fz="10px" c="dimmed" mt={2}>
+          <Text fz="xs" c="dimmed" mt={2}>
             No hay pautas específicas de partido o viaje configuradas para este tipo de día.
           </Text>
         </Paper>
@@ -134,10 +134,10 @@ export default function EstrategiaWidget({
         pt="xs"
         style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
       >
-        <Text fz="10px" c="dimmed" fw={500}>
+        <Text fz="xs" c="dimmed" fw={500}>
           Pautas y timing de competición
         </Text>
-        <Text fz="10px" fw={700} c="indigo.7">
+        <Text fz="xs" fw={600} c="dark.4">
           Ver protocolos →
         </Text>
       </Group>

@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ActionIcon,
-  Badge,
   Box,
   Button,
   Group,
@@ -188,11 +187,11 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
     <Paper p="md" radius="lg" shadow="sm" withBorder bg="white">
       <Group justify="space-between" align="center" wrap="wrap" gap="md" mb="lg">
         <Group gap="sm">
-          <ThemeIcon size="md" radius="xl" variant="light" color="blue">
+          <ThemeIcon size="md" radius="xl" variant="light" color="nutralabColor">
             <IconUserCheck size={18} />
           </ThemeIcon>
           <Box>
-            <Title order={4} c="dark.4">
+            <Title order={3} size="h4" fw={700} c="dark.5">
               Cuerpo Técnico del Equipo
             </Title>
             <Text size="xs" c="dimmed">
@@ -206,8 +205,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
             leftSection={<IconPlus size={14} />}
             size="sm"
             radius="xl"
-            variant="light"
-            color="blue"
+            variant="default"
             onClick={() => {
               setAddMode(availableTecnicos.length > 0 ? 'existing' : 'new');
               setSelectedTecnicoId(null);
@@ -234,10 +232,10 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
         >
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>Técnico</Table.Th>
-              <Table.Th>Email</Table.Th>
-              <Table.Th>Rol</Table.Th>
-              {!readOnly && <Table.Th style={{ textAlign: 'right' }}>Acciones</Table.Th>}
+              <Table.Th style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mantine-color-dimmed)' }}>Técnico</Table.Th>
+              <Table.Th style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mantine-color-dimmed)' }}>Email</Table.Th>
+              <Table.Th style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mantine-color-dimmed)' }}>Rol</Table.Th>
+              {!readOnly && <Table.Th style={{ textAlign: 'right', fontSize: '12px', fontWeight: 600, color: 'var(--mantine-color-dimmed)' }}>Acciones</Table.Th>}
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -245,10 +243,10 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
               <Table.Tr key={tecnico.id}>
                 <Table.Td>
                   <Group gap="sm" wrap="nowrap">
-                    <ThemeIcon color="blue" variant="light" radius="xl" size={32}>
+                    <ThemeIcon color="nutralabColor" variant="light" radius="xl" size={32}>
                       <IconUser size={16} />
                     </ThemeIcon>
-                    <Text fw={650} size="sm" c="#24291f">
+                    <Text fw={600} size="sm" c="dark.5">
                       {tecnico.nombre} {tecnico.apellidos || ''}
                     </Text>
                   </Group>
@@ -259,9 +257,9 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
                   </Text>
                 </Table.Td>
                 <Table.Td>
-                  <Badge variant="light" color="blue" size="sm">
+                  <Text size="xs" fw={600} c="dark.4">
                     Técnico
-                  </Badge>
+                  </Text>
                 </Table.Td>
                 {!readOnly && (
                   <Table.Td style={{ textAlign: 'right' }}>

@@ -29,7 +29,7 @@ export default async function TeamDashboardLayout({ children, params }) {
 
   return (
     <TeamHeaderSlotProvider>
-      <Stack gap="lg" style={{ width: '100%', minWidth: 0, maxWidth: '100%' }} pb={{ base: 76, sm: 0 }} px={{ base: 'xs', sm: 0 }}>
+      <Stack gap={{ base: 'sm', sm: 'lg' }} style={{ width: '100%', minWidth: 0, maxWidth: '100%' }} pb={{ base: 76, sm: 0 }} px={{ base: 6, sm: 0 }}>
         <TeamHeaderTabs team={team} readOnly={user?.role === 'tecnico'} />
         {children}
       </Stack>

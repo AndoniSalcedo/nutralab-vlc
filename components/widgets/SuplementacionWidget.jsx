@@ -77,14 +77,14 @@ export default function SuplementacionWidget({
       {/* Cabecera del widget */}
       <Group justify="space-between" align="center" mb={6}>
         <Group gap="xs" align="center">
-          <ThemeIcon color="grape" variant="light" size="sm" radius="md">
+          <ThemeIcon color="nutralabColor" variant="light" size="sm" radius="md">
             <IconPill size={14} />
           </ThemeIcon>
           <Text fw={700} fz="sm" c="dark.5">
             Suplementación diaria
           </Text>
         </Group>
-        <Text fz="xs" fw={750} c={isAllDone ? 'teal.7' : 'grape.7'}>
+        <Text fz="xs" fw={600} c={isAllDone ? 'teal.7' : 'nutralabColor.8'}>
           {isAllDone ? '¡Todos completados!' : `${completedCount}/${totalCount} listos`}
         </Text>
       </Group>
@@ -92,7 +92,7 @@ export default function SuplementacionWidget({
       {/* Barra de progreso de tomas diarias */}
       <Progress
         value={progressPct}
-        color={isAllDone ? 'teal' : 'grape'}
+        color={isAllDone ? 'teal' : 'nutralabColor'}
         size="xs"
         radius="xl"
         mb="sm"
@@ -139,14 +139,14 @@ export default function SuplementacionWidget({
                   <Box style={{ minWidth: 0, flex: 1 }}>
                     <Text
                       fz="xs"
-                      fw={650}
-                      c={isChecked ? 'dimmed' : 'dark.6'}
+                      fw={600}
+                      c={isChecked ? 'dimmed' : 'dark.5'}
                       td={isChecked ? 'line-through' : undefined}
                       truncate
                     >
                       {item.name}
                     </Text>
-                    <Text fz="10px" c="dimmed" truncate>
+                    <Text fz="xs" c="dimmed" truncate>
                       {item.timing}
                     </Text>
                   </Box>
@@ -154,7 +154,7 @@ export default function SuplementacionWidget({
 
                 <Text
                   fz="xs"
-                  fw={700}
+                  fw={600}
                   c={isChecked ? 'dimmed' : 'dark.4'}
                   td={isChecked ? 'line-through' : undefined}
                   style={{ flexShrink: 0, paddingLeft: 8 }}
@@ -175,13 +175,13 @@ export default function SuplementacionWidget({
         pt="xs"
         style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
       >
-        <Text fz="10px" c="dimmed" fw={500}>
+        <Text fz="xs" c="dimmed" fw={500}>
           Toca cada suplemento para marcarlo
         </Text>
         <Text
-          fz="10px"
-          fw={700}
-          c="grape.7"
+          fz="xs"
+          fw={600}
+          c="dark.4"
           style={{ cursor: 'pointer' }}
           onClick={() => router.push(`/dashboard/jugador/${jugadorId}/nutricion/suplementacion`)}
         >
@@ -191,3 +191,4 @@ export default function SuplementacionWidget({
     </Paper>
   );
 }
+

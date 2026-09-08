@@ -235,14 +235,14 @@ export default function TeamForm({
             <Stack gap="sm">
               <Group justify="space-between" align="center" wrap="wrap">
                 <Box>
-                  <Text size="sm" fw={800} c="#24291f">
+                  <Text size="sm" fw={700} c="dark.5">
                     Jugadores a importar
                   </Text>
                   <Text size="xs" c="dimmed">
                     Selecciona jugadores de cualquier equipo o temporada
                   </Text>
                 </Box>
-                <Badge variant="filled" color={selectedCount ? 'blue' : 'gray'} size="md" radius="sm">
+                <Badge variant="filled" color={selectedCount ? 'nutralabColor' : 'gray'} size="md" radius="sm">
                   {selectedCount} {selectedCount === 1 ? 'jugador seleccionado' : 'jugadores seleccionados'}
                 </Badge>
               </Group>
@@ -303,7 +303,7 @@ export default function TeamForm({
                                 onChange={(event) => toggleCopyPlayer(playerId, event.currentTarget.checked)}
                                 label={
                                   <Box>
-                                    <Text size="sm" fw={650} c="#24291f">
+                                    <Text size="sm" fw={600} c="dark.5">
                                       {playerFullName(player, 'Jugador sin nombre')}
                                     </Text>
                                     <Group gap={6} mt={2} align="center">

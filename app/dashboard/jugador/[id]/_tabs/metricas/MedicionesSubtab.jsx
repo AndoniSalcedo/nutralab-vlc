@@ -503,10 +503,10 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                     >
                       <Group justify="space-between" align="flex-start" mb="xs">
                         <Box>
-                          <Text size="xs" c="dimmed" tt="uppercase" fw={750}>
+                          <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
                             {m.label}
                           </Text>
-                          <Title order={2} mt={4}>
+                          <Title order={2} fw={700} c="dark.5" mt={4}>
                             {formatMetricValue(metricValue(selected, m), unit)}
                           </Title>
                         </Box>
@@ -641,7 +641,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
               <Stack gap="lg">
                 <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
                   <Box>
-                    <Text size="xs" c="dimmed" tt="uppercase" fw={800} mb={6}>Origen</Text>
+                    <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb={6}>Origen</Text>
                     <Table variant="simple" verticalSpacing={5}>
                       <Table.Tbody>
                         {sourceRows(selected).map(([label, value]) => (
@@ -666,13 +666,13 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
 
                     return (
                       <Box key={section.title}>
-                        <Text size="xs" c="dimmed" tt="uppercase" fw={800} mb={6}>{section.title}</Text>
+                        <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb={6}>{section.title}</Text>
                         <Table variant="simple" verticalSpacing={5}>
                           <Table.Tbody>
                             {rows.map((field) => (
                               <Table.Tr key={field.key}>
                                 <Table.Th style={{ width: '58%' }}>{field.label}</Table.Th>
-                                <Table.Td ta="right" fw={650}>
+                                <Table.Td ta="right" fw={600}>
                                   {formatMetricValue(field.value, field.unit)}
                                 </Table.Td>
                               </Table.Tr>
@@ -687,7 +687,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                 {rawMetricEntries(selected).length > 0 && (
                   <Box>
                     <Group justify="space-between" align="center" mb="xs">
-                      <Text size="xs" c="dimmed" tt="uppercase" fw={800}>Columnas Excel importadas</Text>
+                      <Text size="xs" c="dimmed" tt="uppercase" fw={600}>Columnas Excel importadas</Text>
                       <Badge variant="light" color="gray">{rawMetricEntries(selected).length}</Badge>
                     </Group>
                     <ScrollArea h={300} offsetScrollbars>
@@ -702,7 +702,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                           {rawMetricEntries(selected).map(([label, value]) => (
                             <Table.Tr key={label}>
                               <Table.Td>{label}</Table.Td>
-                              <Table.Td ta="right" fw={650}>{displayRawValue(value)}</Table.Td>
+                              <Table.Td ta="right" fw={600}>{displayRawValue(value)}</Table.Td>
                             </Table.Tr>
                           ))}
                         </Table.Tbody>

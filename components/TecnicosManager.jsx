@@ -224,11 +224,11 @@ export default function TecnicosManager({ teams = [] }) {
       <Paper p={{ base: 'sm', sm: 'md' }} shadow="xs" radius={24} bg="white">
         <Group justify="space-between" align="center" wrap="wrap" gap="md">
           <Group gap="sm">
-            <ThemeIcon color="dark" variant="light" radius="md" size={42}>
+            <ThemeIcon color="nutralabColor" variant="light" radius="md" size={42}>
               <IconUserCheck size={21} />
             </ThemeIcon>
             <Box>
-              <Title order={3} fw={850} c="#24291f" lh={1.1}>
+              <Title order={3} fw={700} c="dark.5" lh={1.1}>
                 Cuerpo Técnico
               </Title>
               <Text size="xs" c="dimmed" mt={2}>
@@ -307,7 +307,7 @@ export default function TecnicosManager({ teams = [] }) {
                           </FileButton>
                         </Box>
                         <Box>
-                          <Text fw={650} size="sm" c="#24291f" lh={1.2}>
+                          <Text fw={600} size="sm" c="dark.5" lh={1.2}>
                             {tecnico.nombre} {tecnico.apellidos || ''}
                           </Text>
                           <Text size="xs" c="dimmed">

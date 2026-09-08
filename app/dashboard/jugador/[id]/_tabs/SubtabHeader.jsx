@@ -24,7 +24,7 @@ export default function SubtabHeader({ tab, subtab, readOnly = false }) {
         <HeaderIcon size={20} />
       </ThemeIcon>
       <Box>
-        <Title order={3} fw={800} c="dark.4">{config.title}</Title>
+        <Title order={3} fw={700} c="dark.5">{config.title}</Title>
         <Text size="sm" c="dimmed">{subtitle}</Text>
       </Box>
     </Group>

@@ -38,23 +38,24 @@ export default function PhysicalMetricWidget({
       }}
     >
       <Stack align="center" justify="center" gap={4} w="100%" ta="center">
-        <ThemeIcon color="cyan" variant="light" size={28} radius="md">
+        <ThemeIcon color="nutralabColor" variant="light" size={28} radius="md">
           <IconScale size={16} />
         </ThemeIcon>
 
         <Box>
-          <Text fz={{ base: 14, sm: 18 }} fw={900} c="dark.6" lh={1.1}>
+          <Text fz={{ base: 14, sm: 18 }} fw={700} c="dark.5" lh={1.1}>
             {pesoActual ? `${formatMetricNumber(pesoActual, 1)} kg` : '-'}
           </Text>
-          <Text fz="10px" fw={700} c="teal.6" mt={2}>
+          <Text fz="xs" fw={600} c="teal.7" mt={2}>
             {porcentajeGrasa ? `${formatMetricNumber(porcentajeGrasa, 1)}% gr` : (formattedDiff || '-')}
           </Text>
         </Box>
 
-        <Text fz="9px" fw={800} c="dimmed" tt="uppercase" lts={0.5}>
+        <Text fz="xs" fw={600} c="dimmed" tt="uppercase" lts={0.5}>
           Físico
         </Text>
       </Stack>
     </Paper>
   );
 }
+

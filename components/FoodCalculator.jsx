@@ -87,7 +87,7 @@ export default function FoodCalculator() {
                 </ThemeIcon>
               </Group>
               <Group align="flex-end" gap="xs" mt="sm">
-                <Text fz={36} fw={800} lh={1}>
+                <Text fz={32} fw={700} lh={1} c="dark.5">
                   {result.kcal}
                 </Text>
                 <Text size="md" c="dimmed" fw={500} pb={2}>
@@ -103,8 +103,8 @@ export default function FoodCalculator() {
               <ThemeIcon color="blue" variant="light" size="lg" radius="xl" mx="auto" mb="xs">
                 <IconWheat size={18} />
               </ThemeIcon>
-              <Text fz={20} fw={800}>{result.cho}g</Text>
-              <Text fz={10} c="dimmed" tt="uppercase" fw={600}>Carbos</Text>
+              <Text fz={18} fw={700} c="dark.5">{result.cho}g</Text>
+              <Text fz="xs" c="dimmed" tt="uppercase" fw={600}>Carbos</Text>
             </Paper>
           </Grid.Col>
 
@@ -113,8 +113,8 @@ export default function FoodCalculator() {
               <ThemeIcon color="green" variant="light" size="lg" radius="xl" mx="auto" mb="xs">
                 <IconMeat size={18} />
               </ThemeIcon>
-              <Text fz={20} fw={800}>{result.pro}g</Text>
-              <Text fz={10} c="dimmed" tt="uppercase" fw={600}>Proteína</Text>
+              <Text fz={18} fw={700} c="dark.5">{result.pro}g</Text>
+              <Text fz="xs" c="dimmed" tt="uppercase" fw={600}>Proteína</Text>
             </Paper>
           </Grid.Col>
 
@@ -123,8 +123,8 @@ export default function FoodCalculator() {
               <ThemeIcon color="yellow" variant="light" size="lg" radius="xl" mx="auto" mb="xs">
                 <IconDroplet size={18} />
               </ThemeIcon>
-              <Text fz={20} fw={800}>{result.fat}g</Text>
-              <Text fz={10} c="dimmed" tt="uppercase" fw={600}>Grasas</Text>
+              <Text fz={18} fw={700} c="dark.5">{result.fat}g</Text>
+              <Text fz="xs" c="dimmed" tt="uppercase" fw={600}>Grasas</Text>
             </Paper>
           </Grid.Col>
         </Grid>

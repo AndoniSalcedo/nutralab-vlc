@@ -74,8 +74,8 @@ function clonePlan(data) {
 function MetricCard({ label, value, color, bg, border }) {
   return (
     <Paper p={{ base: 'xs', sm: 'sm' }} radius="md" style={{ backgroundColor: bg, border: `1px solid ${border}`, textAlign: 'center', overflow: 'hidden' }}>
-      <Text size="10px" fw={800} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</Text>
-      <Title order={3} style={{ color, fontSize: 'clamp(13px, 2.2vw, 20px)', fontWeight: 850, marginTop: '2px', letterSpacing: '-0.3px', whiteSpace: 'nowrap' }}>{value}</Title>
+      <Text size="xs" fw={600} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</Text>
+      <Title order={3} style={{ color, fontSize: 'clamp(14px, 2vw, 18px)', fontWeight: 700, marginTop: '2px', letterSpacing: '-0.3px', whiteSpace: 'nowrap' }}>{value}</Title>
     </Paper>
   );
 }
@@ -137,12 +137,12 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
     return (
       <Paper key={dayKey} p="sm" radius="md" style={{ backgroundColor: colors.boxBg, border: `1px solid ${colors.boxBorder}` }} mb="sm">
         <Group justify="space-between" align="center" mb={6}>
-          <Text size="sm" fw={900} tt="uppercase" style={{ color: colors.cardBodyText, letterSpacing: '0.3px' }}>
+          <Text size="sm" fw={700} tt="uppercase" style={{ color: colors.cardBodyText, letterSpacing: '0.3px' }}>
             {dayData.label}
           </Text>
           <Group gap={5} align="center" wrap="nowrap">
             <span style={{ fontSize: '7px', color: `var(--mantine-color-${color}-5)` }}>●</span>
-            <Text size="11px" fw={700} tt="uppercase" style={{ color: `var(--mantine-color-${color}-4)`, letterSpacing: '0.5px' }}>
+            <Text size="xs" fw={600} tt="uppercase" style={{ color: `var(--mantine-color-${color}-4)`, letterSpacing: '0.5px' }}>
               {label}
             </Text>
           </Group>
@@ -150,19 +150,19 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
 
         <Box py={3} px={7} mb="xs" style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}>
           <Group gap={6} justify="space-between" wrap="nowrap">
-            <Text size="11px" fw={800} style={{ color: colors.cardBodyText }}>
-              {formatInt(dayData.kcal)} <span style={{ fontWeight: 400, opacity: 0.65, fontSize: '10px' }}>kcal</span>
+            <Text size="xs" fw={700} style={{ color: colors.cardBodyText }}>
+              {formatInt(dayData.kcal)} <span style={{ fontWeight: 400, opacity: 0.65, fontSize: '11px' }}>kcal</span>
             </Text>
-            <Group gap={5} wrap="nowrap" style={{ fontSize: '11px' }}>
-              <Text size="11px" style={{ color: colors.itemText }}>
+            <Group gap={5} wrap="nowrap" style={{ fontSize: '12px' }}>
+              <Text size="xs" style={{ color: colors.itemText }}>
                 P <strong style={{ color: colors.cardBodyText }}>{formatInt(dayData.proteina)}g</strong>
               </Text>
-              <Text size="11px" c="dimmed">·</Text>
-              <Text size="11px" style={{ color: colors.itemText }}>
+              <Text size="xs" c="dimmed">·</Text>
+              <Text size="xs" style={{ color: colors.itemText }}>
                 HC <strong style={{ color: colors.cardBodyText }}>{formatInt(dayData.hidratos)}g</strong>
               </Text>
-              <Text size="11px" c="dimmed">·</Text>
-              <Text size="11px" style={{ color: colors.itemText }}>
+              <Text size="xs" c="dimmed">·</Text>
+              <Text size="xs" style={{ color: colors.itemText }}>
                 G <strong style={{ color: colors.cardBodyText }}>{formatInt(dayData.grasa)}g</strong>
               </Text>
             </Group>
@@ -180,7 +180,7 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
                 transition: 'background-color 0.2s ease'
               }}
             >
-              <Text size="11px" fw={800} tt="uppercase" lh={1.1} style={{ color: colors.accentText, letterSpacing: '0.4px' }}>
+              <Text size="xs" fw={700} tt="uppercase" lh={1.2} style={{ color: colors.accentText, letterSpacing: '0.4px' }}>
                 {meal.nombre}
               </Text>
               <Text size="xs" mt={3} style={{ color: colors.itemText, lineHeight: 1.4 }}>
@@ -203,7 +203,7 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
         <Title style={{ color: colors.cardBodyText, textAlign: 'center', fontSize: 'clamp(26px, 4.5vw, 40px)', lineHeight: 1, textTransform: 'uppercase', letterSpacing: 0, transition: 'color 0.2s ease' }}>
           {plan.jugador.nombre}
         </Title>
-        <Text style={{ color: colors.accentText, textAlign: 'center', textTransform: 'uppercase', fontWeight: 800, marginTop: '6px', fontSize: '12px', letterSpacing: '1px', transition: 'color 0.2s ease' }}>
+        <Text style={{ color: colors.accentText, textAlign: 'center', textTransform: 'uppercase', fontWeight: 700, marginTop: '6px', fontSize: '12px', letterSpacing: '1px', transition: 'color 0.2s ease' }}>
           {plan.jugador.posicion}
         </Text>
         <Box style={{ height: '2px', backgroundColor: colors.accentText, margin: '10px auto 0', maxWidth: '75%', opacity: 0.85, transition: 'background-color 0.2s ease' }} />
@@ -229,9 +229,9 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
                   {supplementsToShow.map((supp, index) => (
                     <Box key={index} p={7} style={{ backgroundColor: colors.itemBg, borderRadius: '6px' }}>
                       <Group justify="space-between" align="flex-start" wrap="nowrap">
-                        <Text size="xs" fw={800} style={{ color: colors.cardBodyText }}>{supp.nombre}</Text>
+                        <Text size="xs" fw={700} style={{ color: colors.cardBodyText }}>{supp.nombre}</Text>
                         {supp.dosis && (
-                          <Text size="11px" fw={800} style={{ 
+                          <Text size="xs" fw={600} style={{ 
                             color: colors.accentText, 
                             borderRadius: '4px', 
                             padding: '1px 6px',
@@ -243,12 +243,12 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
                         )}
                       </Group>
                       {supp.timing && (
-                        <Text size="11px" fw={700} mt={2} style={{ color: colors.itemText }}>
+                        <Text size="xs" fw={600} mt={2} style={{ color: colors.itemText }}>
                           Momento: {supp.timing}
                         </Text>
                       )}
                       {supp.notas && (
-                        <Text size="11px" fs="italic" mt={1} style={{ color: colors.itemText, opacity: 0.85 }}>
+                        <Text size="xs" fs="italic" mt={1} style={{ color: colors.itemText, opacity: 0.85 }}>
                           {supp.notas}
                         </Text>
                       )}
@@ -279,14 +279,14 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
                             <Group justify="space-between" align="center" wrap="nowrap" mb={2}>
                               <Group gap={6} wrap="nowrap" align="center">
                                 <ProtocolIcon iconName={step.icon} size={14} color={colors.accentText} />
-                                <Text size="xs" fw={800} style={{ color: colors.cardBodyText }}>
+                                <Text size="xs" fw={700} style={{ color: colors.cardBodyText }}>
                                   {step.title}
                                 </Text>
                               </Group>
                               {step.timeLabel && (
-                                <Text size="11px" fw={800} style={{ 
+                                <Text size="xs" fw={600} style={{ 
                                   color: colors.accentText, 
-                                  borderRadius: '4px',
+                                  borderRadius: '4px', 
                                   padding: '1px 6px',
                                   backgroundColor: 'rgba(255,255,255,0.06)',
                                   whiteSpace: 'nowrap'
@@ -307,7 +307,7 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
 
                     {prot.checklist?.length > 0 && (
                       <Stack gap={4} mt="xs" pt="xs" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                        <Text size="11px" fw={800} tt="uppercase" style={{ color: colors.accentText, letterSpacing: '0.5px' }}>
+                        <Text size="xs" fw={700} tt="uppercase" style={{ color: colors.accentText, letterSpacing: '0.5px' }}>
                           Checklist
                         </Text>
                         {prot.checklist.map((item, cIdx) => (
@@ -412,18 +412,18 @@ function AiGenerationOverlay({ opened, messages = [] }) {
             width: '70px',
             height: '70px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, var(--mantine-color-blue-5), var(--mantine-color-grape-5))',
+            background: 'linear-gradient(135deg, var(--mantine-color-nutralabColor-6), var(--mantine-color-nutralabColor-8))',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 8px 20px rgba(34, 139, 230, 0.35)',
+            boxShadow: '0 8px 20px rgba(108, 112, 90, 0.25)',
             animation: 'pulseGlow 2s infinite ease-in-out',
           }}>
             <IconSparkles size={32} color="white" style={{ animation: 'spinSlow 6s infinite linear' }} />
           </div>
         </div>
 
-        <Text fw={800} size="lg" variant="gradient" gradient={{ from: 'blue.6', to: 'grape.6', deg: 135 }} mb="xs">
+        <Text fw={700} size="lg" c="dark.5" mb="xs">
           Generando Planificación Inteligente
         </Text>
 
@@ -434,7 +434,7 @@ function AiGenerationOverlay({ opened, messages = [] }) {
         <div style={{ width: '150px', height: '4px', backgroundColor: 'var(--mantine-color-gray-2)', borderRadius: '2px', marginTop: '1.5rem', overflow: 'hidden' }}>
           <div style={{
             height: '100%',
-            background: 'linear-gradient(90deg, var(--mantine-color-blue-5), var(--mantine-color-grape-5))',
+            background: 'linear-gradient(90deg, var(--mantine-color-nutralabColor-5), var(--mantine-color-nutralabColor-8))',
             width: '100%',
             animation: 'loadingProgress 2s infinite ease-in-out',
           }} />
@@ -749,7 +749,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setActionType('generate');
     notifications.show({
       id: notificationId,
-      color: 'blue',
+      color: 'nutralabColor',
       title: 'Generando ficha nutricional',
       message: `Preparando ficha compacta para ${jugador.nombre}.`,
       loading: true,
@@ -840,7 +840,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setActionType('generate');
     notifications.show({
       id: notificationId,
-      color: 'blue',
+      color: 'nutralabColor',
       title: 'Generando ficha nutricional',
       message: `Preparando ficha compacta para ${jugador.nombre}.`,
       loading: true,
@@ -905,7 +905,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setActionType('save');
     notifications.show({
       id: notificationId,
-      color: 'blue',
+      color: 'nutralabColor',
       title: 'Guardando ficha',
       message: 'Guardando cambios del plan nutricional.',
       loading: true,
@@ -955,7 +955,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setActionType('save');
     notifications.show({
       id: notificationId,
-      color: 'blue',
+      color: 'nutralabColor',
       title: 'Guardando ficha',
       message: 'Guardando cambios del plan nutricional.',
       loading: true,
@@ -1502,16 +1502,16 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
       <style>{`
         @media (min-width: 62em) { .meal-detail-field { grid-column: span 3; } }
-        .plan-md h1 { font-size: 24px; font-weight: 800; color: var(--mantine-color-dark-4); margin: 0 0 12px; letter-spacing: 0; }
-        .plan-md h2 { font-size: 14px; font-weight: 700; color: var(--mantine-color-blue-filled); text-transform: uppercase; letter-spacing: 1px; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--mantine-color-blue-light); }
-        .plan-md h3 { font-size: 16px; font-weight: 600; color: var(--mantine-color-dark-4); margin: 20px 0 10px; }
-        .plan-md p { margin: 10px 0; color: var(--mantine-color-gray-7); font-size: 14px; line-height: 1.7; }
-        .plan-md strong { color: var(--mantine-color-dark-4); font-weight: 700; }
+        .plan-md h1 { font-size: 24px; font-weight: 700; color: var(--mantine-color-dark-5); margin: 0 0 12px; letter-spacing: 0; }
+        .plan-md h2 { font-size: 14px; font-weight: 700; color: var(--mantine-color-dark-5); text-transform: uppercase; letter-spacing: 0.8px; margin: 32px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--mantine-color-gray-2); }
+        .plan-md h3 { font-size: 15px; font-weight: 600; color: var(--mantine-color-dark-5); margin: 20px 0 10px; }
+        .plan-md p { margin: 10px 0; color: var(--mantine-color-dark-4); font-size: 14px; line-height: 1.7; }
+        .plan-md strong { color: var(--mantine-color-dark-5); font-weight: 700; }
         .plan-md ul, .plan-md ol { padding-left: 24px; margin: 12px 0; }
-        .plan-md li { margin: 8px 0; color: var(--mantine-color-gray-7); font-size: 14px; line-height: 1.6; }
+        .plan-md li { margin: 8px 0; color: var(--mantine-color-dark-4); font-size: 14px; line-height: 1.6; }
         .plan-md table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
-        .plan-md th { background: var(--mantine-color-gray-0); color: var(--mantine-color-blue-filled); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px; border: 1px solid var(--mantine-color-gray-2); text-align: left; }
-        .plan-md td { padding: 12px; border: 1px solid var(--mantine-color-gray-2); color: var(--mantine-color-gray-7); }
+        .plan-md th { background: var(--mantine-color-gray-0); color: var(--mantine-color-dark-5); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px; border: 1px solid var(--mantine-color-gray-2); text-align: left; }
+        .plan-md td { padding: 12px; border: 1px solid var(--mantine-color-gray-2); color: var(--mantine-color-dark-4); }
       `}</style>
       <ConfirmModal
         opened={!!deletePlanId}

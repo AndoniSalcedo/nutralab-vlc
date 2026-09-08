@@ -194,17 +194,17 @@ export default function HydrationCalculator({ jugador }) {
             size={180}
             thickness={16}
             roundCaps
-            sections={[{ value: percentage, color: isGoalReached ? 'green' : 'blue' }]}
+            sections={[{ value: percentage, color: isGoalReached ? 'teal' : 'cyan' }]}
             label={
               <Center>
                 <Stack gap={0} align="center">
                   {isGoalReached ? (
-                    <ThemeIcon color="green" variant="light" radius="xl" size="xl">
+                    <ThemeIcon color="teal" variant="light" radius="xl" size="xl">
                       <IconCheck size={26} />
                     </ThemeIcon>
                   ) : (
                     <>
-                      <Title order={2} c="blue" lh={1}>{percentage}%</Title>
+                      <Title order={2} c="dark.5" fw={700} lh={1}>{percentage}%</Title>
                       <Text size="xs" c="dimmed" fw={600} tt="uppercase">Completado</Text>
                     </>
                   )}
@@ -214,7 +214,7 @@ export default function HydrationCalculator({ jugador }) {
           />
 
           <Stack gap={4} justify="center">
-            <Text size="xl" fw={800} c={isGoalReached ? 'green' : 'dark'}>
+            <Text size="xl" fw={700} c={isGoalReached ? 'teal.7' : 'dark.5'}>
               {(consumed / 1000).toFixed(2)} L
             </Text>
             <Text size="sm" c="dimmed" fw={500} lh={1}>

@@ -342,17 +342,17 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
             {/* 1. Subidas */}
             <Box style={{ minWidth: 0, textAlign: 'center' }}>
               <Group gap={4} justify="center" wrap="nowrap">
-                <ThemeIcon size={18} radius="xl" color="blue" variant="light" style={{ flexShrink: 0 }}>
+                <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
                   <IconUsers size={11} />
                 </ThemeIcon>
-                <Text size="11px" c="dimmed" tt="uppercase" fw={750} truncate>
+                <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                   Subidas
                 </Text>
               </Group>
-              <Title order={3} fw={850} c="dark.4" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+              <Title order={3} fw={700} c="dark.5" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
                 {stats.playersWithRecords}/{stats.totalPlayers}
               </Title>
-              <Text size="10px" c="dimmed" visibleFrom="xs" mt={2} truncate>
+              <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
                 {stats.totalPlayers ? Math.round((stats.playersWithRecords / stats.totalPlayers) * 100) : 0}% plantilla
               </Text>
             </Box>
@@ -363,14 +363,14 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
                 <ThemeIcon size={18} radius="xl" color="red" variant="light" style={{ flexShrink: 0 }}>
                   <IconAlertTriangle size={11} />
                 </ThemeIcon>
-                <Text size="11px" c="dimmed" tt="uppercase" fw={750} truncate>
+                <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                   Alertas
                 </Text>
               </Group>
-              <Title order={3} fw={850} c={stats.activeAlertsCount > 0 ? 'red.6' : 'green.6'} mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+              <Title order={3} fw={700} c={stats.activeAlertsCount > 0 ? 'red.6' : 'teal.7'} mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
                 {stats.activeAlertsCount}
               </Title>
-              <Text size="10px" c="dimmed" visibleFrom="xs" mt={2} truncate>
+              <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
                 con alertas
               </Text>
             </Box>
@@ -381,14 +381,14 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
                 <ThemeIcon size={18} radius="xl" color="orange" variant="light" style={{ flexShrink: 0 }}>
                   <IconActivity size={11} />
                 </ThemeIcon>
-                <Text size="11px" c="dimmed" tt="uppercase" fw={750} truncate>
+                <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                   Bajos
                 </Text>
               </Group>
-              <Title order={3} fw={850} c={stats.totalLowParams > 0 ? 'orange.6' : 'green.6'} mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+              <Title order={3} fw={700} c={stats.totalLowParams > 0 ? 'orange.7' : 'teal.7'} mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
                 {stats.totalLowParams}
               </Title>
-              <Text size="10px" c="dimmed" visibleFrom="xs" mt={2} truncate>
+              <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
                 bajo mín.{stats.totalHighParams > 0 ? ` · ${stats.totalHighParams} altos` : ''}
               </Text>
             </Box>
@@ -396,17 +396,17 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
             {/* 4. Total Registros */}
             <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
               <Group gap={4} justify="center" wrap="nowrap">
-                <ThemeIcon size={18} radius="xl" color="grape" variant="light" style={{ flexShrink: 0 }}>
+                <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
                   <IconHistory size={11} />
                 </ThemeIcon>
-                <Text size="11px" c="dimmed" tt="uppercase" fw={750} truncate>
+                <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
                   Total
                 </Text>
               </Group>
-              <Title order={3} fw={850} c="dark.4" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+              <Title order={3} fw={700} c="dark.5" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
                 {stats.totalRecords}
               </Title>
-              <Text size="10px" c="dimmed" visibleFrom="xs" mt={2} truncate>
+              <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
                 registros
               </Text>
             </Box>
@@ -418,7 +418,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
         <Stack gap="md">
           <Group justify="space-between" align="center" wrap="wrap" gap="sm">
             <div>
-              <Title order={4} fw={800} c="dark.4">Inspector de Biomarcadores</Title>
+              <Title order={4} fw={700} c="dark.5">Inspector de Biomarcadores</Title>
               <Text size="xs" c="dimmed">Compara o visualiza la evolución del biomarcador seleccionado</Text>
             </div>
             <Group gap="sm" wrap="wrap">
@@ -516,7 +516,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
                       <Text size="xs" c="dimmed" tt="uppercase" fw={700} mb={4}>Resumen del parámetro</Text>
                       <Group justify="space-between" wrap="nowrap" mb={4}>
                         <Text size="xs" fw={500}>Media del equipo</Text>
-                        <Text size="sm" fw={800} c="dark.4">{paramStats.avg} {paramReferenceRange.unidad}</Text>
+                        <Text size="sm" fw={700} c="dark.5">{paramStats.avg} {paramReferenceRange.unidad}</Text>
                       </Group>
                       {Number.isFinite(paramReferenceRange.min) && Number.isFinite(paramReferenceRange.max) && (
                         <Group justify="space-between" wrap="nowrap" mb={4}>
@@ -638,7 +638,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
       <Paper radius="lg" p="md" bg="white" shadow="sm" withBorder style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
         <Stack gap="md" style={{ width: '100%', minWidth: 0 }}>
           <Group justify="space-between" align="center" wrap="wrap" gap="sm" w="100%">
-            <Title order={4} fw={800} c="dark.4">Listado Clínico General</Title>
+            <Title order={4} fw={700} c="dark.5">Listado Clínico General</Title>
             <Group gap="xs" wrap="wrap" w={{ base: '100%', sm: 'auto' }} style={{ flex: 1, minWidth: 0 }}>
               <TextInput
                 placeholder="Buscar por jugador..."

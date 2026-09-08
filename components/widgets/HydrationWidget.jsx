@@ -52,23 +52,24 @@ export default function HydrationWidget({
       }}
     >
       <Stack align="center" justify="center" gap={4} w="100%" ta="center">
-        <ThemeIcon color="teal" variant="light" size={28} radius="md">
+        <ThemeIcon color="nutralabColor" variant="light" size={28} radius="md">
           <IconDroplet size={16} />
         </ThemeIcon>
 
         <Box>
-          <Text fz={{ base: 14, sm: 18 }} fw={900} c="dark.6" lh={1.1}>
+          <Text fz={{ base: 14, sm: 18 }} fw={700} c="dark.5" lh={1.1}>
             {value ? formatMetricNumber(value, 0) : '620'}
           </Text>
-          <Text fz="10px" fw={700} c={statusColor} mt={2}>
+          <Text fz="xs" fw={600} c={statusColor} mt={2}>
             {statusLabel}
           </Text>
         </Box>
 
-        <Text fz="9px" fw={800} c="dimmed" tt="uppercase" lts={0.5}>
+        <Text fz="xs" fw={600} c="dimmed" tt="uppercase" lts={0.5}>
           Hidratación
         </Text>
       </Stack>
     </Paper>
   );
 }
+

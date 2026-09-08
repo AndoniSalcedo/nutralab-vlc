@@ -126,33 +126,33 @@ function AiGenerationOverlay({ opened, messages = [], progress }) {
             width: '70px',
             height: '70px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, var(--mantine-color-blue-5), var(--mantine-color-grape-5))',
+            background: 'linear-gradient(135deg, var(--mantine-color-nutralabColor-6), var(--mantine-color-nutralabColor-8))',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 8px 20px rgba(34, 139, 230, 0.35)',
+            boxShadow: '0 8px 20px rgba(108, 112, 90, 0.25)',
             animation: 'pulseGlow 2s infinite ease-in-out',
           }}>
             <IconSparkles size={32} color="white" style={{ animation: 'spinSlow 6s infinite linear' }} />
           </div>
         </div>
 
-        <Text fw={800} size="lg" variant="gradient" gradient={{ from: 'blue.6', to: 'grape.6', deg: 135 }} mb="xs">
+        <Text fw={700} size="lg" c="dark.5" mb="xs">
           Generando Planificación Inteligente
         </Text>
 
         {hasProgress ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '380px', marginTop: '0.5rem' }}>
-            <Text size="sm" fw={650} c="gray.7" mb="xs" style={{ display: 'flex', gap: '4px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
-              Procesando: <span style={{ color: 'var(--mantine-color-blue-6)', fontWeight: 800 }}>{progress.currentPlayerName}</span>
+            <Text size="sm" fw={600} c="dark.4" mb="xs" style={{ display: 'flex', gap: '4px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
+              Procesando: <span style={{ color: 'var(--mantine-color-nutralabColor-8)', fontWeight: 700 }}>{progress.currentPlayerName}</span>
             </Text>
-            <Text size="md" fw={800} c="dark" mb="sm">
+            <Text size="md" fw={700} c="dark.5" mb="sm">
               {progress.current} de {progress.total} jugadores ({percentage}%)
             </Text>
             <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--mantine-color-gray-2)', borderRadius: '4px', overflow: 'hidden', position: 'relative', marginBottom: '1rem' }}>
               <div style={{
                 height: '100%',
-                background: 'linear-gradient(90deg, var(--mantine-color-blue-5), var(--mantine-color-grape-5))',
+                background: 'linear-gradient(90deg, var(--mantine-color-nutralabColor-5), var(--mantine-color-nutralabColor-8))',
                 width: `${percentage}%`,
                 transition: 'width 0.4s ease-in-out',
               }} />
@@ -170,7 +170,7 @@ function AiGenerationOverlay({ opened, messages = [], progress }) {
             <div style={{ width: '150px', height: '4px', backgroundColor: 'var(--mantine-color-gray-2)', borderRadius: '2px', marginTop: '1.5rem', overflow: 'hidden' }}>
               <div style={{
                 height: '100%',
-                background: 'linear-gradient(90deg, var(--mantine-color-blue-5), var(--mantine-color-grape-5))',
+                background: 'linear-gradient(90deg, var(--mantine-color-nutralabColor-5), var(--mantine-color-nutralabColor-8))',
                 width: '100%',
                 animation: 'loadingProgress 2s infinite ease-in-out',
               }} />
@@ -225,9 +225,9 @@ export default function SquadReportModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconFileText size={22} style={{ color: 'var(--mantine-color-blue-6)' }} />
+          <IconFileText size={22} style={{ color: 'var(--mantine-color-nutralabColor-8)' }} />
           <Stack gap={0}>
-            <Text fw={800} size="md">
+            <Text fw={700} size="md" c="dark.5">
               {reportModal.player ? `Informe de ${reportModal.player.nombre}` : 'Informe semanal de plantilla'}
             </Text>
             <Text size="xs" c="dimmed">
@@ -244,12 +244,12 @@ export default function SquadReportModal({
         <AiGenerationOverlay opened={generatingReport} messages={SQUAD_GENERATION_MESSAGES} progress={reportProgress} />
         <Stack gap="md">
           {/* Panel 1: Datos de la Semana */}
-          <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(231, 245, 255, 0.35)', borderColor: '#a5d8ff' }}>
+          <Paper p="md" radius="md" withBorder bg="gray.0" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
             <Group gap="xs" mb="xs">
-              <ThemeIcon color="blue" size="sm" radius="xl" variant="light">
+              <ThemeIcon color="nutralabColor" size="sm" radius="xl" variant="light">
                 <IconCalendar size={14} />
               </ThemeIcon>
-              <Text fw={700} size="sm" c="blue.9">Configuración de la Semana</Text>
+              <Text fw={700} size="sm" c="dark.5">Configuración de la Semana</Text>
             </Group>
 
             <Stack gap="sm">
@@ -282,7 +282,7 @@ export default function SquadReportModal({
                 <Button
                   variant="subtle"
                   size="xs"
-                  color="blue"
+                  color="nutralabColor"
                   leftSection={<IconSettings size={14} />}
                   onClick={() => setShowAdvanced(!showAdvanced)}
                   style={{ paddingLeft: 0 }}
@@ -321,12 +321,12 @@ export default function SquadReportModal({
           </Paper>
 
           {/* Panel 2: Menú del Buffet Comedor */}
-          <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(230, 252, 245, 0.35)', borderColor: '#96f2d7' }}>
+          <Paper p="md" radius="md" withBorder bg="gray.0">
             <Group gap="xs" mb="xs">
-              <ThemeIcon color="teal" size="sm" radius="xl" variant="light">
+              <ThemeIcon color="nutralabColor" size="sm" radius="xl" variant="light">
                 <IconChefHat size={14} />
               </ThemeIcon>
-              <Text fw={700} size="sm" c="teal.9">Menú del Buffet Comedor</Text>
+              <Text fw={700} size="sm" c="dark.5">Menú del Buffet Comedor</Text>
             </Group>
 
             <Box>
@@ -351,12 +351,12 @@ export default function SquadReportModal({
           </Paper>
 
           {/* Panel 3: Tipos de Día */}
-          <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(243, 240, 246, 0.4)', borderColor: '#e1dbec' }}>
+          <Paper p="md" radius="md" withBorder bg="gray.0">
             <Group gap="xs" mb="xs">
-              <ThemeIcon color="grape" size="sm" radius="xl" variant="light">
+              <ThemeIcon color="nutralabColor" size="sm" radius="xl" variant="light">
                 <IconCalendarEvent size={14} />
               </ThemeIcon>
-              <Text fw={700} size="sm" c="grape.9">Planificación del Tipo de Día</Text>
+              <Text fw={700} size="sm" c="dark.5">Planificación del Tipo de Día</Text>
             </Group>
 
             <SimpleGrid cols={{ base: 2, sm: 3, md: 4 }} spacing="sm">
@@ -374,13 +374,13 @@ export default function SquadReportModal({
           </Paper>
 
           {/* Panel 3.5: Comidas 24h Pre-Partido */}
-          <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(231, 245, 255, 0.4)', borderColor: '#74c0fc' }}>
+          <Paper p="md" radius="md" withBorder bg="gray.0" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
             <Group justify="space-between" mb="xs">
               <Group gap="xs">
-                <ThemeIcon color="blue" size="sm" radius="xl" variant="light">
+                <ThemeIcon color="nutralabColor" size="sm" radius="xl" variant="light">
                   <IconTrophy size={14} />
                 </ThemeIcon>
-                <Text fw={700} size="sm" c="blue.9">Comidas 24h Pre-Partido</Text>
+                <Text fw={700} size="sm" c="dark.5">Comidas 24h Pre-Partido</Text>
               </Group>
               <Switch
                 checked={reportForm.preMatchConfig?.enabled || false}
@@ -454,13 +454,13 @@ export default function SquadReportModal({
 
           {/* Panel 4: Seleccionar Jugadores */}
           {!reportModal.player && (
-            <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(237, 242, 255, 0.35)', borderColor: '#bac8ff' }}>
+            <Paper p="md" radius="md" withBorder bg="gray.0">
               <Group justify="space-between" mb="xs" align="center">
                 <Group gap="xs">
-                  <ThemeIcon color="indigo" size="sm" radius="xl" variant="light">
+                  <ThemeIcon color="nutralabColor" size="sm" radius="xl" variant="light">
                     <IconUsers size={14} />
                   </ThemeIcon>
-                  <Text fw={700} size="sm" c="indigo.9">
+                  <Text fw={700} size="sm" c="dark.5">
                     Destinatarios ({selectedPlayerIds.length} de {playersState.length})
                   </Text>
                 </Group>
@@ -468,7 +468,7 @@ export default function SquadReportModal({
                   <Button
                     variant="subtle"
                     size="compact-xs"
-                    color="indigo"
+                    color="nutralabColor"
                     onClick={() => setSelectedPlayerIds(playersState.map((p) => p.id))}
                   >
                     Seleccionar todos
@@ -510,12 +510,12 @@ export default function SquadReportModal({
           )}
 
           {/* Panel 5: Textos e Indicaciones */}
-          <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(248, 249, 250, 0.5)', borderColor: '#e9ecef' }}>
+          <Paper p="md" radius="md" withBorder bg="gray.0">
             <Group gap="xs" mb="xs">
-              <ThemeIcon color="gray" size="sm" radius="xl" variant="light">
+              <ThemeIcon color="nutralabColor" size="sm" radius="xl" variant="light">
                 <IconBook size={14} />
               </ThemeIcon>
-              <Text fw={700} size="sm" c="gray.9">Contenido e Indicaciones del PDF</Text>
+              <Text fw={700} size="sm" c="dark.5">Contenido e Indicaciones del PDF</Text>
             </Group>
 
             <Stack gap="sm">
@@ -555,7 +555,7 @@ export default function SquadReportModal({
             <Button
               leftSection={<IconDownload size={16} />}
               radius="xl"
-              color="blue"
+              color="nutralabColor.8"
               loading={generatingReport}
               onClick={generateReport}
             >

@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   Group,
+  Menu,
   Paper,
   ScrollArea,
   Stack,
@@ -61,10 +62,78 @@ export default function TeamSupplementationDashboard({
       {/* Botones de acción integrados en la cabecera */}
       <TeamHeaderRightSection>
         {!readOnly && (
-          <Group gap="xs" wrap="wrap" w={{ base: '100%', sm: 'auto' }}>
-            <Button size="xs" radius="xl" variant="light" color="grape" onClick={() => setManagerModal('assign')} leftSection={<IconUsers size={14} />} style={{ flex: '1 1 auto' }}>Asignar fases</Button>
-            <Button size="xs" radius="xl" variant="light" color="grape" onClick={() => setManagerModal('catalogs')} leftSection={<IconList size={14} />} style={{ flex: '1 1 auto' }}>Catálogos</Button>
-            <Button size="xs" radius="xl" variant="light" color="grape" onClick={() => setManagerModal('supplements')} leftSection={<IconPill size={14} />} style={{ flex: '1 1 auto' }}>Suplementos</Button>
+          <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
+            {/* Móvil: botón pastilla (💊) compacto con menú desplegable */}
+            <Box hiddenFrom="sm">
+              <Menu shadow="md" width={200} position="bottom-end" withArrow radius="md">
+                <Menu.Target>
+                  <ActionIcon
+                    size={36}
+                    radius="xl"
+                    variant="light"
+                    color="grape"
+                    aria-label="Gestión de suplementación"
+                  >
+                    <IconPill size={18} />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Label>Gestión de suplementación</Menu.Label>
+                  <Menu.Item
+                    leftSection={<IconUsers size={16} color="var(--mantine-color-grape-6)" />}
+                    onClick={() => setManagerModal('assign')}
+                  >
+                    Asignar fases
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconList size={16} color="var(--mantine-color-grape-6)" />}
+                    onClick={() => setManagerModal('catalogs')}
+                  >
+                    Catálogos
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconPill size={16} color="var(--mantine-color-grape-6)" />}
+                    onClick={() => setManagerModal('supplements')}
+                  >
+                    Suplementos
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </Box>
+
+            {/* Escritorio: Los 3 botones completos */}
+            <Group visibleFrom="sm" gap="xs" wrap="nowrap">
+              <Button
+                size="xs"
+                radius="xl"
+                variant="light"
+                color="grape"
+                onClick={() => setManagerModal('assign')}
+                leftSection={<IconUsers size={14} />}
+              >
+                Asignar fases
+              </Button>
+              <Button
+                size="xs"
+                radius="xl"
+                variant="light"
+                color="grape"
+                onClick={() => setManagerModal('catalogs')}
+                leftSection={<IconList size={14} />}
+              >
+                Catálogos
+              </Button>
+              <Button
+                size="xs"
+                radius="xl"
+                variant="light"
+                color="grape"
+                onClick={() => setManagerModal('supplements')}
+                leftSection={<IconPill size={14} />}
+              >
+                Suplementos
+              </Button>
+            </Group>
           </Group>
         )}
       </TeamHeaderRightSection>
@@ -103,7 +172,7 @@ export default function TeamSupplementationDashboard({
                         </Avatar>
 
                         <Box style={{ minWidth: 0, flex: 1 }}>
-                          <Text fz="sm" fw={650} c="dark.4" truncate>
+                          <Text fz="sm" fw={600} c="dark.5" truncate>
                             {player.nombre} {player.apellidos}
                           </Text>
                           <Text c="dimmed" fz="xs" style={{ lineHeight: 1.2 }} truncate>

@@ -71,7 +71,7 @@ export default function MeasurementDetailModal({
 
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
             <Box>
-              <Text size="xs" c="dimmed" tt="uppercase" fw={800} mb={6}>Origen</Text>
+              <Text size="xs" c="dimmed" tt="uppercase" fw={700} mb={6}>Origen</Text>
               <Table variant="simple" verticalSpacing={5}>
                 <Table.Tbody>
                   {sourceRows(detailMeasurement).map(([label, value]) => (
@@ -85,7 +85,7 @@ export default function MeasurementDetailModal({
             </Box>
 
             <Box>
-              <Text size="xs" c="dimmed" tt="uppercase" fw={800} mb={6}>Cambios vs anterior</Text>
+              <Text size="xs" c="dimmed" tt="uppercase" fw={700} mb={6}>Cambios vs anterior</Text>
               <Table variant="simple" verticalSpacing={5}>
                 <Table.Tbody>
                   {METRICS.map((metric) => {
@@ -95,7 +95,7 @@ export default function MeasurementDetailModal({
                     return (
                       <Table.Tr key={metric.key}>
                         <Table.Th>{metric.label}</Table.Th>
-                        <Table.Td ta="right" fw={650}>{metricDisplay(value, metric.unit)}</Table.Td>
+                        <Table.Td ta="right" fw={600}>{metricDisplay(value, metric.unit)}</Table.Td>
                         <Table.Td ta="right">
                           {delta !== null && delta !== 0 ? (
                             <Badge color={deltaColor(delta, metric)} variant="light" size="xs">
@@ -118,13 +118,13 @@ export default function MeasurementDetailModal({
 
               return (
                 <Box key={section.title}>
-                  <Text size="xs" c="dimmed" tt="uppercase" fw={800} mb={6}>{section.title}</Text>
+                  <Text size="xs" c="dimmed" tt="uppercase" fw={700} mb={6}>{section.title}</Text>
                   <Table variant="simple" verticalSpacing={5}>
                     <Table.Tbody>
                       {sectionRows.map((field) => (
                         <Table.Tr key={field.key}>
                           <Table.Th style={{ width: '58%' }}>{field.label}</Table.Th>
-                          <Table.Td ta="right" fw={650}>{metricDisplay(field.value, field.unit)}</Table.Td>
+                          <Table.Td ta="right" fw={600}>{metricDisplay(field.value, field.unit)}</Table.Td>
                         </Table.Tr>
                       ))}
                     </Table.Tbody>
@@ -137,7 +137,7 @@ export default function MeasurementDetailModal({
           {detailRawEntries.length > 0 && (
             <Box>
               <Group justify="space-between" align="center" mb="xs">
-                <Text size="xs" c="dimmed" tt="uppercase" fw={800}>Columnas Excel importadas</Text>
+                <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Columnas Excel importadas</Text>
                 <Badge variant="light" color="gray">{detailRawEntries.length}</Badge>
               </Group>
               <ScrollArea h={280} offsetScrollbars>
@@ -152,7 +152,7 @@ export default function MeasurementDetailModal({
                     {detailRawEntries.map(([label, value]) => (
                       <Table.Tr key={label}>
                         <Table.Td>{label}</Table.Td>
-                        <Table.Td ta="right" fw={650}>{displayRawValue(value)}</Table.Td>
+                        <Table.Td ta="right" fw={600}>{displayRawValue(value)}</Table.Td>
                       </Table.Tr>
                     ))}
                   </Table.Tbody>

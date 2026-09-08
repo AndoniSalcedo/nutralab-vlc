@@ -255,7 +255,7 @@ export default function PerfilSubtab({
                 <HeaderIcon size={20} />
               </ThemeIcon>
               <Box>
-                <Title order={3} fw={800} c="dark.4">{headerConfig.title}</Title>
+                <Title order={3} fw={700} c="dark.5">{headerConfig.title}</Title>
                 <Text size="sm" c="dimmed">
                   {readOnly ? (headerConfig.subtitleReadOnly || headerConfig.subtitle) : headerConfig.subtitle}
                 </Text>
@@ -342,7 +342,7 @@ export default function PerfilSubtab({
                   <IconClipboardList size={20} />
                 </ThemeIcon>
                 <Box>
-                  <Title order={3} fw={800} c="dark.4">Preferencias y contexto</Title>
+                  <Title order={3} fw={700} c="dark.5">Preferencias y contexto</Title>
                   <Text size="sm" c="dimmed">
                     Información que condiciona el plan nutricional.
                   </Text>

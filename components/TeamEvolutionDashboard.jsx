@@ -18,6 +18,7 @@ import {
   Table,
   Text,
   TextInput,
+  ThemeIcon,
   Title,
   Tooltip,
 } from '@mantine/core';
@@ -39,12 +40,15 @@ import {
 import {
   IconCalendarStats,
   IconChartLine,
+  IconDatabase,
   IconDownload,
   IconExternalLink,
   IconEye,
   IconFilter,
-  IconUsers,
+  IconHistory,
   IconPlus,
+  IconUserCheck,
+  IconUsers,
   IconX,
 } from '@tabler/icons-react';
 import NothingFound from '@/components/NothingFound';
@@ -684,13 +688,12 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
   return (
     <BoneyardSkeleton name="team-evolution" loading={false}>
-      {/* 1. BOTÓN DE CSV INTEGRADO EN LA CABECERA */}
+      {/* 1. BOTÓN DE CSV INTEGRADO EN LA CABECERA A LA ALTURA DEL NOMBRE */}
       <TeamHeaderRightSection>
         <Button
           radius="xl"
           size="xs"
-          variant="light"
-          color="gray"
+          variant="default"
           leftSection={<IconDownload size={14} />}
           onClick={handleDownloadCsv}
           disabled={viewMode === 'day' ? measuredDayRows.length === 0 : rows.length === 0}
@@ -701,15 +704,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
       {/* 2. BARRA DE HERRAMIENTAS Y FILTROS INTEGRADOS EN LA CABECERA */}
       <TeamHeaderFilters>
-        <Paper
-          p={6}
-          radius={24}
-          shadow="xs"
-          withBorder
-          bg="white"
-          style={{ borderColor: 'rgba(222, 226, 230, 0.85)' }}
-          w="100%"
-        >
+        <Box w="100%" style={{ minWidth: 0 }}>
           <Stack gap="xs" style={{ width: '100%', minWidth: 0 }}>
             <Group justify="space-between" align="center" wrap="wrap" gap="xs" w="100%">
               <SegmentedControl
@@ -745,10 +740,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                   },
                 ]}
                 aria-label="Modo de visualización"
-                color={viewMode === 'day' ? 'teal' : viewMode === 'ranking' ? 'grape' : 'blue'}
+                color={viewMode === 'day' ? 'teal' : viewMode === 'ranking' ? 'grape' : 'nutralabColor'}
                 radius="xl"
                 size="sm"
-                w={{ base: '100%', sm: 'auto' }}
+                w={{ base: '100%', sm: 400 }}
                 styles={{
                   root: { maxWidth: '100%' },
                   control: { minWidth: 0 },
@@ -830,35 +825,89 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               </Group>
             </Group>
           </Stack>
-        </Paper>
+        </Box>
       </TeamHeaderFilters>
 
       <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
 
         {viewMode === 'trends' && (
           <>
-            <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md">
-              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Plantilla total</Text>
-                <Title order={2} c="dark.4" mt={4}>{scopedPlayers.length}</Title>
-                <Text size="xs" c="dimmed">jugadores activos</Text>
-              </Paper>
-              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Jugadores medidos</Text>
-                <Title order={2} c="dark.4" mt={4}>{latestRows.length}/{scopedPlayers.length}</Title>
-                <Text size="xs" c="dimmed">{measuredPct}% con al menos una medición</Text>
-              </Paper>
-              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Registros filtrados</Text>
-                <Title order={2} c="dark.4" mt={4}>{totalRecords}</Title>
-                <Text size="xs" c="dimmed">mediciones en el rango</Text>
-              </Paper>
-              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Última fecha</Text>
-                <Title order={3} c="dark.4" mt={8}>{formatDate(lastDate)}</Title>
-                <Text size="xs" c="dimmed">último registro disponible</Text>
-              </Paper>
-            </SimpleGrid>
+            {/* Resumen de evolución en 1 sola fila compacta (diseño analíticas) */}
+            <Paper p={{ base: 10, sm: 'md' }} radius="lg" withBorder shadow="xs" bg="white">
+              <SimpleGrid cols={4} spacing={{ base: 6, sm: 'md' }}>
+                {/* 1. Plantilla total */}
+                <Box style={{ minWidth: 0, textAlign: 'center' }}>
+                  <Group gap={4} justify="center" wrap="nowrap">
+                    <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
+                      <IconUsers size={11} />
+                    </ThemeIcon>
+                    <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
+                      Plantilla total
+                    </Text>
+                  </Group>
+                  <Title order={3} fw={700} c="dark.5" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+                    {scopedPlayers.length}
+                  </Title>
+                  <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
+                    jugadores activos
+                  </Text>
+                </Box>
+
+                {/* 2. Jugadores medidos */}
+                <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
+                  <Group gap={4} justify="center" wrap="nowrap">
+                    <ThemeIcon size={18} radius="xl" color="teal" variant="light" style={{ flexShrink: 0 }}>
+                      <IconUserCheck size={11} />
+                    </ThemeIcon>
+                    <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
+                      Jugadores medidos
+                    </Text>
+                  </Group>
+                  <Title order={3} fw={700} c="dark.5" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+                    {latestRows.length}/{scopedPlayers.length}
+                  </Title>
+                  <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
+                    {measuredPct}% con al menos una medición
+                  </Text>
+                </Box>
+
+                {/* 3. Registros filtrados */}
+                <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
+                  <Group gap={4} justify="center" wrap="nowrap">
+                    <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
+                      <IconHistory size={11} />
+                    </ThemeIcon>
+                    <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
+                      Registros filtrados
+                    </Text>
+                  </Group>
+                  <Title order={3} fw={700} c="dark.5" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+                    {totalRecords}
+                  </Title>
+                  <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
+                    mediciones en el rango
+                  </Text>
+                </Box>
+
+                {/* 4. Última fecha */}
+                <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
+                  <Group gap={4} justify="center" wrap="nowrap">
+                    <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
+                      <IconCalendarStats size={11} />
+                    </ThemeIcon>
+                    <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
+                      Última fecha
+                    </Text>
+                  </Group>
+                  <Title order={3} fw={700} c="dark.5" mt={2} fz={{ base: 13, sm: 18 }} lh={1.1}>
+                    {formatDate(lastDate)}
+                  </Title>
+                  <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
+                    último registro disponible
+                  </Text>
+                </Box>
+              </SimpleGrid>
+            </Paper>
 
             {chartData.length > 0 ? (
               <SimpleGrid cols={{ base: 1, md: 1, lg: 2 }} spacing="lg">
@@ -876,10 +925,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     <Paper key={item.key} p="md" radius="lg" withBorder bg="white">
                       <Group justify="space-between" align="flex-start" gap="sm" mb="md">
                         <Box>
-                          <Title order={4} fw={800} c="dark.4">{item.label}</Title>
+                          <Title order={4} fw={700} c="dark.5">{item.label}</Title>
                           <Text size="xs" c="dimmed">Tendencia media del equipo</Text>
                         </Box>
-                        <Text fz="xs" fw={700} c={item.goodDown === true ? 'red.7' : item.goodDown === false ? 'teal.7' : 'blue.7'}>
+                        <Text fz="xs" fw={600} c={item.goodDown === true ? 'red.7' : item.goodDown === false ? 'teal.7' : 'dark.4'}>
                           Media: {avg === null ? '-' : `${avg} ${item.unit}`}
                         </Text>
                       </Group>
@@ -993,7 +1042,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                             style={{ cursor: 'pointer' }}
                           >
                             <Table.Td style={{ paddingLeft: 24 }}>
-                              <Text fz="sm" fw={650} c="dark.4">{playerName(row)}</Text>
+                              <Text fz="sm" fw={600} c="dark.5">{playerName(row)}</Text>
                               <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
                             </Table.Td>
                             <Table.Td>{formatDate(latest.fecha)}</Table.Td>
@@ -1036,28 +1085,82 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
         {viewMode === 'day' && (
           <>
-            <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md">
-              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Fecha</Text>
-                <Title order={3} c="dark.4" mt={8}>{formatDate(currentDay)}</Title>
-                <Text size="xs" c="dimmed">{availableDates.length} jornadas registradas</Text>
-              </Paper>
-              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Medidos ese día</Text>
-                <Title order={2} c="dark.4" mt={4}>{measuredDayRows.length}/{scopedPlayers.length}</Title>
-                <Text size="xs" c="dimmed">{dayMeasuredPct}% de cobertura</Text>
-              </Paper>
-              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Importadas</Text>
-                <Title order={2} c="dark.4" mt={4}>{dayImported}</Title>
-                <Text size="xs" c="dimmed">{dayCorrected ? `${dayCorrected} fechas corregidas` : 'sin correcciones de fecha'}</Text>
-              </Paper>
-              <Paper p="md" radius="lg" withBorder shadow="sm" bg="white">
-                <Text size="xs" c="dimmed" tt="uppercase" fw={750}>Columnas Excel</Text>
-                <Title order={2} c="dark.4" mt={4}>{rawColumnTotal}</Title>
-                <Text size="xs" c="dimmed">datos crudos disponibles</Text>
-              </Paper>
-            </SimpleGrid>
+            {/* Resumen del día en 1 sola fila compacta (diseño analíticas) */}
+            <Paper p={{ base: 10, sm: 'md' }} radius="lg" withBorder shadow="xs" bg="white">
+              <SimpleGrid cols={4} spacing={{ base: 6, sm: 'md' }}>
+                {/* 1. Fecha */}
+                <Box style={{ minWidth: 0, textAlign: 'center' }}>
+                  <Group gap={4} justify="center" wrap="nowrap">
+                    <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
+                      <IconCalendarStats size={11} />
+                    </ThemeIcon>
+                    <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
+                      Fecha
+                    </Text>
+                  </Group>
+                  <Title order={3} fw={700} c="dark.5" mt={2} fz={{ base: 13, sm: 18 }} lh={1.1}>
+                    {formatDate(currentDay)}
+                  </Title>
+                  <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
+                    {availableDates.length} jornadas registradas
+                  </Text>
+                </Box>
+
+                {/* 2. Medidos ese día */}
+                <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
+                  <Group gap={4} justify="center" wrap="nowrap">
+                    <ThemeIcon size={18} radius="xl" color="teal" variant="light" style={{ flexShrink: 0 }}>
+                      <IconUserCheck size={11} />
+                    </ThemeIcon>
+                    <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
+                      Medidos ese día
+                    </Text>
+                  </Group>
+                  <Title order={3} fw={700} c="dark.5" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+                    {measuredDayRows.length}/{scopedPlayers.length}
+                  </Title>
+                  <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
+                    {dayMeasuredPct}% de cobertura
+                  </Text>
+                </Box>
+
+                {/* 3. Importadas */}
+                <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
+                  <Group gap={4} justify="center" wrap="nowrap">
+                    <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
+                      <IconDownload size={11} />
+                    </ThemeIcon>
+                    <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
+                      Importadas
+                    </Text>
+                  </Group>
+                  <Title order={3} fw={700} c="dark.5" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+                    {dayImported}
+                  </Title>
+                  <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
+                    {dayCorrected ? `${dayCorrected} fechas corregidas` : 'sin correcciones'}
+                  </Text>
+                </Box>
+
+                {/* 4. Columnas Excel */}
+                <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
+                  <Group gap={4} justify="center" wrap="nowrap">
+                    <ThemeIcon size={18} radius="xl" color="nutralabColor" variant="light" style={{ flexShrink: 0 }}>
+                      <IconDatabase size={11} />
+                    </ThemeIcon>
+                    <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
+                      Columnas Excel
+                    </Text>
+                  </Group>
+                  <Title order={3} fw={700} c="dark.5" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
+                    {rawColumnTotal}
+                  </Title>
+                  <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
+                    datos crudos disponibles
+                  </Text>
+                </Box>
+              </SimpleGrid>
+            </Paper>
 
             {measuredDayRows.length > 0 ? (
               <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
@@ -1065,8 +1168,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                   <Paper key={metric.key} p="md" radius="lg" withBorder bg="white">
                     <Group justify="space-between" align="flex-start" gap="sm">
                       <Box>
-                        <Text size="xs" c="dimmed" tt="uppercase" fw={750}>{metric.label}</Text>
-                        <Title order={3} c="dark.4" mt={4}>{metricDisplay(metric.avg, metric.unit)}</Title>
+                        <Text size="xs" c="dimmed" tt="uppercase" fw={600}>{metric.label}</Text>
+                        <Title order={3} c="dark.5" mt={4}>{metricDisplay(metric.avg, metric.unit)}</Title>
                       </Box>
                       <Text fz="xs" fw={700} c="dimmed">{metric.count}/{measuredDayRows.length}</Text>
                     </Group>
@@ -1086,12 +1189,12 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
                 <Group justify="space-between" p="md" pb="xs" align="center">
                   <Box>
-                    <Title order={4} fw={800} c="dark.4">Mediciones del día</Title>
+                    <Title order={4} fw={700} c="dark.5">Mediciones del día</Title>
                     <Text size="xs" c="dimmed">{formatDate(currentDay)} · {measuredDayRows.length} jugadores</Text>
                   </Box>
                   <Group gap={6} align="center" wrap="nowrap">
                     <span style={{ fontSize: '8px', color: 'var(--mantine-color-teal-6)' }}>●</span>
-                    <Text fz="xs" fw={700} c="teal.8">{dayMeasuredPct}% cobertura</Text>
+                    <Text fz="xs" fw={600} c="teal.7">{dayMeasuredPct}% cobertura</Text>
                   </Group>
                 </Group>
                 <ScrollArea style={{ width: '100%', minWidth: 0 }}>
@@ -1112,11 +1215,11 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                           style={{ cursor: 'pointer' }}
                         >
                           <Table.Td style={{ paddingLeft: 24 }}>
-                            <Text fz="sm" fw={650} c="dark.4">{playerName(row)}</Text>
+                            <Text fz="sm" fw={600} c="dark.5">{playerName(row)}</Text>
                             <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
                           </Table.Td>
                           <Table.Td>
-                            <Text fz="xs" fw={650} c="dark.4">{row.measurement?.fuente_hoja || 'Manual'}</Text>
+                            <Text fz="xs" fw={500} c="dark.4">{row.measurement?.fuente_hoja || 'Manual'}</Text>
                             <Text fz="xs" c="dimmed">{row.measurement?.fuente_fila ? `Fila ${row.measurement.fuente_fila}` : formatDate(row.measurement?.fecha)}</Text>
                           </Table.Td>
                           {METRICS.map((item) => {
@@ -1125,7 +1228,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                             return (
                               <Table.Td key={item.key}>
                                 <Stack gap={3}>
-                                  <Text fz="sm" fw={650} c="dark.4">{metricDisplay(value, item.unit)}</Text>
+                                  <Text fz="sm" fw={600} c="dark.5">{metricDisplay(value, item.unit)}</Text>
                                   {delta !== null && delta !== 0 && (
                                     <Text
                                       fz="xs"
@@ -1183,10 +1286,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
                 <Group justify="space-between" p="md" pb="xs" align="center">
                   <Box>
-                    <Title order={4} fw={800} c="dark.4">Sin medición ese día</Title>
+                    <Title order={4} fw={700} c="dark.5">Sin medición ese día</Title>
                     <Text size="xs" c="dimmed">{missingDayRows.length} jugadores sin registro en {formatDate(currentDay)}</Text>
                   </Box>
-                  <Text fz="xs" fw={700} c="dimmed">{missingDayRows.length} jugadores</Text>
+                  <Text fz="xs" fw={600} c="dimmed">{missingDayRows.length} jugadores</Text>
                 </Group>
                 <ScrollArea.Autosize mah={260}>
                   <Table verticalSpacing="sm" highlightOnHover>
@@ -1202,7 +1305,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                       {missingDayRows.map((row) => (
                         <Table.Tr key={`missing-${row.id}`}>
                           <Table.Td style={{ paddingLeft: 24 }}>
-                            <Text fz="sm" fw={650} c="dark.4">{playerName(row)}</Text>
+                            <Text fz="sm" fw={600} c="dark.5">{playerName(row)}</Text>
                             <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
                           </Table.Td>
                           <Table.Td>{formatDate(row.latest?.fecha)}</Table.Td>
@@ -1253,7 +1356,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
                 <hr style={{ border: 0, borderTop: '1px solid var(--mantine-color-gray-2)', margin: '6px 0' }} />
 
-                <Text size="sm" fw={800} c="dark.4" tt="uppercase">
+                <Text size="xs" fw={700} c="dark.5" tt="uppercase">
                   Configurar Filtros de Alerta
                 </Text>
 
@@ -1419,7 +1522,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
                 <Group justify="space-between" p="md" pb="xs" align="center">
                   <Box>
-                    <Title order={4} fw={800} c="dark.4">
+                    <Title order={4} fw={700} c="dark.5">
                       Tabla de Filtros de Plantilla
                     </Title>
                     <Text size="xs" c="dimmed">
@@ -1559,7 +1662,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                               boxShadow: '2px 0 5px -2px rgba(0,0,0,0.15)',
                             }}
                           >
-                            <Text fz="sm" fw={650} c="dark.4">
+                            <Text fz="sm" fw={600} c="dark.5">
                               {playerName(row)}
                             </Text>
                             <Text fz="xs" c="dimmed">

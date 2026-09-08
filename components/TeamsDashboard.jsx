@@ -291,7 +291,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                 <IconUsersGroup size={21} />
               </ThemeIcon>
               <Box style={{ minWidth: 0, flex: 1 }}>
-                <Title order={3} fw={850} c="#24291f" lh={1.1}>
+                <Title order={2} size="h3" fw={700} c="dark.5" lh={1.2}>
                   Equipos
                 </Title>
                 <Text size="xs" c="dimmed" mt={2} lineClamp={1}>
@@ -361,12 +361,12 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                         src={team.foto_size ? `/api/teams/avatar?id=${team.id}&t=${team.updated_at || ''}` : undefined}
                         size={46}
                         radius="md"
-                        color="blue"
+                        color="nutralabColor"
                         style={{
                           border: '1.5px solid rgba(222, 226, 230, 0.7)',
-                          fontWeight: 700,
-                          backgroundColor: 'var(--mantine-color-blue-0)',
-                          color: 'var(--mantine-color-blue-8)',
+                          fontWeight: 600,
+                          backgroundColor: 'var(--mantine-color-nutralabColor-0)',
+                          color: 'var(--mantine-color-nutralabColor-9)',
                           flexShrink: 0,
                         }}
                       >
@@ -375,10 +375,10 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
 
                       <Box style={{ minWidth: 0, flex: 1 }}>
                         <Group gap={6} wrap="nowrap" align="center">
-                          <Title order={4} fw={800} c="dark.4" lh={1.2} lineClamp={1}>
+                          <Title order={4} size="h5" fw={700} c="dark.5" lh={1.2} lineClamp={1}>
                             {team.nombre}
                           </Title>
-                          <Text size="xs" fw={600} c="dimmed" style={{ flexShrink: 0 }}>
+                          <Text size="xs" fw={500} c="dimmed" style={{ flexShrink: 0 }}>
                             · {team.temporada}
                           </Text>
                         </Group>
@@ -440,7 +440,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                     <Text size="xs" c="dimmed">
                       {team.players_count || 0} jugador{Number(team.players_count || 0) === 1 ? '' : 'es'}
                     </Text>
-                    <Text size="xs" fw={700} c="blue.7">
+                    <Text size="xs" fw={600} c="dark.4">
                       Abrir dashboard →
                     </Text>
                   </Group>

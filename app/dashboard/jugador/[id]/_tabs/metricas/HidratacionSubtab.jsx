@@ -541,7 +541,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
     return (
       <Paper p="md" radius="lg" withBorder bg="white" shadow="sm">
         <Stack gap="xs">
-          <Text size="xs" c="dimmed" tt="uppercase" fw={800}>{metric.chartTitle}</Text>
+          <Text size="xs" c="dimmed" tt="uppercase" fw={600}>{metric.chartTitle}</Text>
           <Box h={140} mt="md">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>

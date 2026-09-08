@@ -318,12 +318,12 @@ export function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) 
         src={avatarSrc || undefined}
         size={size}
         radius="xl"
-        color="blue"
+        color="nutralabColor"
         style={{
           border: size > 50 ? '3px solid white' : '2px solid white',
           boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
-          backgroundColor: 'var(--mantine-color-blue-1)',
-          color: 'var(--mantine-color-blue-8)',
+          backgroundColor: 'var(--mantine-color-nutralabColor-0)',
+          color: 'var(--mantine-color-nutralabColor-9)',
           fontWeight: 700,
           fontSize: size > 80 ? '24px' : (size <= 50 ? '14px' : '16px'),
         }}
@@ -383,7 +383,7 @@ export function PlayerIdentity({ jugador, isAdmin, isPlayer, hasCredentials, ava
       />
 
       <Stack gap={4} align={centered ? 'center' : undefined} style={{ minWidth: 0 }}>
-        <Title order={2} c="dark.4" lh={1.1} fz={titleSize} lineClamp={2}>
+        <Title order={2} c="dark.5" lh={1.1} fz={titleSize} fw={700} lineClamp={2}>
           {jugador.nombre} {jugador.apellidos}
         </Title>
 
@@ -422,7 +422,7 @@ export function JugadorHeaderCompactMobile({ jugador, user, onEdit }) {
           size={44}
         />
         <Stack gap={2} style={{ minWidth: 0, flex: 1 }}>
-          <Title order={3} fw={800} c="dark.4" truncate="end">
+          <Title order={3} fw={700} c="dark.5" truncate="end">
             {jugador?.nombre} {jugador?.apellidos}
           </Title>
           <Group gap={6} align="center" wrap="nowrap">

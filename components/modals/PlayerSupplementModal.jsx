@@ -58,7 +58,7 @@ export default function PlayerSupplementModal({
         {modalMode === 'lista' ? (
           <Stack gap="md">
             <Stack gap={3}>
-              <Text size="sm" fw={900}>Catálogo</Text>
+              <Text size="sm" fw={700} c="dark.5">Catálogo</Text>
               <Text size="xs" c="dimmed">
                 Selecciona el catálogo que generará la suplementación base del jugador.
               </Text>
@@ -78,7 +78,7 @@ export default function PlayerSupplementModal({
         ) : (
           <Stack gap="md">
             <Stack gap={3}>
-              <Text size="sm" fw={900}>Suplemento adicional</Text>
+              <Text size="sm" fw={700} c="dark.5">Suplemento adicional</Text>
               <Text size="xs" c="dimmed">
                 Añade un suplemento fuera del catálogo o personaliza dosis, timing y notas.
               </Text>

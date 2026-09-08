@@ -62,7 +62,7 @@ export default function PlayerSubtabLoading() {
                 <HeaderIcon size={20} />
               </ThemeIcon>
               <Box>
-                <Title order={3} fw={800} c="dark.4">{header.title}</Title>
+                <Title order={3} fw={700} c="dark.5">{header.title}</Title>
                 <Text size="sm" c="dimmed">{header.subtitle}</Text>
               </Box>
             </Group>

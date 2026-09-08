@@ -200,11 +200,9 @@ export default function MealCard({ m, onOpen, onEdit, onDelete }) {
         </Badge>
       </Box>
 
-      {/* 2. Text Content Stack below */}
       <Stack gap={6} p="md" pt="sm">
-        {/* Row 1: Title + Action Icons */}
         <Group justify="space-between" align="center" gap={8} wrap="nowrap">
-          <Text size="lg" fw={800} c="dark.8" lineClamp={1}>
+          <Text size="md" fw={700} c="dark.5" lineClamp={1}>
             {title}
           </Text>
 
@@ -218,6 +216,7 @@ export default function MealCard({ m, onOpen, onEdit, onDelete }) {
                     radius="md"
                     size="md"
                     onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                    aria-label="Editar comida"
                   >
                     <IconEdit size={16} />
                   </ActionIcon>
@@ -231,6 +230,7 @@ export default function MealCard({ m, onOpen, onEdit, onDelete }) {
                     radius="md"
                     size="md"
                     onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                    aria-label="Eliminar comida"
                   >
                     <IconTrash size={16} />
                   </ActionIcon>
@@ -240,7 +240,6 @@ export default function MealCard({ m, onOpen, onEdit, onDelete }) {
           )}
         </Group>
 
-        {/* Row 2: Macros Inline Text */}
         {hasMacros && (
           <Text size="xs" c="dimmed" fw={600} lh={1.3}>
             {Number.isFinite(m.calories) && (
@@ -249,29 +248,28 @@ export default function MealCard({ m, onOpen, onEdit, onDelete }) {
             {calculatedMacros && (
               <>
                 {Number.isFinite(m.calories) && <Text span c="gray.4"> · </Text>}
-                <Text span c="blue.5">P {calculatedMacros.pro}g</Text>
+                <Text span c="dark.5" fw={600}>P {calculatedMacros.pro}g</Text>
                 <Text span c="gray.4"> · </Text>
-                <Text span c="teal.5">HC {calculatedMacros.cho}g</Text>
+                <Text span c="dark.5" fw={600}>HC {calculatedMacros.cho}g</Text>
                 <Text span c="gray.4"> · </Text>
-                <Text span c="yellow.7">G {calculatedMacros.fat}g</Text>
+                <Text span c="dark.5" fw={600}>G {calculatedMacros.fat}g</Text>
               </>
             )}
           </Text>
         )}
       </Stack>
 
-      {/* 3. Expandable Detail Panel */}
       <Collapse in={expanded}>
         <Stack gap="xs" p="md" pt={0} style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}>
           {ingredientsText && (
             <Box mt="xs">
-              <Text size="10px" fw={700} c="dimmed" tt="uppercase" mb={2}>Ingredientes</Text>
+              <Text size="xs" fw={600} c="dimmed" tt="uppercase" mb={2}>Ingredientes</Text>
               <Text size="xs" c="dark.5" lh={1.4}>{ingredientsText}</Text>
             </Box>
           )}
           {m.notes && (
             <Box mt="xs">
-              <Text size="10px" fw={700} c="dimmed" tt="uppercase" mb={2}>Notas completas</Text>
+              <Text size="xs" fw={600} c="dimmed" tt="uppercase" mb={2}>Notas completas</Text>
               <Text size="xs" c="dark.5" fs="italic" lh={1.4}>{m.notes}</Text>
             </Box>
           )}

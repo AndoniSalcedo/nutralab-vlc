@@ -76,12 +76,12 @@ function ParameterRow({ parametro, grupo }) {
     <Table.Tr>
       <Table.Td>
         <Stack gap={2}>
-          <Text size="sm" fw={650} c="dark.4">{parametro.nombre}</Text>
+          <Text size="sm" fw={600} c="dark.5">{parametro.nombre}</Text>
           <Badge visibleFrom="sm" variant="light" color="gray" size="xs" w="fit-content">{grupo}</Badge>
         </Stack>
       </Table.Td>
       <Table.Td>
-        <Text size="sm" fw={800} c={status.color}>
+        <Text size="sm" fw={700} c={status.color}>
           {parametro.valor} <Text span size="xs" fw={500} c="dimmed">{parametro.unidad}</Text>
         </Text>
       </Table.Td>
@@ -401,7 +401,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
                               <Text size="xs" c="dimmed">{rangeLabel(parametro)}</Text>
                             </Table.Td>
                             <Table.Td ta="right">
-                              <Text size="sm" fw={800} c={status.color}>
+                              <Text size="sm" fw={700} c={status.color}>
                                 {parametro.valor} <Text span size="xs" fw={500} c="dimmed">{parametro.unidad}</Text>
                               </Text>
                             </Table.Td>

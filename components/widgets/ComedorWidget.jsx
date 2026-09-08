@@ -54,7 +54,7 @@ export default function ComedorWidget({
       {/* Cabecera con fondo blanco y acento naranja */}
       <Group justify="space-between" align="center" mb="sm">
         <Group gap="xs" align="center">
-          <ThemeIcon color="orange" variant="light" size="sm" radius="md">
+          <ThemeIcon color="nutralabColor" variant="light" size="sm" radius="md">
             <IconChefHat size={14} />
           </ThemeIcon>
           <Text fw={700} fz="sm" c="dark.5">
@@ -63,15 +63,15 @@ export default function ComedorWidget({
         </Group>
         {todayDiningMenu && (
           <Group gap={5} align="center" wrap="nowrap">
-            <IconClock size={13} color="var(--mantine-color-orange-6)" />
-            <Text fz="xs" fw={700} c="orange.8">
+            <IconClock size={13} color="var(--mantine-color-nutralabColor-8)" />
+            <Text fz="xs" fw={600} c="nutralabColor.8">
               13:00 - 15:30
             </Text>
           </Group>
         )}
       </Group>
 
-      {/* Si hay menú publicado para hoy: Platos estructurados con acento naranja */}
+      {/* Si hay menú publicado para hoy: Platos estructurados */}
       {todayDiningMenu ? (
         <Stack gap={8}>
           {todayDiningMenu.primero && (
@@ -83,13 +83,13 @@ export default function ComedorWidget({
               style={{ borderColor: 'var(--mantine-color-gray-2)' }}
             >
               <Group justify="space-between" align="center" wrap="nowrap">
-                <Text fz="10px" fw={850} c="orange.8" tt="uppercase" style={{ flexShrink: 0 }}>
+                <Text fz="xs" fw={700} c="dark.5" tt="uppercase" style={{ flexShrink: 0 }}>
                   1º Base
                 </Text>
-                <Text fz="xs" fw={600} c="dark.7" truncate style={{ flex: 1, paddingLeft: 8 }}>
+                <Text fz="sm" fw={500} c="dark.4" truncate style={{ flex: 1, paddingLeft: 8 }}>
                   {todayDiningMenu.primero}
                 </Text>
-                <Text fz="10px" fw={600} c="dimmed" style={{ flexShrink: 0 }}>
+                <Text fz="xs" fw={500} c="dimmed" style={{ flexShrink: 0 }}>
                   Recarga
                 </Text>
               </Group>
@@ -105,13 +105,13 @@ export default function ComedorWidget({
               style={{ borderColor: 'var(--mantine-color-gray-2)' }}
             >
               <Group justify="space-between" align="center" wrap="nowrap">
-                <Text fz="10px" fw={850} c="orange.8" tt="uppercase" style={{ flexShrink: 0 }}>
+                <Text fz="xs" fw={700} c="dark.5" tt="uppercase" style={{ flexShrink: 0 }}>
                   2º Proteína
                 </Text>
-                <Text fz="xs" fw={600} c="dark.7" truncate style={{ flex: 1, paddingLeft: 8 }}>
+                <Text fz="sm" fw={500} c="dark.4" truncate style={{ flex: 1, paddingLeft: 8 }}>
                   {todayDiningMenu.segundo}
                 </Text>
-                <Text fz="10px" fw={600} c="dimmed" style={{ flexShrink: 0 }}>
+                <Text fz="xs" fw={500} c="dimmed" style={{ flexShrink: 0 }}>
                   Músculo
                 </Text>
               </Group>
@@ -127,13 +127,13 @@ export default function ComedorWidget({
               style={{ borderColor: 'var(--mantine-color-gray-2)' }}
             >
               <Group justify="space-between" align="center" wrap="nowrap">
-                <Text fz="10px" fw={850} c="orange.8" tt="uppercase" style={{ flexShrink: 0 }}>
+                <Text fz="xs" fw={700} c="dark.5" tt="uppercase" style={{ flexShrink: 0 }}>
                   Postre
                 </Text>
-                <Text fz="xs" fw={600} c="dark.7" truncate style={{ flex: 1, paddingLeft: 8 }}>
+                <Text fz="sm" fw={500} c="dark.4" truncate style={{ flex: 1, paddingLeft: 8 }}>
                   {todayDiningMenu.postre}
                 </Text>
-                <Text fz="10px" fw={600} c="dimmed" style={{ flexShrink: 0 }}>
+                <Text fz="xs" fw={500} c="dimmed" style={{ flexShrink: 0 }}>
                   Vitalidad
                 </Text>
               </Group>
@@ -151,13 +151,13 @@ export default function ComedorWidget({
           my="xs"
           style={{ borderColor: 'var(--mantine-color-gray-2)' }}
         >
-          <ThemeIcon color="orange" variant="light" size={32} radius="md" mx="auto" mb={6}>
+          <ThemeIcon color="nutralabColor" variant="light" size={32} radius="md" mx="auto" mb={6}>
             <IconToolsKitchen size={18} />
           </ThemeIcon>
           <Text fz="xs" fw={700} c="dark.5">
             {!hasMenus ? 'Sin servicio de comedor' : 'Sin menú registrado para hoy'}
           </Text>
-          <Text fz="10px" c="dimmed" mt={2}>
+          <Text fz="xs" c="dimmed" mt={2}>
             {!hasMenus
               ? 'El equipo no tiene comedor registrado en la app'
               : 'No se ha publicado menú de comedor para este día'}
@@ -173,11 +173,11 @@ export default function ComedorWidget({
         pt="xs"
         style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
       >
-        <Text fz="10px" c="dimmed" fw={500}>
+        <Text fz="xs" c="dimmed" fw={500}>
           Supervisado por nutrición
         </Text>
         {hasMenus && (
-          <Text fz="10px" fw={700} c="orange.8">
+          <Text fz="xs" fw={600} c="dark.4">
             Menú completo →
           </Text>
         )}

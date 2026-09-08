@@ -77,11 +77,11 @@ export default function SquadReportReviewModal({
       closeOnEscape={false}
       title={
         <Group gap="xs">
-          <ThemeIcon color="teal" variant="light" radius="xl">
+          <ThemeIcon color="nutralabColor" variant="light" radius="xl">
             <IconShieldCheck size={18} />
           </ThemeIcon>
           <Stack gap={0}>
-            <Text fw={800} size="md">Validación previa del informe</Text>
+            <Text fw={700} size="md" c="dark.5">Validación previa del informe</Text>
             <Text size="xs" c="dimmed">Jugador {Math.min(index + 1, total)} de {total}</Text>
           </Stack>
         </Group>
@@ -91,18 +91,18 @@ export default function SquadReportReviewModal({
       overlayProps={{ backgroundOpacity: 0.65, blur: 5 }}
     >
       <Stack ref={contentRef} gap="md">
-        <Paper p="md" radius="md" withBorder style={{ background: 'linear-gradient(135deg, #e6fcf5, #f3f0ff)', borderColor: '#96f2d7' }}>
+        <Paper p="md" radius="md" withBorder bg="gray.0">
           <Group justify="space-between" align="flex-start" wrap="wrap">
             <Group gap="sm" wrap="nowrap">
-              <ThemeIcon color="teal" size="lg" radius="xl">
+              <ThemeIcon color="nutralabColor" size="lg" radius="xl">
                 <IconUserCheck size={20} />
               </ThemeIcon>
               <Box>
-                <Text fw={800} size="lg">{playerName}</Text>
+                <Text fw={700} size="lg" c="dark.5">{playerName}</Text>
                 <Text size="sm" c="dimmed">{preview?.posicion || 'Jugador'} · Plan semanal generado</Text>
               </Box>
             </Group>
-            <Badge color="teal" variant="light" size="lg">Borrador sin guardar</Badge>
+            <Badge color="nutralabColor" variant="light" size="lg">Borrador sin guardar</Badge>
           </Group>
         </Paper>
 
@@ -111,7 +111,7 @@ export default function SquadReportReviewModal({
             <ThemeIcon color="orange" variant="light" size="sm" radius="xl">
               <IconAlertTriangle size={14} />
             </ThemeIcon>
-            <Text size="sm" fw={700}>Revisa las ingestas y las indicaciones de los siete días</Text>
+            <Text size="sm" fw={700} c="dark.5">Revisa las ingestas y las indicaciones de los siete días</Text>
           </Group>
           <Text size="xs" c="dimmed">
             Este contenido todavía no se ha guardado. Puedes guardarlo o descartarlo; al terminar se persistirán solo los jugadores guardados.
@@ -122,15 +122,15 @@ export default function SquadReportReviewModal({
             <Group grow align="stretch">
               <Paper p="xs" withBorder radius="md">
                 <Text size="xs" c="dimmed">Peso</Text>
-                <Text fw={700}>{formatMacro(plan?.metricas?.peso, ' kg')}</Text>
+                <Text fw={700} c="dark.5">{formatMacro(plan?.metricas?.peso, ' kg')}</Text>
               </Paper>
               <Paper p="xs" withBorder radius="md">
                 <Text size="xs" c="dimmed">Grasa</Text>
-                <Text fw={700}>{formatMacro(plan?.metricas?.grasa, '%')}</Text>
+                <Text fw={700} c="dark.5">{formatMacro(plan?.metricas?.grasa, '%')}</Text>
               </Paper>
               <Paper p="xs" withBorder radius="md">
                 <Text size="xs" c="dimmed">Masa magra</Text>
-                <Text fw={700}>{formatMacro(plan?.metricas?.masaMagra, ' kg')}</Text>
+                <Text fw={700} c="dark.5">{formatMacro(plan?.metricas?.masaMagra, ' kg')}</Text>
               </Paper>
             </Group>
 
@@ -141,7 +141,7 @@ export default function SquadReportReviewModal({
                   <Accordion.Item key={dayKey} value={dayKey}>
                     <Accordion.Control>
                       <Group justify="space-between" pr="sm" wrap="nowrap">
-                        <Text fw={700}>{day.label}</Text>
+                        <Text fw={700} c="dark.5">{day.label}</Text>
                         <Text size="xs" c="dimmed" ta="right">
                           {formatMacro(day.kcal, ' kcal')} · P {formatMacro(day.proteina, 'g')} · HC {formatMacro(day.hidratos, 'g')} · G {formatMacro(day.grasa, 'g')}
                         </Text>
@@ -151,7 +151,7 @@ export default function SquadReportReviewModal({
                       <Stack gap="xs">
                         {(day.ingestas || []).map((meal, mealIndex) => (
                           <Box key={`${dayKey}-${mealIndex}`}>
-                            <Text size="xs" fw={800} c="orange.8" tt="uppercase">{meal.nombre}</Text>
+                            <Text size="xs" fw={700} c="nutralabColor.8" tt="uppercase">{meal.nombre}</Text>
                             <Text size="sm" lh={1.35}>{meal.detalle || 'Sin detalle generado'}</Text>
                             {mealIndex < day.ingestas.length - 1 && <Divider mt="xs" />}
                           </Box>
@@ -164,8 +164,8 @@ export default function SquadReportReviewModal({
             </Accordion>
 
             {Array.isArray(weeklyNotes) && weeklyNotes.length > 0 && (
-              <Paper p="sm" radius="md" withBorder bg="blue.0">
-                <Text size="xs" fw={800} c="blue.8" tt="uppercase" mb={4}>Indicaciones semanales</Text>
+              <Paper p="sm" radius="md" withBorder bg="gray.0" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
+                <Text size="xs" fw={700} c="dark.5" tt="uppercase" mb={4}>Indicaciones semanales</Text>
                 {weeklyNotes.map((note, noteIndex) => (
                   <Text key={noteIndex} size="sm">• {note}</Text>
                 ))}

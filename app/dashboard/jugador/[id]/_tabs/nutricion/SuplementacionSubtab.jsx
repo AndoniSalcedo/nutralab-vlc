@@ -83,8 +83,8 @@ function SupplementCard({ item, peso, onDelete, readOnly }) {
         <Group justify="space-between" align="flex-start" wrap="nowrap">
           <Stack gap={3}>
             <Group gap={6}>
-              <Text size="sm" fw={900} c="dark.5">{suplemento.nombre}</Text>
-              <Badge color={item.source === 'extra' ? 'grape' : 'blue'} variant="light" radius="xs" size="xs">
+              <Text size="sm" fw={600} c="dark.5">{suplemento.nombre}</Text>
+              <Badge color={item.source === 'extra' ? 'grape' : 'nutralabColor'} variant="light" radius="xs" size="xs">
                 {item.source === 'extra' ? 'Extra' : item.hasOverride ? 'Lista + ajuste' : 'Lista'}
               </Badge>
             </Group>
@@ -103,7 +103,7 @@ function SupplementCard({ item, peso, onDelete, readOnly }) {
             <IconPill size={16} />
           </ThemeIcon>
           <Stack gap={0}>
-            <Text size="lg" fw={900}>{dose.value}</Text>
+            <Text size="lg" fw={700} c="dark.5">{dose.value}</Text>
             <Text size="xs" c="dimmed">{timing}</Text>
           </Stack>
         </Group>
@@ -122,7 +122,7 @@ function SupplementCard({ item, peso, onDelete, readOnly }) {
 
 function AssignedProtocol({ items, peso, onDelete, canManage }) {
   return (
-    <BentoCard title="Protocolo asignado" icon={IconBottle} color="blue">
+    <BentoCard title="Protocolo asignado" icon={IconBottle} color="nutralabColor">
       {items.length ? (
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm" suppressHydrationWarning>
           {items.map((item) => (
@@ -142,7 +142,7 @@ function AssignedProtocol({ items, peso, onDelete, canManage }) {
               <IconSparkles size={18} />
             </ThemeIcon>
             <Stack gap={2}>
-              <Text fw={800}>Sin suplementos asignados</Text>
+              <Text fw={600} c="dark.5">Sin suplementos asignados</Text>
               <Text size="sm" c="dimmed">
                 Asigna un catálogo o añade suplementos extra para generar el protocolo.
               </Text>
@@ -407,12 +407,12 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
               <SimpleGrid cols={{ base: 1, sm: 3 }} spacing={6}>
                 <Paper py={6} px="xs" radius="md" bg="gray.0" withBorder>
                   <Group gap="xs" wrap="nowrap">
-                    <ThemeIcon color="blue" variant="light" radius="xl" size="sm">
+                    <ThemeIcon color="nutralabColor" variant="light" radius="xl" size="sm">
                       <IconCalendarStats size={14} />
                     </ThemeIcon>
                     <Group gap={4} wrap="nowrap" style={{ minWidth: 0 }}>
-                      <Text size="xs" c="dimmed" fw={800}>Catálogo</Text>
-                      <Text size="sm" fw={900} truncate>{activeList ? activeList.nombre : 'Sin asignar'}</Text>
+                      <Text size="xs" c="dimmed" fw={600}>Catálogo</Text>
+                      <Text size="sm" fw={700} c="dark.5" truncate>{activeList ? activeList.nombre : 'Sin asignar'}</Text>
                       <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>{activeList ? `(${listSupplementCount})` : ''}</Text>
                     </Group>
                   </Group>
@@ -424,8 +424,8 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
                       <IconCirclePlus size={14} />
                     </ThemeIcon>
                     <Group gap={4} wrap="nowrap">
-                      <Text size="xs" c="dimmed" fw={800}>Extras</Text>
-                      <Text size="sm" fw={900}>{data.extras.length}</Text>
+                      <Text size="xs" c="dimmed" fw={600}>Extras</Text>
+                      <Text size="sm" fw={700} c="dark.5">{data.extras.length}</Text>
                     </Group>
                   </Group>
                 </Paper>
@@ -436,8 +436,8 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
                       <IconPill size={14} />
                     </ThemeIcon>
                     <Group gap={4} wrap="nowrap">
-                      <Text size="xs" c="dimmed" fw={800}>Peso</Text>
-                      <Text size="sm" fw={900}>{peso ? `${peso} kg` : 'Pendiente'}</Text>
+                      <Text size="xs" c="dimmed" fw={600}>Peso</Text>
+                      <Text size="sm" fw={700} c="dark.5">{peso ? `${peso} kg` : 'Pendiente'}</Text>
                     </Group>
                   </Group>
                 </Paper>

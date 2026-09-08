@@ -355,14 +355,14 @@ export default function SupplementCatalogManager({
             {assignmentType === 'catalog' ? (
               <Stack gap="xs">
                 <Group justify="space-between" align="center">
-                  <Text size="sm" fw={800}>Catálogo de suplementación</Text>
+                  <Text size="sm" fw={700} c="dark.5">Catálogo de suplementación</Text>
                   <Tooltip
                     label="Esta acción asignará el catálogo seleccionado a los jugadores marcados en la lista inferior. Los suplementos extras de cada jugador se mantendrán intactos."
                     multiline
                     w={280}
                     withArrow
                   >
-                    <ActionIcon variant="subtle" color="blue" radius="xl" aria-label="Información sobre asignación de catálogo">
+                    <ActionIcon variant="subtle" color="nutralabColor" radius="xl" aria-label="Información sobre asignación de catálogo">
                       <IconInfoCircle size={17} />
                     </ActionIcon>
                   </Tooltip>
@@ -380,14 +380,14 @@ export default function SupplementCatalogManager({
             ) : (
               <Stack gap="xs">
                 <Group justify="space-between" align="center">
-                  <Text size="sm" fw={800}>Suplementos Extras</Text>
+                  <Text size="sm" fw={700} c="dark.5">Suplementos Extras</Text>
                   <Tooltip
                     label="Esta acción asignará uno o varios suplementos seleccionados como extras a los jugadores marcados."
                     multiline
                     w={280}
                     withArrow
                   >
-                    <ActionIcon variant="subtle" color="blue" radius="xl" aria-label="Información sobre asignación de suplementos extras">
+                    <ActionIcon variant="subtle" color="nutralabColor" radius="xl" aria-label="Información sobre asignación de suplementos extras">
                       <IconInfoCircle size={17} />
                     </ActionIcon>
                   </Tooltip>
@@ -409,7 +409,7 @@ export default function SupplementCatalogManager({
             <Divider label="Seleccionar destinatarios" labelPosition="center" my="sm" />
 
             <Group justify="space-between" align="center">
-              <Text size="sm" fw={800}>Jugadores ({selectedPlayerIds.length} de {displayPlayers.length})</Text>
+              <Text size="sm" fw={700} c="dark.5">Jugadores ({selectedPlayerIds.length} de {displayPlayers.length})</Text>
               <Group gap="xs">
                 <Button
                   variant="subtle"
@@ -567,7 +567,7 @@ export default function SupplementCatalogManager({
                               <Group justify="space-between" wrap="nowrap" align="center">
                                 <Stack gap={0} style={{ minWidth: 0 }}>
                                   <Group gap={6} wrap="nowrap">
-                                    <Text size="sm" fw={900} truncate>{suplemento?.nombre || 'Suplemento'}</Text>
+                                    <Text size="sm" fw={600} c="dark.5" truncate>{suplemento?.nombre || 'Suplemento'}</Text>
                                     <Badge size="xs" radius="sm" variant="light" color="gray">{suplemento?.categoria || 'Custom'}</Badge>
                                   </Group>
                                   <Text size="xs" c="dimmed" truncate>{suplemento?.dose_text || suplemento?.pauta || 'Según pauta'}</Text>
@@ -592,7 +592,7 @@ export default function SupplementCatalogManager({
                   <ThemeIcon color="gray" variant="light" radius="xl" size="xl" mx="auto" mb="sm">
                     <IconBottle size={24} />
                   </ThemeIcon>
-                  <Text fw={800} c="dimmed">Ningún catálogo seleccionado</Text>
+                  <Text fw={600} c="dimmed">Ningún catálogo seleccionado</Text>
                   <Text size="sm" c="dimmed" mt={4}>
                     Selecciona un catálogo en la columna izquierda para gestionar su contenido.
                   </Text>
@@ -630,7 +630,7 @@ export default function SupplementCatalogManager({
                         <Group justify="space-between" wrap="nowrap" align="center">
                           <Stack gap={0} style={{ minWidth: 0 }}>
                             <Group gap={6} wrap="nowrap">
-                              <Text size="sm" fw={900} truncate>{supp.nombre}</Text>
+                              <Text size="sm" fw={600} c="dark.5" truncate>{supp.nombre}</Text>
                               <Badge size="xs" radius="sm" variant="light" color={editingSupplementId === supp.id ? 'blue' : 'gray'}>
                                 {supp.categoria || 'Custom'}
                               </Badge>

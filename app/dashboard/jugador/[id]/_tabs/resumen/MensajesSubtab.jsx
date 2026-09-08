@@ -99,7 +99,7 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
                 <Group justify="space-between" align="flex-start" gap="sm" mb="xs">
                   <Box style={{ minWidth: 0 }}>
                     <Group gap="xs" wrap="nowrap">
-                      <Title order={4} size="h5" fw={800} c="dark.4" style={{ overflowWrap: 'anywhere' }}>
+                      <Title order={4} size="h5" fw={700} c="dark.5" style={{ overflowWrap: 'anywhere' }}>
                         {message.titulo}
                       </Title>
                       {!message.jugador_id && (

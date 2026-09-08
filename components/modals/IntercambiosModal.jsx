@@ -172,11 +172,11 @@ export default function IntercambiosModal({ opened, onClose }) {
       fullScreen={isMobile}
       title={
         <Group gap="xs">
-          <ThemeIcon color="dark" variant="light" radius="xl" size="lg">
+          <ThemeIcon color="nutralabColor" variant="light" radius="xl" size="lg">
             <IconArrowsLeftRight size={20} />
           </ThemeIcon>
           <Stack gap={0}>
-            <Title order={3} fw={800} c="dark.4">
+            <Title order={3} fw={700} c="dark.5">
               Intercambios
             </Title>
             <Text size="xs" c="dimmed">
@@ -189,17 +189,6 @@ export default function IntercambiosModal({ opened, onClose }) {
       radius="lg"
       overlayProps={{
         backgroundOpacity: 0.55,
-        blur: 4,
-      }}
-      styles={{
-        header: {
-          borderBottom: '1px solid var(--mantine-color-gray-2)',
-          paddingBottom: 16,
-          marginBottom: 16,
-        },
-        body: {
-          paddingTop: 8,
-        },
       }}
     >
       <Stack gap="md">
@@ -260,10 +249,10 @@ export default function IntercambiosModal({ opened, onClose }) {
                 <Stack gap="xs">
                   <Group justify="space-between" align="center">
                     <Group gap="xs">
-                      <ThemeIcon color="dark" variant="light" radius="xl" size="md">
-                        <IconScale size={16} />
+                      <ThemeIcon color="nutralabColor" variant="light" radius="xl" size="sm">
+                        <IconScale size={15} />
                       </ThemeIcon>
-                      <Text fw={800} size="sm" c="dark.5">
+                      <Text fw={700} size="sm" c="dark.5">
                         Calculadora de equivalencias en vivo
                       </Text>
                     </Group>
@@ -382,11 +371,11 @@ export default function IntercambiosModal({ opened, onClose }) {
                             {/* Reference standard quantity block */}
                             <Stack gap={0} align="flex-end" style={{ minWidth: isMobile ? 65 : 80 }}>
                               <Text
-                                size="xxs"
+                                size="xs"
                                 c={isSourceFood ? 'gray.4' : 'dimmed'}
                                 tt="uppercase"
-                                fw={850}
-                                style={{ fontSize: '8px', letterSpacing: '0.6px', lineHeight: 1 }}
+                                fw={600}
+                                style={{ letterSpacing: '0.5px', lineHeight: 1 }}
                               >
                                 Ref. Base
                               </Text>
@@ -399,15 +388,15 @@ export default function IntercambiosModal({ opened, onClose }) {
                             {showCalculator && calcFood && calcQty > 0 && (
                               <Stack gap={0} align="flex-end" style={{ minWidth: isMobile ? 75 : 90 }}>
                                 <Text
-                                  size="xxs"
-                                  c={isSourceFood ? 'teal.3' : 'teal.6'}
+                                  size="xs"
+                                  c={isSourceFood ? 'teal.3' : 'teal.7'}
                                   tt="uppercase"
-                                  fw={850}
-                                  style={{ fontSize: '8px', letterSpacing: '0.6px', lineHeight: 1 }}
+                                  fw={600}
+                                  style={{ letterSpacing: '0.5px', lineHeight: 1 }}
                                 >
                                   {isSourceFood ? 'Origen' : 'Equivalente'}
                                 </Text>
-                                <Text fw={850} size="md" c={isSourceFood ? 'teal.3' : 'teal.6'} mt={2}>
+                                <Text fw={700} size="md" c={isSourceFood ? 'teal.3' : 'teal.7'} mt={2}>
                                   {isSourceFood ? calcQty : food.calcValue} {foodUnit}
                                 </Text>
                               </Stack>

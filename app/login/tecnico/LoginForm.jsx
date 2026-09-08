@@ -132,7 +132,7 @@ export default function TecnicoLoginForm() {
                 >
                   Acceso cuerpo técnico
                 </Badge>
-                <Title order={1} mt="lg" fw={850} c="#24291f" lh={1.05}>
+                <Title order={1} mt="lg" fw={700} c="dark.5" lh={1.05}>
                   Portal de técnicos
                 </Title>
                 <Text c="#5c6049" size="lg" mt="md" maw={430}>
@@ -146,7 +146,7 @@ export default function TecnicoLoginForm() {
                     <ThemeIcon variant="light" color="nutralabColor" radius="md" size={36}>
                       <Icon size={20} stroke={1.7} />
                     </ThemeIcon>
-                    <Text size="sm" fw={700} mt="sm" c="#24291f">
+                    <Text size="sm" fw={700} mt="sm" c="dark.5">
                       {label}
                     </Text>
                     <Text size="xs" c="dimmed" mt={2}>
@@ -195,7 +195,7 @@ export default function TecnicoLoginForm() {
                   >
                     Acceso técnico
                   </Badge>
-                  <Title order={2} fw={850} c="#24291f" ta="center">
+                  <Title order={2} fw={700} c="dark.5" ta="center">
                     {isRegister ? 'Registro de técnico' : 'Portal de técnicos'}
                   </Title>
                   <Text c="dimmed" size="sm" ta="center" px="xs" mb="sm">
@@ -208,7 +208,7 @@ export default function TecnicoLoginForm() {
                 {/* Cabecera desktop */}
                 <Group justify="space-between" align="flex-start" mb="xl" visibleFrom="md">
                   <Box>
-                    <Title order={2} fw={800} c="#24291f">
+                    <Title order={2} fw={700} c="dark.5">
                       {isRegister ? 'Crear cuenta' : 'Portal de Técnicos'}
                     </Title>
                     <Text c="dimmed" size="sm" mt={4}>

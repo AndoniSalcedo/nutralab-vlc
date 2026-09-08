@@ -145,11 +145,11 @@ export default function CreateNutritionPlanModal({
 
         {/* 24h Pre-Match Meals Configuration */}
         {setModalPreMatchConfig && (
-          <Paper p="sm" radius="md" withBorder bg="blue.0" style={{ borderColor: 'var(--mantine-color-blue-3)' }}>
+          <Paper p="sm" radius="md" withBorder bg="gray.0" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
             <Group justify="space-between" mb="xs">
               <Group gap="xs">
-                <IconTrophy size={18} style={{ color: 'var(--mantine-color-blue-7)' }} />
-                <Text size="sm" fw={700} c="blue.9">Comidas 24h Pre-Partido</Text>
+                <IconTrophy size={18} style={{ color: 'var(--mantine-color-nutralabColor-8)' }} />
+                <Text size="sm" fw={700} c="dark.5">Comidas 24h Pre-Partido</Text>
               </Group>
               <Switch
                 checked={modalPreMatchConfig?.enabled || false}
