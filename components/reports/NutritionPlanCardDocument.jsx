@@ -294,7 +294,7 @@ export function PlanCardPage({ plan, teamConfig }) {
           <Text style={[styles.subtitle, { color: planColors.accentText }]}>{plan?.jugador?.posicion || 'Sin posición'}</Text>
         </View>
         <View style={styles.headerRight}>
-          <Text style={styles.teamText}>{teamConfig?.nombre?.toUpperCase() || 'VALENCIA CF'} · NUTRICIÓN DEPORTIVA</Text>
+          <Text style={styles.teamText}>{teamConfig?.nombre?.toUpperCase() || ''} · NUTRICIÓN DEPORTIVA</Text>
           <Text style={styles.metaText}>{plan?.meta?.nombre || 'Plan de Nutrición'}</Text>
         </View>
       </View>
@@ -556,7 +556,7 @@ function CoverPage({ meta, playerName }) {
           <Text style={coverStyles.subtitle}>{meta.subtitle || `Plan nutricional · ${playerName}`}</Text>
         </View>
         <View style={coverStyles.rightHeader}>
-          <Text style={coverStyles.rightStrong}>{meta.team || 'Valencia CF'}</Text>
+          <Text style={coverStyles.rightStrong}>{meta.team || ''}</Text>
           <Text>{meta.author || 'Nutralab'}</Text>
           <Text>{meta.handle || ''}</Text>
         </View>
@@ -594,7 +594,7 @@ function CoverPage({ meta, playerName }) {
       </View>
 
       <View style={coverStyles.footer} fixed>
-        <Text>{meta.author || 'Nutralab'} · {meta.team || 'Valencia CF'} · {meta.handle || ''}</Text>
+        <Text>{meta.author || 'Nutralab'} · {meta.team || ''} · {meta.handle || ''}</Text>
         <Text>Documento generado {formatDate()}</Text>
       </View>
     </Page>

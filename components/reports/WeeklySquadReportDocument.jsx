@@ -496,7 +496,7 @@ export function PlayerDetailBreakdownPage({ player, plan, meta, teamConfig }) {
           </Text>
         </View>
         <View style={detailStyles.headerRight}>
-          <Text style={detailStyles.headerRightTeam}>{meta?.team || 'Valencia CF'}</Text>
+          <Text style={detailStyles.headerRightTeam}>{meta?.team || ''}</Text>
           <Text style={detailStyles.headerRightMeta}>{plan?.meta?.nombre || meta?.title || 'Informe Semanal'}</Text>
         </View>
       </View>
@@ -585,7 +585,7 @@ export function PlayerDetailBreakdownPage({ player, plan, meta, teamConfig }) {
       )}
 
       <View style={detailStyles.footer}>
-        <Text>Carlos Ferrando · Valencia CF · Documento de Validación de Ingestas</Text>
+        <Text>Documento de Validación de Ingestas</Text>
         <Text>Generado {formatDate()}</Text>
       </View>
     </Page>

@@ -317,7 +317,7 @@ export default function WeightExportDocument({
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.brandTitle}>NUTRALAB · VALENCIA CF</Text>
+            <Text style={styles.brandTitle}>NUTRALAB</Text>
             <Text style={styles.title}>Informe de Toma de Pesos</Text>
             <Text style={styles.subtitle}>
               Medición registrada el {fechaFormatted}

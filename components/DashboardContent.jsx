@@ -185,7 +185,7 @@ function defaultReportForm(teamConfig) {
     contexto: 'semana_partido',
     title: getWeekRangeLabel(monday),
     subtitle: 'Plan nutricional',
-    team: 'Valencia CF · Primer Equipo',
+    team: 'Primer Equipo',
     author: 'Carlos Ferrando · Nutralab',
     handle: '@c.ferrando',
     microcycle: teamConfig?.pdfMicrocycle || '',
@@ -851,8 +851,8 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                                       player.semaforo.status === 'verde'
                                         ? '#2e7d32'
                                         : player.semaforo.status === 'amarillo'
-                                        ? '#b45309'
-                                        : '#c92a2a'
+                                          ? '#b45309'
+                                          : '#c92a2a'
                                     }
                                   >
                                     ● {player.semaforo.diff > 0 ? `+${player.semaforo.diff.toFixed(1)}` : player.semaforo.diff.toFixed(1)} kg
@@ -1064,10 +1064,10 @@ export default function DashboardContent({ players = [], team, readOnly = false 
           confirmLabel="Eliminar jugador"
         />
 
-        <TransferPlayersModal 
-          opened={transferModal.opened} 
-          onClose={() => setTransferModal({ opened: false, initialSelectedIds: [] })} 
-          team={team} 
+        <TransferPlayersModal
+          opened={transferModal.opened}
+          onClose={() => setTransferModal({ opened: false, initialSelectedIds: [] })}
+          team={team}
           players={playersState}
           initialSelectedIds={transferModal.initialSelectedIds}
         />

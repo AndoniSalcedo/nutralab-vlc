@@ -33,7 +33,7 @@ function defaultMeta(meta = {}) {
   return {
     title: meta.title || 'Semana nutricional',
     subtitle: meta.subtitle || 'Plan nutricional',
-    team: meta.team || 'Valencia CF · Primer Equipo',
+    team: meta.team || 'Primer Equipo',
     author: meta.author || 'Carlos Ferrando · Nutralab',
     handle: meta.handle || '@c.ferrando',
     microcycle: meta.microcycle || 'DOM 10 · 16:15. Partido.\nJUE 14 · 19:00. Partido.\nDOM 17 · 19:00. Partido.',
