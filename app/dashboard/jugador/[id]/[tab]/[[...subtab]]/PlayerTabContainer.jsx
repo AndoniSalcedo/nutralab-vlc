@@ -5,13 +5,20 @@ import ResumenTab from '@/app/dashboard/jugador/[id]/_tabs/ResumenTab';
 import MetricasTab from '@/app/dashboard/jugador/[id]/_tabs/MetricasTab';
 import NutricionTab from '@/app/dashboard/jugador/[id]/_tabs/NutricionTab';
 
+const DEFAULT_SUBTABS = {
+  resumen: 'perfil',
+  metricas: 'mediciones',
+  nutricion: 'plan',
+};
+
 export default function PlayerTabContainer({
-  tab,
+  tab = 'resumen',
   activeSubtab,
   jugador,
   ...rest
 }) {
   const router = useRouter();
+  const resolvedSubtab = activeSubtab || DEFAULT_SUBTABS[tab] || 'perfil';
 
   function handleSubtabChange(nextSubtab) {
     router.replace(`/dashboard/jugador/${jugador.id}/${tab}/${nextSubtab}`, { scroll: false });
@@ -21,7 +28,7 @@ export default function PlayerTabContainer({
     return (
       <ResumenTab
         jugador={jugador}
-        activeSubtab={activeSubtab}
+        activeSubtab={resolvedSubtab}
         onSubtabChange={handleSubtabChange}
         {...rest}
       />
@@ -32,7 +39,7 @@ export default function PlayerTabContainer({
     return (
       <MetricasTab
         jugador={jugador}
-        activeSubtab={activeSubtab}
+        activeSubtab={resolvedSubtab}
         onSubtabChange={handleSubtabChange}
         pesajes={rest.pesajes}
         {...rest}
@@ -44,7 +51,7 @@ export default function PlayerTabContainer({
     return (
       <NutricionTab
         jugador={jugador}
-        activeSubtab={activeSubtab}
+        activeSubtab={resolvedSubtab}
         onSubtabChange={handleSubtabChange}
         {...rest}
       />

@@ -10,7 +10,7 @@ import AnaliticasSubtab from './metricas/AnaliticasSubtab';
 import MedicionesSubtab from './metricas/MedicionesSubtab';
 import HidratacionSubtab from './metricas/HidratacionSubtab';
 
-export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes, registrosHidratacion = [], activeSubtab, onSubtabChange, readOnly = false }) {
+export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes, registrosHidratacion = [], activeSubtab = 'mediciones', onSubtabChange, readOnly = false }) {
   const analiticasVisibles = readOnly ? (analiticas || []).filter(a => a.visible_para_jugador) : (analiticas || []);
 
   const tabsData = getSubtabControlData('metricas', tabLabel);

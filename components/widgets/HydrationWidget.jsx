@@ -118,6 +118,7 @@ export default function HydrationWidget({
 
   return (
     <Paper
+      id="widget-water"
       radius="lg"
       p={{ base: 'sm', sm: 'md' }}
       bg="white"

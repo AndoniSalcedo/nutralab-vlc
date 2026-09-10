@@ -28,6 +28,7 @@ export default function MascotTutorialBubble({
   size,
   step,
   isLastStep,
+  controls,
   backProps,
   primaryProps,
   skipProps,
@@ -40,8 +41,8 @@ export default function MascotTutorialBubble({
   const [placement, setPlacement] = useState('bottom');
   const [side, setSide] = useState('left');
   const [mascotWiggle, setMascotWiggle] = useState(false);
-  const [isBubbleVisible, setIsBubbleVisible] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [isBubbleVisible, setIsBubbleVisible] = useState(true);
+  const [mounted, setMounted] = useState(() => typeof window !== 'undefined');
 
   useEffect(() => {
     setMounted(true);
@@ -60,13 +61,8 @@ export default function MascotTutorialBubble({
   }, [step?.data?.placement, step?.data?.side, step?.placement, step?.side, step?.target]);
 
   useEffect(() => {
-    setIsBubbleVisible(false);
     updatePlacement();
-    const t = setTimeout(() => setIsBubbleVisible(true), 40);
-
-    return () => {
-      clearTimeout(t);
-    };
+    setIsBubbleVisible(true);
   }, [index, updatePlacement]);
 
   const handleMascotClick = () => {
@@ -373,7 +369,13 @@ export default function MascotTutorialBubble({
                 color="gray"
                 size={isDesktop ? 'md' : 'sm'}
                 radius="xl"
-                onClick={onClose || closeProps?.onClick}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (onClose) onClose();
+                  else if (closeProps?.onClick) closeProps.onClick(e);
+                  else if (controls?.close) controls.close();
+                }}
                 aria-label="Cerrar tutorial"
                 style={{
                   color: '#6b7280',
@@ -433,7 +435,13 @@ export default function MascotTutorialBubble({
                 size={isDesktop ? 'sm' : 'xs'}
                 radius="xl"
                 leftSection={<IconEyeOff size={isDesktop ? 14 : 12} />}
-                onClick={onFinish || skipProps?.onClick}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (onFinish) onFinish();
+                  else if (skipProps?.onClick) skipProps.onClick(e);
+                  else if (controls?.skip) controls.skip();
+                }}
                 styles={{
                   root: {
                     paddingLeft: 2,
@@ -450,11 +458,19 @@ export default function MascotTutorialBubble({
               <Group gap={6} wrap="nowrap">
                 {index > 0 && (
                   <Button
-                    {...backProps}
                     variant="default"
                     size={isDesktop ? 'sm' : 'xs'}
                     radius="xl"
                     leftSection={<IconArrowLeft size={isDesktop ? 14 : 12} />}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (backProps?.onClick) {
+                        backProps.onClick(e);
+                      } else if (controls?.prev) {
+                        controls.prev();
+                      }
+                    }}
                     styles={{
                       root: {
                         borderColor: 'rgba(110, 145, 80, 0.3)',
@@ -473,7 +489,7 @@ export default function MascotTutorialBubble({
                 )}
 
                 <Button
-                  {...primaryProps}
+                  data-action={isLastStep ? 'close' : 'primary'}
                   variant="filled"
                   color="teal"
                   size={isDesktop ? 'sm' : 'xs'}
@@ -485,6 +501,21 @@ export default function MascotTutorialBubble({
                       <IconChevronRight size={isDesktop ? 15 : 13} stroke={2.5} />
                     )
                   }
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (isLastStep) {
+                      if (onFinish) onFinish();
+                      if (primaryProps?.onClick) primaryProps.onClick(e);
+                      else if (controls?.close) controls.close();
+                    } else {
+                      if (primaryProps?.onClick) {
+                        primaryProps.onClick(e);
+                      } else if (controls?.next) {
+                        controls.next();
+                      }
+                    }
+                  }}
                   styles={{
                     root: {
                       backgroundColor: '#2e7d32',
@@ -510,8 +541,14 @@ export default function MascotTutorialBubble({
   return (
     <>
       <span
-        ref={tooltipProps?.ref}
-        style={{ display: 'none' }}
+        style={{
+          display: 'block',
+          width: 1,
+          height: 1,
+          opacity: 0,
+          pointerEvents: 'none',
+          overflow: 'hidden',
+        }}
         data-action="mascot-tooltip-ref"
       />
       {mounted && typeof document !== 'undefined' && createPortal(content, document.body)}

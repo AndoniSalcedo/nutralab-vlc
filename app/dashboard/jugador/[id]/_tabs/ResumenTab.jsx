@@ -15,7 +15,7 @@ export default function ResumenTab({
   pesajes = [],
   registrosHidratacion = [],
   menus = [],
-  activeSubtab,
+  activeSubtab = 'perfil',
   onSubtabChange,
   readOnly = false,
   isPlayer = false,

@@ -9,7 +9,7 @@ import SuplementacionSubtab from './nutricion/SuplementacionSubtab';
 import MenuSemanalSubtab from './nutricion/MenuSemanalSubtab';
 import ProtocolosSubtab from './nutricion/ProtocolosSubtab';
 
-export default function NutricionTab({ jugador, menus = [], activeSubtab, onSubtabChange, readOnly = false }) {
+export default function NutricionTab({ jugador, menus = [], activeSubtab = 'plan', onSubtabChange, readOnly = false }) {
   return (
     <Stack gap={0}>
       <Paper
