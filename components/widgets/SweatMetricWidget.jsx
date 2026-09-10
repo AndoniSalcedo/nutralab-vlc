@@ -36,6 +36,7 @@ export default function SweatMetricWidget({
 
   return (
     <Paper
+      id="widget-sudor"
       shadow="xs"
       radius="lg"
       p={{ base: 'xs', sm: 'sm' }}

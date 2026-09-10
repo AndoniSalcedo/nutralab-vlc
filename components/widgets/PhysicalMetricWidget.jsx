@@ -86,6 +86,7 @@ export default function PhysicalMetricWidget({
       multiline
     >
       <Paper
+        id="widget-fisico"
         shadow="xs"
         radius="lg"
         p={{ base: 'xs', sm: 'sm' }}

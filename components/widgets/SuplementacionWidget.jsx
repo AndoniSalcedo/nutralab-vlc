@@ -73,7 +73,7 @@ export default function SuplementacionWidget({
   const isAllDone = totalCount > 0 && completedCount === totalCount;
 
   return (
-    <Paper shadow="xs" radius="lg" p="md" bg="white" withBorder style={{ height: '100%' }}>
+    <Paper id="widget-suplementacion" shadow="xs" radius="lg" p="md" bg="white" withBorder style={{ height: '100%' }}>
       {/* Cabecera del widget */}
       <Group justify="space-between" align="center" mb={6}>
         <Group gap="xs" align="center">

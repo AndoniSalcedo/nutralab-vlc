@@ -62,6 +62,7 @@ export default function EstrategiaWidget({
 
   return (
     <Paper
+      id="widget-estrategia"
       shadow="xs"
       radius="lg"
       p="md"

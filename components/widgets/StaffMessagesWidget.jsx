@@ -14,6 +14,7 @@ export default function StaffMessagesWidget({
 
   return (
     <Paper
+      id="widget-mensajes"
       shadow="xs"
       radius="lg"
       p={{ base: 'xs', sm: 'sm' }}

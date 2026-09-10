@@ -179,28 +179,28 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false, initial
               )}
 
               {isMobile && (
-                <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="md">
-                  <IconChevronDown size={20} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: '200ms' }} />
-                </ActionIcon>
+                <Group gap="xs" wrap="nowrap">
+                  {!readOnly && (
+                    <Button
+                      id='btn-add-meal'
+                      size="xs"
+                      radius="xl"
+                      color="blue"
+                      leftSection={<IconPlus size={14} />}
+                      onClick={openNewMeal}
+                    >
+                      Registrar
+                    </Button>
+                  )}
+                  <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="md" aria-label="Filtros">
+                    <IconChevronDown size={20} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: '200ms' }} />
+                  </ActionIcon>
+                </Group>
               )}
             </Group>
 
             <Collapse in={!isMobile || expanded} transitionDuration={isMobile ? 200 : 0}>
               <Stack gap="sm">
-                {!readOnly && isMobile && (
-                  <Button
-                    id='btn-add-meal'
-                    size="xs"
-                    radius="xl"
-                    color="blue"
-                    leftSection={<IconPlus size={16} />}
-                    onClick={openNewMeal}
-                    fullWidth
-                  >
-                    Registrar
-                  </Button>
-                )}
-                
                 <SimpleGrid cols={2} spacing="xs">
                   <DatePickerInput
                     placeholder="Fecha"

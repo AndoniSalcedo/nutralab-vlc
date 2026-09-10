@@ -8,6 +8,7 @@ import NutricionTab from './NutricionTab';
 import ResumenTab from './ResumenTab';
 import classes from './PlayerTabs.module.css';
 import { PlayerDashboardProvider } from './PlayerDashboardContext';
+import PlayerTutorial from '@/components/tutorials/PlayerTutorial';
 
 const DEFAULT_SUBTABS = {
   resumen: 'perfil',
@@ -76,6 +77,7 @@ export default function PlayerTabs({
 
   return (
     <PlayerDashboardProvider user={user}>
+      {isPlayer && <PlayerTutorial jugador={jugador} />}
       <Tabs
         className={classes.tabs}
         value={activeTab}
@@ -94,9 +96,9 @@ export default function PlayerTabs({
         }}
       >
         <Tabs.List grow visibleFrom="sm">
-          <Tabs.Tab value="resumen" leftSection={<IconClipboardList size={18} />} style={activeTabStyle('resumen')}>Resumen</Tabs.Tab>
-          <Tabs.Tab value="metricas" leftSection={<IconChartBar size={18} />} style={activeTabStyle('metricas')}>Métricas</Tabs.Tab>
-          <Tabs.Tab value="nutricion" leftSection={<IconSalad size={18} />} style={activeTabStyle('nutricion')}>Nutrición</Tabs.Tab>
+          <Tabs.Tab id="tab-nav-resumen" value="resumen" leftSection={<IconClipboardList size={18} />} style={activeTabStyle('resumen')}>Resumen</Tabs.Tab>
+          <Tabs.Tab id="tab-nav-metricas" value="metricas" leftSection={<IconChartBar size={18} />} style={activeTabStyle('metricas')}>Métricas</Tabs.Tab>
+          <Tabs.Tab id="tab-nav-nutricion" value="nutricion" leftSection={<IconSalad size={18} />} style={activeTabStyle('nutricion')}>Nutrición</Tabs.Tab>
         </Tabs.List>
 
         <Box>
@@ -163,6 +165,7 @@ export default function PlayerTabs({
               return (
                 <Box
                   key={value}
+                  id={`mobile-nav-${value}`}
                   component="button"
                   onClick={() => navigate(value)}
                   style={{

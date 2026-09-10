@@ -120,7 +120,7 @@ export function getSubtabControlData(tab, tabLabelFn) {
   if (!config) return [];
   return config.tabs.map((t) => ({
     value: t.value,
-    label: tabLabelFn(t.icon, t.label, t.mobileLabel),
+    label: tabLabelFn(t.icon, t.label, t.mobileLabel, `subtab-btn-${t.value}`),
   }));
 }
 

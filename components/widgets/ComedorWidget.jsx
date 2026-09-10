@@ -40,6 +40,7 @@ export default function ComedorWidget({
 
   return (
     <Paper
+      id="widget-comedor"
       shadow="xs"
       radius="lg"
       p="md"
