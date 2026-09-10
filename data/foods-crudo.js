@@ -67,7 +67,9 @@ export const FOODS_CRUDO = [
     "cho": 0,
     "pro": 20,
     "fat": 19,
-    "tags": []
+    "tags": [
+      "carne_roja"
+    ]
   },
   {
     "name": "Conejo",
@@ -97,7 +99,9 @@ export const FOODS_CRUDO = [
     "cho": 0,
     "pro": 20.6,
     "fat": 15.6,
-    "tags": []
+    "tags": [
+      "carne_roja"
+    ]
   },
   {
     "name": "Hamburguesa de cerdo",
@@ -151,7 +155,9 @@ export const FOODS_CRUDO = [
     "cho": 1,
     "pro": 20,
     "fat": 9,
-    "tags": []
+    "tags": [
+      "carne_roja"
+    ]
   },
   {
     "name": "Jamón cocido",
@@ -331,7 +337,8 @@ export const FOODS_CRUDO = [
     "pro": 3.5,
     "fat": 2.8,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -372,7 +379,9 @@ export const FOODS_CRUDO = [
     "cho": 75.9,
     "pro": 12.3,
     "fat": 1.3,
-    "tags": []
+    "tags": [
+      "gluten"
+    ]
   },
   {
     "name": "Copos de avena",
@@ -428,7 +437,9 @@ export const FOODS_CRUDO = [
     "cho": 6.7,
     "pro": 1,
     "fat": 1.5,
-    "tags": []
+    "tags": [
+      "gluten"
+    ]
   },
   {
     "name": "Maíz dulce",
@@ -438,7 +449,9 @@ export const FOODS_CRUDO = [
     "cho": 19,
     "pro": 3.2,
     "fat": 1.2,
-    "tags": []
+    "tags": [
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Ñoquis de patata",
@@ -448,7 +461,9 @@ export const FOODS_CRUDO = [
     "cho": 31,
     "pro": 3.5,
     "fat": 0.8,
-    "tags": []
+    "tags": [
+      "gluten"
+    ]
   },
   {
     "name": "Pan blanco de barra",
@@ -566,7 +581,10 @@ export const FOODS_CRUDO = [
     "cho": 63.75,
     "pro": 2.12,
     "fat": 0.34,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Pasta de lenteja roja",
@@ -688,7 +706,9 @@ export const FOODS_CRUDO = [
     "cho": 70,
     "pro": 11,
     "fat": 5,
-    "tags": []
+    "tags": [
+      "gluten"
+    ]
   },
   {
     "name": "Trigo sarraceno",
@@ -738,7 +758,10 @@ export const FOODS_CRUDO = [
     "cho": 40.6,
     "pro": 1.96,
     "fat": 0.84,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Arándanos",
@@ -758,7 +781,10 @@ export const FOODS_CRUDO = [
     "cho": 11.4,
     "pro": 0.7,
     "fat": 0.3,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Dátil",
@@ -768,7 +794,10 @@ export const FOODS_CRUDO = [
     "cho": 75,
     "pro": 2.5,
     "fat": 0.4,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Frambuesa",
@@ -808,7 +837,9 @@ export const FOODS_CRUDO = [
     "cho": 21.56,
     "pro": 1.96,
     "fat": 0.84,
-    "tags": []
+    "tags": [
+      "fructosa"
+    ]
   },
   {
     "name": "Fresas",
@@ -828,7 +859,10 @@ export const FOODS_CRUDO = [
     "cho": 64,
     "pro": 3.3,
     "fat": 0.9,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Higo seco desecada",
@@ -838,7 +872,10 @@ export const FOODS_CRUDO = [
     "cho": 179.2,
     "pro": 9.24,
     "fat": 2.52,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Kiwi",
@@ -869,7 +906,8 @@ export const FOODS_CRUDO = [
     "pro": 0.8,
     "fat": 0.4,
     "tags": [
-      "alto_fodmap"
+      "alto_fodmap",
+      "fructosa"
     ]
   },
   {
@@ -880,7 +918,10 @@ export const FOODS_CRUDO = [
     "cho": 14.7,
     "pro": 0.78,
     "fat": 0.39,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Mango desecada",
@@ -890,7 +931,10 @@ export const FOODS_CRUDO = [
     "cho": 42,
     "pro": 2.24,
     "fat": 1.12,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Manzana",
@@ -901,7 +945,8 @@ export const FOODS_CRUDO = [
     "pro": 0.3,
     "fat": 0.2,
     "tags": [
-      "alto_fodmap"
+      "alto_fodmap",
+      "fructosa"
     ]
   },
   {
@@ -912,7 +957,10 @@ export const FOODS_CRUDO = [
     "cho": 11.73,
     "pro": 0.26,
     "fat": 0.17,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Manzana desecada",
@@ -922,7 +970,10 @@ export const FOODS_CRUDO = [
     "cho": 38.64,
     "pro": 0.84,
     "fat": 0.56,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Melocotón",
@@ -932,7 +983,10 @@ export const FOODS_CRUDO = [
     "cho": 9.5,
     "pro": 0.9,
     "fat": 0.3,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Melón",
@@ -962,7 +1016,9 @@ export const FOODS_CRUDO = [
     "cho": 33.04,
     "pro": 2.52,
     "fat": 0.28,
-    "tags": []
+    "tags": [
+      "fructosa"
+    ]
   },
   {
     "name": "Nectarina",
@@ -972,7 +1028,10 @@ export const FOODS_CRUDO = [
     "cho": 10.6,
     "pro": 1,
     "fat": 0.3,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Paraguayo",
@@ -982,7 +1041,10 @@ export const FOODS_CRUDO = [
     "cho": 10,
     "pro": 0.9,
     "fat": 0.2,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Pera",
@@ -993,7 +1055,8 @@ export const FOODS_CRUDO = [
     "pro": 0.4,
     "fat": 0.1,
     "tags": [
-      "alto_fodmap"
+      "alto_fodmap",
+      "fructosa"
     ]
   },
   {
@@ -1004,7 +1067,10 @@ export const FOODS_CRUDO = [
     "cho": 12.92,
     "pro": 0.34,
     "fat": 0.09,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Piña congelada",
@@ -1024,7 +1090,9 @@ export const FOODS_CRUDO = [
     "cho": 36.68,
     "pro": 1.4,
     "fat": 0.28,
-    "tags": []
+    "tags": [
+      "fructosa"
+    ]
   },
   {
     "name": "Piña pelada",
@@ -1054,7 +1122,9 @@ export const FOODS_CRUDO = [
     "cho": 63.84,
     "pro": 3.08,
     "fat": 0.84,
-    "tags": []
+    "tags": [
+      "fructosa"
+    ]
   },
   {
     "name": "Sandía",
@@ -1065,7 +1135,8 @@ export const FOODS_CRUDO = [
     "pro": 0.6,
     "fat": 0.2,
     "tags": [
-      "alto_fodmap"
+      "alto_fodmap",
+      "fructosa"
     ]
   },
   {
@@ -1076,7 +1147,10 @@ export const FOODS_CRUDO = [
     "cho": 50.4,
     "pro": 1.96,
     "fat": 0.56,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Uvas",
@@ -1086,7 +1160,9 @@ export const FOODS_CRUDO = [
     "cho": 18,
     "pro": 0.7,
     "fat": 0.2,
-    "tags": []
+    "tags": [
+      "fructosa"
+    ]
   },
   {
     "name": "Vinagre de manzana",
@@ -1096,7 +1172,10 @@ export const FOODS_CRUDO = [
     "cho": 0.9,
     "pro": 0,
     "fat": 0,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_azufre"
+    ]
   },
   {
     "name": "Zumo de naranja natural",
@@ -1106,7 +1185,9 @@ export const FOODS_CRUDO = [
     "cho": 10.4,
     "pro": 0.7,
     "fat": 0.2,
-    "tags": []
+    "tags": [
+      "fructosa"
+    ]
   },
   {
     "name": "Aceite de coco",
@@ -1136,7 +1217,9 @@ export const FOODS_CRUDO = [
     "cho": 5.9,
     "pro": 1.5,
     "fat": 12,
-    "tags": []
+    "tags": [
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Almendras",
@@ -1159,7 +1242,8 @@ export const FOODS_CRUDO = [
     "pro": 18.2,
     "fat": 43.9,
     "tags": [
-      "fruto_seco"
+      "fruto_seco",
+      "alto_fodmap"
     ]
   },
   {
@@ -1227,7 +1311,8 @@ export const FOODS_CRUDO = [
     "pro": 0.9,
     "fat": 81,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1251,7 +1336,8 @@ export const FOODS_CRUDO = [
     "pro": 20.2,
     "fat": 45.4,
     "tags": [
-      "fruto_seco"
+      "fruto_seco",
+      "alto_fodmap"
     ]
   },
   {
@@ -1299,7 +1385,8 @@ export const FOODS_CRUDO = [
     "pro": 3.8,
     "fat": 0.2,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1311,7 +1398,8 @@ export const FOODS_CRUDO = [
     "pro": 3.5,
     "fat": 3.5,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1347,7 +1435,8 @@ export const FOODS_CRUDO = [
     "pro": 3.52,
     "fat": 2.15,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1359,7 +1448,8 @@ export const FOODS_CRUDO = [
     "pro": 3.2,
     "fat": 3.3,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1371,7 +1461,8 @@ export const FOODS_CRUDO = [
     "pro": 5.76,
     "fat": 3.79,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1383,7 +1474,8 @@ export const FOODS_CRUDO = [
     "pro": 3.2,
     "fat": 3.3,
     "tags": [
-      "sin_lactosa_especial"
+      "sin_lactosa_especial",
+      "proteina_vaca"
     ]
   },
   {
@@ -1394,7 +1486,10 @@ export const FOODS_CRUDO = [
     "cho": 8,
     "pro": 78,
     "fat": 6.5,
-    "tags": []
+    "tags": [
+      "proteina_vaca",
+      "lactosa"
+    ]
   },
   {
     "name": "Queso cottage",
@@ -1405,7 +1500,8 @@ export const FOODS_CRUDO = [
     "pro": 11.1,
     "fat": 4.3,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1417,7 +1513,8 @@ export const FOODS_CRUDO = [
     "pro": 6,
     "fat": 34,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1429,7 +1526,8 @@ export const FOODS_CRUDO = [
     "pro": 25,
     "fat": 33,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1441,7 +1539,8 @@ export const FOODS_CRUDO = [
     "pro": 21.6,
     "fat": 30,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1453,7 +1552,8 @@ export const FOODS_CRUDO = [
     "pro": 11,
     "fat": 4,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1465,7 +1565,8 @@ export const FOODS_CRUDO = [
     "pro": 19.8,
     "fat": 4.6,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1477,7 +1578,8 @@ export const FOODS_CRUDO = [
     "pro": 12.1,
     "fat": 2.6,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1489,7 +1591,8 @@ export const FOODS_CRUDO = [
     "pro": 11,
     "fat": 4,
     "tags": [
-      "sin_lactosa_especial"
+      "sin_lactosa_especial",
+      "proteina_vaca"
     ]
   },
   {
@@ -1501,7 +1604,8 @@ export const FOODS_CRUDO = [
     "pro": 12,
     "fat": 1.8,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1513,7 +1617,8 @@ export const FOODS_CRUDO = [
     "pro": 26,
     "fat": 33,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1525,7 +1630,8 @@ export const FOODS_CRUDO = [
     "pro": 38,
     "fat": 29,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1536,7 +1642,10 @@ export const FOODS_CRUDO = [
     "cho": 3.4,
     "pro": 11,
     "fat": 4.3,
-    "tags": []
+    "tags": [
+      "proteina_vaca",
+      "lactosa"
+    ]
   },
   {
     "name": "Seitán",
@@ -1546,7 +1655,9 @@ export const FOODS_CRUDO = [
     "cho": 3.8,
     "pro": 24.7,
     "fat": 1.9,
-    "tags": []
+    "tags": [
+      "gluten"
+    ]
   },
   {
     "name": "Skyr natural (Arla/Mercadona)",
@@ -1556,7 +1667,10 @@ export const FOODS_CRUDO = [
     "cho": 4,
     "pro": 11,
     "fat": 0.2,
-    "tags": []
+    "tags": [
+      "proteina_vaca",
+      "lactosa"
+    ]
   },
   {
     "name": "Tofu firme",
@@ -1579,7 +1693,8 @@ export const FOODS_CRUDO = [
     "pro": 9,
     "fat": 5,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1591,7 +1706,8 @@ export const FOODS_CRUDO = [
     "pro": 9.9,
     "fat": 3.25,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1603,7 +1719,8 @@ export const FOODS_CRUDO = [
     "pro": 10,
     "fat": 0.2,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1615,7 +1732,8 @@ export const FOODS_CRUDO = [
     "pro": 10,
     "fat": 1.5,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1627,7 +1745,8 @@ export const FOODS_CRUDO = [
     "pro": 3.5,
     "fat": 3.3,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1639,7 +1758,8 @@ export const FOODS_CRUDO = [
     "pro": 6.3,
     "fat": 3.79,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1651,7 +1771,8 @@ export const FOODS_CRUDO = [
     "pro": 3.85,
     "fat": 2.15,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1663,7 +1784,8 @@ export const FOODS_CRUDO = [
     "pro": 3.5,
     "fat": 3.3,
     "tags": [
-      "sin_lactosa_especial"
+      "sin_lactosa_especial",
+      "proteina_vaca"
     ]
   },
   {
@@ -1675,7 +1797,8 @@ export const FOODS_CRUDO = [
     "pro": 10,
     "fat": 0.2,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1687,7 +1810,8 @@ export const FOODS_CRUDO = [
     "pro": 10,
     "fat": 0.2,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1699,7 +1823,8 @@ export const FOODS_CRUDO = [
     "pro": 10,
     "fat": 1,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1711,7 +1836,8 @@ export const FOODS_CRUDO = [
     "pro": 10,
     "fat": 1.5,
     "tags": [
-      "sin_lactosa_especial"
+      "sin_lactosa_especial",
+      "proteina_vaca"
     ]
   },
   {
@@ -1722,7 +1848,9 @@ export const FOODS_CRUDO = [
     "cho": 60,
     "pro": 23,
     "fat": 0.8,
-    "tags": []
+    "tags": [
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Garbanzo",
@@ -1732,7 +1860,9 @@ export const FOODS_CRUDO = [
     "cho": 61,
     "pro": 19,
     "fat": 6,
-    "tags": []
+    "tags": [
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Lenteja",
@@ -1742,7 +1872,9 @@ export const FOODS_CRUDO = [
     "cho": 60,
     "pro": 25,
     "fat": 1.1,
-    "tags": []
+    "tags": [
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Soja texturizada",
@@ -1753,7 +1885,8 @@ export const FOODS_CRUDO = [
     "pro": 50,
     "fat": 1.2,
     "tags": [
-      "soja"
+      "soja",
+      "alto_fodmap"
     ]
   },
   {
@@ -1775,7 +1908,8 @@ export const FOODS_CRUDO = [
     "pro": 5,
     "fat": 4,
     "tags": [
-      "gluten"
+      "gluten",
+      "fructosa"
     ]
   },
   {
@@ -1787,7 +1921,8 @@ export const FOODS_CRUDO = [
     "pro": 26,
     "fat": 0.5,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1798,7 +1933,10 @@ export const FOODS_CRUDO = [
     "cho": 1,
     "pro": 26,
     "fat": 0.5,
-    "tags": []
+    "tags": [
+      "proteina_vaca",
+      "sin_lactosa_especial"
+    ]
   },
   {
     "name": "Café solo (espresso)",
@@ -1818,7 +1956,10 @@ export const FOODS_CRUDO = [
     "cho": 0,
     "pro": 17.6,
     "fat": 17.5,
-    "tags": []
+    "tags": [
+      "carne_roja",
+      "cerdo"
+    ]
   },
   {
     "name": "Caseína micelar nocturna 30g",
@@ -1829,7 +1970,8 @@ export const FOODS_CRUDO = [
     "pro": 25,
     "fat": 0.5,
     "tags": [
-      "lactosa"
+      "lactosa",
+      "proteina_vaca"
     ]
   },
   {
@@ -1870,7 +2012,10 @@ export const FOODS_CRUDO = [
     "cho": 32,
     "pro": 9,
     "fat": 8,
-    "tags": []
+    "tags": [
+      "proteina_vaca",
+      "lactosa"
+    ]
   },
   {
     "name": "Gazpacho",
@@ -1880,7 +2025,9 @@ export const FOODS_CRUDO = [
     "cho": 4.5,
     "pro": 1,
     "fat": 2.2,
-    "tags": []
+    "tags": [
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Gel energético deportivo (unidad)",
@@ -1899,7 +2046,11 @@ export const FOODS_CRUDO = [
     "cho": 25,
     "pro": 3.5,
     "fat": 10,
-    "tags": []
+    "tags": [
+      "proteina_vaca",
+      "fructosa",
+      "lactosa"
+    ]
   },
   {
     "name": "Mejiilon en conserva (escabeche)",
@@ -1909,7 +2060,10 @@ export const FOODS_CRUDO = [
     "cho": 4,
     "pro": 14,
     "fat": 10,
-    "tags": []
+    "tags": [
+      "marisco",
+      "alto_azufre"
+    ]
   },
   {
     "name": "Miel",
@@ -1919,7 +2073,10 @@ export const FOODS_CRUDO = [
     "cho": 82.4,
     "pro": 0.3,
     "fat": 0,
-    "tags": []
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Mostaza de Dijon",
@@ -1939,7 +2096,10 @@ export const FOODS_CRUDO = [
     "cho": 2.2,
     "pro": 18,
     "fat": 22,
-    "tags": []
+    "tags": [
+      "proteina_vaca",
+      "lactosa"
+    ]
   },
   {
     "name": "Pesto",
@@ -1949,7 +2109,12 @@ export const FOODS_CRUDO = [
     "cho": 5,
     "pro": 4.5,
     "fat": 46,
-    "tags": []
+    "tags": [
+      "proteina_vaca",
+      "lactosa",
+      "fruto_seco",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Piñones",
@@ -1959,7 +2124,9 @@ export const FOODS_CRUDO = [
     "cho": 13.1,
     "pro": 13.7,
     "fat": 68.4,
-    "tags": []
+    "tags": [
+      "fruto_seco"
+    ]
   },
   {
     "name": "Pipas de girasol",
@@ -1979,7 +2146,10 @@ export const FOODS_CRUDO = [
     "cho": 8,
     "pro": 2,
     "fat": 6,
-    "tags": []
+    "tags": [
+      "gluten",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Salsa boloñesa",
@@ -1989,7 +2159,11 @@ export const FOODS_CRUDO = [
     "cho": 6,
     "pro": 6.5,
     "fat": 6,
-    "tags": []
+    "tags": [
+      "carne_roja",
+      "cerdo",
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Salsa de soja",
@@ -2000,7 +2174,8 @@ export const FOODS_CRUDO = [
     "pro": 8,
     "fat": 0.1,
     "tags": [
-      "soja"
+      "soja",
+      "gluten"
     ]
   },
   {
@@ -2181,7 +2356,9 @@ export const FOODS_CRUDO = [
     "cho": 0,
     "pro": 18.6,
     "fat": 13.9,
-    "tags": []
+    "tags": [
+      "pescado"
+    ]
   },
   {
     "name": "Caballa en conserva (al natural)",
@@ -2191,7 +2368,9 @@ export const FOODS_CRUDO = [
     "cho": 0,
     "pro": 24,
     "fat": 7.5,
-    "tags": []
+    "tags": [
+      "pescado"
+    ]
   },
   {
     "name": "Calamar",
@@ -2202,7 +2381,8 @@ export const FOODS_CRUDO = [
     "pro": 15.6,
     "fat": 1.4,
     "tags": [
-      "pescado"
+      "pescado",
+      "marisco"
     ]
   },
   {
@@ -2213,7 +2393,9 @@ export const FOODS_CRUDO = [
     "cho": 0,
     "pro": 19,
     "fat": 2.6,
-    "tags": []
+    "tags": [
+      "pescado"
+    ]
   },
   {
     "name": "Dorada",
@@ -2283,7 +2465,9 @@ export const FOODS_CRUDO = [
     "cho": 3.7,
     "pro": 12,
     "fat": 2.2,
-    "tags": []
+    "tags": [
+      "marisco"
+    ]
   },
   {
     "name": "Merluza",
@@ -2305,7 +2489,9 @@ export const FOODS_CRUDO = [
     "cho": 0,
     "pro": 18.7,
     "fat": 0.8,
-    "tags": []
+    "tags": [
+      "pescado"
+    ]
   },
   {
     "name": "Pulpo",
@@ -2316,7 +2502,8 @@ export const FOODS_CRUDO = [
     "pro": 14.9,
     "fat": 1,
     "tags": [
-      "pescado"
+      "pescado",
+      "marisco"
     ]
   },
   {
@@ -2327,7 +2514,9 @@ export const FOODS_CRUDO = [
     "cho": 0,
     "pro": 16,
     "fat": 3,
-    "tags": []
+    "tags": [
+      "pescado"
+    ]
   },
   {
     "name": "Salmón",
@@ -2422,7 +2611,8 @@ export const FOODS_CRUDO = [
     "pro": 16.2,
     "fat": 0.7,
     "tags": [
-      "pescado"
+      "pescado",
+      "marisco"
     ]
   },
   {
@@ -2535,7 +2725,9 @@ export const FOODS_CRUDO = [
     "cho": 2.5,
     "pro": 1.8,
     "fat": 0.2,
-    "tags": []
+    "tags": [
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Espárragos verdes",
@@ -2545,7 +2737,9 @@ export const FOODS_CRUDO = [
     "cho": 1.8,
     "pro": 2.6,
     "fat": 0.2,
-    "tags": []
+    "tags": [
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Guisantes",
@@ -2555,7 +2749,9 @@ export const FOODS_CRUDO = [
     "cho": 14.5,
     "pro": 5.4,
     "fat": 0.4,
-    "tags": []
+    "tags": [
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Puerro",
@@ -2565,7 +2761,9 @@ export const FOODS_CRUDO = [
     "cho": 5.7,
     "pro": 1.5,
     "fat": 0.3,
-    "tags": []
+    "tags": [
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Espinaca",
@@ -2585,7 +2783,9 @@ export const FOODS_CRUDO = [
     "cho": 12,
     "pro": 5,
     "fat": 5.5,
-    "tags": []
+    "tags": [
+      "gluten"
+    ]
   },
   {
     "name": "Judías verdes",
@@ -2664,7 +2864,9 @@ export const FOODS_CRUDO = [
     "cho": 11,
     "pro": 1.6,
     "fat": 3.5,
-    "tags": []
+    "tags": [
+      "alto_fodmap"
+    ]
   },
   {
     "name": "Zanahoria",
@@ -2675,6 +2877,18 @@ export const FOODS_CRUDO = [
     "pro": 0.9,
     "fat": 0.2,
     "tags": []
+  },
+  {
+    "name": "Batido de proteína vegetal 30g",
+    "originalName": "Batido de proteína vegetal 30g",
+    "category": "otros_y_suplementos",
+    "kcal": 115,
+    "cho": 1.5,
+    "pro": 24,
+    "fat": 1,
+    "tags": [
+      "sin_lactosa_especial"
+    ]
   }
 ];
 

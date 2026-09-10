@@ -21,12 +21,68 @@ export const CLINICAL_TAGS = [
     patterns: [/lactosa/i, /l[aá]cteos/i, /\bleche\b/i, /\bcase[ií]na\b/i, /\bwhey\b/i],
   },
   {
+    value: 'sin_proteina_vaca',
+    label: '🐮 APLV / Alergia a la Proteína de Vaca',
+    shortLabel: 'Sin Proteína de Vaca (APLV)',
+    icon: '🐮',
+    description: 'Excluye estrictamente todos los lácteos de vaca (incluso sin lactosa), quesos, yogures, mantequilla, suero/whey y caseína',
+    patterns: [/aplv/i, /prote[ií]na.*vaca/i, /prote[ií]na.*leche/i, /alergia.*leche/i, /alergia.*l[aá]ctea/i, /cow.*milk.*protein/i, /cmpa/i],
+  },
+  {
     value: 'sibo_low_fodmap',
-    label: '🦠 SIBO / Digestivo / Bajo FODMAP',
-    shortLabel: 'Bajo FODMAP / SIBO',
+    label: '🦠 SIBO General / Bajo FODMAP',
+    shortLabel: 'SIBO General',
     icon: '🦠',
     description: 'Excluye alimentos altamente fermentables (FODMAP): legumbres, cebolla, coliflor, lácteos enteros',
     patterns: [/sibo/i, /fodmap/i, /flatulent/i, /digestiv/i],
+  },
+  {
+    value: 'sibo_hidrogeno',
+    label: '💨 SIBO Hidrógeno (Diarrea / Bajo FODMAP)',
+    shortLabel: 'SIBO Hidrógeno',
+    icon: '💨',
+    description: 'Sobrecrecimiento bacteriano productor de H2 con diarrea o tránsito rápido. Dieta estricta Baja en FODMAP',
+    patterns: [/sibo.*hidr[oó]geno/i, /sibo.*h2\b/i, /(?<!sulfuro.*)hidr[oó]geno/i],
+  },
+  {
+    value: 'sibo_metano_imo',
+    label: '🪨 SIBO Metano / IMO (Estreñimiento / Bajo FODMAP)',
+    shortLabel: 'SIBO Metano (IMO)',
+    icon: '🪨',
+    description: 'Sobrecrecimiento de arqueas (IMO) con motilidad lenta y estreñimiento. Dieta Baja en FODMAP + procinéticos',
+    patterns: [/sibo.*metano/i, /\bimo\b/i, /methano/i, /metanog[eé]nic/i],
+  },
+  {
+    value: 'sibo_mixto',
+    label: '🔄 SIBO Mixto (Hidrógeno + Metano)',
+    shortLabel: 'SIBO Mixto',
+    icon: '🔄',
+    description: 'Sobrecrecimiento mixto de bacterias y arqueas con alternancia de tránsito. Dieta Baja en FODMAP estricta',
+    patterns: [/sibo.*mixto/i, /sibo.*combinado/i],
+  },
+  {
+    value: 'sibo_sulfuro',
+    label: '🧪 SIBO Sulfhídrico / Sulfuro (Bajo en Azufre)',
+    shortLabel: 'SIBO Sulfhídrico',
+    icon: '🧪',
+    description: 'Excluye alimentos ricos en FODMAP y alimentos ricos en azufre/sulfatos: crucíferas, huevos, ajo, cebolla y carnes rojas',
+    patterns: [/sibo.*sulf/i, /sulfh[ií]drico/i, /sulfuro/i, /h2s/i, /azufre/i],
+  },
+  {
+    value: 'colon_irritable',
+    label: '🩺 Colon Irritable / SII (Bajo FODMAP)',
+    shortLabel: 'Colon Irritable (SII)',
+    icon: '🩺',
+    description: 'Excluye alimentos altamente fermentables (FODMAP): legumbres, cebolla, ajo, coliflor y lácteos enteros',
+    patterns: [/colon.*irritable/i, /\bsii\b/i, /\bibs\b/i, /intestino.*irritable/i],
+  },
+  {
+    value: 'sin_fructosa',
+    label: '🍎 Intolerancia / Alergia a la Fructosa',
+    shortLabel: 'Sin Fructosa',
+    icon: '🍎',
+    description: 'Excluye frutas ricas en fructosa (manzana, pera, mango, sandía, uva, desecadas), miel, mermeladas, zumos y dulces',
+    patterns: [/fructosa/i, /fructose/i, /frutaosa/i, /malabsorci[oó]n.*fructosa/i, /intoleran.*fructosa/i, /alergia.*fructosa/i],
   },
   {
     value: 'sin_cerdo',
@@ -140,11 +196,31 @@ export function parsePlayerClinicalTags(playerOrTags) {
       if (tag.patterns.some((p) => p.test(searchable))) {
         detected.add(tag.value);
       }
-      // Chequear SIBO específicamente en contexto clínico si se menciona
-      if (tag.value === 'sibo_low_fodmap' && /sibo|fodmap/i.test(context)) {
+      // Chequear subtipos de SIBO o Colon Irritable específicamente en contexto clínico si se menciona
+      if (tag.value === 'sibo_sulfuro' && /sulfh[ií]drico|sulfuro|h2s|azufre/i.test(context)) {
+        detected.add(tag.value);
+      } else if (tag.value === 'sibo_hidrogeno' && /hidr[oó]geno|h2\b/i.test(context)) {
+        detected.add(tag.value);
+      } else if (tag.value === 'sibo_metano_imo' && /metano|imo\b|methano/i.test(context)) {
+        detected.add(tag.value);
+      } else if (tag.value === 'sibo_mixto' && /mixto|combinado/i.test(context) && /sibo/i.test(context)) {
+        detected.add(tag.value);
+      } else if (tag.value === 'sibo_low_fodmap' && /sibo|fodmap/i.test(context)) {
+        detected.add(tag.value);
+      }
+      if (tag.value === 'colon_irritable' && /colon|sii\b|ibs\b|intestino.*irritable/i.test(context)) {
         detected.add(tag.value);
       }
     }
+
+    // Si se detectó un subtipo específico de SIBO, eliminar el genérico para evitar duplicación en UI
+    if (detected.has('sibo_sulfuro')) {
+      detected.delete('sibo_hidrogeno');
+    }
+    if (detected.has('sibo_hidrogeno') || detected.has('sibo_metano_imo') || detected.has('sibo_mixto') || detected.has('sibo_sulfuro')) {
+      detected.delete('sibo_low_fodmap');
+    }
+
     return Array.from(detected);
   }
 
@@ -162,6 +238,15 @@ export function parsePlayerClinicalTags(playerOrTags) {
         detected.add(tag.value);
       }
     }
+
+    // Si se detectó un subtipo específico de SIBO, eliminar el genérico para evitar duplicación en UI
+    if (detected.has('sibo_sulfuro')) {
+      detected.delete('sibo_hidrogeno');
+    }
+    if (detected.has('sibo_hidrogeno') || detected.has('sibo_metano_imo') || detected.has('sibo_mixto') || detected.has('sibo_sulfuro')) {
+      detected.delete('sibo_low_fodmap');
+    }
+
     return Array.from(detected);
   }
 

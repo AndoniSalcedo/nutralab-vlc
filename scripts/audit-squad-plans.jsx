@@ -296,6 +296,8 @@ async function runSquadAudit() {
     const clinicalCatalog = getClinicalCatalogForPlayer(player);
     const activeTagsSet = new Set(clinicalCatalog.activeTags);
     const isLactose = activeTagsSet.has('sin_lactosa');
+    const isCowProtein = activeTagsSet.has('sin_proteina_vaca');
+    const isFructose = activeTagsSet.has('sin_fructosa');
     const isPork = activeTagsSet.has('sin_cerdo');
     const isFish = activeTagsSet.has('sin_pescado') || activeTagsSet.has('sin_marisco');
     const isGluten = activeTagsSet.has('sin_gluten');
@@ -446,6 +448,24 @@ async function runSquadAudit() {
               severity: 'HIGH',
               category: 'SEGURIDAD_CLINICA',
               message: `Posible lácteo con lactosa para intolerante en ${dayKey} (${mealName}): servido "${item.name}"`,
+            });
+          }
+          if (isCowProtein && (itemLower.includes('queso') || itemLower.includes('leche') || itemLower.includes('yogur') || itemLower.includes('kéfir') || itemLower.includes('mantequilla') || itemLower.includes('requesón') || itemLower.includes('skyr') || itemLower.includes('caseína') || itemLower.includes('suero')) && !isPlantMilk && !itemLower.includes('vegetal')) {
+            daySummary.clinicalAlerts.push({ meal: mealName, food: item.name, violation: 'proteina_vaca' });
+            auditReport.globalFindings.totalClinicalViolations++;
+            playerAudit.issues.push({
+              severity: 'HIGH',
+              category: 'SEGURIDAD_CLINICA',
+              message: `Lácteo/derivado bovino servido a jugador con APLV en ${dayKey} (${mealName}): "${item.name}"`,
+            });
+          }
+          if (isFructose && (itemLower.includes('miel') || itemLower.includes('manzana') || itemLower.includes('pera') || itemLower.includes('mango') || itemLower.includes('sandía') || itemLower.includes('dátil') || itemLower.includes('desecada'))) {
+            daySummary.clinicalAlerts.push({ meal: mealName, food: item.name, violation: 'fructosa' });
+            auditReport.globalFindings.totalClinicalViolations++;
+            playerAudit.issues.push({
+              severity: 'HIGH',
+              category: 'SEGURIDAD_CLINICA',
+              message: `Alimento rico en fructosa para intolerante a fructosa en ${dayKey} (${mealName}): "${item.name}"`,
             });
           }
           if (isGluten && (itemLower.includes('pasta de trigo') || itemLower.includes('pan blanco') || itemLower.includes('pan de barra') || itemLower.includes('cuscús'))) {
