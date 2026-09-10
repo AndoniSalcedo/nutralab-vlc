@@ -528,7 +528,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
           <Stack align="center" gap="xs" ta="center">
             <IconAlertCircle size={36} />
             <Title order={4} c="dark.7">{metric.emptyTitle}</Title>
-            <Text size="xs" c="dimmed" maxW={400} mx="auto">
+            <Text size="xs" c="dimmed" maw={400} mx="auto">
               {metric.emptyText}
             </Text>
           </Stack>
