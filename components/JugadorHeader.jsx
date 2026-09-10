@@ -18,7 +18,7 @@ import {
   UnstyledButton,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import { IconArrowLeft, IconLogout, IconDotsVertical } from '@/components/icons3d';
+import { IconArrowLeft, IconLogout, IconDotsVertical, IconCheck } from '@/components/icons3d';
 import Icon3D from '@/components/Icon3D';
 import { FileButton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -82,8 +82,18 @@ function PlayerLogoutButton({ menuItem = false }) {
   );
 }
 
-export function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, compact = false }) {
-  if (!isAdmin && !isPlayer) return null;
+export function HeaderActions({
+  jugador,
+  isAdmin,
+  isPlayer,
+  onEdit,
+  compact = false,
+  dayTypes = null,
+  activeDayType = null,
+  onDayTypeChange = null,
+}) {
+  const hasDayTypes = Array.isArray(dayTypes) && dayTypes.length > 0 && typeof onDayTypeChange === 'function';
+  if (!isAdmin && !isPlayer && !hasDayTypes) return null;
 
   if (compact) {
     return (
@@ -95,6 +105,26 @@ export function HeaderActions({ jugador, isAdmin, isPlayer, onEdit, compact = fa
         </Menu.Target>
 
         <Menu.Dropdown>
+          {hasDayTypes && (
+            <>
+              <Menu.Label>Tipo de día</Menu.Label>
+              {dayTypes.map((dt) => (
+                <Menu.Item
+                  key={dt.value}
+                  leftSection={
+                    <span style={{ fontSize: '8px', color: `var(--mantine-color-${dt.color || 'blue'}-6)` }}>●</span>
+                  }
+                  rightSection={dt.value === activeDayType ? <IconCheck size={14} color="var(--mantine-color-blue-6)" /> : null}
+                  onClick={() => onDayTypeChange(dt.value)}
+                  style={{ fontWeight: dt.value === activeDayType ? 600 : 400 }}
+                >
+                  {dt.label}
+                </Menu.Item>
+              ))}
+              {(isPlayer || isAdmin) && <Menu.Divider />}
+            </>
+          )}
+
           {isPlayer && (
             <>
               <PlayerPasswordButton menuItem />
@@ -413,14 +443,20 @@ export function PlayerIdentity({ jugador, isAdmin, isPlayer, hasCredentials, ava
             </>
           )}
         </Group>
-        <HeaderSemaforoIndicator semaforo={jugador.semaforo} centered={centered} />
         <CredentialsWarning show={!hasCredentials && isAdmin} />
       </Stack>
     </>
   );
 }
 
-export function JugadorHeaderCompactMobile({ jugador, user, onEdit }) {
+export function JugadorHeaderCompactMobile({
+  jugador,
+  user,
+  onEdit,
+  activeDayType = null,
+  onDayTypeChange = null,
+  dayTypes = null,
+}) {
   const isAdmin = user?.role === 'admin';
   const isPlayer = user?.role === 'jugador';
 
@@ -444,10 +480,12 @@ export function JugadorHeaderCompactMobile({ jugador, user, onEdit }) {
             <Text c="dimmed" size="sm" truncate="end" fw={500}>
               {jugador?.posicion || 'Sin posición'}
             </Text>
-            {jugador?.semaforo?.hasPesajes && (
+            {jugador?.club && (
               <>
                 <Text c="dimmed" size="xs" style={{ opacity: 0.4 }}>•</Text>
-                <HeaderSemaforoIndicator semaforo={jugador.semaforo} compact />
+                <Text c="dimmed" size="xs" truncate="end">
+                  {jugador.club}
+                </Text>
               </>
             )}
           </Group>
@@ -455,7 +493,16 @@ export function JugadorHeaderCompactMobile({ jugador, user, onEdit }) {
       </Group>
 
       <Box style={{ flexShrink: 0 }}>
-        <HeaderActions jugador={jugador} isAdmin={isAdmin} isPlayer={isPlayer} onEdit={onEdit} compact />
+        <HeaderActions
+          jugador={jugador}
+          isAdmin={isAdmin}
+          isPlayer={isPlayer}
+          onEdit={onEdit}
+          compact
+          dayTypes={dayTypes}
+          activeDayType={activeDayType}
+          onDayTypeChange={onDayTypeChange}
+        />
       </Box>
     </Group>
   );

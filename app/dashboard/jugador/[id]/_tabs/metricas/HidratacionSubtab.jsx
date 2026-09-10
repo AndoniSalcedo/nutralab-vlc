@@ -51,7 +51,6 @@ import {
 } from 'recharts';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
-import HydrationCalculator from '@/components/HydrationCalculator';
 
 const METRIC_TABS = {
   hydration: {
@@ -708,11 +707,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
               ))}
             </SimpleGrid>
           </BentoCard>
-
-          <SimpleGrid cols={{ base: 1, lg: 2 }} spacing={{ base: 'md', sm: 'lg' }}>
-            <HydrationCalculator jugador={jugador} />
-            <EditableSection title="Notas y ajustes de hidratación" defaultValue={jugador.notas_hidratacion || hidDef} onSave={(v) => saveField('notas_hidratacion', v)} readOnly={readOnly} />
-          </SimpleGrid>
+          <EditableSection title="Notas y ajustes de hidratación" defaultValue={jugador.notas_hidratacion || hidDef} onSave={(v) => saveField('notas_hidratacion', v)} readOnly={readOnly} />
 
           {/* Historical Hydration Entries Table */}
           {registros.length > 0 && (

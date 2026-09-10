@@ -4,16 +4,18 @@ import { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Group,
+  Menu,
   Paper,
   SimpleGrid,
   Stack,
   Text,
   Title,
+  UnstyledButton,
 } from '@mantine/core';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 
-import { IconClipboardList } from '@/components/icons3d';
+import { IconClipboardList, IconChevronDown, IconCheck } from '@/components/icons3d';
 
 import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/lib/metrics/anthropometry';
 import { CLINICAL_TAGS } from '@/config/clinical-tags';
@@ -29,6 +31,7 @@ import { usePlayerDashboard } from '../PlayerDashboardContext';
 import headerClasses from '../SubtabSectionHeader.module.css';
 import {
   PhysicalMetricWidget,
+  SweatMetricWidget,
   HydrationWidget,
   StaffMessagesWidget,
   SuplementacionWidget,
@@ -225,12 +228,18 @@ export default function PerfilSubtab({
   // Métricas antropométricas con redondeo a 1 decimal para evitar overflow
   const porcentajeGrasa = latestMetricValue(evoluciones, 'porcentaje_grasa', jugador?.porcentaje_grasa);
 
+  const latestSweat = useMemo(() => {
+    if (!registrosHidratacion || registrosHidratacion.length === 0) return null;
+    const sweats = registrosHidratacion.filter((r) => r?.fecha && String(r?.tipo || '').toLowerCase().trim() === 'sweat');
+    if (sweats.length === 0) return null;
+    return [...sweats].sort((a, b) => String(a.fecha).localeCompare(String(b.fecha))).at(-1);
+  }, [registrosHidratacion]);
+
   const latestHydration = useMemo(() => {
     if (!registrosHidratacion || registrosHidratacion.length === 0) return null;
-    return [...registrosHidratacion]
-      .filter(r => r?.fecha)
-      .sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)))
-      .at(-1) || null;
+    const osm = registrosHidratacion.filter((r) => r?.fecha && String(r?.tipo || '').toLowerCase().trim() !== 'sweat');
+    if (osm.length === 0) return null;
+    return [...osm].sort((a, b) => String(a.fecha).localeCompare(String(b.fecha))).at(-1);
   }, [registrosHidratacion]);
 
   const semaforo = jugador?.semaforo;
@@ -248,7 +257,7 @@ export default function PerfilSubtab({
       >
         {/* Desktop Header */}
         <Box visibleFrom="sm">
-          <Group justify="space-between" align="center" wrap="wrap" gap="sm">
+          <Group justify="space-between" align="center" wrap="nowrap" gap="sm">
             <Group gap="sm" align="center" wrap="nowrap">
               <HeaderIcon size={28} />
               <Box style={{ minWidth: 0 }}>
@@ -258,15 +267,59 @@ export default function PerfilSubtab({
                 </Text>
               </Box>
             </Group>
+
+            {/* Selector sutil de Tipo de Día (Desktop) */}
+            <Menu shadow="sm" width={160} position="bottom-end" radius="md">
+              <Menu.Target>
+                <UnstyledButton
+                  aria-label="Seleccionar tipo de día"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '5px 12px',
+                    borderRadius: 20,
+                    backgroundColor: 'var(--mantine-color-gray-1)',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    transition: 'background-color 0.15s ease',
+                  }}
+                >
+                  <span style={{ fontSize: '7px', color: `var(--mantine-color-${activeDay.color || 'blue'}-6)` }}>●</span>
+                  <Text size="xs" fw={500} c="dark.4">{activeDay.label || 'Día'}</Text>
+                  <IconChevronDown size={12} stroke={2} style={{ color: 'var(--mantine-color-gray-5)' }} />
+                </UnstyledButton>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Label>Tipo de día</Menu.Label>
+                {DAY_TYPES.map((dt) => (
+                  <Menu.Item
+                    key={dt.value}
+                    leftSection={
+                      <span style={{ fontSize: '8px', color: `var(--mantine-color-${dt.color || 'blue'}-6)` }}>●</span>
+                    }
+                    rightSection={dt.value === activeDayType ? <IconCheck size={14} color="var(--mantine-color-blue-6)" /> : null}
+                    onClick={() => setActiveDayType(dt.value)}
+                    style={{ fontWeight: dt.value === activeDayType ? 600 : 400 }}
+                  >
+                    {dt.label}
+                  </Menu.Item>
+                ))}
+              </Menu.Dropdown>
+            </Menu>
           </Group>
         </Box>
 
-        {/* Mobile Compact Header: Avatar + Nombre + Posición con indicador semáforo + Tres puntos */}
+        {/* Mobile Compact Header */}
         <Box hiddenFrom="sm" py={2}>
           <JugadorHeaderCompactMobile
             jugador={jugador}
             user={user}
             onEdit={() => setEditModalOpen(true)}
+            activeDayType={activeDayType}
+            onDayTypeChange={setActiveDayType}
+            dayTypes={DAY_TYPES}
           />
         </Box>
       </Paper>
@@ -290,8 +343,8 @@ export default function PerfilSubtab({
             mealsCount={meals.length}
           />
 
-          {/* Cabecera superior: 3 accesos rápidos perfectamente centrados */}
-          <SimpleGrid cols={{ base: 3, sm: 3 }} spacing={{ base: 'xs', sm: 'md' }} >
+          {/* Cabecera superior: 3 accesos rápidos perfectamente equilibrados */}
+          <SimpleGrid cols={{ base: 3, sm: 3 }} spacing={{ base: 'xs', sm: 'md' }}>
             <PhysicalMetricWidget
               jugadorId={jugador.id}
               pesoActual={pesoActual}
@@ -299,9 +352,9 @@ export default function PerfilSubtab({
               semaforo={semaforo}
               formatMetricNumber={formatMetricNumber}
             />
-            <HydrationWidget
+            <SweatMetricWidget
               jugadorId={jugador.id}
-              latestHydration={latestHydration}
+              latestSweat={latestSweat}
               formatMetricNumber={formatMetricNumber}
             />
             <StaffMessagesWidget
@@ -309,6 +362,16 @@ export default function PerfilSubtab({
               messages={messages}
             />
           </SimpleGrid>
+
+          {/* Línea completa de Hidratación: básica, chula y sin sobrecarga */}
+          <HydrationWidget
+            jugadorId={jugador.id}
+            jugador={jugador}
+            pesoActual={pesoActual}
+            activeDayType={activeDayType}
+            latestHydration={latestHydration}
+            formatMetricNumber={formatMetricNumber}
+          />
 
           {/* Fila intermedia: Comedor primero y Suplementación debajo */}
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">

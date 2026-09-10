@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ActionIcon,
-  Box,
   Group,
   Paper,
   Popover,
@@ -15,7 +14,7 @@ import {
   Text,
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
-import { IconCalendar, IconChevronLeft, IconChevronRight } from '@/components/icons3d';
+import { IconCalendar } from '@/components/icons3d';
 import Icon3D from '@/components/Icon3D';
 
 function CompactMacroLine({ label, color, consumed = 0, target = 0 }) {
@@ -23,12 +22,12 @@ function CompactMacroLine({ label, color, consumed = 0, target = 0 }) {
   const pct = targetNum > 0 ? Math.min(100, Math.round((consumed / targetNum) * 100)) : 0;
 
   return (
-    <Stack gap={2}>
+    <Stack gap={1}>
       <Group justify="space-between" align="baseline" wrap="nowrap">
         <Text fz="xs" fw={600} c="dark.5" truncate>
           {label}
         </Text>
-        <Text fz="xs" fw={500} c="dimmed">
+        <Text fz="xs" fw={500} c="dimmed" style={{ fontVariantNumeric: 'tabular-nums' }}>
           <Text span fw={600} c="dark.5">
             {consumed}g
           </Text>
@@ -44,9 +43,6 @@ export default function BalanceNutricionalWidget({
   jugadorId,
   selectedDate = new Date(),
   onDateChange,
-  activeDayType = 'entreno',
-  onDayTypeChange,
-  dayTypes = [],
   consumed = { kcal: 0, pro: 0, cho: 0, fat: 0 },
   target = { kcal: '-', protein: null, cho: null, fat: null },
   mealsCount = 0,
@@ -58,10 +54,6 @@ export default function BalanceNutricionalWidget({
   const kcalPct = targetKcal > 0 ? Math.min(100, Math.round((consumed.kcal / targetKcal) * 100)) : 0;
   const isKcalReached = targetKcal > 0 && consumed.kcal >= targetKcal;
 
-
-  const activeIdx = dayTypes.findIndex((d) => d.value === activeDayType);
-  const activeDay = dayTypes[activeIdx !== -1 ? activeIdx : 0] || {};
-
   // Formato amigable corto para la fecha
   const dateObj = new Date(selectedDate);
   const formattedDate = dateObj.toLocaleDateString('es-ES', {
@@ -70,9 +62,9 @@ export default function BalanceNutricionalWidget({
   });
 
   return (
-    <Paper shadow="xs" radius="lg" p="md" bg="white" withBorder>
-      {/* Cabecera: Título con icono unificado + Icono de Calendario a la derecha */}
-      <Group justify="space-between" align="center" mb="sm">
+    <Paper shadow="xs" radius="lg" p={{ base: 'xs', sm: 'sm' }} bg="white" withBorder>
+      {/* Cabecera: Título con icono unificado + Indicador de fecha y tipo de día */}
+      <Group justify="space-between" align="center" mb={6}>
         <Group gap="xs" align="center">
           <Icon3D name="fire" size={28} />
           <Text fw={700} fz="sm" c="dark.5">
@@ -80,8 +72,8 @@ export default function BalanceNutricionalWidget({
           </Text>
         </Group>
 
-        {/* Icono de Calendario para abrir el selector de fecha en Popover */}
-        <Group gap={6} align="center">
+        {/* Selector de fecha */}
+        <Group gap={4} align="center">
           <Text fz="xs" fw={600} c="dimmed">
             {formattedDate}
           </Text>
@@ -122,102 +114,13 @@ export default function BalanceNutricionalWidget({
         </Group>
       </Group>
 
-      {/* Selector interactivo integrado de Tipo de Día: Carrusel compacto adaptado a la escala del widget */}
-      {dayTypes && dayTypes.length > 0 && (
-        <Paper
-          withBorder
-          py={5}
-          px="xs"
-          radius="lg"
-          bg="gray.0"
-          mb="xs"
-          style={{ borderColor: 'var(--mantine-color-gray-2)' }}
-        >
-          <Group justify="space-between" align="center" wrap="nowrap">
-            {/* Flecha izquierda compacta */}
-            <ActionIcon
-              variant="subtle"
-              color="gray"
-              radius="md"
-              size="sm"
-              onClick={() => {
-                const prevIdx = (activeIdx - 1 + dayTypes.length) % dayTypes.length;
-                onDayTypeChange && onDayTypeChange(dayTypes[prevIdx].value);
-              }}
-              style={{ transition: 'transform 0.1s ease' }}
-              onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.9)')}
-              onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-            >
-              <IconChevronLeft size={14} stroke={2.2} />
-            </ActionIcon>
-
-            {/* Etiqueta central de tipo de día con punto de color */}
-            <Stack gap={2} style={{ flex: 1 }} align="center">
-              <Group gap={6} align="center">
-                <Box
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: '50%',
-                    backgroundColor: `var(--mantine-color-${activeDay.color || 'blue'}-6)`,
-                  }}
-                />
-                <Text fz="xs" fw={600} c="dark.5">
-                  {activeDay.label || 'Entreno'}
-                </Text>
-              </Group>
-
-              {/* Indicator Dots interactivos estilizados */}
-              <Group gap={4} justify="center">
-                {dayTypes.map((dt, idx) => {
-                  const isActive = idx === activeIdx;
-                  return (
-                    <Box
-                      key={dt.value}
-                      onClick={() => onDayTypeChange && onDayTypeChange(dt.value)}
-                      style={{
-                        width: isActive ? '12px' : '4px',
-                        height: '4px',
-                        borderRadius: '2px',
-                        backgroundColor: isActive
-                          ? `var(--mantine-color-${activeDay.color || 'blue'}-6)`
-                          : 'var(--mantine-color-gray-3)',
-                        cursor: 'pointer',
-                        transition: 'width 0.2s ease, background-color 0.2s ease',
-                      }}
-                    />
-                  );
-                })}
-              </Group>
-            </Stack>
-
-            {/* Flecha derecha compacta */}
-            <ActionIcon
-              variant="subtle"
-              color="gray"
-              radius="md"
-              size="sm"
-              onClick={() => {
-                const nextIdx = (activeIdx + 1) % dayTypes.length;
-                onDayTypeChange && onDayTypeChange(dayTypes[nextIdx].value);
-              }}
-              style={{ transition: 'transform 0.1s ease' }}
-              onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.9)')}
-              onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-            >
-              <IconChevronRight size={14} stroke={2.2} />
-            </ActionIcon>
-          </Group>
-        </Paper>
-      )}
-
       {/* Misma fila en 2 columnas (móvil y desktop): Columna 1 Ring de Calorías, Columna 2 Macros */}
-      <SimpleGrid cols={2} spacing={{ base: 'xs', sm: 'md' }} my="xs" style={{ alignItems: 'center' }}>
+      <SimpleGrid cols={2} spacing={{ base: 'xs', sm: 'md' }} my={4} style={{ alignItems: 'center' }}>
         {/* Columna 1: Ring de calorías centrado */}
         <Stack align="center" justify="center" gap={0}>
           <RingProgress
-            size={120}
-            thickness={11}
+            size={98}
+            thickness={9}
             roundCaps
             sections={[
               {
@@ -227,13 +130,13 @@ export default function BalanceNutricionalWidget({
             ]}
             label={
               <Stack gap={0} align="center" justify="center" ta="center">
-                <Text fz="xs" c="dimmed" fw={600} tt="uppercase" lts={0.5}>
+                <Text fz="10px" c="dimmed" fw={600} tt="uppercase" lts={0.5}>
                   Kcal
                 </Text>
-                <Text fz="md" fw={700} lh={1.1} c="dark.5">
+                <Text fz="sm" fw={700} lh={1.1} c="dark.5" style={{ fontVariantNumeric: 'tabular-nums' }}>
                   {consumed.kcal}
                 </Text>
-                <Text fz="xs" c="dimmed" fw={500}>
+                <Text fz="10px" c="dimmed" fw={500} style={{ fontVariantNumeric: 'tabular-nums' }}>
                   / {target.kcal || '-'}
                 </Text>
               </Stack>
@@ -242,7 +145,7 @@ export default function BalanceNutricionalWidget({
         </Stack>
 
         {/* Columna 2: Proteínas, Carbohidratos y Grasas */}
-        <Stack gap={8}>
+        <Stack gap={5}>
           <CompactMacroLine
             label="Proteínas"
             color="red"
@@ -268,8 +171,8 @@ export default function BalanceNutricionalWidget({
       <Group
         justify="space-between"
         align="center"
-        mt="xs"
-        pt="xs"
+        mt={6}
+        pt={6}
         style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
       >
         <Text fz="xs" c="dimmed" fw={500}>
