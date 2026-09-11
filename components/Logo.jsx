@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { Image } from '@mantine/core';
 
-export default function Logo() {
+export default function Logo({ href = '/dashboard', width = 180 }) {
   return (
-    <Link href="/dashboard">
-      <Image src="/logo.png" alt="Nutralab" style={{ width: 200, height: 'auto', cursor: 'pointer' }} />
+    <Link href={href}>
+      <Image src="/logo.png" alt="Nutralab" style={{ width, height: 'auto', cursor: 'pointer' }} />
     </Link>
   );
 }
