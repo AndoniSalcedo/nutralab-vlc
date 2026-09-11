@@ -88,6 +88,10 @@ export default function TeamHeaderTabs({
     }
   };
 
+  const activeTabStyle = (value) => ({
+    backgroundColor: tabValue === value ? 'var(--mantine-color-white)' : 'transparent',
+  });
+
   return (
     <>
       <Paper
@@ -292,6 +296,7 @@ export default function TeamHeaderTabs({
                   component={Link}
                   href={href}
                   leftSection={<Icon3D name={tab.icon3d} size={18} />}
+                  style={activeTabStyle(tab.value)}
                 >
                   {tab.label}
                 </Tabs.Tab>
