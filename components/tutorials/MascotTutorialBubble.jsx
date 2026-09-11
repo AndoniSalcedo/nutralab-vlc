@@ -33,7 +33,7 @@ export default function MascotTutorialBubble({
   primaryProps,
   skipProps,
   closeProps,
-  tooltipProps,
+  tooltipProps: _tooltipProps,
   onClose,
   onFinish,
 }) {

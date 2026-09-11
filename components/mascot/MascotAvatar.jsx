@@ -242,7 +242,6 @@ export default function MascotAvatar({
         />
 
         {/* Imagen PNG transparente pura sin efectos CSS de rotación ni distorsión */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={frameSrc}
           alt={`Mascota Nutralab - ${currentConfig.label}`}

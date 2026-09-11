@@ -8,7 +8,7 @@ export async function POST(request) {
   
   let redirectUrl = new URL('/login', request.url);
   if (user?.role === 'admin') {
-    redirectUrl = new URL('/login', frontendUrl);
+    redirectUrl = new URL('/login/nutritionist', frontendUrl);
   }
 
   const response = NextResponse.redirect(redirectUrl, 303);

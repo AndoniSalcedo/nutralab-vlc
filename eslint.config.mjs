@@ -21,7 +21,9 @@ const eslintConfig = nextConfig.map((config) => {
         'react-hooks/preserve-manual-memoization': 'off',
         'react-hooks/immutability': 'off',
         'react-hooks/static-components': 'off',
-        'react-hooks/use-memo': 'off'
+        'react-hooks/use-memo': 'off',
+        'react-hooks/incompatible-library': 'off',
+        '@next/next/no-img-element': 'off'
       }
     };
   }

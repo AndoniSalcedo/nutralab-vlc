@@ -418,7 +418,7 @@ export default function TecnicoLoginForm() {
 
           <Text size="xs" c="#7a7d68">
             ¿Eres nutricionista?{' '}
-            <Anchor href={`${frontendUrl}/login`} fw={600} c="#5c6049" underline="hover">
+            <Anchor href={`${frontendUrl}/login/nutritionist`} fw={600} c="#5c6049" underline="hover">
               Portal principal
             </Anchor>
           </Text>

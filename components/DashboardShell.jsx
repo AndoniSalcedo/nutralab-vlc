@@ -98,7 +98,7 @@ export default function DashboardShell({ children, user }) {
                   <Menu.Item
                     leftSection={<IconUserStar size={16} stroke={1.5} />}
                     component="a"
-                    href={`${frontendUrl}/admin/nutritionists`}
+                    href={`${frontendUrl}/dashboard/admin/nutritionists`}
                     onClick={() => setOpened(false)}
                   >
                     Gestionar nutricionistas
@@ -107,7 +107,7 @@ export default function DashboardShell({ children, user }) {
                   <Menu.Item
                     leftSection={<IconUserCog size={16} stroke={1.5} />}
                     component="a"
-                    href={`${frontendUrl}/users`}
+                    href={`${frontendUrl}/dashboard/users`}
                     onClick={() => setOpened(false)}
                   >
                     Gestionar usuarios
@@ -120,7 +120,7 @@ export default function DashboardShell({ children, user }) {
                   <Menu.Item
                     leftSection={<Icon3D name="apple" size={20} />}
                     component="a"
-                    href={`${frontendUrl}/recipes`}
+                    href={`${frontendUrl}/dashboard/recipes`}
                     onClick={() => setOpened(false)}
                   >
                     Recetario
@@ -129,7 +129,7 @@ export default function DashboardShell({ children, user }) {
                   <Menu.Item
                     leftSection={<Icon3D name="folder" size={20} />}
                     component="a"
-                    href={`${frontendUrl}/catalogs`}
+                    href={`${frontendUrl}/dashboard/catalogs`}
                     onClick={() => setOpened(false)}
                   >
                     Catálogos
@@ -142,7 +142,7 @@ export default function DashboardShell({ children, user }) {
                 <Menu.Item
                   leftSection={<Icon3D name="configuracion" size={20} />}
                   component="a"
-                  href={`${frontendUrl}/settings`}
+                  href={`${frontendUrl}/dashboard/settings`}
                   onClick={() => setOpened(false)}
                 >
                   Configuración
