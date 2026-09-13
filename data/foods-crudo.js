@@ -1365,10 +1365,10 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Huevo entero (unidad 50g)",
+    "name": "Huevo entero",
     "originalName": "Huevo entero crudo",
     "category": "huevos_y_lacteos",
-    "kcal": 155,
+    "kcal": 160,
     "cho": 1.1,
     "pro": 13,
     "fat": 11,
