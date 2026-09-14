@@ -155,7 +155,7 @@ export default function EditDishDecompositionModal({
             <Group gap={6} mb={4}>
               <Box style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--mantine-color-red-6)' }} />
               <Text size="xs" fw={600} c="dark.4">
-                Proteína (Corte específico o concepto genérico del Árbol)
+                Proteína (Corte específico o concepto genérico)
               </Text>
             </Group>
             <MultiSelect

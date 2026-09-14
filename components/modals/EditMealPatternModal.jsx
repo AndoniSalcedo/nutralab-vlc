@@ -167,7 +167,7 @@ export default function EditMealPatternModal({
       notifications.show({
         color: 'teal',
         title: 'Interpretación completada',
-        message: 'Las categorías del árbol nutricional se han clasificado correctamente.',
+        message: 'Las categorías se han clasificado correctamente.',
         icon: <IconCheck size={16} />,
       });
     } catch (err) {
@@ -188,10 +188,10 @@ export default function EditMealPatternModal({
     ];
 
     const label = isComplete
-      ? 'Árbol completo (rotación variada)'
+      ? 'Rotación variada'
       : allParts.length > 0
       ? allParts.join(' + ')
-      : 'Árbol completo (rotación variada)';
+      : 'Rotación variada';
 
     const structuredMeal = {
       isComplete: isComplete || allParts.length === 0,
@@ -236,7 +236,7 @@ export default function EditMealPatternModal({
           <Group justify="space-between" align="center">
             <Box style={{ flex: 1 }}>
               <Text size="sm" fw={600} c={isComplete ? 'teal.9' : 'dark.7'}>
-                Árbol completo (rotación equilibrada)
+                Rotación variada (pauta abierta)
               </Text>
               <Text size="xs" c="dimmed">
                 El jugador rota libremente entre las opciones aptas y saludables de la cocina sin restricciones fijas.
@@ -303,7 +303,7 @@ export default function EditMealPatternModal({
         {!isComplete ? (
           <Stack gap="sm">
             <Text size="xs" fw={700} c="dimmed" tt="uppercase">
-              Componentes del Árbol Nutricional
+              Componentes de la pauta
             </Text>
 
             <MultiSelect
@@ -388,7 +388,7 @@ export default function EditMealPatternModal({
           </Text>
           {isComplete ? (
             <Text size="xs" c="teal.8" fw={600}>
-              ● Árbol completo (rotación variada y equilibrada)
+              ● Rotación variada y equilibrada
             </Text>
           ) : (
             <Stack gap={3}>
@@ -430,7 +430,7 @@ export default function EditMealPatternModal({
               )}
               {hidrato.length === 0 && proteina.length === 0 && verdura.length === 0 && fruta.length === 0 && lacteo.length === 0 && !grasa && (
                 <Text size="xs" c="dimmed" fs="italic">
-                  Ningún componente seleccionado (se tratará como árbol completo).
+                  Ningún componente seleccionado (se aplicará rotación variada).
                 </Text>
               )}
             </Stack>

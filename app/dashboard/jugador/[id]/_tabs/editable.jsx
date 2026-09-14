@@ -321,7 +321,7 @@ export function ComidasEditable({
         {/* Lista de pautas tipadas por comida */}
         <Box mt={4}>
           <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={6}>
-            Pautas y Árbol Nutricional por Ingesta
+            Pautas por Ingesta
           </Text>
 
           {activeMeals.length === 0 ? (
@@ -346,9 +346,6 @@ export function ComidasEditable({
                       <Group gap="xs" align="center">
                         <Text size="xs" fw={700} c="dark.8">
                           {meal}
-                        </Text>
-                        <Text size="11px" c={isCompl || !hasAnySpecific ? 'teal.7' : 'blue.7'} fw={600}>
-                          {isCompl || !hasAnySpecific ? '● Árbol completo' : '● Árbol estructurado'}
                         </Text>
                       </Group>
 
@@ -753,9 +750,6 @@ export function PrepartidoEditable({
                             <Group gap="xs" align="center">
                               <Text size="xs" fw={700} c="dark.8">
                                 {m} {timing ? `(${timing})` : ''}
-                              </Text>
-                              <Text size="11px" c={isCompl || !hasAnySpecific ? 'teal.7' : 'blue.7'} fw={600}>
-                                {isCompl || !hasAnySpecific ? '● Árbol completo' : '● Árbol estructurado'}
                               </Text>
                             </Group>
 
