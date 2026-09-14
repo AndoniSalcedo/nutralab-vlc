@@ -129,6 +129,8 @@ const foods = [
   { name: 'Salmón - plancha', kcal: 260.0, cho: 0.0, pro: 23.0, fat: 16.25 },
   { name: 'Salmón - conserva natural', kcal: 239.2, cho: 0.0, pro: 22.0, fat: 14.95 },
   { name: 'Salmón - conserva aceite', kcal: 395.2, cho: 0.0, pro: 21.0, fat: 24.7 },
+  { name: 'Atún fresco - crudo', kcal: 130.0, cho: 0.0, pro: 23.5, fat: 4.0 },
+  { name: 'Atún fresco', kcal: 130.0, cho: 0.0, pro: 23.5, fat: 4.0 },
   { name: 'Atún natural - crudo', kcal: 116.0, cho: 0.0, pro: 26.0, fat: 1.0 },
   { name: 'Atún natural - plancha', kcal: 145.0, cho: 0.0, pro: 29.9, fat: 1.15 },
   { name: 'eco Atún natural - plancha', kcal: 145.0, cho: 0.0, pro: 29.9, fat: 1.15 },

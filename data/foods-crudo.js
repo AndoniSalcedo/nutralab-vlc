@@ -1231,7 +1231,9 @@ export const FOODS_CRUDO = [
     "fat": 49.9,
     "tags": [
       "fruto_seco"
-    ]
+    ],
+    "maxGrams": 30,
+    "defaultGrams": 25
   },
   {
     "name": "Anacardo (marañón)",
@@ -1244,7 +1246,9 @@ export const FOODS_CRUDO = [
     "tags": [
       "fruto_seco",
       "alto_fodmap"
-    ]
+    ],
+    "maxGrams": 30,
+    "defaultGrams": 25
   },
   {
     "name": "AOVE",
@@ -1254,7 +1258,10 @@ export const FOODS_CRUDO = [
     "cho": 0,
     "pro": 0,
     "fat": 100,
-    "tags": []
+    "tags": [],
+    "minGrams": 5,
+    "maxGrams": 25,
+    "defaultGrams": 15
   },
   {
     "name": "AOVE (Aceite de oliva virgen extra)",
@@ -1264,7 +1271,10 @@ export const FOODS_CRUDO = [
     "cho": 0,
     "pro": 0,
     "fat": 100,
-    "tags": []
+    "tags": [],
+    "minGrams": 5,
+    "maxGrams": 25,
+    "defaultGrams": 15
   },
   {
     "name": "Avellanas",
@@ -1276,7 +1286,9 @@ export const FOODS_CRUDO = [
     "fat": 60.8,
     "tags": [
       "fruto_seco"
-    ]
+    ],
+    "maxGrams": 30,
+    "defaultGrams": 25
   },
   {
     "name": "Cacahuete (maní)",
@@ -1288,7 +1300,9 @@ export const FOODS_CRUDO = [
     "fat": 49.2,
     "tags": [
       "fruto_seco"
-    ]
+    ],
+    "maxGrams": 30,
+    "defaultGrams": 25
   },
   {
     "name": "Crema de cacahuete natural (100% cacahuete)",
@@ -1300,7 +1314,9 @@ export const FOODS_CRUDO = [
     "fat": 50,
     "tags": [
       "fruto_seco"
-    ]
+    ],
+    "maxGrams": 30,
+    "defaultGrams": 20
   },
   {
     "name": "Mantequilla",
@@ -1325,7 +1341,9 @@ export const FOODS_CRUDO = [
     "fat": 65.2,
     "tags": [
       "fruto_seco"
-    ]
+    ],
+    "maxGrams": 30,
+    "defaultGrams": 25
   },
   {
     "name": "Pistachos",
@@ -1338,7 +1356,9 @@ export const FOODS_CRUDO = [
     "tags": [
       "fruto_seco",
       "alto_fodmap"
-    ]
+    ],
+    "maxGrams": 30,
+    "defaultGrams": 25
   },
   {
     "name": "Claras de huevo",
@@ -1916,9 +1936,9 @@ export const FOODS_CRUDO = [
     "name": "Batido de proteína de suero 30g",
     "originalName": "Batido de proteína de suero 30g",
     "category": "otros_y_suplementos",
-    "kcal": 115,
+    "kcal": 90,
     "cho": 1,
-    "pro": 26,
+    "pro": 20,
     "fat": 0.5,
     "tags": [
       "lactosa",
@@ -1929,9 +1949,9 @@ export const FOODS_CRUDO = [
     "name": "Batido de proteína sin lactosa 30g",
     "originalName": "Batido de proteína sin lactosa 30g",
     "category": "otros_y_suplementos",
-    "kcal": 115,
+    "kcal": 90,
     "cho": 1,
-    "pro": 26,
+    "pro": 20,
     "fat": 0.5,
     "tags": [
       "proteina_vaca",
@@ -1982,7 +2002,9 @@ export const FOODS_CRUDO = [
     "cho": 45.9,
     "pro": 7.8,
     "fat": 42.6,
-    "tags": []
+    "tags": [],
+    "maxGrams": 20,
+    "defaultGrams": 20
   },
   {
     "name": "Ciclodextrina / Maltodextrina 30g",
@@ -2055,7 +2077,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Mejiilon en conserva (escabeche)",
     "originalName": "mejiilon en conserva (escabeche)",
-    "category": "otros_y_suplementos",
+    "category": "conservas",
     "kcal": 168,
     "cho": 4,
     "pro": 14,
@@ -2253,40 +2275,59 @@ export const FOODS_CRUDO = [
     "tags": []
   },
   {
-    "name": "Atún natural",
-    "originalName": "Atún natural crudo",
+    "name": "Atún fresco",
+    "originalName": "Atún fresco lomo crudo",
     "category": "pescados_y_mariscos",
+    "kcal": 130,
+    "cho": 0,
+    "pro": 23.5,
+    "fat": 4,
+    "tags": [
+      "pescado",
+      "pescado_azul"
+    ]
+  },
+  {
+    "name": "Atún natural",
+    "originalName": "Atún natural conserva lata",
+    "category": "conservas",
     "kcal": 116,
     "cho": 0,
     "pro": 26,
     "fat": 1,
     "tags": [
       "pescado"
-    ]
+    ],
+    "defaultGrams": 60,
+    "maxGrams": 120
   },
   {
     "name": "Atún natural conserva aceite",
     "originalName": "Atún natural conserva aceite",
-    "category": "pescados_y_mariscos",
+    "category": "conservas",
     "kcal": 220.4,
     "cho": 0,
     "pro": 27.3,
     "fat": 1.05,
     "tags": [
       "pescado"
-    ]
+    ],
+    "defaultGrams": 60,
+    "maxGrams": 120
   },
   {
     "name": "Atún natural conserva natural",
     "originalName": "Atún natural conserva natural",
-    "category": "pescados_y_mariscos",
+    "category": "conservas",
     "kcal": 133.4,
     "cho": 0,
     "pro": 28.6,
     "fat": 1.1,
     "tags": [
       "pescado"
-    ]
+    ],
+    "defaultGrams": 60,
+    "maxGrams": 120
   },
   {
     "name": "Bacalao",
@@ -2327,7 +2368,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Berberecho conserva",
     "originalName": "berberecho conserva",
-    "category": "pescados_y_mariscos",
+    "category": "conservas",
     "kcal": 69,
     "cho": 2.5,
     "pro": 15,
@@ -2363,7 +2404,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Caballa en conserva (al natural)",
     "originalName": "caballa en conserva (al natural)",
-    "category": "pescados_y_mariscos",
+    "category": "conservas",
     "kcal": 167,
     "cho": 0,
     "pro": 24,
@@ -2533,7 +2574,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Salmón conserva aceite",
     "originalName": "Salmón conserva aceite",
-    "category": "pescados_y_mariscos",
+    "category": "conservas",
     "kcal": 395.2,
     "cho": 0,
     "pro": 21,
@@ -2545,7 +2586,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Salmón conserva natural",
     "originalName": "Salmón conserva natural",
-    "category": "pescados_y_mariscos",
+    "category": "conservas",
     "kcal": 239.2,
     "cho": 0,
     "pro": 22,
@@ -2593,7 +2634,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Sardina conserva aceite",
     "originalName": "Sardina conserva aceite",
-    "category": "pescados_y_mariscos",
+    "category": "conservas",
     "kcal": 395.2,
     "cho": 0,
     "pro": 26.25,
@@ -2882,10 +2923,10 @@ export const FOODS_CRUDO = [
     "name": "Batido de proteína vegetal 30g",
     "originalName": "Batido de proteína vegetal 30g",
     "category": "otros_y_suplementos",
-    "kcal": 115,
+    "kcal": 90,
     "cho": 1.5,
-    "pro": 24,
-    "fat": 1,
+    "pro": 20,
+    "fat": 0.5,
     "tags": [
       "sin_lactosa_especial"
     ]
