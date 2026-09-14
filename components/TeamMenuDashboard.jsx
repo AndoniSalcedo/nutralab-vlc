@@ -12,7 +12,7 @@ import {
   Menu,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX, IconDotsVertical, IconSparkles } from '@/components/icons3d';
+import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX, IconDotsVertical } from '@/components/icons3d';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import MenuSemanal, { formatWeek, WEEKDAY_ORDER } from '@/components/MenuSemanal';
 import { uploadWeeklyMenu, deleteWeeklyMenu, updateWeeklyMenu } from '@/services/menu';
@@ -39,7 +39,6 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
   const [saving, setSaving] = useState(false);
   const [creatingEmpty, setCreatingEmpty] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [decomposing, setDecomposing] = useState(false);
 
   function handleStartEdit() {
     if (!selectedMenu) return;
@@ -105,59 +104,6 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
     }
   }
 
-  async function handleDecomposeMenuDishes() {
-    if (!selectedMenu?.id) return;
-    setDecomposing(true);
-    const notificationId = 'menu-decomposing';
-    notifications.show({
-      id: notificationId,
-      color: 'blue',
-      title: 'Desglosando con IA',
-      message: 'Analizando los platos del menú para desglosar ingredientes y cortes exactos...',
-      loading: true,
-      autoClose: false,
-      withCloseButton: false,
-    });
-
-    try {
-      const res = await fetch('/api/menu-semanal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'desglosar',
-          id: selectedMenu.id,
-          equipo_id: teamId,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al desglosar platos');
-
-      setMenus((prev) => prev.map((m) => (m.id === selectedMenu.id ? data.menu : m)));
-      setSelectedMenu(data.menu);
-
-      notifications.update({
-        id: notificationId,
-        color: 'green',
-        title: 'Platos desglosados',
-        message: 'Todos los platos han sido desglosados con éxito en sus ingredientes y cortes.',
-        loading: false,
-        autoClose: 4000,
-        withCloseButton: true,
-      });
-    } catch (e) {
-      notifications.update({
-        id: notificationId,
-        color: 'red',
-        title: 'Error en desglose',
-        message: e.message,
-        loading: false,
-        autoClose: 5000,
-        withCloseButton: true,
-      });
-    } finally {
-      setDecomposing(false);
-    }
-  }
 
   async function handleSaveDishDecomposition(updatedDish, dayName) {
     if (!selectedMenu) return;
@@ -397,12 +343,6 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
                     {selectedMenu && (
                       <>
                         <Menu.Item
-                          leftSection={<IconSparkles size={16} color="var(--mantine-color-indigo-6)" />}
-                          onClick={handleDecomposeMenuDishes}
-                        >
-                          Desglosar platos con IA
-                        </Menu.Item>
-                        <Menu.Item
                           leftSection={<IconEdit size={16} color="var(--mantine-color-teal-6)" />}
                           onClick={handleStartEdit}
                         >
@@ -434,17 +374,6 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
                 </Button>
                 {selectedMenu && (
                   <>
-                    <Button
-                      size="xs"
-                      radius="xl"
-                      variant="light"
-                      color="indigo"
-                      onClick={handleDecomposeMenuDishes}
-                      loading={decomposing}
-                      leftSection={<IconSparkles size={14} />}
-                    >
-                      Desglosar platos con IA
-                    </Button>
                     <Button
                       size="xs"
                       radius="xl"

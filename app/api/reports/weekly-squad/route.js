@@ -7,7 +7,7 @@ import { getAccessibleTeam } from '@/lib/auth/team-access';
 import { withLatestMeasurement } from '@/lib/metrics/player';
 import WeeklySquadReportDocument from '@/components/reports/WeeklySquadReportDocument';
 import { planDataToLegacyContent } from '@/lib/nutrition/plan-card';
-import { generarDatosPlan } from '@/lib/ai/plan-generator';
+import { generarDatosPlan } from '@/lib/nutrition/plan-generator';
 import { sanitizeFilename, pdfHeaders as getPdfHeaders } from '@/lib/utils';
 import { getPlayerById, getPlayersByTeam } from '@/repositories/playerRepository';
 import { getTeamById } from '@/repositories/teamRepository';

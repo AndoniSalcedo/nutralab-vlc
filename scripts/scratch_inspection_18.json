@@ -233,11 +233,11 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pasta de trigo 80g, AOVE 15g, Pechuga de pollo 145g, Lechuga romana 100g, Tomate 100g, Queso parmesano 20g, Plátano 150g, Yogur proteico natural 120g"
+            "detalle": "Pasta de trigo 70g, AOVE 5g, Alitas de pollo 175g, Espinaca 100g, Tomate 100g, Queso parmesano 20g, Pasta de Dátil 60g, Yogur proteico natural 120g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 80g, AOVE 20g, Pechuga de pollo 230g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 335g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Cena",
@@ -250,7 +250,7 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 160g, Pechuga de pollo 110g, Tomate 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 50g"
+            "detalle": "Pasta de trigo 160g, Alitas de pollo 140g, Tomate 100g, Manzana 180g, AOVE 5g, Pan blanco de barra 50g"
           },
           {
             "nombre": "Merienda",
@@ -258,7 +258,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 135g, Patata 250g, Pechuga de pollo 130g, AOVE 15g, Plátano 120g"
+            "detalle": "Pasta de trigo 135g, Boniato 250g, Alitas de pollo 170g, AOVE 5g, Manzana 150g"
           }
         ]
       },
@@ -271,11 +271,11 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pan blanco de barra 80g, 2 Huevos y 15 Claras, AOVE 5g"
+            "detalle": "Pan blanco de barra 80g, Atún fresco 100g, 1 Huevo y 10 Claras, AOVE 5g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 60g, Ternera magra 300g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Arroz blanco 60g, Carne picada de ternera 315g, Judías verdes 100g, Kiwi 150g, AOVE 5g"
           },
           {
             "nombre": "Cena",
@@ -292,15 +292,15 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Lenteja 100g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, AOVE 10g, 1 Huevo y 3 Claras, Tomate 100g, Ajo 100g, Plátano 100g, Yogur proteico natural 120g"
+            "detalle": "Alubia blanca 100g, Calabacín 100g, Tomate 100g, AOVE 25g, 7 Claras, Ajo 100g, Pasta de Dátil 20g, Yogur proteico natural 120g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Lenteja 100g, Pechuga de pollo 130g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, AOVE 25g, 1 Huevo, Tomate 100g, Ajo 100g, Plátano 100g, Yogur proteico natural 120g"
+            "detalle": "Alubia blanca 100g, Calabacín 100g, Tomate 100g, AOVE 25g, 7 Claras, Ajo 100g, Pasta de Dátil 20g, Yogur proteico natural 120g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 5g, Patata 250g, Pechuga de pavo 100g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Manzana 100g"
+            "detalle": "Arroz blanco 50g, AOVE 5g, Boniato 250g, Carne picada de pavo 100g, Calabacín 100g, Tomate 100g, Manzana 100g"
           }
         ]
       },
@@ -313,15 +313,15 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pasta de trigo 50g, Atún fresco 100g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 5g, Patata 250g, 1 Huevo y 3 Claras, Guisantes 100g, Berenjena 100g, Queso curado 20g, Plátano 100g"
+            "detalle": "Pasta de trigo 50g, Atún fresco 165g, Tomate 100g, Calabacín 100g, AOVE 15g, Boniato 250g, 1 Clara, Guisantes 100g, Queso curado 20g, Pera 100g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 190g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 20g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta de trigo 50g, Atún fresco 205g, Tomate 100g, Calabacín 100g, AOVE 20g, Boniato 250g, Guisantes 100g, Pera 100g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 50g, AOVE 5g, Gambas 100g, Pimiento 100g, Manzana 100g"
+            "detalle": "Pasta de trigo 50g, Merluza 100g, AOVE 5g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Manzana 100g"
           }
         ]
       },
@@ -334,15 +334,15 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Arroz blanco 50g, AOVE 5g, 1 Huevo y 12 Claras, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+            "detalle": "Arroz blanco 50g, AOVE 25g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Pechuga de pollo 230g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+            "detalle": "Arroz blanco 50g, AOVE 25g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 50g, Pechuga de pollo 100g, Calabacín 100g, Mandarina 100g, AOVE 5g"
+            "detalle": "Pasta de trigo 50g, Pechuga de pollo 100g, Zanahoria 100g, Mandarina 100g, AOVE 5g"
           }
         ]
       },
@@ -351,7 +351,7 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 170g, Pechuga de pollo 120g, Tomate 100g, Plátano 185g, AOVE 15g"
+            "detalle": "Pasta de trigo 170g, Alitas de pollo 145g, Tomate 100g, Plátano 185g, AOVE 5g"
           },
           {
             "nombre": "Merienda",
@@ -359,7 +359,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 135g, Patata 250g, Pechuga de pollo 130g, AOVE 15g, Plátano 120g"
+            "detalle": "Pasta de trigo 130g, Boniato 250g, Alitas de pollo 170g, AOVE 5g, Pera 150g"
           }
         ]
       }
@@ -550,11 +550,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 70g, Jamón serrano 25g, Leche de avena 160g, Aguacate 55g, Plátano 180g"
+            "detalle": "Pan blanco de barra 40g, Hamburguesa de cerdo 100g, Leche de avena 135g, Aguacate 30g, Plátano 180g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 145g, AOVE 20g, Pechuga de pollo 165g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 270g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g, Pan blanco de barra 40g"
           },
           {
             "nombre": "Merienda",
@@ -575,15 +575,15 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Jamón serrano 25g, Leche de avena 160g, Aguacate 45g, Plátano 180g"
+            "detalle": "Pan blanco de barra 80g, Hamburguesa de cerdo 100g, Leche de avena 160g, Aguacate 30g, Manzana 180g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 170g, Patata 250g, Pechuga de pollo 110g, Tomate 100g, AOVE 20g, Plátano 155g"
+            "detalle": "Pasta de trigo 170g, Boniato 250g, Alitas de pollo 150g, Tomate 100g, AOVE 5g, Manzana 205g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Plátano 150g, Arroz blanco 70g, Leche entera 150g"
+            "detalle": "Plátano 150g, Arroz blanco 70g"
           },
           {
             "nombre": "Cena",
@@ -600,11 +600,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Jamón serrano 60g, Leche de avena 160g, Aguacate 40g"
+            "detalle": "Pan blanco de barra 80g, Hamburguesa de cerdo 105g, Leche de avena 160g, Aguacate 30g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 450g, Ternera magra 265g, Calabacín 100g, Kiwi 220g, AOVE 15g"
+            "detalle": "Patata 450g, Ternera magra 260g, Judías verdes 100g, Kiwi 220g, AOVE 15g"
           },
           {
             "nombre": "Merienda",
@@ -612,7 +612,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 370g, Ternera magra 280g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 365g, Ternera magra 275g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           }
         ]
       },
@@ -621,11 +621,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 70g, Jamón serrano 25g, Leche de avena 160g, Aguacate 55g, Plátano 180g"
+            "detalle": "Pan blanco de barra 75g, Hamburguesa de cerdo 100g, Leche de avena 160g, Aguacate 30g, Naranja 180g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 110g, Jamón serrano 70g, Ajo 100g, AOVE 20g, Tomate 100g, Plátano 150g"
+            "detalle": "Hamburguesa de cerdo 305g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -633,7 +633,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 25g, Patata 250g, Pechuga de pavo 195g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+            "detalle": "Arroz blanco 70g, AOVE 20g, Boniato 250g, Carne picada de pavo 215g, Calabacín 100g, Tomate 100g, Naranja 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -646,11 +646,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 70g, Jamón serrano 25g, Leche de avena 160g, Aguacate 55g, Plátano 180g"
+            "detalle": "Pan blanco de barra 65g, Hamburguesa de cerdo 100g, Leche de avena 160g, Aguacate 30g, Pera 180g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 160g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 20g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 75g, Atún fresco 160g, Tomate 100g, Calabacín 100g, AOVE 20g, Boniato 250g, Guisantes 100g, Pera 150g"
           },
           {
             "nombre": "Merienda",
@@ -658,7 +658,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 130g, AOVE 25g, Gambas 170g, Pimiento 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 135g, Merluza 185g, AOVE 20g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Pera 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -671,11 +671,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 70g, Jamón serrano 25g, Leche de avena 160g, Aguacate 55g, Plátano 180g"
+            "detalle": "Pan blanco de barra 70g, Hamburguesa de cerdo 100g, Leche de avena 160g, Aguacate 30g, Mandarina 180g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 90g, Pechuga de pollo 190g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+            "detalle": "Arroz blanco 110g, AOVE 25g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Merienda",
@@ -683,7 +683,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 145g, Pechuga de pollo 170g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+            "detalle": "Pasta de trigo 135g, Pechuga de pollo 180g, Zanahoria 100g, Mandarina 150g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -696,15 +696,15 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Jamón serrano 25g, Leche de avena 160g, Aguacate 45g, Plátano 180g"
+            "detalle": "Pan blanco de barra 80g, Hamburguesa de cerdo 100g, Leche de avena 160g, Aguacate 30g, Pera 180g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 170g, Patata 250g, Pechuga de pollo 110g, Tomate 100g, AOVE 20g, Plátano 155g"
+            "detalle": "Pasta de trigo 170g, Boniato 250g, Alitas de pollo 150g, Tomate 100g, AOVE 5g, Pera 175g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Plátano 150g, Arroz blanco 70g, Leche entera 150g"
+            "detalle": "Plátano 150g, Arroz blanco 70g"
           },
           {
             "nombre": "Cena",
@@ -739,7 +739,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 160g, AOVE 20g, Pechuga de pollo 170g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 285g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g, Pan blanco de barra 40g"
           },
           {
             "nombre": "Merienda",
@@ -760,7 +760,7 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 145g, 1 Huevo, Aguacate 30g, Manzana 150g"
+            "detalle": "Copos de avena 140g, 1 Huevo, Aguacate 30g, Manzana 150g"
           },
           {
             "nombre": "Comida",
@@ -789,15 +789,15 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 450g, Ternera magra 295g, Calabacín 100g, Kiwi 220g, AOVE 15g"
+            "detalle": "Patata 450g, Ternera magra 295g, Judías verdes 100g, Kiwi 220g, AOVE 15g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 20g"
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 350g, Ternera magra 305g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 340g, Ternera magra 305g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           }
         ]
       },
@@ -806,11 +806,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 110g, 1 Huevo, Aguacate 30g, Naranja 150g"
+            "detalle": "Copos de avena 105g, 1 Huevo, Aguacate 30g, Naranja 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 120g, Jamón serrano 70g, Ajo 100g, AOVE 20g, Tomate 100g, Plátano 150g"
+            "detalle": "Hamburguesa de cerdo 320g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -818,7 +818,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 55g, AOVE 25g, Patata 250g, Pechuga de pavo 210g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 120g"
+            "detalle": "Arroz blanco 80g, AOVE 25g, Boniato 250g, Carne picada de pavo 230g, Calabacín 100g, Tomate 100g, Naranja 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -835,7 +835,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 60g, Atún fresco 170g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 20g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 85g, Atún fresco 170g, Tomate 100g, Calabacín 100g, AOVE 20g, Boniato 250g, Guisantes 100g, Pera 150g"
           },
           {
             "nombre": "Merienda",
@@ -843,7 +843,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 140g, AOVE 25g, Gambas 180g, Pimiento 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 145g, Merluza 200g, AOVE 20g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Pera 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -860,7 +860,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 100g, Pechuga de pollo 200g, AOVE 25g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+            "detalle": "Arroz blanco 120g, AOVE 25g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Merienda",
@@ -868,7 +868,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 150g, Pechuga de pollo 185g, Calabacín 100g, Mandarina 150g, AOVE 25g"
+            "detalle": "Pasta de trigo 145g, Pechuga de pollo 190g, Zanahoria 100g, Mandarina 150g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
@@ -924,7 +924,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 140g, AOVE 20g, Pechuga de pollo 155g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 260g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g, Pan blanco de barra 35g"
           },
           {
             "nombre": "Merienda",
@@ -974,7 +974,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 450g, Ternera magra 255g, Calabacín 100g, Kiwi 220g, AOVE 15g"
+            "detalle": "Patata 450g, Ternera magra 250g, Judías verdes 100g, Kiwi 220g, AOVE 15g"
           },
           {
             "nombre": "Merienda",
@@ -982,7 +982,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 355g, Ternera magra 260g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 345g, Ternera magra 260g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           }
         ]
       },
@@ -991,11 +991,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 100g, 1 Huevo, Aguacate 30g, Naranja 150g"
+            "detalle": "Copos de avena 95g, 1 Huevo, Aguacate 30g, Naranja 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 100g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+            "detalle": "Hamburguesa de cerdo 285g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -1003,7 +1003,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 25g, Patata 250g, Pechuga de pavo 190g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+            "detalle": "Arroz blanco 65g, AOVE 20g, Boniato 250g, Carne picada de pavo 210g, Calabacín 100g, Tomate 100g, Naranja 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -1020,7 +1020,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 150g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 20g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta de trigo 70g, Atún fresco 150g, Tomate 100g, Calabacín 100g, AOVE 20g, Boniato 250g, Guisantes 100g, Pera 150g"
           },
           {
             "nombre": "Merienda",
@@ -1028,7 +1028,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 120g, AOVE 25g, Gambas 165g, Pimiento 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 130g, Merluza 180g, AOVE 20g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Pera 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -1041,11 +1041,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 95g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+            "detalle": "Copos de avena 90g, 1 Huevo, Aguacate 30g, Mandarina 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 80g, Pechuga de pollo 175g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+            "detalle": "Arroz blanco 105g, AOVE 25g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Merienda",
@@ -1053,7 +1053,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 135g, Pechuga de pollo 170g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+            "detalle": "Pasta de trigo 125g, Pechuga de pollo 175g, Zanahoria 100g, Mandarina 150g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -1109,7 +1109,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 70g, AOVE 15g, Pechuga de pollo 195g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 285g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -1130,7 +1130,7 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 120g, 1 Huevo, Aguacate 30g, Manzana 150g"
+            "detalle": "Copos de avena 115g, 1 Huevo, Aguacate 30g, Manzana 150g"
           },
           {
             "nombre": "Comida",
@@ -1159,7 +1159,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 245g, Ternera magra 275g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 240g, Ternera magra 275g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           },
           {
             "nombre": "Merienda",
@@ -1167,7 +1167,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 150g, Ternera magra 280g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 150g, Ternera magra 280g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           }
         ]
       },
@@ -1176,11 +1176,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 55g, 1 Huevo, Aguacate 30g, Naranja 150g"
+            "detalle": "Copos de avena 50g, 1 Huevo, Aguacate 30g, Naranja 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 100g"
+            "detalle": "Hamburguesa de cerdo 290g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 25g"
           },
           {
             "nombre": "Merienda",
@@ -1188,7 +1188,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 190g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+            "detalle": "Arroz blanco 50g, AOVE 15g, Boniato 250g, Carne picada de pavo 215g, Calabacín 100g, Tomate 100g, Naranja 100g"
           },
           {
             "nombre": "Post-entreno",
@@ -1205,7 +1205,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 150g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta de trigo 50g, Atún fresco 165g, Tomate 100g, Calabacín 100g, AOVE 15g, Boniato 250g, Guisantes 100g, Pera 100g"
           },
           {
             "nombre": "Merienda",
@@ -1213,7 +1213,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 60g, AOVE 20g, Gambas 200g, Pimiento 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 70g, Merluza 225g, AOVE 15g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Pera 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -1226,19 +1226,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 50g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+            "detalle": "Copos de avena 55g, 1 Huevo, Aguacate 30g, Mandarina 100g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Pechuga de pollo 190g, AOVE 15g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+            "detalle": "Arroz blanco 50g, AOVE 20g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+            "detalle": "Mandarina 215g, Yogur proteico natural 120g, Almendras 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 75g, Pechuga de pollo 205g, Calabacín 100g, Mandarina 150g, AOVE 15g"
+            "detalle": "Pasta de trigo 65g, Pechuga de pollo 210g, Zanahoria 100g, Mandarina 150g, AOVE 15g"
           },
           {
             "nombre": "Post-entreno",
@@ -1294,7 +1294,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 105g, AOVE 15g, Pechuga de pollo 125g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 220g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -1315,7 +1315,7 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 110g, 1 Huevo, Aguacate 30g, Manzana 150g"
+            "detalle": "Copos de avena 105g, 1 Huevo, Aguacate 30g, Manzana 150g"
           },
           {
             "nombre": "Comida",
@@ -1344,7 +1344,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 415g, Ternera magra 200g, Calabacín 100g, Kiwi 150g, AOVE 15g"
+            "detalle": "Patata 410g, Ternera magra 195g, Judías verdes 100g, Kiwi 150g, AOVE 15g"
           },
           {
             "nombre": "Merienda",
@@ -1352,7 +1352,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 255g, Ternera magra 220g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 250g, Ternera magra 215g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           }
         ]
       },
@@ -1361,11 +1361,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 75g, 1 Huevo, Aguacate 30g, Naranja 150g"
+            "detalle": "Copos de avena 70g, 1 Huevo, Aguacate 30g, Naranja 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 65g, Jamón serrano 70g, Ajo 100g, AOVE 10g, Tomate 100g, Plátano 150g"
+            "detalle": "Hamburguesa de cerdo 215g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -1373,7 +1373,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 135g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+            "detalle": "Arroz blanco 50g, AOVE 15g, Boniato 250g, Carne picada de pavo 155g, Calabacín 100g, Tomate 100g, Naranja 100g"
           },
           {
             "nombre": "Post-entreno",
@@ -1390,7 +1390,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 100g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta de trigo 50g, Atún fresco 115g, Tomate 100g, Calabacín 100g, AOVE 15g, Boniato 250g, Guisantes 100g, Pera 100g"
           },
           {
             "nombre": "Merienda",
@@ -1398,7 +1398,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 90g, AOVE 20g, Gambas 130g, Pimiento 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 95g, Merluza 135g, AOVE 15g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Pera 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -1415,7 +1415,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Pechuga de pollo 135g, AOVE 15g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+            "detalle": "Arroz blanco 70g, AOVE 20g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Merienda",
@@ -1423,7 +1423,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 105g, Pechuga de pollo 130g, Calabacín 100g, Mandarina 150g, AOVE 15g"
+            "detalle": "Pasta de trigo 95g, Pechuga de pollo 135g, Zanahoria 100g, Mandarina 150g, AOVE 15g"
           },
           {
             "nombre": "Post-entreno",
@@ -1479,7 +1479,7 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pasta de trigo 120g, AOVE 15g, Pechuga de pollo 100g, Lechuga romana 100g, Tomate 100g, Queso parmesano 20g, Plátano 150g, Yogur proteico natural 120g"
+            "detalle": "Pasta de trigo 105g, AOVE 5g, Alitas de pollo 120g, Espinaca 100g, Tomate 100g, Queso parmesano 20g, Pasta de Dátil 60g, Yogur proteico natural 120g"
           },
           {
             "nombre": "Comida",
@@ -1517,7 +1517,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 450g, Ternera magra 200g, Calabacín 100g, Kiwi 150g, AOVE 15g"
+            "detalle": "Patata 445g, Ternera magra 200g, Judías verdes 100g, Kiwi 150g, AOVE 15g"
           }
         ]
       },
@@ -1526,15 +1526,15 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 170g, 2 Huevos y 3 Claras, Aguacate 30g, Naranja 150g"
+            "detalle": "Copos de avena 165g, 2 Huevos y 3 Claras, Aguacate 30g, Naranja 150g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pasta de trigo 80g, Jamón serrano 25g, 1 Huevo y 2 Claras, Ajo 100g, AOVE 5g, Tomate 100g, Plátano 150g, Yogur proteico natural 120g"
+            "detalle": "Pasta de trigo 65g, Hamburguesa de cerdo 110g, 1 Clara, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g, Yogur proteico natural 120g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 80g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+            "detalle": "Hamburguesa de cerdo 255g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g"
           }
         ]
       },
@@ -1547,11 +1547,11 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pasta de trigo 50g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 5g, Patata 250g, 2 Huevos y 5 Claras, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta de trigo 55g, Atún fresco 100g, Tomate 100g, Calabacín 100g, AOVE 10g, Boniato 250g, 1 Clara, Guisantes 100g, Queso curado 20g, Pera 100g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 130g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta de trigo 55g, Atún fresco 140g, Tomate 100g, Calabacín 100g, AOVE 15g, Boniato 250g, Guisantes 100g, Pera 100g"
           }
         ]
       },
@@ -1560,15 +1560,15 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 165g, 2 Huevos y 3 Claras, Aguacate 30g, Mandarina 150g"
+            "detalle": "Copos de avena 160g, 2 Huevos y 3 Claras, Aguacate 30g, Mandarina 150g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Arroz blanco 60g, AOVE 5g, 1 Huevo y 8 Claras, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+            "detalle": "Arroz blanco 85g, AOVE 20g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 145g, Pechuga de pollo 135g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+            "detalle": "Pasta de trigo 135g, Pechuga de pollo 145g, Zanahoria 100g, Mandarina 150g, AOVE 20g"
           }
         ]
       },
@@ -1612,7 +1612,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 80g, AOVE 20g, Pechuga de pollo 205g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 300g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -1662,7 +1662,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 275g, Pechuga de pavo 255g, Calabacín 100g, Kiwi 150g, AOVE 20g"
+            "detalle": "Patata 265g, Pechuga de pavo 250g, Judías verdes 100g, Kiwi 150g, AOVE 20g"
           },
           {
             "nombre": "Merienda",
@@ -1670,7 +1670,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 160g, Pechuga de pavo 260g, Calabacín 100g, Kiwi 150g, AOVE 20g"
+            "detalle": "Patata 155g, Pechuga de pavo 260g, Judías verdes 100g, Kiwi 150g, AOVE 20g"
           }
         ]
       },
@@ -1679,11 +1679,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 60g, 1 Huevo, Aguacate 45g, Naranja 150g"
+            "detalle": "Copos de avena 55g, 1 Huevo, Aguacate 45g, Naranja 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Lenteja 100g, Pechuga de pollo 105g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, AOVE 25g, 1 Huevo, Tomate 100g, Ajo 100g, Plátano 100g, Yogur proteico natural 120g"
+            "detalle": "Alubia blanca 100g, Calabacín 100g, Tomate 100g, AOVE 25g, 5 Claras, Ajo 100g, Pasta de Dátil 20g, Yogur proteico natural 120g"
           },
           {
             "nombre": "Merienda",
@@ -1691,7 +1691,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 25g, Patata 250g, Pechuga de pavo 200g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+            "detalle": "Arroz blanco 50g, AOVE 20g, Boniato 250g, Carne picada de pavo 230g, Calabacín 100g, Tomate 100g, Naranja 100g"
           },
           {
             "nombre": "Post-entreno",
@@ -1708,7 +1708,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Pechuga de pollo 185g, AOVE 20g, Patata 250g, 1 Huevo, Zanahoria 100g, Guisantes 100g, Berenjena 100g, Tomate 100g, Queso curado 20g, Plátano 100g"
+            "detalle": "Arroz blanco 50g, AOVE 20g, Boniato 250g, 7 Claras, Calabacín 100g, Guisantes 100g, Tomate 100g, Queso curado 20g, Pera 100g"
           },
           {
             "nombre": "Merienda",
@@ -1716,7 +1716,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 70g, AOVE 25g, Gambas 205g, Pimiento 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 75g, Pechuga de pavo 175g, AOVE 20g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Pera 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -1729,11 +1729,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 55g, 1 Huevo, Aguacate 45g, Mandarina 150g"
+            "detalle": "Copos de avena 50g, 1 Huevo, Aguacate 45g, Mandarina 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Pechuga de pollo 200g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+            "detalle": "Arroz blanco 55g, AOVE 25g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 100g"
           },
           {
             "nombre": "Merienda",
@@ -1741,7 +1741,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 85g, Ternera magra 225g, Calabacín 100g, Mandarina 150g, AOVE 15g"
+            "detalle": "Pasta de trigo 75g, Ternera magra 235g, Zanahoria 100g, Mandarina 150g, AOVE 15g"
           },
           {
             "nombre": "Post-entreno",
@@ -1976,7 +1976,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 60g, AOVE 20g, Pechuga de pollo 180g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 255g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -2026,7 +2026,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Ternera magra 260g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Arroz blanco 50g, Ternera magra 255g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           },
           {
             "nombre": "Merienda",
@@ -2047,7 +2047,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 100g"
+            "detalle": "Hamburguesa de cerdo 260g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 20g"
           },
           {
             "nombre": "Merienda",
@@ -2055,7 +2055,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 165g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Manzana 100g"
+            "detalle": "Arroz blanco 50g, AOVE 15g, Boniato 250g, Carne picada de pavo 190g, Calabacín 100g, Tomate 100g, Manzana 100g"
           },
           {
             "nombre": "Post-entreno",
@@ -2072,7 +2072,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 130g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta de trigo 50g, Atún fresco 145g, Tomate 100g, Calabacín 100g, AOVE 15g, Boniato 250g, Guisantes 100g, Pera 100g"
           },
           {
             "nombre": "Merienda",
@@ -2080,7 +2080,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 65g, AOVE 20g, Gambas 175g, Pimiento 100g, Manzana 150g"
+            "detalle": "Pasta de trigo 65g, Merluza 195g, AOVE 15g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Manzana 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -2097,7 +2097,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Pechuga de pollo 165g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+            "detalle": "Arroz blanco 50g, AOVE 20g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 100g"
           },
           {
             "nombre": "Merienda",
@@ -2105,7 +2105,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 70g, Pechuga de pollo 180g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+            "detalle": "Pasta de trigo 60g, Pechuga de pollo 185g, Zanahoria 100g, Mandarina 150g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -2161,7 +2161,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 130g, AOVE 20g, Pechuga de pollo 150g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 245g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g, Pan blanco de barra 30g"
           },
           {
             "nombre": "Merienda",
@@ -2182,7 +2182,7 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 135g, 1 Huevo, Aguacate 30g, Manzana 150g"
+            "detalle": "Copos de avena 130g, 1 Huevo, Aguacate 30g, Manzana 150g"
           },
           {
             "nombre": "Comida",
@@ -2211,7 +2211,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 450g, Ternera magra 240g, Calabacín 100g, Kiwi 220g, AOVE 15g"
+            "detalle": "Patata 450g, Ternera magra 240g, Judías verdes 100g, Kiwi 210g, AOVE 15g"
           },
           {
             "nombre": "Merienda",
@@ -2219,7 +2219,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 330g, Ternera magra 250g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 325g, Ternera magra 250g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           }
         ]
       },
@@ -2228,11 +2228,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 95g, 1 Huevo, Aguacate 30g, Naranja 150g"
+            "detalle": "Copos de avena 90g, 1 Huevo, Aguacate 30g, Naranja 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 90g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+            "detalle": "Hamburguesa de cerdo 265g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -2240,7 +2240,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 175g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+            "detalle": "Arroz blanco 55g, AOVE 20g, Boniato 250g, Carne picada de pavo 200g, Calabacín 100g, Tomate 100g, Naranja 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -2257,7 +2257,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 135g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 20g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta de trigo 60g, Atún fresco 145g, Tomate 100g, Calabacín 100g, AOVE 20g, Boniato 250g, Guisantes 100g, Pera 150g"
           },
           {
             "nombre": "Merienda",
@@ -2265,7 +2265,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 115g, AOVE 25g, Gambas 155g, Pimiento 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 120g, Merluza 170g, AOVE 15g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Pera 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -2278,11 +2278,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 90g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+            "detalle": "Copos de avena 85g, 1 Huevo, Aguacate 30g, Mandarina 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 70g, Pechuga de pollo 165g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+            "detalle": "Arroz blanco 95g, AOVE 25g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Merienda",
@@ -2290,7 +2290,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 130g, Pechuga de pollo 160g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+            "detalle": "Pasta de trigo 120g, Pechuga de pollo 165g, Zanahoria 100g, Mandarina 150g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -2590,7 +2590,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 120g, AOVE 15g, Pechuga de pollo 225g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 350g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -2598,7 +2598,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 60g, Patata 250g, Ternera magra 260g, Plátano 100g, AOVE 10g"
+            "detalle": "Pasta de trigo 50g, Boniato 250g, Carne picada de ternera 290g, Plátano 100g, AOVE 5g"
           },
           {
             "nombre": "Post-entreno",
@@ -2615,15 +2615,15 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Patata 250g, Pechuga de pollo 190g, Manzana 150g, AOVE 15g"
+            "detalle": "Arroz blanco 150g, Boniato 250g, Alitas de pollo 245g, Manzana 150g, AOVE 5g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pan blanco de barra 30g, Trigo sarraceno 65g, Jamón serrano 25g, Plátano 150g"
+            "detalle": "Pan blanco de barra 30g, Trigo sarraceno 60g, Hamburguesa de cerdo 100g, Plátano 100g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 130g, Patata 250g, Ternera magra 180g, Manzana 150g, AOVE 10g"
+            "detalle": "Pasta de trigo 120g, Boniato 250g, Carne picada de ternera 205g, Manzana 150g, AOVE 5g"
           },
           {
             "nombre": "Post-entreno",
@@ -2636,11 +2636,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, 2 Huevos y 3 Claras, Naranja 210g"
+            "detalle": "Pan blanco de barra 80g, 2 Huevos y 3 Claras, Naranja 190g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 450g, Pechuga de pavo 275g, Calabacín 100g, Kiwi 150g, AOVE 20g"
+            "detalle": "Patata 445g, Pechuga de pavo 275g, Judías verdes 100g, Kiwi 150g, AOVE 25g"
           },
           {
             "nombre": "Merienda",
@@ -2648,7 +2648,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 290g, Pechuga de pavo 285g, Calabacín 100g, Kiwi 150g, AOVE 15g"
+            "detalle": "Patata 285g, Pechuga de pavo 285g, Judías verdes 100g, Kiwi 150g, AOVE 20g"
           }
         ]
       },
@@ -2661,7 +2661,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 80g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+            "detalle": "Hamburguesa de cerdo 350g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -2669,7 +2669,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 235g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+            "detalle": "Arroz blanco 55g, AOVE 15g, Boniato 250g, Carne picada de pavo 265g, Calabacín 100g, Tomate 100g, Naranja 100g"
           },
           {
             "nombre": "Post-entreno",
@@ -2686,7 +2686,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Pechuga de pollo 230g, AOVE 20g, Patata 250g, 1 Huevo, Zanahoria 100g, Guisantes 100g, Berenjena 100g, Tomate 100g, Queso curado 20g, Plátano 100g"
+            "detalle": "Arroz blanco 55g, AOVE 15g, Boniato 250g, 7 Claras, Calabacín 100g, Guisantes 100g, Tomate 100g, Queso curado 20g, Pera 100g"
           },
           {
             "nombre": "Merienda",
@@ -2694,7 +2694,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 105g, AOVE 25g, Gambas 220g, Pimiento 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 110g, Pechuga de pavo 190g, AOVE 15g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Pera 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -2711,7 +2711,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 60g, Pechuga de pollo 240g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+            "detalle": "Arroz blanco 85g, AOVE 20g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Merienda",
@@ -2719,7 +2719,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 65g, Patata 250g, Ternera magra 260g, Mandarina 150g, AOVE 10g"
+            "detalle": "Pasta de trigo 55g, Boniato 250g, Carne picada de ternera 290g, Mandarina 150g, AOVE 5g"
           },
           {
             "nombre": "Post-entreno",
@@ -2736,15 +2736,15 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 140g, Patata 250g, Pechuga de pollo 195g, Plátano 150g, AOVE 15g"
+            "detalle": "Arroz blanco 135g, Boniato 250g, Alitas de pollo 245g, Plátano 150g, AOVE 5g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pan blanco de barra 30g, Trigo sarraceno 65g, Jamón serrano 25g, Plátano 150g"
+            "detalle": "Pan blanco de barra 30g, Trigo sarraceno 60g, Hamburguesa de cerdo 100g, Plátano 100g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 110g, Patata 250g, Ternera magra 185g, Plátano 150g, AOVE 10g"
+            "detalle": "Pasta de trigo 100g, Boniato 250g, Carne picada de ternera 210g, Plátano 150g, AOVE 5g"
           },
           {
             "nombre": "Post-entreno",
@@ -2775,11 +2775,11 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pasta sin gluten 105g, AOVE 15g, Pechuga de pollo 160g, Lechuga romana 100g, Tomate 100g, Queso fresco sin lactosa 40g, Plátano 150g, Yogur natural sin lactosa 120g"
+            "detalle": "Pasta sin gluten 90g, AOVE 5g, Alitas de pollo 170g, Espinaca 100g, Tomate 100g, Queso fresco sin lactosa 40g, Pasta de Dátil 60g, Yogur natural sin lactosa 120g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta sin gluten 105g, AOVE 15g, Pechuga de pollo 175g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 250g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -2796,7 +2796,7 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena sin gluten 140g, 1 Huevo, Aguacate 30g, Manzana 150g"
+            "detalle": "Copos de avena sin gluten 135g, 1 Huevo, Aguacate 30g, Manzana 150g"
           },
           {
             "nombre": "Almuerzo",
@@ -2829,7 +2829,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 415g, Ternera magra 205g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 410g, Ternera magra 200g, Judías verdes 100g, Kiwi 150g, AOVE 15g"
           },
           {
             "nombre": "Merienda",
@@ -2837,7 +2837,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 150g, Ternera magra 100g, Calabacín 100g, Kiwi 150g, AOVE 5g"
+            "detalle": "Patata 150g, Ternera magra 100g, Judías verdes 100g, Kiwi 150g, AOVE 5g"
           }
         ]
       },
@@ -2850,11 +2850,11 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pasta sin gluten 65g, Jamón serrano 25g, 1 Huevo y 7 Claras, Ajo 100g, AOVE 5g, Tomate 100g, Plátano 150g, Yogur natural sin lactosa 120g"
+            "detalle": "Pasta sin gluten 50g, Hamburguesa de cerdo 180g, 1 Clara, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g, Yogur natural sin lactosa 120g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta sin gluten 65g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+            "detalle": "Hamburguesa de cerdo 250g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -2862,7 +2862,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 5g, Patata 250g, Pechuga de pavo 100g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Manzana 100g"
+            "detalle": "Arroz blanco 50g, AOVE 5g, Boniato 250g, Carne picada de pavo 100g, Calabacín 100g, Tomate 100g, Manzana 100g"
           }
         ]
       },
@@ -2875,11 +2875,11 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pasta sin gluten 50g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 5g, Patata 250g, 2 Huevos y 6 Claras, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta sin gluten 50g, Atún fresco 115g, Tomate 100g, Calabacín 100g, AOVE 15g, Boniato 250g, 1 Clara, Guisantes 100g, Queso fresco sin lactosa 40g, Pera 100g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta sin gluten 50g, Atún fresco 135g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta sin gluten 50g, Atún fresco 150g, Tomate 100g, Calabacín 100g, AOVE 15g, Boniato 250g, Guisantes 100g, Pera 100g"
           },
           {
             "nombre": "Merienda",
@@ -2887,7 +2887,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta sin gluten 50g, AOVE 5g, Gambas 100g, Pimiento 100g, Manzana 100g"
+            "detalle": "Pasta sin gluten 50g, Merluza 100g, AOVE 5g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Manzana 100g"
           }
         ]
       },
@@ -2896,15 +2896,15 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena sin gluten 95g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+            "detalle": "Copos de avena sin gluten 90g, 1 Huevo, Aguacate 30g, Mandarina 150g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Arroz blanco 50g, AOVE 5g, 1 Huevo y 8 Claras, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco sin lactosa 40g, Plátano 120g"
+            "detalle": "Arroz blanco 75g, AOVE 20g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco sin lactosa 40g, Mandarina 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Pechuga de pollo 160g, AOVE 15g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco sin lactosa 40g, Plátano 120g"
+            "detalle": "Arroz blanco 75g, AOVE 20g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco sin lactosa 40g, Mandarina 150g"
           },
           {
             "nombre": "Merienda",
@@ -2912,7 +2912,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta sin gluten 50g, Pechuga de pollo 100g, Calabacín 100g, Mandarina 100g, AOVE 5g"
+            "detalle": "Pasta sin gluten 50g, Pechuga de pollo 100g, Zanahoria 100g, Mandarina 100g, AOVE 5g"
           }
         ]
       },
@@ -2925,7 +2925,7 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Plátano 150g, Yogur natural sin lactosa 120g, Nueces 30g"
+            "detalle": "Plátano 150g, Yogur natural sin lactosa 120g, Nueces 25g"
           },
           {
             "nombre": "Comida",
@@ -2964,7 +2964,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 115g, AOVE 20g, Pechuga de pollo 135g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 240g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -3014,7 +3014,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 450g, Ternera magra 215g, Calabacín 100g, Kiwi 155g, AOVE 15g"
+            "detalle": "Patata 450g, Ternera magra 210g, Judías verdes 100g, Kiwi 150g, AOVE 15g"
           },
           {
             "nombre": "Merienda",
@@ -3022,7 +3022,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 290g, Ternera magra 235g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 285g, Ternera magra 235g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           }
         ]
       },
@@ -3031,11 +3031,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 85g, 1 Huevo, Aguacate 30g, Naranja 150g"
+            "detalle": "Copos de avena 80g, 1 Huevo, Aguacate 30g, Naranja 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 75g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+            "detalle": "Hamburguesa de cerdo 240g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -3043,7 +3043,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 150g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+            "detalle": "Arroz blanco 50g, AOVE 20g, Boniato 250g, Carne picada de pavo 175g, Calabacín 100g, Tomate 100g, Naranja 100g"
           },
           {
             "nombre": "Post-entreno",
@@ -3060,7 +3060,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 115g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta de trigo 55g, Atún fresco 125g, Tomate 100g, Calabacín 100g, AOVE 15g, Boniato 250g, Guisantes 100g, Pera 100g"
           },
           {
             "nombre": "Merienda",
@@ -3068,7 +3068,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 100g, AOVE 20g, Gambas 140g, Pimiento 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 110g, Merluza 145g, AOVE 15g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Pera 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -3081,11 +3081,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 80g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+            "detalle": "Copos de avena 75g, 1 Huevo, Aguacate 30g, Mandarina 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 55g, Pechuga de pollo 150g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+            "detalle": "Arroz blanco 80g, AOVE 20g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Merienda",
@@ -3093,7 +3093,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 115g, Pechuga de pollo 140g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+            "detalle": "Pasta de trigo 105g, Pechuga de pollo 150g, Zanahoria 100g, Mandarina 150g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -3149,7 +3149,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 95g, AOVE 20g, Pechuga de pollo 240g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 350g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -3170,7 +3170,7 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 150g, 1 Huevo, Aguacate 30g, Manzana 150g"
+            "detalle": "Copos de avena 145g, 1 Huevo, Aguacate 30g, Manzana 150g"
           },
           {
             "nombre": "Comida",
@@ -3199,15 +3199,15 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 325g, Ternera magra 330g, Calabacín 100g, Kiwi 150g, AOVE 15g"
+            "detalle": "Patata 320g, Ternera magra 330g, Judías verdes 100g, Kiwi 150g, AOVE 15g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 20g"
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 200g, Ternera magra 340g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 195g, Ternera magra 335g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           }
         ]
       },
@@ -3216,11 +3216,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 70g, 1 Huevo, Aguacate 40g, Naranja 150g"
+            "detalle": "Copos de avena 65g, 1 Huevo, Aguacate 40g, Naranja 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Lenteja 100g, Pechuga de pollo 150g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Plátano 100g, Yogur proteico natural 120g"
+            "detalle": "Alubia blanca 100g, Calabacín 100g, Tomate 100g, AOVE 25g, 7 Claras, Ajo 100g, Pasta de Dátil 20g, Yogur proteico natural 120g"
           },
           {
             "nombre": "Merienda",
@@ -3228,7 +3228,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 25g, Patata 250g, Pechuga de pavo 245g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+            "detalle": "Arroz blanco 50g, AOVE 20g, Boniato 250g, Carne picada de pavo 275g, Calabacín 100g, Tomate 100g, Naranja 100g"
           },
           {
             "nombre": "Post-entreno",
@@ -3245,7 +3245,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 205g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 20g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta de trigo 50g, Atún fresco 220g, Tomate 100g, Calabacín 100g, AOVE 20g, Boniato 250g, Guisantes 100g, Pera 100g"
           },
           {
             "nombre": "Merienda",
@@ -3253,7 +3253,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 85g, AOVE 25g, Gambas 240g, Pimiento 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 90g, Merluza 280g, AOVE 15g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Pera 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -3266,11 +3266,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 65g, 2 Huevos, Aguacate 30g, Mandarina 150g"
+            "detalle": "Copos de avena 65g, 1 Huevo, Aguacate 40g, Mandarina 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Pechuga de pollo 245g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+            "detalle": "Arroz blanco 60g, AOVE 25g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Merienda",
@@ -3278,7 +3278,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 95g, Pechuga de pollo 250g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+            "detalle": "Pasta de trigo 90g, Pechuga de pollo 255g, Zanahoria 100g, Mandarina 150g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -3334,7 +3334,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 110g, AOVE 15g, Pechuga de pollo 210g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 325g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -3384,7 +3384,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 415g, Ternera magra 295g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 410g, Ternera magra 290g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           },
           {
             "nombre": "Merienda",
@@ -3392,7 +3392,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 260g, Ternera magra 310g, Calabacín 100g, Kiwi 150g, AOVE 5g"
+            "detalle": "Patata 255g, Ternera magra 305g, Judías verdes 100g, Kiwi 150g, AOVE 5g"
           }
         ]
       },
@@ -3401,11 +3401,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 80g, 1 Huevo, Aguacate 30g, Naranja 150g"
+            "detalle": "Copos de avena 75g, 1 Huevo, Aguacate 30g, Naranja 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 70g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+            "detalle": "Hamburguesa de cerdo 330g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -3413,7 +3413,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 215g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+            "detalle": "Arroz blanco 50g, AOVE 15g, Boniato 250g, Carne picada de pavo 245g, Calabacín 100g, Tomate 100g, Naranja 100g"
           },
           {
             "nombre": "Post-entreno",
@@ -3430,7 +3430,7 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 185g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta de trigo 50g, Atún fresco 200g, Tomate 100g, Calabacín 100g, AOVE 15g, Boniato 250g, Guisantes 100g, Pera 100g"
           },
           {
             "nombre": "Merienda",
@@ -3438,7 +3438,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 95g, AOVE 20g, Gambas 205g, Pimiento 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 105g, Merluza 230g, AOVE 15g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Pera 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -3451,11 +3451,11 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 75g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+            "detalle": "Copos de avena 70g, 1 Huevo, Aguacate 30g, Mandarina 150g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Pechuga de pollo 220g, AOVE 15g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+            "detalle": "Arroz blanco 75g, AOVE 20g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Merienda",
@@ -3463,7 +3463,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 110g, Pechuga de pollo 210g, Calabacín 100g, Mandarina 150g, AOVE 15g"
+            "detalle": "Pasta de trigo 100g, Pechuga de pollo 215g, Zanahoria 100g, Mandarina 150g, AOVE 15g"
           },
           {
             "nombre": "Post-entreno",
@@ -3519,15 +3519,15 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pasta de trigo 50g, AOVE 10g, Pechuga de pollo 100g, Lechuga romana 100g, Tomate 100g, Queso parmesano 20g, Plátano 150g, Yogur proteico natural 120g"
+            "detalle": "Pasta de trigo 70g, AOVE 5g, Alitas de pollo 120g, Espinaca 100g, Tomate 100g, Queso parmesano 20g, Pasta de Dátil 20g, Yogur proteico natural 120g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, AOVE 15g, Pechuga de pollo 170g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 240g, Espinaca 100g, Tomate 100g, Pasta de Dátil 50g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 30g"
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 25g"
           }
         ]
       },
@@ -3561,11 +3561,11 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 30g"
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 25g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Patata 175g, Ternera magra 215g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 170g, Ternera magra 210g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           },
           {
             "nombre": "Merienda",
@@ -3578,15 +3578,15 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 90g, 2 Huevos y 6 Claras, Aguacate 30g, Naranja 150g"
+            "detalle": "Copos de avena 85g, 2 Huevos y 6 Claras, Aguacate 30g, Naranja 150g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Lenteja 100g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, AOVE 5g, 2 Huevos, Tomate 100g, Ajo 100g, Plátano 100g"
+            "detalle": "Alubia blanca 100g, Calabacín 100g, Tomate 100g, AOVE 20g, 5 Claras, Ajo 100g, Pasta de Dátil 20g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Lenteja 100g, Pechuga de pollo 100g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, AOVE 15g, 1 Huevo, Tomate 100g, Ajo 100g, Plátano 100g, Yogur proteico natural 120g"
+            "detalle": "Alubia blanca 100g, Calabacín 100g, Tomate 100g, AOVE 15g, 2 Claras, Ajo 100g, Pasta de Dátil 20g, Yogur proteico natural 120g"
           },
           {
             "nombre": "Merienda",
@@ -3603,15 +3603,15 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pasta de trigo 50g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 5g, Patata 250g, 2 Huevos y 5 Claras, Guisantes 100g, Berenjena 100g"
+            "detalle": "Pasta de trigo 50g, Atún fresco 100g, Tomate 100g, Calabacín 100g, AOVE 5g, Boniato 250g, 1 Clara, Guisantes 100g, Queso curado 20g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 120g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Manzana 100g"
+            "detalle": "Pasta de trigo 50g, Atún fresco 130g, Tomate 100g, Calabacín 100g, AOVE 15g, Boniato 250g, Guisantes 100g, Manzana 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pera 150g, Yogur natural 120g, Nueces 30g"
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 25g"
           }
         ]
       },
@@ -3620,15 +3620,15 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 90g, 2 Huevos y 6 Claras, Aguacate 30g, Mandarina 150g"
+            "detalle": "Copos de avena 85g, 2 Huevos y 6 Claras, Aguacate 30g, Mandarina 150g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Arroz blanco 50g, AOVE 5g, 1 Huevo y 7 Claras, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g"
+            "detalle": "Arroz blanco 50g, AOVE 15g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Pechuga de pollo 155g, AOVE 15g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Manzana 100g"
+            "detalle": "Arroz blanco 50g, AOVE 15g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Manzana 100g"
           },
           {
             "nombre": "Merienda",
@@ -3645,7 +3645,7 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 25g"
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 20g"
           },
           {
             "nombre": "Comida",
@@ -3653,7 +3653,7 @@
           },
           {
             "nombre": "Merienda",
-            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 25g"
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 20g"
           }
         ]
       }
@@ -3947,7 +3947,7 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 65g, AOVE 25g, Pechuga de pollo 220g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+            "detalle": "AOVE 5g, Alitas de pollo 310g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g"
           },
           {
             "nombre": "Merienda",
@@ -3955,7 +3955,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, Merluza 290g, Boniato 250g, Calabacín 100g, Plátano 100g, AOVE 25g"
+            "detalle": "Arroz blanco 50g, Boniato 250g, Atún fresco 220g, Calabacín 100g, Plátano 100g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
@@ -3968,7 +3968,7 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 140g, Boniato 250g, Pechuga de pollo 170g, Zanahoria 100g, Manzana 150g, AOVE 25g"
+            "detalle": "Pasta de trigo 140g, Boniato 250g, Alitas de pollo 210g, Zanahoria 100g, Manzana 150g, AOVE 5g"
           },
           {
             "nombre": "Merienda",
@@ -3976,7 +3976,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 100g, Merluza 275g, Boniato 250g, Zanahoria 100g, Manzana 150g, AOVE 25g"
+            "detalle": "Arroz blanco 100g, Boniato 250g, Atún fresco 210g, Zanahoria 100g, Manzana 150g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -3989,7 +3989,7 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Patata 210g, Ternera magra 235g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 205g, Ternera magra 230g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           },
           {
             "nombre": "Merienda",
@@ -3997,7 +3997,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 205g, Ternera magra 235g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+            "detalle": "Patata 200g, Ternera magra 230g, Judías verdes 100g, Kiwi 150g, AOVE 10g"
           }
         ]
       },
@@ -4006,7 +4006,7 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Jamón serrano 70g, Ajo 100g, AOVE 25g, Tomate 100g, Plátano 100g"
+            "detalle": "Hamburguesa de cerdo 320g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 25g"
           },
           {
             "nombre": "Merienda",
@@ -4014,7 +4014,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, AOVE 25g, Patata 250g, Pechuga de pavo 210g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Manzana 100g"
+            "detalle": "Arroz blanco 50g, AOVE 25g, Boniato 250g, Carne picada de pavo 235g, Calabacín 100g, Tomate 100g, Manzana 100g"
           },
           {
             "nombre": "Post-entreno",
@@ -4027,7 +4027,7 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 50g, Atún fresco 170g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 25g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+            "detalle": "Pasta de trigo 50g, Atún fresco 185g, Tomate 100g, Calabacín 100g, AOVE 25g, Boniato 250g, Guisantes 100g, Pera 100g"
           },
           {
             "nombre": "Merienda",
@@ -4035,7 +4035,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 70g, AOVE 25g, Gambas 215g, Pimiento 100g, Manzana 150g"
+            "detalle": "Pasta de trigo 70g, Merluza 245g, AOVE 25g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Manzana 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -4048,7 +4048,7 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Pechuga de pollo 210g, AOVE 25g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+            "detalle": "Arroz blanco 50g, AOVE 25g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 100g"
           },
           {
             "nombre": "Merienda",
@@ -4056,7 +4056,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, Merluza 290g, Boniato 250g, Calabacín 100g, Mandarina 100g, AOVE 25g"
+            "detalle": "Arroz blanco 50g, Boniato 250g, Atún fresco 225g, Zanahoria 100g, Mandarina 100g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
@@ -4069,7 +4069,7 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 130g, Boniato 250g, Pechuga de pollo 170g, Calabacín 100g, Plátano 150g, AOVE 25g"
+            "detalle": "Pasta de trigo 130g, Boniato 250g, Alitas de pollo 210g, Calabacín 100g, Plátano 150g, AOVE 5g"
           },
           {
             "nombre": "Merienda",
@@ -4077,7 +4077,7 @@
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 90g, Merluza 270g, Boniato 250g, Calabacín 100g, Plátano 150g, AOVE 25g"
+            "detalle": "Arroz blanco 90g, Boniato 250g, Atún fresco 205g, Calabacín 100g, Plátano 150g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -4143,7 +4143,7 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 170g, AOVE 25g, Pechuga de pollo 210g, Lechuga romana 100g, Tomate 100g, Plátano 215g"
+            "detalle": "AOVE 5g, Alitas de pollo 330g, Espinaca 100g, Tomate 100g, Pasta de Dátil 60g, Pan blanco de barra 75g"
           },
           {
             "nombre": "Cena",
@@ -4169,11 +4169,11 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 90g, Patata 310g, Ternera magra 300g, Calabacín 100g, Kiwi 150g, AOVE 20g"
+            "detalle": "Arroz blanco 85g, Patata 310g, Ternera magra 295g, Judías verdes 100g, Kiwi 150g, AOVE 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 85g, Patata 310g, Ternera magra 295g, Calabacín 100g, Kiwi 150g, AOVE 20g"
+            "detalle": "Arroz blanco 85g, Patata 310g, Ternera magra 290g, Judías verdes 100g, Kiwi 150g, AOVE 20g"
           }
         ]
       },
@@ -4182,11 +4182,11 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 150g, Jamón serrano 70g, Ajo 100g, AOVE 25g, Tomate 100g, Plátano 150g"
+            "detalle": "Hamburguesa de cerdo 350g, Ajo 100g, AOVE 5g, Tomate 100g, Pasta de Dátil 60g, Pan blanco de barra 40g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 115g, AOVE 25g, Patata 250g, Pechuga de pavo 230g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 120g"
+            "detalle": "Arroz blanco 140g, AOVE 25g, Boniato 250g, Carne picada de pavo 255g, Calabacín 100g, Tomate 100g, Naranja 150g"
           }
         ]
       },
@@ -4195,11 +4195,11 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 95g, Atún fresco 195g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 25g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 120g"
+            "detalle": "Pasta de trigo 120g, Atún fresco 195g, Tomate 100g, Calabacín 100g, AOVE 25g, Boniato 250g, Guisantes 100g, Pera 150g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 170g, AOVE 25g, Gambas 200g, Pimiento 100g, Plátano 220g"
+            "detalle": "Pasta de trigo 160g, Merluza 210g, AOVE 20g, Mejiilon en conserva (escabeche) 50g, Calabacín 100g, Pera 180g, Pan blanco de barra 65g"
           }
         ]
       },
@@ -4208,11 +4208,11 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 130g, Pechuga de pollo 235g, AOVE 25g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+            "detalle": "Arroz blanco 155g, AOVE 25g, 7 Claras, Tomate 100g, Ajo 100g, Espinaca 100g, Calabacín 100g, Queso fresco 40g, Mandarina 150g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 160g, Pechuga de pollo 190g, Calabacín 100g, Mandarina 180g, AOVE 25g, Pan blanco de barra 75g"
+            "detalle": "Pasta de trigo 160g, Pechuga de pollo 200g, Zanahoria 100g, Mandarina 180g, AOVE 25g, Pan blanco de barra 60g"
           }
         ]
       },

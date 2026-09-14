@@ -4,7 +4,7 @@ import { getUser } from '@/lib/auth/session';
 import { forbidden, getOwnedPlayer, getAccessiblePlayer } from '@/lib/auth/team-access';
 import { planDataToLegacyContent, sanitizePlanData } from '@/lib/nutrition/plan-card';
 import { withLatestMeasurement } from '@/lib/metrics/player';
-import { generarDatosPlan } from '@/lib/ai/plan-generator';
+import { generarDatosPlan } from '@/lib/nutrition/plan-generator';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
 import { getPesajesByPlayerId } from '@/repositories/pesajeRepository';
