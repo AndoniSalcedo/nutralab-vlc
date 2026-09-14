@@ -49,19 +49,17 @@ export default function SuplementacionWidget({
   }, [jugadorId]);
 
   const handleToggle = (id) => {
-    setSuppChecks((prev) => {
-      const next = { ...prev, [id]: !prev[id] };
-      try {
-        localStorage.setItem(
-          `vlc_supp_checklist_${jugadorId}`,
-          JSON.stringify({
-            date: new Date().toDateString(),
-            checks: next,
-          })
-        );
-      } catch { }
-      return next;
-    });
+    const next = { ...suppChecks, [id]: !suppChecks[id] };
+    setSuppChecks(next);
+    try {
+      localStorage.setItem(
+        `vlc_supp_checklist_${jugadorId}`,
+        JSON.stringify({
+          date: new Date().toDateString(),
+          checks: next,
+        })
+      );
+    } catch { }
   };
 
   const completedCount = useMemo(() => {

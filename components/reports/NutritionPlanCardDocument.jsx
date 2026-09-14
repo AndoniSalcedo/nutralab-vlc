@@ -1,7 +1,7 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
-import { sanitizePlanData } from '@/lib/nutrition/plan-card';
-import { getTeamDayTypeColor, getTeamDayTypeLabel } from '@/lib/metrics/anthropometry';
+import { sanitizePlanData } from '@/lib/engine';
+import { getTeamDayTypeColor, getTeamDayTypeLabel } from '@/config/nutrition-days';
 import { formatNumberDecimal } from '@/lib/utils';
 
 const DAY_TYPE_COLORS = {

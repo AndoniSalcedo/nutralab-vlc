@@ -22,7 +22,8 @@ import {
   IconChevronRight,
 } from '@tabler/icons-react';
 import FillableIcon from '@/components/FillableIcon';
-import { calculateHydration, getTeamNutritionDayTypes } from '@/lib/metrics/anthropometry';
+import { calculateHydration } from '@/lib/metrics/anthropometry';
+import { getTeamNutritionDayTypes } from '@/config/nutrition-days';
 
 export default function WaterWidget({
   jugador,

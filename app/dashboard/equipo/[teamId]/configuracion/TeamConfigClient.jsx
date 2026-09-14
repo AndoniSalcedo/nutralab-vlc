@@ -3,10 +3,11 @@
 import { useState, useMemo, useEffect } from 'react';
 
 import { slugify } from '@/lib/utils';
-import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, Tooltip, Textarea, Box, ColorInput, SimpleGrid, Avatar, FileButton, ScrollArea } from '@mantine/core';
+import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, Title, ActionIcon, Table, Text, Tooltip, Textarea, Box, ColorInput, SimpleGrid, Avatar, FileButton, ScrollArea, Select } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconBook, IconClipboardList, IconPalette, IconCamera, IconFolderShare, IconDownload, IconCalculator } from '@/components/icons3d';
-import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/lib/metrics/anthropometry';
+import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/config/nutrition-days';
+import { PLAN_THEME_PRESETS, DEFAULT_PLAN_COLORS } from '@/config/plan-themes';
 import { compressAvatar, initials } from '@/lib/utils/avatar';
 import { uploadTeamPhoto, removeTeamPhoto } from '@/services/team';
 import { useRouter } from 'next/navigation';
@@ -41,15 +42,15 @@ function getInitialDayTypes(config) {
 function getInitialColors(teamData) {
   const raw = teamData?.configuracion_nutricional?.planColors || {};
   return {
-    cardTopBg: raw.cardTopBg || '#254d5c',
-    cardTopText: raw.cardTopText || '#cad6df',
-    cardBodyBg: raw.cardBodyBg || '#101229',
-    cardBodyText: raw.cardBodyText || '#ffffff',
-    boxBg: raw.boxBg || raw.dayBoxBg || raw.suppBoxBg || '#151932',
-    boxBorder: raw.boxBorder || raw.dayBoxBorder || raw.suppBoxBorder || '#1f2444',
-    itemBg: raw.itemBg || raw.mealBoxBg || raw.suppItemBg || '#1d1f46',
-    accentText: raw.accentText || raw.mealTitleText || raw.suppTitleText || '#ffa94d',
-    itemText: raw.itemText || raw.mealDescText || raw.notesDescText || '#dee2e6'
+    cardTopBg: raw.cardTopBg || DEFAULT_PLAN_COLORS.cardTopBg,
+    cardTopText: raw.cardTopText || DEFAULT_PLAN_COLORS.cardTopText,
+    cardBodyBg: raw.cardBodyBg || DEFAULT_PLAN_COLORS.cardBodyBg,
+    cardBodyText: raw.cardBodyText || DEFAULT_PLAN_COLORS.cardBodyText,
+    boxBg: raw.boxBg || raw.dayBoxBg || raw.suppBoxBg || DEFAULT_PLAN_COLORS.boxBg,
+    boxBorder: raw.boxBorder || raw.dayBoxBorder || raw.suppBoxBorder || DEFAULT_PLAN_COLORS.boxBorder,
+    itemBg: raw.itemBg || raw.mealBoxBg || raw.suppItemBg || DEFAULT_PLAN_COLORS.itemBg,
+    accentText: raw.accentText || raw.mealTitleText || raw.suppTitleText || DEFAULT_PLAN_COLORS.accentText,
+    itemText: raw.itemText || raw.mealDescText || raw.notesDescText || DEFAULT_PLAN_COLORS.itemText
   };
 }
 
@@ -602,23 +603,72 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
               </Group>
             </Box>
           </Group>
-          {!readOnly && (
-            <Group gap="xs" wrap="wrap" w={{ base: '100%', sm: 'auto' }}>
-              {hasColorChanges && (
-                <Button
-                  size="xs"
-                  radius="xl"
-                  color="nutralabColor.8"
-                  loading={savingSection === 'colors'}
-                  leftSection={<IconDeviceFloppy size={14} />}
-                  onClick={() => saveSection('colors')}
-                  style={{ flex: '1 1 auto' }}
-                >
-                  Guardar Colores
-                </Button>
-              )}
-            </Group>
-          )}
+          <Group gap="xs" wrap="wrap" w={{ base: '100%', sm: 'auto' }} align="center">
+            <Select
+              placeholder="Temas predeterminados..."
+              size="xs"
+              radius="xl"
+              w={{ base: '100%', sm: 220 }}
+              disabled={readOnly}
+              allowDeselect={false}
+              leftSection={<IconPalette size={14} />}
+              value={
+                PLAN_THEME_PRESETS.find(
+                  (p) =>
+                    planColors.cardBodyBg === p.colors.cardBodyBg &&
+                    planColors.cardTopBg === p.colors.cardTopBg &&
+                    planColors.boxBg === p.colors.boxBg
+                )?.id || null
+              }
+              data={PLAN_THEME_PRESETS.map((p) => ({
+                value: p.id,
+                label: p.name,
+              }))}
+              onChange={(val) => {
+                const preset = PLAN_THEME_PRESETS.find((p) => p.id === val);
+                if (preset) {
+                  setPlanColors(preset.colors);
+                }
+              }}
+              renderOption={({ option }) => {
+                const preset = PLAN_THEME_PRESETS.find((p) => p.id === option.value);
+                return (
+                  <Group gap="xs" wrap="nowrap" justify="space-between" w="100%">
+                    <Text size="xs">{option.label}</Text>
+                    {preset && (
+                      <Group gap={3} wrap="nowrap">
+                        {preset.swatches.map((s, idx) => (
+                          <Box
+                            key={idx}
+                            style={{
+                              width: 8,
+                              height: 8,
+                              borderRadius: '50%',
+                              backgroundColor: s,
+                              border: '1px solid rgba(0,0,0,0.15)',
+                            }}
+                          />
+                        ))}
+                      </Group>
+                    )}
+                  </Group>
+                );
+              }}
+            />
+            {!readOnly && hasColorChanges && (
+              <Button
+                size="xs"
+                radius="xl"
+                color="nutralabColor.8"
+                loading={savingSection === 'colors'}
+                leftSection={<IconDeviceFloppy size={14} />}
+                onClick={() => saveSection('colors')}
+                style={{ flex: '1 1 auto' }}
+              >
+                Guardar Colores
+              </Button>
+            )}
+          </Group>
         </Group>
 
         <Stack gap="md">
@@ -1247,14 +1297,11 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
         currentDayTypes={dayTypes}
         onTransferred={({ action, protocol }) => {
           if (action === 'move') {
-            setProtocols(current => {
-              const next = current.filter(p => p.id !== protocol.id);
-              setSavedBaselines(prev => ({
-                ...prev,
-                protocols: JSON.parse(JSON.stringify(next))
-              }));
-              return next;
-            });
+            setProtocols(current => current.filter(p => p.id !== protocol.id));
+            setSavedBaselines(prev => ({
+              ...prev,
+              protocols: (prev.protocols || []).filter(p => p.id !== protocol.id)
+            }));
             router.refresh();
           }
         }}
@@ -1265,14 +1312,11 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
         currentTeamId={team.id}
         currentDayTypes={dayTypes}
         onImported={(imported) => {
-          setProtocols(current => {
-            const next = [...current, ...imported];
-            setSavedBaselines(prev => ({
-              ...prev,
-              protocols: JSON.parse(JSON.stringify(next))
-            }));
-            return next;
-          });
+          setProtocols(current => [...current, ...imported]);
+          setSavedBaselines(prev => ({
+            ...prev,
+            protocols: [...(prev.protocols || []), ...JSON.parse(JSON.stringify(imported))]
+          }));
           router.refresh();
         }}
       />

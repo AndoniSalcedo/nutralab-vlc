@@ -268,13 +268,11 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
         title: 'Menú eliminado',
         message: 'El menú comedor se ha eliminado correctamente.',
       });
-      setMenus((prev) => {
-        const filtered = prev.filter((m) => m.id !== deleteMenuId);
-        if (selectedMenu?.id === deleteMenuId) {
-          setSelectedMenu(filtered[0] || null);
-        }
-        return filtered;
-      });
+      const filtered = menus.filter((m) => m.id !== deleteMenuId);
+      setMenus(filtered);
+      if (selectedMenu?.id === deleteMenuId) {
+        setSelectedMenu(filtered[0] || null);
+      }
       setDeleteMenuId(null);
     } catch (e) {
       notifications.show({

@@ -29,9 +29,8 @@ import { withLatestMeasurement } from '@/lib/metrics/player';
 import { getWeeklyReport } from '@/repositories/weeklyReportsRepository';
 import { getMenuByWeekAndTeam } from '@/repositories/menuRepository';
 import { getResolvedPlayerSupplementation } from '@/repositories/supplementationRepository';
-import { generarDatosPlan } from '@/lib/nutrition/plan-generator';
+import { generarDatosPlan, sanitizePlanData } from '@/lib/engine';
 import NutritionPlanCardDocument, { PlanCardPage, CoverPage } from '@/components/reports/NutritionPlanCardDocument';
-import { sanitizePlanData } from '@/lib/nutrition/plan-card';
 
 const ARTIFACTS_DIR = '/Users/andonisalcedo/.gemini/antigravity-ide/brain/c714d7b8-10b6-4984-9087-800d72c8c9a2';
 const PUBLIC_DIR = path.join(process.cwd(), 'public');

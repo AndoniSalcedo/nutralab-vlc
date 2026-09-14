@@ -12,7 +12,8 @@ import { IconChevronDown, IconDots, IconDotsVertical } from '@/components/icons3
 import Icon3D from '@/components/Icon3D';
 import NothingFound from '@/components/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
-import { calculateByObjective, getTeamNutritionDayTypes } from '@/lib/metrics/anthropometry';
+import { calculateByObjective } from '@/lib/metrics/anthropometry';
+import { getTeamNutritionDayTypes } from '@/config/nutrition-days';
 import { useRouter } from 'next/navigation';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import NewPlayerModal from '@/components/modals/NewPlayerModal';

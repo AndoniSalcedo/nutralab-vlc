@@ -4,7 +4,7 @@ import { env } from '@/config/env';
 import {
   findTreeNode,
   getCompleteMealBranches,
-} from '@/lib/nutrition/food-tree';
+} from '@/lib/engine';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedPlayer } from '@/lib/auth/team-access';

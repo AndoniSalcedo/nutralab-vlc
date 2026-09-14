@@ -176,15 +176,17 @@ export function getObjectiveLabel(objectiveKey) {
 }
 
 export function getTeamNutritionDayTypes(teamConfig) {
-  if (teamConfig?.dayTypes && Array.isArray(teamConfig.dayTypes) && teamConfig.dayTypes.length > 0) {
-    return teamConfig.dayTypes;
+  const cfg = teamConfig?.configuracion_nutricional || teamConfig;
+  if (cfg?.dayTypes && Array.isArray(cfg.dayTypes) && cfg.dayTypes.length > 0) {
+    return cfg.dayTypes;
   }
   return NUTRITION_DAY_TYPES;
 }
 
 export function getTeamObjectiveDayTypeMacros(teamConfig) {
-  if (teamConfig?.objectiveMacros && Object.keys(teamConfig.objectiveMacros).length > 0) {
-    return teamConfig.objectiveMacros;
+  const cfg = teamConfig?.configuracion_nutricional || teamConfig;
+  if (cfg?.objectiveMacros && Object.keys(cfg.objectiveMacros).length > 0) {
+    return cfg.objectiveMacros;
   }
   return OBJECTIVE_DAY_TYPE_MACROS;
 }

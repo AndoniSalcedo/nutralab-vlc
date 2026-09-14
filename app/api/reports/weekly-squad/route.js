@@ -6,8 +6,7 @@ import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getAccessibleTeam } from '@/lib/auth/team-access';
 import { withLatestMeasurement } from '@/lib/metrics/player';
 import WeeklySquadReportDocument from '@/components/reports/WeeklySquadReportDocument';
-import { planDataToLegacyContent } from '@/lib/nutrition/plan-card';
-import { generarDatosPlan } from '@/lib/nutrition/plan-generator';
+import { generarDatosPlan } from '@/lib/engine';
 import { sanitizeFilename, pdfHeaders as getPdfHeaders } from '@/lib/utils';
 import { getPlayerById, getPlayersByTeam } from '@/repositories/playerRepository';
 import { getTeamById } from '@/repositories/teamRepository';
@@ -123,7 +122,7 @@ async function runWithConcurrency(items, limit, fn) {
 }
 
 async function savePlanForPlayer(supabase, player, activePlan, baseData, semana, contexto) {
-  const finalContenido = planDataToLegacyContent(baseData, player.teamConfig);
+  const finalContenido = '';
 
   if (activePlan) {
     await updateAiPlan(supabase, activePlan.id, {

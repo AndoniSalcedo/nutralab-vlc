@@ -2,9 +2,8 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
 import { forbidden, getOwnedPlayer, getAccessiblePlayer } from '@/lib/auth/team-access';
-import { planDataToLegacyContent, sanitizePlanData } from '@/lib/nutrition/plan-card';
+import { sanitizePlanData, generarDatosPlan } from '@/lib/engine';
 import { withLatestMeasurement } from '@/lib/metrics/player';
-import { generarDatosPlan } from '@/lib/nutrition/plan-generator';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
 import { getPesajesByPlayerId } from '@/repositories/pesajeRepository';
@@ -90,7 +89,7 @@ export async function POST(req) {
       return NextResponse.json({ datos: generatedDatos });
     }
 
-    const finalContenido = generatedDatos ? planDataToLegacyContent(generatedDatos, teamConfig) : String(contenido || '');
+    const finalContenido = String(contenido || '');
     const now = new Date().toISOString();
     const plan = await insertAiPlan(supabase, {
       jugador_id: jugador.id,
@@ -129,7 +128,7 @@ export async function PATCH(req) {
     const teamConfig = jugadorConMetricas?.equipos?.configuracion_nutricional;
 
     const sanitizedDatos = sanitizePlanData(datos, teamConfig);
-    const finalContenido = sanitizedDatos ? planDataToLegacyContent(sanitizedDatos, teamConfig) : String(contenido || '');
+    const finalContenido = String(contenido || '');
 
     const plan = await updateAiPlan(supabase, id, {
       nombre: planNombre,

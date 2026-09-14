@@ -283,7 +283,7 @@ function CoverPage({ meta, playersCount }) {
   );
 }
 
-import { getTeamDayTypeColor, getTeamDayTypeLabel, getObjectiveLabel } from '@/lib/metrics/anthropometry';
+import { getTeamDayTypeColor, getTeamDayTypeLabel, getObjectiveLabel } from '@/config/nutrition-days';
 
 const detailStyles = StyleSheet.create({
   page: {

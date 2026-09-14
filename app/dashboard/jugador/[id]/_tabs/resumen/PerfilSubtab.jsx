@@ -17,7 +17,8 @@ import 'dayjs/locale/es';
 
 import { IconClipboardList, IconChevronDown, IconCheck } from '@/components/icons3d';
 
-import { calculateByObjective, getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/lib/metrics/anthropometry';
+import { calculateByObjective } from '@/lib/metrics/anthropometry';
+import { getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/config/nutrition-days';
 import { CLINICAL_TAGS } from '@/config/clinical-tags';
 import { CampoEditable, ComidasEditable, PrepartidoEditable } from '../editable';
 import { latestMetricValue } from '@/lib/metrics/player';

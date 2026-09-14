@@ -31,9 +31,9 @@ import { resolvePlayerSupplementsData } from '@/lib/nutrition/supplementation';
 import { IconDownload, IconArrowsLeftRight, IconPlus, IconSparkles, IconEdit, IconCheck, IconTrash, IconChevronDown, IconBrain } from '@/components/icons3d';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
-import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/nutrition/plan-card';
-import { calculateByObjective, getDayTypeColor, getDayTypeLabel, getTeamNutritionDayTypes } from '@/lib/metrics/anthropometry';
-import { getUserMeals } from '@/config/nutrition-days';
+import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/engine';
+import { calculateByObjective } from '@/lib/metrics/anthropometry';
+import { getUserMeals, getDayTypeColor, getDayTypeLabel, getTeamNutritionDayTypes } from '@/config/nutrition-days';
 import IntercambiosModal from '@/components/modals/IntercambiosModal';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
@@ -724,14 +724,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setMode('view');
   }
 
-  function updateDatos(updater) {
-    setDatos((prev) => {
-      const draft = clonePlan(prev);
-      if (!draft) return prev;
-      updater(draft);
-      return draft;
-    });
-  }
 
   async function generateDraft() {
     const notificationId = 'ai-plan-generate';
@@ -941,11 +933,9 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         title: 'Plan eliminado',
         message: 'El plan nutricional se ha eliminado correctamente.',
       });
-      setPlanes((prev) => {
-        const filtered = prev.filter((p) => p.id !== deletePlanId);
-        setCurrentId(filtered.length ? String(filtered[0].id) : null);
-        return filtered;
-      });
+      const filtered = planes.filter((p) => p.id !== deletePlanId);
+      setPlanes(filtered);
+      setCurrentId(filtered.length ? String(filtered[0].id) : null);
       setDeletePlanId(null);
     } catch (e) {
       notifications.show({
@@ -1226,9 +1216,15 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                           value={datos.metricas?.[key] ?? ''}
                           decimalScale={1}
                           min={0}
-                          onChange={(value) => updateDatos((draft) => {
-                            draft.metricas[key] = value === '' ? null : Number(value);
-                          })}
+                          onChange={(value) => {
+                            setDatos((prev) => ({
+                              ...prev,
+                              metricas: {
+                                ...prev?.metricas,
+                                [key]: value === '' ? null : Number(value),
+                              },
+                            }));
+                          }}
                         />
                       ))}
                     </SimpleGrid>
@@ -1248,41 +1244,40 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                               value={item.tipoDia}
                               onChange={(value) => {
                                 if (!value) return;
-                                updateDatos((draft) => {
-                                  draft.dias[dayKey].tipoDia = value;
-
-                                  const weight = Number(draft.metricas?.peso || jugador?.peso_kg || 0);
-                                  const objectiveKey = jugador?.objetivo || 'mejora_rendimiento';
-
-                                  if (weight) {
-                                    let kcal, protein, cho, fat;
-
-                                    const result = calculateByObjective({ weightKg: weight, objectiveKey, dayTypeKey: value, teamConfig });
-                                    if (result) {
-                                      kcal = result.kcal;
-                                      protein = result.protein;
-                                      cho = result.cho;
-                                      fat = result.fat;
-                                    }
-
-                                    if (kcal !== undefined) {
-                                      draft.dias[dayKey].kcal = Math.round(kcal);
-                                      draft.dias[dayKey].proteina = Math.round(protein);
-                                      draft.dias[dayKey].hidratos = Math.round(cho);
-                                      draft.dias[dayKey].grasa = Math.round(fat);
-                                    }
+                                const weight = Number(datos?.metricas?.peso || jugador?.peso_kg || 0);
+                                const objectiveKey = jugador?.objetivo || 'mejora_rendimiento';
+                                let kcal, protein, cho, fat;
+                                if (weight) {
+                                  const result = calculateByObjective({ weightKg: weight, objectiveKey, dayTypeKey: value, teamConfig });
+                                  if (result) {
+                                    kcal = Math.round(result.kcal);
+                                    protein = Math.round(result.protein);
+                                    cho = Math.round(result.cho);
+                                    fat = Math.round(result.fat);
                                   }
+                                }
 
-                                  const existingMeals = draft.dias[dayKey].ingestas || [];
-                                  const fallbackMeals = getUserMeals(jugador).map((name) => {
-                                    const existing = existingMeals.find(m => m.nombre.toLowerCase() === name.toLowerCase());
-                                    return {
-                                      nombre: name,
-                                      detalle: existing?.detalle || '',
-                                    };
-                                  });
-                                  draft.dias[dayKey].ingestas = fallbackMeals;
+                                const existingMeals = datos?.dias?.[dayKey]?.ingestas || [];
+                                const fallbackMeals = getUserMeals(jugador).map((name) => {
+                                  const existing = existingMeals.find(m => m.nombre.toLowerCase() === name.toLowerCase());
+                                  return {
+                                    nombre: name,
+                                    detalle: existing?.detalle || '',
+                                  };
                                 });
+
+                                setDatos((prev) => ({
+                                  ...prev,
+                                  dias: {
+                                    ...prev?.dias,
+                                    [dayKey]: {
+                                      ...prev?.dias?.[dayKey],
+                                      tipoDia: value,
+                                      ...(kcal !== undefined ? { kcal, proteina: protein, hidratos: cho, grasa: fat } : {}),
+                                      ingestas: fallbackMeals,
+                                    },
+                                  },
+                                }));
                               }}
                               size="xs"
                               radius="xl"
@@ -1302,9 +1297,18 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                               label={label}
                               value={item[key] ?? ''}
                               min={0}
-                              onChange={(value) => updateDatos((draft) => {
-                                draft.dias[dayKey][key] = value === '' ? null : Number(value);
-                              })}
+                              onChange={(value) => {
+                                setDatos((prev) => ({
+                                  ...prev,
+                                  dias: {
+                                    ...prev?.dias,
+                                    [dayKey]: {
+                                      ...prev?.dias?.[dayKey],
+                                      [key]: value === '' ? null : Number(value),
+                                    },
+                                  },
+                                }));
+                              }}
                             />
                           ))}
                         </SimpleGrid>
@@ -1314,9 +1318,21 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                               <TextInput
                                 label="Ingesta"
                                 value={meal.nombre}
-                                onChange={(e) => updateDatos((draft) => {
-                                  draft.dias[dayKey].ingestas[index].nombre = e.target.value;
-                                })}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setDatos((prev) => ({
+                                    ...prev,
+                                    dias: {
+                                      ...prev?.dias,
+                                      [dayKey]: {
+                                        ...prev?.dias?.[dayKey],
+                                        ingestas: prev?.dias?.[dayKey]?.ingestas?.map((m, i) =>
+                                          i === index ? { ...m, nombre: val } : m
+                                        ),
+                                      },
+                                    },
+                                  }));
+                                }}
                               />
                               <Box className="meal-detail-field">
                                 <Textarea
@@ -1324,9 +1340,21 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                                   value={meal.detalle}
                                   autosize
                                   minRows={1}
-                                  onChange={(e) => updateDatos((draft) => {
-                                    draft.dias[dayKey].ingestas[index].detalle = e.target.value;
-                                  })}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setDatos((prev) => ({
+                                      ...prev,
+                                      dias: {
+                                        ...prev?.dias,
+                                        [dayKey]: {
+                                          ...prev?.dias?.[dayKey],
+                                          ingestas: prev?.dias?.[dayKey]?.ingestas?.map((m, i) =>
+                                            i === index ? { ...m, detalle: val } : m
+                                          ),
+                                        },
+                                      },
+                                    }));
+                                  }}
                                 />
                               </Box>
                             </SimpleGrid>
@@ -1342,9 +1370,13 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                     value={(datos.notas || []).join('\n')}
                     autosize
                     minRows={3}
-                    onChange={(e) => updateDatos((draft) => {
-                      draft.notas = e.target.value.split('\n').map((line) => line.trim()).filter(Boolean);
-                    })}
+                    onChange={(e) => {
+                      const lines = e.target.value.split('\n').map((line) => line.trim()).filter(Boolean);
+                      setDatos((prev) => ({
+                        ...prev,
+                        notas: lines,
+                      }));
+                    }}
                   />
                 </>
               ) : (

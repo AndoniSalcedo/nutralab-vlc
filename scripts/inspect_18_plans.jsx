@@ -25,7 +25,7 @@ import { getEvolutionsByPlayerIdOrdered } from '@/repositories/evolutionReposito
 import { withLatestMeasurement } from '@/lib/metrics/player';
 import { getWeeklyReport } from '@/repositories/weeklyReportsRepository';
 import { getMenuByWeekAndTeam } from '@/repositories/menuRepository';
-import { generarDatosPlan } from '@/lib/nutrition/plan-generator';
+import { generarDatosPlan } from '@/lib/engine';
 
 const PLAYER_IDS = [
   178, 180, 182, 183, 184, 186, 187, 188, 190, 191, 192, 193, 195, 196, 198, 201, 202, 237
