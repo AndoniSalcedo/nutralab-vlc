@@ -1470,19 +1470,6 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "AOVE",
-    "originalName": "AOVE",
-    "category": "grasas_y_frutos_secos",
-    "kcal": 884,
-    "cho": 0,
-    "pro": 0,
-    "fat": 100,
-    "tags": [],
-    "minGrams": 5,
-    "maxGrams": 25,
-    "defaultGrams": 15
-  },
-  {
-    "name": "AOVE",
     "originalName": "Aceite de oliva virgen extra",
     "category": "grasas_y_frutos_secos",
     "kcal": 884,
@@ -2683,7 +2670,8 @@ export const FOODS_CRUDO = [
     "pro": 26,
     "fat": 1,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 50,
     "maxGrams": 120,
@@ -2698,7 +2686,8 @@ export const FOODS_CRUDO = [
     "pro": 27.3,
     "fat": 1.05,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 50,
     "maxGrams": 120,
@@ -2713,7 +2702,8 @@ export const FOODS_CRUDO = [
     "pro": 28.6,
     "fat": 1.1,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 50,
     "maxGrams": 120,
@@ -2728,7 +2718,8 @@ export const FOODS_CRUDO = [
     "pro": 17.7,
     "fat": 0.4,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_blanco"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -2742,7 +2733,8 @@ export const FOODS_CRUDO = [
     "pro": 18,
     "fat": 0.7,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_blanco"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -2756,7 +2748,8 @@ export const FOODS_CRUDO = [
     "pro": 17.7,
     "fat": 0.4,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_blanco"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -2798,7 +2791,8 @@ export const FOODS_CRUDO = [
     "pro": 18.6,
     "fat": 13.9,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -2812,7 +2806,8 @@ export const FOODS_CRUDO = [
     "pro": 24,
     "fat": 7.5,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 50,
     "maxGrams": 160
@@ -2826,7 +2821,6 @@ export const FOODS_CRUDO = [
     "pro": 15.6,
     "fat": 1.4,
     "tags": [
-      "pescado",
       "marisco"
     ],
     "minGrams": 100,
@@ -2841,7 +2835,8 @@ export const FOODS_CRUDO = [
     "pro": 19,
     "fat": 2.6,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_blanco"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -2855,7 +2850,8 @@ export const FOODS_CRUDO = [
     "pro": 20,
     "fat": 4,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_blanco"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -2869,7 +2865,8 @@ export const FOODS_CRUDO = [
     "pro": 19.8,
     "fat": 4,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -2897,7 +2894,8 @@ export const FOODS_CRUDO = [
     "pro": 16.5,
     "fat": 1.9,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_blanco"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -2911,7 +2909,8 @@ export const FOODS_CRUDO = [
     "pro": 18.4,
     "fat": 2.5,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_blanco"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -2939,7 +2938,8 @@ export const FOODS_CRUDO = [
     "pro": 18,
     "fat": 1.5,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_blanco"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -2953,7 +2953,8 @@ export const FOODS_CRUDO = [
     "pro": 18.7,
     "fat": 0.8,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_blanco"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -2967,7 +2968,6 @@ export const FOODS_CRUDO = [
     "pro": 14.9,
     "fat": 1,
     "tags": [
-      "pescado",
       "marisco"
     ],
     "minGrams": 100,
@@ -2982,7 +2982,8 @@ export const FOODS_CRUDO = [
     "pro": 16,
     "fat": 3,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_blanco"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -2996,7 +2997,8 @@ export const FOODS_CRUDO = [
     "pro": 20,
     "fat": 13,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -3010,7 +3012,8 @@ export const FOODS_CRUDO = [
     "pro": 21,
     "fat": 24.7,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 50,
     "maxGrams": 160
@@ -3024,7 +3027,8 @@ export const FOODS_CRUDO = [
     "pro": 22,
     "fat": 14.95,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 50,
     "maxGrams": 160
@@ -3038,7 +3042,8 @@ export const FOODS_CRUDO = [
     "pro": 22,
     "fat": 10.5,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -3052,7 +3057,8 @@ export const FOODS_CRUDO = [
     "pro": 20,
     "fat": 13,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -3066,7 +3072,8 @@ export const FOODS_CRUDO = [
     "pro": 25,
     "fat": 11,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 100,
     "maxGrams": 350
@@ -3080,7 +3087,8 @@ export const FOODS_CRUDO = [
     "pro": 26.25,
     "fat": 20.9,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 50,
     "maxGrams": 160
@@ -3094,7 +3102,6 @@ export const FOODS_CRUDO = [
     "pro": 16.2,
     "fat": 0.7,
     "tags": [
-      "pescado",
       "marisco"
     ],
     "minGrams": 100,
