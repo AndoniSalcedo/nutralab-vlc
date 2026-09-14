@@ -11,6 +11,7 @@ import {
   deleteMenu,
   getMenusByTeamLimit
 } from '@/repositories/menuRepository';
+import { enrichMenuWithDecomposedDishes } from '@/lib/ai/menu-decomposer';
 
 const client = new Anthropic({ apiKey: env.AI_API_KEY });
 
@@ -102,6 +103,20 @@ export async function POST(req) {
     const contentType = req.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
       const body = await req.json();
+      if (body.action === 'desglosar') {
+        const { id, equipo_id: eqId } = body;
+        if (!id) return NextResponse.json({ error: 'Falta id del menú' }, { status: 400 });
+        const supabase = getSupabaseAdmin();
+        const menu = await getMenuById(supabase, id);
+        if (!menu) return NextResponse.json({ error: 'Menú no encontrado' }, { status: 404 });
+        const team = await getOwnedTeam(supabase, user, eqId || menu.equipo_id);
+        if (!team) return forbidden('No tienes acceso a este equipo');
+
+        const enrichedDias = await enrichMenuWithDecomposedDishes(menu.dias);
+        const data = await updateMenu(supabase, id, { dias: enrichedDias, updated_at: new Date().toISOString() });
+        return NextResponse.json({ ok: true, menu: data });
+      }
+
       const { semana, equipo_id, dias } = body;
       if (!semana || !equipo_id) return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
 
@@ -224,7 +239,10 @@ IMPORTANTE:
 
     const finalSemana = (semanaInicio && /^\d{4}-\d{2}-\d{2}$/.test(semanaInicio)) ? semanaInicio : semana;
 
-    const data = await upsertMenu(supabase, { semana: finalSemana, equipo_id: equipoId, dias: formattedDias, updated_at: new Date().toISOString() });
+    // Desglosar platos con IA a ingredientes elementales respetando cortes específicos y bases genéricas
+    const enrichedDias = await enrichMenuWithDecomposedDishes(formattedDias);
+
+    const data = await upsertMenu(supabase, { semana: finalSemana, equipo_id: equipoId, dias: enrichedDias, updated_at: new Date().toISOString() });
     return NextResponse.json({ ok: true, menu: data });
   } catch (e) {
     console.error('Error en POST /api/menu-semanal:', e);

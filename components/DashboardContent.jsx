@@ -572,12 +572,14 @@ export default function DashboardContent({ players = [], team, readOnly = false 
     await commitApprovedPlayers(approved);
   }
 
-  async function validateCurrentPreview() {
+  async function validateCurrentPreview(editedPlan) {
     if (!reportWorkflow || !reviewPreview) return;
+
+    const planToSave = editedPlan || reviewPreview.plan;
 
     const approved = [
       ...reportWorkflow.approved,
-      { id: reviewPreview.id, plan: reviewPreview.plan },
+      { id: reviewPreview.id, plan: planToSave },
     ];
     setReviewLoading(true);
 

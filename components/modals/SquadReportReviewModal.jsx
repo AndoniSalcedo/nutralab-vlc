@@ -1,21 +1,29 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Accordion,
-  Badge,
+  ActionIcon,
   Box,
   Button,
   Checkbox,
   Divider,
   Group,
   Modal,
+  NumberInput,
   Paper,
+  SimpleGrid,
   Stack,
   Text,
+  Textarea,
+  TextInput,
 } from '@mantine/core';
 import {
   IconAlertTriangle,
   IconCheck,
+  IconEdit,
+  IconPlus,
+  IconRotate,
   IconShieldCheck,
+  IconTrash,
   IconUserCheck,
 } from '@/components/icons3d';
 
@@ -36,17 +44,28 @@ export default function SquadReportReviewModal({
   onCancel,
 }) {
   const [confirmed, setConfirmed] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingMeal, setEditingMeal] = useState(null); // { dayKey, mealIndex }
+  const [editablePlan, setEditablePlan] = useState(null);
+  const [originalPlan, setOriginalPlan] = useState(null);
+
   const contentRef = useRef(null);
   const playerName = `${preview?.nombre || 'Jugador'} ${preview?.apellidos || ''}`.trim();
-  const plan = preview?.plan;
-  const activeDays = useMemo(
-    () => DAYS_OF_WEEK.filter((dayKey) => plan?.dias?.[dayKey]),
-    [plan]
-  );
-  const weeklyNotes = plan?.notas || plan?.notes || [];
 
+  // Initialize editable state whenever preview changes
   useEffect(() => {
     setConfirmed(false);
+    setIsEditing(false);
+    setEditingMeal(null);
+
+    if (preview?.plan) {
+      const clone = JSON.parse(JSON.stringify(preview.plan));
+      setEditablePlan(clone);
+      setOriginalPlan(JSON.parse(JSON.stringify(preview.plan)));
+    } else {
+      setEditablePlan(null);
+      setOriginalPlan(null);
+    }
 
     const content = contentRef.current;
     if (!content) return undefined;
@@ -66,7 +85,151 @@ export default function SquadReportReviewModal({
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [preview?.id, index]);
+  }, [preview?.id, preview?.plan, index]);
+
+  const plan = editablePlan || preview?.plan;
+
+  const activeDays = useMemo(
+    () => DAYS_OF_WEEK.filter((dayKey) => plan?.dias?.[dayKey]),
+    [plan]
+  );
+
+  const weeklyNotes = useMemo(
+    () => (Array.isArray(plan?.notas) ? plan.notas : (Array.isArray(plan?.notes) ? plan.notes : [])),
+    [plan?.notas, plan?.notes]
+  );
+
+  const hasChanges = useMemo(() => {
+    if (!editablePlan || !originalPlan) return false;
+    return JSON.stringify(editablePlan) !== JSON.stringify(originalPlan);
+  }, [editablePlan, originalPlan]);
+
+  const updateMetrica = (field, val) => {
+    setEditablePlan((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        metricas: {
+          ...(prev.metricas || {}),
+          [field]: val === '' ? null : Number(val),
+        },
+      };
+    });
+  };
+
+  const updateDayMacro = (dayKey, macroKey, val) => {
+    setEditablePlan((prev) => {
+      if (!prev?.dias?.[dayKey]) return prev;
+      return {
+        ...prev,
+        dias: {
+          ...prev.dias,
+          [dayKey]: {
+            ...prev.dias[dayKey],
+            [macroKey]: val === '' ? null : Number(val),
+          },
+        },
+      };
+    });
+  };
+
+  const updateMeal = (dayKey, mealIndex, field, val) => {
+    setEditablePlan((prev) => {
+      if (!prev?.dias?.[dayKey]?.ingestas) return prev;
+      const newIngestas = [...prev.dias[dayKey].ingestas];
+      if (!newIngestas[mealIndex]) return prev;
+      newIngestas[mealIndex] = {
+        ...newIngestas[mealIndex],
+        [field]: val,
+      };
+      return {
+        ...prev,
+        dias: {
+          ...prev.dias,
+          [dayKey]: {
+            ...prev.dias[dayKey],
+            ingestas: newIngestas,
+          },
+        },
+      };
+    });
+  };
+
+  const addMeal = (dayKey) => {
+    setEditablePlan((prev) => {
+      if (!prev?.dias?.[dayKey]) return prev;
+      const currentIngestas = prev.dias[dayKey].ingestas || [];
+      const newIngestas = [
+        ...currentIngestas,
+        { nombre: 'NUEVA INGESTA', detalle: '' },
+      ];
+      return {
+        ...prev,
+        dias: {
+          ...prev.dias,
+          [dayKey]: {
+            ...prev.dias[dayKey],
+            ingestas: newIngestas,
+          },
+        },
+      };
+    });
+  };
+
+  const removeMeal = (dayKey, mealIndex) => {
+    setEditablePlan((prev) => {
+      if (!prev?.dias?.[dayKey]?.ingestas) return prev;
+      const newIngestas = prev.dias[dayKey].ingestas.filter((_, idx) => idx !== mealIndex);
+      return {
+        ...prev,
+        dias: {
+          ...prev.dias,
+          [dayKey]: {
+            ...prev.dias[dayKey],
+            ingestas: newIngestas,
+          },
+        },
+      };
+    });
+  };
+
+  const updateNote = (noteIndex, val) => {
+    setEditablePlan((prev) => {
+      const currentNotes = Array.isArray(prev?.notas) ? [...prev.notas] : (Array.isArray(prev?.notes) ? [...prev.notes] : []);
+      currentNotes[noteIndex] = val;
+      return {
+        ...prev,
+        notas: currentNotes,
+      };
+    });
+  };
+
+  const addNote = () => {
+    setEditablePlan((prev) => {
+      const currentNotes = Array.isArray(prev?.notas) ? [...prev.notas] : (Array.isArray(prev?.notes) ? [...prev.notes] : []);
+      return {
+        ...prev,
+        notas: [...currentNotes, ''],
+      };
+    });
+  };
+
+  const removeNote = (noteIndex) => {
+    setEditablePlan((prev) => {
+      const currentNotes = Array.isArray(prev?.notas) ? [...prev.notas] : (Array.isArray(prev?.notes) ? [...prev.notes] : []);
+      return {
+        ...prev,
+        notas: currentNotes.filter((_, idx) => idx !== noteIndex),
+      };
+    });
+  };
+
+  const resetToOriginal = () => {
+    if (originalPlan) {
+      setEditablePlan(JSON.parse(JSON.stringify(originalPlan)));
+      setEditingMeal(null);
+    }
+  };
 
   return (
     <Modal
@@ -89,7 +252,7 @@ export default function SquadReportReviewModal({
     >
       <Stack ref={contentRef} gap="md">
         <Paper p="md" radius="md" withBorder bg="gray.0">
-          <Group justify="space-between" align="flex-start" wrap="wrap">
+          <Group justify="space-between" align="center" wrap="wrap" gap="sm">
             <Group gap="sm" wrap="nowrap">
               <IconUserCheck size={24} color="var(--mantine-color-nutralabColor-6)" stroke={1.8} />
               <Box>
@@ -97,73 +260,372 @@ export default function SquadReportReviewModal({
                 <Text size="sm" c="dimmed">{preview?.posicion || 'Jugador'} · Plan semanal generado</Text>
               </Box>
             </Group>
-            <Badge color="nutralabColor" variant="light" size="lg">Borrador sin guardar</Badge>
+
+            <Group gap="xs">
+              {hasChanges ? (
+                <Group gap={6} px="xs" py={4} style={{ borderRadius: 6, backgroundColor: 'var(--mantine-color-yellow-0)', border: '1px solid var(--mantine-color-yellow-3)' }}>
+                  <Box style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: 'var(--mantine-color-yellow-7)' }} />
+                  <Text size="xs" fw={700} c="yellow.9">Editado manualmente</Text>
+                </Group>
+              ) : (
+                <Group gap={6} px="xs" py={4} style={{ borderRadius: 6, backgroundColor: 'var(--mantine-color-gray-1)', border: '1px solid var(--mantine-color-gray-3)' }}>
+                  <Box style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: 'var(--mantine-color-nutralabColor-6)' }} />
+                  <Text size="xs" fw={600} c="dimmed">Borrador de validación</Text>
+                </Group>
+              )}
+
+              {hasChanges && (
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  color="gray"
+                  leftSection={<IconRotate size={14} />}
+                  onClick={resetToOriginal}
+                  disabled={loading}
+                >
+                  Restablecer
+                </Button>
+              )}
+
+              <Button
+                size="xs"
+                variant={isEditing ? 'filled' : 'light'}
+                color="nutralabColor"
+                leftSection={<IconEdit size={14} />}
+                onClick={() => {
+                  setIsEditing((prev) => !prev);
+                  setEditingMeal(null);
+                }}
+                disabled={loading}
+              >
+                {isEditing ? 'Finalizar edición' : 'Modo edición'}
+              </Button>
+            </Group>
           </Group>
         </Paper>
 
         <Paper p="sm" radius="md" withBorder>
           <Group gap="xs" mb="xs">
             <IconAlertTriangle size={18} color="var(--mantine-color-orange-6)" stroke={1.8} />
-            <Text size="sm" fw={700} c="dark.5">Revisa las ingestas y las indicaciones de los siete días</Text>
+            <Text size="sm" fw={700} c="dark.5">
+              {isEditing
+                ? 'Modo edición activo: puedes modificar métricas, macros por día, comidas e indicaciones.'
+                : 'Revisa las ingestas y las indicaciones. Si algo no cuadra, puedes editarlo directamente aquí mismo.'}
+            </Text>
           </Group>
           <Text size="xs" c="dimmed">
-            Este contenido todavía no se ha guardado. Puedes guardarlo o descartarlo; al terminar se persistirán solo los jugadores guardados.
+            {isEditing
+              ? 'Realiza los ajustes necesarios. Al guardar el informe se persistirán tus datos editados y se compilarán en el PDF final.'
+              : 'Haz clic en el icono de lápiz de cualquier comida para editarla rápidamente, o activa "Modo edición" para editar todo el plan.'}
           </Text>
         </Paper>
 
         <Stack gap="sm">
-            <Group grow align="stretch">
-              <Paper p="xs" withBorder radius="md">
-                <Text size="xs" c="dimmed">Peso</Text>
-                <Text fw={700} c="dark.5">{formatMacro(plan?.metricas?.peso, ' kg')}</Text>
-              </Paper>
-              <Paper p="xs" withBorder radius="md">
-                <Text size="xs" c="dimmed">Grasa</Text>
-                <Text fw={700} c="dark.5">{formatMacro(plan?.metricas?.grasa, '%')}</Text>
-              </Paper>
-              <Paper p="xs" withBorder radius="md">
-                <Text size="xs" c="dimmed">Masa magra</Text>
-                <Text fw={700} c="dark.5">{formatMacro(plan?.metricas?.masaMagra, ' kg')}</Text>
-              </Paper>
-            </Group>
+          {/* Métricas del jugador */}
+          <Stack gap={4}>
+            <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: '0.5px' }}>
+              Métricas del jugador
+            </Text>
+            {isEditing ? (
+              <SimpleGrid cols={{ base: 1, sm: 4 }} spacing="xs">
+                <Paper p="xs" withBorder radius="md">
+                  <NumberInput
+                    label="Peso (kg)"
+                    size="xs"
+                    value={plan?.metricas?.peso ?? ''}
+                    decimalScale={1}
+                    min={0}
+                    onChange={(val) => updateMetrica('peso', val)}
+                  />
+                </Paper>
+                <Paper p="xs" withBorder radius="md">
+                  <NumberInput
+                    label="Grasa (%)"
+                    size="xs"
+                    value={plan?.metricas?.grasa ?? ''}
+                    decimalScale={1}
+                    min={0}
+                    onChange={(val) => updateMetrica('grasa', val)}
+                  />
+                </Paper>
+                <Paper p="xs" withBorder radius="md">
+                  <NumberInput
+                    label="Masa magra (kg)"
+                    size="xs"
+                    value={plan?.metricas?.masaMagra ?? ''}
+                    decimalScale={1}
+                    min={0}
+                    onChange={(val) => updateMetrica('masaMagra', val)}
+                  />
+                </Paper>
+                <Paper p="xs" withBorder radius="md">
+                  <NumberInput
+                    label="% P. Muscular"
+                    size="xs"
+                    value={plan?.metricas?.pesoMuscular ?? ''}
+                    decimalScale={1}
+                    min={0}
+                    onChange={(val) => updateMetrica('pesoMuscular', val)}
+                  />
+                </Paper>
+              </SimpleGrid>
+            ) : (
+              <Group grow align="stretch">
+                <Paper p="xs" withBorder radius="md">
+                  <Text size="xs" c="dimmed">Peso</Text>
+                  <Text fw={700} c="dark.5">{formatMacro(plan?.metricas?.peso, ' kg')}</Text>
+                </Paper>
+                <Paper p="xs" withBorder radius="md">
+                  <Text size="xs" c="dimmed">Grasa</Text>
+                  <Text fw={700} c="dark.5">{formatMacro(plan?.metricas?.grasa, '%')}</Text>
+                </Paper>
+                <Paper p="xs" withBorder radius="md">
+                  <Text size="xs" c="dimmed">Masa magra</Text>
+                  <Text fw={700} c="dark.5">{formatMacro(plan?.metricas?.masaMagra, ' kg')}</Text>
+                </Paper>
+                {plan?.metricas?.pesoMuscular != null && (
+                  <Paper p="xs" withBorder radius="md">
+                    <Text size="xs" c="dimmed">% Músculo</Text>
+                    <Text fw={700} c="dark.5">{formatMacro(plan?.metricas?.pesoMuscular, '%')}</Text>
+                  </Paper>
+                )}
+              </Group>
+            )}
+          </Stack>
 
-            <Accordion multiple defaultValue={activeDays.slice(0, 1)} variant="separated">
-              {activeDays.map((dayKey) => {
-                const day = plan.dias[dayKey];
-                return (
-                  <Accordion.Item key={dayKey} value={dayKey}>
-                    <Accordion.Control>
-                      <Group justify="space-between" pr="sm" wrap="nowrap">
+          {/* Días y comidas */}
+          <Accordion multiple defaultValue={activeDays.slice(0, 1)} variant="separated">
+            {activeDays.map((dayKey) => {
+              const day = plan.dias[dayKey];
+              if (!day) return null;
+
+              return (
+                <Accordion.Item key={dayKey} value={dayKey}>
+                  <Accordion.Control>
+                    <Group justify="space-between" pr="sm" wrap="nowrap">
+                      <Group gap="xs" wrap="nowrap">
                         <Text fw={700} c="dark.5">{day.label}</Text>
-                        <Text size="xs" c="dimmed" ta="right">
-                          {formatMacro(day.kcal, ' kcal')} · P {formatMacro(day.proteina, 'g')} · HC {formatMacro(day.hidratos, 'g')} · G {formatMacro(day.grasa, 'g')}
-                        </Text>
+                        {day.tipoDia && (
+                          <Text size="xs" c="dimmed" fw={600}>
+                            · {day.tipoDia.toUpperCase()}
+                          </Text>
+                        )}
                       </Group>
-                    </Accordion.Control>
-                    <Accordion.Panel>
-                      <Stack gap="xs">
-                        {(day.ingestas || []).map((meal, mealIndex) => (
+                      <Text size="xs" c="dimmed" ta="right">
+                        {formatMacro(day.kcal, ' kcal')} · P {formatMacro(day.proteina, 'g')} · HC {formatMacro(day.hidratos, 'g')} · G {formatMacro(day.grasa, 'g')}
+                      </Text>
+                    </Group>
+                  </Accordion.Control>
+                  <Accordion.Panel>
+                    <Stack gap="sm">
+                      {/* En modo edición: inputs de macros del día */}
+                      {isEditing && (
+                        <Paper p="xs" withBorder radius="md" bg="gray.0">
+                          <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={6}>
+                            Objetivos de macronutrientes para {day.label}
+                          </Text>
+                          <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="xs">
+                            <NumberInput
+                              label="Kcal"
+                              size="xs"
+                              value={day.kcal ?? ''}
+                              min={0}
+                              onChange={(val) => updateDayMacro(dayKey, 'kcal', val)}
+                            />
+                            <NumberInput
+                              label="Proteína (g)"
+                              size="xs"
+                              value={day.proteina ?? ''}
+                              min={0}
+                              onChange={(val) => updateDayMacro(dayKey, 'proteina', val)}
+                            />
+                            <NumberInput
+                              label="Hidratos (g)"
+                              size="xs"
+                              value={day.hidratos ?? ''}
+                              min={0}
+                              onChange={(val) => updateDayMacro(dayKey, 'hidratos', val)}
+                            />
+                            <NumberInput
+                              label="Grasa (g)"
+                              size="xs"
+                              value={day.grasa ?? ''}
+                              min={0}
+                              onChange={(val) => updateDayMacro(dayKey, 'grasa', val)}
+                            />
+                          </SimpleGrid>
+                        </Paper>
+                      )}
+
+                      {/* Lista de ingestas */}
+                      {(day.ingestas || []).map((meal, mealIndex) => {
+                        const isSingleEditing = !isEditing && editingMeal?.dayKey === dayKey && editingMeal?.mealIndex === mealIndex;
+
+                        if (isEditing) {
+                          return (
+                            <Paper key={`${dayKey}-${mealIndex}`} p="xs" withBorder radius="md" bg="white">
+                              <Stack gap="xs">
+                                <Group justify="space-between" align="center">
+                                  <TextInput
+                                    size="xs"
+                                    placeholder="NOMBRE DE LA INGESTA (Ej: COMIDA)"
+                                    value={meal.nombre || ''}
+                                    onChange={(e) => updateMeal(dayKey, mealIndex, 'nombre', e.target.value)}
+                                    style={{ flex: 1, maxWidth: 300 }}
+                                    styles={{ input: { fontWeight: 700, textTransform: 'uppercase', color: 'var(--mantine-color-nutralabColor-8)' } }}
+                                  />
+                                  <ActionIcon
+                                    size="sm"
+                                    color="red"
+                                    variant="subtle"
+                                    title="Eliminar ingesta"
+                                    onClick={() => removeMeal(dayKey, mealIndex)}
+                                  >
+                                    <IconTrash size={14} />
+                                  </ActionIcon>
+                                </Group>
+                                <Textarea
+                                  size="xs"
+                                  autosize
+                                  minRows={2}
+                                  placeholder="Detalle de alimentos, gramajes en crudo..."
+                                  value={meal.detalle || ''}
+                                  onChange={(e) => updateMeal(dayKey, mealIndex, 'detalle', e.target.value)}
+                                />
+                              </Stack>
+                            </Paper>
+                          );
+                        }
+
+                        if (isSingleEditing) {
+                          return (
+                            <Paper key={`${dayKey}-${mealIndex}`} p="xs" withBorder radius="md" bg="gray.0" style={{ borderColor: 'var(--mantine-color-nutralabColor-4)' }}>
+                              <Stack gap="xs">
+                                <Group justify="space-between" align="center">
+                                  <TextInput
+                                    size="xs"
+                                    value={meal.nombre || ''}
+                                    onChange={(e) => updateMeal(dayKey, mealIndex, 'nombre', e.target.value)}
+                                    style={{ flex: 1, maxWidth: 280 }}
+                                    styles={{ input: { fontWeight: 700, textTransform: 'uppercase', color: 'var(--mantine-color-nutralabColor-8)' } }}
+                                  />
+                                  <Button
+                                    size="xs"
+                                    variant="light"
+                                    color="teal"
+                                    leftSection={<IconCheck size={14} />}
+                                    onClick={() => setEditingMeal(null)}
+                                  >
+                                    Listo
+                                  </Button>
+                                </Group>
+                                <Textarea
+                                  size="xs"
+                                  autosize
+                                  minRows={2}
+                                  value={meal.detalle || ''}
+                                  onChange={(e) => updateMeal(dayKey, mealIndex, 'detalle', e.target.value)}
+                                />
+                              </Stack>
+                            </Paper>
+                          );
+                        }
+
+                        // Vista lectura para esta comida
+                        return (
                           <Box key={`${dayKey}-${mealIndex}`}>
-                            <Text size="xs" fw={700} c="nutralabColor.8" tt="uppercase">{meal.nombre}</Text>
-                            <Text size="sm" lh={1.35}>{meal.detalle || 'Sin detalle generado'}</Text>
+                            <Group justify="space-between" align="center" mb={2}>
+                              <Text size="xs" fw={700} c="nutralabColor.8" tt="uppercase">{meal.nombre}</Text>
+                              <ActionIcon
+                                size="xs"
+                                variant="subtle"
+                                color="gray"
+                                title="Editar esta ingesta"
+                                onClick={() => setEditingMeal({ dayKey, mealIndex })}
+                              >
+                                <IconEdit size={13} />
+                              </ActionIcon>
+                            </Group>
+                            <Text size="sm" lh={1.35} c="dark.6">{meal.detalle || 'Sin detalle generado'}</Text>
                             {mealIndex < day.ingestas.length - 1 && <Divider mt="xs" />}
                           </Box>
-                        ))}
-                      </Stack>
-                    </Accordion.Panel>
-                  </Accordion.Item>
-                );
-              })}
-            </Accordion>
+                        );
+                      })}
 
-            {Array.isArray(weeklyNotes) && weeklyNotes.length > 0 && (
-              <Paper p="sm" radius="md" withBorder bg="gray.0" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
-                <Text size="xs" fw={700} c="dark.5" tt="uppercase" mb={4}>Indicaciones semanales</Text>
+                      {isEditing && (
+                        <Button
+                          variant="light"
+                          size="xs"
+                          color="nutralabColor"
+                          leftSection={<IconPlus size={14} />}
+                          onClick={() => addMeal(dayKey)}
+                          style={{ alignSelf: 'flex-start' }}
+                        >
+                          Añadir ingesta a {day.label}
+                        </Button>
+                      )}
+                    </Stack>
+                  </Accordion.Panel>
+                </Accordion.Item>
+              );
+            })}
+          </Accordion>
+
+          {/* Indicaciones semanales */}
+          <Paper p="sm" radius="md" withBorder bg="gray.0" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
+            <Group justify="space-between" align="center" mb={4}>
+              <Text size="xs" fw={700} c="dark.5" tt="uppercase">Indicaciones semanales</Text>
+              {isEditing && (
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  color="nutralabColor"
+                  leftSection={<IconPlus size={14} />}
+                  onClick={addNote}
+                >
+                  Añadir indicación
+                </Button>
+              )}
+            </Group>
+
+            {isEditing ? (
+              <Stack gap="xs" mt="xs">
                 {weeklyNotes.map((note, noteIndex) => (
-                  <Text key={noteIndex} size="sm">• {note}</Text>
+                  <Group key={noteIndex} gap="xs" align="center">
+                    <TextInput
+                      size="xs"
+                      placeholder="Indicación para el jugador..."
+                      value={note || ''}
+                      onChange={(e) => updateNote(noteIndex, e.target.value)}
+                      style={{ flex: 1 }}
+                    />
+                    <ActionIcon
+                      size="sm"
+                      color="red"
+                      variant="subtle"
+                      title="Eliminar indicación"
+                      onClick={() => removeNote(noteIndex)}
+                    >
+                      <IconTrash size={14} />
+                    </ActionIcon>
+                  </Group>
                 ))}
-              </Paper>
+                {weeklyNotes.length === 0 && (
+                  <Text size="xs" c="dimmed" fs="italic">No hay indicaciones añadidas.</Text>
+                )}
+              </Stack>
+            ) : (
+              <Stack gap={4} mt={4}>
+                {weeklyNotes.length > 0 ? (
+                  weeklyNotes.map((note, noteIndex) => (
+                    <Text key={noteIndex} size="sm">• {note}</Text>
+                  ))
+                ) : (
+                  <Text size="xs" c="dimmed" fs="italic">Sin indicaciones específicas.</Text>
+                )}
+              </Stack>
             )}
+          </Paper>
         </Stack>
 
         <Checkbox
@@ -190,7 +652,7 @@ export default function SquadReportReviewModal({
             <Button
               color="teal"
               leftSection={<IconCheck size={16} />}
-              onClick={() => onValidate()}
+              onClick={() => onValidate(editablePlan)}
               loading={loading}
               disabled={!confirmed || loading}
             >
@@ -202,3 +664,4 @@ export default function SquadReportReviewModal({
     </Modal>
   );
 }
+

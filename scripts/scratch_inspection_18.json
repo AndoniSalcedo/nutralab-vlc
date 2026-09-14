@@ -1,0 +1,4234 @@
+[
+  {
+    "id": 178,
+    "name": "Arnaut Danjuma",
+    "position": "Sin posición",
+    "clinical": "Ninguno",
+    "intolerances": "sin_cerdo",
+    "allergies": "Ninguna",
+    "aversions": "Cerdo",
+    "preMatchConfig": [
+      "noche",
+      "manana"
+    ],
+    "raw_config_prepartido": {
+      "noche": {
+        "ingestas": [
+          "Comida",
+          "Merienda",
+          "Cena"
+        ],
+        "postentreno": false,
+        "dia_anterior": "Pasta con boloñesa + pollo y puré de patata",
+        "recomendaciones": {
+          "Cena": {
+            "raw": "Pasta con boloñesa + pollo y puré de patata",
+            "fruta": [],
+            "grasa": null,
+            "label": "Pasta (Grupo genérico) + Patata + Pollo (Genérico)",
+            "lacteo": [],
+            "hidrato": [
+              "Pasta (Grupo genérico)",
+              "Patata"
+            ],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [
+              "Pollo (Genérico)"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Comida": {
+            "raw": "Pasta con tomate o pesto + pollo + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Pasta (Grupo genérico) + Pollo (Genérico) + Tomate + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Pasta (Grupo genérico)"
+            ],
+            "isValid": true,
+            "verdura": [
+              "Tomate"
+            ],
+            "proteina": [
+              "Pollo (Genérico)"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Merienda": {
+            "raw": "Tortitas de arroz con miel + plátano + fruta",
+            "fruta": [
+              "Plátano",
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Tortitas de arroz + Plátano + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Tortitas de arroz"
+            ],
+            "isValid": false,
+            "verdura": [],
+            "proteina": [],
+            "isComplete": false,
+            "unrecognized": [
+              "Miel"
+            ]
+          }
+        }
+      },
+      "manana": {
+        "ingestas": [
+          "Desayuno",
+          "Almuerzo",
+          "Comida",
+          "Cena"
+        ],
+        "postentreno": true,
+        "dia_anterior": "Pasta con boloñesa + pollo y puré de patata",
+        "recomendaciones": {
+          "Cena": {
+            "raw": "Pizza o algo más libre",
+            "fruta": [],
+            "grasa": null,
+            "label": "Árbol completo",
+            "lacteo": [],
+            "hidrato": [],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [],
+            "isComplete": true,
+            "unrecognized": []
+          },
+          "Comida": {
+            "raw": "Pasta con huevos y salsa de toamte o pesto y pollo fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": "Pesto",
+            "label": "Pasta (Grupo genérico) + Huevos + Pollo (Genérico) + Tomate + Frutas + Pesto",
+            "lacteo": [],
+            "hidrato": [
+              "Pasta (Grupo genérico)"
+            ],
+            "isValid": true,
+            "verdura": [
+              "Tomate"
+            ],
+            "proteina": [
+              "Huevos",
+              "Pollo (Genérico)"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Desayuno": {
+            "raw": "huevos con pan + zumo de manzana",
+            "fruta": [
+              "Manzana"
+            ],
+            "grasa": null,
+            "label": "Panes (Grupo genérico) + Huevos + Manzana",
+            "lacteo": [],
+            "hidrato": [
+              "Panes (Grupo genérico)"
+            ],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [
+              "Huevos"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          }
+        }
+      }
+    },
+    "raw_recomendaciones_defecto": {
+      "Cena": {
+        "raw": "Yogur con fruta",
+        "fruta": [
+          "Frutas"
+        ],
+        "grasa": null,
+        "label": "Frutas + Yogur natural",
+        "lacteo": [
+          "Yogur natural"
+        ],
+        "hidrato": [],
+        "isValid": true,
+        "verdura": [],
+        "proteina": [],
+        "isComplete": false,
+        "unrecognized": []
+      },
+      "Comida": {
+        "raw": "Arroz o pasta con carne + vegetales + fruta",
+        "fruta": [
+          "Frutas"
+        ],
+        "grasa": null,
+        "label": "Arroz (Grupo genérico) + Pasta (Grupo genérico) + Ternera magra + Verduras y Hortalizas + Frutas",
+        "lacteo": [],
+        "hidrato": [
+          "Arroz (Grupo genérico)",
+          "Pasta (Grupo genérico)"
+        ],
+        "isValid": true,
+        "verdura": [
+          "Verduras y Hortalizas"
+        ],
+        "proteina": [
+          "Ternera magra"
+        ],
+        "isComplete": false,
+        "unrecognized": []
+      },
+      "Almuerzo": {
+        "raw": "Pan con salmón y huevos",
+        "fruta": [],
+        "grasa": null,
+        "label": "Panes (Grupo genérico) + Salmón + Huevos",
+        "lacteo": [],
+        "hidrato": [
+          "Panes (Grupo genérico)"
+        ],
+        "isValid": true,
+        "verdura": [],
+        "proteina": [
+          "Salmón",
+          "Huevos"
+        ],
+        "isComplete": false,
+        "unrecognized": []
+      },
+      "Desayuno": {
+        "raw": "café con leche, no quiere nada más",
+        "fruta": [],
+        "grasa": null,
+        "label": "Leches (Grupo genérico)",
+        "lacteo": [
+          "Leches (Grupo genérico)"
+        ],
+        "hidrato": [],
+        "isValid": true,
+        "verdura": [],
+        "proteina": [],
+        "isComplete": false,
+        "unrecognized": []
+      }
+    },
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Leche de avena 170g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Pasta de trigo 80g, AOVE 15g, Pechuga de pollo 145g, Lechuga romana 100g, Tomate 100g, Queso parmesano 20g, Plátano 150g, Yogur proteico natural 120g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 80g, AOVE 20g, Pechuga de pollo 230g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 100g, Calabacín 100g, Plátano 100g, AOVE 5g"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, Pechuga de pollo 110g, Tomate 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 50g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Tortas de arroz 60g, Plátano 180g, Manzana 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 135g, Patata 250g, Pechuga de pollo 130g, AOVE 15g, Plátano 120g"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Leche de avena 170g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Pan blanco de barra 80g, 2 Huevos y 15 Claras, AOVE 5g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 60g, Ternera magra 300g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, Merluza 100g, Kiwi 100g, Yogur proteico natural 120g, AOVE 5g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Leche de avena 170g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Lenteja 100g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, AOVE 10g, 1 Huevo y 3 Claras, Tomate 100g, Ajo 100g, Plátano 100g, Yogur proteico natural 120g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Lenteja 100g, Pechuga de pollo 130g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, AOVE 25g, 1 Huevo, Tomate 100g, Ajo 100g, Plátano 100g, Yogur proteico natural 120g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 5g, Patata 250g, Pechuga de pavo 100g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Manzana 100g"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Leche de avena 170g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Pasta de trigo 50g, Atún fresco 100g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 5g, Patata 250g, 1 Huevo y 3 Claras, Guisantes 100g, Berenjena 100g, Queso curado 20g, Plátano 100g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 190g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 20g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 50g, AOVE 5g, Gambas 100g, Pimiento 100g, Manzana 100g"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Leche de avena 170g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Arroz blanco 50g, AOVE 5g, 1 Huevo y 12 Claras, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 230g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 50g, Pechuga de pollo 100g, Calabacín 100g, Mandarina 100g, AOVE 5g"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 170g, Pechuga de pollo 120g, Tomate 100g, Plátano 185g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Tortas de arroz 60g, Plátano 180g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 135g, Patata 250g, Pechuga de pollo 130g, AOVE 15g, Plátano 120g"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 180,
+    "name": "César Tárrega",
+    "position": "Sin posición",
+    "clinical": "Comida prepartido: pasta + pollo + puré de patata. Cena previa: arroz + salmón con puré de patata",
+    "intolerances": "Ninguna",
+    "allergies": "Ninguna",
+    "aversions": "Espinacas, garbanzos, alubias",
+    "preMatchConfig": [
+      "noche"
+    ],
+    "raw_config_prepartido": {
+      "noche": {
+        "ingestas": [
+          "Desayuno",
+          "Comida",
+          "Merienda",
+          "Cena"
+        ],
+        "postentreno": true,
+        "dia_anterior": "Arroz blanco + salsa de tomate y huevo plancha + salmón con puré de patata ",
+        "recomendaciones": {
+          "Cena": {
+            "raw": "pizza o pasta y burger",
+            "fruta": [],
+            "grasa": null,
+            "label": "Pasta (Grupo genérico)",
+            "lacteo": [],
+            "hidrato": [
+              "Pasta (Grupo genérico)"
+            ],
+            "isValid": false,
+            "verdura": [],
+            "proteina": [],
+            "isComplete": true,
+            "unrecognized": [
+              "pizza",
+              "burger"
+            ]
+          },
+          "Comida": {
+            "raw": "Pasta con salsa de tomate y huevo plancha + pollo con puré de patata",
+            "fruta": [],
+            "grasa": null,
+            "label": "Pasta (Grupo genérico) + Patata + Huevos + Pechuga de pollo + Tomate",
+            "lacteo": [],
+            "hidrato": [
+              "Pasta (Grupo genérico)",
+              "Patata"
+            ],
+            "isValid": true,
+            "verdura": [
+              "Tomate"
+            ],
+            "proteina": [
+              "Huevos",
+              "Pechuga de pollo"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Desayuno": {
+            "raw": "2 tostadas con aguacate y jamón + café con leceh",
+            "fruta": [],
+            "grasa": "Aguacate",
+            "label": "Panes (Grupo genérico) + Jamón serrano + Leches (Grupo genérico) + Aguacate",
+            "lacteo": [
+              "Leches (Grupo genérico)"
+            ],
+            "hidrato": [
+              "Panes (Grupo genérico)"
+            ],
+            "isValid": false,
+            "verdura": [],
+            "proteina": [
+              "Jamón serrano"
+            ],
+            "isComplete": false,
+            "unrecognized": [
+              "café"
+            ]
+          },
+          "Merienda": {
+            "raw": "Arroz con leche + 1 plátano",
+            "fruta": [
+              "Plátano"
+            ],
+            "grasa": null,
+            "label": "Plátano + Arroz con leche",
+            "lacteo": [
+              "Arroz con leche"
+            ],
+            "hidrato": [],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [],
+            "isComplete": false,
+            "unrecognized": []
+          }
+        }
+      }
+    },
+    "raw_recomendaciones_defecto": {
+      "Cena": {
+        "raw": "primer plato de carbohidrato + segundo plato de proteína con vegetales",
+        "fruta": [],
+        "grasa": null,
+        "label": "Hidratos de Carbono + Proteínas + Verduras y Hortalizas",
+        "lacteo": [],
+        "hidrato": [
+          "Hidratos de Carbono"
+        ],
+        "isValid": true,
+        "verdura": [
+          "Verduras y Hortalizas"
+        ],
+        "proteina": [
+          "Proteínas"
+        ],
+        "isComplete": true,
+        "unrecognized": []
+      },
+      "Comida": {
+        "raw": "primer plato pasta o arroz con algo de proteína + segundo plato de proteína con patata o boniato y/o vegetales",
+        "fruta": [],
+        "grasa": null,
+        "label": "Pasta (Grupo genérico) + Arroz (Grupo genérico) + Patata + Boniato + Proteínas + Verduras y Hortalizas",
+        "lacteo": [],
+        "hidrato": [
+          "Pasta (Grupo genérico)",
+          "Arroz (Grupo genérico)",
+          "Patata",
+          "Boniato"
+        ],
+        "isValid": true,
+        "verdura": [
+          "Verduras y Hortalizas"
+        ],
+        "proteina": [
+          "Proteínas"
+        ],
+        "isComplete": true,
+        "unrecognized": []
+      },
+      "Desayuno": {
+        "raw": "2 tostadas de aguacate con jamón y café con leche",
+        "fruta": [],
+        "grasa": "Aguacate",
+        "label": "Panes (Grupo genérico) + Jamón serrano + Leches (Grupo genérico) + Aguacate",
+        "lacteo": [
+          "Leches (Grupo genérico)"
+        ],
+        "hidrato": [
+          "Panes (Grupo genérico)"
+        ],
+        "isValid": true,
+        "verdura": [],
+        "proteina": [
+          "Jamón serrano"
+        ],
+        "isComplete": false,
+        "unrecognized": []
+      },
+      "Merienda": {
+        "raw": "Fruta o nada",
+        "fruta": [
+          "Frutas"
+        ],
+        "grasa": null,
+        "label": "Frutas",
+        "lacteo": [],
+        "hidrato": [],
+        "isValid": true,
+        "verdura": [],
+        "proteina": [],
+        "isComplete": false,
+        "unrecognized": []
+      }
+    },
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 70g, Jamón serrano 25g, Leche de avena 160g, Aguacate 55g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 145g, AOVE 20g, Pechuga de pollo 165g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 120g, Pechuga de pollo 215g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Jamón serrano 25g, Leche de avena 160g, Aguacate 45g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 170g, Patata 250g, Pechuga de pollo 110g, Tomate 100g, AOVE 20g, Plátano 155g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Arroz blanco 70g, Leche entera 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 160g, Ternera magra 130g, Zanahoria 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 50g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Jamón serrano 60g, Leche de avena 160g, Aguacate 40g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 450g, Ternera magra 265g, Calabacín 100g, Kiwi 220g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 370g, Ternera magra 280g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 70g, Jamón serrano 25g, Leche de avena 160g, Aguacate 55g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 110g, Jamón serrano 70g, Ajo 100g, AOVE 20g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 25g, Patata 250g, Pechuga de pavo 195g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 70g, Jamón serrano 25g, Leche de avena 160g, Aguacate 55g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 160g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 20g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 130g, AOVE 25g, Gambas 170g, Pimiento 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 70g, Jamón serrano 25g, Leche de avena 160g, Aguacate 55g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 90g, Pechuga de pollo 190g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 145g, Pechuga de pollo 170g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Jamón serrano 25g, Leche de avena 160g, Aguacate 45g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 170g, Patata 250g, Pechuga de pollo 110g, Tomate 100g, AOVE 20g, Plátano 155g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Arroz blanco 70g, Leche entera 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 115g, Patata 310g, Ternera magra 175g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 182,
+    "name": "Copete",
+    "position": "Sin posición",
+    "clinical": "Ninguno",
+    "intolerances": "Ninguna",
+    "allergies": "Ninguna",
+    "aversions": "Ninguna",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {},
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, AOVE 20g, Pechuga de pollo 170g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 130g, Pechuga de pollo 230g, Calabacín 100g, Plátano 150g, AOVE 25g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 145g, 1 Huevo, Aguacate 30g, Manzana 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, Ternera magra 130g, Zanahoria 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 80g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 160g, Ternera magra 150g, Zanahoria 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 40g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 15g, Kiwi 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 450g, Ternera magra 295g, Calabacín 100g, Kiwi 220g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 20g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 350g, Ternera magra 305g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 110g, 1 Huevo, Aguacate 30g, Naranja 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 120g, Jamón serrano 70g, Ajo 100g, AOVE 20g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 55g, AOVE 25g, Patata 250g, Pechuga de pavo 210g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Pera 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 60g, Atún fresco 170g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 20g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 140g, AOVE 25g, Gambas 180g, Pimiento 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 105g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 100g, Pechuga de pollo 200g, AOVE 25g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 150g, Pechuga de pollo 185g, Calabacín 100g, Mandarina 150g, AOVE 25g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 145g, Patata 310g, Ternera magra 180g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 105g, Patata 310g, Ternera magra 195g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 183,
+    "name": "Cristian Rivero",
+    "position": "Sin posición",
+    "clinical": "Ninguno",
+    "intolerances": "Ninguna",
+    "allergies": "Ninguna",
+    "aversions": "Ninguna",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {},
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Plátano 195g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 140g, AOVE 20g, Pechuga de pollo 155g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 110g, Pechuga de pollo 210g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 140g, 1 Huevo, Aguacate 30g, Manzana 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, Ternera magra 105g, Zanahoria 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 80g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 160g, Ternera magra 125g, Zanahoria 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 40g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Kiwi 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 450g, Ternera magra 255g, Calabacín 100g, Kiwi 220g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 355g, Ternera magra 260g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 100g, 1 Huevo, Aguacate 30g, Naranja 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 100g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 25g, Patata 250g, Pechuga de pavo 190g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Pera 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 150g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 20g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 120g, AOVE 25g, Gambas 165g, Pimiento 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 95g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 80g, Pechuga de pollo 175g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 135g, Pechuga de pollo 170g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 140g, Patata 310g, Ternera magra 155g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 105g, Patata 310g, Ternera magra 170g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 184,
+    "name": "Dani Raba",
+    "position": "Sin posición",
+    "clinical": "Ninguno",
+    "intolerances": "Ninguna",
+    "allergies": "Ninguna",
+    "aversions": "Ninguna",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {},
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 40g, Pechuga de pavo 100g, AOVE 10g, Plátano 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 70g, AOVE 15g, Pechuga de pollo 195g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 55g, Pechuga de pollo 230g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 120g, 1 Huevo, Aguacate 30g, Manzana 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, Ternera magra 105g, Zanahoria 100g, Manzana 180g, AOVE 10g, Pan blanco de barra 40g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 155g, Ternera magra 125g, Zanahoria 100g, Manzana 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 40g, Pechuga de pavo 100g, AOVE 10g, Kiwi 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 245g, Ternera magra 275g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 150g, Ternera magra 280g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 55g, 1 Huevo, Aguacate 30g, Naranja 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 190g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 60g, Pechuga de pavo 100g, AOVE 10g, Pera 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 150g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 60g, AOVE 20g, Gambas 200g, Pimiento 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 50g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 190g, AOVE 15g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 75g, Pechuga de pollo 205g, Calabacín 100g, Mandarina 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 5g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 105g, Patata 310g, Ternera magra 150g, Calabacín 100g, Plátano 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 450g, Ternera magra 170g, Calabacín 100g, Plátano 220g, AOVE 10g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 186,
+    "name": "Diego López",
+    "position": "Sin posición",
+    "clinical": "Ninguno",
+    "intolerances": "Ninguna",
+    "allergies": "Ninguna",
+    "aversions": "Ninguna",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {},
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 70g, Pechuga de pavo 100g, AOVE 10g, Plátano 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 105g, AOVE 15g, Pechuga de pollo 125g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 80g, Pechuga de pollo 160g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 110g, 1 Huevo, Aguacate 30g, Manzana 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 170g, Ternera magra 100g, Zanahoria 100g, Manzana 205g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 145g, Ternera magra 100g, Zanahoria 100g, Manzana 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 75g, Pechuga de pavo 100g, AOVE 10g, Kiwi 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 415g, Ternera magra 200g, Calabacín 100g, Kiwi 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 255g, Ternera magra 220g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 75g, 1 Huevo, Aguacate 30g, Naranja 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 65g, Jamón serrano 70g, Ajo 100g, AOVE 10g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 135g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Pera 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 100g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 90g, AOVE 20g, Gambas 130g, Pimiento 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 70g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 135g, AOVE 15g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 105g, Pechuga de pollo 130g, Calabacín 100g, Mandarina 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 5g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 95g, Patata 310g, Ternera magra 120g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 450g, Ternera magra 130g, Calabacín 100g, Plátano 220g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 187,
+    "name": "Dimitri Foulquier",
+    "position": "Sin posición",
+    "clinical": "Ninguno",
+    "intolerances": "Ninguna",
+    "allergies": "Ninguna",
+    "aversions": "Ninguna",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {},
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 180g, AOVE 20g, Plátano 180g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Pasta de trigo 120g, AOVE 15g, Pechuga de pollo 100g, Lechuga romana 100g, Tomate 100g, Queso parmesano 20g, Plátano 150g, Yogur proteico natural 120g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 120g, Pechuga de pollo 180g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 170g, 2 Huevos y 2 Claras, Aguacate 30g, Manzana 180g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Manzana 180g, Yogur proteico natural 250g, Almendras 30g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, Ternera magra 100g, Zanahoria 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 50g"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 190g, AOVE 20g, Kiwi 180g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 30g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 450g, Ternera magra 200g, Calabacín 100g, Kiwi 150g, AOVE 15g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 170g, 2 Huevos y 3 Claras, Aguacate 30g, Naranja 150g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Pasta de trigo 80g, Jamón serrano 25g, 1 Huevo y 2 Claras, Ajo 100g, AOVE 5g, Tomate 100g, Plátano 150g, Yogur proteico natural 120g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 80g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 185g, AOVE 20g, Pera 180g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Pasta de trigo 50g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 5g, Patata 250g, 2 Huevos y 5 Claras, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 130g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 165g, 2 Huevos y 3 Claras, Aguacate 30g, Mandarina 150g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Arroz blanco 60g, AOVE 5g, 1 Huevo y 8 Claras, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 145g, Pechuga de pollo 135g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 160g, AOVE 20g, Plátano 180g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 30g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 115g, Patata 310g, Ternera magra 145g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 188,
+    "name": "Filip Ugrinic",
+    "position": "Sin posición",
+    "clinical": "Ninguno",
+    "intolerances": "sin_cerdo, sin_pescado",
+    "allergies": "Ninguna",
+    "aversions": "Pescado y cerdo",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {},
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 45g, Pechuga de pavo 100g, AOVE 10g, Plátano 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 80g, AOVE 20g, Pechuga de pollo 205g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 60g, Pechuga de pollo 240g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 140g, 1 Huevo, Aguacate 30g, Manzana 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, Ternera magra 145g, Zanahoria 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 80g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 160g, Ternera magra 165g, Zanahoria 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 40g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 45g, Pechuga de pavo 100g, AOVE 10g, Kiwi 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 275g, Pechuga de pavo 255g, Calabacín 100g, Kiwi 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 160g, Pechuga de pavo 260g, Calabacín 100g, Kiwi 150g, AOVE 20g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 60g, 1 Huevo, Aguacate 45g, Naranja 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Lenteja 100g, Pechuga de pollo 105g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, AOVE 25g, 1 Huevo, Tomate 100g, Ajo 100g, Plátano 100g, Yogur proteico natural 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 25g, Patata 250g, Pechuga de pavo 200g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 70g, Pechuga de pavo 100g, AOVE 10g, Pera 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 185g, AOVE 20g, Patata 250g, 1 Huevo, Zanahoria 100g, Guisantes 100g, Berenjena 100g, Tomate 100g, Queso curado 20g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 70g, AOVE 25g, Gambas 205g, Pimiento 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 55g, 1 Huevo, Aguacate 45g, Mandarina 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 200g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 85g, Ternera magra 225g, Calabacín 100g, Mandarina 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 140g, Patata 310g, Pechuga de pavo 170g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 105g, Patata 310g, Pechuga de pavo 185g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 190,
+    "name": "Hugo Duro",
+    "position": "Sin posición",
+    "clinical": "Día de partido: Pasta con boloñesa + 2 huevos con pan + arroz con leche",
+    "intolerances": "Ninguna",
+    "allergies": "Ninguna",
+    "aversions": "Verdura",
+    "preMatchConfig": [
+      "manana"
+    ],
+    "raw_config_prepartido": {
+      "manana": {
+        "ingestas": [
+          "Desayuno",
+          "Comida",
+          "Merienda",
+          "Cena"
+        ],
+        "postentreno": true,
+        "dia_anterior": "Pasta + salsa de tomate + 2 huevos plancha con pan ",
+        "recomendaciones": {
+          "Cena": {
+            "raw": "Burger y pasta",
+            "fruta": [],
+            "grasa": null,
+            "label": "Pasta (Grupo genérico) + Panes (Grupo genérico) + Ternera magra",
+            "lacteo": [],
+            "hidrato": [
+              "Pasta (Grupo genérico)",
+              "Panes (Grupo genérico)"
+            ],
+            "isValid": false,
+            "verdura": [],
+            "proteina": [
+              "Ternera magra"
+            ],
+            "isComplete": false,
+            "unrecognized": [
+              "Burger"
+            ]
+          },
+          "Comida": {
+            "raw": "Pasta + salsa de tomate + 2 huevos plancha con pan",
+            "fruta": [],
+            "grasa": null,
+            "label": "Pasta (Grupo genérico) + Panes (Grupo genérico) + Huevos + Tomate",
+            "lacteo": [],
+            "hidrato": [
+              "Pasta (Grupo genérico)",
+              "Panes (Grupo genérico)"
+            ],
+            "isValid": true,
+            "verdura": [
+              "Tomate"
+            ],
+            "proteina": [
+              "Huevos"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Desayuno": {
+            "raw": "tostadas con huevo  o pancakes con queso y miel + zumo",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Panes (Grupo genérico) + Pancakes + Huevos + Frutas + Queso",
+            "lacteo": [
+              "Queso"
+            ],
+            "hidrato": [
+              "Panes (Grupo genérico)",
+              "Pancakes"
+            ],
+            "isValid": false,
+            "verdura": [],
+            "proteina": [
+              "Huevos"
+            ],
+            "isComplete": false,
+            "unrecognized": [
+              "Miel"
+            ]
+          },
+          "Merienda": {
+            "raw": "2 tostadas de tomate y jamón + agua",
+            "fruta": [],
+            "grasa": null,
+            "label": "Panes (Grupo genérico) + Jamón serrano + Tomate",
+            "lacteo": [],
+            "hidrato": [
+              "Panes (Grupo genérico)"
+            ],
+            "isValid": true,
+            "verdura": [
+              "Tomate"
+            ],
+            "proteina": [
+              "Jamón serrano"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          }
+        }
+      }
+    },
+    "raw_recomendaciones_defecto": {
+      "Cena": {
+        "raw": "Proteína magra + poco carbohidrato + colacao",
+        "fruta": [],
+        "grasa": null,
+        "label": "Hidratos de Carbono + Proteínas + Colacao",
+        "lacteo": [
+          "Colacao"
+        ],
+        "hidrato": [
+          "Hidratos de Carbono"
+        ],
+        "isValid": true,
+        "verdura": [],
+        "proteina": [
+          "Proteínas"
+        ],
+        "isComplete": false,
+        "unrecognized": []
+      },
+      "Comida": {
+        "raw": "Ensalada + Pasta o arroz con alguna salsa y algo de proteína magra + fruta",
+        "fruta": [
+          "Frutas"
+        ],
+        "grasa": null,
+        "label": "Pasta (Grupo genérico) + Arroz (Grupo genérico) + Proteínas + Hojas verdes y ensaladas + Frutas",
+        "lacteo": [],
+        "hidrato": [
+          "Pasta (Grupo genérico)",
+          "Arroz (Grupo genérico)"
+        ],
+        "isValid": true,
+        "verdura": [
+          "Hojas verdes y ensaladas"
+        ],
+        "proteina": [
+          "Proteínas"
+        ],
+        "isComplete": false,
+        "unrecognized": []
+      },
+      "Desayuno": {
+        "raw": "2 tostadas con huevo revuelto y pavo de fiambre + Zumo de naranja",
+        "fruta": [],
+        "grasa": null,
+        "label": "Panes (Grupo genérico) + Huevos + Pavo de fiambre",
+        "lacteo": [],
+        "hidrato": [
+          "Panes (Grupo genérico)"
+        ],
+        "isValid": false,
+        "verdura": [],
+        "proteina": [
+          "Huevos",
+          "Pavo de fiambre"
+        ],
+        "isComplete": false,
+        "unrecognized": [
+          "Zumo de naranja"
+        ]
+      },
+      "Merienda": {
+        "raw": "yogur o fruta o 3-4 lonchas de pavo",
+        "fruta": [
+          "Frutas"
+        ],
+        "grasa": null,
+        "label": "Pavo de fiambre + Frutas + Yogur natural",
+        "lacteo": [
+          "Yogur natural"
+        ],
+        "hidrato": [],
+        "isValid": true,
+        "verdura": [],
+        "proteina": [
+          "Pavo de fiambre"
+        ],
+        "isComplete": false,
+        "unrecognized": []
+      }
+    },
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, 2 Huevos"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 60g, AOVE 20g, Pechuga de pollo 180g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pechuga de pavo 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 205g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 120g, 1 Huevo, Aguacate 30g, Manzana 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, Ternera magra 120g, Zanahoria 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 45g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 160g, Ternera magra 140g, Zanahoria 100g, Manzana 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, 1 Huevo y 3 Claras"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Ternera magra 260g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pechuga de pavo 100g, Kiwi 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 150g, Ternera magra 270g, Colacao 20g, AOVE 5g, Manzana 150g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, 2 Huevos"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pechuga de pavo 100g, Naranja 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 165g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Manzana 100g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, 2 Huevos"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 130g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pechuga de pavo 100g, Pera 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 65g, AOVE 20g, Gambas 175g, Pimiento 100g, Manzana 150g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, 2 Huevos"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 165g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pechuga de pavo 100g, Mandarina 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 70g, Pechuga de pollo 180g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 5g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 110g, Patata 310g, Ternera magra 165g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 450g, Ternera magra 190g, Calabacín 100g, Plátano 220g, AOVE 10g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 191,
+    "name": "Javi Guerra",
+    "position": "Sin posición",
+    "clinical": "Ninguno",
+    "intolerances": "Ninguna",
+    "allergies": "Ninguna",
+    "aversions": "Ninguna",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {},
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 130g, AOVE 20g, Pechuga de pollo 150g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 105g, Pechuga de pollo 200g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 135g, 1 Huevo, Aguacate 30g, Manzana 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, Ternera magra 100g, Zanahoria 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 75g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 170g, Ternera magra 125g, Zanahoria 100g, Manzana 205g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Kiwi 215g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 450g, Ternera magra 240g, Calabacín 100g, Kiwi 220g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 330g, Ternera magra 250g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 95g, 1 Huevo, Aguacate 30g, Naranja 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 90g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 175g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Pera 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 135g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 20g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 115g, AOVE 25g, Gambas 155g, Pimiento 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 90g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 70g, Pechuga de pollo 165g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 130g, Pechuga de pollo 160g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 130g, Patata 310g, Ternera magra 145g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 95g, Patata 310g, Ternera magra 165g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 192,
+    "name": "Jesús Vázquez",
+    "position": "Sin posición",
+    "clinical": "nada",
+    "intolerances": "sin_pescado",
+    "allergies": "Ninguna",
+    "aversions": "Espinacas, cebolla pochada, queso frío, verdura cocinada, salsas",
+    "preMatchConfig": [
+      "noche",
+      "tarde",
+      "manana"
+    ],
+    "raw_config_prepartido": {
+      "noche": {
+        "ingestas": [
+          "Cena",
+          "Desayuno",
+          "Comida",
+          "Merienda"
+        ],
+        "postentreno": true,
+        "recomendaciones": {
+          "Cena": {
+            "raw": "Pasta con salsa boloñesa + ternera + puré de patata + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Pasta (Grupo genérico) + Patata + Ternera magra + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Pasta (Grupo genérico)",
+              "Patata"
+            ],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [
+              "Ternera magra"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Comida": {
+            "raw": "Arroz con huevo plancha + pollo con puré de patata + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Arroz (Grupo genérico) + Patata + Huevos + Pechuga de pollo + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Arroz (Grupo genérico)",
+              "Patata"
+            ],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [
+              "Huevos",
+              "Pechuga de pollo"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Merienda": {
+            "raw": "Pan con jamón o crepes de trigo sarraceno con miel y plátano",
+            "fruta": [
+              "Plátano"
+            ],
+            "grasa": null,
+            "label": "Panes (Grupo genérico) + Trigo sarraceno + Jamón serrano + Plátano",
+            "lacteo": [],
+            "hidrato": [
+              "Panes (Grupo genérico)",
+              "Trigo sarraceno"
+            ],
+            "isValid": false,
+            "verdura": [],
+            "proteina": [
+              "Jamón serrano"
+            ],
+            "isComplete": false,
+            "unrecognized": [
+              "miel"
+            ]
+          }
+        }
+      },
+      "tarde": {
+        "ingestas": [
+          "Cena",
+          "Desayuno",
+          "Comida",
+          "Merienda"
+        ],
+        "postentreno": true,
+        "recomendaciones": {
+          "Cena": {
+            "raw": "Pasta con salsa boloñesa + ternera + puré de patata + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Pasta (Grupo genérico) + Patata + Ternera magra + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Pasta (Grupo genérico)",
+              "Patata"
+            ],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [
+              "Ternera magra"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Comida": {
+            "raw": "Arroz con huevo plancha + pollo con puré de patata + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Arroz (Grupo genérico) + Patata + Huevos + Pechuga de pollo + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Arroz (Grupo genérico)",
+              "Patata"
+            ],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [
+              "Huevos",
+              "Pechuga de pollo"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          }
+        }
+      },
+      "manana": {
+        "ingestas": [
+          "Cena",
+          "Merienda",
+          "Desayuno",
+          "Comida"
+        ],
+        "postentreno": true,
+        "recomendaciones": {
+          "Cena": {
+            "raw": "Pasta con salsa boloñesa + ternera + puré de patata + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Pasta (Grupo genérico) + Patata + Ternera magra + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Pasta (Grupo genérico)",
+              "Patata"
+            ],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [
+              "Ternera magra"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Comida": {
+            "raw": "Arroz con huevo plancha + pollo con puré de patata + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Arroz (Grupo genérico) + Patata + Huevos + Pollo (Genérico) + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Arroz (Grupo genérico)",
+              "Patata"
+            ],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [
+              "Huevos",
+              "Pollo (Genérico)"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          }
+        }
+      }
+    },
+    "raw_recomendaciones_defecto": {
+      "Cena": {
+        "raw": "Carbohidrato + prote + vegetales + fruta",
+        "fruta": [],
+        "grasa": null,
+        "label": "Árbol completo",
+        "lacteo": [],
+        "hidrato": [],
+        "isValid": true,
+        "verdura": [],
+        "proteina": [],
+        "isComplete": true,
+        "unrecognized": []
+      },
+      "Comida": {
+        "raw": "Carbohidrato + prote + vegetales + fruta",
+        "fruta": [],
+        "grasa": null,
+        "label": "Árbol completo",
+        "lacteo": [],
+        "hidrato": [],
+        "isValid": true,
+        "verdura": [],
+        "proteina": [],
+        "isComplete": true,
+        "unrecognized": []
+      },
+      "Desayuno": {
+        "raw": "tostadas de pan + proteína (pavo, jamón, queso, huevos + zumo de naranja",
+        "fruta": [
+          "Naranja"
+        ],
+        "grasa": null,
+        "label": "Panes (Grupo genérico) + Pavo + Jamón serrano + Queso + Huevos + Naranja",
+        "lacteo": [],
+        "hidrato": [
+          "Panes (Grupo genérico)"
+        ],
+        "isValid": true,
+        "verdura": [],
+        "proteina": [
+          "Pavo",
+          "Jamón serrano",
+          "Queso",
+          "Huevos"
+        ],
+        "isComplete": false,
+        "unrecognized": []
+      },
+      "Merienda": {
+        "raw": "variadas",
+        "fruta": [],
+        "grasa": null,
+        "label": "Árbol completo (rotación variada)",
+        "lacteo": [],
+        "hidrato": [],
+        "isValid": true,
+        "verdura": [],
+        "proteina": [],
+        "isComplete": true
+      }
+    },
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, 2 Huevos, Naranja 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 120g, AOVE 15g, Pechuga de pollo 225g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 60g, Patata 250g, Ternera magra 260g, Plátano 100g, AOVE 10g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 130g, 1 Huevo, Aguacate 30g, Manzana 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 160g, Patata 250g, Pechuga de pollo 190g, Manzana 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pan blanco de barra 30g, Trigo sarraceno 65g, Jamón serrano 25g, Plátano 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 130g, Patata 250g, Ternera magra 180g, Manzana 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, 2 Huevos y 3 Claras, Naranja 210g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 450g, Pechuga de pavo 275g, Calabacín 100g, Kiwi 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 290g, Pechuga de pavo 285g, Calabacín 100g, Kiwi 150g, AOVE 15g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, 2 Huevos, Naranja 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 80g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 235g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, 2 Huevos, Naranja 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 230g, AOVE 20g, Patata 250g, 1 Huevo, Zanahoria 100g, Guisantes 100g, Berenjena 100g, Tomate 100g, Queso curado 20g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 105g, AOVE 25g, Gambas 220g, Pimiento 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, 2 Huevos, Naranja 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 60g, Pechuga de pollo 240g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 65g, Patata 250g, Ternera magra 260g, Mandarina 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 5g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 140g, Patata 250g, Pechuga de pollo 195g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pan blanco de barra 30g, Trigo sarraceno 65g, Jamón serrano 25g, Plátano 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 110g, Patata 250g, Ternera magra 185g, Plátano 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 193,
+    "name": "José Luis Gayá",
+    "position": "Sin posición",
+    "clinical": "Hipotiroidismo",
+    "intolerances": "sin_gluten, sin_lactosa",
+    "allergies": "Ninguna",
+    "aversions": "Edulcorantes artificiales",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {},
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan sin gluten 80g, Pechuga de pavo 100g, AOVE 10g, Plátano 170g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Pasta sin gluten 105g, AOVE 15g, Pechuga de pollo 160g, Lechuga romana 100g, Tomate 100g, Queso fresco sin lactosa 40g, Plátano 150g, Yogur natural sin lactosa 120g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta sin gluten 105g, AOVE 15g, Pechuga de pollo 175g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural sin lactosa 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 100g, Calabacín 100g, Plátano 100g, AOVE 5g"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena sin gluten 140g, 1 Huevo, Aguacate 30g, Manzana 150g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Manzana 180g, Yogur proteico sin lactosa 250g, Almendras 30g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta sin gluten 170g, Ternera magra 160g, Zanahoria 100g, Manzana 205g, AOVE 10g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 180g, Yogur proteico sin lactosa 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta sin gluten 50g, Ternera magra 100g, Zanahoria 100g, Manzana 100g, AOVE 5g"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan sin gluten 80g, Pechuga de pavo 100g, AOVE 10g, Kiwi 165g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Kiwi 150g, Yogur natural sin lactosa 120g, Nueces 30g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 415g, Ternera magra 205g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural sin lactosa 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 150g, Ternera magra 100g, Calabacín 100g, Kiwi 150g, AOVE 5g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena sin gluten 95g, 1 Huevo, Aguacate 30g, Naranja 150g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Pasta sin gluten 65g, Jamón serrano 25g, 1 Huevo y 7 Claras, Ajo 100g, AOVE 5g, Tomate 100g, Plátano 150g, Yogur natural sin lactosa 120g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta sin gluten 65g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico sin lactosa 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 5g, Patata 250g, Pechuga de pavo 100g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Manzana 100g"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan sin gluten 80g, Pechuga de pavo 100g, AOVE 10g, Pera 180g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Pasta sin gluten 50g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 5g, Patata 250g, 2 Huevos y 6 Claras, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta sin gluten 50g, Atún fresco 135g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural sin lactosa 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta sin gluten 50g, AOVE 5g, Gambas 100g, Pimiento 100g, Manzana 100g"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena sin gluten 95g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Arroz blanco 50g, AOVE 5g, 1 Huevo y 8 Claras, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco sin lactosa 40g, Plátano 120g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 160g, AOVE 15g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco sin lactosa 40g, Plátano 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico sin lactosa 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta sin gluten 50g, Pechuga de pollo 100g, Calabacín 100g, Mandarina 100g, AOVE 5g"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan sin gluten 80g, Pechuga de pavo 100g, AOVE 5g, Plátano 180g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Plátano 150g, Yogur natural sin lactosa 120g, Nueces 30g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 100g, Patata 310g, Ternera magra 145g, Calabacín 100g, Plátano 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural sin lactosa 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 150g, Ternera magra 100g, Calabacín 100g, Plátano 150g, AOVE 5g"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 195,
+    "name": "Luis Rioja",
+    "position": "Sin posición",
+    "clinical": "Suplementación en taquilla + batido de chocolate + poner geles",
+    "intolerances": "Ninguna",
+    "allergies": "Ninguna",
+    "aversions": "Coliflor, brócoli, tomate muy maduro",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {},
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 5g, Plátano 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 115g, AOVE 20g, Pechuga de pollo 135g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 90g, Pechuga de pollo 175g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 120g, 1 Huevo, Aguacate 30g, Manzana 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, Ternera magra 100g, Zanahoria 100g, Manzana 180g, AOVE 15g, Pan blanco de barra 45g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 160g, Ternera magra 105g, Zanahoria 100g, Manzana 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Kiwi 165g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 450g, Ternera magra 215g, Calabacín 100g, Kiwi 155g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 290g, Ternera magra 235g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 85g, 1 Huevo, Aguacate 30g, Naranja 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 75g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 150g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Pera 215g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 115g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 100g, AOVE 20g, Gambas 140g, Pimiento 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 80g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 55g, Pechuga de pollo 150g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 115g, Pechuga de pollo 140g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 5g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 110g, Patata 310g, Ternera magra 135g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 450g, Ternera magra 150g, Calabacín 100g, Plátano 220g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 196,
+    "name": "Mouctar Diakhaby",
+    "position": "Defensa",
+    "clinical": "Cena prepartido: salmón y pasta con aguacate / Comida: puré de patata o boniato + pollo y huevos + fruta",
+    "intolerances": "sin_cerdo",
+    "allergies": "Ninguna",
+    "aversions": "Cerdo",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {},
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 60g, Pechuga de pavo 100g, AOVE 10g, Plátano 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 95g, AOVE 20g, Pechuga de pollo 240g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 75g, Pechuga de pollo 280g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 150g, 1 Huevo, Aguacate 30g, Manzana 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, Ternera magra 145g, Zanahoria 100g, Manzana 180g, AOVE 10g, Pan blanco de barra 80g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 160g, Ternera magra 155g, Zanahoria 100g, Manzana 180g, AOVE 10g, Pan blanco de barra 45g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 55g, Pechuga de pavo 105g, AOVE 15g, Kiwi 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 325g, Ternera magra 330g, Calabacín 100g, Kiwi 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 20g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 200g, Ternera magra 340g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 70g, 1 Huevo, Aguacate 40g, Naranja 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Lenteja 100g, Pechuga de pollo 150g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Plátano 100g, Yogur proteico natural 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 25g, Patata 250g, Pechuga de pavo 245g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Pera 165g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 205g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 20g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 85g, AOVE 25g, Gambas 240g, Pimiento 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 65g, 2 Huevos, Aguacate 30g, Mandarina 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 245g, AOVE 20g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 95g, Pechuga de pollo 250g, Calabacín 100g, Mandarina 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 5g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 150g, Patata 310g, Ternera magra 190g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 110g, Patata 310g, Ternera magra 200g, Calabacín 100g, Plátano 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 198,
+    "name": "Pepelu",
+    "position": "Sin posición",
+    "clinical": "Psoriasis (Protocolo antiinflamatorio)",
+    "intolerances": "Ninguna",
+    "allergies": "Ninguna",
+    "aversions": "Boniato, porridge de avena, ñoquis",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {},
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 75g, Pechuga de pavo 100g, AOVE 10g, Plátano 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 110g, AOVE 15g, Pechuga de pollo 210g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 85g, Pechuga de pollo 245g, Calabacín 100g, Plátano 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 120g, 1 Huevo, Aguacate 30g, Manzana 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, Ternera magra 140g, Zanahoria 100g, Manzana 180g, AOVE 10g, Pan blanco de barra 45g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 165g, Ternera magra 160g, Zanahoria 100g, Manzana 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 75g, Pechuga de pavo 100g, AOVE 10g, Kiwi 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 415g, Ternera magra 295g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 260g, Ternera magra 310g, Calabacín 100g, Kiwi 150g, AOVE 5g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 80g, 1 Huevo, Aguacate 30g, Naranja 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 70g, Jamón serrano 70g, Ajo 100g, AOVE 15g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 20g, Patata 250g, Pechuga de pavo 215g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Pera 200g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 185g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 95g, AOVE 20g, Gambas 205g, Pimiento 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 75g, 1 Huevo, Aguacate 30g, Mandarina 150g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 220g, AOVE 15g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 110g, Pechuga de pollo 210g, Calabacín 100g, Mandarina 150g, AOVE 15g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 5g, Plátano 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 110g, Patata 310g, Ternera magra 185g, Calabacín 100g, Plátano 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 80g, Patata 310g, Ternera magra 195g, Calabacín 100g, Plátano 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 201,
+    "name": "Sadiq",
+    "position": "Sin posición",
+    "clinical": "Ninguno",
+    "intolerances": "sin_cerdo",
+    "allergies": "Ninguna",
+    "aversions": "Cerdo",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {},
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 165g, AOVE 15g, Plátano 170g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Pasta de trigo 50g, AOVE 10g, Pechuga de pollo 100g, Lechuga romana 100g, Tomate 100g, Queso parmesano 20g, Plátano 150g, Yogur proteico natural 120g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, AOVE 15g, Pechuga de pollo 170g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 30g"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 170g, 2 Huevos, Aguacate 30g, Manzana 180g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Manzana 180g, Yogur proteico natural 250g, Almendras 30g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 155g, Ternera magra 100g, Zanahoria 100g, Manzana 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 180g, Yogur proteico natural 250g, Almendras 25g"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 70g, Pechuga de pavo 180g, AOVE 15g, Kiwi 150g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 30g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 175g, Ternera magra 215g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 30g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 90g, 2 Huevos y 6 Claras, Aguacate 30g, Naranja 150g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Lenteja 100g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, AOVE 5g, 2 Huevos, Tomate 100g, Ajo 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Lenteja 100g, Pechuga de pollo 100g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, AOVE 15g, 1 Huevo, Tomate 100g, Ajo 100g, Plátano 100g, Yogur proteico natural 120g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico natural 250g, Almendras 30g"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 170g, AOVE 15g, Pera 180g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Pasta de trigo 50g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 5g, Patata 250g, 2 Huevos y 5 Claras, Guisantes 100g, Berenjena 100g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 120g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 15g, Patata 250g, Guisantes 100g, Berenjena 100g, Manzana 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 30g"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Copos de avena 90g, 2 Huevos y 6 Claras, Aguacate 30g, Mandarina 150g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Arroz blanco 50g, AOVE 5g, 1 Huevo y 7 Claras, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 155g, AOVE 15g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Manzana 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico natural 250g, Almendras 30g"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 135g, AOVE 10g, Plátano 180g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 25g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 450g, Ternera magra 140g, Calabacín 100g, Plátano 220g, AOVE 10g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 25g"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 202,
+    "name": "Stole Dimitrevski",
+    "position": "Sin posición",
+    "clinical": "Ninguno",
+    "intolerances": "Ninguna",
+    "allergies": "Ninguna",
+    "aversions": "Ninguna",
+    "preMatchConfig": [
+      "noche",
+      "tarde",
+      "manana"
+    ],
+    "raw_config_prepartido": {
+      "noche": {
+        "ingestas": [
+          "Cena",
+          "Comida",
+          "Merienda"
+        ],
+        "postentreno": true,
+        "recomendaciones": {
+          "Cena": {
+            "raw": "Arroz + salmón + boniato + vegetales + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Arroz (Grupo genérico) + Boniato + Salmón + Verduras y Hortalizas + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Arroz (Grupo genérico)",
+              "Boniato"
+            ],
+            "isValid": true,
+            "verdura": [
+              "Verduras y Hortalizas"
+            ],
+            "proteina": [
+              "Salmón"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Comida": {
+            "raw": "PAsta + pollo + boniato + vegetales + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Pasta (Grupo genérico) + Boniato + Pechuga de pollo + Verduras y Hortalizas + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Pasta (Grupo genérico)",
+              "Boniato"
+            ],
+            "isValid": true,
+            "verdura": [
+              "Verduras y Hortalizas"
+            ],
+            "proteina": [
+              "Pechuga de pollo"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Merienda": {
+            "raw": "fruta poca y 1 yogur",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Frutas + Yogur natural",
+            "lacteo": [
+              "Yogur natural"
+            ],
+            "hidrato": [],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [],
+            "isComplete": false,
+            "unrecognized": []
+          }
+        }
+      },
+      "tarde": {
+        "ingestas": [
+          "Cena",
+          "Comida",
+          "Merienda"
+        ],
+        "postentreno": true,
+        "recomendaciones": {
+          "Cena": {
+            "raw": "Arroz + salmón + boniato + vegetales + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Arroz (Grupo genérico) + Boniato + Salmón + Verduras y Hortalizas + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Arroz (Grupo genérico)",
+              "Boniato"
+            ],
+            "isValid": true,
+            "verdura": [
+              "Verduras y Hortalizas"
+            ],
+            "proteina": [
+              "Salmón"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Comida": {
+            "raw": "Pasta + pollo + boniato + vegetales + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Pasta (Grupo genérico) + Boniato + Pechuga de pollo + Verduras y Hortalizas + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Pasta (Grupo genérico)",
+              "Boniato"
+            ],
+            "isValid": true,
+            "verdura": [
+              "Verduras y Hortalizas"
+            ],
+            "proteina": [
+              "Pechuga de pollo"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Merienda": {
+            "raw": "fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Frutas",
+            "lacteo": [],
+            "hidrato": [],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [],
+            "isComplete": false,
+            "unrecognized": []
+          }
+        }
+      },
+      "manana": {
+        "ingestas": [
+          "Cena",
+          "Merienda",
+          "Comida"
+        ],
+        "postentreno": true,
+        "recomendaciones": {
+          "Cena": {
+            "raw": "Arroz + salmón + boniato + vegetales + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Arroz (Grupo genérico) + Boniato + Salmón + Verduras y Hortalizas + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Arroz (Grupo genérico)",
+              "Boniato"
+            ],
+            "isValid": true,
+            "verdura": [
+              "Verduras y Hortalizas"
+            ],
+            "proteina": [
+              "Salmón"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Comida": {
+            "raw": "Arroz + pollo + boniato + vegetales + fruta",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Arroz (Grupo genérico) + Boniato + Pollo (Genérico) + Verduras y Hortalizas + Frutas",
+            "lacteo": [],
+            "hidrato": [
+              "Arroz (Grupo genérico)",
+              "Boniato"
+            ],
+            "isValid": true,
+            "verdura": [
+              "Verduras y Hortalizas"
+            ],
+            "proteina": [
+              "Pollo (Genérico)"
+            ],
+            "isComplete": false,
+            "unrecognized": []
+          },
+          "Merienda": {
+            "raw": "fruta con yogur",
+            "fruta": [
+              "Frutas"
+            ],
+            "grasa": null,
+            "label": "Frutas + Yogur natural",
+            "lacteo": [
+              "Yogur natural"
+            ],
+            "hidrato": [],
+            "isValid": true,
+            "verdura": [],
+            "proteina": [],
+            "isComplete": false,
+            "unrecognized": []
+          }
+        }
+      }
+    },
+    "raw_recomendaciones_defecto": {
+      "Cena": {
+        "raw": "vegetales + carbohidrato + proteína + fruta",
+        "fruta": [
+          "Frutas"
+        ],
+        "grasa": null,
+        "label": "Hidratos de Carbono + Proteínas + Verduras y Hortalizas + Frutas",
+        "lacteo": [],
+        "hidrato": [
+          "Hidratos de Carbono"
+        ],
+        "isValid": true,
+        "verdura": [
+          "Verduras y Hortalizas"
+        ],
+        "proteina": [
+          "Proteínas"
+        ],
+        "isComplete": true,
+        "unrecognized": []
+      },
+      "Comida": {
+        "raw": "vegetales + carbohidrato + proteína + fruta",
+        "fruta": [
+          "Frutas"
+        ],
+        "grasa": null,
+        "label": "Hidratos de Carbono + Proteínas + Verduras y Hortalizas + Frutas",
+        "lacteo": [],
+        "hidrato": [
+          "Hidratos de Carbono"
+        ],
+        "isValid": true,
+        "verdura": [
+          "Verduras y Hortalizas"
+        ],
+        "proteina": [
+          "Proteínas"
+        ],
+        "isComplete": true,
+        "unrecognized": []
+      },
+      "Merienda": {
+        "raw": "variadas saludables",
+        "fruta": [],
+        "grasa": null,
+        "label": "Árbol completo (rotación variada)",
+        "lacteo": [],
+        "hidrato": [],
+        "isValid": true,
+        "verdura": [],
+        "proteina": [],
+        "isComplete": true
+      }
+    },
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 65g, AOVE 25g, Pechuga de pollo 220g, Lechuga romana 100g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, Merluza 290g, Boniato 250g, Calabacín 100g, Plátano 100g, AOVE 25g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 140g, Boniato 250g, Pechuga de pollo 170g, Zanahoria 100g, Manzana 150g, AOVE 25g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 150g, Yogur proteico natural 155g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 100g, Merluza 275g, Boniato 250g, Zanahoria 100g, Manzana 150g, AOVE 25g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Patata 210g, Ternera magra 235g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Kiwi 150g, Yogur natural 120g, Nueces 30g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 205g, Ternera magra 235g, Calabacín 100g, Kiwi 150g, AOVE 10g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Jamón serrano 70g, Ajo 100g, AOVE 25g, Tomate 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, AOVE 25g, Patata 250g, Pechuga de pavo 210g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Manzana 100g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 50g, Atún fresco 170g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 25g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 150g, Yogur natural 120g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 70g, AOVE 25g, Gambas 215g, Pimiento 100g, Manzana 150g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Pechuga de pollo 210g, AOVE 25g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 100g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 50g, Merluza 290g, Boniato 250g, Calabacín 100g, Mandarina 100g, AOVE 25g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Batido de proteína 30g disuelto en agua"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 130g, Boniato 250g, Pechuga de pollo 170g, Calabacín 100g, Plátano 150g, AOVE 25g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 150g, Yogur proteico natural 145g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 90g, Merluza 270g, Boniato 250g, Calabacín 100g, Plátano 150g, AOVE 25g"
+          },
+          {
+            "nombre": "Post-entreno",
+            "detalle": "Recovery y fruta"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": 237,
+    "name": "Pablo Maffeo",
+    "position": "Defensa",
+    "clinical": "Ninguno",
+    "intolerances": "Ninguna",
+    "allergies": "Ninguna",
+    "aversions": "Café",
+    "preMatchConfig": [],
+    "raw_config_prepartido": {},
+    "raw_recomendaciones_defecto": {
+      "Cena": {
+        "raw": "plato combinado de proteína y carbohidratos con vegetales y fruta",
+        "fruta": [
+          "Frutas"
+        ],
+        "grasa": null,
+        "label": "Hidratos de Carbono + Proteínas + Verduras y Hortalizas + Frutas",
+        "lacteo": [],
+        "hidrato": [
+          "Hidratos de Carbono"
+        ],
+        "isValid": true,
+        "verdura": [
+          "Verduras y Hortalizas"
+        ],
+        "proteina": [
+          "Proteínas"
+        ],
+        "isComplete": true,
+        "unrecognized": []
+      },
+      "Comida": {
+        "raw": "Ensalada completa y fruta",
+        "fruta": [
+          "Frutas"
+        ],
+        "grasa": null,
+        "label": "Hojas verdes y ensaladas + Frutas",
+        "lacteo": [],
+        "hidrato": [],
+        "isValid": true,
+        "verdura": [
+          "Hojas verdes y ensaladas"
+        ],
+        "proteina": [],
+        "isComplete": true,
+        "unrecognized": []
+      }
+    },
+    "days": {
+      "lunes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 170g, AOVE 25g, Pechuga de pollo 210g, Lechuga romana 100g, Tomate 100g, Plátano 215g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 170g, Pechuga de pollo 255g, Calabacín 100g, Plátano 220g, AOVE 25g"
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 160g, Ternera magra 185g, Zanahoria 100g, Manzana 180g, AOVE 20g, Pan blanco de barra 80g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 160g, Ternera magra 185g, Zanahoria 100g, Manzana 180g, AOVE 20g, Pan blanco de barra 80g"
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 90g, Patata 310g, Ternera magra 300g, Calabacín 100g, Kiwi 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 85g, Patata 310g, Ternera magra 295g, Calabacín 100g, Kiwi 150g, AOVE 20g"
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 150g, Jamón serrano 70g, Ajo 100g, AOVE 25g, Tomate 100g, Plátano 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 115g, AOVE 25g, Patata 250g, Pechuga de pavo 230g, Zanahoria 100g, Cebolla 100g, Pimiento 100g, Plátano 120g"
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo 95g, Atún fresco 195g, Tomate 100g, Cebolla 100g, Zanahoria 100g, AOVE 25g, Patata 250g, Guisantes 100g, Berenjena 100g, Plátano 120g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 170g, AOVE 25g, Gambas 200g, Pimiento 100g, Plátano 220g"
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 130g, Pechuga de pollo 235g, AOVE 25g, 1 Huevo, Tomate 100g, Ajo 100g, Pepino 100g, Cebolla 100g, Pimiento 100g, Queso fresco 40g, Plátano 120g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo 160g, Pechuga de pollo 190g, Calabacín 100g, Mandarina 180g, AOVE 25g, Pan blanco de barra 75g"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 170g, Patata 310g, Ternera magra 225g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 170g, Patata 310g, Ternera magra 225g, Calabacín 100g, Plátano 150g, AOVE 20g"
+          }
+        ]
+      }
+    }
+  }
+]

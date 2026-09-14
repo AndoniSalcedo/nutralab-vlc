@@ -362,9 +362,9 @@ const INDIVIDUAL_GENERATION_MESSAGES = [
   "Analizando métricas corporales...",
   "Calculando requerimientos energéticos y objetivos...",
   "Sincronizando con el menú del buffet...",
-  "IA: Diseñando distribución de macronutrientes...",
-  "IA: Optimizando ingestas para los días de entrenamiento...",
-  "IA: Personalizando suplementación y sugerencias..."
+  "Calculando distribución de macronutrientes...",
+  "Optimizando ingestas para los días de entrenamiento...",
+  "Personalizando suplementación y sugerencias..."
 ];
 
 function AiGenerationOverlay({ opened, messages = [] }) {
@@ -606,7 +606,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     const initialRecs = {};
     const defaultRecs = jugador?.recomendaciones_defecto || {};
     meals.forEach((meal) => {
-      initialRecs[meal] = defaultRecs[meal] || '';
+      const rec = defaultRecs[meal];
+      initialRecs[meal] = typeof rec === 'string' ? rec : (rec?.raw || rec?.text || '');
     });
     setModalRecomendacionesIngestas(initialRecs);
     setCreationModalOpened(true);
@@ -658,7 +659,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         notifications.show({
           color: 'yellow',
           title: 'Generando sin menú',
-          message: 'La IA tendrá libertad total para crear los platos ya que no se ha seleccionado menú comedor.',
+          message: 'Se generará la propuesta según las recomendaciones y preferencias del jugador ya que no se ha seleccionado menú comedor.',
         });
       }
 
@@ -757,7 +758,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         notifications.show({
           color: 'yellow',
           title: 'Generando sin menú',
-          message: 'La IA tendrá libertad total para crear los platos ya que no se ha seleccionado menú comedor.',
+          message: 'Se generará la propuesta según las recomendaciones y preferencias del jugador ya que no se ha seleccionado menú comedor.',
         });
       }
 
@@ -1143,7 +1144,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                     loading={actionType === 'generate'}
                     disabled={!nombre.trim() || actionType === 'save'}
                   >
-                    {datos ? 'Regenerar ficha IA' : 'Generar ficha IA'}
+                    {datos ? 'Regenerar ficha' : 'Generar ficha'}
                   </Button>
                   <Button
                     size="xs"
@@ -1185,7 +1186,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
               </SimpleGrid>
 
               <Textarea
-                label="Instrucciones adicionales para la IA"
+                label="Instrucciones adicionales o notas"
                 placeholder="Ej: Sale de lesión, reduce fibra el día de partido..."
                 value={contextoAdicional}
                 onChange={(e) => setContextoAdicional(e.target.value)}

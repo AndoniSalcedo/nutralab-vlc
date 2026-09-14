@@ -204,7 +204,7 @@ export default function CreateNutritionPlanModal({
                         </Group>
 
                         <Text size="xs" c="dimmed" mt="xs">
-                          Al generar el plan con IA, se aplicarán automáticamente las ingestas, recomendaciones y pauta de 24h previas que este jugador tenga configuradas en su perfil para partidos por la <strong>{dayConfig.horario === 'manana' ? 'Mañana' : dayConfig.horario === 'noche' ? 'Noche' : 'Tarde'}</strong>.
+                          Al generar el plan, se aplicarán automáticamente las ingestas, recomendaciones y pauta de 24h previas que este jugador tenga configuradas en su perfil para partidos por la <strong>{dayConfig.horario === 'manana' ? 'Mañana' : dayConfig.horario === 'noche' ? 'Noche' : 'Tarde'}</strong>.
                         </Text>
                       </Paper>
                     );
@@ -237,7 +237,7 @@ export default function CreateNutritionPlanModal({
             disabled={!modalNombre.trim() || actionType === 'generate'}
             loading={actionType === 'generate'}
           >
-            Generar con IA
+            Generar Plan
           </Button>
         </Group>
       </Stack>

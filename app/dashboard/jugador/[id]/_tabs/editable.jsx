@@ -14,7 +14,6 @@ import {
   Title,
   MultiSelect,
   Checkbox,
-  Divider,
   NumberInput,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -23,6 +22,13 @@ import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/services/player';
 import { useRouter } from 'next/navigation';
 import { AVAILABLE_MEALS, STANDARD_MEALS, sortMeals } from '@/config/nutrition-days';
+import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
+
+export function getRawText(val) {
+  if (!val) return '';
+  if (typeof val === 'string') return val;
+  return val.raw || val.text || '';
+}
 
 export function CampoEditable({
   label,
@@ -170,13 +176,24 @@ function parseMeals(val) {
   return sortMeals(val.split(',').map((s) => s.trim()).filter(Boolean));
 }
 
-export function ComidasEditable({ label, numComidas, postentreno, preentreno, jugadorId, recomendacionesDefecto = {}, readOnly = false, icon3d = 'bowl' }) {
+export function ComidasEditable({
+  label,
+  numComidas,
+  postentreno,
+  preentreno,
+  jugadorId,
+  recomendacionesDefecto = {},
+  _jugador = null,
+  readOnly = false,
+  icon3d = 'bowl',
+}) {
   const router = useRouter();
-  const [editing, setEditing] = useState(false);
+  const [editingDistribution, setEditingDistribution] = useState(false);
   const [meals, setMeals] = useState(() => parseMeals(numComidas));
   const [hasPost, setHasPost] = useState(Boolean(postentreno));
   const [recsDefecto, setRecsDefecto] = useState(() => recomendacionesDefecto || {});
   const [saving, setSaving] = useState(false);
+  const [selectedMealForModal, setSelectedMealForModal] = useState(null);
 
   useEffect(() => {
     setMeals(parseMeals(numComidas));
@@ -186,20 +203,19 @@ export function ComidasEditable({ label, numComidas, postentreno, preentreno, ju
 
   const MEAL_OPTIONS = AVAILABLE_MEALS;
 
-  async function save() {
+  async function saveDistribution() {
     setSaving(true);
     try {
       const mealsValue = meals.join(', ');
       await updatePlayerField(jugadorId, 'num_comidas', mealsValue);
       await updatePlayerField(jugadorId, 'preentreno', false);
       await updatePlayerField(jugadorId, 'postentreno', hasPost);
-      await updatePlayerField(jugadorId, 'recomendaciones_defecto', recsDefecto);
-      setEditing(false);
+      setEditingDistribution(false);
       router.refresh();
       notifications.show({
         color: 'green',
-        title: 'Comidas guardadas',
-        message: 'Las comidas, la opción de pre/post-entreno y las recomendaciones por defecto se han actualizado correctamente.',
+        title: 'Distribución guardada',
+        message: 'La distribución de comidas y tomas se ha guardado correctamente.',
       });
     } catch (e) {
       notifications.show({
@@ -212,119 +228,229 @@ export function ComidasEditable({ label, numComidas, postentreno, preentreno, ju
     }
   }
 
-  function handleCancel() {
+  function handleCancelDistribution() {
     setMeals(parseMeals(numComidas));
     setHasPost(Boolean(postentreno));
-    setRecsDefecto(recomendacionesDefecto || {});
-    setEditing(false);
+    setEditingDistribution(false);
   }
 
+  const activeMeals = meals.filter((m) => m.toLowerCase() !== 'post-entreno');
   const displayMeals = meals.length > 0 ? meals.join(', ') : 'Ninguna seleccionada';
 
   return (
     <BentoCard title={label} icon3d={icon3d} style={{ height: 'auto' }}>
       <Stack gap="sm">
-        <Group justify="space-between" align="flex-start" wrap="nowrap">
-          <Box style={{ flex: 1 }}>
-            {editing ? (
-              <Stack gap="xs">
-                <MultiSelect
-                  label="Distribución de comidas"
-                  placeholder="Ej. Desayuno, Merienda, Cena"
-                  data={MEAL_OPTIONS}
-                  value={meals}
-                  onChange={(val) => {
-                    const sorted = sortMeals(val);
-                    setMeals(sorted);
-                    // Also clean up any recommendations for meals that are deselected
-                    setRecsDefecto((prev) => {
-                      const clean = { ...prev };
-                      Object.keys(clean).forEach((k) => {
-                        if (!sorted.includes(k)) delete clean[k];
-                      });
-                      return clean;
-                    });
-                  }}
-                  size="sm"
-                  searchable
-                  clearable
-                />
-                <Checkbox
-                  label="Post-entreno"
-                  checked={hasPost}
-                  onChange={(event) => setHasPost(event.currentTarget.checked)}
-                  mt="xs"
-                  size="sm"
-                />
-              </Stack>
-            ) : (
-              <Stack gap="xs">
-                <Text size="sm">
-                  <Text span fw={600} c="dimmed">Comidas: </Text>
-                  {displayMeals}
-                </Text>
-                <Text size="sm">
-                  <Text span fw={600} c="dimmed">Post-entreno: </Text>
-                  {hasPost ? 'Sí' : 'No'}
-                </Text>
-              </Stack>
-            )}
-          </Box>
-
-          {!readOnly && (
-            <Box style={{ minWidth: editing ? '90px' : 'auto', marginTop: editing ? '20px' : '0' }}>
-              {!editing ? (
-                <Button variant="subtle" size="xs" radius="xl" onClick={() => setEditing(true)}>
-                  Editar
-                </Button>
+        {/* Cabecera de distribución general */}
+        <Paper p="xs" withBorder radius="sm" bg="gray.0">
+          <Group justify="space-between" align="center">
+            <Box style={{ flex: 1 }}>
+              {editingDistribution ? (
+                <Stack gap="xs">
+                  <MultiSelect
+                    label="Distribución de tomas diarias"
+                    placeholder="Ej. Desayuno, Merienda, Cena"
+                    data={MEAL_OPTIONS}
+                    value={meals}
+                    onChange={(val) => {
+                      const sorted = sortMeals(val);
+                      setMeals(sorted);
+                    }}
+                    size="xs"
+                    searchable
+                    clearable
+                  />
+                  <Checkbox
+                    label="Incluir toma Post-entreno / Recuperación"
+                    checked={hasPost}
+                    onChange={(event) => setHasPost(event.currentTarget.checked)}
+                    size="xs"
+                  />
+                </Stack>
               ) : (
-                <Stack gap={6} align="stretch">
-                  <Button variant="filled" size="xs" radius="xl" onClick={save} loading={saving}>
-                    Guardar
-                  </Button>
-                  <Button variant="subtle" color="gray" size="xs" radius="xl" onClick={handleCancel}>
-                    Cancelar
-                  </Button>
+                <Stack gap={3}>
+                  <Text size="xs">
+                    <Text span fw={700} c="dimmed">Tomas activas: </Text>
+                    <Text span c="dark.8" fw={600}>{displayMeals}</Text>
+                  </Text>
+                  <Text size="xs">
+                    <Text span fw={700} c="dimmed">Post-entreno: </Text>
+                    <Text span c="dark.7">{hasPost ? 'Sí (recuperación)' : 'No'}</Text>
+                  </Text>
                 </Stack>
               )}
             </Box>
-          )}
-        </Group>
 
-        {editing ? (
-          meals.filter((m) => m.toLowerCase() !== 'post-entreno').length > 0 && (
-            <Paper p="xs" withBorder bg="gray.0" mt="xs">
-              <Text size="xs" fw={700} mb="xs">Recomendaciones por defecto:</Text>
-              <Stack gap="xs">
-                {meals.filter((m) => m.toLowerCase() !== 'post-entreno').map((meal) => (
-                  <TextInput
-                    key={meal}
-                    label={meal}
-                    placeholder={`Ej. Tostadas de aguacate con pavo...`}
-                    value={recsDefecto[meal] || ''}
-                    onChange={(e) => setRecsDefecto((prev) => ({ ...prev, [meal]: e.target.value }))}
+            {!readOnly && (
+              <Box>
+                {!editingDistribution ? (
+                  <Button
+                    variant="subtle"
                     size="xs"
-                  />
-                ))}
-              </Stack>
-            </Paper>
-          )
-        ) : (
-          Object.values(recsDefecto).some((v) => v) && (
-            <Box mt="xs">
-              <Text size="sm" fw={600} c="dimmed" mb={4}>Recomendaciones por defecto:</Text>
-              <Stack gap={4}>
-                {Object.entries(recsDefecto).filter((entry) => entry[1]).map(([m, val]) => (
-                  <Text key={m} size="xs">
-                    <Text span fw={600}>{m}: </Text>
-                    {val}
-                  </Text>
-                ))}
-              </Stack>
-            </Box>
-          )
-        )}
+                    radius="xl"
+                    onClick={() => setEditingDistribution(true)}
+                  >
+                    Editar tomas
+                  </Button>
+                ) : (
+                  <Group gap={6}>
+                    <Button
+                      variant="filled"
+                      size="xs"
+                      radius="xl"
+                      onClick={saveDistribution}
+                      loading={saving}
+                    >
+                      Guardar
+                    </Button>
+                    <Button
+                      variant="subtle"
+                      color="gray"
+                      size="xs"
+                      radius="xl"
+                      onClick={handleCancelDistribution}
+                    >
+                      Cancelar
+                    </Button>
+                  </Group>
+                )}
+              </Box>
+            )}
+          </Group>
+        </Paper>
+
+        {/* Lista de pautas tipadas por comida */}
+        <Box mt={4}>
+          <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={6}>
+            Pautas y Árbol Nutricional por Ingesta
+          </Text>
+
+          {activeMeals.length === 0 ? (
+            <Text size="xs" c="dimmed">No hay tomas configuradas.</Text>
+          ) : (
+            <Stack gap="xs">
+              {activeMeals.map((meal) => {
+                const mealData = recsDefecto[meal] || {};
+                const isCompl = Boolean(mealData.isComplete);
+                const hidratos = Array.isArray(mealData.hidrato) ? mealData.hidrato : mealData.hidrato ? [mealData.hidrato] : [];
+                const proteinas = Array.isArray(mealData.proteina) ? mealData.proteina : mealData.proteina ? [mealData.proteina] : [];
+                const verduras = Array.isArray(mealData.verdura) ? mealData.verdura : mealData.verdura ? [mealData.verdura] : [];
+                const frutas = Array.isArray(mealData.fruta) ? mealData.fruta : mealData.fruta ? [mealData.fruta] : [];
+                const lacteos = Array.isArray(mealData.lacteo) ? mealData.lacteo : mealData.lacteo ? [mealData.lacteo] : [];
+                const grasa = mealData.grasa;
+
+                const hasAnySpecific = hidratos.length > 0 || proteinas.length > 0 || verduras.length > 0 || frutas.length > 0 || lacteos.length > 0 || Boolean(grasa);
+
+                return (
+                  <Paper key={meal} p="xs" withBorder radius="sm">
+                    <Group justify="space-between" align="flex-start" mb={4}>
+                      <Group gap="xs" align="center">
+                        <Text size="xs" fw={700} c="dark.8">
+                          {meal}
+                        </Text>
+                        <Text size="11px" c={isCompl || !hasAnySpecific ? 'teal.7' : 'blue.7'} fw={600}>
+                          {isCompl || !hasAnySpecific ? '● Árbol completo' : '● Árbol estructurado'}
+                        </Text>
+                      </Group>
+
+                      {!readOnly && (
+                        <Button
+                          variant="light"
+                          color="dark"
+                          size="compact-xs"
+                          radius="xl"
+                          leftSection={<IconEdit size={12} />}
+                          onClick={() => setSelectedMealForModal(meal)}
+                        >
+                          Configurar pauta
+                        </Button>
+                      )}
+                    </Group>
+
+                    {isCompl || !hasAnySpecific ? (
+                      <Text size="11px" c="dimmed">
+                        Rotación variada y completa del comedor oficial del club según preferencias.
+                      </Text>
+                    ) : (
+                      <Stack gap={2} mt={2}>
+                        {hidratos.length > 0 && (
+                          <Text size="11px">
+                            <Text span fw={600} c="orange.8">● Hidratos: </Text>
+                            <Text span c="dark.6">{hidratos.join(', ')}</Text>
+                          </Text>
+                        )}
+                        {proteinas.length > 0 && (
+                          <Text size="11px">
+                            <Text span fw={600} c="blue.8">● Proteínas: </Text>
+                            <Text span c="dark.6">{proteinas.join(', ')}</Text>
+                          </Text>
+                        )}
+                        {verduras.length > 0 && (
+                          <Text size="11px">
+                            <Text span fw={600} c="green.8">● Verduras: </Text>
+                            <Text span c="dark.6">{verduras.join(', ')}</Text>
+                          </Text>
+                        )}
+                        {frutas.length > 0 && (
+                          <Text size="11px">
+                            <Text span fw={600} c="pink.8">● Frutas: </Text>
+                            <Text span c="dark.6">{frutas.join(', ')}</Text>
+                          </Text>
+                        )}
+                        {lacteos.length > 0 && (
+                          <Text size="11px">
+                            <Text span fw={600} c="indigo.8">● Lácteos / Postres: </Text>
+                            <Text span c="dark.6">{lacteos.join(', ')}</Text>
+                          </Text>
+                        )}
+                        {grasa && (
+                          <Text size="11px">
+                            <Text span fw={600} c="yellow.9">● Grasa: </Text>
+                            <Text span c="dark.6">{grasa}</Text>
+                          </Text>
+                        )}
+                      </Stack>
+                    )}
+                  </Paper>
+                );
+              })}
+            </Stack>
+          )}
+        </Box>
       </Stack>
+
+      {/* Modal para editar la pauta de una comida */}
+      {selectedMealForModal && (
+        <EditMealPatternModal
+          opened={Boolean(selectedMealForModal)}
+          onClose={() => setSelectedMealForModal(null)}
+          mealName={selectedMealForModal}
+          timing="Pauta habitual"
+          value={recsDefecto[selectedMealForModal] || null}
+          jugadorId={jugadorId}
+          onSave={async (updatedMeal) => {
+            const newRecs = {
+              ...recsDefecto,
+              [selectedMealForModal]: updatedMeal,
+            };
+            setRecsDefecto(newRecs);
+            try {
+              await updatePlayerField(jugadorId, 'recomendaciones_defecto', newRecs);
+              notifications.show({
+                color: 'teal',
+                title: 'Pauta guardada',
+                message: `La pauta de ${selectedMealForModal} se ha guardado correctamente.`,
+              });
+              router.refresh();
+            } catch (err) {
+              notifications.show({
+                color: 'red',
+                title: 'Error al guardar',
+                message: err.message,
+              });
+            }
+          }}
+        />
+      )}
     </BentoCard>
   );
 }
@@ -431,11 +557,20 @@ function getMealTimingBadge(scheduleKey, mealName) {
   return null;
 }
 
-export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, postentreno, jugadorId, readOnly = false }) {
+export function PrepartidoEditable({
+  label,
+  configPrepartido = {},
+  numComidas,
+  postentreno,
+  jugadorId,
+  _jugador = null,
+  readOnly = false,
+}) {
   const router = useRouter();
   const [editingSchedule, setEditingSchedule] = useState(null);
   const [config, setConfig] = useState(() => configPrepartido || {});
   const [saving, setSaving] = useState(false);
+  const [selectedPreMeal, setSelectedPreMeal] = useState(null);
 
   const defaultMeals = parseMeals(numComidas);
   const defaultPost = Boolean(postentreno);
@@ -473,12 +608,13 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
     }));
   }
 
-  async function save(scheduleLabel, customConfig = null) {
+  async function saveSchedule(scheduleLabel, customConfig = null) {
     setSaving(true);
     try {
-      const toSave = customConfig || config;
+      const toSave = customConfig ? { ...customConfig } : { ...config };
       await updatePlayerField(jugadorId, 'config_prepartido', toSave);
       if (customConfig) setConfig(customConfig);
+      else setConfig(toSave);
       setEditingSchedule(null);
       router.refresh();
       notifications.show({
@@ -500,7 +636,7 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
   async function handleResetSchedule(scheduleKey, scheduleLabel) {
     const next = { ...config };
     delete next[scheduleKey];
-    await save(scheduleLabel, next);
+    await saveSchedule(scheduleLabel, next);
   }
 
   function handleCancel() {
@@ -518,7 +654,7 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
         {scheduleOptions.map((opt) => {
           const cfg = config?.[opt.value];
           const hasCustomMeals = Array.isArray(cfg?.ingestas) && cfg.ingestas.length > 0;
-          const hasRecs = Boolean(cfg?.recomendaciones && Object.values(cfg.recomendaciones).some((v) => Boolean(v && String(v).trim())));
+          const hasRecs = Boolean(cfg?.recomendaciones && Object.values(cfg.recomendaciones).some((v) => Boolean(v && (typeof v === 'object' || String(v).trim()))));
           const hasLegacy = Boolean(cfg?.dia_anterior && String(cfg.dia_anterior).trim());
           const isConfigured = Boolean(cfg && (hasCustomMeals || hasRecs || hasLegacy));
 
@@ -526,7 +662,6 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
           const currentMeals = sortPreMatchMealsChronological(opt.value, Array.isArray(cfg?.ingestas) ? cfg.ingestas : defaultMeals);
           const currentPost = cfg?.postentreno !== undefined ? Boolean(cfg.postentreno) : defaultPost;
           const currentRecs = { ...(cfg?.recomendaciones || {}) };
-          // Fallback legacy dia_anterior into Cena recommendation if present and not overwritten
           if (cfg?.dia_anterior && !currentRecs.Cena && !currentRecs.cena) {
             currentRecs.Cena = cfg.dia_anterior;
           }
@@ -560,7 +695,7 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
                   </Group>
 
                   <Text size="xs" c="dimmed">
-                    Sin protocolo específico configurado. En días de partido por la {opt.label.toLowerCase()} se aplicará el menú del comedor de la ciudad deportiva o sus ingestas y preferencias habituales.
+                    Sin protocolo específico configurado. En días de partido por la {opt.label.toLowerCase()} se aplicará el menú del comedor de la ciudad deportiva o sus ingestas habituales.
                   </Text>
                 </Paper>
               );
@@ -586,30 +721,106 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
                       disabled={editingSchedule !== null && editingSchedule !== opt.value}
                       onClick={() => setEditingSchedule(opt.value)}
                     >
-                      Editar
+                      Editar tomas
                     </Button>
                   )}
                 </Group>
 
-                <Stack gap={4}>
+                <Stack gap={6}>
                   <Text size="xs" c="dark.6">
                     <Text span fw={600} c="dimmed">Ingestas pautadas: </Text>
                     {mealsList} ({currentPost ? 'con toma post-partido' : 'sin post-partido'})
                   </Text>
 
-                  {Object.entries(currentRecs).filter((entry) => entry[1]).length > 0 && (
-                    <Stack gap={2} mt={4}>
-                      {currentMeals.filter((m) => currentRecs[m]).map((m) => {
-                        const timing = getMealTimingBadge(opt.value, m);
-                        return (
-                          <Text key={m} size="xs" c="dark.7">
-                            <Text span fw={600} c="dimmed">{m}{timing ? ` (${timing})` : ''}: </Text>
-                            {currentRecs[m]}
-                          </Text>
-                        );
-                      })}
-                    </Stack>
-                  )}
+                  {/* Detalle estructurado de cada comida */}
+                  <Stack gap="xs" mt={4}>
+                    {currentMeals.map((m) => {
+                      const timing = getMealTimingBadge(opt.value, m);
+                      const mealData = currentRecs[m] || {};
+                      const isCompl = Boolean(mealData.isComplete);
+                      const hidratos = Array.isArray(mealData.hidrato) ? mealData.hidrato : mealData.hidrato ? [mealData.hidrato] : [];
+                      const proteinas = Array.isArray(mealData.proteina) ? mealData.proteina : mealData.proteina ? [mealData.proteina] : [];
+                      const verduras = Array.isArray(mealData.verdura) ? mealData.verdura : mealData.verdura ? [mealData.verdura] : [];
+                      const frutas = Array.isArray(mealData.fruta) ? mealData.fruta : mealData.fruta ? [mealData.fruta] : [];
+                      const lacteos = Array.isArray(mealData.lacteo) ? mealData.lacteo : mealData.lacteo ? [mealData.lacteo] : [];
+                      const grasa = mealData.grasa;
+
+                      const hasAnySpecific = hidratos.length > 0 || proteinas.length > 0 || verduras.length > 0 || frutas.length > 0 || lacteos.length > 0 || Boolean(grasa);
+
+                      return (
+                        <Paper key={m} p="xs" withBorder radius="sm" bg="gray.0">
+                          <Group justify="space-between" align="flex-start" mb={2}>
+                            <Group gap="xs" align="center">
+                              <Text size="xs" fw={700} c="dark.8">
+                                {m} {timing ? `(${timing})` : ''}
+                              </Text>
+                              <Text size="11px" c={isCompl || !hasAnySpecific ? 'teal.7' : 'blue.7'} fw={600}>
+                                {isCompl || !hasAnySpecific ? '● Árbol completo' : '● Árbol estructurado'}
+                              </Text>
+                            </Group>
+
+                            {!readOnly && (
+                              <Button
+                                variant="light"
+                                color="dark"
+                                size="compact-xs"
+                                radius="xl"
+                                leftSection={<IconEdit size={12} />}
+                                onClick={() => setSelectedPreMeal({ scheduleKey: opt.value, scheduleLabel: opt.label, meal: m })}
+                              >
+                                Configurar pauta
+                              </Button>
+                            )}
+                          </Group>
+
+                          {isCompl || !hasAnySpecific ? (
+                            <Text size="11px" c="dimmed">
+                              Rotación pre-partido completa (fácil digestión y carga energética equilibrada).
+                            </Text>
+                          ) : (
+                            <Stack gap={2} mt={2}>
+                              {hidratos.length > 0 && (
+                                <Text size="11px">
+                                  <Text span fw={600} c="orange.8">● Hidratos: </Text>
+                                  <Text span c="dark.6">{hidratos.join(', ')}</Text>
+                                </Text>
+                              )}
+                              {proteinas.length > 0 && (
+                                <Text size="11px">
+                                  <Text span fw={600} c="blue.8">● Proteínas: </Text>
+                                  <Text span c="dark.6">{proteinas.join(', ')}</Text>
+                                </Text>
+                              )}
+                              {verduras.length > 0 && (
+                                <Text size="11px">
+                                  <Text span fw={600} c="green.8">● Verduras: </Text>
+                                  <Text span c="dark.6">{verduras.join(', ')}</Text>
+                                </Text>
+                              )}
+                              {frutas.length > 0 && (
+                                <Text size="11px">
+                                  <Text span fw={600} c="pink.8">● Frutas: </Text>
+                                  <Text span c="dark.6">{frutas.join(', ')}</Text>
+                                </Text>
+                              )}
+                              {lacteos.length > 0 && (
+                                <Text size="11px">
+                                  <Text span fw={600} c="indigo.8">● Lácteos / Postres: </Text>
+                                  <Text span c="dark.6">{lacteos.join(', ')}</Text>
+                                </Text>
+                              )}
+                              {grasa && (
+                                <Text size="11px">
+                                  <Text span fw={600} c="yellow.9">● Grasa: </Text>
+                                  <Text span c="dark.6">{grasa}</Text>
+                                </Text>
+                              )}
+                            </Stack>
+                          )}
+                        </Paper>
+                      );
+                    })}
+                  </Stack>
                 </Stack>
               </Paper>
             );
@@ -641,8 +852,8 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
                       Desactivar
                     </Button>
                   )}
-                  <Button variant="filled" size="xs" radius="xl" onClick={() => save(opt.label)} loading={saving}>
-                    Guardar
+                  <Button variant="filled" size="xs" radius="xl" onClick={() => saveSchedule(opt.label)} loading={saving}>
+                    Guardar tomas
                   </Button>
                   <Button variant="subtle" color="gray" size="xs" radius="xl" onClick={handleCancel} disabled={saving}>
                     Cancelar
@@ -653,7 +864,7 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
               <Stack gap="xs">
                 {/* 1º Ingestas que componen la rutina pre-partido */}
                 <Box>
-                  <Text size="xs" fw={700} c="dark.7" mb={2}>1. Ingestas del Protocolo Pre-Partido</Text>
+                  <Text size="xs" fw={700} c="dark.7" mb={2}>Ingestas del Protocolo Pre-Partido</Text>
                   <Text size="11px" c="dimmed" mb={6}>
                     Selecciona las ingestas que componen la rutina previa (incluyendo la cena de carga del día anterior):
                   </Text>
@@ -681,42 +892,54 @@ export function PrepartidoEditable({ label, configPrepartido = {}, numComidas, p
                     size="xs"
                   />
                 </Box>
-
-                <Divider my={4} />
-
-                {/* 2º Recomendaciones por Ingesta (Ordenadas cronológicamente) */}
-                {currentMeals.length > 0 && (
-                  <Box>
-                    <Text size="xs" fw={700} c="dark.7" mb={6}>2. Pautas e Indicaciones por Ingesta</Text>
-                    <Stack gap={6}>
-                      {currentMeals.map((meal) => {
-                        const timing = getMealTimingBadge(opt.value, meal);
-                        return (
-                          <TextInput
-                            key={meal}
-                            label={
-                              <Group gap={4} align="center">
-                                <Text size="xs" fw={600}>{meal}</Text>
-                                {timing && <Text size="10px" c="dimmed">({timing})</Text>}
-                              </Group>
-                            }
-                            placeholder={`Ej. Pauta específica para ${meal.toLowerCase()}...`}
-                            value={currentRecs[meal] || ''}
-                            onChange={(e) => handleUpdateSchedule(opt.value, {
-                              recomendaciones: { ...currentRecs, [meal]: e.target.value }
-                            })}
-                            size="xs"
-                          />
-                        );
-                      })}
-                    </Stack>
-                  </Box>
-                )}
               </Stack>
             </Paper>
           );
         })}
       </Stack>
+
+      {/* Modal para editar la pauta de una toma pre-partido */}
+      {selectedPreMeal && (
+        <EditMealPatternModal
+          opened={Boolean(selectedPreMeal)}
+          onClose={() => setSelectedPreMeal(null)}
+          mealName={selectedPreMeal.meal}
+          timing={`${selectedPreMeal.scheduleLabel} - ${getMealTimingBadge(selectedPreMeal.scheduleKey, selectedPreMeal.meal) || 'Día de partido'}`}
+          value={config?.[selectedPreMeal.scheduleKey]?.recomendaciones?.[selectedPreMeal.meal] || null}
+          jugadorId={jugadorId}
+          onSave={async (updatedMeal) => {
+            const scheduleKey = selectedPreMeal.scheduleKey;
+            const currentCfg = config?.[scheduleKey] || {};
+            const currentRecs = { ...(currentCfg.recomendaciones || {}) };
+            currentRecs[selectedPreMeal.meal] = updatedMeal;
+
+            const newConfig = {
+              ...config,
+              [scheduleKey]: {
+                ...currentCfg,
+                recomendaciones: currentRecs,
+              },
+            };
+
+            setConfig(newConfig);
+            try {
+              await updatePlayerField(jugadorId, 'config_prepartido', newConfig);
+              notifications.show({
+                color: 'teal',
+                title: 'Pauta pre-partido guardada',
+                message: `Pauta para ${selectedPreMeal.meal} guardada correctamente.`,
+              });
+              router.refresh();
+            } catch (err) {
+              notifications.show({
+                color: 'red',
+                title: 'Error al guardar',
+                message: err.message,
+              });
+            }
+          }}
+        />
+      )}
     </BentoCard>
   );
 }
