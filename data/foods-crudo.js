@@ -442,7 +442,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Bulgur",
     "originalName": "Bulgur crudo",
-    "category": "cereales_y_tuberculos",
+    "category": "otros_granos",
     "kcal": 342,
     "cho": 75.9,
     "pro": 12.3,
@@ -456,7 +456,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Copos de avena",
     "originalName": "Avena en copos crudo",
-    "category": "cereales_y_tuberculos",
+    "category": "otros_granos",
     "kcal": 389,
     "cho": 66.3,
     "pro": 16.9,
@@ -470,7 +470,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Copos de avena sin gluten",
     "originalName": "Copos de avena sin gluten",
-    "category": "cereales_y_tuberculos",
+    "category": "otros_granos",
     "kcal": 375,
     "cho": 59,
     "pro": 14,
@@ -484,7 +484,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Cuscús",
     "originalName": "Cuscús crudo",
-    "category": "cereales_y_tuberculos",
+    "category": "otros_granos",
     "kcal": 376,
     "cho": 77.4,
     "pro": 12.8,
@@ -498,7 +498,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Fideos de arroz",
     "originalName": "Fideos de arroz",
-    "category": "cereales_y_tuberculos",
+    "category": "otros_granos",
     "kcal": 364,
     "cho": 80,
     "pro": 7,
@@ -763,7 +763,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Quinoa",
     "originalName": "Quinoa crudo",
-    "category": "cereales_y_tuberculos",
+    "category": "otros_granos",
     "kcal": 368,
     "cho": 64.2,
     "pro": 14.1,
@@ -841,7 +841,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Trigo sarraceno",
     "originalName": "Trigo sarraceno crudo",
-    "category": "cereales_y_tuberculos",
+    "category": "otros_granos",
     "kcal": 343,
     "cho": 71.5,
     "pro": 13.3,
@@ -853,7 +853,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Trigo sarraceno hinchado",
     "originalName": "Trigo sarraceno hinchado",
-    "category": "cereales_y_tuberculos",
+    "category": "otros_granos",
     "kcal": 360.2,
     "cho": 67.92,
     "pro": 12.63,
