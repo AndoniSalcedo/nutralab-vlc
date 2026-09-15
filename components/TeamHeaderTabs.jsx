@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -70,7 +70,13 @@ export default function TeamHeaderTabs({
     return 'plantilla';
   }, [pathname]);
 
-  const tabValue = activeTab || currentTab;
+  const [optimisticTab, setOptimisticTab] = useState(null);
+
+  useEffect(() => {
+    setOptimisticTab(null);
+  }, [pathname]);
+
+  const tabValue = optimisticTab || activeTab || currentTab;
 
   // Prefetch tabs for instant navigation between sections
   useEffect(() => {
@@ -84,6 +90,7 @@ export default function TeamHeaderTabs({
     if (!val || val === tabValue || !teamId) return;
     const target = TABS.find((t) => t.value === val);
     if (target) {
+      setOptimisticTab(val);
       router.push(target.href(teamId));
     }
   };
@@ -295,6 +302,7 @@ export default function TeamHeaderTabs({
                   value={tab.value}
                   component={Link}
                   href={href}
+                  onClick={() => setOptimisticTab(tab.value)}
                   leftSection={<Icon3D name={tab.icon3d} size={18} />}
                   style={activeTabStyle(tab.value)}
                 >
@@ -350,6 +358,7 @@ export default function TeamHeaderTabs({
                 key={tab.value}
                 component={Link}
                 href={href}
+                onClick={() => setOptimisticTab(tab.value)}
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
