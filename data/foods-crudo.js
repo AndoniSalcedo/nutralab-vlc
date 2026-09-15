@@ -3445,17 +3445,9 @@ export function normalizeFoodName(str) {
     .trim();
 }
 
-// Precomputar normalizedName en cada elemento del catálogo para acceso O(1)
+// Precomputar normalizedName en cada elemento del catálogo para indexación del árbol
 FOODS_CRUDO.forEach((f) => {
   f.normalizedName = normalizeFoodName(f.name);
-});
-
-export const FOODS_BY_NORMALIZED_NAME = new Map();
-FOODS_CRUDO.forEach((f) => {
-  FOODS_BY_NORMALIZED_NAME.set(f.normalizedName, f);
-  if (f.originalName && f.originalName !== f.name) {
-    FOODS_BY_NORMALIZED_NAME.set(normalizeFoodName(f.originalName), f);
-  }
 });
 
 export default FOODS_CRUDO;

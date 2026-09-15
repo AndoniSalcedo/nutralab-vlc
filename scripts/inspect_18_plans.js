@@ -100,7 +100,7 @@ async function inspectPlans() {
       const dayData = planData.dias[d];
       playerReport.days[d] = {
         tipo: dayData?.tipoDia,
-        calorias: dayData?.caloriasObjetivo,
+        calorias: dayData?.kcal,
         ingestas: (dayData?.ingestas || []).map((ing) => ({
           nombre: ing.nombre,
           detalle: ing.detalle,

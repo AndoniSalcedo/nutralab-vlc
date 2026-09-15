@@ -20,7 +20,7 @@ import {
   getTreeFrutaOptions,
   getTreeLacteoOptions,
   getTreeGrasaOptions,
-} from '@/lib/engine';
+} from '@/config/food-tree-options';
 
 function ensureOptionsContain(options, currentValues) {
   if (!currentValues) return options;
