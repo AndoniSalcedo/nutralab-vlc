@@ -11,6 +11,7 @@ import {
   deleteMenu,
   getMenusByTeamLimit
 } from '@/repositories/menuRepository';
+import { getPlayerById } from '@/repositories/playerRepository';
 import { enrichMenuWithDecomposedDishes } from '@/lib/ai/menu-decomposer';
 
 const client = new Anthropic({ apiKey: env.AI_API_KEY });
@@ -284,7 +285,7 @@ export async function GET(req) {
 
   const supabase = getSupabaseAdmin();
   if (user.role === 'jugador') {
-    const { data: player } = await supabase.from('jugadores').select('equipo_id').eq('id', user.id).single();
+    const player = await getPlayerById(supabase, user.id);
     if (String(player?.equipo_id) !== String(equipoId)) return forbidden('No autorizado');
   } else {
     const team = await getAccessibleTeam(supabase, user, equipoId);

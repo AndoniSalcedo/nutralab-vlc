@@ -18,6 +18,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconFolderShare, IconArrowsExchange, IconClipboardList, IconShield } from '@/components/icons3d';
 import { getTeams } from '@/services/team';
+import { transferProtocol } from '@/services/protocol';
 import { NUTRITION_DAY_TYPES } from '@/config/nutrition-days';
 
 export default function ProtocolTransferModal({ 
@@ -97,20 +98,13 @@ export default function ProtocolTransferModal({
 
     setLoading(true);
     try {
-      const res = await fetch('/api/teams/protocols/transfer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action,
-          sourceTeamId: currentTeamId,
-          targetTeamId,
-          protocol,
-          targetDayTypeKey
-        }),
+      const data = await transferProtocol({
+        action,
+        sourceTeamId: currentTeamId,
+        targetTeamId,
+        protocol,
+        targetDayTypeKey
       });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al transferir el protocolo');
 
       const targetTeamName = selectedTargetTeam?.nombre || 'Equipo destino';
 

@@ -66,3 +66,14 @@ export async function removeTeamPhoto(teamId) {
   return data;
 }
 
+export async function saveTeamConfig(teamId, configuracion_nutricional) {
+  const res = await fetch(`/api/teams/${teamId}/config`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ configuracion_nutricional }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al guardar la configuración');
+  return data;
+}
+

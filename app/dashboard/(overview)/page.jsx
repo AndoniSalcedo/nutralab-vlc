@@ -3,8 +3,9 @@ import TeamsDashboard from '@/components/TeamsDashboard';
 import { getUser } from '@/lib/auth/session';
 import { getOwnerId } from '@/lib/auth/team-access';
 import { redirect } from 'next/navigation';
-import { getPlayerById, getPlayersByOwner } from '@/repositories/playerRepository';
+import { getPlayerById, getPlayersByOwner, getPlayersByMultipleTeamIds } from '@/repositories/playerRepository';
 import { getTeamsByOwner } from '@/repositories/teamRepository';
+import { getTeamsByTecnico } from '@/repositories/tecnicoRepository';
 import NothingFound from '@/components/NothingFound';
 
 export const dynamic = 'force-dynamic';
@@ -35,30 +36,14 @@ export default async function Dashboard() {
   if (user?.role === 'tecnico') {
     let teams = [];
     try {
-      const { data: assignedTeams, error: resEquiposErr } = await supabase
-        .from('tecnico_equipos')
-        .select('equipo_id, equipos(*)')
-        .eq('tecnico_id', user.id);
-
-      if (resEquiposErr) throw resEquiposErr;
-
-      const rawTeams = (assignedTeams || []).map((a) => a.equipos).filter(Boolean);
+      const rawTeams = await getTeamsByTecnico(supabase, user.id);
       const teamIds = rawTeams.map((t) => t.id);
 
-      let resJugadores = { data: [] };
-      if (teamIds.length > 0) {
-        resJugadores = await supabase
-          .from('jugadores')
-          .select('id,equipo_id,nombre,apellidos,posicion')
-          .in('equipo_id', teamIds)
-          .order('nombre');
-
-        if (resJugadores.error) throw resJugadores.error;
-      }
+      const jugadores = await getPlayersByMultipleTeamIds(supabase, teamIds);
 
       const counts = new Map();
       const playersByTeam = new Map();
-      for (const player of resJugadores.data || []) {
+      for (const player of jugadores) {
         const teamId = String(player.equipo_id);
         counts.set(teamId, (counts.get(teamId) || 0) + 1);
         const currentPlayers = playersByTeam.get(teamId) || [];

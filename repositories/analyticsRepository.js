@@ -1,4 +1,10 @@
+import { mockAnalytics, isMockPlayer } from '@/lib/boneyardMockData';
+
 export async function getAnalyticsByPlayerId(supabase, playerId) {
+  if (isMockPlayer(playerId)) {
+    return mockAnalytics;
+  }
+
   const { data, error } = await supabase
     .from('analiticas')
     .select('*')
@@ -10,6 +16,10 @@ export async function getAnalyticsByPlayerId(supabase, playerId) {
 }
 
 export async function getAnalyticsByPlayerIds(supabase, playerIds) {
+  if (Array.isArray(playerIds) && playerIds.some(isMockPlayer)) {
+    return mockAnalytics;
+  }
+
   const { data, error } = await supabase
     .from('analiticas')
     .select('*')

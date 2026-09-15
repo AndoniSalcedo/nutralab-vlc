@@ -9,7 +9,7 @@ import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, I
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/config/nutrition-days';
 import { PLAN_THEME_PRESETS, DEFAULT_PLAN_COLORS } from '@/config/plan-themes';
 import { compressAvatar, initials } from '@/lib/utils/avatar';
-import { uploadTeamPhoto, removeTeamPhoto } from '@/services/team';
+import { uploadTeamPhoto, removeTeamPhoto, updateTeam, saveTeamConfig } from '@/services/team';
 import { useRouter } from 'next/navigation';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import DayTypeModal from '@/components/modals/DayTypeModal';
@@ -311,18 +311,11 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
       }
       setSavingSection('info');
       try {
-        const teamRes = await fetch('/api/teams', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'update',
-            team_id: team.id,
-            nombre: teamName,
-            temporada: teamSeason,
-            descripcion: team.descripcion,
-          })
+        await updateTeam(team.id, {
+          nombre: teamName,
+          temporada: teamSeason,
+          descripcion: team.descripcion,
         });
-        if (!teamRes.ok) throw new Error('Error actualizando la información del equipo');
         setSavedBaselines(prev => ({
           ...prev,
           info: { nombre: teamName, temporada: teamSeason }
@@ -339,23 +332,15 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
 
     setSavingSection(sectionKey);
     try {
-      const res = await fetch(`/api/teams/${team.id}/config`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          configuracion_nutricional: {
-            dayTypes,
-            objectiveMacros,
-            protocols,
-            pdfMicrocycle,
-            pdfRules,
-            pdfBuffet,
-            planColors
-          }
-        })
+      await saveTeamConfig(team.id, {
+        dayTypes,
+        objectiveMacros,
+        protocols,
+        pdfMicrocycle,
+        pdfRules,
+        pdfBuffet,
+        planColors
       });
-
-      if (!res.ok) throw new Error('Error guardando la configuración');
 
       // Actualizar inmediatamente la línea base de la sección guardada para limpiar "Cambios sin guardar"
       setSavedBaselines(prev => {

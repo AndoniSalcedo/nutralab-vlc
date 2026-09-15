@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
 import { forbidden, getOwnerId } from '@/lib/auth/team-access';
+import {
+  getTecnicoById,
+  getNutricionistaTecnicoLink,
+  updateTecnicoAvatar,
+  removeTecnicoAvatar,
+} from '@/repositories/tecnicoRepository';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,14 +25,8 @@ export async function GET(req) {
     if (!id) return NextResponse.json({ error: 'Falta id del técnico' }, { status: 400 });
 
     const supabase = getSupabaseAdmin();
+    const tecnico = await getTecnicoById(supabase, id);
 
-    const { data: tecnico, error } = await supabase
-      .from('tecnicos')
-      .select('id, nombre, apellidos, avatar, avatar_mime, avatar_size, updated_at')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (error) throw error;
     if (!tecnico || !tecnico.avatar) {
       return NextResponse.json({ error: 'Avatar no encontrado' }, { status: 404 });
     }
@@ -81,29 +81,12 @@ export async function POST(req) {
       const ownerId = getOwnerId(user);
       if (!ownerId) return forbidden('No autorizado');
 
-      const { data: link, error: linkErr } = await supabase
-        .from('nutricionista_tecnicos')
-        .select('id')
-        .eq('nutricionista_id', ownerId)
-        .eq('tecnico_id', id)
-        .maybeSingle();
-
-      if (linkErr) throw linkErr;
+      const link = await getNutricionistaTecnicoLink(supabase, ownerId, id);
       if (!link) return forbidden('No tienes acceso a este técnico');
     }
 
     if (remove) {
-      const { error: updateErr } = await supabase
-        .from('tecnicos')
-        .update({
-          avatar: null,
-          avatar_mime: null,
-          avatar_size: null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id);
-
-      if (updateErr) throw updateErr;
+      await removeTecnicoAvatar(supabase, id);
       return NextResponse.json({ success: true, removed: true });
     }
 
@@ -116,15 +99,9 @@ export async function POST(req) {
       avatar: `\\x${buffer.toString('hex')}`,
       avatar_mime: avatarFile.type || 'image/webp',
       avatar_size: avatarFile.size,
-      updated_at: new Date().toISOString(),
     };
 
-    const { error: updateErr } = await supabase
-      .from('tecnicos')
-      .update(payload)
-      .eq('id', id);
-
-    if (updateErr) throw updateErr;
+    await updateTecnicoAvatar(supabase, id, payload);
 
     return NextResponse.json({
       success: true,

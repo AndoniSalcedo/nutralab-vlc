@@ -4,6 +4,7 @@ import { env } from '@/config/env';
 import { buildSessionValue, COOKIE_NAME } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getPlayerByAuthUserIdSingle } from '@/repositories/playerRepository';
+import { getTecnicoByAuthUserId } from '@/repositories/tecnicoRepository';
 
 export async function POST(request) {
   try {
@@ -43,12 +44,7 @@ export async function POST(request) {
 
     // Si esperamos rol técnico (o no se especifica rol y no era jugador), buscamos en tecnicos
     if (!jugador && (expectedRole === 'tecnico' || !expectedRole)) {
-      const { data } = await supabaseAdmin
-        .from('tecnicos')
-        .select('id, nombre, apellidos')
-        .eq('auth_user_id', supabaseUser.id)
-        .maybeSingle();
-      tecnico = data;
+      tecnico = await getTecnicoByAuthUserId(supabaseAdmin, supabaseUser.id);
     }
 
     if (!jugador && !tecnico) {

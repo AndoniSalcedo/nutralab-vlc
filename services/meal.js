@@ -88,3 +88,21 @@ export async function deletePlayerMeal(id) {
   if (!res.ok) throw new Error(data.error || 'Error al eliminar la comida');
   return data;
 }
+
+export async function parseMealTree({ text, mealName = 'Comida', jugadorId, context }) {
+  const res = await fetch('/api/nutrition/parse-meal-tree', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      text,
+      mealName,
+      jugadorId,
+      context,
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'No se pudo interpretar el texto. Por favor, revisa los términos.');
+  }
+  return data;
+}

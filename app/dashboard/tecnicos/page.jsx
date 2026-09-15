@@ -1,6 +1,7 @@
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
 import { getOwnerId } from '@/lib/auth/team-access';
+import { getTeamsByOwner } from '@/repositories/teamRepository';
 import { redirect } from 'next/navigation';
 import TecnicosManager from '@/components/TecnicosManager';
 
@@ -20,15 +21,7 @@ export default async function TecnicosPage() {
 
   let teams = [];
   try {
-    const { data, error } = await supabase
-      .from('equipos')
-      .select('id, nombre, temporada')
-      .eq('owner_id', ownerId)
-      .order('temporada', { ascending: false })
-      .order('nombre');
-
-    if (error) throw error;
-    teams = data || [];
+    teams = await getTeamsByOwner(supabase, ownerId);
   } catch (err) {
     console.error('Error fetching teams for tecnicos page:', err);
   }

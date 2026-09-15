@@ -1,4 +1,14 @@
+import { mockMeals, isMockPlayer } from '@/lib/boneyardMockData';
+
 export async function getMealsFiltered(supabase, jugadorId, mealType, dayFromUTC, dayToUTC) {
+  if (isMockPlayer(jugadorId)) {
+    let result = mockMeals;
+    if (mealType) {
+      result = result.filter(m => m.meal_type === mealType);
+    }
+    return result;
+  }
+
   let query = supabase
     .from('comidas')
     .select('id, jugador_id, taken_at, dish_name, meal_type, ingredients, calories, notes, photo_size, photo_mime, created_at')

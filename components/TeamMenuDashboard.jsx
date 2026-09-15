@@ -15,7 +15,7 @@ import { notifications } from '@mantine/notifications';
 import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX, IconDotsVertical } from '@/components/icons3d';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import MenuSemanal, { formatWeek, WEEKDAY_ORDER } from '@/components/MenuSemanal';
-import { uploadWeeklyMenu, deleteWeeklyMenu, updateWeeklyMenu } from '@/services/menu';
+import { uploadWeeklyMenu, deleteWeeklyMenu, updateWeeklyMenu, createWeeklyMenu } from '@/services/menu';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import CreateMenuModal from '@/components/modals/CreateMenuModal';
 import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
@@ -154,17 +154,11 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _te
         cena: { primero: '', segundo: '', postre: '' },
       }));
 
-      const res = await fetch('/api/menu-semanal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          semana: weekDate,
-          equipo_id: teamId,
-          dias: defaultDias,
-        }),
+      const data = await createWeeklyMenu({
+        semana: weekDate,
+        equipo_id: teamId,
+        dias: defaultDias,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al crear el menú');
 
       setMenus((prev) => {
         const filtered = prev.filter((m) => m.semana !== data.menu.semana);

@@ -1,4 +1,10 @@
+import { mockHydration, isMockPlayer } from '@/lib/boneyardMockData';
+
 export async function getHydrationRecordsByPlayerId(supabase, playerId) {
+  if (isMockPlayer(playerId)) {
+    return mockHydration;
+  }
+
   const { data, error } = await supabase
     .from('registros_hidratacion')
     .select('*')
@@ -10,6 +16,10 @@ export async function getHydrationRecordsByPlayerId(supabase, playerId) {
 }
 
 export async function getHydrationRecordsByPlayerIds(supabase, playerIds) {
+  if (Array.isArray(playerIds) && playerIds.some(isMockPlayer)) {
+    return mockHydration;
+  }
+
   const { data, error } = await supabase
     .from('registros_hidratacion')
     .select('*')

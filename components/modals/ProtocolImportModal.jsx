@@ -19,6 +19,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconDownload, IconShield } from '@/components/icons3d';
 import { getTeams } from '@/services/team';
+import { batchImportProtocols } from '@/services/protocol';
 
 const EMPTY_DAY_TYPES = [];
 
@@ -129,19 +130,11 @@ export default function ProtocolImportModal({
 
     setLoading(true);
     try {
-      const res = await fetch('/api/teams/protocols/transfer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'batch_import',
-          sourceTeamId,
-          targetTeamId: currentTeamId,
-          protocols: protocolsToImport,
-        }),
+      const data = await batchImportProtocols({
+        sourceTeamId,
+        targetTeamId: currentTeamId,
+        protocols: protocolsToImport,
       });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al importar protocolos');
 
       notifications.show({
         color: 'green',

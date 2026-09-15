@@ -1,4 +1,10 @@
+import { mockMessages, isMockPlayer, isMockTeam } from '@/lib/boneyardMockData';
+
 export async function getMessages(supabase, equipoId, jugadorId) {
+  if (isMockPlayer(jugadorId) || isMockTeam(equipoId)) {
+    return mockMessages;
+  }
+
   const { data, error } = await supabase
     .from('mensajes')
     .select('id,jugador_id,titulo,contenido,created_by_name,created_at')

@@ -18,6 +18,7 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconSparkles, IconAlertCircle, IconCheck, IconX } from '@/components/icons3d';
+import { parseMealTree } from '@/services/meal';
 import {
   getTreeProteinaOptions,
   getTreeHidratoOptions,
@@ -124,21 +125,11 @@ export default function EditMealPatternModal({
     setIsAnalyzing(true);
     setAiError(null);
     try {
-      const res = await fetch('/api/nutrition/parse-meal-tree', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: aiText,
-          mealName: mealName || 'Comida',
-          jugadorId,
-        }),
+      const data = await parseMealTree({
+        text: aiText,
+        mealName: mealName || 'Comida',
+        jugadorId,
       });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        setAiError(data.error || 'No se pudo interpretar el texto. Por favor, revisa los términos.');
-        return;
-      }
 
       const mealData = data.tree || Object.values(data.results || {})[0];
       if (!mealData) {

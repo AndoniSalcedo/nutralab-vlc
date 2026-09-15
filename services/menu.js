@@ -18,6 +18,17 @@ export async function uploadWeeklyMenu(file, weekDate, teamId) {
   return data;
 }
 
+export async function createWeeklyMenu({ semana, equipo_id, dias }) {
+  const res = await fetch('/api/menu-semanal', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ semana, equipo_id, dias }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al crear el menú');
+  return data;
+}
+
 export async function deleteWeeklyMenu(id) {
   const res = await fetch(`/api/menu-semanal?id=${id}`, { method: 'DELETE' });
   const data = await res.json();

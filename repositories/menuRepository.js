@@ -1,5 +1,11 @@
+import { mockMenus, isMockTeam } from '@/lib/boneyardMockData';
+
 export async function getLatestMenu(supabase, equipoId) {
   if (!equipoId) return null;
+  if (isMockTeam(equipoId)) {
+    return mockMenus[0] || null;
+  }
+
   const { data, error } = await supabase
     .from('menu_semanal')
     .select('*')
@@ -13,6 +19,10 @@ export async function getLatestMenu(supabase, equipoId) {
 }
 
 export async function getMenusByTeam(supabase, teamId) {
+  if (isMockTeam(teamId)) {
+    return mockMenus;
+  }
+
   const { data, error } = await supabase
     .from('menu_semanal')
     .select('*')
@@ -80,6 +90,10 @@ export async function getMenuByWeekAndTeam(supabase, week, teamId) {
 }
 
 export async function getMenuById(supabase, id) {
+  if (id === 101 || isMockTeam(id)) {
+    return mockMenus[0] || null;
+  }
+
   const { data, error } = await supabase
     .from('menu_semanal')
     .select('id, equipo_id')
@@ -102,6 +116,10 @@ export async function upsertMenu(supabase, payload) {
 }
 
 export async function getMenusByTeamLimit(supabase, teamId, semana, limit = 10) {
+  if (isMockTeam(teamId)) {
+    return mockMenus.slice(0, limit);
+  }
+
   let query = supabase
     .from('menu_semanal')
     .select('*')

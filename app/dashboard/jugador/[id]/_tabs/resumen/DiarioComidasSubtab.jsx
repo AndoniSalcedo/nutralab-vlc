@@ -241,41 +241,43 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false, initial
                 />
               </Box>
             ) : (
-              grouped.map((g) => (
-                <Stack key={g.iso} gap="sm">
-                  <Text
-                    c="dimmed"
-                    size="sm"
-                    fw={700}
-                    tt="uppercase"
-                    style={{ paddingLeft: 4, letterSpacing: 0.5 }}
-                  >
-                    {g.label}
-                  </Text>
+              <BoneyardSkeleton name="diario-comidas" loading={false}>
+                {grouped.map((g) => (
+                  <Stack key={g.iso} gap="sm">
+                    <Text
+                      c="dimmed"
+                      size="sm"
+                      fw={700}
+                      tt="uppercase"
+                      style={{ paddingLeft: 4, letterSpacing: 0.5 }}
+                    >
+                      {g.label}
+                    </Text>
 
-                  <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-                    {g.items.map((m) => (
-                      <MealCard
-                        key={m.id}
-                        m={m}
-                        onEdit={!readOnly ? () => openEditMeal(m) : undefined}
-                        onDelete={!readOnly ? () => setDeleteMeal(m) : undefined}
-                        onOpen={() =>
-                          m.photoUrl &&
-                          setViewer({
-                            open: true,
-                            src: m.photoUrl,
-                            caption: `${new Date(m.takenAt).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })} · ${Number.isFinite(m.calories) ? `${m.calories} kcal` : ''}`,
-                          })
-                        }
-                      />
-                    ))}
-                  </SimpleGrid>
-                </Stack>
-              ))
+                    <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+                      {g.items.map((m) => (
+                        <MealCard
+                          key={m.id}
+                          m={m}
+                          onEdit={!readOnly ? () => openEditMeal(m) : undefined}
+                          onDelete={!readOnly ? () => setDeleteMeal(m) : undefined}
+                          onOpen={() =>
+                            m.photoUrl &&
+                            setViewer({
+                              open: true,
+                              src: m.photoUrl,
+                              caption: `${new Date(m.takenAt).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })} · ${Number.isFinite(m.calories) ? `${m.calories} kcal` : ''}`,
+                            })
+                          }
+                        />
+                      ))}
+                    </SimpleGrid>
+                  </Stack>
+                ))}
+              </BoneyardSkeleton>
             )}
           </Stack>
         </Box>

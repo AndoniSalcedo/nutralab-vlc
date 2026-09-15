@@ -1,4 +1,10 @@
+import { mockEvolutions, isMockPlayer } from '@/lib/boneyardMockData';
+
 export async function getEvolutionsByPlayerId(supabase, playerId) {
+  if (isMockPlayer(playerId)) {
+    return mockEvolutions;
+  }
+
   const { data, error } = await supabase
     .from('evoluciones')
     .select('*')
@@ -10,6 +16,10 @@ export async function getEvolutionsByPlayerId(supabase, playerId) {
 }
 
 export async function getEvolutionsByPlayerIdOrdered(supabase, playerId) {
+  if (isMockPlayer(playerId)) {
+    return mockEvolutions;
+  }
+
   const { data, error } = await supabase
     .from('evoluciones')
     .select('*')
@@ -21,6 +31,10 @@ export async function getEvolutionsByPlayerIdOrdered(supabase, playerId) {
 }
 
 export async function getEvolutionsByPlayerIdsSimple(supabase, playerIds) {
+  if (Array.isArray(playerIds) && playerIds.some(isMockPlayer)) {
+    return mockEvolutions;
+  }
+
   const { data, error } = await supabase
     .from('evoluciones')
     .select('jugador_id,fecha,peso_kg,porcentaje_grasa,peso_magro')
@@ -31,6 +45,10 @@ export async function getEvolutionsByPlayerIdsSimple(supabase, playerIds) {
 }
 
 export async function getEvolutionsByPlayerIds(supabase, playerIds) {
+  if (Array.isArray(playerIds) && playerIds.some(isMockPlayer)) {
+    return mockEvolutions;
+  }
+
   const { data, error } = await supabase
     .from('evoluciones')
     .select('*')

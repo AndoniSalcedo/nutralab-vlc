@@ -1,17 +1,13 @@
+import { mockTeam, mockTeams, isMockTeam } from '@/lib/boneyardMockData';
+
 function getOwnerId(user) {
   if (!user || user.role === 'jugador') return null;
   return String(user.external_admin_id || user.id || user.email || user.username || '').trim() || null;
 }
 
 export async function getOwnedTeam(supabase, user, teamId) {
-  if (user?.isBoneyardBypass) {
-    const { data, error } = await supabase
-      .from('equipos')
-      .select('*')
-      .eq('id', teamId)
-      .maybeSingle();
-    if (error) throw error;
-    return data || null;
+  if (user?.isBoneyardBypass || isMockTeam(teamId)) {
+    return mockTeam;
   }
 
   const ownerId = getOwnerId(user);
@@ -29,6 +25,10 @@ export async function getOwnedTeam(supabase, user, teamId) {
 }
 
 export async function getTeamsByOwner(supabase, ownerId) {
+  if (ownerId === 'boneyard-mock-user' || process.env.BONEYARD_MODE === 'true') {
+    return mockTeams;
+  }
+
   const { data, error } = await supabase
     .from('equipos')
     .select('*')
@@ -41,6 +41,10 @@ export async function getTeamsByOwner(supabase, ownerId) {
 }
 
 export async function getTeamById(supabase, teamId) {
+  if (isMockTeam(teamId)) {
+    return mockTeam;
+  }
+
   const { data, error } = await supabase
     .from('equipos')
     .select('*')
@@ -52,6 +56,10 @@ export async function getTeamById(supabase, teamId) {
 }
 
 export async function getTeamByIdAndOwner(supabase, teamId, ownerId) {
+  if (isMockTeam(teamId)) {
+    return mockTeam;
+  }
+
   const { data, error } = await supabase
     .from('equipos')
     .select('id')

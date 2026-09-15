@@ -11,6 +11,7 @@ import { getHydrationRecordsByPlayerId } from '@/repositories/hydrationRepositor
 import { getMessages } from '@/repositories/messagesRepository';
 import NothingFound from '@/components/NothingFound';
 import PlayerTabContainer from './PlayerTabContainer';
+import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 export const dynamic = 'force-dynamic';
 
@@ -120,19 +121,25 @@ export default async function JugadorTabPage({ params }) {
     console.error('Error fetching tab details:', err);
   }
 
+  const skeletonName = activeSubtab
+    ? `player-dashboard-${activeTab}-${activeSubtab}`
+    : `player-dashboard-${activeTab}`;
+
   return (
-    <PlayerTabContainer
-      tab={activeTab}
-      activeSubtab={activeSubtab}
-      jugador={jugador}
-      readOnly={isPlayer || user?.role === 'tecnico'}
-      isPlayer={isPlayer}
-      evoluciones={evoluciones}
-      pesajes={pesajes}
-      analiticas={analiticas}
-      registrosHidratacion={registrosHidratacion}
-      messages={messages}
-      menus={menus}
-    />
+    <BoneyardSkeleton name={skeletonName} loading={false}>
+      <PlayerTabContainer
+        tab={activeTab}
+        activeSubtab={activeSubtab}
+        jugador={jugador}
+        readOnly={isPlayer || user?.role === 'tecnico'}
+        isPlayer={isPlayer}
+        evoluciones={evoluciones}
+        pesajes={pesajes}
+        analiticas={analiticas}
+        registrosHidratacion={registrosHidratacion}
+        messages={messages}
+        menus={menus}
+      />
+    </BoneyardSkeleton>
   );
 }

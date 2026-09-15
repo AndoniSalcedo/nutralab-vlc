@@ -1,17 +1,13 @@
+import { mockPlayers, mockTeam, isMockPlayer, isMockTeam } from '@/lib/boneyardMockData';
+
 function getOwnerId(user) {
   if (!user || user.role === 'jugador') return null;
   return String(user.external_admin_id || user.id || user.email || user.username || '').trim() || null;
 }
 
 export async function getOwnedPlayer(supabase, user, playerId) {
-  if (user?.isBoneyardBypass) {
-    const { data, error } = await supabase
-      .from('jugadores')
-      .select('id,equipo_id,equipos!inner(id,owner_id)')
-      .eq('id', playerId)
-      .maybeSingle();
-    if (error) throw error;
-    return data || null;
+  if (user?.isBoneyardBypass || isMockPlayer(playerId)) {
+    return mockPlayers[0];
   }
 
   const ownerId = getOwnerId(user);
@@ -29,6 +25,10 @@ export async function getOwnedPlayer(supabase, user, playerId) {
 }
 
 export async function getPlayerById(supabase, id) {
+  if (isMockPlayer(id)) {
+    return mockPlayers[0];
+  }
+
   const { data, error } = await supabase
     .from('jugadores')
     .select('*')
@@ -40,6 +40,10 @@ export async function getPlayerById(supabase, id) {
 }
 
 export async function getPlayerByIdMaybe(supabase, id) {
+  if (isMockPlayer(id)) {
+    return mockPlayers[0];
+  }
+
   const { data, error } = await supabase
     .from('jugadores')
     .select('*')
@@ -95,6 +99,10 @@ export async function getPlayerByAuthUserIdSingle(supabase, authUserId) {
 }
 
 export async function getPlayersByOwner(supabase, ownerId) {
+  if (ownerId === 'boneyard-mock-user' || process.env.BONEYARD_MODE === 'true') {
+    return mockPlayers;
+  }
+
   const { data, error } = await supabase
     .from('jugadores')
     .select('id,equipo_id,nombre,apellidos,posicion,equipos!inner(owner_id)')
@@ -106,6 +114,10 @@ export async function getPlayersByOwner(supabase, ownerId) {
 }
 
 export async function getPlayersByTeam(supabase, teamId) {
+  if (isMockTeam(teamId)) {
+    return mockPlayers;
+  }
+
   const { data, error } = await supabase
     .from('jugadores')
     .select('*')
@@ -117,6 +129,10 @@ export async function getPlayersByTeam(supabase, teamId) {
 }
 
 export async function getPlayersByTeamSelect(supabase, teamId, selectFields = '*') {
+  if (isMockTeam(teamId)) {
+    return mockPlayers;
+  }
+
   const { data, error } = await supabase
     .from('jugadores')
     .select(selectFields)
@@ -128,6 +144,10 @@ export async function getPlayersByTeamSelect(supabase, teamId, selectFields = '*
 }
 
 export async function getPlayersByTeamSelectSimple(supabase, teamId) {
+  if (isMockTeam(teamId)) {
+    return mockPlayers;
+  }
+
   const { data, error } = await supabase
     .from('jugadores')
     .select('id,nombre,apellidos,posicion,avatar_size,updated_at')
@@ -149,7 +169,27 @@ export async function getPlayersByTeamIds(supabase, teamId, ids) {
   return data || [];
 }
 
+export async function getPlayersByMultipleTeamIds(supabase, teamIds) {
+  if (!teamIds || teamIds.length === 0) return [];
+  if (teamIds.some(isMockTeam)) {
+    return mockPlayers;
+  }
+
+  const { data, error } = await supabase
+    .from('jugadores')
+    .select('id,equipo_id,nombre,apellidos,posicion')
+    .in('equipo_id', teamIds)
+    .order('nombre');
+
+  if (error) throw error;
+  return data || [];
+}
+
 export async function getPlayerWithTeamConfig(supabase, id) {
+  if (isMockPlayer(id)) {
+    return { ...mockPlayers[0], equipos: mockTeam };
+  }
+
   const { data, error } = await supabase
     .from('jugadores')
     .select('*, equipos(configuracion_nutricional)')
@@ -161,6 +201,10 @@ export async function getPlayerWithTeamConfig(supabase, id) {
 }
 
 export async function getPlayerWithTeamConfigMaybe(supabase, id) {
+  if (isMockPlayer(id)) {
+    return { ...mockPlayers[0], equipos: mockTeam };
+  }
+
   const { data, error } = await supabase
     .from('jugadores')
     .select('*, equipos(configuracion_nutricional)')
