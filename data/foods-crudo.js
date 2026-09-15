@@ -3458,7 +3458,4 @@ FOODS_CRUDO.forEach((f) => {
   }
 });
 
-export const FOOD_NAMES_LIST = FOODS_CRUDO.map((f) => f.name);
-export const FOOD_NORMALIZED_NAMES_LIST = FOODS_CRUDO.map((f) => f.normalizedName);
-
 export default FOODS_CRUDO;

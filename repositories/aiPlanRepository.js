@@ -25,27 +25,6 @@ export async function getAiPlanById(supabase, id) {
   return data || null;
 }
 
-export async function getAiPlansByPlayerIds(supabase, playerIds) {
-  const { data, error } = await supabase
-    .from('planes_ia')
-    .select('jugador_id, datos, meta')
-    .in('jugador_id', playerIds);
-
-  if (error) throw error;
-  return data || [];
-}
-
-export async function getAiPlansByPlayerIdsOrdered(supabase, playerIds) {
-  const { data, error } = await supabase
-    .from('planes_ia')
-    .select('id, jugador_id, datos, meta')
-    .in('jugador_id', playerIds)
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
-}
-
 export async function insertAiPlan(supabase, payload) {
   const { data, error } = await supabase
     .from('planes_ia')

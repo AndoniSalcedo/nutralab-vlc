@@ -15,21 +15,6 @@ export async function getHydrationRecordsByPlayerId(supabase, playerId) {
   return data || [];
 }
 
-export async function getHydrationRecordsByPlayerIds(supabase, playerIds) {
-  if (Array.isArray(playerIds) && playerIds.some(isMockPlayer)) {
-    return mockHydration;
-  }
-
-  const { data, error } = await supabase
-    .from('registros_hidratacion')
-    .select('*')
-    .in('jugador_id', playerIds)
-    .order('fecha', { ascending: true });
-
-  if (error) throw error;
-  return data || [];
-}
-
 export async function upsertHydrationRecords(supabase, records) {
   const { data, error } = await supabase
     .from('registros_hidratacion')

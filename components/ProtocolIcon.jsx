@@ -30,7 +30,7 @@ export const PROTOCOL_ICON_MAP = {
   IconClipboardList,
 };
 
-export const PROTOCOL_3D_MAP = {
+const PROTOCOL_3D_MAP = {
   IconApple: 'apple',
   IconRun: 'running',
   IconCoffee: 'coffee',
@@ -58,19 +58,8 @@ export const PROTOCOL_AVAILABLE_ICONS = {
   IconClipboardList: <Icon3D name="target" size={22} />
 };
 
-export const PROTOCOL_ICON_OPTIONS = [
-  { value: 'IconApple', label: 'Comida / Manzana' },
-  { value: 'IconRun', label: 'Ejercicio / Correr' },
-  { value: 'IconCoffee', label: 'Cafeína / Café' },
-  { value: 'IconDroplet', label: 'Hidratación / Agua' },
-  { value: 'IconBatteryCharging', label: 'Energía / Batería' },
-  { value: 'IconFlag', label: 'Meta / Bandera' },
-  { value: 'IconBed', label: 'Descanso / Cama' },
-  { value: 'IconActivity', label: 'Rendimiento / Actividad' },
-  { value: 'IconMeat', label: 'Proteína / Carne' },
-  { value: 'IconPill', label: 'Suplemento / Píldora' },
-  { value: 'IconClipboardList', label: 'Tareas / Checklist' },
-];
+
+
 
 export default function ProtocolIcon({ iconName, size = 20, color, style = {} }) {
   if (!iconName) return null;

@@ -7,7 +7,6 @@ import {
   Avatar,
   Box,
   Button,
-  Divider,
   Group,
   Menu,
   Paper,
@@ -29,7 +28,7 @@ import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
 
-export function BackButton({ size = 42, iconSize = 26, equipoId }) {
+function BackButton({ size = 42, iconSize = 26, equipoId }) {
   const url = equipoId ? `/dashboard/equipo/${equipoId}` : '/dashboard';
   return (
     <Tooltip label="Volver al listado" position="right" withArrow>
@@ -82,7 +81,7 @@ function PlayerLogoutButton({ menuItem = false }) {
   );
 }
 
-export function HeaderActions({
+function HeaderActions({
   jugador,
   isAdmin,
   isPlayer,
@@ -171,126 +170,7 @@ export function HeaderActions({
   );
 }
 
-export function HeaderSemaforoIndicator({ semaforo, centered = false, compact = false }) {
-  if (!semaforo?.hasPesajes && !semaforo?.hasReference) return null;
-
-  const { status, label, pesoActual, pesoReferencia, diff, masaMagra, porcentajeGrasaObjetivo } = semaforo;
-  const isPositive = diff > 0;
-  const formattedDiff = diff !== null ? (isPositive ? `+${diff.toFixed(2)} kg` : `${diff.toFixed(2)} kg`) : '0.00 kg';
-  const fatPctLabel = porcentajeGrasaObjetivo ? `${porcentajeGrasaObjetivo}%` : '10%';
-
-  const statusConfigMap = {
-    verde: {
-      color: '#2e7d32',
-      dotColor: '#2e7d32',
-      title: 'Óptimo',
-    },
-    amarillo: {
-      color: '#b45309',
-      dotColor: '#f59f00',
-      title: 'Precaución',
-    },
-    rojo: {
-      color: '#c92a2a',
-      dotColor: '#e03131',
-      title: diff < 0 ? 'Pérdida' : 'Exceso',
-    },
-  };
-
-  const cfg = statusConfigMap[status] || statusConfigMap.verde;
-
-  if (compact) {
-    return (
-      <Tooltip
-        withArrow
-        radius="md"
-        label={`${label} · ${pesoActual} kg (${formattedDiff}) · Ref: ${pesoReferencia} kg (${fatPctLabel})`}
-      >
-        <Group gap={4} align="center" wrap="nowrap" style={{ cursor: 'pointer' }}>
-          <Box
-            style={{
-              width: 7,
-              height: 7,
-              borderRadius: '50%',
-              backgroundColor: cfg.dotColor,
-              boxShadow: `0 0 4px ${cfg.dotColor}`,
-              flexShrink: 0,
-            }}
-          />
-          <Text fz="xs" fw={700} style={{ color: cfg.color }}>
-            {formattedDiff}
-          </Text>
-        </Group>
-      </Tooltip>
-    );
-  }
-
-  return (
-    <Tooltip
-      withArrow
-      radius="md"
-      multiline
-      w={250}
-      label={
-        <Stack gap={4} p={4}>
-          <Group justify="space-between" align="center">
-            <Text size="xs" fw={700} c={cfg.color}>
-              ● {label}
-            </Text>
-            <Text size="xs" fw={700} c={cfg.color} style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {status}
-            </Text>
-          </Group>
-          <Divider my={2} style={{ opacity: 0.2 }} />
-          <Group justify="space-between">
-            <Text size="xs" c="dimmed">Peso Actual:</Text>
-            <Text size="xs" fw={700}>{pesoActual} kg</Text>
-          </Group>
-          <Group justify="space-between">
-            <Text size="xs" c="dimmed">Peso Ref ({fatPctLabel} grasa):</Text>
-            <Text size="xs" fw={700}>{pesoReferencia} kg</Text>
-          </Group>
-          {masaMagra && (
-            <Group justify="space-between">
-              <Text size="xs" c="dimmed">Masa Magra (Antropo):</Text>
-              <Text size="xs" fw={700}>{masaMagra} kg</Text>
-            </Group>
-          )}
-          <Group justify="space-between">
-            <Text size="xs" c="dimmed">Variación:</Text>
-            <Text size="xs" fw={700} c={cfg.color}>
-              {formattedDiff}
-            </Text>
-          </Group>
-          <Text size="10px" c="dimmed" mt={2} style={{ fontStyle: 'italic' }}>
-            Margen verde (±0,50 kg) · Amarillo (±1,00 kg)
-          </Text>
-        </Stack>
-      }
-    >
-      <Group gap={6} align="center" justify={centered ? 'center' : undefined} style={{ cursor: 'pointer', marginTop: 2 }}>
-        <Box
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            backgroundColor: cfg.dotColor,
-            boxShadow: `0 0 6px ${cfg.dotColor}`,
-            flexShrink: 0,
-          }}
-        />
-        <Text fz="xs" fw={700} style={{ color: cfg.color }}>
-          {pesoActual} kg ({formattedDiff})
-        </Text>
-        <Text fz="xs" c="dimmed">
-          · {cfg.title} (Ref: {pesoReferencia} kg)
-        </Text>
-      </Group>
-    </Tooltip>
-  );
-}
-
-export function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
+function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
   const [loading, setLoading] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState(() => {
     if (jugador?.avatar_url) return jugador.avatar_url;
@@ -417,7 +297,7 @@ export function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) 
   );
 }
 
-export function PlayerIdentity({ jugador, isAdmin, isPlayer, hasCredentials, avatarSize = 84, titleSize = 26, centered = false }) {
+function PlayerIdentity({ jugador, isAdmin, isPlayer, hasCredentials, avatarSize = 84, titleSize = 26, centered = false }) {
   return (
     <>
       <PlayerAvatarUploader

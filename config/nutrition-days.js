@@ -41,14 +41,9 @@ export const NUTRITION_DAY_TYPES = [
   },
 ];
 
-export const PLAN_DAY_TYPES = NUTRITION_DAY_TYPES.map((dayType) => ({
-  ...dayType,
-  label: dayType.planLabel,
-  shortLabel: dayType.label,
-  kcalLabel: dayType.planLabel,
-}));
 
-export function getNutritionDayType(key) {
+
+function getNutritionDayType(key) {
   return NUTRITION_DAY_TYPES.find((dayType) => dayType.key === key) || null;
 }
 
@@ -60,15 +55,7 @@ export function getDayTypeLabel(key) {
   return getNutritionDayType(key)?.label || key;
 }
 
-export const PLAN_CONTEXTS = [
-  { value: 'semana_normal', label: 'Semana normal de entrenamiento', promptDescription: 'semana normal de entrenamiento (3-4 sesiones)' },
-  { value: 'semana_partido', label: 'Semana con partido oficial (microciclo competitivo)', promptDescription: 'semana con partido oficial (microciclo competitivo)' },
-  { value: 'dia_partido', label: 'Día de partido (ajuste máximo de timing nutricional)', promptDescription: 'dia de partido (ajuste maximo de timing nutricional)' },
-  { value: 'viaje', label: 'Viaje / desplazamiento', promptDescription: 'viaje o desplazamiento para jugar fuera' },
-  { value: 'lesion', label: 'Lesión / inactividad', promptDescription: 'periodo de lesion o inactividad reducida' },
-  { value: 'vacaciones', label: 'Vacaciones / fuera de temporada', promptDescription: 'periodo vacacional fuera de temporada' },
-  { value: 'pretemporada', label: 'Pretemporada (alta carga)', promptDescription: 'pretemporada (alta carga de trabajo)' },
-];
+
 
 export const AVAILABLE_MEALS = [
   { value: 'Desayuno', label: 'Desayuno' },
@@ -167,9 +154,7 @@ export const OBJECTIVE_DAY_TYPE_MACROS = {
   },
 };
 
-export function getObjectiveMacros(objectiveKey, dayTypeKey) {
-  return OBJECTIVE_DAY_TYPE_MACROS[objectiveKey]?.[dayTypeKey] || null;
-}
+
 
 export function getObjectiveLabel(objectiveKey) {
   return PLAYER_OBJECTIVES.find((o) => o.value === objectiveKey)?.label || objectiveKey || '';
@@ -191,7 +176,7 @@ export function getTeamObjectiveDayTypeMacros(teamConfig) {
   return OBJECTIVE_DAY_TYPE_MACROS;
 }
 
-export function getTeamNutritionDayType(key, teamConfig) {
+function getTeamNutritionDayType(key, teamConfig) {
   return getTeamNutritionDayTypes(teamConfig).find((dayType) => dayType.key === key) || null;
 }
 
@@ -203,9 +188,7 @@ export function getTeamDayTypeLabel(key, teamConfig) {
   return getTeamNutritionDayType(key, teamConfig)?.label || key;
 }
 
-export function getTeamObjectiveMacros(objectiveKey, dayTypeKey, teamConfig) {
-  return getTeamObjectiveDayTypeMacros(teamConfig)[objectiveKey]?.[dayTypeKey] || null;
-}
+
 
 export function getUserMealsForDay(jugador, tipoDia, teamConfig, preMatchConfig = null, dayKey = null) {
   const baseMeals = getUserMeals(jugador);

@@ -62,18 +62,3 @@ export async function uploadTecnicoAvatar(tecnicoId, file) {
   if (!res.ok) throw new Error(data.error || 'Error al subir foto de perfil');
   return data;
 }
-
-export async function removeTecnicoAvatar(tecnicoId) {
-  const formData = new FormData();
-  if (tecnicoId) formData.append('id', tecnicoId);
-  formData.append('remove', 'true');
-
-  const res = await fetch('/api/tecnicos/avatar', {
-    method: 'POST',
-    body: formData,
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al eliminar foto de perfil');
-  return data;
-}
-

@@ -95,18 +95,3 @@ export async function uploadPlayerAvatar(jugadorId, file) {
   if (!res.ok) throw new Error(data.error || 'Error al subir foto de perfil');
   return data;
 }
-
-export async function removePlayerAvatar(jugadorId) {
-  const formData = new FormData();
-  if (jugadorId) formData.append('id', jugadorId);
-  formData.append('remove', 'true');
-
-  const res = await fetch('/api/players/avatar', {
-    method: 'POST',
-    body: formData,
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al eliminar foto de perfil');
-  return data;
-}
-

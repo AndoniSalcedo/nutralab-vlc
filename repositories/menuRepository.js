@@ -33,28 +33,6 @@ export async function getMenusByTeam(supabase, teamId) {
   return data || [];
 }
 
-export async function getMenusLimit(supabase, limit = 10) {
-  const { data, error } = await supabase
-    .from('menu_semanal')
-    .select('*')
-    .order('semana', { ascending: false })
-    .limit(limit);
-
-  if (error) throw error;
-  return data || [];
-}
-
-export async function insertMenu(supabase, payload) {
-  const { data, error } = await supabase
-    .from('menu_semanal')
-    .insert(payload)
-    .select('*')
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
 export async function updateMenu(supabase, id, payload) {
   const { data, error } = await supabase
     .from('menu_semanal')

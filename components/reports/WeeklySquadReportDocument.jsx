@@ -460,7 +460,7 @@ const detailStyles = StyleSheet.create({
   },
 });
 
-export function PlayerDetailBreakdownPage({ player, plan, meta, teamConfig }) {
+function PlayerDetailBreakdownPage({ player, plan, meta, teamConfig }) {
   const p = player || {};
   const metrics = plan?.metricas || {
     peso: p.peso_kg,

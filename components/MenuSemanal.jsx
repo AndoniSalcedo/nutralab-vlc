@@ -36,7 +36,7 @@ export function formatWeek(value) {
   }).format(new Date(`${value}T00:00:00`));
 }
 
-export function getDayDate(weekStr, dayName) {
+function getDayDate(weekStr, dayName) {
   if (!weekStr) return null;
   try {
     const date = new Date(`${weekStr}T00:00:00`);

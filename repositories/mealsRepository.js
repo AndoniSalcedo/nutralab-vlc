@@ -40,17 +40,6 @@ export async function getMealById(supabase, id) {
   return data || null;
 }
 
-export async function getMealPhoto(supabase, id) {
-  const { data, error } = await supabase
-    .from('comidas')
-    .select('photo, photo_mime')
-    .eq('id', id)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
-}
-
 export async function insertMeal(supabase, payload) {
   const { data, error } = await supabase
     .from('comidas')

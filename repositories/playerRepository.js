@@ -65,27 +65,6 @@ export async function getPlayerAuthUserId(supabase, id) {
   return data;
 }
 
-export async function getPlayerForCredentials(supabase, id) {
-  const { data, error } = await supabase
-    .from('jugadores')
-    .select('id, auth_user_id, auth_email')
-    .eq('id', id)
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
-export async function getPlayerByAuthUserId(supabase, authUserId) {
-  const { data, error } = await supabase
-    .from('jugadores')
-    .select('id, nombre, apellidos')
-    .eq('auth_user_id', authUserId)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data;
-}
 
 export async function getPlayerByAuthUserIdSingle(supabase, authUserId) {
   const { data, error } = await supabase
@@ -200,52 +179,6 @@ export async function getPlayerWithTeamConfig(supabase, id) {
   return data;
 }
 
-export async function getPlayerWithTeamConfigMaybe(supabase, id) {
-  if (isMockPlayer(id)) {
-    return { ...mockPlayers[0], equipos: mockTeam };
-  }
-
-  const { data, error } = await supabase
-    .from('jugadores')
-    .select('*, equipos(configuracion_nutricional)')
-    .eq('id', id)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data;
-}
-
-export async function getPlayersIdsByTeamOrdered(supabase, teamId) {
-  const { data, error } = await supabase
-    .from('jugadores')
-    .select('id')
-    .eq('equipo_id', teamId)
-    .order('id', { ascending: true });
-
-  if (error) throw error;
-  return data || [];
-}
-
-export async function getPlayersForImport(supabase, teamId) {
-  const { data, error } = await supabase
-    .from('jugadores')
-    .select('id, nombre, apellidos, equipo_id')
-    .eq('equipo_id', teamId);
-
-  if (error) throw error;
-  return data || [];
-}
-
-export async function getPlayerIdByAuthUserId(supabase, authUserId) {
-  const { data, error } = await supabase
-    .from('jugadores')
-    .select('id')
-    .eq('auth_user_id', authUserId)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data;
-}
 
 export async function insertPlayer(supabase, payload) {
   const { data, error } = await supabase

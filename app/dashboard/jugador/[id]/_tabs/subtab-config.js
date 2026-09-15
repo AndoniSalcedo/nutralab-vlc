@@ -12,7 +12,7 @@ import { IconScale } from '@/components/icons3d';
  * it will be reflected everywhere automatically.
  */
 
-export const SUBTAB_CONFIGS = {
+const SUBTAB_CONFIGS = {
   resumen: {
     defaultSubtab: 'perfil',
     tabs: [

@@ -158,7 +158,7 @@ export const CLINICAL_TAGS = [
   },
 ];
 
-export const CLINICAL_TAGS_MAP = new Map(CLINICAL_TAGS.map((t) => [t.value, t]));
+const CLINICAL_TAGS_MAP = new Map(CLINICAL_TAGS.map((t) => [t.value, t]));
 
 /**
  * Parsea el perfil de un jugador (o texto libre histórico) y devuelve un array de tags canónicos.

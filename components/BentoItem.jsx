@@ -1,4 +1,4 @@
-import { Box, Group, Text, ThemeIcon, Paper, Stack } from '@mantine/core';
+import { Group, Text, ThemeIcon, Paper, Stack } from '@mantine/core';
 import Icon3D, { USE_3D_ICONS } from '@/components/Icon3D';
 
 export function BentoCard({ title, icon: Icon, icon3d, color = 'blue', children, ...props }) {
@@ -32,24 +32,5 @@ export function BentoCard({ title, icon: Icon, icon3d, color = 'blue', children,
         {children}
       </Stack>
     </Paper>
-  );
-}
-
-export function InfoRow({ label, children, border = true }) {
-  return (
-    <Group
-      justify="space-between"
-      align="start"
-      wrap="nowrap"
-      style={{
-        borderBottom: border ? '1px dashed var(--mantine-color-gray-2)' : 'none',
-        paddingBottom: border ? 8 : 0,
-      }}
-    >
-      <Text size="xs" c="dimmed" fw={500} style={{ flex: '0 0 40%' }}>
-        {label}
-      </Text>
-      <Box style={{ flex: 1, textAlign: 'right' }}>{children}</Box>
-    </Group>
   );
 }

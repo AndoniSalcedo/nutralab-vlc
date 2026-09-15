@@ -24,12 +24,6 @@ import { useRouter } from 'next/navigation';
 import { AVAILABLE_MEALS, STANDARD_MEALS, sortMeals } from '@/config/nutrition-days';
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
 
-export function getRawText(val) {
-  if (!val) return '';
-  if (typeof val === 'string') return val;
-  return val.raw || val.text || '';
-}
-
 export function CampoEditable({
   label,
   campo,
