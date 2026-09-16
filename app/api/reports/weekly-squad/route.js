@@ -288,8 +288,9 @@ export async function POST(request) {
     const generateOnly = !!body?.generateOnly;
     const previewOnly = !!body?.previewOnly;
     const commitDraft = !!body?.commitDraft;
+    const downloadOnly = !!body?.downloadOnly;
 
-    if (!previewOnly && !commitDraft) {
+    if (!previewOnly && !commitDraft && !downloadOnly) {
       semana = await persistWeeklyReport(supabase, team.id, { ...meta, semanaMenu }, semana);
     }
 
@@ -308,6 +309,9 @@ export async function POST(request) {
       throw httpError('El borrador de validación no contiene todos los jugadores seleccionados', 400);
     }
 
+    const hasDraftPlans = draftPlans.size > 0;
+    const shouldPersist = !previewOnly && !downloadOnly;
+
     const players = await loadPlayersWithMeasurements(
       supabase,
       team,
@@ -318,7 +322,7 @@ export async function POST(request) {
       meta.contexto,
       forceRegenerate,
       meta.preMatchConfig,
-      { persistPlans: !previewOnly, draftPlans: commitDraft ? draftPlans : null }
+      { persistPlans: shouldPersist, draftPlans: hasDraftPlans ? draftPlans : null }
     );
 
     if (commitDraft && players.length !== jugadorIds.length) {

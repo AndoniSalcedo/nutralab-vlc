@@ -260,6 +260,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
   const [reviewPreview, setReviewPreview] = useState(null);
   const [reviewOpened, setReviewOpened] = useState(false);
   const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewActionLoading, setReviewActionLoading] = useState(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [availableMenus, setAvailableMenus] = useState([]);
   const [selectedMenuWeek, setSelectedMenuWeek] = useState('');
@@ -426,6 +427,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
   function resetReportWorkflow(closeModal = true) {
     setGeneratingReport(false);
     setReviewLoading(false);
+    setReviewActionLoading(null);
     setReportProgress(null);
     setReportWorkflow(null);
     setReviewPreview(null);
@@ -478,6 +480,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
     setReviewPreview(previews[0]);
     setReviewOpened(true);
     setReviewLoading(false);
+    setReviewActionLoading(null);
     setGeneratingReport(false);
     setReportProgress(null);
   }
@@ -567,6 +570,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       setReportWorkflow({ ...reportWorkflow, index: index + 1, approved });
       setReviewPreview(previews[index + 1]);
       setReviewLoading(false);
+      setReviewActionLoading(null);
       return;
     }
 
@@ -583,11 +587,13 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       { id: reviewPreview.id, plan: planToSave },
     ];
     setReviewLoading(true);
+    setReviewActionLoading('validate');
 
     try {
       await moveToNextReview(approved);
     } catch (e) {
       setReviewLoading(false);
+      setReviewActionLoading(null);
       setGeneratingReport(false);
       setReportProgress(null);
       setReviewOpened(true);
@@ -602,16 +608,148 @@ export default function DashboardContent({ players = [], team, readOnly = false 
   async function discardCurrentPreview() {
     if (!reportWorkflow) return;
     setReviewLoading(true);
+    setReviewActionLoading('discard');
     try {
       await moveToNextReview(reportWorkflow.approved);
     } catch (e) {
       setReviewLoading(false);
+      setReviewActionLoading(null);
       setGeneratingReport(false);
       setReviewOpened(true);
       notifications.show({
         color: 'red',
         title: 'No se pudo completar la revisión',
         message: e.message,
+      });
+    }
+  }
+
+  async function regenerateCurrentPlayer() {
+    if (!reportWorkflow || !reviewPreview) return;
+    const playerId = reviewPreview.id;
+    setReviewLoading(true);
+    setReviewActionLoading('regenerate');
+
+    try {
+      const res = await generateWeeklySquadReport(reportPayload([playerId], {
+        previewOnly: true,
+        forceRegenerate: true,
+      }));
+      const data = await res.json();
+      const newPreview = Array.isArray(data.preview) && data.preview[0];
+      if (!newPreview?.plan) {
+        throw new Error('No se pudo regenerar la dieta del jugador.');
+      }
+
+      setReportWorkflow((prev) => {
+        if (!prev) return prev;
+        const newPreviews = prev.previews.map((p) =>
+          String(p.id) === String(playerId) ? { ...p, plan: newPreview.plan } : p
+        );
+        return { ...prev, previews: newPreviews };
+      });
+
+      setReviewPreview((prev) => ({
+        ...prev,
+        plan: newPreview.plan,
+      }));
+
+      notifications.show({
+        color: 'green',
+        title: 'Dieta regenerada',
+        message: `Se ha generado una nueva propuesta para ${reviewPreview.nombre || 'el jugador'}.`,
+      });
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al regenerar',
+        message: e.message || 'No se pudo regenerar la dieta.',
+      });
+    } finally {
+      setReviewLoading(false);
+      setReviewActionLoading(null);
+    }
+  }
+
+  async function downloadCurrentPlayerPdf(editedPlan) {
+    if (!reportWorkflow || !reviewPreview) return;
+    const playerId = reviewPreview.id;
+    setReviewLoading(true);
+    setReviewActionLoading('single');
+
+    try {
+      const planToUse = editedPlan || reviewPreview.plan;
+
+      // Actualizar en previews locales para mantener ediciones en memoria
+      setReportWorkflow((prev) => {
+        if (!prev) return prev;
+        const newPreviews = prev.previews.map((p) =>
+          String(p.id) === String(playerId) ? { ...p, plan: planToUse } : p
+        );
+        return { ...prev, previews: newPreviews };
+      });
+
+      const res = await generateWeeklySquadReport(reportPayload([playerId], {
+        downloadOnly: true,
+        forceRegenerate: false,
+        draftPlayers: [{ id: playerId, plan: planToUse }],
+      }));
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const playerName = `${reviewPreview.nombre || 'Jugador'}_${reviewPreview.apellidos || ''}`.trim().replace(/\s+/g, '_');
+      a.download = filenameFromResponse(
+        res,
+        `Informe_${reportForm.semana || 'Semana'}_${playerName}.pdf`
+      );
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      notifications.show({
+        color: 'green',
+        title: 'Dieta descargada',
+        message: `PDF descargado para ${reviewPreview.nombre || 'el jugador'}.`,
+      });
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al descargar PDF',
+        message: e.message || 'No se pudo generar el PDF individual.',
+      });
+    } finally {
+      setReviewLoading(false);
+      setReviewActionLoading(null);
+    }
+  }
+
+  async function downloadAllPlayersPdf(currentEditedPlan) {
+    if (!reportWorkflow || !reviewPreview) return;
+    setReviewLoading(true);
+    setReviewActionLoading('all');
+
+    try {
+      const { previews, index, approved } = reportWorkflow;
+      const planToUse = currentEditedPlan || reviewPreview.plan;
+
+      // Combinar los ya aprobados, el actual con sus ediciones, y los restantes
+      const allApproved = [
+        ...approved,
+        { id: reviewPreview.id, plan: planToUse },
+        ...previews.slice(index + 1).map((p) => ({ id: p.id, plan: p.plan })),
+      ];
+
+      await commitApprovedPlayers(allApproved);
+    } catch (e) {
+      setReviewLoading(false);
+      setReviewActionLoading(null);
+      notifications.show({
+        color: 'red',
+        title: 'Error al descargar plantilla',
+        message: e.message || 'No se pudo generar el PDF de todos los jugadores.',
       });
     }
   }
@@ -1012,9 +1150,13 @@ export default function DashboardContent({ players = [], team, readOnly = false 
           index={reportWorkflow?.index || 0}
           total={reportWorkflow?.jugadorIds?.length || 0}
           loading={reviewLoading}
+          actionLoading={reviewActionLoading}
           onValidate={validateCurrentPreview}
           onDiscard={discardCurrentPreview}
           onCancel={cancelReportWorkflow}
+          onRegenerate={regenerateCurrentPlayer}
+          onDownloadSingle={downloadCurrentPlayerPdf}
+          onDownloadAll={downloadAllPlayersPdf}
         />
 
         <NewPlayerModal

@@ -19,13 +19,16 @@ import {
 import {
   IconAlertTriangle,
   IconCheck,
+  IconDownload,
   IconEdit,
+  IconFileDownload,
   IconPlus,
   IconRotate,
   IconShieldCheck,
   IconTrash,
   IconUserCheck,
 } from '@/components/icons3d';
+import ConfirmModal from '@/components/modals/ConfirmModal';
 
 const DAYS_OF_WEEK = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
 
@@ -39,15 +42,21 @@ export default function SquadReportReviewModal({
   index,
   total,
   loading,
+  actionLoading,
   onValidate,
   onDiscard,
   onCancel,
+  onRegenerate,
+  onDownloadSingle,
+  onDownloadAll,
 }) {
   const [confirmed, setConfirmed] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingMeal, setEditingMeal] = useState(null); // { dayKey, mealIndex }
   const [editablePlan, setEditablePlan] = useState(null);
   const [originalPlan, setOriginalPlan] = useState(null);
+  const [confirmRegenerateOpened, setConfirmRegenerateOpened] = useState(false);
+  const [confirmDownloadAllOpened, setConfirmDownloadAllOpened] = useState(false);
 
   const contentRef = useRef(null);
   const playerName = `${preview?.nombre || 'Jugador'} ${preview?.apellidos || ''}`.trim();
@@ -232,7 +241,8 @@ export default function SquadReportReviewModal({
   };
 
   return (
-    <Modal
+    <>
+      <Modal
       opened={opened}
       onClose={onCancel}
       closeOnClickOutside={false}
@@ -277,6 +287,7 @@ export default function SquadReportReviewModal({
               {hasChanges && (
                 <Button
                   size="xs"
+                  radius="xl"
                   variant="subtle"
                   color="gray"
                   leftSection={<IconRotate size={14} />}
@@ -289,6 +300,27 @@ export default function SquadReportReviewModal({
 
               <Button
                 size="xs"
+                radius="xl"
+                variant="light"
+                color="blue"
+                leftSection={<IconRotate size={14} />}
+                onClick={() => {
+                  if (hasChanges) {
+                    setConfirmRegenerateOpened(true);
+                  } else {
+                    onRegenerate?.();
+                  }
+                }}
+                loading={actionLoading === 'regenerate'}
+                disabled={loading}
+                title="Generar una nueva combinación aleatoria del árbol de opciones para este jugador"
+              >
+                Regenerar dieta
+              </Button>
+
+              <Button
+                size="xs"
+                radius="xl"
                 variant={isEditing ? 'filled' : 'light'}
                 color="nutralabColor"
                 leftSection={<IconEdit size={14} />}
@@ -511,6 +543,7 @@ export default function SquadReportReviewModal({
                                   />
                                   <Button
                                     size="xs"
+                                    radius="xl"
                                     variant="light"
                                     color="teal"
                                     leftSection={<IconCheck size={14} />}
@@ -556,6 +589,7 @@ export default function SquadReportReviewModal({
                         <Button
                           variant="light"
                           size="xs"
+                          radius="xl"
                           color="nutralabColor"
                           leftSection={<IconPlus size={14} />}
                           onClick={() => addMeal(dayKey)}
@@ -578,6 +612,7 @@ export default function SquadReportReviewModal({
               {isEditing && (
                 <Button
                   size="xs"
+                  radius="xl"
                   variant="subtle"
                   color="nutralabColor"
                   leftSection={<IconPlus size={14} />}
@@ -635,25 +670,79 @@ export default function SquadReportReviewModal({
           disabled={loading}
         />
 
-        <Group justify="space-between" align="center" wrap="wrap">
-          <Button variant="subtle" color="red" onClick={onCancel} disabled={loading}>
+        <Divider my={4} />
+
+        <Group justify="space-between" align="center" wrap="nowrap" gap="sm">
+          {/* Izquierda: Cancelar */}
+          <Button
+            variant="subtle"
+            color="gray"
+            size="xs"
+            radius="xl"
+            onClick={onCancel}
+            disabled={loading}
+          >
             Cancelar generación
           </Button>
-          <Group gap="xs">
+
+          {/* Centro: Descargas */}
+          <Group gap="xs" wrap="nowrap">
             <Button
               variant="light"
+              color="nutralabColor"
+              size="xs"
+              radius="xl"
+              leftSection={<IconDownload size={14} />}
+              onClick={() => onDownloadSingle?.(editablePlan)}
+              loading={actionLoading === 'single'}
+              disabled={loading}
+              title="Descargar el PDF de la dieta de este jugador"
+            >
+              Descargar dieta
+            </Button>
+
+            <Button
+              variant="light"
+              color="nutralabColor"
+              size="xs"
+              radius="xl"
+              leftSection={<IconFileDownload size={14} />}
+              onClick={() => {
+                if (index + 1 < total) {
+                  setConfirmDownloadAllOpened(true);
+                } else {
+                  onDownloadAll?.(editablePlan);
+                }
+              }}
+              loading={actionLoading === 'all'}
+              disabled={loading}
+              title="Aprobar y descargar el PDF con todos los jugadores"
+            >
+              Descargar todos ({total})
+            </Button>
+          </Group>
+
+          {/* Derecha: Descartar y Guardar */}
+          <Group gap="xs" wrap="nowrap">
+            <Button
+              variant="subtle"
               color="red"
+              size="xs"
+              radius="xl"
               onClick={onDiscard}
-              loading={loading}
+              loading={actionLoading === 'discard'}
               disabled={loading}
             >
               Descartar jugador
             </Button>
+
             <Button
               color="teal"
-              leftSection={<IconCheck size={16} />}
+              size="xs"
+              radius="xl"
+              leftSection={<IconCheck size={14} />}
               onClick={() => onValidate(editablePlan)}
-              loading={loading}
+              loading={actionLoading === 'validate'}
               disabled={!confirmed || loading}
             >
               {index + 1 < total ? 'Guardar y continuar' : 'Guardar informe'}
@@ -662,6 +751,37 @@ export default function SquadReportReviewModal({
         </Group>
       </Stack>
     </Modal>
+
+    {/* Modal de confirmación para regenerar dieta si hay cambios manuales */}
+    <ConfirmModal
+      opened={confirmRegenerateOpened}
+      onClose={() => setConfirmRegenerateOpened(false)}
+      title={`¿Regenerar dieta de ${playerName}?`}
+      message="Has realizado modificaciones manuales en la dieta de este jugador. Al regenerar, se descartarán los cambios no guardados y se creará una nueva combinación aleatoria del árbol de alimentos."
+      confirmLabel="Regenerar dieta"
+      cancelLabel="Cancelar"
+      color="blue"
+      onConfirm={() => {
+        setConfirmRegenerateOpened(false);
+        onRegenerate?.();
+      }}
+    />
+
+    {/* Modal de confirmación para descargar todos si quedan pendientes */}
+    <ConfirmModal
+      opened={confirmDownloadAllOpened}
+      onClose={() => setConfirmDownloadAllOpened(false)}
+      title="¿Guardar y descargar toda la plantilla?"
+      message={`Quedan ${total - (index + 1)} jugadores pendientes de validar. Al continuar, se aprobarán automáticamente los jugadores pendientes con sus dietas generadas, se guardarán todos en el sistema y se descargará el informe PDF conjunto de la plantilla (${total} jugadores).`}
+      confirmLabel={`Aprobar y descargar (${total})`}
+      cancelLabel="Seguir revisando"
+      color="teal"
+      onConfirm={() => {
+        setConfirmDownloadAllOpened(false);
+        onDownloadAll?.(editablePlan);
+      }}
+    />
+    </>
   );
 }
 
