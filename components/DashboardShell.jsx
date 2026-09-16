@@ -16,6 +16,7 @@ import {
 import {
   Avatar,
   Box,
+  Button,
   Container,
   Group,
   Menu,
@@ -65,9 +66,10 @@ export default function DashboardShell({ children, user }) {
       >
         <Container size="xl">
           <Group justify="space-between" align="center">
-            <Logo href="/dashboard" width={180} />
+            <Logo href={user ? "/dashboard" : "/login"} width={180} />
 
-            <Menu
+            {user ? (
+              <Menu
               width={240}
               position="bottom-end"
               withinPortal
@@ -206,6 +208,18 @@ export default function DashboardShell({ children, user }) {
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
+            ) : (
+              <Button
+                component="a"
+                href="/login"
+                variant="light"
+                color="nutralabColor"
+                size="xs"
+                radius="xl"
+              >
+                Iniciar sesión
+              </Button>
+            )}
           </Group>
         </Container>
       </Box>
