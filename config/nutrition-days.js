@@ -120,6 +120,14 @@ export function getUserMeals(jugador) {
   return sortMeals(meals);
 }
 
+export function isMainMeal(mealName, mealConfig = null) {
+  if (mealConfig && typeof mealConfig === 'object' && mealConfig.isMain !== undefined) {
+    return Boolean(mealConfig.isMain);
+  }
+  const norm = String(mealName || '').toLowerCase().trim();
+  return norm.includes('comida') || norm.includes('cena');
+}
+
 export const DEFAULT_OBJECTIVE_KEY = 'mejora_rendimiento';
 
 export const PLAYER_OBJECTIVES = [

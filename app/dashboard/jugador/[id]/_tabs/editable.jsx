@@ -21,7 +21,7 @@ import { IconEdit } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/services/player';
 import { useRouter } from 'next/navigation';
-import { AVAILABLE_MEALS, getMealsForCount, sortMeals } from '@/config/nutrition-days';
+import { AVAILABLE_MEALS, getMealsForCount, sortMeals, isMainMeal } from '@/config/nutrition-days';
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
 
 export function CampoEditable({
@@ -323,6 +323,7 @@ export function ComidasEditable({
             <Stack gap="xs">
               {activeMeals.map((meal) => {
                 const mealData = recsDefecto[meal] || {};
+                const isMain = isMainMeal(meal, mealData);
                 const isCompl = Boolean(mealData.isComplete);
                 const hidratos = Array.isArray(mealData.hidrato) ? mealData.hidrato : mealData.hidrato ? [mealData.hidrato] : [];
                 const proteinas = Array.isArray(mealData.proteina) ? mealData.proteina : mealData.proteina ? [mealData.proteina] : [];
@@ -336,10 +337,13 @@ export function ComidasEditable({
 
                 return (
                   <Paper key={meal} p="xs" withBorder radius="sm">
-                    <Group justify="space-between" align="flex-start" mb={4}>
+                    <Group justify="space-between" align="center" mb={4}>
                       <Group gap="xs" align="center">
                         <Text size="xs" fw={700} c="dark.8">
                           {meal}
+                        </Text>
+                        <Text size="11px" fw={600} c={isMain ? 'blue.7' : 'dimmed'}>
+                          ● {isMain ? 'Comida principal' : 'Toma ligera'}
                         </Text>
                       </Group>
 
@@ -738,6 +742,7 @@ export function PrepartidoEditable({
                     {currentMeals.map((m) => {
                       const timing = getMealTimingBadge(opt.value, m);
                       const mealData = currentRecs[m] || {};
+                      const isMain = isMainMeal(m, mealData);
                       const isCompl = Boolean(mealData.isComplete);
                       const hidratos = Array.isArray(mealData.hidrato) ? mealData.hidrato : mealData.hidrato ? [mealData.hidrato] : [];
                       const proteinas = Array.isArray(mealData.proteina) ? mealData.proteina : mealData.proteina ? [mealData.proteina] : [];
@@ -750,10 +755,13 @@ export function PrepartidoEditable({
 
                       return (
                         <Paper key={m} p="xs" withBorder radius="sm" bg="gray.0">
-                          <Group justify="space-between" align="flex-start" mb={2}>
+                          <Group justify="space-between" align="center" mb={2}>
                             <Group gap="xs" align="center">
                               <Text size="xs" fw={700} c="dark.8">
                                 {m} {timing ? `(${timing})` : ''}
+                              </Text>
+                              <Text size="11px" fw={600} c={isMain ? 'blue.7' : 'dimmed'}>
+                                ● {isMain ? 'Comida principal' : 'Toma ligera'}
                               </Text>
                             </Group>
 
