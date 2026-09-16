@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import Logo from "./Logo";
 import { initials } from "@/lib/utils";
 import { env } from "@/config/env";
+import { logout } from "@/services/auth";
 
 export default function DashboardShell({ children, user }) {
   const [opened, setOpened] = useState(false);
@@ -42,11 +43,8 @@ export default function DashboardShell({ children, user }) {
         ? `/api/media/player-avatar?id=${user.id}`
         : undefined);
 
-  const handleLogout = () => {
-    const form = document.getElementById("logout-form");
-    if (form && "requestSubmit" in form) {
-      form.requestSubmit();
-    }
+  const handleLogout = async () => {
+    await logout();
   };
 
   return (
@@ -212,7 +210,6 @@ export default function DashboardShell({ children, user }) {
         </Container>
       </Box>
 
-      <form id="logout-form" method="post" action="/api/auth/logout" />
 
       <Container size="xl" px={{ base: 0, sm: "md" }} pt={{ base: 0, sm: "md" }} pb="xl">
         {children}

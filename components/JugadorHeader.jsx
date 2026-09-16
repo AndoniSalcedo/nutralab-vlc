@@ -23,6 +23,7 @@ import { FileButton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { compressAvatar, initials } from '@/lib/utils/avatar';
 import { uploadPlayerAvatar } from '@/services/player';
+import { logout } from '@/services/auth';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from './PlayerCredentialsButton';
@@ -55,29 +56,33 @@ function CredentialsWarning({ show }) {
 }
 
 function PlayerLogoutButton({ menuItem = false }) {
+  const handleLogout = async () => {
+    await logout();
+  };
+
   if (menuItem) {
     return (
-      <form method="post" action="/api/auth/logout">
-        <Menu.Item type="submit" color="red" leftSection={<IconLogout size={14} />}>
-          Cerrar sesión
-        </Menu.Item>
-      </form>
+      <Menu.Item
+        color="red"
+        leftSection={<IconLogout size={14} />}
+        onClick={handleLogout}
+      >
+        Cerrar sesión
+      </Menu.Item>
     );
   }
 
   return (
-    <form method="post" action="/api/auth/logout">
-      <Button
-        type="submit"
-        size="xs"
-        radius="xl"
-        variant="subtle"
-        color="red"
-        leftSection={<IconLogout size={14} />}
-      >
-        Cerrar sesión
-      </Button>
-    </form>
+    <Button
+      size="xs"
+      radius="xl"
+      variant="subtle"
+      color="red"
+      leftSection={<IconLogout size={14} />}
+      onClick={handleLogout}
+    >
+      Cerrar sesión
+    </Button>
   );
 }
 
