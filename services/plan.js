@@ -9,12 +9,10 @@ export async function getAiPlans(jugadorId, semana = null) {
   return await getAiPlansAction(jugadorId, semana);
 }
 
-export async function generateAiPlanDraft({ jugador, nombre, contextoAdicional, calendario, semanaMenu, preMatchConfig }) {
+export async function generateAiPlanDraft({ jugador, nombre, calendario, semanaMenu, preMatchConfig }) {
   return await createAiPlanAction({
     jugador,
     nombre,
-    contexto: 'semana_normal',
-    contextoAdicional,
     calendario,
     semanaMenu,
     preMatchConfig,
@@ -22,25 +20,21 @@ export async function generateAiPlanDraft({ jugador, nombre, contextoAdicional, 
   });
 }
 
-export async function saveAiPlan({ jugador, nombre, contexto, contextoAdicional, datos, contenido }) {
+export async function saveAiPlan({ jugador, nombre, datos, contenido }) {
   return await createAiPlanAction({
     jugador,
     nombre,
-    contexto,
-    contextoAdicional,
     datos,
     contenido
   });
 }
 
-export async function updateAiPlan({ id, nombre, contenido, datos, contexto, contextoAdicional }) {
+export async function updateAiPlan({ id, nombre, contenido, datos }) {
   return await updateAiPlanAction({
     id,
     nombre,
     contenido,
     datos,
-    contexto,
-    contextoAdicional,
   });
 }
 

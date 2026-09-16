@@ -4,7 +4,6 @@ import {
   Stack,
   TextInput,
   Select,
-  Textarea,
   Paper,
   SimpleGrid,
   Button,
@@ -15,7 +14,6 @@ import {
   Badge,
 } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
-import { getUserMeals } from '@/config/nutrition-days';
 
 const MATCH_SCHEDULE_OPTIONS = [
   { label: 'Mañana', value: 'manana' },
@@ -32,9 +30,6 @@ export default function CreateNutritionPlanModal({
   modalSelectedMenuWeek,
   setModalSelectedMenuWeek,
   availableMenus,
-  modalContextoAdicional,
-  setModalContextoAdicional,
-  modalRecomendacionesIngestas,
   modalCalendar,
   setModalCalendar,
   modalPreMatchConfig,
@@ -43,7 +38,6 @@ export default function CreateNutritionPlanModal({
   createEmptyPlan,
   generatePlanFromModal,
   actionType,
-  jugador
 }) {
   const dayKeys = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
   const dayLabels = {
@@ -97,32 +91,6 @@ export default function CreateNutritionPlanModal({
           ]}
           allowDeselect={false}
         />
-
-        <Textarea
-          label="Instrucciones adicionales para la IA"
-          placeholder="Ej: Sale de lesión, reduce fibra el día de partido..."
-          value={modalContextoAdicional}
-          onChange={(e) => setModalContextoAdicional(e.target.value)}
-          rows={2}
-        />
-
-        <Paper p="sm" radius="md" withBorder bg="gray.0">
-          <Text size="sm" fw={700} mb="xs">Recomendaciones por defecto del jugador</Text>
-          <Text size="xs" c="dimmed" mb="xs">
-            Se utilizarán únicamente las pautas ya guardadas en la ficha del jugador.
-          </Text>
-          <Stack gap="sm">
-            {getUserMeals(jugador).filter((meal) => meal.toLowerCase() !== 'post-entreno').map((meal) => (
-              <TextInput
-                key={meal}
-                label={meal}
-                placeholder="Sin pauta por defecto"
-                value={modalRecomendacionesIngestas[meal] || ''}
-                readOnly
-              />
-            ))}
-          </Stack>
-        </Paper>
 
         <Paper p="sm" radius="md" withBorder bg="gray.0">
           <Text size="sm" fw={700} mb="xs">Calendario de tipos de día de la semana</Text>

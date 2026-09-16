@@ -38,7 +38,6 @@ function defaultMeta(meta = {}) {
     microcycle: meta.microcycle || 'DOM 10 · 16:15. Partido.\nJUE 14 · 19:00. Partido.\nDOM 17 · 19:00. Partido.',
     rules: meta.rules || 'Ningún día en déficit calórico. Carga glucogénica continua.\nPescado azul 4-5 tomas mínimo. Frutos rojos diarios.\nBatido post-entreno y post-partido obligatorio.\nHidratación reforzada y sueño 8 h.',
     buffet: meta.buffet || 'Desayuno y comidas usan exclusivamente las opciones disponibles del buffet. Las meriendas se hacen en casa con yogur de proteína, tortitas de arroz, fruta y frutos secos.',
-    contexto: meta.contexto || 'semana_partido',
     calendario: meta.calendario || {
       lunes: 'entreno',
       martes: 'entreno',
@@ -121,12 +120,12 @@ async function runWithConcurrency(items, limit, fn) {
   return results;
 }
 
-async function savePlanForPlayer(supabase, player, activePlan, baseData, semana, contexto) {
+async function savePlanForPlayer(supabase, player, activePlan, baseData, semana) {
   const finalContenido = '';
 
   if (activePlan) {
     await updateAiPlan(supabase, activePlan.id, {
-      contexto: contexto || 'semana_partido',
+      contexto: null,
       contenido: finalContenido,
       datos: baseData,
       updated_at: new Date().toISOString(),
@@ -137,7 +136,7 @@ async function savePlanForPlayer(supabase, player, activePlan, baseData, semana,
   const newPlan = await insertAiPlan(supabase, {
     jugador_id: player.id,
     nombre: `Plan ${semana}`,
-    contexto: contexto || 'semana_partido',
+    contexto: null,
     contenido: finalContenido,
     datos: baseData,
   });
@@ -152,7 +151,6 @@ async function loadPlayersWithMeasurements(
   semana,
   calendario,
   semanaMenu,
-  contexto,
   forceRegenerate = false,
   preMatchConfig = null,
   { persistPlans = true, draftPlans = null } = {}
@@ -201,8 +199,7 @@ async function loadPlayersWithMeasurements(
           { ...player, teamConfig: team.configuracion_nutricional },
           activePlan,
           draftPlan,
-          semana,
-          contexto
+          semana
         );
       } else {
         activePlan = { ...(activePlan || {}), datos: draftPlan };
@@ -211,7 +208,6 @@ async function loadPlayersWithMeasurements(
       const baseData = await generarDatosPlan({
         jugador: player,
         nombre: `Plan ${semana}`,
-        contexto: contexto || 'semana_partido',
         menu,
         calendario,
         preMatchConfig,
@@ -224,8 +220,7 @@ async function loadPlayersWithMeasurements(
           { ...player, teamConfig: team.configuracion_nutricional },
           activePlan,
           baseData,
-          semana,
-          contexto
+          semana
         );
       } else {
         activePlan = { ...(activePlan || {}), datos: baseData };
@@ -319,7 +314,6 @@ export async function POST(request) {
       semana,
       calendario,
       semanaMenu,
-      meta.contexto,
       forceRegenerate,
       meta.preMatchConfig,
       { persistPlans: shouldPersist, draftPlans: hasDraftPlans ? draftPlans : null }
@@ -377,7 +371,7 @@ export async function GET(request) {
 
     const team = await resolveTeam(supabase, user, paramTeamId);
     const meta = await loadStoredMeta(supabase, team.id, semanaParam);
-    const players = await loadPlayersWithMeasurements(supabase, team, jugadorIds, semanaParam, meta?.calendario, meta?.semanaMenu, meta?.contexto, false, meta?.preMatchConfig);
+    const players = await loadPlayersWithMeasurements(supabase, team, jugadorIds, semanaParam, meta?.calendario, meta?.semanaMenu, false, meta?.preMatchConfig);
 
     return renderReportResponse(meta, players, semanaParam, team.configuracion_nutricional);
   } catch (error) {

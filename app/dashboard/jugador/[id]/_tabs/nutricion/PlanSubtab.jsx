@@ -58,7 +58,7 @@ function formatSigned(value, suffix = '') {
   return `${sign}${formatInt(numeric)}${suffix}`;
 }
 
-function planWithMeta(data, { nombre, contextoAdicional, recomendacionesIngestas }) {
+function planWithMeta(data, { nombre }) {
   const clean = sanitizePlanData(data);
   if (!clean) return null;
   return {
@@ -66,9 +66,6 @@ function planWithMeta(data, { nombre, contextoAdicional, recomendacionesIngestas
     meta: {
       ...clean.meta,
       nombre,
-      contexto: clean.meta?.contexto || 'semana_normal',
-      contextoAdicional,
-      recomendacionesIngestas,
     },
   };
 }
@@ -489,15 +486,23 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [mode, setMode] = useState('view');
   const [intercambiosOpened, setIntercambiosOpened] = useState(false);
   const [activeSupplements, setActiveSupplements] = useState([]);
-
   const [nombre, setNombre] = useState('');
-  const [contextoAdicional, setContextoAdicional] = useState('');
   const [contenido, setContenido] = useState('');
   const [datos, setDatos] = useState(null);
-  const [loadingList, setLoadingList] = useState(true);
+  const [hasGeneratedAi, setHasGeneratedAi] = useState(false);
   const [actionType, setActionType] = useState(null);
+  const [selectedMenuWeek, setSelectedMenuWeek] = useState('none');
+  const [creationModalOpened, setCreationModalOpened] = useState(false);
+  const [modalNombre, setModalNombre] = useState('');
+  const [modalSelectedMenuWeek, setModalSelectedMenuWeek] = useState('none');
+  const [modalCalendar, setModalCalendar] = useState(getDefaultCalendar());
+  const [modalPreMatchConfig, setModalPreMatchConfig] = useState({
+    enabled: false,
+    diaPartido: 'sabado',
+    horario: 'tarde',
+  });
+  const [loadingList, setLoadingList] = useState(true);
   const [availableMenus, setAvailableMenus] = useState([]);
-  const [selectedMenuWeek, setSelectedMenuWeek] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -521,21 +526,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     };
   }, [jugador?.id, jugador?.peso_kg]);
 
-  const [recomendacionesIngestas, setRecomendacionesIngestas] = useState({});
-
-  // Creation modal states
-  const [creationModalOpened, setCreationModalOpened] = useState(false);
-  const [modalNombre, setModalNombre] = useState('');
-  const [modalSelectedMenuWeek, setModalSelectedMenuWeek] = useState('none');
-  const [modalContextoAdicional, setModalContextoAdicional] = useState('');
-  const [modalRecomendacionesIngestas, setModalRecomendacionesIngestas] = useState({});
-  const [modalCalendar, setModalCalendar] = useState(getDefaultCalendar());
-  const [modalPreMatchConfig, setModalPreMatchConfig] = useState({
-    enabled: false,
-    diaPartido: 'sabado',
-    horario: 'tarde',
-  });
-
   const teamConfig = jugador?.equipos?.configuracion_nutricional;
 
   const dayTypeOptions = useMemo(() => {
@@ -544,7 +534,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       label: d.label,
     }));
   }, [teamConfig]);
-  const [hasGeneratedAi, setHasGeneratedAi] = useState(false);
   const isDocumentMode = mode === 'create' || mode === 'edit';
   const loadingAction = Boolean(actionType);
   const [deleting, setDeleting] = useState(false);
@@ -613,7 +602,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     const now = new Date();
     setModalNombre(`Ficha ${now.toLocaleDateString('es-ES')}`);
     setModalSelectedMenuWeek(selectedMenuWeek || 'none');
-    setModalContextoAdicional('');
     const defaultCal = getDefaultCalendar();
     setModalCalendar(defaultCal);
     const matchDay = Object.keys(defaultCal).find((k) => defaultCal[k] === 'partido') || 'sabado';
@@ -622,15 +610,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       diaPartido: matchDay,
       horario: 'tarde',
     });
-
-    const meals = getUserMeals(jugador);
-    const initialRecs = {};
-    const defaultRecs = jugador?.recomendaciones_defecto || {};
-    meals.forEach((meal) => {
-      const rec = defaultRecs[meal];
-      initialRecs[meal] = typeof rec === 'string' ? rec : (rec?.raw || rec?.text || '');
-    });
-    setModalRecomendacionesIngestas(initialRecs);
     setCreationModalOpened(true);
   }
 
@@ -638,8 +617,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setMode('create');
     setNombre(modalNombre);
     setSelectedMenuWeek(modalSelectedMenuWeek);
-    setContextoAdicional(modalContextoAdicional);
-    setRecomendacionesIngestas(modalRecomendacionesIngestas);
     setContenido('');
 
     let resolvedMenu = null;
@@ -650,8 +627,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setDatos(buildBasePlanData({
       jugador,
       nombre: modalNombre,
-      contexto: 'semana_normal',
-      contextoAdicional: modalContextoAdicional,
       menu: resolvedMenu,
       calendario: modalCalendar,
       preMatchConfig: modalPreMatchConfig,
@@ -687,7 +662,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       const data = await generateAiPlanDraft({
         jugador,
         nombre: modalNombre,
-        contextoAdicional: modalContextoAdicional,
         calendario: modalCalendar,
         semanaMenu: modalSelectedMenuWeek,
         preMatchConfig: modalPreMatchConfig,
@@ -695,8 +669,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
       setNombre(modalNombre);
       setSelectedMenuWeek(modalSelectedMenuWeek);
-      setContextoAdicional(modalContextoAdicional);
-      setRecomendacionesIngestas(modalRecomendacionesIngestas);
 
       setDatos(data.datos || null);
       setContenido('');
@@ -732,8 +704,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     if (!currentPlan) return;
     setMode('edit');
     setNombre(currentPlan.nombre || '');
-    setContextoAdicional(currentPlan.contexto_adicional || currentPlan.datos?.meta?.contextoAdicional || '');
-    setRecomendacionesIngestas(currentPlan.datos?.meta?.recomendacionesIngestas || {});
     setSelectedMenuWeek(currentPlan.datos?.meta?.semanaMenu || 'none');
     setContenido(currentPlan.contenido || '');
     setDatos(currentDatos ? clonePlan(currentDatos) : null);
@@ -777,7 +747,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       const data = await generateAiPlanDraft({
         jugador,
         nombre,
-        contextoAdicional,
         calendario: currentCalendar || getDefaultCalendar(),
         semanaMenu: selectedMenuWeek,
         preMatchConfig: datos?.meta?.preMatchConfig || null,
@@ -811,7 +780,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
   async function saveCreate() {
     const notificationId = 'ai-plan-save';
-    const finalDatos = planWithMeta(datos, { nombre, contextoAdicional, recomendacionesIngestas });
+    const finalDatos = planWithMeta(datos, { nombre });
     setActionType('save');
     notifications.show({
       id: notificationId,
@@ -826,8 +795,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       const data = await saveAiPlan({
         jugador,
         nombre,
-        contexto: 'semana_normal',
-        contextoAdicional,
         datos: finalDatos,
         contenido
       });
@@ -869,7 +836,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       return;
     }
     const notificationId = 'ai-plan-save';
-    const finalDatos = planWithMeta(datos, { nombre, contextoAdicional, recomendacionesIngestas });
+    const finalDatos = planWithMeta(datos, { nombre });
     setActionType('save');
     notifications.show({
       id: notificationId,
@@ -886,8 +853,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         nombre,
         contenido,
         datos: finalDatos,
-        contexto: 'semana_normal',
-        contextoAdicional,
       });
       setPlanes((prev) => [data.plan, ...prev.filter((plan) => plan.id !== data.plan.id)]);
       setCurrentId(String(data.plan.id));
@@ -1216,32 +1181,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                 </Text>
               )}
 
-              <Textarea
-                label="Instrucciones adicionales o notas"
-                placeholder="Ej: Sale de lesión, reduce fibra el día de partido..."
-                value={contextoAdicional}
-                onChange={(e) => setContextoAdicional(e.target.value)}
-                rows={2}
-              />
-
-              <Paper p="sm" radius="md" withBorder bg="gray.0">
-                <Text size="sm" fw={700} mb="xs">Recomendaciones por defecto del jugador</Text>
-                <Text size="xs" c="dimmed" mb="xs">
-                  Se utilizarán únicamente las pautas ya guardadas en la ficha del jugador.
-                </Text>
-                <Stack gap="sm">
-                  {getUserMeals(jugador).filter((meal) => meal.toLowerCase() !== 'post-entreno').map((meal) => (
-                    <TextInput
-                      key={meal}
-                      label={meal}
-                      placeholder="Sin pauta por defecto"
-                      value={recomendacionesIngestas[meal] || ''}
-                      readOnly
-                      size="sm"
-                    />
-                  ))}
-                </Stack>
-              </Paper>
 
               {datos ? (
                 <>
@@ -1503,10 +1442,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         modalSelectedMenuWeek={modalSelectedMenuWeek}
         setModalSelectedMenuWeek={setModalSelectedMenuWeek}
         availableMenus={availableMenus}
-        modalContextoAdicional={modalContextoAdicional}
-        setModalContextoAdicional={setModalContextoAdicional}
-        jugador={jugador}
-        modalRecomendacionesIngestas={modalRecomendacionesIngestas}
         modalCalendar={modalCalendar}
         setModalCalendar={setModalCalendar}
         modalPreMatchConfig={modalPreMatchConfig}
@@ -1515,7 +1450,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         createEmptyPlan={createEmptyPlan}
         generatePlanFromModal={generatePlanFromModal}
         actionType={actionType}
-        getUserMeals={getUserMeals}
       />
     </Stack>
   );

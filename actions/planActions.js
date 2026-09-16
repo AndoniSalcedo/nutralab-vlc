@@ -28,24 +28,6 @@ async function loadPlayerWithLatestMetrics(supabase, jugadorId) {
   return withLatestMeasurement(jugador, evoluciones || [], pesajes || []);
 }
 
-function getDefaultMealRecommendations(jugador) {
-  const recommendations = jugador?.recomendaciones_defecto;
-  return recommendations && typeof recommendations === 'object' && !Array.isArray(recommendations)
-    ? recommendations
-    : {};
-}
-
-function forceDefaultMealRecommendations(datos, jugador) {
-  if (!datos) return datos;
-  return {
-    ...datos,
-    meta: {
-      ...(datos.meta || {}),
-      recomendacionesIngestas: getDefaultMealRecommendations(jugador),
-    },
-  };
-}
-
 export async function getAiPlansAction(jugadorId, semana = null) {
   if (!jugadorId) throw new Error('Falta jugador_id');
 
@@ -68,8 +50,6 @@ export async function createAiPlanAction(payload) {
   const {
     jugador,
     nombre,
-    contexto,
-    contextoAdicional,
     contenido,
     datos,
     draftOnly = false,
@@ -93,7 +73,6 @@ export async function createAiPlanAction(payload) {
 
   const jugadorConMetricas = await loadPlayerWithLatestMetrics(supabase, jugador.id);
   const teamConfig = jugadorConMetricas?.equipos?.configuracion_nutricional;
-  const defaultMealRecommendations = getDefaultMealRecommendations(jugadorConMetricas);
 
   let resolvedMenu = undefined;
   if (semanaMenu === 'none' || semanaMenu === null) {
@@ -106,17 +85,12 @@ export async function createAiPlanAction(payload) {
     ? await generarDatosPlan({
         jugador: jugadorConMetricas,
         nombre: planNombre,
-        contexto: contexto || 'semana_normal',
-        contextoAdicional,
         calendario,
         menu: resolvedMenu,
         teamConfig,
-        // Las recomendaciones editables del formulario no forman parte de la
-        // entrada del motor: siempre se usan las pautas guardadas en el jugador.
-        recomendacionesIngestas: defaultMealRecommendations,
         preMatchConfig
       })
-    : forceDefaultMealRecommendations(sanitizePlanData(datos, teamConfig), jugadorConMetricas);
+    : sanitizePlanData(datos, teamConfig);
 
   if (draftOnly) {
     return { datos: generatedDatos };
@@ -127,8 +101,8 @@ export async function createAiPlanAction(payload) {
   const plan = await insertAiPlan(supabase, {
     jugador_id: jugador.id,
     nombre: planNombre,
-    contexto,
-    contexto_adicional: contextoAdicional || '',
+    contexto: null,
+    contexto_adicional: null,
     contenido: finalContenido,
     datos: generatedDatos,
     created_at: now,
@@ -140,7 +114,7 @@ export async function createAiPlanAction(payload) {
 }
 
 export async function updateAiPlanAction(payload) {
-  const { id, nombre, contenido, datos, contexto, contextoAdicional } = payload || {};
+  const { id, nombre, contenido, datos } = payload || {};
   if (!id) throw new Error('Falta id del plan');
   const planNombre = String(nombre || '').trim();
   if (!planNombre) throw new Error('El nombre del plan es obligatorio');
@@ -160,18 +134,15 @@ export async function updateAiPlanAction(payload) {
   const jugadorConMetricas = await loadPlayerWithLatestMetrics(supabase, currentPlan.jugador_id);
   const teamConfig = jugadorConMetricas?.equipos?.configuracion_nutricional;
 
-  const sanitizedDatos = forceDefaultMealRecommendations(
-    sanitizePlanData(datos, teamConfig),
-    jugadorConMetricas
-  );
+  const sanitizedDatos = sanitizePlanData(datos, teamConfig);
   const finalContenido = String(contenido || '');
 
   const plan = await updateAiPlan(supabase, id, {
     nombre: planNombre,
     contenido: finalContenido,
     datos: sanitizedDatos,
-    contexto,
-    contexto_adicional: contextoAdicional || '',
+    contexto: null,
+    contexto_adicional: null,
     updated_at: new Date().toISOString(),
   });
 
