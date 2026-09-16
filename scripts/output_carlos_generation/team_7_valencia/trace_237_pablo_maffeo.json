@@ -1,0 +1,599 @@
+{
+  "team": {
+    "id": 7,
+    "nombre": "Valencia C.F.",
+    "tieneMenu": true,
+    "semanaMenu": "2026-09-14"
+  },
+  "jugador": {
+    "id": 237,
+    "nombre": "Pablo Maffeo",
+    "posicion": "Defensa",
+    "numComidas": "Comida, Cena",
+    "objetivo": "mejora_rendimiento",
+    "postentreno": false,
+    "pesoKg": 73.7,
+    "alturaCm": 173,
+    "contextoClinico": null,
+    "intolerancias": null,
+    "alergias": null,
+    "aversiones": "Café",
+    "tieneConfigPrepartido": false,
+    "tieneRecomendacionesDefecto": true,
+    "ultimaMedicion": {
+      "fecha": "2026-09-02",
+      "pesoKg": 73.7,
+      "grasaPorcentaje": 8.9501,
+      "suma6Pliegues": 29.7
+    }
+  },
+  "etapa1_catalogo_clinico": {
+    "resumen": "Perfil clínico estándar (Tolerante / Sin restricciones específicas)",
+    "tagsActivos": [],
+    "alimentosDisponiblesTotal": 234,
+    "alimentosCerdoPresentes": [
+      "Hamburguesa de cerdo",
+      "Jamón cocido",
+      "Jamón cocido (York)",
+      "Jamón ibérico de bellota",
+      "Jamón serrano",
+      "Jamón serrano curado",
+      "Lomo embuchado",
+      "Morro de cerdo cocido",
+      "Solomillo de cerdo",
+      "Carne picada mixta",
+      "Salsa boloñesa",
+      "Secreto de cerdo"
+    ],
+    "alimentosGlutenPresentes": [
+      "Bulgur",
+      "Copos de avena",
+      "Cuscús",
+      "Leche de avena",
+      "Ñoquis de patata",
+      "Pan blanco de barra",
+      "Pan de centeno",
+      "Pan de hamburguesa",
+      "Pan de molde blanco",
+      "Pan de molde integral",
+      "Pan de pita",
+      "Pan de semillas",
+      "Pan integral",
+      "Pasta de trigo",
+      "Picos / colines",
+      "Tortilla de trigo",
+      "Tortilla de trigo integral",
+      "Tostadas integrales (biscotes)",
+      "Barrita energética avena y fruta",
+      "Salmorejo",
+      "Salsa de soja",
+      "Hamburguesa de espinacas"
+    ],
+    "alimentosLacteosPresentes": [],
+    "muestrasRamasArbol": [
+      {
+        "id": "hidratos.pasta",
+        "exists": true,
+        "leaves": 2,
+        "sample": [
+          "Pasta de lenteja roja",
+          "Pasta de trigo"
+        ]
+      },
+      {
+        "id": "hidratos.arroz",
+        "exists": true,
+        "leaves": 4,
+        "sample": [
+          "Arroz basmati",
+          "Arroz blanco",
+          "Arroz integral",
+          "Arroz jazmín"
+        ]
+      },
+      {
+        "id": "hidratos.tuberculos",
+        "exists": true,
+        "leaves": 4,
+        "sample": [
+          "Boniato",
+          "Ñoquis de patata",
+          "Patata",
+          "Yuca"
+        ]
+      },
+      {
+        "id": "proteina.pollo",
+        "exists": true,
+        "leaves": 6,
+        "sample": [
+          "Alitas de pollo",
+          "Carne picada de pollo",
+          "Contramuslo de pollo deshuesado",
+          "Hamburguesa de pollo",
+          "Muslo de pollo",
+          "Pechuga de pollo"
+        ]
+      },
+      {
+        "id": "proteina.pavo",
+        "exists": true,
+        "leaves": 4,
+        "sample": [
+          "Carne picada de pavo",
+          "Chuletas de pavo",
+          "Hamburguesa de pavo",
+          "Pechuga de pavo"
+        ]
+      },
+      {
+        "id": "proteina.pescado_blanco",
+        "exists": true,
+        "leaves": 10,
+        "sample": [
+          "Bacalao",
+          "Bacalao desalado",
+          "Bacalao fresco",
+          "Corvina",
+          "Dorada",
+          "Lenguado",
+          "Lubina",
+          "Merluza"
+        ]
+      },
+      {
+        "id": "proteina.pescado_azul",
+        "exists": true,
+        "leaves": 7,
+        "sample": [
+          "Atún fresco",
+          "Caballa",
+          "Emperador (pez espada)",
+          "Salmón",
+          "Salmón ahumado",
+          "Salmón fresco",
+          "Sardina"
+        ]
+      }
+    ]
+  },
+  "etapa2_plan_base_y_presupuestos": {
+    "metricas": {
+      "peso": 73.7,
+      "grasa": 9,
+      "masaMagra": 67.1,
+      "pesoMuscular": 48.1
+    },
+    "calendarioDias": {
+      "lunes": {
+        "tipo": "entreno",
+        "macrosObjetivo": {
+          "kcal": 2694,
+          "proteina": 147,
+          "hidratos": 369,
+          "grasa": 70
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1351,
+              "p": 74,
+              "hc": 185,
+              "g": 35
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 1343,
+              "p": 73,
+              "hc": 184,
+              "g": 35
+            }
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "macrosObjetivo": {
+          "kcal": 3174,
+          "proteina": 136,
+          "hidratos": 509,
+          "grasa": 66
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1589,
+              "p": 68,
+              "hc": 255,
+              "g": 33
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 1585,
+              "p": 68,
+              "hc": 254,
+              "g": 33
+            }
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "macrosObjetivo": {
+          "kcal": 2466,
+          "proteina": 155,
+          "hidratos": 295,
+          "grasa": 74
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1237,
+              "p": 78,
+              "hc": 148,
+              "g": 37
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 1229,
+              "p": 77,
+              "hc": 147,
+              "g": 37
+            }
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "macrosObjetivo": {
+          "kcal": 2694,
+          "proteina": 147,
+          "hidratos": 369,
+          "grasa": 70
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1351,
+              "p": 74,
+              "hc": 185,
+              "g": 35
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 1343,
+              "p": 73,
+              "hc": 184,
+              "g": 35
+            }
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "macrosObjetivo": {
+          "kcal": 2694,
+          "proteina": 147,
+          "hidratos": 369,
+          "grasa": 70
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1351,
+              "p": 74,
+              "hc": 185,
+              "g": 35
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 1343,
+              "p": 73,
+              "hc": 184,
+              "g": 35
+            }
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "macrosObjetivo": {
+          "kcal": 2694,
+          "proteina": 147,
+          "hidratos": 369,
+          "grasa": 70
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1351,
+              "p": 74,
+              "hc": 185,
+              "g": 35
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 1343,
+              "p": 73,
+              "hc": 184,
+              "g": 35
+            }
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "macrosObjetivo": {
+          "kcal": 3174,
+          "proteina": 136,
+          "hidratos": 509,
+          "grasa": 66
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1589,
+              "p": 68,
+              "hc": 255,
+              "g": 33
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 1585,
+              "p": 68,
+              "hc": 254,
+              "g": 33
+            }
+          }
+        ]
+      }
+    }
+  },
+  "etapa3_fuentes_de_resolucion": {
+    "lunes": [
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      }
+    ],
+    "martes": [
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      }
+    ],
+    "miercoles": [
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      }
+    ],
+    "jueves": [
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      }
+    ],
+    "viernes": [
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      }
+    ],
+    "sabado": [
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      }
+    ],
+    "domingo": [
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      }
+    ]
+  },
+  "etapa4_plan_final_calibrado": {
+    "lunes": {
+      "tipo": "entreno",
+      "kcal": 2694,
+      "macros": {
+        "proteina": 147,
+        "hidratos": 369,
+        "grasa": 70
+      },
+      "ingestas": [
+        {
+          "nombre": "Comida",
+          "detalle": "Pechuga de pollo 100g, Carne picada de ternera 100g, Lechuga romana 50g, Tomate 80g, Queso parmesano 20g, AOVE 5g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Arroz blanco 170g, Patata 310g, Conejo 350g, Judías verdes 80g, Ciruela 200g, AOVE 25g",
+          "alerta": false
+        }
+      ]
+    },
+    "martes": {
+      "tipo": "partido",
+      "kcal": 3174,
+      "macros": {
+        "proteina": 136,
+        "hidratos": 509,
+        "grasa": 66
+      },
+      "ingestas": [
+        {
+          "nombre": "Comida",
+          "detalle": "Pasta de lenteja roja 160g, Caballa 100g, Acelga 80g, Piña pelada 200g, AOVE 10g, Pan blanco de barra 80g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Arroz blanco 160g, Rape 245g, Champiñón 80g, Melón 200g, AOVE 25g, Pan blanco de barra 80g",
+          "alerta": false
+        }
+      ]
+    },
+    "miercoles": {
+      "tipo": "descanso",
+      "kcal": 2466,
+      "macros": {
+        "proteina": 155,
+        "hidratos": 295,
+        "grasa": 74
+      },
+      "ingestas": [
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 155g, Chuletas de pavo 285g, Lechuga romana 50g, Frambuesa 200g, AOVE 25g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Cuscús 150g, Carne picada de pollo 265g, Puerro 80g, Arándanos 200g, AOVE 20g",
+          "alerta": false
+        }
+      ]
+    },
+    "jueves": {
+      "tipo": "entreno",
+      "kcal": 2694,
+      "macros": {
+        "proteina": 147,
+        "hidratos": 369,
+        "grasa": 70
+      },
+      "ingestas": [
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 160g, Pechuga de pollo 250g, AOVE 25g, Naranja 180g, Pan blanco de barra 45g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Pasta de lenteja roja 160g, Conejo 110g, Pepino 80g, Pera 200g, AOVE 25g, Pan blanco de barra 80g",
+          "alerta": false
+        }
+      ]
+    },
+    "viernes": {
+      "tipo": "entreno",
+      "kcal": 2694,
+      "macros": {
+        "proteina": 147,
+        "hidratos": 369,
+        "grasa": 70
+      },
+      "ingestas": [
+        {
+          "nombre": "Comida",
+          "detalle": "Yuca 405g, Caballa 350g, Tomate frito 80g, Naranja 200g, AOVE 5g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Pasta de trigo 160g, Mejillones frescos 350g, Espárragos verdes 80g, Zumo de naranja natural 200g, AOVE 20g, Pan blanco de barra 75g",
+          "alerta": false
+        }
+      ]
+    },
+    "sabado": {
+      "tipo": "entreno",
+      "kcal": 2694,
+      "macros": {
+        "proteina": 147,
+        "hidratos": 369,
+        "grasa": 70
+      },
+      "ingestas": [
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 160g, Pechuga de pollo 250g, AOVE 25g, Mandarina 180g, Pan blanco de barra 50g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Bulgur 160g, Carne picada de ternera 225g, Remolacha 80g, Ciruela 200g, AOVE 5g, Pan blanco de barra 80g",
+          "alerta": false
+        }
+      ]
+    },
+    "domingo": {
+      "tipo": "partido",
+      "kcal": 3174,
+      "macros": {
+        "proteina": 136,
+        "hidratos": 509,
+        "grasa": 66
+      },
+      "ingestas": [
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 160g, Conejo 210g, Champiñón 80g, Fresas 200g, AOVE 20g, Pan blanco de barra 80g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Arroz blanco 170g, Boniato 310g, Salmón 240g, Cebolla 80g, Mandarina 200g, AOVE 5g",
+          "alerta": false
+        }
+      ]
+    }
+  },
+  "validacion": {
+    "valido": true,
+    "alertasCount": 0,
+    "alertas": []
+  }
+}

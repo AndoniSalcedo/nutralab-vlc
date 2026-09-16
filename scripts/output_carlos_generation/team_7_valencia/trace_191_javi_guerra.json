@@ -1,0 +1,959 @@
+{
+  "team": {
+    "id": 7,
+    "nombre": "Valencia C.F.",
+    "tieneMenu": true,
+    "semanaMenu": "2026-09-14"
+  },
+  "jugador": {
+    "id": 191,
+    "nombre": "Javi Guerra",
+    "posicion": "Sin posición",
+    "numComidas": "Desayuno, Comida, Merienda, Cena",
+    "objetivo": "mejora_rendimiento",
+    "postentreno": true,
+    "pesoKg": 79.6,
+    "alturaCm": 188,
+    "contextoClinico": null,
+    "intolerancias": null,
+    "alergias": null,
+    "aversiones": null,
+    "tieneConfigPrepartido": false,
+    "tieneRecomendacionesDefecto": false,
+    "ultimaMedicion": {
+      "fecha": "2026-09-04",
+      "pesoKg": 79.6,
+      "grasaPorcentaje": 10.373,
+      "suma6Pliegues": 46
+    }
+  },
+  "etapa1_catalogo_clinico": {
+    "resumen": "Perfil clínico estándar (Tolerante / Sin restricciones específicas)",
+    "tagsActivos": [],
+    "alimentosDisponiblesTotal": 234,
+    "alimentosCerdoPresentes": [
+      "Hamburguesa de cerdo",
+      "Jamón cocido",
+      "Jamón cocido (York)",
+      "Jamón ibérico de bellota",
+      "Jamón serrano",
+      "Jamón serrano curado",
+      "Lomo embuchado",
+      "Morro de cerdo cocido",
+      "Solomillo de cerdo",
+      "Carne picada mixta",
+      "Salsa boloñesa",
+      "Secreto de cerdo"
+    ],
+    "alimentosGlutenPresentes": [
+      "Bulgur",
+      "Copos de avena",
+      "Cuscús",
+      "Leche de avena",
+      "Ñoquis de patata",
+      "Pan blanco de barra",
+      "Pan de centeno",
+      "Pan de hamburguesa",
+      "Pan de molde blanco",
+      "Pan de molde integral",
+      "Pan de pita",
+      "Pan de semillas",
+      "Pan integral",
+      "Pasta de trigo",
+      "Picos / colines",
+      "Tortilla de trigo",
+      "Tortilla de trigo integral",
+      "Tostadas integrales (biscotes)",
+      "Barrita energética avena y fruta",
+      "Salmorejo",
+      "Salsa de soja",
+      "Hamburguesa de espinacas"
+    ],
+    "alimentosLacteosPresentes": [],
+    "muestrasRamasArbol": [
+      {
+        "id": "hidratos.pasta",
+        "exists": true,
+        "leaves": 2,
+        "sample": [
+          "Pasta de lenteja roja",
+          "Pasta de trigo"
+        ]
+      },
+      {
+        "id": "hidratos.arroz",
+        "exists": true,
+        "leaves": 4,
+        "sample": [
+          "Arroz basmati",
+          "Arroz blanco",
+          "Arroz integral",
+          "Arroz jazmín"
+        ]
+      },
+      {
+        "id": "hidratos.tuberculos",
+        "exists": true,
+        "leaves": 4,
+        "sample": [
+          "Boniato",
+          "Ñoquis de patata",
+          "Patata",
+          "Yuca"
+        ]
+      },
+      {
+        "id": "proteina.pollo",
+        "exists": true,
+        "leaves": 6,
+        "sample": [
+          "Alitas de pollo",
+          "Carne picada de pollo",
+          "Contramuslo de pollo deshuesado",
+          "Hamburguesa de pollo",
+          "Muslo de pollo",
+          "Pechuga de pollo"
+        ]
+      },
+      {
+        "id": "proteina.pavo",
+        "exists": true,
+        "leaves": 4,
+        "sample": [
+          "Carne picada de pavo",
+          "Chuletas de pavo",
+          "Hamburguesa de pavo",
+          "Pechuga de pavo"
+        ]
+      },
+      {
+        "id": "proteina.pescado_blanco",
+        "exists": true,
+        "leaves": 10,
+        "sample": [
+          "Bacalao",
+          "Bacalao desalado",
+          "Bacalao fresco",
+          "Corvina",
+          "Dorada",
+          "Lenguado",
+          "Lubina",
+          "Merluza"
+        ]
+      },
+      {
+        "id": "proteina.pescado_azul",
+        "exists": true,
+        "leaves": 7,
+        "sample": [
+          "Atún fresco",
+          "Caballa",
+          "Emperador (pez espada)",
+          "Salmón",
+          "Salmón ahumado",
+          "Salmón fresco",
+          "Sardina"
+        ]
+      }
+    ]
+  },
+  "etapa2_plan_base_y_presupuestos": {
+    "metricas": {
+      "peso": 79.6,
+      "grasa": 10.4,
+      "masaMagra": 71.3,
+      "pesoMuscular": 45.6
+    },
+    "calendarioDias": {
+      "lunes": {
+        "tipo": "entreno",
+        "macrosObjetivo": {
+          "kcal": 2912,
+          "proteina": 159,
+          "hidratos": 398,
+          "grasa": 76
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Desayuno",
+            "target": {
+              "kcal": 506,
+              "p": 15,
+              "hc": 80,
+              "g": 14
+            }
+          },
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1015,
+              "p": 54,
+              "hc": 139,
+              "g": 27
+            }
+          },
+          {
+            "nombre": "Merienda",
+            "target": {
+              "kcal": 381,
+              "p": 15,
+              "hc": 60,
+              "g": 9
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 930,
+              "p": 55,
+              "hc": 119,
+              "g": 26
+            }
+          },
+          {
+            "nombre": "Post-entreno",
+            "target": {
+              "kcal": 80,
+              "p": 20,
+              "hc": 0,
+              "g": 0
+            }
+          }
+        ]
+      },
+      "martes": {
+        "tipo": "partido",
+        "macrosObjetivo": {
+          "kcal": 3432,
+          "proteina": 147,
+          "hidratos": 549,
+          "grasa": 72
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Desayuno",
+            "target": {
+              "kcal": 613,
+              "p": 14,
+              "hc": 110,
+              "g": 13
+            }
+          },
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1189,
+              "p": 49,
+              "hc": 192,
+              "g": 25
+            }
+          },
+          {
+            "nombre": "Merienda",
+            "target": {
+              "kcal": 465,
+              "p": 14,
+              "hc": 82,
+              "g": 9
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 1085,
+              "p": 50,
+              "hc": 165,
+              "g": 25
+            }
+          },
+          {
+            "nombre": "Post-entreno",
+            "target": {
+              "kcal": 80,
+              "p": 20,
+              "hc": 0,
+              "g": 0
+            }
+          }
+        ]
+      },
+      "miercoles": {
+        "tipo": "descanso",
+        "macrosObjetivo": {
+          "kcal": 2660,
+          "proteina": 167,
+          "hidratos": 318,
+          "grasa": 80
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Desayuno",
+            "target": {
+              "kcal": 524,
+              "p": 25,
+              "hc": 70,
+              "g": 16
+            }
+          },
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 960,
+              "p": 63,
+              "hc": 114,
+              "g": 28
+            }
+          },
+          {
+            "nombre": "Merienda",
+            "target": {
+              "kcal": 380,
+              "p": 17,
+              "hc": 51,
+              "g": 12
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 796,
+              "p": 62,
+              "hc": 83,
+              "g": 24
+            }
+          }
+        ]
+      },
+      "jueves": {
+        "tipo": "entreno",
+        "macrosObjetivo": {
+          "kcal": 2912,
+          "proteina": 159,
+          "hidratos": 398,
+          "grasa": 76
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Desayuno",
+            "target": {
+              "kcal": 506,
+              "p": 15,
+              "hc": 80,
+              "g": 14
+            }
+          },
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1015,
+              "p": 54,
+              "hc": 139,
+              "g": 27
+            }
+          },
+          {
+            "nombre": "Merienda",
+            "target": {
+              "kcal": 381,
+              "p": 15,
+              "hc": 60,
+              "g": 9
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 930,
+              "p": 55,
+              "hc": 119,
+              "g": 26
+            }
+          },
+          {
+            "nombre": "Post-entreno",
+            "target": {
+              "kcal": 80,
+              "p": 20,
+              "hc": 0,
+              "g": 0
+            }
+          }
+        ]
+      },
+      "viernes": {
+        "tipo": "entreno",
+        "macrosObjetivo": {
+          "kcal": 2912,
+          "proteina": 159,
+          "hidratos": 398,
+          "grasa": 76
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Desayuno",
+            "target": {
+              "kcal": 506,
+              "p": 15,
+              "hc": 80,
+              "g": 14
+            }
+          },
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1015,
+              "p": 54,
+              "hc": 139,
+              "g": 27
+            }
+          },
+          {
+            "nombre": "Merienda",
+            "target": {
+              "kcal": 381,
+              "p": 15,
+              "hc": 60,
+              "g": 9
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 930,
+              "p": 55,
+              "hc": 119,
+              "g": 26
+            }
+          },
+          {
+            "nombre": "Post-entreno",
+            "target": {
+              "kcal": 80,
+              "p": 20,
+              "hc": 0,
+              "g": 0
+            }
+          }
+        ]
+      },
+      "sabado": {
+        "tipo": "entreno",
+        "macrosObjetivo": {
+          "kcal": 2912,
+          "proteina": 159,
+          "hidratos": 398,
+          "grasa": 76
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Desayuno",
+            "target": {
+              "kcal": 506,
+              "p": 15,
+              "hc": 80,
+              "g": 14
+            }
+          },
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1015,
+              "p": 54,
+              "hc": 139,
+              "g": 27
+            }
+          },
+          {
+            "nombre": "Merienda",
+            "target": {
+              "kcal": 381,
+              "p": 15,
+              "hc": 60,
+              "g": 9
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 930,
+              "p": 55,
+              "hc": 119,
+              "g": 26
+            }
+          },
+          {
+            "nombre": "Post-entreno",
+            "target": {
+              "kcal": 80,
+              "p": 20,
+              "hc": 0,
+              "g": 0
+            }
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "partido",
+        "macrosObjetivo": {
+          "kcal": 3432,
+          "proteina": 147,
+          "hidratos": 549,
+          "grasa": 72
+        },
+        "repartoIngestas": [
+          {
+            "nombre": "Desayuno",
+            "target": {
+              "kcal": 613,
+              "p": 14,
+              "hc": 110,
+              "g": 13
+            }
+          },
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 1189,
+              "p": 49,
+              "hc": 192,
+              "g": 25
+            }
+          },
+          {
+            "nombre": "Merienda",
+            "target": {
+              "kcal": 465,
+              "p": 14,
+              "hc": 82,
+              "g": 9
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 1085,
+              "p": 50,
+              "hc": 165,
+              "g": 25
+            }
+          },
+          {
+            "nombre": "Post-entreno",
+            "target": {
+              "kcal": 80,
+              "p": 20,
+              "hc": 0,
+              "g": 0
+            }
+          }
+        ]
+      }
+    }
+  },
+  "etapa3_fuentes_de_resolucion": {
+    "lunes": [
+      {
+        "ingesta": "Desayuno",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Merienda",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Post-entreno",
+        "fuente": "fixed:batido"
+      }
+    ],
+    "martes": [
+      {
+        "ingesta": "Desayuno",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Merienda",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Post-entreno",
+        "fuente": "fixed:Recovery y fruta"
+      }
+    ],
+    "miercoles": [
+      {
+        "ingesta": "Desayuno",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Merienda",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      }
+    ],
+    "jueves": [
+      {
+        "ingesta": "Desayuno",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Merienda",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Post-entreno",
+        "fuente": "fixed:batido"
+      }
+    ],
+    "viernes": [
+      {
+        "ingesta": "Desayuno",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Merienda",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Post-entreno",
+        "fuente": "fixed:batido"
+      }
+    ],
+    "sabado": [
+      {
+        "ingesta": "Desayuno",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Merienda",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Post-entreno",
+        "fuente": "fixed:batido"
+      }
+    ],
+    "domingo": [
+      {
+        "ingesta": "Desayuno",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Comida",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Merienda",
+        "fuente": "default_recommendation"
+      },
+      {
+        "ingesta": "Cena",
+        "fuente": "buffet_menu"
+      },
+      {
+        "ingesta": "Post-entreno",
+        "fuente": "fixed:Recovery y fruta"
+      }
+    ]
+  },
+  "etapa4_plan_final_calibrado": {
+    "lunes": {
+      "tipo": "entreno",
+      "kcal": 2912,
+      "macros": {
+        "proteina": 159,
+        "hidratos": 398,
+        "grasa": 76
+      },
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan blanco de barra 80g, Chuletas de pavo 100g, AOVE 20g, Melón 200g",
+          "alerta": false
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Carne picada de ternera 100g, Tomate 80g, Pepino 80g, Pimiento 80g, Cebolla 80g, Ajo 5g, AOVE 5g",
+          "alerta": false
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Kiwi 200g, Yogur proteico natural 250g, Pipas de girasol 20g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Arroz basmati 160g, Bacalao fresco 350g, Remolacha 80g, Sandía 200g, AOVE 25g, Pan blanco de barra 80g",
+          "alerta": false
+        },
+        {
+          "nombre": "Post-entreno",
+          "detalle": "Batido de proteína 30g disuelto en agua",
+          "alerta": false
+        }
+      ]
+    },
+    "martes": {
+      "tipo": "partido",
+      "kcal": 3432,
+      "macros": {
+        "proteina": 147,
+        "hidratos": 549,
+        "grasa": 72
+      },
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Copos de avena 150g, 1 Huevo, Aguacate 30g, Frambuesa 200g",
+          "alerta": false
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Fideos de arroz 160g, Conejo 100g, Espinaca 50g, Melocotón 200g, AOVE 20g, Pan blanco de barra 80g",
+          "alerta": false
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Plátano 200g, Yogur proteico natural 250g, Semillas de chía 20g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Pasta de lenteja roja 160g, Caballa 100g, Tomate 80g, Zumo de naranja natural 200g, AOVE 5g, Pan blanco de barra 80g",
+          "alerta": false
+        },
+        {
+          "nombre": "Post-entreno",
+          "detalle": "Recovery y fruta",
+          "alerta": false
+        }
+      ]
+    },
+    "miercoles": {
+      "tipo": "descanso",
+      "kcal": 2660,
+      "macros": {
+        "proteina": 167,
+        "hidratos": 318,
+        "grasa": 80
+      },
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 15g, Ciruela 200g",
+          "alerta": false
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Boniato 440g, Berberechos frescos 315g, Pepino 80g, Fresas 200g, AOVE 25g",
+          "alerta": false
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Naranja 200g, Yogur proteico natural 250g, Piñones 20g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Arroz basmati 75g, Morro de cerdo cocido 320g, Zanahoria 80g, Mandarina 200g, AOVE 5g",
+          "alerta": false
+        }
+      ]
+    },
+    "jueves": {
+      "tipo": "entreno",
+      "kcal": 2912,
+      "macros": {
+        "proteina": 159,
+        "hidratos": 398,
+        "grasa": 76
+      },
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Copos de avena 105g, 1 Huevo, Aguacate 30g, Uvas 200g",
+          "alerta": false
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 150g, Pechuga de pollo 160g, AOVE 25g, Naranja 100g",
+          "alerta": false
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Paraguayo 200g, Yogur proteico natural 250g, Pipas de girasol 20g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Bulgur 135g, Hamburguesa de pavo 155g, Hamburguesa de espinacas 50g, Zumo de naranja natural 200g, AOVE 15g",
+          "alerta": false
+        },
+        {
+          "nombre": "Post-entreno",
+          "detalle": "Batido de proteína 30g disuelto en agua",
+          "alerta": false
+        }
+      ]
+    },
+    "viernes": {
+      "tipo": "entreno",
+      "kcal": 2912,
+      "macros": {
+        "proteina": 159,
+        "hidratos": 398,
+        "grasa": 76
+      },
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Melocotón 200g",
+          "alerta": false
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Pasta de trigo 145g, Solomillo de ternera 105g, Guisantes 80g, Manzana 200g, AOVE 20g",
+          "alerta": false
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Arándanos 200g, Yogur proteico natural 250g, Pistachos 15g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Boniato 450g, Bacalao fresco 220g, Calabacín 80g, Nectarina 200g, AOVE 25g",
+          "alerta": false
+        },
+        {
+          "nombre": "Post-entreno",
+          "detalle": "Batido de proteína 30g disuelto en agua",
+          "alerta": false
+        }
+      ]
+    },
+    "sabado": {
+      "tipo": "entreno",
+      "kcal": 2912,
+      "macros": {
+        "proteina": 159,
+        "hidratos": 398,
+        "grasa": 76
+      },
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Copos de avena 105g, 1 Huevo, Aguacate 30g, Frambuesa 200g",
+          "alerta": false
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 145g, Pechuga de pollo 165g, AOVE 25g, Mandarina 100g",
+          "alerta": false
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Naranja 200g, Yogur proteico natural 250g, Semillas de calabaza (pipas) 20g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Quinoa 160g, Hamburguesa de pavo 130g, Puerro 80g, Pera 200g, AOVE 10g",
+          "alerta": false
+        },
+        {
+          "nombre": "Post-entreno",
+          "detalle": "Batido de proteína 30g disuelto en agua",
+          "alerta": false
+        }
+      ]
+    },
+    "domingo": {
+      "tipo": "partido",
+      "kcal": 3432,
+      "macros": {
+        "proteina": 147,
+        "hidratos": 549,
+        "grasa": 72
+      },
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Paraguayo 200g",
+          "alerta": false
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 160g, Hamburguesa de ternera 125g, Tomate 80g, Sandía 200g, AOVE 5g, Pan blanco de barra 80g",
+          "alerta": false
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Piña pelada 200g, Yogur proteico natural 250g, Pistachos 15g",
+          "alerta": false
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Pasta de trigo 160g, Bacalao 100g, Espinaca 50g, Zumo de naranja natural 200g, AOVE 20g, Pan blanco de barra 80g",
+          "alerta": false
+        },
+        {
+          "nombre": "Post-entreno",
+          "detalle": "Recovery y fruta",
+          "alerta": false
+        }
+      ]
+    }
+  },
+  "validacion": {
+    "valido": true,
+    "alertasCount": 0,
+    "alertas": []
+  }
+}

@@ -1,0 +1,560 @@
+{
+  "version": 2,
+  "meta": {
+    "nombre": "Plan Semanal - César Tárrega",
+    "contexto": "semana_partido",
+    "semanaMenu": "2026-09-14",
+    "preMatchConfig": {
+      "texto": "",
+      "enabled": true,
+      "horario": "tarde",
+      "partidos": {
+        "martes": {
+          "horario": "noche"
+        },
+        "domingo": {
+          "horario": "noche"
+        }
+      },
+      "diaPartido": "sabado"
+    },
+    "fecha": "2026-09-16T11:37:37.918Z",
+    "recomendacionesIngestas": {},
+    "engine": "deterministic_food_tree"
+  },
+  "jugador": {
+    "id": 180,
+    "nombre": "César Tárrega",
+    "posicion": "Sin posición",
+    "num_comidas": "Desayuno, Comida, Merienda, Cena",
+    "postentreno": true,
+    "objetivo": "mejora_rendimiento"
+  },
+  "metricas": {
+    "peso": 86.9,
+    "grasa": 9.8,
+    "masaMagra": 78.4,
+    "pesoMuscular": 45.1
+  },
+  "dias": {
+    "lunes": {
+      "dayKey": "lunes",
+      "label": "Lunes",
+      "tipoDia": "entreno",
+      "kcal": 3183,
+      "proteina": 174,
+      "hidratos": 435,
+      "grasa": 83,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan blanco de barra 80g, Jamón serrano 70g, Leche de avena 170g, Aguacate 120g, Plátano 180g",
+          "macrosReales": {
+            "kcal": 789,
+            "proteina": 34,
+            "hidratos": 99,
+            "grasa": 28
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Carne picada de ternera 100g, Zanahoria 80g, Cebolla 80g, Puerro 80g, AOVE 5g",
+          "macrosReales": {
+            "kcal": 321,
+            "proteina": 22,
+            "hidratos": 20,
+            "grasa": 17
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Frambuesa 200g",
+          "macrosReales": {
+            "kcal": 104,
+            "proteina": 2,
+            "hidratos": 24,
+            "grasa": 1
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Maíz dulce 160g, Carne picada de pavo 350g, Coliflor 80g, Fresas 200g, AOVE 25g, Pan blanco de barra 80g",
+          "macrosReales": {
+            "kcal": 1057,
+            "proteina": 92,
+            "hidratos": 89,
+            "grasa": 41
+          }
+        },
+        {
+          "nombre": "Post-entreno",
+          "detalle": "Batido de proteína 30g disuelto en agua",
+          "macrosReales": null
+        }
+      ],
+      "macrosReales": null,
+      "desviacionMacros": null,
+      "cierreMacros": {
+        "estado": "parcial",
+        "ingestasCalculadas": 4,
+        "ingestasTotales": 5
+      }
+    },
+    "martes": {
+      "dayKey": "martes",
+      "label": "Martes",
+      "tipoDia": "partido",
+      "kcal": 3746,
+      "proteina": 161,
+      "hidratos": 600,
+      "grasa": 78,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan blanco de barra 80g, Jamón serrano 30g, Leche de avena 170g, Aguacate 70g, Manzana 180g",
+          "macrosReales": {
+            "kcal": 556,
+            "proteina": 20,
+            "hidratos": 80,
+            "grasa": 17
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Pasta de trigo 160g, Patata 150g, Pechuga de pollo 120g, Tomate 80g, AOVE 20g, Manzana 180g, Pan blanco de barra 80g",
+          "macrosReales": {
+            "kcal": 1350,
+            "proteina": 59,
+            "hidratos": 213,
+            "grasa": 29
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Plátano 200g, Arroz con leche 50g",
+          "macrosReales": {
+            "kcal": 246,
+            "proteina": 4,
+            "hidratos": 57,
+            "grasa": 2
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Yuca 450g, Pulpo 340g, Hamburguesa de espinacas 50g, Ciruela 200g, AOVE 20g",
+          "macrosReales": {
+            "kcal": 1328,
+            "proteina": 61,
+            "hidratos": 207,
+            "grasa": 28
+          }
+        },
+        {
+          "nombre": "Post-entreno",
+          "detalle": "Recovery y fruta",
+          "macrosReales": null
+        }
+      ],
+      "macrosReales": null,
+      "desviacionMacros": null,
+      "cierreMacros": {
+        "estado": "parcial",
+        "ingestasCalculadas": 4,
+        "ingestasTotales": 5
+      }
+    },
+    "miercoles": {
+      "dayKey": "miercoles",
+      "label": "Miércoles",
+      "tipoDia": "descanso",
+      "kcal": 2903,
+      "proteina": 182,
+      "hidratos": 348,
+      "grasa": 87,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan blanco de barra 80g, Jamón serrano 70g, Leche de avena 170g, Aguacate 65g",
+          "macrosReales": {
+            "kcal": 552,
+            "proteina": 32,
+            "hidratos": 54,
+            "grasa": 21
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 130g, Corvina 335g, Cebolla 80g, Manzana 200g, AOVE 25g",
+          "macrosReales": {
+            "kcal": 1167,
+            "proteina": 74,
+            "hidratos": 136,
+            "grasa": 35
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Mandarina 200g",
+          "macrosReales": {
+            "kcal": 106,
+            "proteina": 2,
+            "hidratos": 27,
+            "grasa": 1
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Arroz basmati 90g, Solomillo de ternera 300g, Zanahoria 80g, Mango 200g, AOVE 15g",
+          "macrosReales": {
+            "kcal": 1010,
+            "proteina": 76,
+            "hidratos": 108,
+            "grasa": 30
+          }
+        }
+      ],
+      "macrosReales": {
+        "kcal": 2835,
+        "proteina": 184,
+        "hidratos": 325,
+        "grasa": 87
+      },
+      "desviacionMacros": {
+        "kcal": -68,
+        "proteina": 2,
+        "hidratos": -23,
+        "grasa": 0
+      },
+      "cierreMacros": {
+        "estado": "completo",
+        "ingestasCalculadas": 4,
+        "ingestasTotales": 4
+      }
+    },
+    "jueves": {
+      "dayKey": "jueves",
+      "label": "Jueves",
+      "tipoDia": "entreno",
+      "kcal": 3183,
+      "proteina": 174,
+      "hidratos": 435,
+      "grasa": 83,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan blanco de barra 80g, Jamón serrano 30g, Leche de avena 170g, Aguacate 80g, Naranja 180g",
+          "macrosReales": {
+            "kcal": 561,
+            "proteina": 21,
+            "hidratos": 77,
+            "grasa": 18
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 150g, Pechuga de pavo 200g, Guisantes 80g, Cebolla 80g, AOVE 25g, Naranja 100g",
+          "macrosReales": {
+            "kcal": 1140,
+            "proteina": 65,
+            "hidratos": 148,
+            "grasa": 29
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Kiwi 200g",
+          "macrosReales": {
+            "kcal": 122,
+            "proteina": 2,
+            "hidratos": 29,
+            "grasa": 1
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Pasta de lenteja roja 160g, Conejo 100g, Puerro 80g, Uvas 200g, AOVE 20g, Pan blanco de barra 80g",
+          "macrosReales": {
+            "kcal": 1223,
+            "proteina": 73,
+            "hidratos": 158,
+            "grasa": 32
+          }
+        },
+        {
+          "nombre": "Post-entreno",
+          "detalle": "Batido de proteína 30g disuelto en agua",
+          "macrosReales": null
+        }
+      ],
+      "macrosReales": null,
+      "desviacionMacros": null,
+      "cierreMacros": {
+        "estado": "parcial",
+        "ingestasCalculadas": 4,
+        "ingestasTotales": 5
+      }
+    },
+    "viernes": {
+      "dayKey": "viernes",
+      "label": "Viernes",
+      "tipoDia": "entreno",
+      "kcal": 3183,
+      "proteina": 174,
+      "hidratos": 435,
+      "grasa": 83,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan blanco de barra 80g, Jamón serrano 35g, Leche de avena 170g, Aguacate 75g, Pera 180g",
+          "macrosReales": {
+            "kcal": 584,
+            "proteina": 22,
+            "hidratos": 82,
+            "grasa": 18
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Yuca 380g, Morro de cerdo cocido 350g, Pepino 80g, Sandía 200g, AOVE 5g",
+          "macrosReales": {
+            "kcal": 1337,
+            "proteina": 61,
+            "hidratos": 162,
+            "grasa": 50
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Naranja 200g",
+          "macrosReales": {
+            "kcal": 94,
+            "proteina": 2,
+            "hidratos": 24,
+            "grasa": 0
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Bulgur 160g, Muslo de pollo 240g, Alcachofa 80g, Manzana 200g, AOVE 5g",
+          "macrosReales": {
+            "kcal": 1155,
+            "proteina": 65,
+            "hidratos": 155,
+            "grasa": 34
+          }
+        },
+        {
+          "nombre": "Post-entreno",
+          "detalle": "Batido de proteína 30g disuelto en agua",
+          "macrosReales": null
+        }
+      ],
+      "macrosReales": null,
+      "desviacionMacros": null,
+      "cierreMacros": {
+        "estado": "parcial",
+        "ingestasCalculadas": 4,
+        "ingestasTotales": 5
+      }
+    },
+    "sabado": {
+      "dayKey": "sabado",
+      "label": "Sábado",
+      "tipoDia": "entreno",
+      "kcal": 3183,
+      "proteina": 174,
+      "hidratos": 435,
+      "grasa": 83,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan blanco de barra 80g, Jamón serrano 30g, Leche de avena 170g, Aguacate 80g, Mandarina 180g",
+          "macrosReales": {
+            "kcal": 572,
+            "proteina": 21,
+            "hidratos": 79,
+            "grasa": 19
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 170g, Pulpo 345g, AOVE 25g, Mandarina 190g",
+          "macrosReales": {
+            "kcal": 1225,
+            "proteina": 65,
+            "hidratos": 165,
+            "grasa": 30
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Melocotón 200g",
+          "macrosReales": {
+            "kcal": 78,
+            "proteina": 2,
+            "hidratos": 19,
+            "grasa": 1
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Pasta de trigo 150g, Hamburguesa de pavo 220g, Judías verdes 80g, Nectarina 200g, AOVE 15g, Pan blanco de barra 40g",
+          "macrosReales": {
+            "kcal": 1209,
+            "proteina": 66,
+            "hidratos": 159,
+            "grasa": 34
+          }
+        },
+        {
+          "nombre": "Post-entreno",
+          "detalle": "Batido de proteína 30g disuelto en agua",
+          "macrosReales": null
+        }
+      ],
+      "macrosReales": null,
+      "desviacionMacros": null,
+      "cierreMacros": {
+        "estado": "parcial",
+        "ingestasCalculadas": 4,
+        "ingestasTotales": 5
+      }
+    },
+    "domingo": {
+      "dayKey": "domingo",
+      "label": "Domingo",
+      "tipoDia": "partido",
+      "kcal": 3746,
+      "proteina": 161,
+      "hidratos": 600,
+      "grasa": 78,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan blanco de barra 80g, Jamón serrano 30g, Leche de avena 170g, Aguacate 70g, Pera 180g",
+          "macrosReales": {
+            "kcal": 565,
+            "proteina": 20,
+            "hidratos": 82,
+            "grasa": 17
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Pasta de trigo 160g, Patata 150g, Pechuga de pollo 120g, Tomate 80g, AOVE 20g, Pera 180g, Pan blanco de barra 70g",
+          "macrosReales": {
+            "kcal": 1332,
+            "proteina": 59,
+            "hidratos": 211,
+            "grasa": 28
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Plátano 200g, Arroz con leche 50g",
+          "macrosReales": {
+            "kcal": 246,
+            "proteina": 4,
+            "hidratos": 57,
+            "grasa": 2
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Arroz blanco 105g, Ñoquis de patata 300g, Chuletón de ternera 200g, Espinaca 50g, Arándanos 200g, AOVE 5g",
+          "macrosReales": {
+            "kcal": 1503,
+            "proteina": 61,
+            "hidratos": 206,
+            "grasa": 47
+          }
+        },
+        {
+          "nombre": "Post-entreno",
+          "detalle": "Recovery y fruta",
+          "macrosReales": null
+        }
+      ],
+      "macrosReales": null,
+      "desviacionMacros": null,
+      "cierreMacros": {
+        "estado": "parcial",
+        "ingestasCalculadas": 4,
+        "ingestasTotales": 5
+      }
+    }
+  },
+  "suplementacion": [],
+  "protocolos": [
+    {
+      "id": "prot_prepartido_old",
+      "name": "Protocolo Prepartido",
+      "timeline": [
+        {
+          "id": "tl_1",
+          "icon": "IconApple",
+          "title": "Comida principal",
+          "timeLabel": "-3 / -4 h",
+          "description": "Base alta en CHO: arroz, pasta o patata. Proteína fácil de digerir, 100-150 g."
+        },
+        {
+          "id": "tl_2",
+          "icon": "IconRun",
+          "title": "Snack",
+          "timeLabel": "-90 min",
+          "description": "Plátano, gel o opción habitual ya testada. Evitar novedades."
+        },
+        {
+          "id": "tl_3",
+          "icon": "IconCoffee",
+          "title": "Cafeína",
+          "timeLabel": "-60 min",
+          "description": "3-6 mg/kg según tolerancia y rol esperado."
+        },
+        {
+          "id": "tl_4",
+          "icon": "IconDroplet",
+          "title": "Medio tiempo",
+          "timeLabel": "Medio tiempo",
+          "description": "300-500 ml de isotónica y ajuste de CHO si hay alta carga."
+        },
+        {
+          "id": "tl_5",
+          "icon": "IconBatteryCharging",
+          "title": "Recuperación",
+          "timeLabel": "+30 min",
+          "description": "Proteína + CHO rápidos. Priorizar disponibilidad si hay viaje."
+        }
+      ],
+      "checklist": [
+        {
+          "id": "cl_1",
+          "title": "Comida",
+          "description": "Baja en grasa y fibra si el jugador tiene molestias GI."
+        },
+        {
+          "id": "cl_2",
+          "title": "Hidratación",
+          "description": "Orina clara antes de salida. Electrolitos si calor o alta sudoración."
+        },
+        {
+          "id": "cl_3",
+          "title": "Suplementos",
+          "description": "Solo lo probado en entrenamiento. Nada nuevo en partido."
+        },
+        {
+          "id": "cl_4",
+          "title": "Recuperación",
+          "description": "Dejar preparado batido, snack y cena si hay desplazamiento."
+        }
+      ],
+      "dayTypeKey": "partido"
+    }
+  ],
+  "notas": [
+    "Ajusta la hidratación según la intensidad de la sesión y la sudoración.",
+    "Respeta los gramajes en crudo indicados para cada comida.",
+    "Toma el batido post-entreno en los primeros 30 minutos tras finalizar la sesión.",
+    "Mantén las pautas de descanso nocturno y digestión adecuada."
+  ]
+}

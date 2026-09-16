@@ -35,7 +35,6 @@ export default function CreateNutritionPlanModal({
   modalContextoAdicional,
   setModalContextoAdicional,
   modalRecomendacionesIngestas,
-  setModalRecomendacionesIngestas,
   modalCalendar,
   setModalCalendar,
   modalPreMatchConfig,
@@ -108,15 +107,18 @@ export default function CreateNutritionPlanModal({
         />
 
         <Paper p="sm" radius="md" withBorder bg="gray.0">
-          <Text size="sm" fw={700} mb="xs">Recomendaciones para las ingestas del jugador</Text>
+          <Text size="sm" fw={700} mb="xs">Recomendaciones por defecto del jugador</Text>
+          <Text size="xs" c="dimmed" mb="xs">
+            Se utilizarán únicamente las pautas ya guardadas en la ficha del jugador.
+          </Text>
           <Stack gap="sm">
             {getUserMeals(jugador).filter((meal) => meal.toLowerCase() !== 'post-entreno').map((meal) => (
               <TextInput
                 key={meal}
                 label={meal}
-                placeholder={`Ej: Tostadas de aguacate con pavo...`}
+                placeholder="Sin pauta por defecto"
                 value={modalRecomendacionesIngestas[meal] || ''}
-                onChange={(e) => setModalRecomendacionesIngestas((prev) => ({ ...prev, [meal]: e.target.value }))}
+                readOnly
               />
             ))}
           </Stack>

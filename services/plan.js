@@ -9,7 +9,7 @@ export async function getAiPlans(jugadorId, semana = null) {
   return await getAiPlansAction(jugadorId, semana);
 }
 
-export async function generateAiPlanDraft({ jugador, nombre, contextoAdicional, calendario, semanaMenu, recomendacionesIngestas, preMatchConfig }) {
+export async function generateAiPlanDraft({ jugador, nombre, contextoAdicional, calendario, semanaMenu, preMatchConfig }) {
   return await createAiPlanAction({
     jugador,
     nombre,
@@ -17,7 +17,6 @@ export async function generateAiPlanDraft({ jugador, nombre, contextoAdicional, 
     contextoAdicional,
     calendario,
     semanaMenu,
-    recomendacionesIngestas,
     preMatchConfig,
     draftOnly: true
   });

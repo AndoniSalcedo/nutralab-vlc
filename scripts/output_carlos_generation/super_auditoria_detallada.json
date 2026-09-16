@@ -1,0 +1,765 @@
+[
+  {
+    "id": 178,
+    "nombre": "Arnaut Danjuma",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": [
+      {
+        "day": "lunes",
+        "meal": "Desayuno",
+        "text": "Desayuno solo con leche (pautado \"café con leche, no quiere nada más\")"
+      },
+      {
+        "day": "lunes",
+        "meal": "Almuerzo",
+        "text": "Almuerzo con huevo/pan (pautado \"Pan con salmón y huevos\")"
+      },
+      {
+        "day": "miercoles",
+        "meal": "Desayuno",
+        "text": "Desayuno solo con leche (pautado \"café con leche, no quiere nada más\")"
+      },
+      {
+        "day": "miercoles",
+        "meal": "Almuerzo",
+        "text": "Almuerzo con huevo/pan (pautado \"Pan con salmón y huevos\")"
+      },
+      {
+        "day": "miercoles",
+        "meal": "Cena",
+        "text": "Cena con yogur y fruta (pautado \"Yogur con fruta\")"
+      },
+      {
+        "day": "jueves",
+        "meal": "Desayuno",
+        "text": "Desayuno solo con leche (pautado \"café con leche, no quiere nada más\")"
+      },
+      {
+        "day": "jueves",
+        "meal": "Cena",
+        "text": "Cena con yogur y fruta (pautado \"Yogur con fruta\")"
+      },
+      {
+        "day": "viernes",
+        "meal": "Desayuno",
+        "text": "Desayuno solo con leche (pautado \"café con leche, no quiere nada más\")"
+      },
+      {
+        "day": "viernes",
+        "meal": "Almuerzo",
+        "text": "Almuerzo con huevo/pan (pautado \"Pan con salmón y huevos\")"
+      },
+      {
+        "day": "viernes",
+        "meal": "Cena",
+        "text": "Cena con yogur y fruta (pautado \"Yogur con fruta\")"
+      },
+      {
+        "day": "sabado",
+        "meal": "Desayuno",
+        "text": "Desayuno solo con leche (pautado \"café con leche, no quiere nada más\")"
+      },
+      {
+        "day": "sabado",
+        "meal": "Almuerzo",
+        "text": "Almuerzo con huevo/pan (pautado \"Pan con salmón y huevos\")"
+      }
+    ]
+  },
+  {
+    "id": 180,
+    "nombre": "César Tárrega",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 182,
+    "nombre": "Copete",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "miercoles",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 15g, Frambuesa 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 183,
+    "nombre": "Cristian Rivero",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 2,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "miercoles",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Naranja 200g"
+      },
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "viernes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Ciruela 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 184,
+    "nombre": "Dani Raba",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "viernes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 75g, Carne picada de pavo 100g, AOVE 10g, Melón 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 185,
+    "nombre": "David Otorbi",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 2,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "lunes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (110g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 110g, AOVE 20g, Melocotón 200g"
+      },
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "viernes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Naranja 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 186,
+    "nombre": "Diego López",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "miercoles",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Melón 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 187,
+    "nombre": "Dimitri Foulquier",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "domingo",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Plátano 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 188,
+    "nombre": "Filip Ugrinic",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "miercoles",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 45g, Carne picada de pavo 100g, AOVE 15g, Melocotón 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 189,
+    "nombre": "Guido",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 2,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "miercoles",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan sin gluten 80g, Carne picada de pavo 100g, AOVE 10g, Piña pelada 200g"
+      },
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "viernes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan sin gluten 80g, Carne picada de pavo 100g, AOVE 10g, Paraguayo 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 190,
+    "nombre": "Hugo Duro",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": [
+      {
+        "day": "lunes",
+        "meal": "Cena",
+        "text": "Colacao presente (pautado por Carlos en BD)"
+      },
+      {
+        "day": "martes",
+        "meal": "Cena",
+        "text": "Colacao presente (pautado por Carlos en BD)"
+      },
+      {
+        "day": "miercoles",
+        "meal": "Cena",
+        "text": "Colacao presente (pautado por Carlos en BD)"
+      },
+      {
+        "day": "jueves",
+        "meal": "Cena",
+        "text": "Colacao presente (pautado por Carlos en BD)"
+      },
+      {
+        "day": "viernes",
+        "meal": "Cena",
+        "text": "Colacao presente (pautado por Carlos en BD)"
+      },
+      {
+        "day": "sabado",
+        "meal": "Cena",
+        "text": "Colacao presente (pautado por Carlos en BD)"
+      },
+      {
+        "day": "domingo",
+        "meal": "Cena",
+        "text": "Colacao presente (pautado por Carlos en BD)"
+      }
+    ]
+  },
+  {
+    "id": 191,
+    "nombre": "Javi Guerra",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "domingo",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Paraguayo 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 192,
+    "nombre": "Jesús Vázquez",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 193,
+    "nombre": "José Luis Gayá",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 195,
+    "nombre": "Luis Rioja",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "lunes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 15g, Sandía 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 196,
+    "nombre": "Mouctar Diakhaby",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 2,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "viernes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Mango 200g"
+      },
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "domingo",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 5g, Naranja 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 198,
+    "nombre": "Pepelu",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "miercoles",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Frambuesa 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 200,
+    "nombre": "Raúl Jimenez",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "miercoles",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 40g, Carne picada de pavo 100g, AOVE 10g, Naranja 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 201,
+    "nombre": "Sadiq",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 2,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "lunes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (195g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 195g, AOVE 25g, Piña pelada 200g"
+      },
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "viernes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Fresas 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 202,
+    "nombre": "Stole Dimitrevski",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 204,
+    "nombre": "Justin de Haas",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 205,
+    "nombre": "Íker Córdoba",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 218,
+    "nombre": "Sato",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "lunes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (170g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 170g, AOVE 15g, Arándanos 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 220,
+    "nombre": "Dieng Aliou",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 237,
+    "nombre": "Pablo Maffeo",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 245,
+    "nombre": "Kayne Van Oeleven",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 4,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "lunes",
+        "meal": "Merienda",
+        "detail": "Hamburguesa de ternera magra (130g) en Merienda",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Hamburguesa de ternera magra 130g, Paraguayo 200g, Yogur natural 250g"
+      },
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "miercoles",
+        "meal": "Merienda",
+        "detail": "Conejo (100g) en Merienda",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 40g, Conejo 100g, Kiwi 200g, Yogur natural 250g"
+      },
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "jueves",
+        "meal": "Merienda",
+        "detail": "Bacalao desalado (100g) en Merienda",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Bacalao desalado 100g, Mango 200g, Yogur natural 250g"
+      },
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "domingo",
+        "meal": "Merienda",
+        "detail": "Conejo (100g) en Merienda",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Conejo 100g, Mango 200g, Yogur natural 250g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 247,
+    "nombre": "Arnau Martínez",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 251,
+    "nombre": "Harvey Elliot",
+    "equipo": "Valencia C.F.",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "domingo",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 5g, Frambuesa 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 175,
+    "nombre": "Juan Foyth",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 4,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "lunes",
+        "meal": "Merienda",
+        "detail": "Conejo (100g) en Merienda",
+        "source": "default_recommendation",
+        "rawMeal": "Copos de avena 50g, Pan blanco de barra 30g, Conejo 100g, Mango 200g, Leche de avena 170g, Yogur natural 250g"
+      },
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "jueves",
+        "meal": "Merienda",
+        "detail": "Conejo (100g) en Merienda",
+        "source": "default_recommendation",
+        "rawMeal": "Copos de avena 50g, Pan blanco de barra 30g, Conejo 100g, Plátano 200g, Leche de avena 170g, Yogur natural 250g"
+      },
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "sabado",
+        "meal": "Merienda",
+        "detail": "Hamburguesa de ternera magra (100g) en Merienda",
+        "source": "default_recommendation",
+        "rawMeal": "Copos de avena 50g, Pan blanco de barra 30g, Hamburguesa de ternera magra 100g, Arándanos 200g, Leche de avena 170g, Yogur natural 250g"
+      },
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "domingo",
+        "meal": "Merienda",
+        "detail": "Conejo (100g) en Merienda",
+        "source": "default_recommendation",
+        "rawMeal": "Copos de avena 50g, Pan blanco de barra 30g, Conejo 100g, Nectarina 200g, Leche de avena 170g, Yogur natural 250g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 176,
+    "nombre": "Alberto Marí",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 177,
+    "nombre": "André Almeida",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 194,
+    "nombre": "Lucas Nuñez",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "miercoles",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 70g, Carne picada de pavo 100g, AOVE 10g, Zumo de naranja natural 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 197,
+    "nombre": "Pablo López",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "viernes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 5g, Sandía 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 206,
+    "nombre": "Mario Dominguez",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "viernes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 5g, Mango 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 207,
+    "nombre": "Rodrigo Gamón",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 2,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "lunes",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Melón 200g"
+      },
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "miercoles",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Melón 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 208,
+    "nombre": "Aaron Mayol",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "PLATO_COCINADO_EN_DESAYUNO_MERIENDA",
+        "severity": "ALTA",
+        "day": "domingo",
+        "meal": "Desayuno",
+        "detail": "Carne picada de pavo (100g) en Desayuno",
+        "source": "default_recommendation",
+        "rawMeal": "Pan blanco de barra 70g, Carne picada de pavo 100g, AOVE 10g, Melocotón 200g"
+      }
+    ],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 209,
+    "nombre": "Miguel Monferrer",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 219,
+    "nombre": "Wanjala",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 231,
+    "nombre": "Eray Comert",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 234,
+    "nombre": "Cenk",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  },
+  {
+    "id": 236,
+    "nombre": "Gonzalo Crettaz",
+    "equipo": "Fútbol élite",
+    "totalHallazgos": 0,
+    "hallazgos": [],
+    "notasIntencionadas": []
+  }
+]

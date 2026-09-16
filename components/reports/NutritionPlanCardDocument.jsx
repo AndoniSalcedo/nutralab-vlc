@@ -115,8 +115,13 @@ const styles = StyleSheet.create({
   macrosLine: {
     fontSize: 6.2,
     color: '#a5adcb',
-    marginBottom: 4,
+    marginBottom: 2,
     fontWeight: 700,
+  },
+  macroDiagnostics: {
+    fontSize: 5.5,
+    color: '#a5adcb',
+    marginBottom: 1.5,
   },
   mealsList: {
     flexDirection: 'column',
@@ -265,6 +270,36 @@ function formatNumber(value, unit = '') {
   return formatNumberDecimal(value, unit, 0);
 }
 
+function formatSigned(value, unit = '') {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return '—';
+  const sign = numeric > 0 ? '+' : '';
+  return `${sign}${formatNumber(numeric, unit)}`;
+}
+
+function renderMacroDiagnostics(dayData) {
+  if (dayData.macrosReales) {
+    return (
+      <>
+        <Text style={styles.macroDiagnostics}>
+          Calculado {formatNumber(dayData.macrosReales.kcal, ' kcal')} · P {formatNumber(dayData.macrosReales.proteina, 'g')} · HC {formatNumber(dayData.macrosReales.hidratos, 'g')} · G {formatNumber(dayData.macrosReales.grasa, 'g')}
+        </Text>
+        <Text style={styles.macroDiagnostics}>
+          Desviación {formatSigned(dayData.desviacionMacros?.kcal, ' kcal')} · P {formatSigned(dayData.desviacionMacros?.proteina, 'g')} · HC {formatSigned(dayData.desviacionMacros?.hidratos, 'g')} · G {formatSigned(dayData.desviacionMacros?.grasa, 'g')}
+        </Text>
+      </>
+    );
+  }
+  if (dayData.cierreMacros?.estado === 'parcial') {
+    return (
+      <Text style={styles.macroDiagnostics}>
+        Cierre parcial: {dayData.cierreMacros.ingestasCalculadas}/{dayData.cierreMacros.ingestasTotales} ingestas calculadas; se muestra el objetivo teórico.
+      </Text>
+    );
+  }
+  return null;
+}
+
 export function PlanCardPage({ plan, teamConfig }) {
   const clubName = teamConfig?.nombre || 'Club';
   const planColors = teamConfig?.planColors || {
@@ -327,8 +362,9 @@ export function PlanCardPage({ plan, teamConfig }) {
                   <Text style={[styles.dayIndicator, { color }]}>● {label}</Text>
                 </View>
                 <Text style={styles.macrosLine}>
-                  {formatNumber(dayData.kcal, ' kcal')} · P {formatNumber(dayData.proteina, 'g')} · HC {formatNumber(dayData.hidratos, 'g')} · G {formatNumber(dayData.grasa, 'g')}
+                  Objetivo {formatNumber(dayData.kcal, ' kcal')} · P {formatNumber(dayData.proteina, 'g')} · HC {formatNumber(dayData.hidratos, 'g')} · G {formatNumber(dayData.grasa, 'g')}
                 </Text>
+                {renderMacroDiagnostics(dayData)}
                 <View style={styles.mealsList}>
                   {dayData.ingestas.map((meal, index) => (
                     <View key={index} style={[styles.mealRow, { backgroundColor: planColors.itemBg }]}>
@@ -370,8 +406,9 @@ export function PlanCardPage({ plan, teamConfig }) {
                   <Text style={[styles.dayIndicator, { color }]}>● {label}</Text>
                 </View>
                 <Text style={styles.macrosLine}>
-                  {formatNumber(dayData.kcal, ' kcal')} · P {formatNumber(dayData.proteina, 'g')} · HC {formatNumber(dayData.hidratos, 'g')} · G {formatNumber(dayData.grasa, 'g')}
+                  Objetivo {formatNumber(dayData.kcal, ' kcal')} · P {formatNumber(dayData.proteina, 'g')} · HC {formatNumber(dayData.hidratos, 'g')} · G {formatNumber(dayData.grasa, 'g')}
                 </Text>
+                {renderMacroDiagnostics(dayData)}
                 <View style={styles.mealsList}>
                   {dayData.ingestas.map((meal, index) => (
                     <View key={index} style={[styles.mealRow, { backgroundColor: planColors.itemBg }]}>

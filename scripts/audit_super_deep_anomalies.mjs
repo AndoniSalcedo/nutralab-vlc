@@ -145,33 +145,7 @@ for (const teamKey of ['team_7_valencia', 'team_8_futbol_elite']) {
         for (const it of parsedItems) {
           const n = it.name.toLowerCase();
 
-          // Gramaje superior a 350g en sólidos (excepto patata/boniato que pueden llegar a 350-400g)
-          const isTuber = n.includes('patata') || n.includes('boniato') || n.includes('yuca');
-          const isWaterOrMilk = n.includes('leche') || n.includes('agua') || n.includes('caldo');
-
-          if (it.grams && it.grams > 400 && !isWaterOrMilk) {
-            findings.push({
-              category: 'PORCIÓN_GIGANTE',
-              severity: 'ALTA',
-              day: dayKey,
-              meal: mName,
-              detail: `${it.name} con ${it.grams}g en una sola ingesta`,
-              source: sourceInfo,
-              rawMeal: detalle,
-            });
-          }
-
-          if (it.grams && it.grams > 320 && !isTuber && !isWaterOrMilk && !n.includes('fruta') && !n.includes('sandía') && !n.includes('melon') && !n.includes('melón')) {
-            findings.push({
-              category: 'PORCIÓN_MUY_ELEVADA',
-              severity: 'MEDIA',
-              day: dayKey,
-              meal: mName,
-              detail: `${it.name} con ${it.grams}g`,
-              source: sourceInfo,
-              rawMeal: detalle,
-            });
-          }
+          // (Gramajes de proteínas y tubérculos son calculados por el calibrador según macros del jugador — no son anomalías)
 
           // Porciones diminutas (<20g) en carbohidratos o proteínas principales de comida/cena
           if (isMain && it.grams && it.grams < 30) {
@@ -206,7 +180,8 @@ for (const teamKey of ['team_7_valencia', 'team_8_futbol_elite']) {
         }
 
         // 2.4 Mezclas extrañas de hidratos en comida principal (doble hidrato de plato)
-        if (isMain) {
+        // Saltar tomas cuya fuente es protocolo pre-partido (Carlos prescribe arroz+pasta)
+        if (isMain && !sourceInfo.startsWith('pre_match')) {
           const dishCarbs = parsedItems.filter((it) => {
             const n = it.name.toLowerCase();
             return (n.includes('arroz') || n.includes('pasta') || n.includes('ñoc')) && !n.includes('leche');

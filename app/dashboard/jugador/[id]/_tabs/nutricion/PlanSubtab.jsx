@@ -51,6 +51,13 @@ function formatNumber(value, suffix = '') {
   return formatNumberDecimal(value, suffix, 1);
 }
 
+function formatSigned(value, suffix = '') {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return '—';
+  const sign = numeric > 0 ? '+' : '';
+  return `${sign}${formatInt(numeric)}${suffix}`;
+}
+
 function planWithMeta(data, { nombre, contextoAdicional, recomendacionesIngestas }) {
   const clean = sanitizePlanData(data);
   if (!clean) return null;
@@ -150,7 +157,7 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
         <Box py={3} px={7} mb="xs" style={{ backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}>
           <Group gap={6} justify="space-between" wrap="nowrap">
             <Text size="xs" fw={700} style={{ color: colors.cardBodyText }}>
-              {formatInt(dayData.kcal)} <span style={{ fontWeight: 400, opacity: 0.65, fontSize: '11px' }}>kcal</span>
+              Objetivo {formatInt(dayData.kcal)} <span style={{ fontWeight: 400, opacity: 0.65, fontSize: '11px' }}>kcal</span>
             </Text>
             <Group gap={5} wrap="nowrap" style={{ fontSize: '12px' }}>
               <Text size="xs" style={{ color: colors.itemText }}>
@@ -166,6 +173,20 @@ function PlanFicha({ data, activeSupplements = [], jugador, themeColors }) {
               </Text>
             </Group>
           </Group>
+          {dayData.macrosReales ? (
+            <>
+              <Text size="xs" c="dimmed" mt={3}>
+                Calculado {formatInt(dayData.macrosReales.kcal)} kcal · P {formatInt(dayData.macrosReales.proteina)}g · HC {formatInt(dayData.macrosReales.hidratos)}g · G {formatInt(dayData.macrosReales.grasa)}g
+              </Text>
+              <Text size="xs" c="dimmed">
+                Desviación {formatSigned(dayData.desviacionMacros?.kcal, ' kcal')} · P {formatSigned(dayData.desviacionMacros?.proteina, 'g')} · HC {formatSigned(dayData.desviacionMacros?.hidratos, 'g')} · G {formatSigned(dayData.desviacionMacros?.grasa, 'g')}
+              </Text>
+            </>
+          ) : dayData.cierreMacros?.estado === 'parcial' ? (
+            <Text size="xs" c="orange" mt={3}>
+              Cierre parcial: {dayData.cierreMacros.ingestasCalculadas}/{dayData.cierreMacros.ingestasTotales} ingestas calculadas; se muestra el objetivo teórico.
+            </Text>
+          ) : null}
         </Box>
 
         <Stack gap={5}>
@@ -669,7 +690,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         contextoAdicional: modalContextoAdicional,
         calendario: modalCalendar,
         semanaMenu: modalSelectedMenuWeek,
-        recomendacionesIngestas: modalRecomendacionesIngestas,
         preMatchConfig: modalPreMatchConfig,
       });
 
@@ -760,7 +780,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         contextoAdicional,
         calendario: currentCalendar || getDefaultCalendar(),
         semanaMenu: selectedMenuWeek,
-        recomendacionesIngestas
+        preMatchConfig: datos?.meta?.preMatchConfig || null,
       });
       setDatos(data.datos || null);
       setContenido('');
@@ -840,6 +860,14 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
   async function saveEdit() {
     if (!currentPlan) return;
+    if (menuChangedWithoutRegeneration) {
+      notifications.show({
+        color: 'yellow',
+        title: 'Regenera la ficha',
+        message: 'Has cambiado el menú. Pulsa “Regenerar ficha” antes de guardar para aplicar la nueva semana a las comidas.',
+      });
+      return;
+    }
     const notificationId = 'ai-plan-save';
     const finalDatos = planWithMeta(datos, { nombre, contextoAdicional, recomendacionesIngestas });
     setActionType('save');
@@ -948,7 +976,14 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     }
   }
 
-  const canSave = nombre.trim() && (datos || contenido.trim()) && actionType !== 'generate';
+  const storedMenuWeek = datos?.meta?.semanaMenu || 'none';
+  const menuChangedWithoutRegeneration = mode === 'edit'
+    && Boolean(datos)
+    && (selectedMenuWeek || 'none') !== storedMenuWeek;
+  const canSave = nombre.trim()
+    && (datos || contenido.trim())
+    && actionType !== 'generate'
+    && !menuChangedWithoutRegeneration;
 
   return (
     <Stack gap={0}>
@@ -1175,6 +1210,12 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                 />
               </SimpleGrid>
 
+              {menuChangedWithoutRegeneration && (
+                <Text size="xs" c="orange.8">
+                  Has cambiado el menú. Pulsa “Regenerar ficha” antes de guardar para aplicar la nueva semana a las comidas.
+                </Text>
+              )}
+
               <Textarea
                 label="Instrucciones adicionales o notas"
                 placeholder="Ej: Sale de lesión, reduce fibra el día de partido..."
@@ -1184,15 +1225,18 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
               />
 
               <Paper p="sm" radius="md" withBorder bg="gray.0">
-                <Text size="sm" fw={700} mb="xs">Recomendaciones para las ingestas del jugador</Text>
+                <Text size="sm" fw={700} mb="xs">Recomendaciones por defecto del jugador</Text>
+                <Text size="xs" c="dimmed" mb="xs">
+                  Se utilizarán únicamente las pautas ya guardadas en la ficha del jugador.
+                </Text>
                 <Stack gap="sm">
                   {getUserMeals(jugador).filter((meal) => meal.toLowerCase() !== 'post-entreno').map((meal) => (
                     <TextInput
                       key={meal}
                       label={meal}
-                      placeholder={`Ej: Tostadas de aguacate con pavo...`}
+                      placeholder="Sin pauta por defecto"
                       value={recomendacionesIngestas[meal] || ''}
-                      onChange={(e) => setRecomendacionesIngestas((prev) => ({ ...prev, [meal]: e.target.value }))}
+                      readOnly
                       size="sm"
                     />
                   ))}
@@ -1463,7 +1507,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         setModalContextoAdicional={setModalContextoAdicional}
         jugador={jugador}
         modalRecomendacionesIngestas={modalRecomendacionesIngestas}
-        setModalRecomendacionesIngestas={setModalRecomendacionesIngestas}
         modalCalendar={modalCalendar}
         setModalCalendar={setModalCalendar}
         modalPreMatchConfig={modalPreMatchConfig}

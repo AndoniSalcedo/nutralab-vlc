@@ -1,0 +1,660 @@
+{
+  "version": 2,
+  "meta": {
+    "nombre": "Plan Semanal - José Luis Gayá",
+    "contexto": "semana_partido",
+    "semanaMenu": "2026-09-14",
+    "preMatchConfig": {
+      "texto": "",
+      "enabled": true,
+      "horario": "tarde",
+      "partidos": {
+        "martes": {
+          "horario": "noche"
+        },
+        "domingo": {
+          "horario": "noche"
+        }
+      },
+      "diaPartido": "sabado"
+    },
+    "fecha": "2026-09-16T11:37:39.856Z",
+    "recomendacionesIngestas": {},
+    "engine": "deterministic_food_tree"
+  },
+  "jugador": {
+    "id": 193,
+    "nombre": "José Luis Gayá",
+    "posicion": "Sin posición",
+    "num_comidas": "5",
+    "postentreno": false,
+    "objetivo": "Salud y mejorar calambres y recuperación muscular"
+  },
+  "metricas": {
+    "peso": 68.1,
+    "grasa": 9.8,
+    "masaMagra": 61.5,
+    "pesoMuscular": 47.6
+  },
+  "dias": {
+    "lunes": {
+      "dayKey": "lunes",
+      "label": "Lunes",
+      "tipoDia": "entreno",
+      "kcal": 2493,
+      "proteina": 136,
+      "hidratos": 341,
+      "grasa": 65,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan sin gluten 80g, Hamburguesa de pavo 100g, AOVE 5g, Zumo de naranja natural 200g",
+          "macrosReales": {
+            "kcal": 461,
+            "proteina": 22,
+            "hidratos": 59,
+            "grasa": 14
+          }
+        },
+        {
+          "nombre": "Almuerzo",
+          "detalle": "Naranja 200g, Yogur proteico sin lactosa 250g, Anacardo (marañón) 15g",
+          "macrosReales": {
+            "kcal": 327,
+            "proteina": 30,
+            "hidratos": 38,
+            "grasa": 11
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Pasta sin gluten 85g, Dorada 170g, Calabacín 80g, Zanahoria 80g, Puerro 80g, AOVE 15g, Plátano 100g",
+          "macrosReales": {
+            "kcal": 804,
+            "proteina": 44,
+            "hidratos": 104,
+            "grasa": 24
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Kiwi 200g, Yogur natural sin lactosa 250g, Almendras 15g",
+          "macrosReales": {
+            "kcal": 361,
+            "proteina": 14,
+            "hidratos": 44,
+            "grasa": 17
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Maíz dulce 170g, Muslo de pollo 175g, Puerro 80g, Piña pelada 200g, AOVE 5g",
+          "macrosReales": {
+            "kcal": 620,
+            "proteina": 39,
+            "hidratos": 62,
+            "grasa": 27
+          }
+        }
+      ],
+      "macrosReales": {
+        "kcal": 2573,
+        "proteina": 149,
+        "hidratos": 307,
+        "grasa": 93
+      },
+      "desviacionMacros": {
+        "kcal": 80,
+        "proteina": 13,
+        "hidratos": -34,
+        "grasa": 28
+      },
+      "cierreMacros": {
+        "estado": "completo",
+        "ingestasCalculadas": 5,
+        "ingestasTotales": 5
+      }
+    },
+    "martes": {
+      "dayKey": "martes",
+      "label": "Martes",
+      "tipoDia": "partido",
+      "kcal": 2933,
+      "proteina": 126,
+      "hidratos": 470,
+      "grasa": 61,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Copos de avena sin gluten 115g, 1 Huevo, Aguacate 30g, Mandarina 200g",
+          "macrosReales": {
+            "kcal": 660,
+            "proteina": 25,
+            "hidratos": 97,
+            "grasa": 18
+          }
+        },
+        {
+          "nombre": "Almuerzo",
+          "detalle": "Plátano 200g, Yogur natural sin lactosa 250g, Semillas de lino (linaza) 20g",
+          "macrosReales": {
+            "kcal": 437,
+            "proteina": 15,
+            "hidratos": 63,
+            "grasa": 17
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 170g, Conejo 120g, Lechuga romana 50g, Fresas 200g, AOVE 15g",
+          "macrosReales": {
+            "kcal": 983,
+            "proteina": 40,
+            "hidratos": 150,
+            "grasa": 22
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Arándanos 200g, Yogur proteico sin lactosa 250g, Pipas de girasol 20g",
+          "macrosReales": {
+            "kcal": 381,
+            "proteina": 31,
+            "hidratos": 43,
+            "grasa": 15
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Boniato 410g, Corvina 115g, Guisantes 80g, Melocotón 200g, AOVE 10g",
+          "macrosReales": {
+            "kcal": 699,
+            "proteina": 35,
+            "hidratos": 113,
+            "grasa": 14
+          }
+        }
+      ],
+      "macrosReales": {
+        "kcal": 3160,
+        "proteina": 146,
+        "hidratos": 466,
+        "grasa": 86
+      },
+      "desviacionMacros": {
+        "kcal": 227,
+        "proteina": 20,
+        "hidratos": -4,
+        "grasa": 25
+      },
+      "cierreMacros": {
+        "estado": "completo",
+        "ingestasCalculadas": 5,
+        "ingestasTotales": 5
+      }
+    },
+    "miercoles": {
+      "dayKey": "miercoles",
+      "label": "Miércoles",
+      "tipoDia": "descanso",
+      "kcal": 2272,
+      "proteina": 143,
+      "hidratos": 272,
+      "grasa": 68,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan sin gluten 50g, Pechuga de pavo 100g, AOVE 10g, Pera 200g",
+          "macrosReales": {
+            "kcal": 436,
+            "proteina": 27,
+            "hidratos": 53,
+            "grasa": 13
+          }
+        },
+        {
+          "nombre": "Almuerzo",
+          "detalle": "Ciruela 200g, Yogur natural sin lactosa 250g, Anacardo (marañón) 15g",
+          "macrosReales": {
+            "kcal": 327,
+            "proteina": 13,
+            "hidratos": 39,
+            "grasa": 15
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 60g, Gambas 170g, Acelga 80g, Frambuesa 200g, AOVE 25g",
+          "macrosReales": {
+            "kcal": 728,
+            "proteina": 49,
+            "hidratos": 74,
+            "grasa": 27
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Naranja 200g, Yogur proteico sin lactosa 250g, Cacahuete (maní) 15g",
+          "macrosReales": {
+            "kcal": 329,
+            "proteina": 31,
+            "hidratos": 36,
+            "grasa": 11
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Pasta sin gluten 50g, Secreto de cerdo 195g, Tomate frito 80g, Plátano 200g, AOVE 5g",
+          "macrosReales": {
+            "kcal": 1033,
+            "proteina": 41,
+            "hidratos": 93,
+            "grasa": 56
+          }
+        }
+      ],
+      "macrosReales": {
+        "kcal": 2853,
+        "proteina": 161,
+        "hidratos": 295,
+        "grasa": 122
+      },
+      "desviacionMacros": {
+        "kcal": 581,
+        "proteina": 18,
+        "hidratos": 23,
+        "grasa": 54
+      },
+      "cierreMacros": {
+        "estado": "completo",
+        "ingestasCalculadas": 5,
+        "ingestasTotales": 5
+      }
+    },
+    "jueves": {
+      "dayKey": "jueves",
+      "label": "Jueves",
+      "tipoDia": "entreno",
+      "kcal": 2493,
+      "proteina": 136,
+      "hidratos": 341,
+      "grasa": 65,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Copos de avena sin gluten 80g, 1 Huevo, Aguacate 30g, Fresas 200g",
+          "macrosReales": {
+            "kcal": 503,
+            "proteina": 20,
+            "hidratos": 65,
+            "grasa": 17
+          }
+        },
+        {
+          "nombre": "Almuerzo",
+          "detalle": "Mandarina 200g, Yogur natural sin lactosa 250g, Piñones 20g",
+          "macrosReales": {
+            "kcal": 393,
+            "proteina": 13,
+            "hidratos": 41,
+            "grasa": 23
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 120g, Pechuga de pollo 160g, AOVE 20g, Naranja 100g",
+          "macrosReales": {
+            "kcal": 854,
+            "proteina": 45,
+            "hidratos": 105,
+            "grasa": 25
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Uvas 200g, Yogur proteico sin lactosa 250g, Pipas de girasol 20g",
+          "macrosReales": {
+            "kcal": 405,
+            "proteina": 31,
+            "hidratos": 50,
+            "grasa": 14
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Quinoa 90g, Lenguado 140g, Alcachofa 80g, Zumo de naranja natural 200g, AOVE 10g",
+          "macrosReales": {
+            "kcal": 665,
+            "proteina": 39,
+            "hidratos": 85,
+            "grasa": 19
+          }
+        }
+      ],
+      "macrosReales": {
+        "kcal": 2820,
+        "proteina": 148,
+        "hidratos": 346,
+        "grasa": 98
+      },
+      "desviacionMacros": {
+        "kcal": 327,
+        "proteina": 12,
+        "hidratos": 5,
+        "grasa": 33
+      },
+      "cierreMacros": {
+        "estado": "completo",
+        "ingestasCalculadas": 5,
+        "ingestasTotales": 5
+      }
+    },
+    "viernes": {
+      "dayKey": "viernes",
+      "label": "Viernes",
+      "tipoDia": "entreno",
+      "kcal": 2493,
+      "proteina": 136,
+      "hidratos": 341,
+      "grasa": 65,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan sin gluten 80g, Chuletas de pavo 100g, AOVE 5g, Kiwi 200g",
+          "macrosReales": {
+            "kcal": 476,
+            "proteina": 28,
+            "hidratos": 66,
+            "grasa": 11
+          }
+        },
+        {
+          "nombre": "Almuerzo",
+          "detalle": "Manzana 200g, Yogur proteico sin lactosa 250g, Crema de cacahuete natural (100% cacahuete) 15g",
+          "macrosReales": {
+            "kcal": 342,
+            "proteina": 29,
+            "hidratos": 41,
+            "grasa": 12
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Yuca 230g, Sardina 155g, Coliflor 80g, Naranja 200g, AOVE 5g",
+          "macrosReales": {
+            "kcal": 849,
+            "proteina": 45,
+            "hidratos": 115,
+            "grasa": 23
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Fresas 200g, Yogur natural sin lactosa 250g, Nueces 15g",
+          "macrosReales": {
+            "kcal": 315,
+            "proteina": 12,
+            "hidratos": 29,
+            "grasa": 19
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Trigo sarraceno 75g, Morro de cerdo cocido 170g, Pepino 80g, Arándanos 200g, AOVE 5g",
+          "macrosReales": {
+            "kcal": 725,
+            "proteina": 38,
+            "hidratos": 86,
+            "grasa": 29
+          }
+        }
+      ],
+      "macrosReales": {
+        "kcal": 2707,
+        "proteina": 152,
+        "hidratos": 337,
+        "grasa": 94
+      },
+      "desviacionMacros": {
+        "kcal": 214,
+        "proteina": 16,
+        "hidratos": -4,
+        "grasa": 29
+      },
+      "cierreMacros": {
+        "estado": "completo",
+        "ingestasCalculadas": 5,
+        "ingestasTotales": 5
+      }
+    },
+    "sabado": {
+      "dayKey": "sabado",
+      "label": "Sábado",
+      "tipoDia": "entreno",
+      "kcal": 2493,
+      "proteina": 136,
+      "hidratos": 341,
+      "grasa": 65,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Copos de avena sin gluten 80g, 1 Huevo, Aguacate 30g, Sandía 200g",
+          "macrosReales": {
+            "kcal": 499,
+            "proteina": 19,
+            "hidratos": 65,
+            "grasa": 16
+          }
+        },
+        {
+          "nombre": "Almuerzo",
+          "detalle": "Uvas 200g, Yogur proteico sin lactosa 250g, Anacardo (marañón) 15g",
+          "macrosReales": {
+            "kcal": 371,
+            "proteina": 29,
+            "hidratos": 51,
+            "grasa": 11
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 115g, Pulpo 240g, AOVE 20g, Mandarina 100g",
+          "macrosReales": {
+            "kcal": 846,
+            "proteina": 45,
+            "hidratos": 108,
+            "grasa": 23
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Nectarina 200g, Yogur natural sin lactosa 250g, Semillas de chía 20g",
+          "macrosReales": {
+            "kcal": 342,
+            "proteina": 14,
+            "hidratos": 41,
+            "grasa": 15
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Pasta de lenteja roja 135g, Chuletas de pavo 100g, Espinaca 50g, Ciruela 200g, AOVE 10g",
+          "macrosReales": {
+            "kcal": 766,
+            "proteina": 60,
+            "hidratos": 91,
+            "grasa": 17
+          }
+        }
+      ],
+      "macrosReales": {
+        "kcal": 2824,
+        "proteina": 167,
+        "hidratos": 356,
+        "grasa": 82
+      },
+      "desviacionMacros": {
+        "kcal": 331,
+        "proteina": 31,
+        "hidratos": 15,
+        "grasa": 17
+      },
+      "cierreMacros": {
+        "estado": "completo",
+        "ingestasCalculadas": 5,
+        "ingestasTotales": 5
+      }
+    },
+    "domingo": {
+      "dayKey": "domingo",
+      "label": "Domingo",
+      "tipoDia": "partido",
+      "kcal": 2933,
+      "proteina": 126,
+      "hidratos": 470,
+      "grasa": 61,
+      "ingestas": [
+        {
+          "nombre": "Desayuno",
+          "detalle": "Pan sin gluten 80g, Hamburguesa de pavo 100g, AOVE 5g, Melocotón 200g",
+          "macrosReales": {
+            "kcal": 449,
+            "proteina": 23,
+            "hidratos": 57,
+            "grasa": 15
+          }
+        },
+        {
+          "nombre": "Almuerzo",
+          "detalle": "Pera 200g, Yogur proteico sin lactosa 250g, Nueces 15g",
+          "macrosReales": {
+            "kcal": 362,
+            "proteina": 28,
+            "hidratos": 42,
+            "grasa": 14
+          }
+        },
+        {
+          "nombre": "Comida",
+          "detalle": "Arroz blanco 170g, Conejo 120g, Puerro 80g, Arándanos 200g, AOVE 15g",
+          "macrosReales": {
+            "kcal": 1049,
+            "proteina": 41,
+            "hidratos": 166,
+            "grasa": 22
+          }
+        },
+        {
+          "nombre": "Merienda",
+          "detalle": "Piña pelada 200g, Yogur natural sin lactosa 250g, Semillas de calabaza (pipas) 20g",
+          "macrosReales": {
+            "kcal": 359,
+            "proteina": 16,
+            "hidratos": 39,
+            "grasa": 18
+          }
+        },
+        {
+          "nombre": "Cena",
+          "detalle": "Boniato 450g, Carne picada de pollo 125g, Acelga 80g, Kiwi 200g, AOVE 5g",
+          "macrosReales": {
+            "kcal": 746,
+            "proteina": 36,
+            "hidratos": 123,
+            "grasa": 15
+          }
+        }
+      ],
+      "macrosReales": {
+        "kcal": 2965,
+        "proteina": 144,
+        "hidratos": 427,
+        "grasa": 84
+      },
+      "desviacionMacros": {
+        "kcal": 32,
+        "proteina": 18,
+        "hidratos": -43,
+        "grasa": 23
+      },
+      "cierreMacros": {
+        "estado": "completo",
+        "ingestasCalculadas": 5,
+        "ingestasTotales": 5
+      }
+    }
+  },
+  "suplementacion": [],
+  "protocolos": [
+    {
+      "id": "prot_prepartido_old",
+      "name": "Protocolo Prepartido",
+      "timeline": [
+        {
+          "id": "tl_1",
+          "icon": "IconApple",
+          "title": "Comida principal",
+          "timeLabel": "-3 / -4 h",
+          "description": "Base alta en CHO: arroz, pasta o patata. Proteína fácil de digerir, 100-150 g."
+        },
+        {
+          "id": "tl_2",
+          "icon": "IconRun",
+          "title": "Snack",
+          "timeLabel": "-90 min",
+          "description": "Plátano, gel o opción habitual ya testada. Evitar novedades."
+        },
+        {
+          "id": "tl_3",
+          "icon": "IconCoffee",
+          "title": "Cafeína",
+          "timeLabel": "-60 min",
+          "description": "3-6 mg/kg según tolerancia y rol esperado."
+        },
+        {
+          "id": "tl_4",
+          "icon": "IconDroplet",
+          "title": "Medio tiempo",
+          "timeLabel": "Medio tiempo",
+          "description": "300-500 ml de isotónica y ajuste de CHO si hay alta carga."
+        },
+        {
+          "id": "tl_5",
+          "icon": "IconBatteryCharging",
+          "title": "Recuperación",
+          "timeLabel": "+30 min",
+          "description": "Proteína + CHO rápidos. Priorizar disponibilidad si hay viaje."
+        }
+      ],
+      "checklist": [
+        {
+          "id": "cl_1",
+          "title": "Comida",
+          "description": "Baja en grasa y fibra si el jugador tiene molestias GI."
+        },
+        {
+          "id": "cl_2",
+          "title": "Hidratación",
+          "description": "Orina clara antes de salida. Electrolitos si calor o alta sudoración."
+        },
+        {
+          "id": "cl_3",
+          "title": "Suplementos",
+          "description": "Solo lo probado en entrenamiento. Nada nuevo en partido."
+        },
+        {
+          "id": "cl_4",
+          "title": "Recuperación",
+          "description": "Dejar preparado batido, snack y cena si hay desplazamiento."
+        }
+      ],
+      "dayTypeKey": "partido"
+    }
+  ],
+  "notas": [
+    "Ajusta la hidratación según la intensidad de la sesión y la sudoración.",
+    "Respeta los gramajes en crudo indicados para cada comida.",
+    "Toma el batido post-entreno en los primeros 30 minutos tras finalizar la sesión.",
+    "Mantén las pautas de descanso nocturno y digestión adecuada."
+  ]
+}
