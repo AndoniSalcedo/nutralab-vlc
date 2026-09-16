@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Container,
+  Group,
   Image,
   Paper,
   PasswordInput,
@@ -423,6 +424,25 @@ export default function TecnicoLoginForm() {
             </Anchor>
           </Text>
         </Stack>
+
+        {/* Enlaces legales discretos */}
+        <Group justify="center" gap="xs" mt="lg">
+          <Anchor href="/legal/aviso-legal" size="xs" c="#8d917a" underline="hover">
+            Aviso Legal
+          </Anchor>
+          <Text size="xs" c="#c2c5b6">
+            ·
+          </Text>
+          <Anchor href="/legal/privacidad" size="xs" c="#8d917a" underline="hover">
+            Privacidad
+          </Anchor>
+          <Text size="xs" c="#c2c5b6">
+            ·
+          </Text>
+          <Anchor href="/legal/cookies" size="xs" c="#8d917a" underline="hover">
+            Cookies
+          </Anchor>
+        </Group>
       </Container>
     </Box>
   );

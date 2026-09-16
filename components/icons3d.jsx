@@ -700,3 +700,4 @@ export const IconFlag = makeIcon('flag', TablerIcons.IconFlag);
 export const IconExternalLink = makeIcon('link', TablerIcons.IconExternalLink);
 export const IconEye = makeIcon('eye', TablerIcons.IconEye);
 export const IconBell = makeIcon('bell', TablerIcons.IconBell);
+export const IconCookie = makeIcon('cookie', TablerIcons.IconCookie);

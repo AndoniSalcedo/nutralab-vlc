@@ -21,7 +21,7 @@ import {
   IconCheck,
   IconEyeOff,
   IconSparkles,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 
 export default function MascotTutorialBubble({
   index,
@@ -94,24 +94,24 @@ export default function MascotTutorialBubble({
         pointerEvents: 'none',
         ...(side === 'right'
           ? {
-              right: 0,
-              left: 'auto',
-            }
+            right: 0,
+            left: 'auto',
+          }
           : {
-              left: 0,
-              right: 'auto',
-            }),
+            left: 0,
+            right: 'auto',
+          }),
         ...(placement === 'top'
           ? {
-              top: isDesktop ? '20px' : 'max(16px, calc(env(safe-area-inset-top, 0px) + 14px))',
-              bottom: 'auto',
-            }
+            top: isDesktop ? '20px' : 'max(16px, calc(env(safe-area-inset-top, 0px) + 14px))',
+            bottom: 'auto',
+          }
           : {
-              bottom: isDesktop
-                ? '32px'
-                : 'max(76px, calc(env(safe-area-inset-bottom, 0px) + 76px))',
-              top: 'auto',
-            }),
+            bottom: isDesktop
+              ? '32px'
+              : 'max(76px, calc(env(safe-area-inset-bottom, 0px) + 76px))',
+            top: 'auto',
+          }),
         width: '100%',
         maxWidth: isDesktop ? 510 : 'min(450px, 100vw)',
         boxSizing: 'border-box',
@@ -227,9 +227,8 @@ export default function MascotTutorialBubble({
           >
             <div
               key={`mascot-${index}-${side}`}
-              className={`nutra-mascot-img nutra-mascot-floating ${
-                mascotWiggle ? 'nutra-mascot-wiggle' : ''
-              }`}
+              className={`nutra-mascot-img nutra-mascot-floating ${mascotWiggle ? 'nutra-mascot-wiggle' : ''
+                }`}
               style={{
                 width: mascotWidth,
                 height: mascotHeight,
@@ -290,15 +289,15 @@ export default function MascotTutorialBubble({
               position: 'absolute',
               ...(side === 'left'
                 ? {
-                    left: tailOffset,
-                    right: 'auto',
-                    filter: 'drop-shadow(-2px 1px 1.5px rgba(45, 60, 25, 0.06))',
-                  }
+                  left: tailOffset,
+                  right: 'auto',
+                  filter: 'drop-shadow(-2px 1px 1.5px rgba(45, 60, 25, 0.06))',
+                }
                 : {
-                    right: tailOffset,
-                    left: 'auto',
-                    filter: 'drop-shadow(2px 1px 1.5px rgba(45, 60, 25, 0.06))',
-                  }),
+                  right: tailOffset,
+                  left: 'auto',
+                  filter: 'drop-shadow(2px 1px 1.5px rgba(45, 60, 25, 0.06))',
+                }),
               top: `clamp(18px, ${mouthY - (isDesktop ? 12 : 10)}px, calc(100% - 34px))`,
               zIndex: 1,
               pointerEvents: 'none',

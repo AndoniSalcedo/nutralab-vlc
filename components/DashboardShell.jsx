@@ -11,7 +11,8 @@ import {
   IconUserStar,
   IconBook,
   IconApple,
-} from "@tabler/icons-react";
+  IconShieldCheck,
+} from "@/components/icons3d";
 import {
   Avatar,
   Box,
@@ -186,7 +187,17 @@ export default function DashboardShell({ children, user }) {
                   </>
                 )}
 
-                {isTecnico && <Menu.Divider />}
+                <Menu.Divider />
+
+                <Menu.Item
+                  leftSection={<IconShieldCheck size={16} stroke={1.5} />}
+                  onClick={() => {
+                    router.push('/legal');
+                    setOpened(false);
+                  }}
+                >
+                  Legal y Privacidad
+                </Menu.Item>
 
                 <Menu.Item
                   color="red"

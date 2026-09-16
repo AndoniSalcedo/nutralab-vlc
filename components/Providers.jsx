@@ -40,6 +40,7 @@ const theme = createTheme({
 });
 
 import { Notifications } from '@mantine/notifications';
+import CookieBanner from '@/components/legal/CookieBanner';
 
 export default function Providers({ children }) {
   useEffect(() => {
@@ -68,6 +69,7 @@ export default function Providers({ children }) {
     <MantineProvider theme={theme} defaultColorScheme="light">
       <Notifications />
       {children}
+      <CookieBanner />
     </MantineProvider>
   );
 }

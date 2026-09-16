@@ -20,7 +20,7 @@ import {
   IconRefresh,
   IconDroplet,
   IconChevronRight,
-} from '@tabler/icons-react';
+} from '@/components/icons3d';
 import FillableIcon from '@/components/FillableIcon';
 import { calculateHydration } from '@/lib/metrics/anthropometry';
 import { getTeamNutritionDayTypes } from '@/config/nutrition-days';
@@ -252,11 +252,10 @@ export default function WaterWidget({
                   backgroundColor: isActive
                     ? `var(--mantine-color-${colorName}-0)`
                     : 'var(--mantine-color-gray-0)',
-                  border: `1px solid ${
-                    isActive
-                      ? `var(--mantine-color-${colorName}-4)`
-                      : 'var(--mantine-color-gray-2)'
-                  }`,
+                  border: `1px solid ${isActive
+                    ? `var(--mantine-color-${colorName}-4)`
+                    : 'var(--mantine-color-gray-2)'
+                    }`,
                   transition: 'all 0.15s ease',
                   display: 'flex',
                   alignItems: 'center',
