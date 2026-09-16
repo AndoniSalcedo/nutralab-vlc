@@ -200,7 +200,8 @@ const trace = {
     branches: [
       treeBranchSummary(playerFoodTree, 'hidratos.pasta'),
       treeBranchSummary(playerFoodTree, 'hidratos.tuberculos'),
-      treeBranchSummary(playerFoodTree, 'proteina.aves'),
+      treeBranchSummary(playerFoodTree, 'proteina.pollo'),
+      treeBranchSummary(playerFoodTree, 'proteina.pavo'),
     ],
   },
   stage2_basePlan: {

@@ -1,4 +1,5 @@
 import { FOODS_CRUDO } from '@/data/foods-crudo';
+import { hasTreePath } from '@/lib/engine/food-tree';
 
 /**
  * Configuración de los selectores de edición del árbol.
@@ -22,29 +23,36 @@ function genericOptions(items) {
 
 export function getTreeProteinaOptions() {
   const seen = new Set();
-  const aves = FOODS_CRUDO.filter((f) => f.category === 'carnes_y_aves' && !f.tags?.includes('carne_roja') && !f.tags?.includes('cerdo'));
-  const ternera = FOODS_CRUDO.filter((f) => f.category === 'carnes_y_aves' && f.tags?.includes('carne_roja'));
-  const cerdo = FOODS_CRUDO.filter((f) => f.category === 'carnes_y_aves' && f.tags?.includes('cerdo'));
-  const mariscos = FOODS_CRUDO.filter((f) => f.tags?.includes('marisco'));
-  const azules = FOODS_CRUDO.filter((f) => f.tags?.includes('pescado_azul'));
-  const blancos = FOODS_CRUDO.filter((f) => f.tags?.includes('pescado_blanco'));
-  const vegetalHuevos = FOODS_CRUDO.filter((f) => f.tags?.includes('huevo') || ['tofu firme', 'seitán', 'seitan', 'soja texturizada'].includes(f.name.toLowerCase()));
+  const pollo = FOODS_CRUDO.filter((f) => hasTreePath(f, 'pollo'));
+  const pavo = FOODS_CRUDO.filter((f) => hasTreePath(f, 'pavo'));
+  const conejo = FOODS_CRUDO.filter((f) => hasTreePath(f, 'conejo'));
+  const ternera = FOODS_CRUDO.filter((f) => hasTreePath(f, 'vacuno'));
+  const cerdo = FOODS_CRUDO.filter((f) => hasTreePath(f, 'cerdo'));
+  const embutidos = FOODS_CRUDO.filter((f) => hasTreePath(f, 'embutidos'));
+  const mariscos = FOODS_CRUDO.filter((f) => hasTreePath(f, 'marisco'));
+  const azules = FOODS_CRUDO.filter((f) => hasTreePath(f, 'pescado_azul'));
+  const blancos = FOODS_CRUDO.filter((f) => hasTreePath(f, 'pescado_blanco'));
+  const vegetalHuevos = FOODS_CRUDO.filter((f) => hasTreePath(f, 'huevos') || hasTreePath(f, 'vegetal_proteina'));
 
   return [
     ...genericOptions([
       { value: 'pollo', label: 'Pollo (Genérico)' },
       { value: 'pavo', label: 'Pavo (Genérico)' },
+      { value: 'conejo', label: 'Conejo' },
       { value: 'vacuno', label: 'Ternera / Vacuno (Genérico)' },
-      { value: 'cerdo', label: 'Cerdo (Genérico)' },
+      { value: 'cerdo', label: 'Cerdo fresco (Genérico)' },
+      { value: 'embutidos_fiambres', label: 'Embutidos y Fiambres (Genérico)' },
       { value: 'pescado_blanco', label: 'Pescado blanco (Genérico)' },
       { value: 'pescado_azul', label: 'Pescado azul (Genérico)' },
       { value: 'marisco', label: 'Marisco (Genérico)' },
       { value: 'huevos', label: 'Huevos (Genérico)' },
       { value: 'vegetal_proteina', label: 'Proteína vegetal (Genérico)' },
     ]),
-    { group: 'Aves y Conejo', items: mapFoodsToItems(aves, seen) },
+    { group: 'Pollo', items: mapFoodsToItems(pollo, seen) },
+    { group: 'Pavo y Conejo', items: mapFoodsToItems([...pavo, ...conejo], seen) },
     { group: 'Ternera y Carnes Rojas', items: mapFoodsToItems(ternera, seen) },
-    { group: 'Cerdo', items: mapFoodsToItems(cerdo, seen) },
+    { group: 'Cerdo fresco', items: mapFoodsToItems(cerdo, seen) },
+    { group: 'Embutidos y Fiambres', items: mapFoodsToItems(embutidos, seen) },
     { group: 'Pescados Blancos', items: mapFoodsToItems(blancos, seen) },
     { group: 'Pescados Azules y Conservas', items: mapFoodsToItems(azules, seen) },
     { group: 'Mariscos y Cefalópodos', items: mapFoodsToItems(mariscos, seen) },
@@ -54,17 +62,18 @@ export function getTreeProteinaOptions() {
 
 export function getTreeHidratoOptions() {
   const seen = new Set();
-  const carbFoods = FOODS_CRUDO.filter((f) => ['cereales_y_tuberculos', 'otros_granos'].includes(f.category));
-  const pastas = carbFoods.filter((f) => f.name.toLowerCase().includes('pasta'));
+  const pastas = FOODS_CRUDO.filter((f) => hasTreePath(f, 'pasta'));
   pastas.forEach((f) => seen.add(f.name));
-  const arroces = carbFoods.filter((f) => !seen.has(f.name) && f.name.toLowerCase().includes('arroz') && !f.name.toLowerCase().includes('tortas'));
+  const arroces = FOODS_CRUDO.filter((f) => hasTreePath(f, 'arroz'));
   arroces.forEach((f) => seen.add(f.name));
-  const tuberculos = carbFoods.filter((f) => ['patata', 'boniato', 'yuca', 'ñoquis', 'noquis'].some((k) => f.name.toLowerCase().includes(k)));
+  const tuberculos = FOODS_CRUDO.filter((f) => hasTreePath(f, 'tuberculos'));
   tuberculos.forEach((f) => seen.add(f.name));
-  const panes = carbFoods.filter((f) => !seen.has(f.name) && ['pan ', 'pan de', 'tostada', 'picos', 'tortas', 'tortilla de trigo', 'biscote'].some((k) => f.name.toLowerCase().includes(k)));
+  const panes = FOODS_CRUDO.filter((f) => hasTreePath(f, 'panes'));
   panes.forEach((f) => seen.add(f.name));
-  const granos = carbFoods.filter((f) => !seen.has(f.name) && !f.name.toLowerCase().includes('leche'));
-  const legumbres = FOODS_CRUDO.filter((f) => f.category === 'legumbres' && f.name.toLowerCase() !== 'soja texturizada');
+  const cerealesDesayuno = FOODS_CRUDO.filter((f) => hasTreePath(f, 'cereales_desayuno'));
+  cerealesDesayuno.forEach((f) => seen.add(f.name));
+  const granos = FOODS_CRUDO.filter((f) => hasTreePath(f, 'otros_granos'));
+  const legumbres = FOODS_CRUDO.filter((f) => hasTreePath(f, 'legumbres'));
 
   return [
     ...genericOptions([
@@ -72,14 +81,16 @@ export function getTreeHidratoOptions() {
       { value: 'arroz', label: 'Arroz (Genérico adaptable)' },
       { value: 'panes', label: 'Panes (Genérico adaptable)' },
       { value: 'tuberculos', label: 'Tubérculos (Genérico)' },
-      { value: 'otros_granos', label: 'Otros granos y cereales (Genérico)' },
+      { value: 'otros_granos', label: 'Otros granos culinarios (Quinoa, Cuscús, Bulgur)' },
+      { value: 'cereales_desayuno', label: 'Cereales de desayuno y Avena (Genérico)' },
       { value: 'legumbres', label: 'Legumbres (Genérico)' },
     ]),
     { group: 'Pastas', items: mapFoodsToItems(pastas) },
     { group: 'Arroces', items: mapFoodsToItems(arroces) },
     { group: 'Tubérculos', items: mapFoodsToItems(tuberculos) },
     { group: 'Panes y Masas', items: mapFoodsToItems(panes) },
-    { group: 'Granos, Cereales y Semillas', items: mapFoodsToItems(granos) },
+    { group: 'Granos Culinarios (Quinoa, Cuscús...)', items: mapFoodsToItems(granos) },
+    { group: 'Cereales de Desayuno y Avena', items: mapFoodsToItems(cerealesDesayuno) },
     { group: 'Legumbres', items: mapFoodsToItems(legumbres) },
   ];
 }
@@ -87,16 +98,14 @@ export function getTreeHidratoOptions() {
 export function getTreeVerduraOptions() {
   return [
     ...genericOptions([{ value: 'verduras', label: 'Verduras variadas (Genérico)' }]),
-    { group: 'Verduras y Hortalizas', items: mapFoodsToItems(FOODS_CRUDO.filter((f) => f.category === 'verduras_y_hortalizas')) },
+    { group: 'Verduras de Hoja Verde', items: mapFoodsToItems(FOODS_CRUDO.filter((f) => hasTreePath(f, 'hojas_verdes'))) },
+    { group: 'Verduras y Hortalizas', items: mapFoodsToItems(FOODS_CRUDO.filter((f) => hasTreePath(f, 'hortalizas'))) },
   ];
 }
 
 export function getTreeFrutaOptions() {
-  const frutaFoods = FOODS_CRUDO.filter((f) => f.category === 'frutas' && f.name !== 'Vinagre de manzana');
-  const desecadasKeywords = ['desecada', 'compota', 'seco', 'pasta de dátil', 'pasta de datil'];
-  const desecadas = frutaFoods.filter((f) => desecadasKeywords.some((k) => f.name.toLowerCase().includes(k)));
-  const desecadasNames = new Set(desecadas.map((f) => f.name));
-  const frescas = frutaFoods.filter((f) => !desecadasNames.has(f.name));
+  const frescas = FOODS_CRUDO.filter((f) => hasTreePath(f, 'frutas') && !hasTreePath(f, 'desecadas'));
+  const desecadas = FOODS_CRUDO.filter((f) => hasTreePath(f, 'desecadas'));
 
   return [
     ...genericOptions([{ value: 'frutas', label: 'Fruta fresca / de temporada (Genérica)' }]),
@@ -106,11 +115,9 @@ export function getTreeFrutaOptions() {
 }
 
 export function getTreeLacteoOptions() {
-  const yogurKeywords = ['yogur', 'kéfir', 'kefir', 'skyr'];
-  const quesoKeywords = ['queso', 'requesón', 'requeson', 'mozzarella'];
-  const yogures = FOODS_CRUDO.filter((f) => yogurKeywords.some((k) => f.name.toLowerCase().includes(k)));
-  const quesos = FOODS_CRUDO.filter((f) => quesoKeywords.some((k) => f.name.toLowerCase().includes(k)));
-  const leches = FOODS_CRUDO.filter((f) => f.name.toLowerCase().includes('leche') && f.name !== 'Arroz con leche');
+  const yogures = FOODS_CRUDO.filter((f) => hasTreePath(f, 'yogures'));
+  const quesos = FOODS_CRUDO.filter((f) => hasTreePath(f, 'quesos'));
+  const leches = FOODS_CRUDO.filter((f) => hasTreePath(f, 'leches'));
 
   return [
     ...genericOptions([
