@@ -1,3 +1,10 @@
+import {
+  listPlayerMealsAction,
+  savePlayerMealAction,
+  deletePlayerMealAction,
+  parseMealTreeAction
+} from '@/actions/mealActions';
+
 function mapMealToClient(dbMeal) {
   if (!dbMeal) return null;
   return {
@@ -17,21 +24,13 @@ function mapMealToClient(dbMeal) {
 }
 
 export async function listPlayerMeals(jugadorId, { mealType, day } = {}) {
-  const params = new URLSearchParams();
-  params.append('jugador_id', jugadorId);
-  if (mealType) params.append('mealType', mealType);
-  if (day) params.append('day', day);
-
-  const res = await fetch(`/api/comidas?${params.toString()}`);
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al listar comidas');
-  
+  const data = await listPlayerMealsAction(jugadorId, { mealType, day });
   const items = Array.isArray(data.meals) ? data.meals : [];
 
   const withUrls = items.map((m) => {
     const mapped = mapMealToClient(m);
     if (!mapped.hasPhoto) return mapped;
-    return { ...mapped, photoUrl: `/api/comidas/photo?id=${m.id}` };
+    return { ...mapped, photoUrl: `/api/media/meal-photo?id=${m.id}` };
   });
 
   return withUrls;
@@ -71,38 +70,19 @@ export async function savePlayerMeal(jugadorId, payload) {
     fd.append('jugador_id', jugadorId);
   }
 
-  const res = await fetch('/api/comidas', {
-    method: 'POST',
-    body: fd,
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al guardar la comida');
+  const data = await savePlayerMealAction(fd);
   return mapMealToClient(data.meal);
 }
 
 export async function deletePlayerMeal(id) {
-  const res = await fetch(`/api/comidas?id=${id}`, {
-    method: 'DELETE',
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al eliminar la comida');
-  return data;
+  return await deletePlayerMealAction(id);
 }
 
 export async function parseMealTree({ text, mealName = 'Comida', jugadorId, context }) {
-  const res = await fetch('/api/nutrition/parse-meal-tree', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      text,
-      mealName,
-      jugadorId,
-      context,
-    }),
+  return await parseMealTreeAction({
+    text,
+    mealName,
+    jugadorId,
+    context,
   });
-  const data = await res.json();
-  if (!res.ok || !data.success) {
-    throw new Error(data.error || 'No se pudo interpretar el texto. Por favor, revisa los términos.');
-  }
-  return data;
 }

@@ -119,7 +119,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
       temporada: nextSeasonLabel(),
       descripcion: team.descripcion || '',
       fotoFile: null,
-      fotoPreview: team.foto_size ? `/api/teams/avatar?id=${team.id}&t=${team.updated_at || Date.now()}` : '',
+      fotoPreview: team.foto_size ? `/api/media/team-avatar?id=${team.id}&t=${team.updated_at || Date.now()}` : '',
       removeFoto: false,
     });
     setModal({ type: 'copy', team });
@@ -133,7 +133,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
       temporada: team.temporada,
       descripcion: team.descripcion || '',
       fotoFile: null,
-      fotoPreview: team.foto_size ? `/api/teams/avatar?id=${team.id}&t=${team.updated_at || Date.now()}` : '',
+      fotoPreview: team.foto_size ? `/api/media/team-avatar?id=${team.id}&t=${team.updated_at || Date.now()}` : '',
       removeFoto: false,
     });
     setModal({ type: 'edit', team });
@@ -350,7 +350,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                   <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
                     <Group gap="sm" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
                       <Avatar
-                        src={team.foto_size ? `/api/teams/avatar?id=${team.id}&t=${team.updated_at || ''}` : undefined}
+                        src={team.foto_size ? `/api/media/team-avatar?id=${team.id}&t=${team.updated_at || ''}` : undefined}
                         size={48}
                         radius="md"
                         color="nutralabColor"

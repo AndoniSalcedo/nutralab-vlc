@@ -21,7 +21,7 @@ import { IconEdit } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/services/player';
 import { useRouter } from 'next/navigation';
-import { AVAILABLE_MEALS, STANDARD_MEALS, sortMeals } from '@/config/nutrition-days';
+import { AVAILABLE_MEALS, getMealsForCount, sortMeals } from '@/config/nutrition-days';
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
 
 export function CampoEditable({
@@ -164,8 +164,7 @@ export function CampoEditable({
 function parseMeals(val) {
   if (!val) return [];
   if (!isNaN(Number(val))) {
-    const count = Number(val);
-    return STANDARD_MEALS.slice(0, Math.min(count, 5));
+    return getMealsForCount(val);
   }
   return sortMeals(val.split(',').map((s) => s.trim()).filter(Boolean));
 }
@@ -331,8 +330,9 @@ export function ComidasEditable({
                 const frutas = Array.isArray(mealData.fruta) ? mealData.fruta : mealData.fruta ? [mealData.fruta] : [];
                 const lacteos = Array.isArray(mealData.lacteo) ? mealData.lacteo : mealData.lacteo ? [mealData.lacteo] : [];
                 const grasa = mealData.grasa;
+                const alternativas = Array.isArray(mealData.alternativas) ? mealData.alternativas : [];
 
-                const hasAnySpecific = hidratos.length > 0 || proteinas.length > 0 || verduras.length > 0 || frutas.length > 0 || lacteos.length > 0 || Boolean(grasa);
+                const hasAnySpecific = alternativas.length > 0 || hidratos.length > 0 || proteinas.length > 0 || verduras.length > 0 || frutas.length > 0 || lacteos.length > 0 || Boolean(grasa);
 
                 return (
                   <Paper key={meal} p="xs" withBorder radius="sm">
@@ -363,6 +363,16 @@ export function ComidasEditable({
                       </Text>
                     ) : (
                       <Stack gap={2} mt={2}>
+                        {alternativas.length > 0 && (
+                          <Text size="11px">
+                            <Text span fw={600} c="yellow.9">● Alternativas completas: </Text>
+                            <Text span c="dark.6">
+                              {alternativas.map((alternative, index) => (
+                                `${index > 0 ? ' / ' : ''}${alternative.label || alternative.nombre || `Alternativa ${index + 1}`}`
+                              )).join('')}
+                            </Text>
+                          </Text>
+                        )}
                         {hidratos.length > 0 && (
                           <Text size="11px">
                             <Text span fw={600} c="orange.8">● Hidratos: </Text>

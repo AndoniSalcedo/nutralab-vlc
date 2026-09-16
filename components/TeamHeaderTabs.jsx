@@ -130,7 +130,7 @@ export default function TeamHeaderTabs({
                 {/* Escudo Móvil (44px - idéntico al jugador en móvil) */}
                 <Box hiddenFrom="sm">
                   <Avatar
-                    src={teamId ? `/api/teams/avatar?id=${teamId}&t=${teamPhotoVersion || team?.updated_at || ''}` : undefined}
+                    src={teamId ? `/api/media/team-avatar?id=${teamId}&t=${teamPhotoVersion || team?.updated_at || ''}` : undefined}
                     size={44}
                     radius="xl"
                     color="nutralabColor"
@@ -161,7 +161,7 @@ export default function TeamHeaderTabs({
                 {/* Escudo Escritorio (84px - idéntico al jugador en escritorio) */}
                 <Box visibleFrom="sm">
                   <Avatar
-                    src={teamId ? `/api/teams/avatar?id=${teamId}&t=${teamPhotoVersion || team?.updated_at || ''}` : undefined}
+                    src={teamId ? `/api/media/team-avatar?id=${teamId}&t=${teamPhotoVersion || team?.updated_at || ''}` : undefined}
                     size={84}
                     radius="xl"
                     color="nutralabColor"

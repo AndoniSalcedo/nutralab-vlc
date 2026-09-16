@@ -3,7 +3,7 @@ export async function login(email, password, expectedRole = null) {
   if (expectedRole) {
     payload.expectedRole = expectedRole;
   }
-  const res = await fetch('/api/login', {
+  const res = await fetch('/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

@@ -72,6 +72,7 @@ export default function EditMealPatternModal({
   const [fruta, setFruta] = useState([]);
   const [lacteo, setLacteo] = useState([]);
   const [grasa, setGrasa] = useState(null);
+  const [alternativas, setAlternativas] = useState([]);
 
   useEffect(() => {
     if (opened) {
@@ -93,8 +94,16 @@ export default function EditMealPatternModal({
       setFruta(toArray(val.fruta));
       setLacteo(toArray(val.lacteo));
       setGrasa(val.grasa || null);
+      setAlternativas(Array.isArray(val.alternativas) ? val.alternativas : []);
     }
   }, [opened, value]);
+
+  function updateManualValue(setter) {
+    return (nextValue) => {
+      setAlternativas([]);
+      setter(nextValue);
+    };
+  }
 
   const baseProteinaOptions = useMemo(() => getTreeProteinaOptions(), []);
   const baseHidratoOptions = useMemo(() => getTreeHidratoOptions(), []);
@@ -118,6 +127,7 @@ export default function EditMealPatternModal({
       setFruta([]);
       setLacteo([]);
       setGrasa(null);
+      setAlternativas([]);
       setAiError(null);
       return;
     }
@@ -145,14 +155,16 @@ export default function EditMealPatternModal({
         setFruta([]);
         setLacteo([]);
         setGrasa(null);
+        setAlternativas([]);
       } else {
         setIsComplete(false);
-        setProteina(mealData.proteina || []);
-        setHidrato(mealData.hidrato || []);
-        setVerdura(mealData.verdura || []);
-        setFruta(mealData.fruta || []);
-        setLacteo(mealData.lacteo || []);
-        setGrasa(mealData.grasa || null);
+        setProteina(mealData.alternativas?.length ? [] : (mealData.proteina || []));
+        setHidrato(mealData.alternativas?.length ? [] : (mealData.hidrato || []));
+        setVerdura(mealData.alternativas?.length ? [] : (mealData.verdura || []));
+        setFruta(mealData.alternativas?.length ? [] : (mealData.fruta || []));
+        setLacteo(mealData.alternativas?.length ? [] : (mealData.lacteo || []));
+        setGrasa(mealData.alternativas?.length ? null : (mealData.grasa || null));
+        setAlternativas(Array.isArray(mealData.alternativas) ? mealData.alternativas : []);
       }
 
       notifications.show({
@@ -178,20 +190,24 @@ export default function EditMealPatternModal({
       ...(grasa && grasa !== 'Sin grasa añadida' ? [grasa] : []),
     ];
 
-    const label = isComplete
+    const hasAlternatives = !isComplete && alternativas.length > 0;
+    const label = hasAlternatives
+      ? alternativas.map((alternative, index) => alternative.label || alternative.nombre || `Alternativa ${index + 1}`).join(' / ')
+      : isComplete
       ? 'Rotación variada'
       : allParts.length > 0
       ? allParts.join(' + ')
       : 'Rotación variada';
 
     const structuredMeal = {
-      isComplete: isComplete || allParts.length === 0,
-      proteina: isComplete ? [] : proteina,
-      hidrato: isComplete ? [] : hidrato,
-      verdura: isComplete ? [] : verdura,
-      fruta: isComplete ? [] : fruta,
-      lacteo: isComplete ? [] : lacteo,
-      grasa: isComplete ? null : (grasa && grasa !== 'Sin grasa añadida' ? grasa : null),
+      isComplete: isComplete || (!hasAlternatives && allParts.length === 0),
+      proteina: isComplete || hasAlternatives ? [] : proteina,
+      hidrato: isComplete || hasAlternatives ? [] : hidrato,
+      verdura: isComplete || hasAlternatives ? [] : verdura,
+      fruta: isComplete || hasAlternatives ? [] : fruta,
+      lacteo: isComplete || hasAlternatives ? [] : lacteo,
+      grasa: isComplete || hasAlternatives ? null : (grasa && grasa !== 'Sin grasa añadida' ? grasa : null),
+      alternativas: hasAlternatives ? alternativas : [],
       raw: aiText.trim() || label,
       label,
       isValid: true,
@@ -235,7 +251,11 @@ export default function EditMealPatternModal({
             </Box>
             <Switch
               checked={isComplete}
-              onChange={(e) => setIsComplete(e.currentTarget.checked)}
+              onChange={(e) => {
+                const checked = e.currentTarget.checked;
+                setIsComplete(checked);
+                if (checked) setAlternativas([]);
+              }}
               color="teal"
               size="md"
             />
@@ -293,6 +313,22 @@ export default function EditMealPatternModal({
         {/* Selectores tipados por categoría */}
         {!isComplete ? (
           <Stack gap="sm">
+            {alternativas.length > 0 && (
+              <Paper p="xs" withBorder radius="sm" bg="yellow.0">
+                <Text size="xs" fw={700} c="yellow.9" mb={4}>
+                  Opciones completas detectadas
+                </Text>
+                <Text size="xs" c="dark.7">
+                  {alternativas.map((alternative, index) => (
+                    `${index > 0 ? ' / ' : ''}${alternative.label || alternative.nombre || `Alternativa ${index + 1}`}`
+                  )).join('')}
+                </Text>
+                <Text size="xs" c="dimmed" mt={4}>
+                  Se elegirá una opción entera; sus ingredientes no se mezclarán con los de las demás.
+                </Text>
+              </Paper>
+            )}
+
             <Text size="xs" fw={700} c="dimmed" tt="uppercase">
               Componentes de la pauta
             </Text>
@@ -302,7 +338,7 @@ export default function EditMealPatternModal({
               placeholder="Seleccionar hidratos..."
               data={hidratoOptions}
               value={hidrato}
-              onChange={setHidrato}
+              onChange={updateManualValue(setHidrato)}
               searchable
               clearable
               size="xs"
@@ -313,7 +349,7 @@ export default function EditMealPatternModal({
               placeholder="Seleccionar fuentes de proteína..."
               data={proteinaOptions}
               value={proteina}
-              onChange={setProteina}
+              onChange={updateManualValue(setProteina)}
               searchable
               clearable
               size="xs"
@@ -324,7 +360,7 @@ export default function EditMealPatternModal({
               placeholder="Seleccionar verduras / hojas verdes..."
               data={verduraOptions}
               value={verdura}
-              onChange={setVerdura}
+              onChange={updateManualValue(setVerdura)}
               searchable
               clearable
               size="xs"
@@ -335,7 +371,7 @@ export default function EditMealPatternModal({
               placeholder="Seleccionar frutas..."
               data={frutaOptions}
               value={fruta}
-              onChange={setFruta}
+              onChange={updateManualValue(setFruta)}
               searchable
               clearable
               size="xs"
@@ -346,7 +382,7 @@ export default function EditMealPatternModal({
               placeholder="Seleccionar lácteos o postres..."
               data={lacteoOptions}
               value={lacteo}
-              onChange={setLacteo}
+              onChange={updateManualValue(setLacteo)}
               searchable
               clearable
               size="xs"
@@ -357,7 +393,7 @@ export default function EditMealPatternModal({
               placeholder="Seleccionar grasa..."
               data={baseGrasaOptions}
               value={grasa}
-              onChange={setGrasa}
+              onChange={updateManualValue(setGrasa)}
               clearable
               size="xs"
             />

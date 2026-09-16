@@ -418,7 +418,7 @@ export default function TeamConfigClient({ team, user: _user, availableTeams: _a
           <Stack align="center" gap="xs">
             <Box style={{ position: 'relative', display: 'inline-block' }}>
               <Avatar
-                src={team?.id ? `/api/teams/avatar?id=${team.id}&t=${teamPhotoVersion}` : undefined}
+                src={team?.id ? `/api/media/team-avatar?id=${team.id}&t=${teamPhotoVersion}` : undefined}
                 size={96}
                 radius="xl"
                 color="nutralabColor"

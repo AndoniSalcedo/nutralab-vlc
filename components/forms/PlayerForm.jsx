@@ -50,7 +50,7 @@ export default function PlayerForm({ initial, team }) {
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(() => {
     if (initial?.avatar_url) return initial.avatar_url;
-    if (initial?.avatar_size) return `/api/players/avatar?id=${initial.id}&t=${initial.updated_at || ''}`;
+    if (initial?.avatar_size) return `/api/media/player-avatar?id=${initial.id}&t=${initial.updated_at || ''}`;
     if (typeof initial?.avatar === 'string' && initial.avatar.startsWith('data:')) return initial.avatar;
     return '';
   });

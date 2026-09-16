@@ -36,9 +36,9 @@ export default function DashboardShell({ children, user }) {
     user?.avatar_url ||
     user?.avatar ||
     (user?.role === "tecnico"
-      ? `/api/tecnicos/avatar?id=${user.id}`
+      ? `/api/media/tecnico-avatar?id=${user.id}`
       : user?.role === "jugador"
-        ? `/api/players/avatar?id=${user.id}`
+        ? `/api/media/player-avatar?id=${user.id}`
         : undefined);
 
   const handleLogout = () => {
@@ -201,7 +201,7 @@ export default function DashboardShell({ children, user }) {
         </Container>
       </Box>
 
-      <form id="logout-form" method="post" action="/api/logout" />
+      <form id="logout-form" method="post" action="/api/auth/logout" />
 
       <Container size="xl" px={{ base: 0, sm: "md" }} pt={{ base: 0, sm: "md" }} pb="xl">
         {children}

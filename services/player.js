@@ -1,27 +1,19 @@
+import {
+  updatePlayerCredentialsAction,
+  updatePlayerPasswordAction,
+  updatePlayerFieldAction,
+  transferPlayersAction,
+  savePlayerAction,
+  deletePlayerAction,
+  importPlayerExcelAction,
+} from '@/actions/playerActions';
+
 export async function updatePlayerCredentials(jugadorId, email, password) {
-  const res = await fetch('/api/player-credentials', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      jugadorId,
-      email,
-      password,
-    }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error creando credenciales');
-  return data;
+  return await updatePlayerCredentialsAction({ jugadorId, email, password });
 }
 
 export async function updatePlayerPassword(password) {
-  const res = await fetch('/api/player-password', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error actualizando contraseña');
-  return data;
+  return await updatePlayerPasswordAction(password);
 }
 
 export async function importPlayerExcel({ file, modo, teamId, decisiones }) {
@@ -31,55 +23,23 @@ export async function importPlayerExcel({ file, modo, teamId, decisiones }) {
   if (teamId) formData.append('team_id', teamId);
   if (decisiones) formData.append('decisiones', JSON.stringify(decisiones));
 
-  const res = await fetch('/api/import-player-excel', {
-    method: 'POST',
-    body: formData,
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'No se pudo procesar el Excel');
-  return data;
+  return await importPlayerExcelAction(formData);
 }
 
 export async function deletePlayer(id) {
-  const formData = new FormData();
-  formData.append('id', id);
-  const res = await fetch('/api/players?delete=1', {
-    method: 'POST',
-    body: formData,
-  });
-  if (!res.ok) throw new Error('Error al eliminar jugador');
-  return res;
+  return await deletePlayerAction(id);
 }
 
 export async function savePlayer(formData) {
-  const res = await fetch('/api/players', {
-    method: 'POST',
-    body: formData,
-  });
-  if (!res.ok) throw new Error('Error al guardar jugador');
-  return res;
+  return await savePlayerAction(formData);
 }
 
 export async function updatePlayerField(id, field, value) {
-  const res = await fetch('/api/update-player', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id, field, value }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'No se pudo guardar el campo');
-  return data;
+  return await updatePlayerFieldAction(id, field, value);
 }
 
 export async function transferPlayers({ playerIds, targetTeamId, action }) {
-  const res = await fetch('/api/players/transfer', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ playerIds, targetTeamId, action }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al transferir jugadores');
-  return data;
+  return await transferPlayersAction({ playerIds, targetTeamId, action });
 }
 
 export async function uploadPlayerAvatar(jugadorId, file) {
@@ -87,7 +47,7 @@ export async function uploadPlayerAvatar(jugadorId, file) {
   if (jugadorId) formData.append('id', jugadorId);
   formData.append('avatar', file);
 
-  const res = await fetch('/api/players/avatar', {
+  const res = await fetch('/api/media/player-avatar', {
     method: 'POST',
     body: formData,
   });

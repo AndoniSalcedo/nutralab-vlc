@@ -14,6 +14,10 @@ function tryFile(filePath) {
 }
 
 export async function resolve(specifier, context, nextResolve) {
+  if (specifier.startsWith('next/') && !specifier.endsWith('.js')) {
+    return nextResolve(`${specifier}.js`, context);
+  }
+
   let targetPath = null;
   if (specifier.startsWith('@/')) {
     targetPath = path.resolve(process.cwd(), specifier.slice(2));

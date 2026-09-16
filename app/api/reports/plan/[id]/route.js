@@ -1,0 +1,117 @@
+import React from 'react';
+import { NextResponse } from 'next/server';
+import { renderToStream } from '@react-pdf/renderer';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getUser } from '@/lib/auth/session';
+import { forbidden, getAccessiblePlayer } from '@/lib/auth/team-access';
+import NutritionPlanCardDocument from '@/components/reports/NutritionPlanCardDocument';
+import { sanitizeFilename, pdfHeaders } from '@/lib/utils';
+import { getAiPlanById } from '@/repositories/aiPlanRepository';
+import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
+import { getWeeklyReport } from '@/repositories/weeklyReportsRepository';
+import { getResolvedPlayerSupplementation } from '@/repositories/supplementationRepository';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+export async function GET(_request, { params }) {
+  try {
+    const resolvedParams = await params;
+    const planId = resolvedParams?.id;
+    if (!planId) return NextResponse.json({ error: 'Falta id del plan' }, { status: 400 });
+
+    const supabase = getSupabaseAdmin();
+    const user = await getUser();
+    if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
+
+    const plan = await getAiPlanById(supabase, planId);
+    if (!plan) return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 });
+    if (!plan.datos) return NextResponse.json({ error: 'Este plan no tiene datos de ficha para PDF' }, { status: 400 });
+
+    if (user.role === 'jugador') {
+      if (String(user.id) !== String(plan.jugador_id)) return forbidden();
+    } else {
+      const accessiblePlayer = await getAccessiblePlayer(supabase, user, plan.jugador_id);
+      if (!accessiblePlayer) return forbidden('No tienes acceso a este jugador');
+    }
+
+    let weeklyReportMeta = null;
+    const jugador = await getPlayerWithTeamConfig(supabase, plan.jugador_id);
+
+    const teamConfig = jugador?.equipos?.configuracion_nutricional;
+
+    const planData = { ...plan.datos };
+    if (!Array.isArray(planData.suplementacion) || planData.suplementacion.length === 0) {
+      const resolvedSupps = await getResolvedPlayerSupplementation(
+        supabase,
+        plan.jugador_id,
+        planData.metricas?.peso || jugador?.peso_kg
+      );
+      if (resolvedSupps?.length) {
+        planData.suplementacion = resolvedSupps;
+      }
+    }
+
+    if (!Array.isArray(planData.protocolos) || planData.protocolos.length === 0) {
+      const teamProtocols = teamConfig?.protocols || [];
+      const customProtocols = jugador?.protocolos_custom || {};
+      const activeDayTypes = new Set(Object.values(planData.dias || {}).map((d) => d.tipoDia).filter(Boolean));
+      const resolvedProtocols = teamProtocols
+        .map((p) => customProtocols[p.id] || p)
+        .filter((p) => {
+          const isIncluded = p.incluirEnPlan !== false && (p.incluirEnPlan === true || p.dayTypeKey === 'partido' || p.dayTypeKey === 'match_day' || (typeof p.dayTypeKey === 'string' && p.dayTypeKey.includes('partido')));
+          if (!isIncluded) return false;
+          if (p.dayTypeKey && activeDayTypes.size > 0) {
+            return activeDayTypes.has(p.dayTypeKey);
+          }
+          return true;
+        });
+      if (resolvedProtocols.length > 0) {
+        planData.protocolos = resolvedProtocols;
+      }
+    }
+
+    let semana = planData.meta?.semanaMenu;
+    if (!semana && planData.meta?.fecha) {
+      const d = new Date(planData.meta.fecha);
+      if (!Number.isNaN(d.getTime())) {
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(d);
+        monday.setDate(diff);
+        semana = monday.toISOString().split('T')[0];
+      }
+    }
+
+    if (jugador?.equipo_id && semana) {
+      const report = await getWeeklyReport(supabase, jugador.equipo_id, semana);
+      if (report) {
+        weeklyReportMeta = report.meta;
+      }
+    }
+
+    const effectiveTeamConfig = {
+      ...teamConfig,
+      planColors: planData.meta?.planColors || planData.planColors || teamConfig?.planColors,
+    };
+
+    const stream = await renderToStream(
+      <NutritionPlanCardDocument data={planData} weeklyReportMeta={weeklyReportMeta} teamConfig={effectiveTeamConfig} />
+    );
+    const chunks = [];
+    for await (const chunk of stream) {
+      chunks.push(chunk);
+    }
+
+    const buffer = Buffer.concat(chunks);
+    const uint8Array = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+    const filename = `${sanitizeFilename(`Ficha_${plan.nombre}`, 'Ficha_Nutricional')}.pdf`;
+
+    return new NextResponse(uint8Array, {
+      status: 200,
+      headers: pdfHeaders(filename, buffer.length),
+    });
+  } catch (e) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}

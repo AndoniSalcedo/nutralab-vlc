@@ -1,51 +1,31 @@
+import {
+  getTecnicosAction,
+  createTecnicoAction,
+  deleteTecnicoAction,
+  assignTeamsAction,
+  registerTecnicoAction,
+} from '@/actions/tecnicoActions';
+
 export async function getTecnicos() {
-  const res = await fetch('/api/tecnicos');
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'No se pudieron obtener los técnicos');
+  const data = await getTecnicosAction();
   return data.tecnicos || [];
 }
 
 export async function createTecnico(payload) {
-  const res = await fetch('/api/tecnicos', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'create', ...payload }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'No se pudo vincular el técnico');
+  const data = await createTecnicoAction(payload);
   return data.tecnico;
 }
 
 export async function deleteTecnico(id) {
-  const res = await fetch('/api/tecnicos', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'delete', id }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'No se pudo eliminar el técnico');
-  return data;
+  return await deleteTecnicoAction(id);
 }
 
 export async function assignTeams(tecnicoId, teamIds) {
-  const res = await fetch('/api/tecnicos', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'assign', tecnico_id: tecnicoId, team_ids: teamIds }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'No se pudieron asignar los equipos');
-  return data;
+  return await assignTeamsAction(tecnicoId, teamIds);
 }
 
 export async function registerTecnico(payload) {
-  const res = await fetch('/api/tecnicos', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'register', ...payload }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'No se pudo registrar el técnico');
+  const data = await registerTecnicoAction(payload);
   return data.tecnico;
 }
 
@@ -54,7 +34,7 @@ export async function uploadTecnicoAvatar(tecnicoId, file) {
   if (tecnicoId) formData.append('id', tecnicoId);
   formData.append('avatar', file);
 
-  const res = await fetch('/api/tecnicos/avatar', {
+  const res = await fetch('/api/media/tecnico-avatar', {
     method: 'POST',
     body: formData,
   });

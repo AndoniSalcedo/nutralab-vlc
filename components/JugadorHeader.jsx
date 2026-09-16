@@ -57,7 +57,7 @@ function CredentialsWarning({ show }) {
 function PlayerLogoutButton({ menuItem = false }) {
   if (menuItem) {
     return (
-      <form method="post" action="/api/logout">
+      <form method="post" action="/api/auth/logout">
         <Menu.Item type="submit" color="red" leftSection={<IconLogout size={14} />}>
           Cerrar sesión
         </Menu.Item>
@@ -66,7 +66,7 @@ function PlayerLogoutButton({ menuItem = false }) {
   }
 
   return (
-    <form method="post" action="/api/logout">
+    <form method="post" action="/api/auth/logout">
       <Button
         type="submit"
         size="xs"
@@ -174,7 +174,7 @@ function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
   const [loading, setLoading] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState(() => {
     if (jugador?.avatar_url) return jugador.avatar_url;
-    if (jugador?.avatar_size) return `/api/players/avatar?id=${jugador.id}&t=${jugador.updated_at || ''}`;
+    if (jugador?.avatar_size) return `/api/media/player-avatar?id=${jugador.id}&t=${jugador.updated_at || ''}`;
     if (typeof jugador?.avatar === 'string' && jugador.avatar.startsWith('data:')) return jugador.avatar;
     return '';
   });
@@ -183,7 +183,7 @@ function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
     if (jugador?.avatar_url) {
       setAvatarSrc(jugador.avatar_url);
     } else if (jugador?.avatar_size) {
-      setAvatarSrc(`/api/players/avatar?id=${jugador.id}&t=${jugador.updated_at || ''}`);
+      setAvatarSrc(`/api/media/player-avatar?id=${jugador.id}&t=${jugador.updated_at || ''}`);
     } else if (typeof jugador?.avatar === 'string' && jugador.avatar.startsWith('data:')) {
       setAvatarSrc(jugador.avatar);
     }

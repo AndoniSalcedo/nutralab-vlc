@@ -65,9 +65,24 @@ export const AVAILABLE_MEALS = [
   { value: 'Cena', label: 'Cena' }
 ];
 
-export const STANDARD_MEALS = ['Desayuno', 'Almuerzo', 'Comida', 'Merienda', 'Cena'];
+const STANDARD_MEALS = ['Desayuno', 'Almuerzo', 'Comida', 'Merienda', 'Cena'];
 
 export const DEFAULT_PLAYER_MEALS_STRING = 'Desayuno, Comida, Cena';
+
+const MEALS_BY_COUNT = {
+  1: ['Comida'],
+  2: ['Comida', 'Cena'],
+  3: ['Desayuno', 'Comida', 'Cena'],
+  4: ['Desayuno', 'Almuerzo', 'Comida', 'Cena'],
+  5: [...STANDARD_MEALS],
+};
+
+export function getMealsForCount(count) {
+  const numericCount = Number(count);
+  return MEALS_BY_COUNT[numericCount]
+    ? [...MEALS_BY_COUNT[numericCount]]
+    : [...STANDARD_MEALS];
+}
 
 export function sortMeals(meals = []) {
   if (!Array.isArray(meals)) return [];
@@ -86,8 +101,7 @@ export function getUserMeals(jugador) {
   let meals = [];
   if (jugador.num_comidas) {
     if (!isNaN(Number(jugador.num_comidas))) {
-      const count = Number(jugador.num_comidas);
-      meals = STANDARD_MEALS.slice(0, Math.min(count, 5));
+      meals = getMealsForCount(jugador.num_comidas);
     } else {
       meals = sortMeals(jugador.num_comidas.split(',').map((s) => s.trim()).filter(Boolean));
     }

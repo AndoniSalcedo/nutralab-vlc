@@ -1,41 +1,26 @@
+import {
+  getTeamsAction,
+  createTeamAction,
+  updateTeamAction,
+  deleteTeamAction,
+  saveTeamConfigAction
+} from '@/actions/teamActions';
+
 export async function getTeams() {
-  const res = await fetch('/api/teams');
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'No se pudieron cargar los equipos');
+  const data = await getTeamsAction();
   return data.equipos;
 }
 
 export async function createTeam(payload) {
-  const res = await fetch('/api/teams', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'No se pudo guardar el equipo');
-  return data;
+  return await createTeamAction(payload);
 }
 
 export async function deleteTeam(teamId) {
-  const res = await fetch('/api/teams', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'delete', team_id: teamId }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'No se pudo eliminar el equipo');
-  return data;
+  return await deleteTeamAction(teamId);
 }
 
 export async function updateTeam(teamId, payload) {
-  const res = await fetch('/api/teams', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'update', team_id: teamId, ...payload }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'No se pudo actualizar el equipo');
-  return data;
+  return await updateTeamAction(teamId, payload);
 }
 
 export async function uploadTeamPhoto(teamId, file) {
@@ -43,7 +28,7 @@ export async function uploadTeamPhoto(teamId, file) {
   formData.append('id', teamId);
   formData.append('foto', file);
 
-  const res = await fetch('/api/teams/avatar', {
+  const res = await fetch('/api/media/team-avatar', {
     method: 'POST',
     body: formData,
   });
@@ -57,7 +42,7 @@ export async function removeTeamPhoto(teamId) {
   formData.append('id', teamId);
   formData.append('remove', 'true');
 
-  const res = await fetch('/api/teams/avatar', {
+  const res = await fetch('/api/media/team-avatar', {
     method: 'POST',
     body: formData,
   });
@@ -67,13 +52,5 @@ export async function removeTeamPhoto(teamId) {
 }
 
 export async function saveTeamConfig(teamId, configuracion_nutricional) {
-  const res = await fetch(`/api/teams/${teamId}/config`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ configuracion_nutricional }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al guardar la configuración');
-  return data;
+  return await saveTeamConfigAction(teamId, configuracion_nutricional);
 }
-

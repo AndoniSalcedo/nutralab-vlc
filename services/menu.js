@@ -1,8 +1,13 @@
+import {
+  getWeeklyMenusAction,
+  createWeeklyMenuAction,
+  uploadWeeklyMenuAction,
+  updateWeeklyMenuAction,
+  deleteWeeklyMenuAction
+} from '@/actions/menuActions';
+
 export async function getWeeklyMenus(teamId) {
-  const url = teamId ? `/api/menu-semanal?equipo_id=${teamId}` : '/api/menu-semanal';
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Error al cargar menús');
-  const data = await res.json();
+  const data = await getWeeklyMenusAction(teamId);
   return data;
 }
 
@@ -12,37 +17,17 @@ export async function uploadWeeklyMenu(file, weekDate, teamId) {
   fd.append('semana', weekDate);
   fd.append('equipo_id', teamId);
 
-  const res = await fetch('/api/menu-semanal', { method: 'POST', body: fd });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al subir el archivo');
-  return data;
+  return await uploadWeeklyMenuAction(fd);
 }
 
 export async function createWeeklyMenu({ semana, equipo_id, dias }) {
-  const res = await fetch('/api/menu-semanal', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ semana, equipo_id, dias }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al crear el menú');
-  return data;
+  return await createWeeklyMenuAction({ semana, equipo_id, dias });
 }
 
 export async function deleteWeeklyMenu(id) {
-  const res = await fetch(`/api/menu-semanal?id=${id}`, { method: 'DELETE' });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al eliminar el menú');
-  return data;
+  return await deleteWeeklyMenuAction(id);
 }
 
 export async function updateWeeklyMenu(id, dias) {
-  const res = await fetch('/api/menu-semanal', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id, dias }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error al guardar el menú');
-  return data;
+  return await updateWeeklyMenuAction(id, dias);
 }
