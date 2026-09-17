@@ -106,23 +106,6 @@ export default function DashboardShell({ children, user }) {
               </Menu.Target>
 
               <Menu.Dropdown>
-                {(user?.name || user?.email) && (
-                  <>
-                    <Box px="xs" py={6}>
-                      {user?.name && (
-                        <Text size="sm" fw={600} truncate>
-                          {user.name}
-                        </Text>
-                      )}
-                      {user?.email && (
-                        <Text size="xs" c="dimmed" truncate>
-                          {user.email}
-                        </Text>
-                      )}
-                    </Box>
-                    <Menu.Divider />
-                  </>
-                )}
                 <Menu.Item
                   leftSection={<IconUsersGroup size={16} stroke={1.5} />}
                   onClick={() => {

@@ -26,6 +26,7 @@ export async function GET(request) {
       try {
         const supabase = getSupabaseAdmin();
         const { data: nutri } = await supabase
+          .schema('public')
           .from('Nutritionist')
           .select('id, name, email, avatar, avatarSize, avatarMime')
           .eq('id', nutritionistId)
@@ -46,8 +47,8 @@ export async function GET(request) {
     const sessionObj = {
       external_admin_id: nutritionistId,
       id: nutritionistId,
-      name: nutriName || 'Nutricionista',
-      email: nutriEmail || '',
+      name: nutriName || decoded.name || '',
+      email: nutriEmail || decoded.email || '',
       role: 'admin',
       avatar: hasAvatar ? `/api/media/nutritionist-avatar?id=${nutritionistId}` : null,
     };

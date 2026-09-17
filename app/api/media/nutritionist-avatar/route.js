@@ -20,6 +20,7 @@ export async function GET(req) {
 
     const supabase = getSupabaseAdmin();
     const { data: nutri, error } = await supabase
+      .schema('public')
       .from('Nutritionist')
       .select('id, avatar, avatarMime, avatarSize')
       .eq('id', id)
