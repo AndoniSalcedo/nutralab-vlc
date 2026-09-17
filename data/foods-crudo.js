@@ -4073,13 +4073,14 @@ export const FOODS_CRUDO = [
     "pro": 5,
     "fat": 5.5,
     "tags": [
-      "gluten"
+      "gluten",
+      "proteina_vegetal"
     ],
     "minGrams": 50,
     "maxGrams": 200,
     "treePath": [
-      "verduras",
-      "hojas_verdes"
+      "proteinas",
+      "vegetal_proteina"
     ]
   },
   {
