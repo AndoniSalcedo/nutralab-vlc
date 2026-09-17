@@ -144,6 +144,34 @@ async function savePlanForPlayer(supabase, player, activePlan, baseData, semana)
   return newPlan || { datos: baseData };
 }
 
+function isPlanForWeek(plan, semana) {
+  if (!plan) return false;
+  const planName = plan.nombre || '';
+  if (planName === `Plan ${semana}` || (typeof planName === 'string' && planName.includes(semana))) {
+    return true;
+  }
+  const meta = plan.datos?.meta;
+  if (meta?.semanaMenu && meta.semanaMenu === semana) {
+    return true;
+  }
+  if (meta?.semana && meta.semana === semana) {
+    return true;
+  }
+  const dateVal = meta?.fecha || plan.created_at;
+  if (dateVal && semana) {
+    const d = new Date(dateVal);
+    if (!Number.isNaN(d.getTime())) {
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(d);
+      monday.setDate(diff);
+      const mStr = monday.toISOString().split('T')[0];
+      if (mStr === semana) return true;
+    }
+  }
+  return false;
+}
+
 async function loadPlayersWithMeasurements(
   supabase,
   team,
@@ -189,7 +217,9 @@ async function loadPlayersWithMeasurements(
 
     // Find if player has plan for this week
     const playerPlans = (allPlans || []).filter((p) => String(p.jugador_id) === String(player.id));
-    let activePlan = playerPlans.find((p) => p.nombre === `Plan ${semana}`);
+    let activePlan = playerPlans.find((p) => p.nombre === `Plan ${semana}`) || playerPlans.find((p) => isPlanForWeek(p, semana));
+    const hasExistingPlan = Boolean(activePlan);
+    const existingPlanName = activePlan?.nombre || null;
     const draftPlan = draftPlans?.get(String(player.id));
 
     if (draftPlan) {
@@ -230,9 +260,10 @@ async function loadPlayersWithMeasurements(
     return {
       ...player,
       plan: activePlan.datos,
+      hasExistingPlan,
+      existingPlanName,
     };
   });
-
 
   return resolvedPlayers;
 }
@@ -337,7 +368,14 @@ export async function POST(request) {
           apellidos: p.apellidos,
           posicion: p.posicion,
           plan: p.plan,
+          hasExistingPlan: Boolean(p.hasExistingPlan),
+          existingPlanName: p.existingPlanName || null,
         })),
+        hasAnyExistingPlan: players.some((p) => p.hasExistingPlan),
+        existingPlanPlayers: players
+          .filter((p) => p.hasExistingPlan)
+          .map((p) => `${p.nombre || 'Jugador'} ${p.apellidos || ''}`.trim()),
+        semana,
       });
     }
 

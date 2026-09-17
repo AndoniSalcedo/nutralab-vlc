@@ -49,6 +49,8 @@ export default function SquadReportReviewModal({
   onRegenerate,
   onDownloadSingle,
   onDownloadAll,
+  semana,
+  allPreviews = [],
 }) {
   const [confirmed, setConfirmed] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -57,9 +59,53 @@ export default function SquadReportReviewModal({
   const [originalPlan, setOriginalPlan] = useState(null);
   const [confirmRegenerateOpened, setConfirmRegenerateOpened] = useState(false);
   const [confirmDownloadAllOpened, setConfirmDownloadAllOpened] = useState(false);
+  const [confirmOverwriteOpened, setConfirmOverwriteOpened] = useState(false);
+  const [overwriteModalData, setOverwriteModalData] = useState({ title: '', message: '', onConfirm: null });
 
   const contentRef = useRef(null);
   const playerName = `${preview?.nombre || 'Jugador'} ${preview?.apellidos || ''}`.trim();
+
+  const isLastPlayer = index + 1 >= total;
+
+  const playersWithExistingPlan = useMemo(() => {
+    return (allPreviews || []).filter((p) => p?.hasExistingPlan);
+  }, [allPreviews]);
+
+  function handleSaveClick() {
+    // 1. Si el jugador actual tiene un plan previo en esta semana
+    if (preview?.hasExistingPlan) {
+      setOverwriteModalData({
+        title: 'Plan existente en esta semana',
+        message: `Atención: Existen planes para esta semana que se sobrescribirán al guardar. Ya existe un plan registrado para ${playerName} en la semana seleccionada (${semana || 'esta semana'}). Al guardar, se sobrescribirá con los datos actuales. ¿Deseas continuar?`,
+        onConfirm: () => {
+          setConfirmOverwriteOpened(false);
+          onValidate(editablePlan);
+        },
+      });
+      setConfirmOverwriteOpened(true);
+      return;
+    }
+
+    // 2. Si es el último jugador y en la plantilla hay jugadores que sobrescribirán plan
+    if (isLastPlayer && playersWithExistingPlan.length > 0) {
+      const names = playersWithExistingPlan
+        .map((p) => `${p.nombre || 'Jugador'} ${p.apellidos || ''}`.trim())
+        .join(', ');
+      setOverwriteModalData({
+        title: 'Planes existentes en esta semana',
+        message: `Atención: Existen planes guardados para esta semana (${semana || 'esta semana'}) que se sobrescribirán al guardar el informe definitivo (${names}). ¿Deseas continuar y sobrescribirlos?`,
+        onConfirm: () => {
+          setConfirmOverwriteOpened(false);
+          onValidate(editablePlan);
+        },
+      });
+      setConfirmOverwriteOpened(true);
+      return;
+    }
+
+    // 3. Sin planes existentes a sobrescribir
+    onValidate(editablePlan);
+  }
 
   // Initialize editable state whenever preview changes
   useEffect(() => {
@@ -272,6 +318,13 @@ export default function SquadReportReviewModal({
             </Group>
 
             <Group gap="xs">
+              {preview?.hasExistingPlan && (
+                <Group gap={6} px="xs" py={4} style={{ borderRadius: 6, backgroundColor: 'var(--mantine-color-orange-0)', border: '1px solid var(--mantine-color-orange-3)' }}>
+                  <Box style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: 'var(--mantine-color-orange-7)' }} />
+                  <Text size="xs" fw={700} c="orange.9">Plan existente esta semana</Text>
+                </Group>
+              )}
+
               {hasChanges ? (
                 <Group gap={6} px="xs" py={4} style={{ borderRadius: 6, backgroundColor: 'var(--mantine-color-yellow-0)', border: '1px solid var(--mantine-color-yellow-3)' }}>
                   <Box style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: 'var(--mantine-color-yellow-7)' }} />
@@ -335,6 +388,29 @@ export default function SquadReportReviewModal({
             </Group>
           </Group>
         </Paper>
+
+        {preview?.hasExistingPlan && (
+          <Paper
+            p="xs"
+            radius="md"
+            style={{
+              backgroundColor: 'var(--mantine-color-orange-0)',
+              border: '1px solid var(--mantine-color-orange-3)',
+            }}
+          >
+            <Group gap="xs" wrap="nowrap" align="center">
+              <IconAlertTriangle size={18} color="var(--mantine-color-orange-8)" style={{ flexShrink: 0 }} />
+              <Box>
+                <Text size="xs" fw={700} c="orange.9">
+                  Plan existente en esta semana
+                </Text>
+                <Text size="xs" c="orange.8">
+                  Ya existe un plan registrado ({preview.existingPlanName || `semana ${semana || ''}`}) para {playerName}. Al guardar el informe, se sobrescribirá con los datos actuales.
+                </Text>
+              </Box>
+            </Group>
+          </Paper>
+        )}
 
         <Paper p="sm" radius="md" withBorder>
           <Group gap="xs" mb="xs">
@@ -696,7 +772,7 @@ export default function SquadReportReviewModal({
               onClick={() => onDownloadSingle?.(editablePlan)}
               loading={actionLoading === 'single'}
               disabled={loading}
-              title="Descargar el PDF de la dieta de este jugador"
+              title="Descargar el PDF de la dieta de este jugador (sin guardar en base de datos)"
             >
               Descargar dieta
             </Button>
@@ -716,7 +792,7 @@ export default function SquadReportReviewModal({
               }}
               loading={actionLoading === 'all'}
               disabled={loading}
-              title="Aprobar y descargar el PDF con todos los jugadores"
+              title="Descargar el PDF conjunto de todos los jugadores (sin guardar en base de datos)"
             >
               Descargar todos ({total})
             </Button>
@@ -741,7 +817,7 @@ export default function SquadReportReviewModal({
               size="xs"
               radius="xl"
               leftSection={<IconCheck size={14} />}
-              onClick={() => onValidate(editablePlan)}
+              onClick={handleSaveClick}
               loading={actionLoading === 'validate'}
               disabled={!confirmed || loading}
             >
@@ -771,14 +847,28 @@ export default function SquadReportReviewModal({
     <ConfirmModal
       opened={confirmDownloadAllOpened}
       onClose={() => setConfirmDownloadAllOpened(false)}
-      title="¿Guardar y descargar toda la plantilla?"
-      message={`Quedan ${total - (index + 1)} jugadores pendientes de validar. Al continuar, se aprobarán automáticamente los jugadores pendientes con sus dietas generadas, se guardarán todos en el sistema y se descargará el informe PDF conjunto de la plantilla (${total} jugadores).`}
-      confirmLabel={`Aprobar y descargar (${total})`}
+      title={`¿Descargar PDF de toda la plantilla (${total} jugadores)?`}
+      message={`Quedan ${total - (index + 1)} jugadores por revisar. Se generará y descargará el PDF conjunto con los borradores de todos los jugadores sin guardar ningún cambio en la base de datos. Podrás continuar revisándolos o guardarlos cuando termines.`}
+      confirmLabel={`Descargar PDF (${total})`}
       cancelLabel="Seguir revisando"
-      color="teal"
+      color="nutralabColor"
       onConfirm={() => {
         setConfirmDownloadAllOpened(false);
         onDownloadAll?.(editablePlan);
+      }}
+    />
+
+    {/* Modal de confirmación cuando existen planes que se sobrescribirán */}
+    <ConfirmModal
+      opened={confirmOverwriteOpened}
+      onClose={() => setConfirmOverwriteOpened(false)}
+      title={overwriteModalData.title || 'Planes existentes en esta semana'}
+      message={overwriteModalData.message}
+      confirmLabel="Sobrescribir y continuar"
+      cancelLabel="Volver a revisar"
+      color="orange"
+      onConfirm={() => {
+        overwriteModalData.onConfirm?.();
       }}
     />
     </>

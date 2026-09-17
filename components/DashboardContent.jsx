@@ -644,7 +644,14 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       setReportWorkflow((prev) => {
         if (!prev) return prev;
         const newPreviews = prev.previews.map((p) =>
-          String(p.id) === String(playerId) ? { ...p, plan: newPreview.plan } : p
+          String(p.id) === String(playerId)
+            ? {
+                ...p,
+                plan: newPreview.plan,
+                hasExistingPlan: typeof newPreview.hasExistingPlan === 'boolean' ? newPreview.hasExistingPlan : p.hasExistingPlan,
+                existingPlanName: newPreview.existingPlanName || p.existingPlanName,
+              }
+            : p
         );
         return { ...prev, previews: newPreviews };
       });
@@ -652,6 +659,8 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       setReviewPreview((prev) => ({
         ...prev,
         plan: newPreview.plan,
+        hasExistingPlan: typeof newPreview.hasExistingPlan === 'boolean' ? newPreview.hasExistingPlan : prev?.hasExistingPlan,
+        existingPlanName: newPreview.existingPlanName || prev?.existingPlanName,
       }));
 
       notifications.show({
@@ -712,7 +721,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       notifications.show({
         color: 'green',
         title: 'Dieta descargada',
-        message: `PDF descargado para ${reviewPreview.nombre || 'el jugador'}.`,
+        message: `PDF descargado para ${reviewPreview.nombre || 'el jugador'} (sin guardar en base de datos).`,
       });
     } catch (e) {
       notifications.show({
@@ -736,21 +745,36 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       const planToUse = currentEditedPlan || reviewPreview.plan;
 
       // Combinar los ya aprobados, el actual con sus ediciones, y los restantes
-      const allApproved = [
+      const allDrafts = [
         ...approved,
         { id: reviewPreview.id, plan: planToUse },
         ...previews.slice(index + 1).map((p) => ({ id: p.id, plan: p.plan })),
       ];
 
-      await commitApprovedPlayers(allApproved);
+      const allPlayerIds = allDrafts.map((p) => p.id);
+
+      const res = await generateWeeklySquadReport(reportPayload(allPlayerIds, {
+        downloadOnly: true,
+        forceRegenerate: false,
+        draftPlayers: allDrafts,
+      }));
+
+      await downloadPdfFromResponse(res);
+
+      notifications.show({
+        color: 'green',
+        title: 'Informe de plantilla descargado',
+        message: `PDF descargado con ${allDrafts.length} jugadores (sin guardar en base de datos).`,
+      });
     } catch (e) {
-      setReviewLoading(false);
-      setReviewActionLoading(null);
       notifications.show({
         color: 'red',
         title: 'Error al descargar plantilla',
         message: e.message || 'No se pudo generar el PDF de todos los jugadores.',
       });
+    } finally {
+      setReviewLoading(false);
+      setReviewActionLoading(null);
     }
   }
 
@@ -1157,6 +1181,8 @@ export default function DashboardContent({ players = [], team, readOnly = false 
           onRegenerate={regenerateCurrentPlayer}
           onDownloadSingle={downloadCurrentPlayerPdf}
           onDownloadAll={downloadAllPlayersPdf}
+          semana={reportForm?.semana}
+          allPreviews={reportWorkflow?.previews}
         />
 
         <NewPlayerModal
