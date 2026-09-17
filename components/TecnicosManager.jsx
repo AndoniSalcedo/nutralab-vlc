@@ -221,7 +221,15 @@ export default function TecnicosManager({ teams = [] }) {
 
   return (
     <Stack gap="lg">
-      <Paper p={{ base: 'sm', sm: 'md' }} shadow="xs" radius={24} bg="white">
+      <Paper
+        p={{ base: 'sm', sm: 'md' }}
+        radius={24}
+        bg="white"
+        style={{
+          position: 'relative',
+          boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
+        }}
+      >
         <Group justify="space-between" align="center" wrap="wrap" gap="md">
           <Group gap="sm">
             <ThemeIcon color="nutralabColor" variant="light" radius="md" size={42}>
@@ -247,7 +255,17 @@ export default function TecnicosManager({ teams = [] }) {
         </Group>
       </Paper>
 
-      <Paper p="md" shadow="sm" radius="lg" withBorder bg="white">
+      <Paper
+        p="md"
+        radius={24}
+        bg="white"
+        style={{
+          position: 'relative',
+          borderRadius: 24,
+          boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
+          overflow: 'hidden',
+        }}
+      >
         {loading ? (
           <Text size="sm" c="dimmed" ta="center" py="xl">
             Cargando técnicos...

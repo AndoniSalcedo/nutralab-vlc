@@ -950,7 +950,19 @@ export default function DashboardContent({ players = [], team, readOnly = false 
         {/* 3. LISTADO DE JUGADORES (TABLA) */}
         <Box style={{ width: '100%', minWidth: 0 }}>
           {filteredPlayers.length > 0 ? (
-            <Paper radius="xl" p={0} bg="white" shadow="xs" withBorder style={{ overflow: 'hidden', borderColor: 'rgba(222,226,230,0.8)', width: '100%', minWidth: 0 }}>
+            <Paper
+              radius={24}
+              p={0}
+              bg="white"
+              style={{
+                position: 'relative',
+                borderRadius: 24,
+                boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
+                overflow: 'hidden',
+                width: '100%',
+                minWidth: 0,
+              }}
+            >
               <ScrollArea style={{ width: '100%', minWidth: 0 }}>
                 <Table verticalSpacing="sm" highlightOnHover w="100%" miw={{ base: '100%', sm: 760 }}>
                   <Table.Thead bg="rgba(248, 249, 250, 0.95)">

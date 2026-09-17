@@ -175,8 +175,7 @@ export default function WaterWidget({
       radius="lg"
       p={{ base: 'md', sm: 'lg' }}
       bg="white"
-      shadow="xs"
-      withBorder
+      shadow="sm"
     >
       <Stack gap="md">
         {/* Cabecera: Título + Integración del estado clínico de osmolaridad */}

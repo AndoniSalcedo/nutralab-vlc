@@ -63,11 +63,10 @@ export default function EstrategiaWidget({
   return (
     <Paper
       id="widget-estrategia"
-      shadow="xs"
+      shadow="sm"
       radius="lg"
       p="md"
       bg="white"
-      withBorder
       mt="md"
       onClick={() => router.push(`/dashboard/jugador/${jugador?.id}/nutricion/protocolos`)}
       style={{ cursor: 'pointer' }}

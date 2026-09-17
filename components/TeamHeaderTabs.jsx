@@ -95,18 +95,34 @@ export default function TeamHeaderTabs({
     }
   };
 
-  const activeTabStyle = (value) => ({
-    backgroundColor: tabValue === value ? 'var(--mantine-color-white)' : 'transparent',
-  });
+  const activeTabStyle = (value) => {
+    const isActive = tabValue === value;
+    return {
+      border: 'none',
+      borderBottom: 'none',
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      backgroundColor: isActive ? 'white' : 'transparent',
+      color: isActive ? 'var(--mantine-color-dark-6)' : 'var(--mantine-color-gray-6)',
+      fontWeight: isActive ? 700 : 600,
+      boxShadow: isActive ? '0 0 2px 0 rgba(0,0,0,0.1)' : 'none',
+      clipPath: isActive ? 'inset(-10px -10px 0 -10px)' : 'none',
+      position: 'relative',
+      zIndex: isActive ? 3 : 1,
+    };
+  };
 
   return (
     <>
       <Paper
         radius={24}
         p={{ base: 'xs', sm: 'lg' }}
-        shadow="xs"
         bg="white"
         mb="md"
+        style={{
+          position: 'relative',
+          boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
+        }}
       >
         <Group justify="space-between" align="center" wrap="nowrap" gap={{ base: 'xs', sm: 'md' }} style={{ width: '100%' }}>
           <Group gap={{ base: 'xs', sm: 'md' }} align="center" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
@@ -277,22 +293,27 @@ export default function TeamHeaderTabs({
           value={tabValue}
           onChange={handleTabChange}
           variant="outline"
-          radius="md"
           color="dark"
           style={{ width: '100%' }}
           styles={{
+            root: { marginBottom: 0 },
             list: {
               backgroundColor: 'transparent',
-              borderBottomColor: 'var(--mantine-color-gray-3)',
+              border: 'none',
+              borderBottom: 'none',
             },
             tab: {
               fontSize: 15,
               fontWeight: 600,
-              padding: '10px 16px',
+              padding: '11px 20px',
+              border: 'none',
+              borderBottom: 'none',
+              backgroundColor: 'transparent',
+              transition: 'all 150ms ease',
             },
           }}
         >
-          <Tabs.List grow visibleFrom="sm">
+          <Tabs.List grow visibleFrom="sm" style={{ border: 'none', borderBottom: 'none' }}>
             {TABS.map((tab) => {
               const href = teamId ? tab.href(teamId) : '#';
 
@@ -322,10 +343,12 @@ export default function TeamHeaderTabs({
             padding: slotContext?.hasDesktopFilters ? '12px 16px 16px' : 0,
             display: slotContext?.hasDesktopFilters ? undefined : 'none',
             backgroundColor: 'var(--mantine-color-white)',
-            border: slotContext?.hasDesktopFilters ? '1px solid rgba(222,226,230,0.85)' : 'none',
-            borderTop: slotContext?.hasDesktopFilters ? 'none' : undefined,
-            borderRadius: slotContext?.hasDesktopFilters ? '0 0 16px 16px' : 0,
-            boxShadow: slotContext?.hasDesktopFilters ? '0 2px 10px rgba(31, 35, 28, 0.08)' : 'none',
+            border: 'none',
+            borderTop: 'none',
+            borderRadius: slotContext?.hasDesktopFilters ? '0 0 24px 24px' : 0,
+            marginTop: -1,
+            boxShadow: slotContext?.hasDesktopFilters ? '0 2px 2px -1px rgba(0, 0, 0, 0.1), -2px 1px 2px -1px rgba(0, 0, 0, 0.1), 2px 1px 2px -1px rgba(0, 0, 0, 0.1)' : 'none',
+            clipPath: 'inset(1px -100% -100% -100%)',
           }}
         />
       </Box>

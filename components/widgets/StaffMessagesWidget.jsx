@@ -15,11 +15,11 @@ export default function StaffMessagesWidget({
   return (
     <Paper
       id="widget-mensajes"
-      shadow="xs"
+      shadow="sm"
       radius="lg"
       p={{ base: 'xs', sm: 'sm' }}
       bg={hasMessages ? 'pink.0' : 'white'}
-      withBorder
+      withBorder={hasMessages}
       h="100%"
       onClick={() => router.push(`/dashboard/jugador/${jugadorId}/resumen/mensajes`)}
       style={{

@@ -278,7 +278,17 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
   return (
     <BoneyardSkeleton name="teams-list" loading={false}>
       <Stack gap="lg" style={{ width: '100%', minWidth: 0 }} px={{ base: 'xs', sm: 0 }}>
-        <Paper p={{ base: 'sm', sm: 'md' }} shadow="xs" radius={24} bg="white" style={{ width: '100%', minWidth: 0 }}>
+        <Paper
+          p={{ base: 'sm', sm: 'md' }}
+          radius={24}
+          bg="white"
+          style={{
+            width: '100%',
+            minWidth: 0,
+            position: 'relative',
+            boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
+          }}
+        >
           <Group justify="space-between" align="center" wrap="wrap" gap="md" style={{ width: '100%', minWidth: 0 }}>
             <Group gap="sm" style={{ minWidth: 0, flex: 1 }}>
               <Icon3D name="soccer" size={44} style={{ flexShrink: 0 }} />
@@ -337,8 +347,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                 key={team.id}
                 p="md"
                 radius="lg"
-                withBorder
-                shadow="xs"
+                shadow="sm"
                 bg="white"
                 style={{
                   cursor: 'pointer',

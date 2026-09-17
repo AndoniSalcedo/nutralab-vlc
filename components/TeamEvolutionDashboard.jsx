@@ -827,7 +827,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
         {viewMode === 'trends' && (
           <>
             {/* Resumen de evolución en 1 sola fila compacta (diseño analíticas) */}
-            <Paper p={{ base: 10, sm: 'md' }} radius="lg" withBorder shadow="xs" bg="white">
+            <Paper p={{ base: 10, sm: 'md' }} radius="lg" shadow="sm" bg="white">
               <SimpleGrid cols={4} spacing={{ base: 6, sm: 'md' }}>
                 {/* 1. Plantilla total */}
                 <Box style={{ minWidth: 0, textAlign: 'center' }}>
@@ -1007,7 +1007,20 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
             )}
 
             {rows.length > 0 && (
-              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
+              <Paper
+                radius={24}
+                p={0}
+                bg="white"
+                style={{
+                  position: 'relative',
+                  borderRadius: 24,
+                  boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
+                  overflow: 'hidden',
+                  width: '100%',
+                  minWidth: 0,
+                  maxWidth: '100%',
+                }}
+              >
                 <ScrollArea style={{ width: '100%', minWidth: 0 }}>
                   <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 760 + METRICS.length * 128 }}>
                     <Table.Thead bg="gray.0">
@@ -1072,7 +1085,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
         {viewMode === 'day' && (
           <>
             {/* Resumen del día en 1 sola fila compacta (diseño analíticas) */}
-            <Paper p={{ base: 10, sm: 'md' }} radius="lg" withBorder shadow="xs" bg="white">
+            <Paper p={{ base: 10, sm: 'md' }} radius="lg" shadow="sm" bg="white">
               <SimpleGrid cols={4} spacing={{ base: 6, sm: 'md' }}>
                 {/* 1. Fecha */}
                 <Box style={{ minWidth: 0, textAlign: 'center' }}>
@@ -1164,7 +1177,20 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
             )}
 
             {measuredDayRows.length > 0 && (
-              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
+              <Paper
+                radius={24}
+                p={0}
+                bg="white"
+                style={{
+                  position: 'relative',
+                  borderRadius: 24,
+                  boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
+                  overflow: 'hidden',
+                  width: '100%',
+                  minWidth: 0,
+                  maxWidth: '100%',
+                }}
+              >
                 <Group justify="space-between" p="md" pb="xs" align="center">
                   <Box>
                     <Title order={4} fw={700} c="dark.5">Mediciones del día</Title>
@@ -1261,7 +1287,17 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
             )}
 
             {missingDayRows.length > 0 && (
-              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden' }}>
+              <Paper
+                radius={24}
+                p={0}
+                bg="white"
+                style={{
+                  position: 'relative',
+                  borderRadius: 24,
+                  boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
+                  overflow: 'hidden',
+                }}
+              >
                 <Group justify="space-between" p="md" pb="xs" align="center">
                   <Box>
                     <Title order={4} fw={700} c="dark.5">Sin medición ese día</Title>
@@ -1497,7 +1533,20 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
             </Paper>
 
             {sortedTableData.length > 0 ? (
-              <Paper radius="lg" p={0} bg="white" shadow="sm" withBorder style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
+              <Paper
+                radius={24}
+                p={0}
+                bg="white"
+                style={{
+                  position: 'relative',
+                  borderRadius: 24,
+                  boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
+                  overflow: 'hidden',
+                  width: '100%',
+                  minWidth: 0,
+                  maxWidth: '100%',
+                }}
+              >
                 <Group justify="space-between" p="md" pb="xs" align="center">
                   <Box>
                     <Title order={4} fw={700} c="dark.5">

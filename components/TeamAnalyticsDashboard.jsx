@@ -336,7 +336,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
     <BoneyardSkeleton name="team-analytics" loading={false}>
       <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
         {/* Resumen de analíticas en 1 sola fila compacta */}
-        <Paper p={{ base: 10, sm: 'md' }} radius="lg" withBorder shadow="xs" bg="white">
+        <Paper p={{ base: 10, sm: 'md' }} radius="lg" shadow="sm" bg="white">
           <SimpleGrid cols={4} spacing={{ base: 6, sm: 'md' }}>
             {/* 1. Subidas */}
             <Box style={{ minWidth: 0, textAlign: 'center' }}>
@@ -626,7 +626,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [], 
       </Paper>
 
       {/* Sección 3: Listado general de la plantilla */}
-      <Paper radius="lg" p="md" bg="white" shadow="sm" withBorder style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
+      <Paper radius="lg" p="md" bg="white" shadow="sm" style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
         <Stack gap="md" style={{ width: '100%', minWidth: 0 }}>
           <Group justify="space-between" align="center" wrap="wrap" gap="sm" w="100%">
             <Title order={4} fw={700} c="dark.5">Listado Clínico General</Title>

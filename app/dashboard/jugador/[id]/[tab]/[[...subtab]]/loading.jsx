@@ -33,10 +33,8 @@ export default function PlayerSubtabLoading() {
           top: 0,
           clipPath: 'inset(0 -100% 0 -100%)',
           width: '100%',
-          borderBottom: 0,
-          borderLeft: '1px solid var(--mantine-color-gray-3)',
-          borderRight: '1px solid var(--mantine-color-gray-3)',
-          boxShadow: 'none',
+          border: 'none',
+          boxShadow: '-2px -1px 2px -1px rgba(0,0,0,0.1), 2px -1px 2px -1px rgba(0,0,0,0.1)',
         }}
       >
         <PlayerSubtabControl
@@ -51,10 +49,17 @@ export default function PlayerSubtabLoading() {
         <Paper
           p={{ base: 'sm', sm: 'md' }}
           bg="white"
-          shadow="xs"
-          radius="lg"
-          withBorder
-          style={{ borderTop: 0, borderTopLeftRadius: 0, borderTopRightRadius: 0 }}
+          radius={0}
+          style={{
+            borderBottomLeftRadius: 24,
+            borderBottomRightRadius: 24,
+            zIndex: 1,
+            position: 'relative',
+            marginTop: -1,
+            border: 'none',
+            boxShadow: '0 2px 2px -1px rgba(0,0,0,0.1), -2px 1px 2px -1px rgba(0,0,0,0.1), 2px 1px 2px -1px rgba(0,0,0,0.1)',
+            clipPath: 'inset(1px -100% -100% -100%)',
+          }}
         >
             <Group justify="space-between" align="center" wrap="wrap" gap="sm">
               <Group gap="sm" align="center" wrap="nowrap">

@@ -400,9 +400,12 @@ function JugadorHeaderDesktop({ jugador, isAdmin, isPlayer, hasCredentials, onEd
     <Paper
       radius={24}
       p="lg"
-      shadow="xs"
       bg="white"
       mb="md"
+      style={{
+        position: 'relative',
+        boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
+      }}
     >
       <Group justify="space-between" align="center" wrap="wrap" gap="md">
         <Group gap="md">
@@ -450,11 +453,15 @@ function JugadorHeaderMobile({ jugador, isAdmin, isPlayer, hasCredentials, onEdi
     <Paper
       radius={0}
       p="sm"
-      withBorder
-      shadow="xs"
       bg="white"
       mb="xs"
-      style={{ position: 'relative' }}
+      style={{
+        position: 'relative',
+        borderBottomLeftRadius: 24,
+        borderBottomRightRadius: 24,
+        boxShadow: '0 2px 2px -1px rgba(0, 0, 0, 0.1), -2px 1px 2px -1px rgba(0, 0, 0, 0.1), 2px 1px 2px -1px rgba(0, 0, 0, 0.1)',
+        clipPath: 'inset(1px -100% -100% -100%)',
+      }}
     >
       {content}
     </Paper>

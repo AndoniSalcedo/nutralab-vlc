@@ -11,7 +11,6 @@ import _team_analytics from './team-analytics.bones.json'
 import _team_config from './team-config.bones.json'
 import _player_dashboard_resumen_perfil from './player-dashboard-resumen-perfil.bones.json'
 import _player_dashboard_resumen_diario from './player-dashboard-resumen-diario.bones.json'
-import _diario_comidas from './diario-comidas.bones.json'
 import _player_dashboard_resumen_mensajes from './player-dashboard-resumen-mensajes.bones.json'
 import _player_dashboard_metricas_mediciones from './player-dashboard-metricas-mediciones.bones.json'
 import _player_dashboard_metricas_pesos from './player-dashboard-metricas-pesos.bones.json'
@@ -32,7 +31,6 @@ registerBones({
   "team-config": _team_config,
   "player-dashboard-resumen-perfil": _player_dashboard_resumen_perfil,
   "player-dashboard-resumen-diario": _player_dashboard_resumen_diario,
-  "diario-comidas": _diario_comidas,
   "player-dashboard-resumen-mensajes": _player_dashboard_resumen_mensajes,
   "player-dashboard-metricas-mediciones": _player_dashboard_metricas_mediciones,
   "player-dashboard-metricas-pesos": _player_dashboard_metricas_pesos,

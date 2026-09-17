@@ -122,8 +122,7 @@ export default function HydrationWidget({
       radius="lg"
       p={{ base: 'sm', sm: 'md' }}
       bg="white"
-      shadow="xs"
-      withBorder
+      shadow="sm"
     >
       {/* 1. Cabecera uniforme idéntica al resto de widgets del dashboard */}
       <Group justify="space-between" align="center" mb="xs">

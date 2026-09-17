@@ -62,7 +62,7 @@ export default function BalanceNutricionalWidget({
   });
 
   return (
-    <Paper id="widget-balance-nutricional" shadow="xs" radius="lg" p={{ base: 'xs', sm: 'sm' }} bg="white" withBorder>
+    <Paper id="widget-balance-nutricional" shadow="sm" radius="lg" p={{ base: 'xs', sm: 'sm' }} bg="white">
       {/* Cabecera: Título con icono unificado + Indicador de fecha y tipo de día */}
       <Group justify="space-between" align="center" mb={6}>
         <Group gap="xs" align="center">

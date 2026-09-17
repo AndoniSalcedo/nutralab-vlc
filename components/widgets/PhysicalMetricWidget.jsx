@@ -87,11 +87,10 @@ export default function PhysicalMetricWidget({
     >
       <Paper
         id="widget-fisico"
-        shadow="xs"
+        shadow="sm"
         radius="lg"
         p={{ base: 'xs', sm: 'sm' }}
         bg="white"
-        withBorder
         h="100%"
         onClick={() => router.push(`/dashboard/jugador/${jugadorId}/metricas/pesos`)}
         style={{

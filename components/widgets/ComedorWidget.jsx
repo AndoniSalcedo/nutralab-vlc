@@ -41,11 +41,10 @@ export default function ComedorWidget({
   return (
     <Paper
       id="widget-comedor"
-      shadow="xs"
+      shadow="sm"
       radius="lg"
       p="md"
       bg="white"
-      withBorder
       style={{
         height: '100%',
         cursor: 'pointer',

@@ -65,9 +65,22 @@ export default function PlayerTabs({
     router.replace(`/dashboard/jugador/${jugador.id}/${nextTab}/${nextSubtab}`, { scroll: false });
   }
 
-  const activeTabStyle = (value) => ({
-    backgroundColor: activeTab === value ? 'var(--mantine-color-white)' : 'transparent',
-  });
+  const activeTabStyle = (value) => {
+    const isActive = activeTab === value;
+    return {
+      border: 'none',
+      borderBottom: 'none',
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      backgroundColor: isActive ? 'white' : 'transparent',
+      color: isActive ? 'var(--mantine-color-dark-6)' : 'var(--mantine-color-gray-6)',
+      fontWeight: isActive ? 700 : 600,
+      boxShadow: isActive ? '0 0 2px 0 rgba(0,0,0,0.1)' : 'none',
+      clipPath: isActive ? 'inset(-10px -10px 0 -10px)' : 'none',
+      position: 'relative',
+      zIndex: isActive ? 3 : 1,
+    };
+  };
 
   const mobileTabs = [
     { value: 'resumen', label: 'Resumen', icon: IconClipboardList },
@@ -83,19 +96,27 @@ export default function PlayerTabs({
         value={activeTab}
         onChange={(value) => value && navigate(value)}
         variant="outline"
-        radius="md"
         color="dark"
         keepMounted={false}
         styles={{
-          list: { backgroundColor: 'transparent', borderBottomColor: 'var(--mantine-color-gray-3)' },
+          root: { marginBottom: 0 },
+          list: {
+            backgroundColor: 'transparent',
+            border: 'none',
+            borderBottom: 'none',
+          },
           tab: {
             fontSize: rem(15),
             fontWeight: 600,
-            padding: `${rem(10)} ${rem(16)}`,
+            padding: `${rem(11)} ${rem(20)}`,
+            border: 'none',
+            borderBottom: 'none',
+            backgroundColor: 'transparent',
+            transition: 'all 150ms ease',
           },
         }}
       >
-        <Tabs.List grow visibleFrom="sm">
+        <Tabs.List grow visibleFrom="sm" style={{ border: 'none', borderBottom: 'none' }}>
           <Tabs.Tab id="tab-nav-resumen" value="resumen" leftSection={<IconClipboardList size={18} />} style={activeTabStyle('resumen')}>Resumen</Tabs.Tab>
           <Tabs.Tab id="tab-nav-metricas" value="metricas" leftSection={<IconChartBar size={18} />} style={activeTabStyle('metricas')}>Métricas</Tabs.Tab>
           <Tabs.Tab id="tab-nav-nutricion" value="nutricion" leftSection={<IconSalad size={18} />} style={activeTabStyle('nutricion')}>Nutrición</Tabs.Tab>

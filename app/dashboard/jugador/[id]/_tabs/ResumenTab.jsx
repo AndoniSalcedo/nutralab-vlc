@@ -32,10 +32,7 @@ export default function ResumenTab({
           top: 0,
           clipPath: 'inset(0 -100% 0 -100%)',
           width: '100%',
-          borderBottom: 0,
-          borderLeft: '1px solid var(--mantine-color-gray-3)',
-          borderRight: '1px solid var(--mantine-color-gray-3)',
-          boxShadow: 'none',
+          boxShadow: '-2px -1px 2px -1px rgba(0,0,0,0.1), 2px -1px 2px -1px rgba(0,0,0,0.1)',
         }}
       >
         <PlayerSubtabControl
