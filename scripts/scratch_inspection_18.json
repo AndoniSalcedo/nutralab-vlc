@@ -165,6 +165,7 @@
         "verdura": [],
         "proteina": [],
         "isComplete": false,
+        "isMainMeal": true,
         "unrecognized": []
       },
       "Comida": {
@@ -187,6 +188,7 @@
           "Ternera magra"
         ],
         "isComplete": false,
+        "isMainMeal": true,
         "unrecognized": []
       },
       "Almuerzo": {
@@ -205,6 +207,7 @@
           "Huevos"
         ],
         "isComplete": false,
+        "isMainMeal": false,
         "unrecognized": []
       },
       "Desayuno": {
@@ -220,6 +223,7 @@
         "verdura": [],
         "proteina": [],
         "isComplete": false,
+        "isMainMeal": false,
         "unrecognized": []
       }
     },
@@ -234,33 +238,37 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pasta de trigo 85g, Dorada 255g, Calabacín 80g, Zanahoria 80g, Puerro 80g, AOVE 15g, Plátano 100g"
+            "detalle": "Pan blanco de barra 80g, 1 Huevo y 3 Claras, 1 Clara"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 95g, Pechuga de pollo 255g, Lechuga romana 50g, Tomate 80g, AOVE 20g, Plátano 100g"
+            "detalle": "Macarrones 170g, Dorada 350g, Calabacín 80g, Zanahoria 80g, Puerro 80g, Cebolla 80g, AOVE 25g, Sandía 100g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 50g, Patata 150g, Hamburguesa de pollo 100g, AOVE 5g, Manzana 100g"
+            "detalle": "Uvas 200g, Yogur natural 250g"
           }
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3294,
+        "tipo": "entreno",
+        "calorias": 2304,
         "ingestas": [
           {
-            "nombre": "Comida",
-            "detalle": "Pasta de trigo 160g, Alitas de pollo 125g, Tomate 80g, Fresas 180g, AOVE 5g, Pan blanco de barra 75g"
+            "nombre": "Desayuno",
+            "detalle": "Leche de avena 170g"
           },
           {
-            "nombre": "Merienda",
-            "detalle": "Plátano 100g, Sandía 100g"
+            "nombre": "Almuerzo",
+            "detalle": "Pan blanco de barra 70g, 2 Huevos y 3 Claras"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 170g, Ternera magra 350g, Alcachofa 80g, Plátano 200g, AOVE 25g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 170g, Patata 150g, Contramuslo de pollo deshuesado 140g, AOVE 5g, Manzana 125g"
+            "detalle": "Melón 200g, Yogur natural 250g"
           }
         ]
       },
@@ -274,15 +282,15 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pan blanco de barra 80g, Salmón 290g, 1 Clara, AOVE 5g"
+            "detalle": "Pan blanco de barra 45g, Atún natural 50g, 1 Huevo y 2 Claras"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 70g, Ternera magra 295g, Brócoli 80g, Naranja 100g, AOVE 10g"
+            "detalle": "Arroz blanco 110g, Ternera magra 350g, Calabacín 80g, Piña pelada 200g, AOVE 25g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, Merluza 100g, Plátano 100g, Yogur natural 120g, AOVE 5g"
+            "detalle": "Naranja 200g, Yogur natural 250g"
           }
         ]
       },
@@ -296,15 +304,15 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Arroz blanco 115g, Atún fresco 240g, AOVE 20g, Naranja 100g"
+            "detalle": "Pan blanco de barra 80g, 1 Clara, 1 Huevo y 3 Claras"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 120g, Pechuga de pollo 220g, AOVE 20g, Naranja 100g"
+            "detalle": "Arroz blanco 170g, Salmón 350g, Aguacate 30g, Pepino 80g, Zanahoria 80g, Espárragos verdes 80g, AOVE 5g, Mandarina 130g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, Merluza 100g, Mandarina 100g, Yogur natural 120g, AOVE 5g"
+            "detalle": "Manzana 200g, Yogur natural 250g"
           }
         ]
       },
@@ -318,21 +326,39 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pan blanco de barra 80g, Salmón 100g, 1 Huevo y 10 Claras, AOVE 5g, Pera 180g"
+            "detalle": "Pan blanco de barra 60g, 2 Huevos"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 100g, Ternera magra 275g, Puerro 80g, AOVE 15g, Manzana 150g"
+            "detalle": "Macarrones 110g, Atún fresco 225g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Brócoli 80g, Calabacín 80g, AOVE 25g, Pera 100g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, Merluza 100g, Uvas 100g, Yogur natural 120g, AOVE 5g"
+            "detalle": "Macarrones 70g, Patata 150g, Pechuga de pollo 230g, AOVE 20g, Ciruela 100g"
           }
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2304,
+        "tipo": "partido",
+        "calorias": 3294,
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Macarrones 160g, Alitas de pollo 260g, Tomate 80g, Paraguayo 200g, AOVE 5g, Pan blanco de barra 80g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 200g, Melocotón 200g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Macarrones 160g, Patata 150g, Contramuslo de pollo deshuesado 210g, AOVE 10g, Nectarina 180g, Pan blanco de barra 80g"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2022,
         "ingestas": [
           {
             "nombre": "Desayuno",
@@ -340,33 +366,15 @@
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "1 Huevo y 8 Claras, Pulpo 100g, Tomate 80g, Ajo 250g, AOVE 5g, Mandarina 110g"
+            "detalle": "Pan blanco de barra 40g, Berberecho conserva 145g, 1 Clara"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 115g, Pechuga de pollo 255g, AOVE 20g, Mandarina 100g"
+            "detalle": "Arroz blanco 105g, Ternera magra 350g, Lechuga romana 50g, Kiwi 200g, AOVE 25g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 50g, Patata 150g, Pechuga de pollo 100g, AOVE 5g, Manzana 100g"
-          }
-        ]
-      },
-      "domingo": {
-        "tipo": "partido",
-        "calorias": 3294,
-        "ingestas": [
-          {
-            "nombre": "Comida",
-            "detalle": "Pasta de trigo 160g, Contramuslo de pollo deshuesado 125g, Tomate 80g, Manzana 180g, AOVE 5g, Pan blanco de barra 50g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Plátano 100g, Ciruela 100g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Pasta de trigo 170g, Patata 150g, Alitas de pollo 150g, AOVE 5g, Pera 125g"
+            "detalle": "Naranja 200g, Yogur natural 250g"
           }
         ]
       }
@@ -492,6 +500,7 @@
           "Proteínas"
         ],
         "isComplete": true,
+        "isMainMeal": true,
         "unrecognized": []
       },
       "Comida": {
@@ -514,6 +523,7 @@
           "Proteínas"
         ],
         "isComplete": true,
+        "isMainMeal": true,
         "unrecognized": []
       },
       "Desayuno": {
@@ -533,6 +543,7 @@
           "Jamón serrano"
         ],
         "isComplete": false,
+        "isMainMeal": false,
         "unrecognized": []
       },
       "Merienda": {
@@ -548,6 +559,7 @@
         "verdura": [],
         "proteina": [],
         "isComplete": false,
+        "isMainMeal": false,
         "unrecognized": []
       }
     },
@@ -558,19 +570,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 40g, Jamón serrano 30g, Leche de avena 150g, Aguacate 60g, Plátano 180g"
+            "detalle": "Pan blanco de barra 80g, Jamón serrano 30g, Leche de avena 170g, Aguacate 80g, Melón 180g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 170g, Carne picada de ternera 185g, AOVE 5g, Plátano 100g"
+            "detalle": "Patata 450g, Dorada 240g, Calabacín 80g, Zanahoria 80g, Puerro 80g, Tomate 80g, Pepino 80g, Pimiento 80g, Cebolla 80g, Ajo 5g, AOVE 20g, Paraguayo 220g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pasta de Dátil 20g"
+            "detalle": "Arándanos 200g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Trigo sarraceno 165g, Salmón ahumado 160g, Coliflor 80g, Paraguayo 100g, AOVE 5g"
+            "detalle": "Arroz blanco 160g, Conejo 240g, Remolacha 80g, Ciruela 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -579,28 +591,28 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3746,
+        "tipo": "entreno",
+        "calorias": 3183,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Jamón serrano 25g, Leche de avena 160g, Aguacate 45g, Manzana 180g"
+            "detalle": "Pan blanco de barra 80g, Jamón serrano 30g, Leche de avena 170g, Aguacate 80g, Uvas 180g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 160g, Patata 150g, Pechuga de pollo 105g, Tomate 80g, AOVE 20g, Manzana 180g, Pan blanco de barra 75g"
+            "detalle": "Maíz dulce 160g, Pechuga de pavo 210g, Tomate 80g, Naranja 200g, AOVE 25g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Plátano 180g, Arroz con leche 170g"
+            "detalle": "Mango 200g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 120g, Boniato 310g, Carne picada de ternera 180g, Guisantes 80g, Melón 150g, AOVE 5g"
+            "detalle": "Pasta de trigo sarraceno 170g, Salmón 210g, Acelga 80g, Nectarina 200g, AOVE 5g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -610,19 +622,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Jamón serrano 55g, Leche de avena 160g, Aguacate 45g"
+            "detalle": "Pan blanco de barra 80g, Jamón serrano 70g, Leche de avena 170g, Aguacate 65g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 140g, Jamón ibérico de bellota 70g, Alcachofa 80g, Sandía 100g, AOVE 20g"
+            "detalle": "Arroz blanco 130g, Mejillones frescos 350g, Brócoli 80g, Fresas 200g, AOVE 25g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Kiwi 100g"
+            "detalle": "Plátano 200g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 90g, Caballa 300g, Calabacín 80g, AOVE 5g, Manzana 150g"
+            "detalle": "Patata 410g, Bacalao desalado 350g, Tomate frito 80g, Sandía 200g, AOVE 25g"
           }
         ]
       },
@@ -632,19 +644,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Jamón serrano 25g, Leche de avena 160g, Aguacate 55g, Naranja 180g"
+            "detalle": "Pan blanco de barra 80g, Jamón serrano 30g, Leche de avena 170g, Aguacate 75g, Mango 180g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 165g, Pechuga de pollo 205g, Aguacate 30g, Pepino 80g, Zanahoria 80g, AOVE 20g, Naranja 100g"
+            "detalle": "Arroz blanco 160g, Salmón 250g, Aguacate 30g, Pepino 80g, Zanahoria 80g, Espárragos verdes 80g, AOVE 5g, Nectarina 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Melón 100g"
+            "detalle": "Pera 200g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Boniato 450g, Gambas 210g, Pepino 80g, Dátil 50g, AOVE 25g"
+            "detalle": "Macarrones 170g, Conejo 190g, Judías verdes 80g, Mandarina 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -658,19 +670,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 65g, Jamón serrano 25g, Leche de avena 160g, Aguacate 60g, Pera 180g"
+            "detalle": "Pan blanco de barra 80g, Jamón serrano 35g, Leche de avena 170g, Aguacate 75g, Fresas 180g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 170g, Conejo 210g, Berenjena 80g, Paraguayo 140g, AOVE 20g"
+            "detalle": "Macarrones 150g, Atún fresco 165g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Brócoli 80g, Calabacín 80g, AOVE 20g, Arándanos 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Manzana 100g"
+            "detalle": "Piña pelada 200g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Boniato 450g, Jamón ibérico de bellota 70g, Zanahoria 80g, Arándanos 220g, AOVE 15g"
+            "detalle": "Quinoa 160g, Hamburguesa de pavo 205g, Espárragos blancos conserva 80g, Naranja 200g, AOVE 5g, Pan blanco de barra 55g"
           },
           {
             "nombre": "Post-entreno",
@@ -679,54 +691,50 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 3183,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 75g, Jamón serrano 25g, Leche de avena 160g, Aguacate 55g, Mandarina 180g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 170g, Pechuga de pollo 205g, AOVE 20g, Mandarina 160g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Pasta de Dátil 20g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Fideos de arroz 140g, Hamburguesa de pavo 270g, Judías verdes 80g, Pera 100g, AOVE 10g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3746,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Jamón serrano 25g, Leche de avena 160g, Aguacate 50g, Pera 180g"
+            "detalle": "Pan blanco de barra 80g, Jamón serrano 25g, Leche de avena 170g, Aguacate 75g, Mango 180g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 160g, Patata 150g, Pechuga de pollo 105g, Tomate 80g, AOVE 20g, Pera 180g, Pan blanco de barra 70g"
+            "detalle": "Macarrones 160g, Patata 150g, Pechuga de pollo 120g, Tomate 80g, AOVE 20g, Uvas 180g, Pan blanco de barra 65g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Plátano 180g, Arroz con leche 170g"
+            "detalle": "Plátano 200g, Arroz con leche 50g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 130g, Boniato 310g, Corvina 190g, Champiñón 80g, Melocotón 150g, AOVE 20g"
+            "detalle": "Arroz blanco 100g, Ñoquis de patata 300g, Bacalao desalado 215g, Hamburguesa de espinacas 50g, Mandarina 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2903,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 80g, Jamón serrano 65g, Leche de avena 170g, Aguacate 75g, Paraguayo 180g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz basmati 140g, Solomillo de cerdo 290g, Espinaca 50g, Melocotón 200g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Piña pelada 200g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo sarraceno 110g, Conejo 265g, Rúcula 80g, Pera 200g, AOVE 15g"
           }
         ]
       }
@@ -750,19 +758,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Melocotón 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Melón 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 150g, Carne picada de ternera 245g, Zanahoria 80g, Cebolla 80g, Puerro 80g, AOVE 5g, Plátano 100g"
+            "detalle": "Macarrones 160g, Carne picada de ternera 185g, Tomate 80g, Pepino 80g, Pimiento 80g, Cebolla 80g, Ajo 5g, AOVE 15g, Mango 180g, Pan blanco de barra 60g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Paraguayo 100g, Yogur proteico natural 145g, Piñones 20g"
+            "detalle": "Manzana 200g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 145g, Rape 235g, Zanahoria 80g, AOVE 25g, Manzana 150g"
+            "detalle": "Bulgur 160g, Solomillo de cerdo 180g, Espárragos verdes 80g, Uvas 200g, AOVE 25g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Post-entreno",
@@ -771,28 +779,28 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3663,
+        "tipo": "entreno",
+        "calorias": 3343,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Bulgur 130g, 1 Clara, Aguacate 100g, Mango 100g"
+            "detalle": "Copos de avena 115g, 1 Huevo, Aguacate 30g, Frambuesa 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 165g, Patata 310g, Rodaballo 225g, Alcachofa 80g, Zumo de naranja natural 150g, AOVE 15g"
+            "detalle": "Arroz basmati 165g, Dorada 215g, Brócoli 80g, Plátano 200g, AOVE 20g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Kiwi 100g, Yogur proteico natural 120g, Semillas de calabaza (pipas) 20g"
+            "detalle": "Ciruela 200g, Yogur proteico natural 250g, Avellanas 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 160g, Hamburguesa de ternera magra 155g, Berenjena 80g, Pera 180g, AOVE 10g, Pan blanco de barra 45g"
+            "detalle": "Arroz blanco 50g, Ñoquis de patata 300g, Conejo 195g, Tomate 80g, Piña pelada 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -802,19 +810,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Chuletas de pavo 100g, AOVE 10g, Ciruela 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Melón 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Trigo sarraceno hinchado 145g, Mejillones frescos 350g, Cebolla 80g, Frambuesa 100g, AOVE 20g"
+            "detalle": "Bulgur 155g, Hamburguesa de ternera 340g, Pepino 80g, Naranja 200g, AOVE 5g, Pan blanco de barra 40g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Manzana 100g, Yogur proteico natural 190g, Pesto 20g"
+            "detalle": "Sandía 200g, Yogur proteico natural 250g, Pipas de girasol 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 95g, Salmón ahumado 270g, Tomate 80g, Nectarina 100g, AOVE 5g"
+            "detalle": "Macarrones 125g, Hamburguesa de pavo 350g, Hamburguesa de espinacas 50g, Frambuesa 200g, AOVE 15g"
           }
         ]
       },
@@ -824,19 +832,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Trigo sarraceno 110g, 1 Clara, Aguacate 100g, Paraguayo 100g"
+            "detalle": "Copos de avena 120g, 1 Clara, Aguacate 70g, Paraguayo 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 155g, Atún fresco 200g, AOVE 20g, Naranja 180g, Pan blanco de barra 35g"
+            "detalle": "Arroz blanco 155g, Salmón 220g, Aguacate 30g, Pepino 80g, Zanahoria 80g, AOVE 5g, Melocotón 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Cacahuete (maní) 15g"
+            "detalle": "Mango 200g, Yogur proteico natural 250g, Sésamo 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 85g, Patata 310g, Carne picada de ternera 255g, Pimiento 80g, Fresas 150g, AOVE 5g"
+            "detalle": "Arroz blanco 75g, Boniato 310g, Secreto de cerdo 260g, Espinaca 50g, Plátano 200g, AOVE 5g"
           },
           {
             "nombre": "Post-entreno",
@@ -850,19 +858,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Chuletas de pavo 100g, AOVE 10g, Arándanos 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Pera 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 155g, Gambas 190g, Puerro 80g, Melón 180g, AOVE 25g, Pan blanco de barra 40g"
+            "detalle": "Macarrones 160g, Atún fresco 150g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Brócoli 80g, Calabacín 80g, AOVE 25g, Nectarina 180g, Pan blanco de barra 55g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Naranja 100g, Yogur proteico natural 145g, Piñones 20g"
+            "detalle": "Manzana 200g, Yogur proteico natural 250g, Pistachos 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz jazmín 145g, Carne picada de pavo 235g, Tomate frito 80g, Pera 100g, AOVE 20g"
+            "detalle": "Trigo sarraceno 160g, Entrecot de ternera 165g, Guisantes 80g, Arándanos 200g, AOVE 5g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Post-entreno",
@@ -871,54 +879,50 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 3343,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Quinoa 115g, 1 Clara, Aguacate 70g, Arándanos 100g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 170g, Pechuga de pollo 220g, AOVE 25g, Mandarina 215g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Zumo de naranja natural 100g, Yogur proteico natural 165g, Pesto 20g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Pasta de trigo 160g, Jamón cocido 70g, Espinaca 50g, Mango 100g, AOVE 25g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3663,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, AOVE 5g, Ciruela 180g"
+            "detalle": "Copos de avena 170g, 1 Huevo, Aguacate 30g, Frambuesa 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Fideos de arroz 170g, Hamburguesa de ternera 225g, Judías verdes 80g, Higo seco 100g, AOVE 5g"
+            "detalle": "Arroz blanco 150g, Patata 310g, Pechuga de pollo 130g, Brócoli 80g, Zanahoria 80g, Leche de avena 170g, AOVE 20g, Paraguayo 150g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Melón 180g, Yogur proteico natural 120g, Avellanas 15g"
+            "detalle": "Mandarina 200g, Yogur proteico natural 250g, Semillas de chía 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 170g, Lenguado 195g, Puerro 80g, Dátil 55g, AOVE 20g"
+            "detalle": "Maíz dulce 160g, Lenguado 215g, Coliflor 80g, Naranja 200g, AOVE 20g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2943,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Kiwi 200g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Macarrones 155g, Solomillo de cerdo 285g, Brócoli 80g, Pera 200g, AOVE 25g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Piña pelada 200g, Yogur proteico natural 250g, Almendras 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 110g, Conejo 340g, Rúcula 80g, Frambuesa 200g, AOVE 25g"
           }
         ]
       }
@@ -942,19 +946,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, AOVE 5g, Arándanos 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Melón 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 135g, Pechuga de pollo 185g, Lechuga romana 50g, Tomate 80g, Calabacín 80g, Zanahoria 80g, Puerro 80g, AOVE 20g, Plátano 100g"
+            "detalle": "Macarrones 160g, Dorada 155g, Calabacín 80g, Zanahoria 80g, Puerro 80g, AOVE 25g, Manzana 180g, Pan blanco de barra 45g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Mango 180g, Yogur proteico natural 120g, Avellanas 15g"
+            "detalle": "Naranja 200g, Yogur proteico natural 250g, Nueces 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 450g, Solomillo de cerdo 195g, Ajo 80g, Frambuesa 165g, AOVE 15g"
+            "detalle": "Arroz blanco 160g, Carne picada de pollo 200g, Lechuga romana 50g, Mango 200g, AOVE 20g, Pan blanco de barra 60g"
           },
           {
             "nombre": "Post-entreno",
@@ -963,28 +967,28 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3591,
+        "tipo": "entreno",
+        "calorias": 3047,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Trigo sarraceno hinchado 130g, 1 Huevo, Aguacate 30g, Plátano 100g"
+            "detalle": "Copos de avena 95g, 1 Huevo, Aguacate 30g, Arándanos 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Solomillo de cerdo 135g, Champiñón 80g, Melón 180g, AOVE 15g, Pan blanco de barra 80g"
+            "detalle": "Cuscús 140g, Solomillo de ternera 135g, Coliflor 80g, Frambuesa 200g, AOVE 20g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Ciruela 180g, Yogur proteico natural 120g, Avellanas 15g"
+            "detalle": "Plátano 200g, Yogur proteico natural 250g, Anacardo (marañón) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 160g, Bacalao 145g, Pepino 80g, Manzana 180g, AOVE 20g, Pan blanco de barra 50g"
+            "detalle": "Ñoquis de patata 300g, Lubina 215g, Acelga 80g, Pera 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -994,19 +998,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, AOVE 10g, Naranja 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Piña pelada 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 110g, Berberechos frescos 350g, Zanahoria 80g, Plátano 100g, AOVE 25g"
+            "detalle": "Arroz jazmín 145g, Alitas de pollo 315g, Guisantes 80g, Melocotón 200g, AOVE 5g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Ciruela 100g, Yogur proteico natural 150g, Nueces 15g"
+            "detalle": "Mango 200g, Yogur proteico natural 250g, Semillas de chía 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 420g, Jamón cocido (York) 70g, Calabacín 80g, Nectarina 100g, AOVE 20g"
+            "detalle": "Pasta de lenteja roja 165g, Pulpo 180g, Hamburguesa de espinacas 50g, Uvas 200g, AOVE 25g"
           }
         ]
       },
@@ -1016,19 +1020,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Fideos de arroz 90g, 2 Huevos, Aguacate 30g, Paraguayo 100g"
+            "detalle": "Copos de avena 115g, 1 Huevo, Aguacate 30g, Nectarina 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 130g, Pechuga de pavo 165g, Aguacate 30g, Pepino 80g, Zanahoria 80g, Guisantes 80g, Cebolla 80g, AOVE 20g, Naranja 100g"
+            "detalle": "Patata 450g, Pechuga de pavo 140g, Guisantes 80g, Cebolla 80g, Espárragos verdes 80g, AOVE 25g, Manzana 220g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pasta de Dátil 60g, Yogur proteico natural 120g, Cacahuete (maní) 15g"
+            "detalle": "Mandarina 200g, Yogur proteico natural 250g, Almendras 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz jazmín 135g, Merluza 260g, Cebolla 80g, Mandarina 100g, AOVE 25g"
+            "detalle": "Trigo sarraceno 160g, Solomillo de ternera 130g, Pimiento 80g, Paraguayo 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -1042,19 +1046,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, AOVE 5g, Uvas 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Ciruela 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 170g, Pulpo 285g, Coliflor 80g, Fresas 100g, AOVE 25g"
+            "detalle": "Macarrones 160g, Atún fresco 115g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Calabacín 80g, Puerro 80g, AOVE 25g, Naranja 180g, Pan blanco de barra 40g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pera 100g, Yogur proteico natural 130g, Piñones 20g"
+            "detalle": "Frambuesa 200g, Yogur proteico natural 250g, Anacardo (marañón) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Yuca 295g, Lubina 285g, Lechuga romana 50g, Frambuesa 100g, AOVE 20g"
+            "detalle": "Arroz blanco 115g, Boniato 310g, Secreto de cerdo 255g, Cebolla 80g, Fresas 200g, AOVE 5g"
           },
           {
             "nombre": "Post-entreno",
@@ -1063,54 +1067,50 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 3047,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Fideos de arroz 90g, 2 Huevos, Aguacate 30g, Melón 100g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 165g, Pulpo 300g, AOVE 25g, Mandarina 100g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Dátil 20g, Yogur proteico natural 120g, Semillas de calabaza (pipas) 20g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Pasta de trigo 145g, Bacalao fresco 210g, Espinaca 50g, Mango 100g, AOVE 25g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3591,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, AOVE 5g, Ciruela 180g"
+            "detalle": "Copos de avena 170g, 1 Clara, Aguacate 30g, Uvas 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz basmati 160g, Contramuslo de pollo deshuesado 150g, Ajo 80g, Arándanos 180g, AOVE 10g, Pan blanco de barra 50g"
+            "detalle": "Arroz blanco 160g, Pulpo 165g, Champiñón 80g, AOVE 20g, Pera 180g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Sandía 180g, Yogur proteico natural 120g, Pistachos 15g"
+            "detalle": "Sandía 200g, Yogur proteico natural 250g, Pistachos 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 155g, Mejillones frescos 215g, Berenjena 80g, Mango 180g, AOVE 15g, Pan blanco de barra 45g"
+            "detalle": "Arroz blanco 95g, Ñoquis de patata 300g, Carne picada de pavo 120g, Espinaca 50g, Nectarina 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2779,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Melocotón 200g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo sarraceno 160g, Entrecot de ternera 225g, Rúcula 80g, Melón 200g, AOVE 5g, Pan blanco de barra 40g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 200g, Yogur proteico natural 250g, Sésamo 20g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Fideos de arroz 120g, Conejo 285g, Calabacín 80g, Naranja 200g, AOVE 25g"
           }
         ]
       }
@@ -1134,19 +1134,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Chuletas de pavo 100g, AOVE 5g, Mandarina 100g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Piña pelada 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 95g, Carne picada de ternera 220g, AOVE 5g, Plátano 100g"
+            "detalle": "Patata 425g, Carne picada de ternera 235g, Tomate 80g, Pepino 80g, Pimiento 80g, Cebolla 80g, Ajo 5g, AOVE 5g, Fresas 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pasta de Dátil 45g, Yogur proteico natural 120g, Cacahuete (maní) 15g"
+            "detalle": "Nectarina 200g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Trigo sarraceno hinchado 95g, Hamburguesa de pollo 250g, Espárragos verdes 80g, Kiwi 100g, AOVE 5g"
+            "detalle": "Quinoa 130g, Merluza 220g, Tomate 80g, Melocotón 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -1155,28 +1155,28 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3065,
+        "tipo": "entreno",
+        "calorias": 2344,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Cuscús 115g, 1 Huevo, Aguacate 30g, Sandía 100g"
+            "detalle": "Copos de avena 50g, 2 Claras, Aguacate 80g, Sandía 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Gambas 125g, Remolacha 80g, Frambuesa 180g, AOVE 15g, Pan blanco de barra 40g"
+            "detalle": "Arroz blanco 70g, Caballa 235g, Rúcula 80g, Plátano 200g, AOVE 5g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pera 180g, Yogur proteico natural 120g, Avellanas 15g"
+            "detalle": "Arándanos 200g, Yogur proteico natural 250g, Avellanas 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Trigo sarraceno 170g, Emperador (pez espada) 110g, Brócoli 80g, Plátano 100g, AOVE 10g"
+            "detalle": "Macarrones 50g, Carne picada de pavo 195g, Remolacha 80g, Mango 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -1186,19 +1186,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 60g, Chuletas de pavo 100g, AOVE 10g, Manzana 100g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Kiwi 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Boniato 280g, Hamburguesa de pavo 330g, Acelga 80g, Melón 100g, AOVE 5g"
+            "detalle": "Boniato 200g, Bacalao fresco 350g, Judías verdes 80g, Ciruela 200g, AOVE 25g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Frambuesa 125g, Yogur proteico natural 120g, Anacardo (marañón) 20g"
+            "detalle": "Frambuesa 200g, Yogur proteico natural 250g, Semillas de lino (linaza) 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz basmati 50g, Solomillo de ternera 270g, Zanahoria 80g, Dátil 20g, AOVE 10g"
+            "detalle": "Trigo sarraceno 50g, Secreto de cerdo 350g, Cebolla 80g, Manzana 200g, AOVE 5g"
           }
         ]
       },
@@ -1208,19 +1208,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Fideos de arroz 50g, 2 Huevos, Aguacate 30g, Piña pelada 100g"
+            "detalle": "Copos de avena 60g, 1 Clara, Aguacate 75g, Piña pelada 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 105g, Pechuga de pollo 215g, AOVE 20g, Naranja 100g"
+            "detalle": "Patata 310g, Pechuga de pollo 185g, Espárragos verdes 80g, AOVE 20g, Paraguayo 150g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Arándanos 100g, Yogur proteico natural 130g, Nueces 15g"
+            "detalle": "Nectarina 200g, Yogur proteico natural 250g, Sésamo 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 75g, Calamar 300g, Puerro 80g, Pera 100g, AOVE 20g"
+            "detalle": "Arroz jazmín 75g, Conejo 205g, Espárragos blancos conserva 80g, Uvas 200g, AOVE 15g"
           },
           {
             "nombre": "Post-entreno",
@@ -1234,19 +1234,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Chuletas de pavo 100g, AOVE 5g, Paraguayo 150g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Sandía 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Yuca 210g, Hamburguesa de pollo 300g, Espárragos verdes 80g, Nectarina 100g, AOVE 5g"
+            "detalle": "Macarrones 75g, Sardina 175g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Calabacín 80g, Puerro 80g, AOVE 10g, Mango 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Kiwi 100g, Yogur proteico natural 140g, Pesto 20g"
+            "detalle": "Fresas 200g, Yogur proteico natural 250g, Nueces 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Quinoa 105g, Solomillo de ternera 185g, Tomate 80g, Melón 100g, AOVE 10g"
+            "detalle": "Arroz blanco 100g, Sepia 310g, Calabacín 80g, Plátano 200g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
@@ -1255,54 +1255,50 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2344,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Trigo sarraceno hinchado 55g, 3 Claras, Aguacate 80g, Arándanos 100g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 100g, Pechuga de pollo 220g, AOVE 15g, Mandarina 100g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Higo seco 100g, Yogur proteico natural 120g, Pesto 20g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Arroz integral 80g, Lomo embuchado 70g, Pepino 80g, Pera 100g, AOVE 10g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3065,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 5g, Dátil 60g"
+            "detalle": "Copos de avena 145g, 1 Huevo, Aguacate 30g, Kiwi 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Caballa 165g, Lechuga romana 50g, Mandarina 180g, AOVE 5g, Pan blanco de barra 45g"
+            "detalle": "Arroz blanco 160g, Pulpo 150g, Champiñón 80g, AOVE 15g, Ciruela 180g, Pan blanco de barra 40g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Higo seco 100g, Yogur proteico natural 120g, Almendras 15g"
+            "detalle": "Naranja 200g, Yogur proteico natural 250g, Sésamo 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Yuca 350g, Rodaballo 250g, Hamburguesa de espinacas 50g, Melón 100g, AOVE 10g"
+            "detalle": "Bulgur 160g, Rape 100g, Puerro 80g, Melocotón 200g, AOVE 15g, Pan blanco de barra 40g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2144,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Melón 200g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Boniato 160g, Solomillo de cerdo 310g, Alcachofa 80g, Nectarina 200g, AOVE 20g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 200g, Yogur proteico natural 250g, Piñones 20g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Espaguetis 50g, Alitas de pollo 350g, Lechuga romana 50g, Mango 200g, AOVE 5g"
           }
         ]
       }
@@ -1326,19 +1322,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, AOVE 5g, Kiwi 185g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Arándanos 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 110g, Dorada 135g, Calabacín 80g, Zanahoria 80g, Puerro 80g, AOVE 15g, Plátano 100g"
+            "detalle": "Macarrones 120g, Dorada 115g, Calabacín 80g, Zanahoria 80g, Puerro 80g, Cebolla 80g, AOVE 20g, Kiwi 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Mango 100g, Yogur proteico natural 120g, Piñones 20g"
+            "detalle": "Sandía 200g, Yogur proteico natural 250g, Cacahuete (maní) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Yuca 225g, Solomillo de ternera 180g, Pepino 80g, Naranja 100g, AOVE 15g"
+            "detalle": "Arroz blanco 130g, Conejo 155g, Zanahoria 80g, Plátano 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -1347,28 +1343,28 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 2921,
+        "tipo": "entreno",
+        "calorias": 2476,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Copos de avena 125g, 1 Clara, Aguacate 30g, Nectarina 100g"
+            "detalle": "Copos de avena 80g, 1 Huevo, Aguacate 30g, Manzana 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 155g, Caballa 120g, Champiñón 80g, Ciruela 180g, AOVE 5g, Pan blanco de barra 40g"
+            "detalle": "Patata 450g, Gambas 110g, Espinaca 50g, Nectarina 200g, AOVE 25g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Dátil 20g, Yogur proteico natural 120g, Semillas de chía 120g"
+            "detalle": "Ciruela 200g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Cuscús 155g, Morro de cerdo cocido 120g, Puerro 80g, Arándanos 100g, AOVE 5g"
+            "detalle": "Quinoa 120g, Pechuga de pavo 100g, Tomate 80g, Naranja 200g, AOVE 15g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -1378,19 +1374,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Mandarina 155g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Melón 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Boniato 335g, Muslo de pollo 255g, Cebolla 80g, Plátano 100g, AOVE 5g"
+            "detalle": "Arroz jazmín 115g, Bacalao 260g, Judías verdes 80g, Piña pelada 200g, AOVE 25g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Fresas 180g, Yogur proteico natural 120g, Cacahuete (maní) 15g"
+            "detalle": "Pera 200g, Yogur proteico natural 250g, Semillas de chía 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 80g, Atún fresco 180g, Lechuga romana 50g, Melocotón 100g, AOVE 10g"
+            "detalle": "Pasta de trigo sarraceno 85g, Conejo 200g, Berenjena 80g, Kiwi 200g, AOVE 20g"
           }
         ]
       },
@@ -1400,19 +1396,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Fideos de arroz 65g, 1 Huevo, Aguacate 50g, Dátil 20g"
+            "detalle": "Copos de avena 90g, 1 Huevo, Aguacate 30g, Paraguayo 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 95g, Pechuga de pavo 125g, Aguacate 30g, Pepino 80g, Zanahoria 80g, Guisantes 80g, Cebolla 80g, AOVE 15g, Naranja 100g"
+            "detalle": "Arroz blanco 115g, Salmón 120g, Aguacate 30g, Pepino 80g, Zanahoria 80g, Espárragos verdes 80g, AOVE 5g, Melón 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Higo seco 100g, Yogur proteico natural 120g, Almendras 15g"
+            "detalle": "Melocotón 200g, Yogur proteico natural 250g, Avellanas 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Boniato 425g, Jamón serrano 70g, Zanahoria 80g, Sandía 100g, AOVE 15g"
+            "detalle": "Cuscús 110g, Muslo de pollo 120g, Remolacha 80g, Nectarina 200g, AOVE 10g"
           },
           {
             "nombre": "Post-entreno",
@@ -1426,19 +1422,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Chuletas de pavo 100g, AOVE 5g, Frambuesa 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Mango 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de lenteja roja 155g, Salmón 100g, Champiñón 80g, Naranja 180g, AOVE 5g, Pan blanco de barra 40g"
+            "detalle": "Macarrones 125g, Sardina 100g, Tomate 80g, Cebolla 80g, Zanahoria 80g, AOVE 15g, Fresas 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Ciruela 100g, Yogur proteico natural 120g, Semillas de calabaza (pipas) 20g"
+            "detalle": "Plátano 200g, Yogur proteico natural 250g, Semillas de lino (linaza) 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Ñoquis de patata 270g, Entrecot de ternera 165g, Pepino 80g, Arándanos 100g, AOVE 5g"
+            "detalle": "Ñoquis de patata 300g, Solomillo de cerdo 145g, Lechuga romana 50g, Arándanos 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -1447,54 +1443,50 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2476,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Copos de avena 75g, 1 Clara, Aguacate 55g, Dátil 20g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 135g, Pulpo 230g, AOVE 20g, Mandarina 100g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Plátano 165g, Yogur proteico natural 120g, Pistachos 15g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Trigo sarraceno hinchado 120g, Carne picada de ternera 135g, Hamburguesa de espinacas 50g, Piña pelada 100g, AOVE 5g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 2921,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 5g, Ciruela 180g"
+            "detalle": "Copos de avena 125g, 1 Huevo, Aguacate 30g, Frambuesa 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 160g, Contramuslo de pollo deshuesado 100g, Remolacha 80g, Melón 180g, AOVE 10g, Pan blanco de barra 45g"
+            "detalle": "Arroz blanco 85g, Patata 310g, Pulpo 105g, Brócoli 80g, Zanahoria 80g, Leche de avena 170g, AOVE 20g, Melón 150g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Manzana 180g, Yogur proteico natural 120g, Anacardo (marañón) 15g"
+            "detalle": "Uvas 200g, Yogur proteico natural 250g, Avellanas 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 90g, Patata 310g, Carne picada de ternera 130g, Calabacín 80g, Fresas 150g, AOVE 5g"
+            "detalle": "Pasta de trigo sarraceno 145g, Pechuga de pavo 100g, Brócoli 80g, Naranja 200g, AOVE 15g, Pan blanco de barra 40g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2264,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Mandarina 200g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 105g, Contramuslo de pollo deshuesado 225g, Rúcula 80g, Plátano 200g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Fresas 200g, Yogur proteico natural 250g, Semillas de calabaza (pipas) 20g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Trigo sarraceno 70g, Corvina 215g, Guisantes 80g, Frambuesa 200g, AOVE 20g"
           }
         ]
       }
@@ -1518,33 +1510,33 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 240g, AOVE 5g, Mandarina 180g"
-          },
-          {
-            "nombre": "Almuerzo",
-            "detalle": "Pechuga de pollo 100g, Dorada 100g, Lechuga romana 50g, Tomate 80g, Calabacín 80g, Zanahoria 80g, Puerro 80g, Queso parmesano 20g, AOVE 10g, Plátano 100g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Melón 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Carne picada de ternera 160g, Tomate 80g, Pepino 80g, Pimiento 80g, Cebolla 80g, Ajo 250g, AOVE 5g, Plátano 130g"
+            "detalle": "Macarrones 150g, Dorada 260g, Calabacín 80g, Zanahoria 80g, Puerro 80g, AOVE 20g, Kiwi 180g, Pan blanco de barra 45g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 110g, Boniato 310g, Hamburguesa de ternera magra 285g, Brócoli 80g, Plátano 200g, AOVE 10g"
           }
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3358,
+        "tipo": "entreno",
+        "calorias": 2850,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Quinoa 170g, 2 Huevos y 3 Claras, Aguacate 30g, Fresas 180g"
-          },
-          {
-            "nombre": "Almuerzo",
-            "detalle": "Pasta de Dátil 60g, Yogur proteico natural 120g, Semillas de chía 250g"
+            "detalle": "Copos de avena 120g, 2 Huevos, Aguacate 30g, Piña pelada 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 160g, Contramuslo de pollo deshuesado 100g, Guisantes 80g, Paraguayo 180g, AOVE 10g, Pan blanco de barra 60g"
+            "detalle": "Arroz jazmín 165g, Atún fresco 220g, Lechuga romana 50g, Nectarina 200g, AOVE 20g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Maíz dulce 160g, Solomillo de cerdo 200g, Judías verdes 80g, Melocotón 200g, AOVE 10g, Pan blanco de barra 80g"
           }
         ]
       },
@@ -1554,15 +1546,15 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Carne picada de pavo 205g, AOVE 15g, Frambuesa 180g"
-          },
-          {
-            "nombre": "Almuerzo",
-            "detalle": "Arándanos 100g, Yogur proteico natural 250g, Pesto 20g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Naranja 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Boniato 445g, Berberechos frescos 285g, Coliflor 80g, Fresas 100g, AOVE 20g"
+            "detalle": "Arroz blanco 90g, Boniato 310g, Gambas 290g, Champiñón 80g, Sandía 200g, AOVE 25g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Espaguetis 155g, Hamburguesa de pavo 305g, Calabacín 80g, Fresas 200g, AOVE 15g"
           }
         ]
       },
@@ -1572,15 +1564,15 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Fideos de arroz 145g, 7 Claras, Aguacate 120g, Pasta de Dátil 20g"
-          },
-          {
-            "nombre": "Almuerzo",
-            "detalle": "Arroz blanco 125g, Pechuga de pavo 155g, Guisantes 80g, Cebolla 80g, AOVE 20g, Naranja 100g"
+            "detalle": "Copos de avena 130g, 2 Huevos, Aguacate 30g, Frambuesa 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 160g, Atún fresco 130g, AOVE 15g, Naranja 100g"
+            "detalle": "Arroz blanco 135g, Pechuga de pavo 195g, Guisantes 80g, Cebolla 80g, Espárragos verdes 80g, AOVE 25g, Ciruela 100g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Fideos de arroz 150g, Muslo de pollo 260g, Pepino 80g, Paraguayo 200g, AOVE 5g"
           }
         ]
       },
@@ -1590,51 +1582,51 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 180g, AOVE 20g, Dátil 60g"
-          },
-          {
-            "nombre": "Almuerzo",
-            "detalle": "Plátano 180g, Yogur proteico natural 250g, Almendras 30g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Nectarina 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de lenteja roja 125g, Berberechos frescos 100g, Acelga 80g, Higo seco 100g, AOVE 20g"
+            "detalle": "Macarrones 170g, Atún fresco 215g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Brócoli 80g, Calabacín 80g, AOVE 25g, Melocotón 180g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 70g, Ñoquis de patata 300g, Lubina 295g, Espinaca 50g, Plátano 200g, AOVE 25g"
           }
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2850,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Fideos de arroz 140g, 7 Claras, Aguacate 120g, Pera 100g"
-          },
-          {
-            "nombre": "Almuerzo",
-            "detalle": "1 Huevo y 2 Claras, Pechuga de pollo 100g, Tomate 80g, Ajo 250g, AOVE 5g, Mandarina 180g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 145g, Pulpo 275g, AOVE 20g, Mandarina 100g"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3358,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 165g, AOVE 20g, Uvas 180g"
-          },
-          {
-            "nombre": "Almuerzo",
-            "detalle": "Pasta de Dátil 20g, Yogur proteico natural 250g, Nueces 30g"
+            "detalle": "Copos de avena 170g, 1 Huevo, Aguacate 30g, Sandía 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Salmón ahumado 120g, Brócoli 80g, Melocotón 180g, AOVE 10g, Pan blanco de barra 65g"
+            "detalle": "Arroz blanco 130g, Patata 310g, Pulpo 265g, Brócoli 80g, Zanahoria 80g, Leche de avena 170g, AOVE 20g, Arándanos 150g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Quinoa 160g, Secreto de cerdo 120g, Rúcula 80g, Mango 200g, AOVE 5g, Pan blanco de barra 80g"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2606,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Manzana 200g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo sarraceno 165g, Carne picada de pavo 285g, Cebolla 80g, Ciruela 200g, AOVE 25g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz jazmín 135g, Conejo 305g, Berenjena 80g, Mandarina 200g, AOVE 25g"
           }
         ]
       }
@@ -1658,19 +1650,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Manzana 135g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Naranja 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 105g, Carne picada de ternera 230g, AOVE 5g, Plátano 100g"
+            "detalle": "Patata 405g, Pechuga de pollo 205g, Lechuga romana 50g, Tomate 80g, Zanahoria 80g, Cebolla 80g, Puerro 80g, Queso parmesano 20g, AOVE 25g, Mango 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Mango 210g, Yogur proteico natural 120g, Almendras 15g"
+            "detalle": "Piña pelada 200g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Yuca 155g, Hamburguesa de ternera 300g, Guisantes 80g, Mandarina 100g, AOVE 5g"
+            "detalle": "Fideos de arroz 110g, Calamar 320g, Judías verdes 80g, Melocotón 200g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
@@ -1679,28 +1671,28 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3666,
+        "tipo": "entreno",
+        "calorias": 2569,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Quinoa 160g, 1 Huevo, Aguacate 30g, Zumo de naranja natural 100g"
+            "detalle": "Copos de avena 60g, 2 Claras, Aguacate 100g, Ciruela 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Hamburguesa de ternera 210g, Champiñón 80g, Pera 180g, AOVE 5g, Pan blanco de barra 80g"
+            "detalle": "Arroz jazmín 90g, Hamburguesa de ternera 250g, Champiñón 80g, Paraguayo 200g, AOVE 5g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Melón 180g, Yogur proteico natural 120g, Almendras 15g"
+            "detalle": "Nectarina 200g, Yogur proteico natural 250g, Pistachos 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 170g, Carne picada de pavo 165g, Acelga 80g, Dátil 55g, AOVE 20g"
+            "detalle": "Pasta de trigo sarraceno 80g, Contramuslo de pollo deshuesado 215g, Remolacha 80g, Pera 200g, AOVE 10g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -1710,19 +1702,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 60g, Pechuga de pavo 100g, AOVE 10g, Manzana 100g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Naranja 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz integral 50g, Hamburguesa de ternera magra 305g, Pimiento 80g, Higo seco 100g, AOVE 5g"
+            "detalle": "Ñoquis de patata 150g, Pulpo 350g, Espárragos verdes 80g, Frambuesa 200g, AOVE 25g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Paraguayo 100g, Yogur proteico natural 165g, Leche de almendra sin azúcar 150g"
+            "detalle": "Uvas 200g, Yogur proteico natural 250g, Semillas de lino (linaza) 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 50g, Sepia 350g, Puerro 80g, Pera 100g, AOVE 20g"
+            "detalle": "Cuscús 50g, Chuletas de pavo 300g, Brócoli 80g, Mandarina 200g, AOVE 25g"
           }
         ]
       },
@@ -1732,19 +1724,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Cuscús 55g, 2 Huevos, Aguacate 30g, Pasta de Dátil 20g"
+            "detalle": "Copos de avena 60g, 1 Huevo, Aguacate 55g, Paraguayo 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 90g, Pechuga de pavo 200g, Guisantes 80g, Cebolla 80g, AOVE 25g, Naranja 100g"
+            "detalle": "Macarrones 55g, Pechuga de pavo 165g, Guisantes 80g, Cebolla 80g, Espárragos verdes 80g, AOVE 25g, Kiwi 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Almendras 15g"
+            "detalle": "Plátano 200g, Yogur proteico natural 250g, Almendras 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 385g, Mejillones frescos 350g, Calabacín 80g, Ciruela 100g, AOVE 20g"
+            "detalle": "Arroz jazmín 75g, Conejo 220g, Pimiento 80g, Piña pelada 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -1758,19 +1750,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, AOVE 5g, Paraguayo 175g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Manzana 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Quinoa 140g, Chuletas de pavo 170g, Acelga 80g, Melón 100g, AOVE 15g"
+            "detalle": "Calabacín 80g, Cebolla 80g, Puerro 80g, Brócoli 80g, Zanahoria 80g, AOVE 5g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Naranja 100g, Yogur proteico natural 120g, Semillas de calabaza (pipas) 20g"
+            "detalle": "Naranja 200g, Yogur proteico natural 250g, Cacahuete (maní) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz jazmín 55g, Carne picada de ternera 260g, Ajo 80g, Mango 100g, AOVE 5g"
+            "detalle": "Arroz blanco 160g, Pulpo 350g, Acelga 80g, Frambuesa 200g, AOVE 25g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Post-entreno",
@@ -1779,54 +1771,50 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2569,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Bulgur 55g, 2 Huevos, Aguacate 30g, Pasta de Dátil 20g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 110g, Pulpo 345g, AOVE 25g, Mandarina 100g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Higo seco 100g, Yogur proteico natural 130g, Pesto 20g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Boniato 345g, Hamburguesa de ternera 300g, Cebolla 80g, Fresas 100g, AOVE 5g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3666,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Chuletas de pavo 100g, AOVE 5g, Kiwi 180g"
+            "detalle": "Copos de avena 165g, 1 Clara, Aguacate 30g, Paraguayo 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de lenteja roja 160g, Berberechos frescos 100g, Lechuga romana 50g, Mandarina 180g, AOVE 20g, Pan blanco de barra 80g"
+            "detalle": "Arroz blanco 150g, Patata 310g, Pechuga de pollo 145g, Brócoli 80g, Zanahoria 80g, Leche de avena 170g, AOVE 20g, Fresas 150g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Uvas 180g, Yogur proteico natural 120g, Avellanas 15g"
+            "detalle": "Pera 200g, Yogur proteico natural 250g, Avellanas 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Fideos de arroz 170g, Carne picada de ternera 225g, Guisantes 80g, Dátil 35g, AOVE 5g"
+            "detalle": "Quinoa 160g, Hamburguesa de pavo 130g, Zanahoria 80g, Mango 200g, AOVE 5g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2246,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Plátano 200g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 50g, Conejo 335g, Lechuga romana 50g, Naranja 200g, AOVE 25g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Manzana 200g, Yogur proteico natural 250g, Anacardo (marañón) 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo sarraceno 50g, Sepia 350g, Coliflor 80g, Arándanos 200g, AOVE 25g"
           }
         ]
       }
@@ -1958,6 +1946,7 @@
           "Proteínas"
         ],
         "isComplete": false,
+        "isMainMeal": true,
         "unrecognized": []
       },
       "Comida": {
@@ -1980,6 +1969,7 @@
           "Proteínas"
         ],
         "isComplete": false,
+        "isMainMeal": true,
         "unrecognized": []
       },
       "Desayuno": {
@@ -1998,6 +1988,7 @@
           "Pavo de fiambre"
         ],
         "isComplete": false,
+        "isMainMeal": false,
         "unrecognized": [
           "Zumo de naranja"
         ]
@@ -2019,6 +2010,7 @@
           "Pavo de fiambre"
         ],
         "isComplete": false,
+        "isMainMeal": false,
         "unrecognized": []
       }
     },
@@ -2029,19 +2021,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, 2 Claras"
+            "detalle": "Pan blanco de barra 80g, 2 Huevos"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 55g, Dorada 215g, Zanahoria 80g, Cebolla 80g, Puerro 80g, Calabacín 80g, AOVE 15g, Plátano 100g"
+            "detalle": "Patata 340g, Dorada 215g, Calabacín 80g, Zanahoria 80g, Puerro 80g, Cebolla 80g, AOVE 15g, Melón 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Sandía 100g, Yogur natural 120g"
+            "detalle": "Paraguayo 200g, Yogur natural 250g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 55g, Hamburguesa de pollo 255g, Colacao 15g, AOVE 5g, Manzana 150g"
+            "detalle": "Arroz integral 65g, Carne picada de pollo 230g, Colacao 15g, AOVE 5g, Melocotón 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -2050,28 +2042,28 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3225,
+        "tipo": "entreno",
+        "calorias": 2259,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, 1 Huevo, Manzana 180g"
+            "detalle": "Pan blanco de barra 80g, 2 Huevos"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Berberechos frescos 230g, Pera 180g, AOVE 20g, Pan blanco de barra 45g"
+            "detalle": "Arroz blanco 100g, Conejo 215g, Ciruela 200g, AOVE 15g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Dátil 20g, Yogur natural 120g"
+            "detalle": "Manzana 200g, Yogur natural 250g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz basmati 160g, Carne picada de pavo 180g, Colacao 15g, AOVE 15g, Manzana 100g"
+            "detalle": "Bulgur 60g, Salmón 225g, Colacao 15g, AOVE 5g, Sandía 150g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -2081,19 +2073,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, 1 Huevo y 3 Claras"
+            "detalle": "Pan blanco de barra 60g, 6 Claras"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 70g, Salmón 275g, Paraguayo 100g, AOVE 5g"
+            "detalle": "Arroz blanco 60g, Muslo de pollo 320g, Frambuesa 200g, AOVE 5g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Plátano 100g, Yogur natural 120g"
+            "detalle": "Kiwi 200g, Yogur natural 250g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Cuscús 50g, Conejo 245g, Colacao 15g, AOVE 10g, Manzana 100g"
+            "detalle": "Arroz basmati 50g, Hamburguesa de pavo 315g, Colacao 15g, AOVE 5g, Mandarina 100g"
           }
         ]
       },
@@ -2103,19 +2095,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, 2 Claras"
+            "detalle": "Pan blanco de barra 80g, 2 Huevos"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 100g, Pechuga de pollo 195g, AOVE 20g, Naranja 100g"
+            "detalle": "Arroz blanco 75g, Salmón 230g, Aguacate 30g, Pepino 80g, Zanahoria 80g, AOVE 5g, Arándanos 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Nectarina 100g, Yogur natural 120g"
+            "detalle": "Pera 200g, Yogur natural 250g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Ñoquis de patata 150g, Berberechos frescos 290g, Colacao 15g, AOVE 20g, Manzana 150g"
+            "detalle": "Boniato 250g, Solomillo de cerdo 225g, Colacao 15g, AOVE 10g, Melón 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -2133,15 +2125,15 @@
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 95g, Muslo de pollo 245g, Kiwi 100g, AOVE 5g"
+            "detalle": "Macarrones 80g, Atún fresco 175g, Tomate 80g, Cebolla 80g, Zanahoria 80g, AOVE 15g, Fresas 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Zumo de naranja natural 100g, Yogur natural 120g"
+            "detalle": "Mango 200g, Yogur natural 250g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Fideos de arroz 55g, Solomillo de ternera 210g, Colacao 15g, AOVE 15g, Manzana 150g"
+            "detalle": "Trigo sarraceno 60g, Rodaballo 285g, Colacao 15g, AOVE 15g, Manzana 150g"
           },
           {
             "nombre": "Post-entreno",
@@ -2150,54 +2142,50 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2259,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, 2 Claras"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 95g, Pulpo 300g, AOVE 20g, Mandarina 100g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Plátano 100g, Yogur natural 120g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Arroz basmati 50g, Berberechos frescos 300g, Colacao 15g, AOVE 20g, Manzana 150g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3225,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, 1 Huevo, Pera 180g"
+            "detalle": "Pan blanco de barra 80g, 2 Claras, Frambuesa 180g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Lomo embuchado 70g, Ciruela 180g, AOVE 10g, Pan blanco de barra 65g"
+            "detalle": "Arroz blanco 160g, Pulpo 210g, Champiñón 80g, AOVE 15g, Nectarina 180g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Mango 100g, Yogur natural 120g"
+            "detalle": "Melocotón 200g, Yogur natural 250g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 165g, Entrecot de ternera 140g, Colacao 15g, AOVE 5g, Pera 100g"
+            "detalle": "Arroz blanco 110g, Patata 310g, Muslo de pollo 210g, Colacao 15g, AOVE 5g, Paraguayo 150g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 1981,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 60g, 2 Huevos y 2 Claras"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 65g, Conejo 265g, Kiwi 200g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Naranja 200g, Yogur natural 250g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Ñoquis de patata 150g, Rodaballo 340g, Colacao 15g, AOVE 10g, Plátano 150g"
           }
         ]
       }
@@ -2221,19 +2209,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, AOVE 5g, Ciruela 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Arándanos 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 145g, Pechuga de pollo 185g, Lechuga romana 50g, Tomate 80g, AOVE 20g, Plátano 100g"
+            "detalle": "Arroz blanco 85g, Patata 310g, Carne picada de ternera 195g, Tomate 80g, Pepino 80g, Pimiento 80g, Cebolla 80g, Ajo 5g, AOVE 10g, Nectarina 150g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Manzana 100g, Yogur proteico natural 140g, Pesto 20g"
+            "detalle": "Uvas 200g, Yogur proteico natural 250g, Piñones 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Trigo sarraceno hinchado 135g, Merluza 195g, Judías verdes 80g, Plátano 100g, AOVE 20g"
+            "detalle": "Pasta de lenteja roja 160g, Secreto de cerdo 100g, Pepino 80g, Kiwi 200g, AOVE 5g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Post-entreno",
@@ -2242,28 +2230,28 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3432,
+        "tipo": "entreno",
+        "calorias": 2912,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Trigo sarraceno hinchado 145g, 1 Huevo, Aguacate 30g, Melocotón 100g"
+            "detalle": "Copos de avena 105g, 1 Clara, Aguacate 65g, Piña pelada 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Boniato 310g, Hamburguesa de pollo 210g, Zanahoria 80g, Dátil 60g, AOVE 5g"
+            "detalle": "Arroz integral 165g, Pechuga de pavo 140g, Espárragos blancos conserva 80g, Fresas 200g, AOVE 20g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pasta de Dátil 20g, Yogur proteico natural 120g, Semillas de chía 150g"
+            "detalle": "Melocotón 200g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Trigo sarraceno hinchado 160g, Dorada 105g, Brócoli 80g, Kiwi 180g, AOVE 10g, Pan blanco de barra 50g"
+            "detalle": "Cuscús 135g, Ternera magra 135g, Zanahoria 80g, Sandía 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -2273,19 +2261,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Zumo de naranja natural 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Pera 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz basmati 135g, Jamón cocido 70g, Calabacín 80g, Sandía 100g, AOVE 25g"
+            "detalle": "Espaguetis 130g, Mejillones frescos 350g, Coliflor 80g, Plátano 200g, AOVE 25g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Arándanos 100g, Yogur proteico natural 155g, Pesto 20g"
+            "detalle": "Manzana 200g, Yogur proteico natural 250g, Nueces 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Boniato 330g, Pulpo 350g, Lechuga romana 50g, Mandarina 100g, AOVE 20g"
+            "detalle": "Ñoquis de patata 230g, Alitas de pollo 325g, Pimiento 80g, Naranja 200g, AOVE 5g"
           }
         ]
       },
@@ -2295,19 +2283,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Cuscús 80g, 1 Huevo, Aguacate 65g, Dátil 20g"
+            "detalle": "Copos de avena 110g, 1 Huevo, Aguacate 30g, Ciruela 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 165g, Pechuga de pollo 185g, AOVE 20g, Naranja 100g"
+            "detalle": "Arroz blanco 145g, Atún fresco 145g, Espárragos verdes 80g, AOVE 20g, Uvas 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Zumo de naranja natural 100g, Yogur proteico natural 135g, Pesto 20g"
+            "detalle": "Frambuesa 200g, Yogur proteico natural 250g, Sésamo 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz integral 135g, Berberechos frescos 270g, Rúcula 80g, Sandía 100g, AOVE 20g"
+            "detalle": "Trigo sarraceno 145g, Lubina 145g, Tomate frito 80g, Paraguayo 200g, AOVE 15g"
           },
           {
             "nombre": "Post-entreno",
@@ -2321,19 +2309,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Fresas 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Arándanos 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de lenteja roja 160g, Atún fresco 100g, Alcachofa 80g, Uvas 180g, AOVE 15g, Pan blanco de barra 45g"
+            "detalle": "Macarrones 170g, Sardina 105g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Calabacín 80g, Puerro 80g, AOVE 20g, Melocotón 180g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Arándanos 180g, Yogur proteico natural 120g, Pistachos 15g"
+            "detalle": "Sandía 200g, Yogur proteico natural 250g, Semillas de chía 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Yuca 265g, Chuletón de ternera 245g, Judías verdes 80g, Dátil 20g, AOVE 5g"
+            "detalle": "Maíz dulce 160g, Pechuga de pavo 170g, Alcachofa 80g, Mandarina 200g, AOVE 25g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Post-entreno",
@@ -2342,54 +2330,50 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2912,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Trigo sarraceno 90g, 1 Clara, Aguacate 90g, Pera 100g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Pechuga de pollo 185g, AOVE 20g, Mandarina 100g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Ciruela 190g, Yogur proteico natural 120g, Pan de semillas 80g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Trigo sarraceno hinchado 150g, Calamar 215g, Acelga 80g, Zumo de naranja natural 100g, AOVE 15g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3432,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 5g, Mango 180g"
+            "detalle": "Copos de avena 160g, 1 Huevo, Aguacate 30g, Manzana 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 95g, Ñoquis de patata 300g, Chuletas de pavo 130g, Lechuga romana 50g, Mandarina 150g, AOVE 20g"
+            "detalle": "Arroz blanco 140g, Patata 310g, Pechuga de pollo 100g, Champiñón 80g, Leche de avena 170g, AOVE 20g, Mango 150g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Kiwi 180g, Yogur proteico natural 120g, Avellanas 15g"
+            "detalle": "Melón 200g, Yogur proteico natural 250g, Almendras 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 160g, Sardina 135g, Ajo 80g, Manzana 100g, AOVE 10g"
+            "detalle": "Macarrones 160g, Berberechos frescos 100g, Espinaca 50g, Naranja 200g, AOVE 20g, Pan blanco de barra 75g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2660,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Nectarina 200g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz basmati 135g, Conejo 260g, Remolacha 80g, Mandarina 200g, AOVE 25g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Pera 200g, Yogur proteico natural 250g, Avellanas 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Ñoquis de patata 250g, Merluza 320g, Judías verdes 80g, Uvas 200g, AOVE 25g"
           }
         ]
       }
@@ -2600,6 +2584,7 @@
         "verdura": [],
         "proteina": [],
         "isComplete": true,
+        "isMainMeal": true,
         "unrecognized": []
       },
       "Comida": {
@@ -2613,6 +2598,7 @@
         "verdura": [],
         "proteina": [],
         "isComplete": true,
+        "isMainMeal": true,
         "unrecognized": []
       },
       "Desayuno": {
@@ -2635,6 +2621,7 @@
           "Huevos"
         ],
         "isComplete": false,
+        "isMainMeal": false,
         "unrecognized": []
       },
       "Merienda": {
@@ -2647,7 +2634,8 @@
         "isValid": true,
         "verdura": [],
         "proteina": [],
-        "isComplete": true
+        "isComplete": true,
+        "isMainMeal": false
       }
     },
     "days": {
@@ -2657,19 +2645,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Chuletas de pavo 100g, Naranja 180g"
+            "detalle": "Tostadas de pan blanco de barra, Pavo (Genérico), Jamón serrano, Queso de cabra, Huevo entero tortilla, Naranja"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 135g, Pechuga de pollo 260g, Lechuga romana 50g, Tomate 80g, AOVE 20g, Plátano 100g"
+            "detalle": "Patata 450g, Carne picada de ternera 260g, Zanahoria 80g, Cebolla 80g, Puerro 80g, AOVE 5g, Frambuesa 220g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Higo seco 100g, Yogur proteico natural 140g, Piñones 20g"
+            "detalle": "Mandarina 200g, Yogur proteico natural 250g, Semillas de chía 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 100g, Patata 150g, Ternera magra 250g, Zumo de naranja natural 100g, AOVE 10g"
+            "detalle": "Arroz integral 140g, Calamar 340g, Rúcula 80g, Fresas 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -2678,28 +2666,28 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3446,
+        "tipo": "entreno",
+        "calorias": 2963,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, 2 Huevos, Naranja 180g"
+            "detalle": "Tostadas de pan blanco de barra, Pavo (Genérico), Jamón serrano, Queso crema tipo untable, Claras de huevo, Naranja"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Patata 150g, Pechuga de pollo 180g, Melocotón 180g, AOVE 15g, Pan blanco de barra 45g"
+            "detalle": "Fideos de arroz 145g, Pechuga de pavo 230g, Pimiento 80g, Sandía 200g, AOVE 25g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pan blanco de barra 30g, Trigo sarraceno 60g, Jamón serrano 25g, Plátano 100g"
+            "detalle": "Arándanos 200g, Yogur proteico natural 250g, Semillas de chía 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 170g, Patata 150g, Ternera magra 165g, Sandía 100g, AOVE 10g"
+            "detalle": "Pasta de lenteja roja 160g, Muslo de pollo 100g, Coliflor 80g, Piña pelada 200g, AOVE 10g, Pan blanco de barra 45g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -2709,19 +2697,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, 2 Huevos y 3 Claras, Naranja 205g"
+            "detalle": "Tostadas de pan blanco de barra, Pavo (Genérico), Jamón serrano, Queso curado, Huevo entero tortilla, Naranja"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de lenteja roja 170g, Jamón serrano 70g, Pepino 80g, Uvas 100g, AOVE 15g"
+            "detalle": "Arroz jazmín 100g, Solomillo de cerdo 305g, Remolacha 80g, Ciruela 200g, AOVE 15g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pera 100g, Yogur proteico natural 120g, Semillas de lino (linaza) 90g"
+            "detalle": "Mango 200g, Yogur proteico natural 250g, Pistachos 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Ñoquis de patata 185g, Pulpo 350g, Zanahoria 80g, Melocotón 100g, AOVE 20g"
+            "detalle": "Boniato 285g, Gambas 290g, Pepino 80g, Pera 200g, AOVE 25g"
           }
         ]
       },
@@ -2731,19 +2719,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, 2 Huevos, Naranja 180g"
+            "detalle": "Tostadas de pan blanco de barra, Pavo (Genérico), Jamón serrano, Queso fresco alto proteína, Huevo entero tortilla, Naranja"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 160g, Pechuga de pollo 215g, AOVE 20g, Naranja 100g"
+            "detalle": "Patata 450g, Pechuga de pavo 205g, Guisantes 80g, Cebolla 80g, AOVE 25g, Nectarina 220g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Melón 180g, Yogur proteico natural 130g, Anacardo (marañón) 15g"
+            "detalle": "Melón 200g, Yogur proteico natural 250g, Sésamo 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Copos de avena 145g, Sepia 260g, Judías verdes 80g, Frambuesa 100g, AOVE 15g"
+            "detalle": "Fideos de arroz 135g, Pechuga de pollo 240g, Puerro 80g, Kiwi 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
@@ -2757,19 +2745,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, Naranja 180g"
+            "detalle": "Tostadas de pan blanco de barra, Pavo (Genérico), Jamón serrano, Queso curado, Huevo entero, Naranja"
           },
           {
             "nombre": "Comida",
-            "detalle": "Fideos de arroz 140g, Hamburguesa de ternera 325g, Cebolla 80g, Nectarina 100g, AOVE 5g"
+            "detalle": "Calabacín 80g, Cebolla 80g, Puerro 80g, Brócoli 80g, Zanahoria 80g, AOVE 5g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Ciruela 180g, Yogur proteico natural 120g, Cacahuete (maní) 15g"
+            "detalle": "Piña pelada 200g, Yogur proteico natural 250g, Pistachos 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Quinoa 145g, Gambas 190g, Rúcula 80g, Pera 100g, AOVE 15g"
+            "detalle": "Macarrones 160g, Patata 150g, Ternera magra 350g, Sandía 200g, AOVE 25g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Post-entreno",
@@ -2778,54 +2766,50 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2963,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, 2 Huevos, Naranja 180g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 150g, Pechuga de pollo 260g, AOVE 20g, Mandarina 100g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Arándanos 115g, Yogur proteico natural 120g, Pan de semillas 80g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Pasta de trigo 95g, Patata 150g, Ternera magra 250g, Kiwi 100g, AOVE 10g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3446,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, Naranja 180g"
+            "detalle": "Tostadas de pan blanco de barra, Pavo (Genérico), Jamón serrano, Queso crema tipo untable, Huevo entero, Naranja"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 170g, Patata 150g, Pechuga de pollo 195g, Manzana 215g, AOVE 15g"
+            "detalle": "Arroz blanco 165g, Patata 150g, Pechuga de pollo 190g, Mandarina 200g, AOVE 15g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pan blanco de barra 30g, Trigo sarraceno 60g, Jamón serrano 25g, Plátano 100g"
+            "detalle": "Pan blanco de barra 30g, Trigo sarraceno 75g, Jamón serrano 25g, Plátano 200g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 165g, Patata 150g, Ternera magra 165g, Naranja 100g, AOVE 10g"
+            "detalle": "Macarrones 145g, Patata 150g, Ternera magra 175g, Paraguayo 200g, AOVE 10g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2699,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Tostadas de pan blanco de barra, Pavo (Genérico), Jamón serrano, Queso fresco alto proteína, Claras de huevo, Naranja"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo sarraceno 130g, Solomillo de cerdo 260g, Espárragos blancos conserva 80g, Melocotón 200g, AOVE 15g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Ciruela 200g, Yogur proteico natural 250g, Semillas de chía 20g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz integral 80g, Hamburguesa de pavo 350g, Alcachofa 80g, Melón 200g, AOVE 5g"
           }
         ]
       }
@@ -2849,49 +2833,49 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan sin gluten 80g, Chuletas de pavo 100g, AOVE 5g, Manzana 180g"
+            "detalle": "Pan sin gluten 30g, AOVE 5g, Mandarina 200g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Carne picada de ternera 155g, Tomate 80g, Pepino 80g, Pimiento 80g, Cebolla 80g, Ajo 250g, AOVE 5g, Plátano 100g"
+            "detalle": "Plátano 200g, Yogur natural sin lactosa 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta sin gluten 110g, Dorada 195g, Calabacín 80g, Zanahoria 80g, Puerro 80g, AOVE 15g, Plátano 100g"
+            "detalle": "Patata 450g, Carne picada de ternera 195g, Zanahoria 80g, Cebolla 80g, Puerro 80g, AOVE 5g, Melón 220g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pera 180g, Yogur natural sin lactosa 120g, Crema de cacahuete natural (100% cacahuete) 15g"
+            "detalle": "Paraguayo 200g, Yogur proteico sin lactosa 250g, Anacardo (marañón) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz jazmín 50g, Alitas de pollo 120g, Pimiento 80g, Sandía 100g, AOVE 5g"
+            "detalle": "Pasta de trigo sarraceno 100g, Pechuga de pavo 125g, Zanahoria 80g, Arándanos 200g, AOVE 15g"
           }
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 2933,
+        "tipo": "entreno",
+        "calorias": 2493,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Fideos de arroz 115g, 2 Huevos, Aguacate 30g, Melón 100g"
+            "detalle": "Copos de avena sin gluten 70g, 1 Clara, Aguacate 50g, Melocotón 200g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Kiwi 100g, Yogur natural sin lactosa 120g, Piñones 20g"
+            "detalle": "Kiwi 200g, Yogur natural sin lactosa 250g, Cacahuete (maní) 15g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 115g, Patata 310g, Chuletas de pavo 135g, Alcachofa 80g, Piña pelada 150g, AOVE 15g"
+            "detalle": "Arroz jazmín 100g, Conejo 165g, Tomate frito 80g, Mandarina 200g, AOVE 10g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Dátil 20g, Yogur natural sin lactosa 120g, Nueces 15g"
+            "detalle": "Pera 200g, Yogur proteico sin lactosa 250g, Pistachos 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz integral 50g, Sepia 100g, Puerro 80g, Arándanos 100g, AOVE 5g"
+            "detalle": "Trigo sarraceno 75g, Rodaballo 165g, Calabacín 80g, Manzana 200g, AOVE 10g"
           }
         ]
       },
@@ -2901,23 +2885,23 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan sin gluten 80g, Chuletas de pavo 100g, AOVE 10g, Zumo de naranja natural 180g"
+            "detalle": "Pan sin gluten 30g, AOVE 5g, Naranja 200g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Nectarina 180g, Yogur proteico sin lactosa 250g, Cacahuete (maní) 30g"
+            "detalle": "Melón 200g, Yogur natural sin lactosa 250g, Anacardo (marañón) 15g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 110g, Chuletón de ternera 220g, Calabacín 80g, Melón 100g, AOVE 5g"
+            "detalle": "Boniato 375g, Solomillo de ternera 215g, Pepino 80g, Mango 200g, AOVE 20g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Higo seco 100g, Yogur natural sin lactosa 120g, Nueces 15g"
+            "detalle": "Kiwi 200g, Yogur proteico sin lactosa 250g, Nueces 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 150g, Solomillo de ternera 100g, Zanahoria 80g, Frambuesa 100g, AOVE 5g"
+            "detalle": "Pasta de lenteja roja 100g, Carne picada de pavo 100g, Espinaca 50g, Ciruela 200g, AOVE 15g"
           }
         ]
       },
@@ -2927,23 +2911,23 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Quinoa 80g, 1 Huevo, Aguacate 30g, Plátano 100g"
+            "detalle": "Copos de avena sin gluten 75g, 2 Claras, Aguacate 45g, Plátano 200g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Arroz blanco 145g, Pechuga de pollo 175g, AOVE 15g, Naranja 100g"
+            "detalle": "Paraguayo 200g, Yogur natural sin lactosa 250g, Semillas de chía 20g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 125g, Atún fresco 170g, Aguacate 30g, Pepino 80g, Zanahoria 80g, AOVE 10g, Naranja 100g"
+            "detalle": "Arroz blanco 100g, Pechuga de pollo 185g, Espárragos verdes 80g, AOVE 15g, Arándanos 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Uvas 100g, Yogur proteico sin lactosa 120g, Semillas de chía 75g"
+            "detalle": "Piña pelada 200g, Yogur natural sin lactosa 250g, Pipas de girasol 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Trigo sarraceno hinchado 50g, Sepia 100g, Lechuga romana 50g, Melón 100g, AOVE 5g"
+            "detalle": "Fideos de arroz 70g, Atún fresco 160g, Judías verdes 80g, Manzana 200g, AOVE 5g"
           }
         ]
       },
@@ -2953,75 +2937,75 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan sin gluten 80g, Carne picada de pavo 100g, AOVE 5g, Paraguayo 180g"
+            "detalle": "Pan sin gluten 30g, AOVE 5g, Frambuesa 200g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Melocotón 100g, Yogur natural sin lactosa 120g, Piñones 20g"
+            "detalle": "Melocotón 200g, Yogur proteico sin lactosa 250g, Anacardo (marañón) 15g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Yuca 285g, Sepia 270g, Champiñón 80g, Ciruela 100g, AOVE 20g"
+            "detalle": "Pasta sin gluten 135g, Atún fresco 115g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Brócoli 80g, Calabacín 80g, AOVE 25g, Mandarina 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Melón 100g, Yogur natural sin lactosa 120g, Semillas de lino (linaza) 140g"
+            "detalle": "Ciruela 200g, Yogur proteico sin lactosa 250g, Almendras 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Trigo sarraceno hinchado 50g, Lenguado 100g, Cebolla 80g, Paraguayo 100g, AOVE 5g"
+            "detalle": "Arroz integral 115g, Pechuga de pavo 105g, Coliflor 80g, Paraguayo 200g, AOVE 15g"
           }
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2493,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Quinoa 95g, 1 Huevo, Aguacate 30g, Frambuesa 100g"
-          },
-          {
-            "nombre": "Almuerzo",
-            "detalle": "3 Claras, Pechuga de pollo 100g, Tomate 80g, Ajo 250g, AOVE 20g, Mandarina 180g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 140g, Pulpo 270g, AOVE 20g, Mandarina 100g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Uvas 180g, Yogur natural sin lactosa 120g, Anacardo (marañón) 15g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Arroz basmati 50g, Pechuga de pavo 100g, Pepino 80g, Plátano 100g, AOVE 5g"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 2933,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan sin gluten 80g, Chuletas de pavo 100g, AOVE 5g, Mango 180g"
+            "detalle": "Copos de avena sin gluten 120g, 1 Huevo, Aguacate 30g, Nectarina 200g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Kiwi 100g, Yogur proteico sin lactosa 250g, Piñones 20g"
+            "detalle": "Uvas 200g, Yogur natural sin lactosa 250g, Semillas de chía 20g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 120g, Patata 310g, Hamburguesa de cerdo 175g, Coliflor 80g, Naranja 150g, AOVE 5g"
+            "detalle": "Arroz blanco 100g, Patata 310g, Pechuga de pollo 100g, Champiñón 80g, Leche entera sin lactosa 250g, AOVE 15g, Manzana 150g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Melocotón 100g, Yogur proteico sin lactosa 120g, Piñones 20g"
+            "detalle": "Naranja 200g, Yogur proteico sin lactosa 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta sin gluten 50g, Pulpo 100g, Remolacha 80g, Sandía 100g, AOVE 5g"
+            "detalle": "Trigo sarraceno 125g, Rape 100g, Remolacha 80g, Arándanos 200g, AOVE 5g"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2272,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan sin gluten 30g, AOVE 5g, Paraguayo 200g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Sandía 200g, Yogur natural sin lactosa 250g, Semillas de lino (linaza) 20g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz integral 100g, Conejo 210g, Alcachofa 80g, Kiwi 200g, AOVE 20g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Mandarina 200g, Yogur proteico sin lactosa 250g, Crema de cacahuete natural (100% cacahuete) 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de lenteja roja 95g, Emperador (pez espada) 100g, Berenjena 80g, Naranja 200g, AOVE 15g"
           }
         ]
       }
@@ -3045,19 +3029,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Plátano 145g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Uvas 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 140g, Carne picada de ternera 150g, AOVE 5g, Plátano 100g"
+            "detalle": "Patata 450g, Pechuga de pollo 130g, Lechuga romana 50g, Tomate 80g, Zanahoria 80g, Cebolla 80g, Puerro 80g, Queso parmesano 20g, AOVE 25g, Mango 220g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Piña pelada 135g, Yogur proteico natural 120g, Pan de semillas 80g"
+            "detalle": "Piña pelada 200g, Yogur proteico natural 250g, Sésamo 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 110g, Calamar 210g, Tomate frito 80g, Mango 100g, AOVE 15g"
+            "detalle": "Macarrones 160g, Rodaballo 140g, Puerro 80g, Frambuesa 200g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
@@ -3066,28 +3050,28 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3150,
+        "tipo": "entreno",
+        "calorias": 2665,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Trigo sarraceno 115g, 1 Huevo, Aguacate 30g, Uvas 100g"
+            "detalle": "Copos de avena 85g, 1 Huevo, Aguacate 30g, Ciruela 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Hamburguesa de pavo 140g, Judías verdes 80g, Nectarina 180g, AOVE 10g, Pan blanco de barra 55g"
+            "detalle": "Arroz blanco 125g, Mejillones frescos 265g, Judías verdes 80g, Melón 200g, AOVE 20g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Melocotón 180g, Yogur proteico natural 120g, Pan de semillas 80g"
+            "detalle": "Manzana 200g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Trigo sarraceno 140g, Jamón ibérico de bellota 60g, Ajo 80g, Plátano 100g, AOVE 10g"
+            "detalle": "Bulgur 115g, Solomillo de cerdo 125g, Coliflor 80g, Pera 200g, AOVE 15g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -3097,19 +3081,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Chuletas de pavo 100g, AOVE 10g, Melón 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Uvas 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz integral 115g, Pechuga de pavo 195g, Pimiento 80g, Paraguayo 100g, AOVE 20g"
+            "detalle": "Macarrones 130g, Hamburguesa de pavo 230g, Espárragos verdes 80g, Melocotón 200g, AOVE 20g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Mango 100g, Yogur proteico natural 120g, Semillas de chía 65g"
+            "detalle": "Frambuesa 200g, Yogur proteico natural 250g, Anacardo (marañón) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Trigo sarraceno hinchado 85g, Rape 240g, Coliflor 80g, Piña pelada 100g, AOVE 15g"
+            "detalle": "Ñoquis de patata 220g, Hamburguesa de pollo 305g, Calabacín 80g, Mango 200g, AOVE 5g"
           }
         ]
       },
@@ -3119,19 +3103,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Quinoa 95g, 1 Clara, Aguacate 50g, Zumo de naranja natural 100g"
+            "detalle": "Copos de avena 90g, 1 Clara, Aguacate 55g, Mandarina 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 150g, Pechuga de pollo 165g, AOVE 20g, Naranja 100g"
+            "detalle": "Arroz blanco 95g, Pechuga de pavo 115g, Guisantes 80g, Cebolla 80g, Espárragos verdes 80g, AOVE 25g, Manzana 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Naranja 180g, Yogur proteico natural 120g, Crema de cacahuete natural (100% cacahuete) 15g"
+            "detalle": "Plátano 200g, Yogur proteico natural 250g, Almendras 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz basmati 115g, Morro de cerdo cocido 245g, Rúcula 80g, Mango 100g, AOVE 5g"
+            "detalle": "Quinoa 135g, Solomillo de cerdo 105g, Zanahoria 80g, Fresas 200g, AOVE 10g"
           },
           {
             "nombre": "Post-entreno",
@@ -3145,19 +3129,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 10g, Manzana 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Nectarina 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 135g, Alitas de pollo 205g, Tomate frito 80g, Dátil 20g, AOVE 5g"
+            "detalle": "Macarrones 165g, Atún fresco 105g, Tomate 80g, Cebolla 80g, Zanahoria 80g, AOVE 25g, Naranja 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Paraguayo 165g, Yogur proteico natural 120g, Pan de semillas 80g"
+            "detalle": "Sandía 200g, Yogur proteico natural 250g, Nueces 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Boniato 450g, Mejillones frescos 325g, Acelga 80g, Melón 150g, AOVE 15g"
+            "detalle": "Fideos de arroz 150g, Rodaballo 205g, Guisantes 80g, Pera 200g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
@@ -3166,54 +3150,50 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2665,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Quinoa 85g, 1 Clara, Aguacate 55g, Mango 100g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 145g, Pechuga de pollo 170g, AOVE 20g, Mandarina 100g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Nectarina 180g, Yogur proteico natural 120g, Crema de cacahuete natural (100% cacahuete) 15g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Pasta de trigo 55g, Salmón fresco 185g, Judías verdes 80g, Higo seco 100g, AOVE 5g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3150,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 100g, AOVE 5g, Ciruela 180g"
+            "detalle": "Copos de avena 145g, 1 Huevo, Aguacate 30g, Melocotón 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 170g, Bacalao fresco 155g, Guisantes 80g, Pera 205g, AOVE 20g"
+            "detalle": "Arroz blanco 105g, Patata 310g, Pulpo 120g, Brócoli 80g, Zanahoria 80g, Leche de avena 170g, AOVE 20g, Mandarina 150g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Piña pelada 100g, Yogur proteico natural 120g, Semillas de lino (linaza) 200g"
+            "detalle": "Frambuesa 200g, Yogur proteico natural 250g, Cacahuete (maní) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Cuscús 170g, Jamón cocido 70g, Pepino 80g, Nectarina 135g, AOVE 15g"
+            "detalle": "Arroz integral 160g, Hamburguesa de pollo 110g, Rúcula 80g, Ciruela 200g, AOVE 10g, Pan blanco de barra 40g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2437,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Melón 200g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Fideos de arroz 115g, Salmón 250g, Champiñón 80g, Manzana 200g, AOVE 5g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Plátano 200g, Yogur proteico natural 250g, Nueces 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de trigo sarraceno 95g, Secreto de cerdo 280g, Lechuga romana 50g, Piña pelada 200g, AOVE 5g"
           }
         ]
       }
@@ -3237,19 +3217,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, AOVE 5g, Mango 165g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Mango 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Dorada 260g, Tomate 80g, Pepino 80g, Pimiento 80g, Cebolla 80g, Ajo 170g, Calabacín 80g, Zanahoria 80g, Puerro 80g, AOVE 15g, Plátano 100g"
+            "detalle": "Patata 450g, Dorada 305g, Calabacín 80g, Zanahoria 80g, Puerro 80g, Cebolla 80g, AOVE 25g, Melocotón 220g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Manzana 100g, Yogur proteico natural 120g, Semillas de lino (linaza) 100g"
+            "detalle": "Piña pelada 200g, Yogur proteico natural 250g, Semillas de calabaza (pipas) 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 110g, Entrecot de ternera 265g, Tomate 80g, Nectarina 100g, AOVE 5g"
+            "detalle": "Bulgur 130g, Conejo 275g, Puerro 80g, Manzana 200g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
@@ -3258,28 +3238,28 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3676,
+        "tipo": "entreno",
+        "calorias": 2822,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Bulgur 135g, 1 Huevo, Aguacate 40g, Piña pelada 100g"
+            "detalle": "Copos de avena 75g, 2 Claras, Aguacate 90g, Sandía 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 105g, Ñoquis de patata 300g, Atún fresco 155g, Guisantes 80g, Ciruela 150g, AOVE 15g"
+            "detalle": "Pasta de lenteja roja 140g, Salmón 125g, Pimiento 80g, Paraguayo 200g, AOVE 10g, Pan blanco de barra 40g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Kiwi 100g, Yogur proteico natural 130g, Piñones 20g"
+            "detalle": "Melón 200g, Yogur proteico natural 250g, Avellanas 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz integral 170g, Rodaballo 270g, Calabacín 80g, Plátano 185g, AOVE 10g"
+            "detalle": "Arroz integral 100g, Pechuga de pavo 230g, Coliflor 80g, Mango 200g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -3289,19 +3269,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 70g, Carne picada de pavo 115g, AOVE 10g, Dátil 20g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Mandarina 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Copos de avena 95g, Hamburguesa de pollo 350g, Berenjena 80g, Pasta de Dátil 20g, AOVE 5g"
+            "detalle": "Cuscús 70g, Conejo 350g, Remolacha 80g, Kiwi 200g, AOVE 25g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Naranja 100g, Yogur proteico natural 195g, Leche de almendra sin azúcar 150g"
+            "detalle": "Ciruela 200g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 50g, Bacalao desalado 350g, Ajo 80g, Fresas 100g, AOVE 25g"
+            "detalle": "Ñoquis de patata 150g, Berberechos frescos 350g, Judías verdes 80g, Arándanos 200g, AOVE 25g"
           }
         ]
       },
@@ -3311,19 +3291,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Fideos de arroz 50g, 2 Huevos, Aguacate 30g, Higo seco 100g"
+            "detalle": "Copos de avena 80g, 1 Huevo, Aguacate 30g, Piña pelada 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 90g, Pechuga de pavo 230g, Aguacate 30g, Pepino 80g, Zanahoria 80g, Guisantes 80g, Cebolla 80g, AOVE 20g, Naranja 100g"
+            "detalle": "Arroz blanco 90g, Salmón 290g, Aguacate 30g, Pepino 80g, Zanahoria 80g, AOVE 5g, Naranja 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Mandarina 100g, Yogur proteico natural 120g, Semillas de lino (linaza) 100g"
+            "detalle": "Paraguayo 200g, Yogur proteico natural 250g, Semillas de calabaza (pipas) 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Quinoa 110g, Calamar 345g, Cebolla 80g, Arándanos 100g, AOVE 15g"
+            "detalle": "Espaguetis 105g, Contramuslo de pollo deshuesado 260g, Pepino 80g, Pera 200g, AOVE 5g"
           },
           {
             "nombre": "Post-entreno",
@@ -3337,19 +3317,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, AOVE 5g, Sandía 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Kiwi 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Yuca 255g, Dorada 320g, Calabacín 80g, Frambuesa 100g, AOVE 15g"
+            "detalle": "Macarrones 105g, Sardina 225g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Pepino 80g, Pimiento 80g, Ajo 5g, AOVE 10g, Fresas 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Mango 180g, Yogur proteico natural 120g, Cacahuete (maní) 15g"
+            "detalle": "Ciruela 200g, Yogur proteico natural 250g, Cacahuete (maní) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Fideos de arroz 100g, Gambas 255g, Brócoli 80g, Melocotón 100g, AOVE 25g"
+            "detalle": "Boniato 450g, Hamburguesa de ternera magra 335g, Espinaca 50g, Plátano 200g, AOVE 5g"
           },
           {
             "nombre": "Post-entreno",
@@ -3358,54 +3338,50 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2822,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Quinoa 85g, 2 Claras, Aguacate 80g, Sandía 100g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 125g, Pechuga de pollo 270g, AOVE 20g, Mandarina 100g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Fresas 100g, Yogur proteico natural 185g, Pesto 20g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Arroz integral 105g, Carne picada de pollo 300g, Tomate 80g, Frambuesa 100g, AOVE 5g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3676,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 5g, Ciruela 180g"
+            "detalle": "Copos de avena 170g, 1 Huevo, Aguacate 30g, Melón 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Patata 310g, Bacalao 220g, Hamburguesa de espinacas 50g, Arándanos 150g, AOVE 20g"
+            "detalle": "Arroz blanco 165g, Patata 310g, Pulpo 215g, Champiñón 80g, Leche de avena 170g, AOVE 20g, Paraguayo 150g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Mandarina 180g, Yogur proteico natural 120g, Avellanas 15g"
+            "detalle": "Manzana 200g, Yogur proteico natural 250g, Anacardo (marañón) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Trigo sarraceno 160g, Conejo 130g, Zanahoria 80g, Melón 180g, AOVE 10g, Pan blanco de barra 80g"
+            "detalle": "Trigo sarraceno 160g, Carne picada de pollo 120g, Lechuga romana 50g, Uvas 200g, AOVE 10g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2571,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Melocotón 200g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz integral 95g, Conejo 350g, Hamburguesa de espinacas 50g, Frambuesa 200g, AOVE 25g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Fresas 200g, Yogur proteico natural 250g, Cacahuete (maní) 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Espaguetis 70g, Solomillo de ternera 350g, Berenjena 80g, Nectarina 200g, AOVE 20g"
           }
         ]
       }
@@ -3429,19 +3405,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 5g, Frambuesa 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Manzana 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 120g, Carne picada de ternera 205g, Zanahoria 80g, Cebolla 80g, Puerro 80g, AOVE 5g, Plátano 100g"
+            "detalle": "Macarrones 170g, Carne picada de ternera 140g, Tomate 80g, Pepino 80g, Pimiento 80g, Cebolla 80g, Ajo 5g, AOVE 15g, Sandía 150g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Manzana 180g, Yogur proteico natural 120g, Crema de cacahuete natural (100% cacahuete) 15g"
+            "detalle": "Naranja 200g, Yogur proteico natural 250g, Nueces 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Cuscús 130g, Merluza 195g, Cebolla 80g, Fresas 100g, AOVE 20g"
+            "detalle": "Arroz blanco 85g, Boniato 310g, Conejo 185g, Remolacha 80g, Mango 200g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
@@ -3450,28 +3426,28 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3358,
+        "tipo": "entreno",
+        "calorias": 2850,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Quinoa 150g, 1 Clara, Aguacate 30g, Paraguayo 100g"
+            "detalle": "Copos de avena 90g, 1 Huevo, Aguacate 30g, Ciruela 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz jazmín 160g, Pulpo 190g, Brócoli 80g, Uvas 180g, AOVE 20g, Pan blanco de barra 50g"
+            "detalle": "Maíz dulce 160g, Carne picada de pavo 155g, Pepino 80g, Piña pelada 200g, AOVE 20g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pera 100g, Yogur proteico natural 120g, Piñones 20g"
+            "detalle": "Uvas 200g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Boniato 450g, Salmón ahumado 165g, Acelga 80g, Higo seco 105g, AOVE 5g"
+            "detalle": "Arroz basmati 115g, Dorada 180g, Brócoli 80g, Manzana 200g, AOVE 20g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -3481,19 +3457,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 10g, Zumo de naranja natural 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Plátano 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Fideos de arroz 115g, Ternera magra 230g, Guisantes 80g, Paraguayo 100g, AOVE 15g"
+            "detalle": "Pasta de lenteja roja 160g, Atún fresco 100g, Champiñón 80g, Nectarina 200g, AOVE 25g, Pan blanco de barra 45g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Nectarina 100g, Yogur proteico natural 120g, Semillas de lino (linaza) 120g"
+            "detalle": "Arándanos 200g, Yogur proteico natural 250g, Semillas de calabaza (pipas) 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Boniato 340g, Gambas 225g, Berenjena 80g, Fresas 100g, AOVE 20g"
+            "detalle": "Boniato 305g, Hamburguesa de ternera magra 285g, Guisantes 80g, Mandarina 200g, AOVE 10g"
           }
         ]
       },
@@ -3503,19 +3479,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Trigo sarraceno 75g, 1 Huevo, Aguacate 40g, Plátano 100g"
+            "detalle": "Copos de avena 110g, 1 Huevo, Aguacate 30g, Melón 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 165g, Atún fresco 130g, AOVE 20g, Naranja 100g"
+            "detalle": "Arroz blanco 155g, Atún fresco 135g, Espárragos verdes 80g, AOVE 20g, Naranja 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Mandarina 100g, Yogur proteico natural 120g, Piñones 20g"
+            "detalle": "Frambuesa 200g, Yogur proteico natural 250g, Pipas de girasol 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Fideos de arroz 125g, Calamar 270g, Calabacín 80g, Paraguayo 100g, AOVE 20g"
+            "detalle": "Ñoquis de patata 300g, Conejo 160g, Calabacín 80g, Sandía 200g, AOVE 15g"
           },
           {
             "nombre": "Post-entreno",
@@ -3529,19 +3505,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Hamburguesa de pavo 100g, AOVE 5g, Melocotón 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Ciruela 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Rodaballo 245g, Acelga 80g, Zumo de naranja natural 100g, AOVE 15g"
+            "detalle": "Macarrones 165g, Atún fresco 110g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Brócoli 80g, Calabacín 80g, AOVE 25g, Mandarina 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Melón 100g, Yogur proteico natural 120g, Nueces 15g"
+            "detalle": "Manzana 200g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Trigo sarraceno hinchado 145g, Jamón ibérico de bellota 70g, Hamburguesa de espinacas 50g, Ciruela 100g, AOVE 5g"
+            "detalle": "Fideos de arroz 165g, Solomillo de cerdo 195g, Zanahoria 80g, Piña pelada 200g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
@@ -3550,54 +3526,50 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2850,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Bulgur 80g, 1 Clara, Aguacate 100g, Pera 100g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Pechuga de pollo 180g, AOVE 20g, Mandarina 100g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Dátil 20g, Yogur proteico natural 120g, Semillas de calabaza (pipas) 20g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Pasta de trigo 140g, Atún fresco 135g, Champiñón 80g, Paraguayo 100g, AOVE 20g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3358,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Carne picada de pavo 100g, AOVE 5g, Mandarina 180g"
+            "detalle": "Copos de avena 155g, 1 Huevo, Aguacate 30g, Fresas 200g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Berberechos frescos 185g, Judías verdes 80g, Pera 180g, AOVE 20g, Pan blanco de barra 60g"
+            "detalle": "Arroz blanco 120g, Patata 310g, Pechuga de pollo 100g, Champiñón 80g, Leche de avena 170g, AOVE 20g, Plátano 150g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Fresas 100g, Yogur proteico natural 120g, Nueces 15g"
+            "detalle": "Melocotón 200g, Yogur proteico natural 250g, Semillas de calabaza (pipas) 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 160g, Alitas de pollo 120g, Pepino 80g, Sandía 180g, AOVE 5g, Pan blanco de barra 50g"
+            "detalle": "Bulgur 160g, Conejo 100g, Espárragos verdes 80g, Uvas 200g, AOVE 15g, Pan blanco de barra 70g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2606,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Frambuesa 200g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz basmati 150g, Rodaballo 340g, Pimiento 80g, Sandía 200g, AOVE 25g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Arándanos 200g, Yogur proteico natural 250g, Avellanas 15g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Macarrones 110g, Solomillo de cerdo 235g, Cebolla 80g, Nectarina 200g, AOVE 20g"
           }
         ]
       }
@@ -3621,41 +3593,41 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 170g, AOVE 15g, Melón 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Mango 200g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pechuga de pollo 100g, Carne picada de ternera 100g, Lechuga romana 50g, Tomate 80g, Queso parmesano 20g, AOVE 5g"
+            "detalle": "Paraguayo 200g, Yogur proteico natural 250g, Avellanas 15g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 55g, Dorada 195g, Calabacín 80g, Zanahoria 80g, Puerro 80g, AOVE 10g, Manzana 150g"
+            "detalle": "Patata 450g, Carne picada de ternera 350g, Zanahoria 80g, Cebolla 80g, Puerro 80g, AOVE 5g, Pera 165g"
           },
           {
-            "nombre": "Merienda",
-            "detalle": "Paraguayo 100g, Yogur proteico natural 250g, Piñones 20g"
+            "nombre": "Cena",
+            "detalle": "Trigo sarraceno 125g, Hamburguesa de pavo 330g, Espárragos blancos conserva 80g, Uvas 200g, AOVE 5g"
           }
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3595,
+        "tipo": "entreno",
+        "calorias": 2752,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Quinoa 170g, 1 Huevo y 3 Claras, Aguacate 30g, Kiwi 180g"
+            "detalle": "Copos de avena 70g, 1 Huevo y 3 Claras, Aguacate 30g, Naranja 200g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Arándanos 180g, Yogur proteico natural 250g, Almendras 30g"
+            "detalle": "Melón 200g, Yogur proteico natural 250g, Semillas de chía 20g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Lenguado 170g, Hamburguesa de espinacas 50g, Piña pelada 100g, AOVE 10g"
+            "detalle": "Arroz jazmín 105g, Carne picada de pollo 300g, Guisantes 80g, Ciruela 200g, AOVE 15g"
           },
           {
-            "nombre": "Merienda",
-            "detalle": "Manzana 180g, Yogur proteico natural 250g, Avellanas 20g"
+            "nombre": "Cena",
+            "detalle": "Macarrones 90g, Conejo 230g, Rúcula 80g, Frambuesa 200g, AOVE 15g"
           }
         ]
       },
@@ -3665,19 +3637,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Chuletas de pavo 190g, AOVE 15g, Kiwi 115g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Sandía 200g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Mandarina 180g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 30g"
+            "detalle": "Paraguayo 200g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 50g, Berberechos frescos 290g, Calabacín 80g, Arándanos 100g, AOVE 20g"
+            "detalle": "Quinoa 110g, Ternera magra 350g, Judías verdes 80g, Melocotón 200g, AOVE 25g"
           },
           {
-            "nombre": "Merienda",
-            "detalle": "Naranja 100g, Yogur proteico natural 250g, Semillas de lino (linaza) 130g"
+            "nombre": "Cena",
+            "detalle": "Patata 305g, Salmón 350g, Pepino 80g, Manzana 200g, AOVE 5g"
           }
         ]
       },
@@ -3687,19 +3659,19 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Trigo sarraceno hinchado 95g, 2 Huevos y 7 Claras, Aguacate 30g, Ciruela 100g"
+            "detalle": "Copos de avena 75g, 1 Huevo y 3 Claras, Aguacate 30g, Fresas 200g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "4 Claras, Pechuga de pollo 100g, Tomate 80g, Ajo 225g, AOVE 15g"
+            "detalle": "Arándanos 200g, Yogur proteico natural 250g, Pipas de girasol 20g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 75g, Atún fresco 185g, AOVE 10g, Manzana 150g"
+            "detalle": "Patata 415g, Pechuga de pavo 245g, Guisantes 80g, Cebolla 80g, AOVE 25g, Frambuesa 100g"
           },
           {
-            "nombre": "Merienda",
-            "detalle": "Sandía 180g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 30g"
+            "nombre": "Cena",
+            "detalle": "Arroz basmati 90g, Pulpo 350g, Pimiento 80g, Ciruela 200g, AOVE 20g"
           }
         ]
       },
@@ -3709,63 +3681,63 @@
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Carne picada de pavo 185g, AOVE 10g, Paraguayo 180g"
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Piña pelada 200g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Pera 100g, Yogur proteico natural 250g, Semillas de calabaza (pipas) 20g"
+            "detalle": "Plátano 200g, Yogur proteico natural 250g, Cacahuete (maní) 15g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 80g, Berberechos frescos 260g, Judías verdes 80g, Melón 100g, AOVE 15g"
+            "detalle": "Macarrones 115g, Atún fresco 295g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Calabacín 80g, Puerro 80g, AOVE 25g, Sandía 100g"
           },
           {
-            "nombre": "Merienda",
-            "detalle": "Fresas 180g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 30g"
+            "nombre": "Cena",
+            "detalle": "Arroz jazmín 110g, Conejo 305g, Brócoli 80g, Paraguayo 200g, AOVE 20g"
           }
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2752,
-        "ingestas": [
-          {
-            "nombre": "Desayuno",
-            "detalle": "Trigo sarraceno 90g, 7 Claras, Aguacate 120g, Zumo de naranja natural 100g"
-          },
-          {
-            "nombre": "Almuerzo",
-            "detalle": "1 Huevo y 2 Claras, Pechuga de pollo 100g, Tomate 80g, Ajo 225g, AOVE 5g"
-          },
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 70g, Pulpo 290g, AOVE 15g, Manzana 150g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Nectarina 180g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 30g"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3595,
         "ingestas": [
           {
             "nombre": "Desayuno",
-            "detalle": "Pan blanco de barra 80g, Pechuga de pavo 140g, AOVE 10g, Dátil 60g"
+            "detalle": "Copos de avena 160g, 1 Huevo, Aguacate 30g, Naranja 200g"
           },
           {
             "nombre": "Almuerzo",
-            "detalle": "Melón 100g, Yogur proteico natural 250g, Semillas de calabaza (pipas) 20g"
+            "detalle": "Uvas 200g, Yogur proteico natural 250g, Semillas de chía 20g"
           },
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 165g, Salmón ahumado 125g, Espárragos verdes 80g, Mango 100g, AOVE 5g"
+            "detalle": "Arroz blanco 160g, Pulpo 260g, Brócoli 80g, Zanahoria 80g, AOVE 20g, Melocotón 180g, Pan blanco de barra 80g"
           },
           {
-            "nombre": "Merienda",
-            "detalle": "Sandía 180g, Yogur proteico natural 120g, Semillas de lino (linaza) 250g"
+            "nombre": "Cena",
+            "detalle": "Fideos de arroz 160g, Carne picada de ternera 185g, Tomate 80g, Mandarina 200g, AOVE 5g, Pan blanco de barra 60g"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2513,
+        "ingestas": [
+          {
+            "nombre": "Desayuno",
+            "detalle": "Pan blanco de barra 30g, AOVE 5g, Mango 200g"
+          },
+          {
+            "nombre": "Almuerzo",
+            "detalle": "Piña pelada 200g, Yogur proteico natural 250g, Piñones 20g"
+          },
+          {
+            "nombre": "Comida",
+            "detalle": "Pasta de trigo sarraceno 90g, Chuletas de pavo 350g, Lechuga romana 50g, Ciruela 200g, AOVE 25g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Patata 225g, Lenguado 350g, Tomate frito 80g, Nectarina 200g, AOVE 25g"
           }
         ]
       }
@@ -4017,6 +3989,7 @@
           "Proteínas"
         ],
         "isComplete": true,
+        "isMainMeal": true,
         "unrecognized": []
       },
       "Comida": {
@@ -4038,6 +4011,7 @@
           "Proteínas"
         ],
         "isComplete": true,
+        "isMainMeal": true,
         "unrecognized": []
       },
       "Merienda": {
@@ -4050,7 +4024,8 @@
         "isValid": true,
         "verdura": [],
         "proteina": [],
-        "isComplete": true
+        "isComplete": true,
+        "isMainMeal": false
       }
     },
     "days": {
@@ -4060,15 +4035,15 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 60g, Carne picada de ternera 275g, Zanahoria 80g, Cebolla 80g, Puerro 80g, AOVE 5g, Plátano 100g"
+            "detalle": "Macarrones 90g, Pechuga de pollo 160g, Lechuga romana 50g, Tomate 80g, Zanahoria 80g, Cebolla 80g, Puerro 80g, Queso parmesano 20g, AOVE 25g, Pera 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Dátil 20g, Yogur proteico natural 130g, Piñones 20g"
+            "detalle": "Paraguayo 200g, Yogur proteico natural 250g, Crema de cacahuete natural (100% cacahuete) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, Boniato 150g, Salmón 255g, Guisantes 80g, Kiwi 100g, AOVE 5g"
+            "detalle": "Arroz blanco 115g, Secreto de cerdo 245g, Calabacín 80g, Arándanos 200g, AOVE 5g"
           },
           {
             "nombre": "Post-entreno",
@@ -4077,24 +4052,24 @@
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3347,
+        "tipo": "entreno",
+        "calorias": 2350,
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 155g, Boniato 150g, Pechuga de pollo 150g, Lechuga romana 50g, Melocotón 180g, AOVE 20g, Pan blanco de barra 40g"
+            "detalle": "Trigo sarraceno 120g, Conejo 160g, Guisantes 80g, Melocotón 200g, AOVE 25g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Pera 100g, Yogur natural 120g"
+            "detalle": "Naranja 200g, Yogur proteico natural 250g, Piñones 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 145g, Boniato 150g, Salmón 240g, Tomate 80g, Naranja 100g, AOVE 5g"
+            "detalle": "Boniato 385g, Merluza 260g, Alcachofa 80g, Mandarina 200g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
-            "detalle": "Recovery y fruta"
+            "detalle": "Batido de proteína 30g disuelto en agua"
           }
         ]
       },
@@ -4104,15 +4079,15 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Patata 240g, Solomillo de cerdo 225g, Hamburguesa de espinacas 50g, Manzana 100g, AOVE 10g"
+            "detalle": "Arroz jazmín 65g, Alitas de pollo 340g, Champiñón 80g, Mango 200g, AOVE 5g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Plátano 100g, Yogur proteico natural 250g, Semillas de calabaza (pipas) 20g"
+            "detalle": "Paraguayo 200g, Yogur proteico natural 250g, Cacahuete (maní) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Pasta de trigo 50g, Lubina 260g, Acelga 80g, AOVE 15g, Manzana 150g"
+            "detalle": "Pasta de trigo sarraceno 70g, Berberechos frescos 350g, Lechuga romana 50g, Fresas 200g, AOVE 25g"
           }
         ]
       },
@@ -4122,15 +4097,15 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 105g, Pechuga de pollo 210g, AOVE 25g, Naranja 100g"
+            "detalle": "Patata 450g, Atún fresco 185g, Espárragos verdes 80g, AOVE 25g, Naranja 120g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Frambuesa 100g, Yogur proteico natural 140g, Leche de almendra sin azúcar 150g"
+            "detalle": "Plátano 200g, Yogur proteico natural 250g, Anacardo (marañón) 15g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Patata 360g, Solomillo de ternera 235g, Judías verdes 80g, Piña pelada 100g, AOVE 25g"
+            "detalle": "Cuscús 100g, Dorada 205g, Hamburguesa de espinacas 50g, Manzana 200g, AOVE 25g"
           },
           {
             "nombre": "Post-entreno",
@@ -4144,15 +4119,15 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de lenteja roja 140g, Atún fresco 100g, Alcachofa 80g, Pera 100g, AOVE 25g"
+            "detalle": "Macarrones 75g, Atún fresco 180g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Pepino 80g, Pimiento 80g, Ajo 5g, AOVE 25g, Pera 100g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Uvas 100g, Yogur proteico natural 145g, Leche de almendra sin azúcar 150g"
+            "detalle": "Uvas 200g, Yogur proteico natural 250g, Pipas de girasol 20g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Copos de avena 100g, Jamón serrano curado 70g, Espinaca 50g, Paraguayo 100g, AOVE 15g"
+            "detalle": "Arroz blanco 65g, Boniato 150g, Salmón 230g, Brócoli 80g, Kiwi 200g, AOVE 5g"
           },
           {
             "nombre": "Post-entreno",
@@ -4161,46 +4136,42 @@
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2350,
-        "ingestas": [
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 100g, Pechuga de pollo 240g, AOVE 25g, Mandarina 100g"
-          },
-          {
-            "nombre": "Merienda",
-            "detalle": "Arándanos 100g, Yogur proteico natural 120g, Semillas de chía 170g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Arroz blanco 50g, Boniato 150g, Salmón 270g, Remolacha 80g, Melón 100g, AOVE 5g"
-          },
-          {
-            "nombre": "Post-entreno",
-            "detalle": "Batido de proteína 30g disuelto en agua"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3347,
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 170g, Boniato 150g, Pechuga de pollo 150g, Espárragos verdes 80g, Mango 175g, AOVE 25g"
+            "detalle": "Macarrones 160g, Boniato 150g, Pechuga de pollo 135g, Rúcula 80g, Piña pelada 200g, AOVE 20g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Merienda",
-            "detalle": "Frambuesa 100g, Yogur natural 120g"
+            "detalle": "Arándanos 200g, Yogur natural 250g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 145g, Boniato 150g, Salmón 240g, Berenjena 80g, Nectarina 100g, AOVE 5g"
+            "detalle": "Arroz blanco 160g, Boniato 150g, Salmón 215g, Puerro 80g, Plátano 200g, AOVE 5g, Pan blanco de barra 65g"
           },
           {
             "nombre": "Post-entreno",
             "detalle": "Recovery y fruta"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2051,
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Fideos de arroz 65g, Secreto de cerdo 350g, Berenjena 80g, Sandía 200g, AOVE 5g"
+          },
+          {
+            "nombre": "Merienda",
+            "detalle": "Fresas 200g, Yogur proteico natural 250g, Semillas de chía 20g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Arroz blanco 70g, Gambas 265g, Espárragos blancos conserva 80g, Manzana 200g, AOVE 25g"
           }
         ]
       }
@@ -4236,6 +4207,7 @@
           "Proteínas"
         ],
         "isComplete": true,
+        "isMainMeal": true,
         "unrecognized": []
       },
       "Comida": {
@@ -4253,6 +4225,7 @@
         ],
         "proteina": [],
         "isComplete": true,
+        "isMainMeal": true,
         "unrecognized": []
       }
     },
@@ -4263,25 +4236,25 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de trigo 160g, Carne picada de ternera 235g, AOVE 5g, Plátano 180g, Pan blanco de barra 50g"
+            "detalle": "Macarrones 170g, Dorada 215g, Calabacín 80g, Zanahoria 80g, Puerro 80g, Tomate 80g, Pepino 80g, Pimiento 80g, Cebolla 80g, Ajo 5g, AOVE 20g, Paraguayo 140g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Yuca 430g, Calamar 350g, Acelga 80g, Mango 100g, AOVE 25g"
+            "detalle": "Cuscús 160g, Sardina 175g, Cebolla 80g, Sandía 200g, AOVE 10g, Pan blanco de barra 80g"
           }
         ]
       },
       "martes": {
-        "tipo": "partido",
-        "calorias": 3174,
+        "tipo": "entreno",
+        "calorias": 2694,
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Quinoa 160g, Carne picada de pollo 170g, Tomate frito 80g, Melocotón 180g, AOVE 5g, Pan blanco de barra 80g"
+            "detalle": "Arroz jazmín 160g, Solomillo de cerdo 250g, Calabacín 80g, Mandarina 200g, AOVE 15g, Pan blanco de barra 65g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 170g, Boniato 310g, Jamón serrano 70g, Espinaca 50g, Fresas 150g, AOVE 25g"
+            "detalle": "Arroz blanco 115g, Boniato 310g, Gambas 240g, Tomate frito 80g, Ciruela 200g, AOVE 25g"
           }
         ]
       },
@@ -4291,11 +4264,11 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Pasta de lenteja roja 160g, Carne picada de pavo 115g, Espárragos verdes 80g, Kiwi 180g, AOVE 25g, Pan blanco de barra 80g"
+            "detalle": "Maíz dulce 160g, Chuletas de pavo 270g, Champiñón 80g, Arándanos 200g, AOVE 25g, Pan blanco de barra 80g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz integral 95g, Sepia 350g, Zanahoria 80g, Higo seco 100g, AOVE 25g"
+            "detalle": "Pasta de lenteja roja 160g, Sardina 105g, Pimiento 80g, Naranja 200g, AOVE 20g, Pan blanco de barra 80g"
           }
         ]
       },
@@ -4305,11 +4278,11 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Atún fresco 230g, AOVE 20g, Naranja 180g, Pan blanco de barra 80g"
+            "detalle": "Arroz blanco 160g, Atún fresco 225g, Espárragos verdes 80g, AOVE 25g, Fresas 180g, Pan blanco de barra 45g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 80g, Ñoquis de patata 300g, Carne picada de ternera 270g, Alcachofa 80g, Naranja 150g, AOVE 5g"
+            "detalle": "Arroz blanco 75g, Ñoquis de patata 300g, Conejo 250g, Brócoli 80g, Plátano 200g, AOVE 20g"
           }
         ]
       },
@@ -4319,39 +4292,39 @@
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Cuscús 160g, Pulpo 290g, Espinaca 50g, Frambuesa 180g, AOVE 25g, Pan blanco de barra 75g"
+            "detalle": "Macarrones 170g, Atún fresco 190g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Calabacín 80g, Puerro 80g, AOVE 25g, Mandarina 155g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Arroz blanco 130g, Boniato 310g, Chuletón de ternera 285g, Judías verdes 80g, Piña pelada 150g, AOVE 5g"
+            "detalle": "Arroz blanco 135g, Boniato 310g, Hamburguesa de ternera 315g, Espinaca 50g, Frambuesa 200g, AOVE 5g"
           }
         ]
       },
       "sabado": {
-        "tipo": "entreno",
-        "calorias": 2694,
-        "ingestas": [
-          {
-            "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Pechuga de pollo 240g, AOVE 25g, Mandarina 180g, Pan blanco de barra 75g"
-          },
-          {
-            "nombre": "Cena",
-            "detalle": "Fideos de arroz 150g, Sardina 210g, Ajo 80g, Melocotón 180g, AOVE 10g, Pan blanco de barra 40g"
-          }
-        ]
-      },
-      "domingo": {
         "tipo": "partido",
         "calorias": 3174,
         "ingestas": [
           {
             "nombre": "Comida",
-            "detalle": "Arroz blanco 160g, Hamburguesa de pavo 245g, Guisantes 80g, Ciruela 180g, AOVE 15g, Pan blanco de barra 80g"
+            "detalle": "Arroz blanco 170g, Patata 310g, Pulpo 295g, Brócoli 80g, Zanahoria 80g, Leche de avena 170g, AOVE 25g, Ciruela 150g"
           },
           {
             "nombre": "Cena",
-            "detalle": "Yuca 160g, Salmón fresco 280g, Champiñón 80g, Manzana 180g, AOVE 5g, Pan blanco de barra 80g"
+            "detalle": "Trigo sarraceno 160g, Hamburguesa de pavo 200g, Espárragos verdes 80g, Nectarina 200g, AOVE 10g, Pan blanco de barra 80g"
+          }
+        ]
+      },
+      "domingo": {
+        "tipo": "descanso",
+        "calorias": 2466,
+        "ingestas": [
+          {
+            "nombre": "Comida",
+            "detalle": "Arroz blanco 155g, Corvina 330g, Rúcula 80g, Pera 200g, AOVE 25g"
+          },
+          {
+            "nombre": "Cena",
+            "detalle": "Pasta de lenteja roja 160g, Pechuga de pollo 120g, Tomate frito 80g, Paraguayo 200g, AOVE 25g, Pan blanco de barra 70g"
           }
         ]
       }

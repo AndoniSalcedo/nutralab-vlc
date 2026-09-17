@@ -162,11 +162,13 @@ export function parsePlayerClinicalTags(playerOrTags) {
     return Array.from(new Set(playerOrTags.filter((v) => CLINICAL_TAGS_MAP.has(v))));
   }
 
-  // Si es un objeto jugador, solo se leen intolerancias y alergias explícitas.
+  // Si es un objeto jugador, se leen intolerancias, alergias o tags clínicos explícitos.
   if (typeof playerOrTags === 'object') {
     return Array.from(new Set([
       ...extractExplicitTags(playerOrTags.intolerancias),
       ...extractExplicitTags(playerOrTags.alergias),
+      ...extractExplicitTags(playerOrTags.clinical_tags),
+      ...extractExplicitTags(playerOrTags.tags),
     ]));
   }
 

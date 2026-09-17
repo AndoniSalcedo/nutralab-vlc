@@ -86,8 +86,8 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Chuletón de ternera",
-    "originalName": "Chuletón de ternera crudo",
+    "name": "Entrecot de ternera",
+    "originalName": "Entrecot de ternera crudo",
     "kcal": 250,
     "cho": 0,
     "pro": 20,
@@ -147,23 +147,6 @@ export const FOODS_CRUDO = [
     "treePath": [
       "proteina",
       "vacuno"
-    ]
-  },
-  {
-    "name": "Hamburguesa de cerdo",
-    "originalName": "Hamburguesa de cerdo crudo",
-    "kcal": 210,
-    "cho": 1,
-    "pro": 17,
-    "fat": 15.5,
-    "tags": [
-      "cerdo"
-    ],
-    "minGrams": 100,
-    "maxGrams": 350,
-    "treePath": [
-      "proteina",
-      "cerdo"
     ]
   },
   {
@@ -512,6 +495,22 @@ export const FOODS_CRUDO = [
     "cho": 20.1,
     "pro": 1.6,
     "fat": 0.1,
+    "tags": [],
+    "minGrams": 150,
+    "maxGrams": 450,
+    "defaultGrams": 250,
+    "treePath": [
+      "hidratos",
+      "tuberculos"
+    ]
+  },
+  {
+    "name": "Puré de boniato",
+    "originalName": "Puré de boniato",
+    "kcal": 90,
+    "cho": 20,
+    "pro": 1.6,
+    "fat": 0.2,
     "tags": [],
     "minGrams": 150,
     "maxGrams": 450,
@@ -896,12 +895,43 @@ export const FOODS_CRUDO = [
     ]
   },
   {
+    "name": "Pasta de trigo sarraceno",
+    "originalName": "Pasta de trigo sarraceno cruda",
+    "kcal": 348,
+    "cho": 71,
+    "pro": 12.5,
+    "fat": 1.7,
+    "tags": [],
+    "minGrams": 50,
+    "maxGrams": 170,
+    "treePath": [
+      "hidratos",
+      "pasta"
+    ]
+  },
+  {
     "name": "Patata",
     "originalName": "Patata crudo",
     "kcal": 77,
     "cho": 17.5,
     "pro": 2,
     "fat": 0.1,
+    "tags": [],
+    "minGrams": 150,
+    "maxGrams": 450,
+    "defaultGrams": 250,
+    "treePath": [
+      "hidratos",
+      "tuberculos"
+    ]
+  },
+  {
+    "name": "Puré de patata",
+    "originalName": "Puré de patata casero",
+    "kcal": 83,
+    "cho": 17.5,
+    "pro": 2,
+    "fat": 0.5,
     "tags": [],
     "minGrams": 150,
     "maxGrams": 450,
@@ -1002,6 +1032,23 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 50,
     "maxGrams": 170,
+    "treePath": [
+      "hidratos",
+      "panes"
+    ]
+  },
+  {
+    "name": "Fajitas",
+    "originalName": "Tortillas para fajitas",
+    "kcal": 312,
+    "cho": 52,
+    "pro": 8,
+    "fat": 8.5,
+    "tags": [
+      "gluten"
+    ],
+    "minGrams": 60,
+    "maxGrams": 180,
     "treePath": [
       "hidratos",
       "panes"
@@ -1653,22 +1700,22 @@ export const FOODS_CRUDO = [
       "salsas"
     ]
   },
-  {
-    "name": "Zumo de naranja natural",
-    "originalName": "Zumo de naranja natural",
-    "kcal": 45,
-    "cho": 10.4,
-    "pro": 0.7,
-    "fat": 0.2,
-    "tags": [
-      "fructosa"
-    ],
-    "minGrams": 100,
-    "maxGrams": 220,
-    "treePath": [
-      "frutas"
-    ]
-  },
+  // {
+  //   "name": "Zumo de naranja natural",
+  //   "originalName": "Zumo de naranja natural",
+  //   "kcal": 45,
+  //   "cho": 10.4,
+  //   "pro": 0.7,
+  //   "fat": 0.2,
+  //   "tags": [
+  //     "fructosa"
+  //   ],
+  //   "minGrams": 100,
+  //   "maxGrams": 220,
+  //   "treePath": [
+  //     "frutas"
+  //   ]
+  // },
   {
     "name": "Aceite de coco",
     "originalName": "Aceite de coco",
@@ -2313,7 +2360,8 @@ export const FOODS_CRUDO = [
     "pro": 24.7,
     "fat": 1.9,
     "tags": [
-      "gluten"
+      "gluten",
+      "proteina_vegetal"
     ],
     "minGrams": 30,
     "maxGrams": 150,
@@ -2348,10 +2396,65 @@ export const FOODS_CRUDO = [
     "pro": 8.1,
     "fat": 4.8,
     "tags": [
-      "soja"
+      "soja",
+      "proteina_vegetal"
     ],
     "minGrams": 30,
     "maxGrams": 150,
+    "treePath": [
+      "proteina",
+      "vegetal_proteina"
+    ]
+  },
+  {
+    "name": "Heura",
+    "originalName": "Bocados de Heura",
+    "kcal": 126,
+    "cho": 1.8,
+    "pro": 18.6,
+    "fat": 3.1,
+    "tags": [
+      "soja",
+      "proteina_vegetal"
+    ],
+    "minGrams": 100,
+    "maxGrams": 220,
+    "treePath": [
+      "proteina",
+      "vegetal_proteina"
+    ]
+  },
+  {
+    "name": "Tempeh",
+    "originalName": "Tempeh de soja",
+    "kcal": 192,
+    "cho": 7.6,
+    "pro": 19,
+    "fat": 10.8,
+    "tags": [
+      "soja",
+      "proteina_vegetal"
+    ],
+    "minGrams": 80,
+    "maxGrams": 200,
+    "treePath": [
+      "proteina",
+      "vegetal_proteina"
+    ]
+  },
+  {
+    "name": "Burger vegana",
+    "originalName": "Hamburguesa vegana",
+    "kcal": 190,
+    "cho": 4.2,
+    "pro": 17,
+    "fat": 11,
+    "tags": [
+      "soja",
+      "proteina_vegetal"
+    ],
+    "minGrams": 100,
+    "maxGrams": 220,
     "treePath": [
       "proteina",
       "vegetal_proteina"
@@ -2633,13 +2736,14 @@ export const FOODS_CRUDO = [
     "fat": 1.2,
     "tags": [
       "soja",
-      "alto_fodmap"
+      "alto_fodmap",
+      "proteina_vegetal"
     ],
-    "minGrams": 100,
-    "maxGrams": 300,
+    "minGrams": 35,
+    "maxGrams": 80,
     "treePath": [
-      "hidratos",
-      "legumbres"
+      "proteina",
+      "vegetal_proteina"
     ]
   },
   {
