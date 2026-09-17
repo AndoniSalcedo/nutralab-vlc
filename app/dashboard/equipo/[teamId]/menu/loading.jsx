@@ -1,13 +1,28 @@
 'use client';
 
-import { Box, Group, Select, ActionIcon } from '@mantine/core';
+import { Box, Group, Select, ActionIcon, Button } from '@mantine/core';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
-import { TeamHeaderFilters } from '@/components/TeamHeaderContext';
-import { IconCalendar } from '@/components/icons3d';
+import { TeamHeaderFilters, TeamHeaderRightSection } from '@/components/TeamHeaderContext';
+import { IconCalendar, IconPlus } from '@/components/icons3d';
 
 export default function TeamMenuLoading() {
   return (
     <>
+      <TeamHeaderRightSection>
+        <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
+          <Button
+            visibleFrom="sm"
+            size="xs"
+            radius="xl"
+            color="nutralabColor.8"
+            leftSection={<IconPlus size={14} />}
+            disabled
+          >
+            Nuevo menú
+          </Button>
+        </Group>
+      </TeamHeaderRightSection>
+
       <TeamHeaderFilters>
         <Box w="100%" style={{ minWidth: 0 }}>
           <Group justify="space-between" align="center" w="100%" wrap="wrap" gap="sm">

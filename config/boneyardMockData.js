@@ -1,7 +1,7 @@
 // Mock datasets for Boneyard skeleton crawler
 
 export const mockTeam = {
-  id: 4,
+  id: 'mock',
   nombre: 'Equipo de Prueba Boneyard',
   temporada: '2026/27',
   descripcion: 'Equipo ficticio para generación de skeletons',
@@ -101,7 +101,7 @@ export const mockPlayers = [
     objetivo: 'Ganancia muscular',
     auth_email: 'carlos@nutralab.com',
     credentials_created_at: '2026-01-01T00:00:00Z',
-    equipo_id: 4,
+    equipo_id: 'mock',
     equipos: mockTeam,
     altura_cm: 184,
     peso_kg: 81.5,
@@ -122,7 +122,7 @@ export const mockPlayers = [
     objetivo: 'Mantenimiento',
     auth_email: 'sofia@nutralab.com',
     credentials_created_at: '2026-01-02T00:00:00Z',
-    equipo_id: 4,
+    equipo_id: 'mock',
     equipos: mockTeam,
     altura_cm: 168,
     peso_kg: 61.2,
@@ -140,7 +140,7 @@ export const mockPlayers = [
     objetivo: 'Pérdida de grasa',
     auth_email: 'mateo@nutralab.com',
     credentials_created_at: '2026-01-03T00:00:00Z',
-    equipo_id: 4,
+    equipo_id: 'mock',
     equipos: mockTeam,
     altura_cm: 189,
     peso_kg: 88.0,
@@ -351,7 +351,7 @@ export const mockHydration = [
 export const mockMessages = [
   {
     id: 500,
-    equipo_id: 4,
+    equipo_id: 'mock',
     jugador_id: 220,
     sender_id: 'tecnico',
     mensaje: 'Hola Carlos, recuerda tomar la creatina hoy después del entreno.',
@@ -391,7 +391,12 @@ export function isMockTeam(teamId) {
 }
 
 export function isMockPlayer(playerId) {
-  return process.env.BONEYARD_MODE === 'true' || String(playerId) === 'mock';
+  return (
+    process.env.BONEYARD_MODE === 'true' ||
+    String(playerId) === 'mock' ||
+    String(playerId).startsWith('mock') ||
+    [220, 221, 222].includes(Number(playerId))
+  );
 }
 
 
