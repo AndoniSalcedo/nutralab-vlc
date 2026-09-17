@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { buildSessionValue, COOKIE_NAME } from '@/lib/auth/session';
 import { env } from '@/config/env';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get('token');
   const url = searchParams.get('url') || '/dashboard';
-  console.log(url)
 
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url), 303);
@@ -16,13 +16,40 @@ export async function GET(request) {
   try {
     // Verify the JWT token from the backend
     const decoded = jwt.verify(token, env.JWT_SECRET);
+    const nutritionistId = decoded.id;
 
-    // The decoded token will have nutritionist details: { id, name, email, role, ... }
+    let nutriName = decoded.name;
+    let nutriEmail = decoded.email;
+    let hasAvatar = false;
+
+    if (nutritionistId) {
+      try {
+        const supabase = getSupabaseAdmin();
+        const { data: nutri } = await supabase
+          .from('Nutritionist')
+          .select('id, name, email, avatar, avatarSize, avatarMime')
+          .eq('id', nutritionistId)
+          .maybeSingle();
+
+        if (nutri) {
+          if (nutri.name) nutriName = nutri.name;
+          if (nutri.email) nutriEmail = nutri.email;
+          if (nutri.avatar && (nutri.avatarSize || nutri.avatar.length > 0)) {
+            hasAvatar = true;
+          }
+        }
+      } catch (dbErr) {
+        console.warn('Could not fetch nutritionist details for auth-jump:', dbErr.message);
+      }
+    }
+
     const sessionObj = {
-      external_admin_id: decoded.id,
-      name: decoded.name,
-      email: decoded.email,
-      role: 'admin'
+      external_admin_id: nutritionistId,
+      id: nutritionistId,
+      name: nutriName || 'Nutricionista',
+      email: nutriEmail || '',
+      role: 'admin',
+      avatar: hasAvatar ? `/api/media/nutritionist-avatar?id=${nutritionistId}` : null,
     };
 
     const response = NextResponse.redirect(new URL(url, request.url), 303);

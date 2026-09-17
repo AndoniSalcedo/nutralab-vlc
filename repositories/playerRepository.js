@@ -1,4 +1,4 @@
-import { mockPlayers, mockTeam, isMockPlayer, isMockTeam } from '@/lib/boneyardMockData';
+import { mockPlayers, mockTeam, isMockPlayer, isMockTeam } from '@/config/boneyardMockData';
 
 function getOwnerId(user) {
   if (!user || user.role === 'jugador') return null;

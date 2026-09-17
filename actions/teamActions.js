@@ -334,3 +334,87 @@ export async function saveTeamConfigAction(teamId, configuracion_nutricional) {
   revalidatePath(`/dashboard/equipo/${teamId}/configuracion`);
   return { success: true };
 }
+
+export async function getTeams() {
+  const data = await getTeamsAction();
+  return data.equipos || [];
+}
+
+export async function uploadTeamPhotoAction(teamIdOrFormData, maybeFile) {
+  const user = await getUser();
+  if (!user || user.role === 'jugador' || user.role === 'tecnico') {
+    throw new Error('No autorizado');
+  }
+
+  let id;
+  let fotoFile;
+  if (teamIdOrFormData instanceof FormData) {
+    id = teamIdOrFormData.get('id');
+    fotoFile = teamIdOrFormData.get('foto') || teamIdOrFormData.get('avatar');
+  } else {
+    id = teamIdOrFormData;
+    fotoFile = maybeFile;
+  }
+
+  if (!id) throw new Error('Falta id del equipo');
+  if (!fotoFile || !(fotoFile instanceof File)) {
+    throw new Error('Falta archivo de foto');
+  }
+
+  const supabase = getSupabaseAdmin();
+  const ownedTeam = await getOwnedTeam(supabase, user, id);
+  if (!ownedTeam) throw new Error('No tienes acceso a este equipo');
+
+  const buffer = Buffer.from(await fotoFile.arrayBuffer());
+  const payload = {
+    foto: `\\x${buffer.toString('hex')}`,
+    foto_mime: fotoFile.type || 'image/webp',
+    foto_size: fotoFile.size,
+    updated_at: new Date().toISOString(),
+  };
+
+  await updateTeam(supabase, id, payload);
+  revalidatePath('/dashboard');
+  revalidatePath(`/dashboard/equipo/${id}`);
+  return { success: true, foto_mime: payload.foto_mime, foto_size: payload.foto_size };
+}
+
+export async function removeTeamPhotoAction(teamIdOrFormData) {
+  const user = await getUser();
+  if (!user || user.role === 'jugador' || user.role === 'tecnico') {
+    throw new Error('No autorizado');
+  }
+
+  let id;
+  if (teamIdOrFormData instanceof FormData) {
+    id = teamIdOrFormData.get('id');
+  } else {
+    id = teamIdOrFormData;
+  }
+
+  if (!id) throw new Error('Falta id del equipo');
+
+  const supabase = getSupabaseAdmin();
+  const ownedTeam = await getOwnedTeam(supabase, user, id);
+  if (!ownedTeam) throw new Error('No tienes acceso a este equipo');
+
+  await updateTeam(supabase, id, {
+    foto: null,
+    foto_mime: null,
+    foto_size: null,
+    updated_at: new Date().toISOString(),
+  });
+
+  revalidatePath('/dashboard');
+  revalidatePath(`/dashboard/equipo/${id}`);
+  return { success: true, removed: true };
+}
+
+export {
+  createTeamAction as createTeam,
+  updateTeamAction as updateTeam,
+  deleteTeamAction as deleteTeam,
+  saveTeamConfigAction as saveTeamConfig,
+  uploadTeamPhotoAction as uploadTeamPhoto,
+  removeTeamPhotoAction as removeTeamPhoto,
+};

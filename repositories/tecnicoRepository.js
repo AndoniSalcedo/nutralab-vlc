@@ -1,4 +1,4 @@
-import { mockTeam, mockTeams, mockPlayers, isMockTeam, isMockPlayer } from '@/lib/boneyardMockData';
+import { mockTeam, mockTeams, mockPlayers, isMockTeam, isMockPlayer } from '@/config/boneyardMockData';
 
 export async function getTecnicosByOwner(supabase, ownerId) {
   const { data: links, error: linksError } = await supabase

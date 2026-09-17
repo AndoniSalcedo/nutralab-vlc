@@ -1,4 +1,4 @@
-import { mockMeals, isMockPlayer } from '@/lib/boneyardMockData';
+import { mockMeals, isMockPlayer } from '@/config/boneyardMockData';
 
 export async function getMealsFiltered(supabase, jugadorId, mealType, dayFromUTC, dayToUTC) {
   if (isMockPlayer(jugadorId)) {

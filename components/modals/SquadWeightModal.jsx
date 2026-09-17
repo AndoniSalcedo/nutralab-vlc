@@ -27,7 +27,7 @@ import {
   IconFileSpreadsheet,
   IconFileTypePdf,
 } from '@/components/icons3d';
-import { savePesaje } from '@/services/pesaje';
+import { savePesaje } from '@/actions/pesajeActions';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';

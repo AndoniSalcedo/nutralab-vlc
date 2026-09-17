@@ -19,7 +19,7 @@ import {
 import { notifications } from '@mantine/notifications';
 import { IconEdit } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
-import { updatePlayerField } from '@/services/player';
+import { updatePlayerField } from '@/actions/playerActions';
 import { useRouter } from 'next/navigation';
 import { AVAILABLE_MEALS, getMealsForCount, sortMeals, isMainMeal } from '@/config/nutrition-days';
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';

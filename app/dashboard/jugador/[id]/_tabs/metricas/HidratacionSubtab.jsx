@@ -24,8 +24,8 @@ import classes from '../SubtabSectionHeader.module.css';
 import ImportCsvModal from '@/components/modals/ImportCsvModal';
 import EditRecordModal from '@/components/modals/EditRecordModal';
 import { notifications } from '@mantine/notifications';
-import { saveHydrationRecord, importHydrationRecords, refetchHydrationRecords, deleteHydrationRecord } from '@/services/hydration';
-import { updatePlayerField } from '@/services/player';
+import { saveHydrationRecord, importHydrationRecords, refetchHydrationRecords, deleteHydrationRecord } from '@/actions/hydrationActions';
+import { updatePlayerField } from '@/actions/playerActions';
 import {
   IconActivityHeartbeat,
   IconTrash,

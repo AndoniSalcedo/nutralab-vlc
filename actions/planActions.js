@@ -169,3 +169,32 @@ export async function deleteAiPlanAction(id) {
   revalidatePath(`/dashboard/jugador/${plan.jugador_id}`);
   return { ok: true };
 }
+
+export async function generateAiPlanDraftAction({ jugador, nombre, calendario, semanaMenu, preMatchConfig }) {
+  return await createAiPlanAction({
+    jugador,
+    nombre,
+    calendario,
+    semanaMenu,
+    preMatchConfig,
+    draftOnly: true,
+  });
+}
+
+export async function saveAiPlanAction({ jugador, nombre, datos, contenido }) {
+  return await createAiPlanAction({
+    jugador,
+    nombre,
+    datos,
+    contenido,
+  });
+}
+
+export {
+  getAiPlansAction as getAiPlans,
+  createAiPlanAction as createAiPlan,
+  updateAiPlanAction as updateAiPlan,
+  deleteAiPlanAction as deleteAiPlan,
+  generateAiPlanDraftAction as generateAiPlanDraft,
+  saveAiPlanAction as saveAiPlan,
+};

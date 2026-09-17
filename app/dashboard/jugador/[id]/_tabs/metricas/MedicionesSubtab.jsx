@@ -35,7 +35,7 @@ import classes from '../SubtabSectionHeader.module.css';
 import MeasurementModal from '@/components/modals/MeasurementModal';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
-import { saveEvolution, deleteEvolution } from '@/services/evolution';
+import { saveEvolution, deleteEvolution } from '@/actions/evolutionActions';
 import { IconCalendarStats, IconEdit, IconPlus, IconRuler2, IconTrash, IconFilter, IconChevronDown } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
 import NothingFound from '@/components/NothingFound';

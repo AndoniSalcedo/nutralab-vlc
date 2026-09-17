@@ -132,10 +132,18 @@ export async function createWeeklyMenuAction({ semana, equipo_id, dias }) {
   return { ok: true, menu: data };
 }
 
-export async function uploadWeeklyMenuAction(formData) {
+export async function uploadWeeklyMenuAction(fileOrFormData, weekDateParam, teamIdParam) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
+  }
+
+  let formData = fileOrFormData;
+  if (!(fileOrFormData instanceof FormData)) {
+    formData = new FormData();
+    formData.append('file', fileOrFormData);
+    if (weekDateParam) formData.append('semana', weekDateParam);
+    if (teamIdParam) formData.append('equipo_id', teamIdParam);
   }
 
   const archivo = formData.get('file');
@@ -288,3 +296,11 @@ export async function deleteWeeklyMenuAction(id) {
   revalidatePath(`/dashboard/equipo/${menu.equipo_id}/menu`);
   return { ok: true };
 }
+
+export {
+  getWeeklyMenusAction as getWeeklyMenus,
+  createWeeklyMenuAction as createWeeklyMenu,
+  uploadWeeklyMenuAction as uploadWeeklyMenu,
+  updateWeeklyMenuAction as updateWeeklyMenu,
+  deleteWeeklyMenuAction as deleteWeeklyMenu,
+};

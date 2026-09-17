@@ -20,8 +20,8 @@ import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import PlayerSupplementModal from '@/components/modals/PlayerSupplementModal';
 import { notifications } from '@mantine/notifications';
-import { getPlayerSupplementation, postPlayerSupplementation } from '@/services/supplement';
-import { updatePlayerField } from '@/services/player';
+import { getPlayerSupplementation, postPlayerSupplementation } from '@/actions/supplementActions';
+import { updatePlayerField } from '@/actions/playerActions';
 import Icon3D from '@/components/Icon3D';
 import {
   IconAlertCircle,

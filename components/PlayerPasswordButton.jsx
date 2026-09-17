@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button, Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import Icon3D from '@/components/Icon3D';
-import { updatePlayerPassword } from '@/services/player';
+import { updatePlayerPassword } from '@/actions/playerActions';
 import PlayerPasswordModal from '@/components/modals/PlayerPasswordModal';
 
 export default function PlayerPasswordButton({ compact = false, menuItem = false }) {

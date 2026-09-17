@@ -1,4 +1,4 @@
-import { mockHydration, isMockPlayer } from '@/lib/boneyardMockData';
+import { mockHydration, isMockPlayer } from '@/config/boneyardMockData';
 
 export async function getHydrationRecordsByPlayerId(supabase, playerId) {
   if (isMockPlayer(playerId)) {

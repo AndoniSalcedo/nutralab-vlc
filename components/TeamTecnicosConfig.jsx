@@ -30,7 +30,7 @@ import {
   assignTeams,
   createTecnico,
   getTecnicos,
-} from '@/services/tecnico';
+} from '@/actions/tecnicoActions';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 
 export default function TeamTecnicosConfig({ team, readOnly = false }) {

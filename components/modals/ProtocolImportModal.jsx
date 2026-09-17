@@ -18,8 +18,8 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconDownload, IconShield } from '@/components/icons3d';
-import { getTeams } from '@/services/team';
-import { batchImportProtocols } from '@/services/protocol';
+import { getTeams } from '@/actions/teamActions';
+import { batchImportProtocols } from '@/actions/protocolActions';
 
 const EMPTY_DAY_TYPES = [];
 

@@ -1,4 +1,4 @@
-import { mockPesajes, isMockPlayer } from '@/lib/boneyardMockData';
+import { mockPesajes, isMockPlayer } from '@/config/boneyardMockData';
 
 export async function getPesajesByPlayerId(supabase, playerId) {
   if (isMockPlayer(playerId)) {

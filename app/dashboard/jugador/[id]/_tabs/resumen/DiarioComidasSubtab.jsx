@@ -19,7 +19,7 @@ import { useMediaQuery, useDisclosure } from '@mantine/hooks';
 import { IconPlus, IconPhoto, IconCalendar, IconChevronDown } from '@/components/icons3d';
 
 import NothingFound from '@/components/NothingFound';
-import { deletePlayerMeal, listPlayerMeals } from '@/services/meal';
+import { deletePlayerMeal, listPlayerMeals } from '@/actions/mealActions';
 import MealCard from '@/components/MealCard';
 import ImageViewerModal from '@/components/modals/ImageViewerModal';
 import MealEditorModal from '@/components/modals/MealEditorModal';

@@ -8,7 +8,7 @@ export default function MealEditorModal({
   jugadorId,
   meal,
   onSuccess,
-  onCancel
+  onCancel,
 }) {
   return (
     <Modal

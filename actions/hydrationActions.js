@@ -231,7 +231,16 @@ export async function deleteHydrationRecordAction(id) {
   return { success: true };
 }
 
-export async function importTeamOsmolarityAction(formData) {
+export async function importTeamOsmolarityAction(formDataOrFile, teamIdParam, decisionesParam) {
+  let formData = formDataOrFile;
+  if (!(formDataOrFile instanceof FormData)) {
+    formData = new FormData();
+    formData.append('file', formDataOrFile);
+    if (teamIdParam) formData.append('team_id', String(teamIdParam));
+    formData.append('mode', 'importar');
+    if (decisionesParam) formData.append('decisiones', JSON.stringify(decisionesParam));
+  }
+
   const file = formData.get('file');
   const mode = String(formData.get('mode') || 'preview').trim();
   const teamId = String(formData.get('team_id') || '').trim();
@@ -527,3 +536,30 @@ export async function importTeamOsmolarityAction(formData) {
 
   throw new Error('Modo de importación no soportado');
 }
+
+export async function previewTeamOsmolarityAction(file, teamId) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('team_id', String(teamId));
+  formData.append('mode', 'preview');
+  return await importTeamOsmolarityAction(formData);
+}
+
+export async function refetchHydrationRecordsAction(jugadorId) {
+  const data = await getHydrationRecordsAction(jugadorId);
+  return {
+    ok: true,
+    records: data.records,
+    json: async () => data,
+  };
+}
+
+export {
+  saveHydrationRecordAction as saveHydrationRecord,
+  deleteHydrationRecordAction as deleteHydrationRecord,
+  importHydrationRecordsAction as importHydrationRecords,
+  getHydrationRecordsAction as getHydrationRecords,
+  importTeamOsmolarityAction as importTeamOsmolarity,
+  previewTeamOsmolarityAction as previewTeamOsmolarity,
+  refetchHydrationRecordsAction as refetchHydrationRecords,
+};

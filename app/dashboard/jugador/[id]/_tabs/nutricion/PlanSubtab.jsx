@@ -24,9 +24,10 @@ import {
 import CreateNutritionPlanModal from '@/components/modals/CreateNutritionPlanModal';
 import { useMediaQuery, useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, downloadAiPlanPdf, deleteAiPlan } from '@/services/plan';
-import { getWeeklyMenus } from '@/services/menu';
-import { getPlayerSupplementation } from '@/services/supplement';
+import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, deleteAiPlan } from '@/actions/planActions';
+import { downloadAiPlanPdf } from '@/services/report';
+import { getWeeklyMenus } from '@/actions/menuActions';
+import { getPlayerSupplementation } from '@/actions/supplementActions';
 import { resolvePlayerSupplementsData } from '@/lib/nutrition/supplementation';
 import { IconDownload, IconArrowsLeftRight, IconPlus, IconSparkles, IconEdit, IconCheck, IconTrash, IconChevronDown, IconBrain } from '@/components/icons3d';
 import SubtabHeader from '../SubtabHeader';

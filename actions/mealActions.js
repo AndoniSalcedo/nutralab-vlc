@@ -19,6 +19,26 @@ function getDateStr(dateStr, tz = DEFAULT_TZ) {
   return new Date(dateStr).toLocaleDateString('sv-SE', { timeZone: tz });
 }
 
+function mapMealToClient(dbMeal) {
+  if (!dbMeal) return null;
+  return {
+    ...dbMeal,
+    id: dbMeal.id,
+    jugadorId: dbMeal.jugador_id,
+    takenAt: dbMeal.taken_at,
+    dishName: dbMeal.dish_name,
+    mealType: dbMeal.meal_type,
+    ingredients: dbMeal.ingredients || [],
+    calories: dbMeal.calories,
+    notes: dbMeal.notes,
+    hasPhoto: !!dbMeal.photo_size,
+    photoMime: dbMeal.photo_mime,
+    photoSize: dbMeal.photo_size,
+    createdAt: dbMeal.created_at,
+    photoUrl: dbMeal.photo_size ? `/api/media/meal-photo?id=${dbMeal.id}` : null,
+  };
+}
+
 export async function listPlayerMealsAction(jugadorId, { mealType, day } = {}) {
   if (!jugadorId) throw new Error('Falta jugador_id');
 
@@ -49,10 +69,39 @@ export async function listPlayerMealsAction(jugadorId, { mealType, day } = {}) {
     resultMeals = await getMealsFiltered(supabase, jugadorId, mealType, null, null);
   }
 
-  return { meals: resultMeals };
+  return (resultMeals || []).map(mapMealToClient);
 }
 
-export async function savePlayerMealAction(formData) {
+export async function savePlayerMealAction(jugadorIdOrFormData, payload) {
+  let formData;
+  if (jugadorIdOrFormData instanceof FormData) {
+    formData = jugadorIdOrFormData;
+  } else {
+    const jugadorId = jugadorIdOrFormData;
+    formData = new FormData();
+    if (payload?.id) formData.append('id', payload.id);
+    if (payload?.takenAt) {
+      const d = payload.takenAt instanceof Date ? payload.takenAt : new Date(payload.takenAt);
+      if (!Number.isNaN(+d)) formData.append('takenAt', d.toISOString());
+    }
+    if (payload?.dishName) formData.append('dishName', payload.dishName);
+    if (payload?.mealType) formData.append('mealType', payload.mealType);
+
+    if (Array.isArray(payload?.ingredients)) {
+      formData.append('ingredients', JSON.stringify(payload.ingredients));
+    } else if (typeof payload?.ingredients === 'string') {
+      const arr = payload.ingredients.split('\n').map(s => s.trim()).filter(Boolean);
+      formData.append('ingredients', JSON.stringify(arr));
+    }
+
+    if (Number.isFinite(Number(payload?.calories))) {
+      formData.append('calories', String(Math.round(Number(payload.calories))));
+    }
+    if (payload?.notes) formData.append('notes', payload.notes);
+    if (payload?.photo) formData.append('photo', payload.photo);
+    if (jugadorId) formData.set('jugador_id', String(jugadorId));
+  }
+
   const id = formData.get('id');
   const jugadorId = formData.get('jugador_id');
   const takenAt = formData.get('takenAt');
@@ -92,7 +141,7 @@ export async function savePlayerMealAction(formData) {
     }
   }
 
-  const payload = {
+  const mealPayload = {
     jugador_id: Number(jugadorId),
     taken_at: takenAt ? new Date(takenAt).toISOString() : new Date().toISOString(),
     dish_name: dishName ? String(dishName).trim() : null,
@@ -104,16 +153,16 @@ export async function savePlayerMealAction(formData) {
 
   if (photoFile && photoFile instanceof File && photoFile.size > 0) {
     const photoBuffer = Buffer.from(await photoFile.arrayBuffer());
-    payload.photo = `\\x${photoBuffer.toString('hex')}`;
-    payload.photo_mime = photoFile.type;
-    payload.photo_size = photoFile.size;
+    mealPayload.photo = `\\x${photoBuffer.toString('hex')}`;
+    mealPayload.photo_mime = photoFile.type;
+    mealPayload.photo_size = photoFile.size;
   }
 
   let resultMeal;
   if (id) {
-    resultMeal = await updateMeal(supabase, id, payload);
+    resultMeal = await updateMeal(supabase, id, mealPayload);
   } else {
-    resultMeal = await insertMeal(supabase, payload);
+    resultMeal = await insertMeal(supabase, mealPayload);
   }
 
   revalidatePath(`/dashboard/jugador/${jugadorId}`);
@@ -161,3 +210,10 @@ export async function parseMealTreeAction(body) {
 
   return parseMealTreeWithAI({ ...parseInput, jugador });
 }
+
+export {
+  listPlayerMealsAction as listPlayerMeals,
+  savePlayerMealAction as savePlayerMeal,
+  deletePlayerMealAction as deletePlayerMeal,
+  parseMealTreeAction as parseMealTree,
+};

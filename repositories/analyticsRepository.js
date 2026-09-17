@@ -1,4 +1,4 @@
-import { mockAnalytics, isMockPlayer } from '@/lib/boneyardMockData';
+import { mockAnalytics, isMockPlayer } from '@/config/boneyardMockData';
 
 export async function getAnalyticsByPlayerId(supabase, playerId) {
   if (isMockPlayer(playerId)) {

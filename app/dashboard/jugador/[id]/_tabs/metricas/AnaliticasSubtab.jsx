@@ -21,7 +21,7 @@ import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import dayjs from 'dayjs';
 import { notifications } from '@mantine/notifications';
-import { uploadAnalitica, deleteAnalitica, toggleAnaliticaVisibility } from '@/services/analytic';
+import { uploadAnalitica, deleteAnalitica, toggleAnaliticaVisibility } from '@/actions/analyticActions';
 import {
   IconAlertTriangle,
   IconFileAnalytics,

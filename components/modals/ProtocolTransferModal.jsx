@@ -17,8 +17,8 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconFolderShare, IconArrowsExchange, IconClipboardList, IconShield } from '@/components/icons3d';
-import { getTeams } from '@/services/team';
-import { transferProtocol } from '@/services/protocol';
+import { getTeams } from '@/actions/teamActions';
+import { transferProtocol } from '@/actions/protocolActions';
 import { NUTRITION_DAY_TYPES } from '@/config/nutrition-days';
 
 export default function ProtocolTransferModal({ 

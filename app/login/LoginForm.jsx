@@ -18,7 +18,7 @@ import {
 import { IconLock, IconMail, IconArrowRight } from '@/components/icons3d';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
-import { login } from '@/services/auth';
+import { login } from '@/actions/authActions';
 import { env } from '@/config/env';
 import MascotAvatar from '@/components/mascot/MascotAvatar';
 

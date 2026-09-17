@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Dropzone } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
-import { importPlayerExcel } from '@/services/player';
+import { importPlayerExcel } from '@/actions/playerActions';
 import * as XLSX from 'xlsx';
 import { DateInput } from '@mantine/dates';
 import {

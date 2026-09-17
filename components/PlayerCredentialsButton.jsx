@@ -6,7 +6,7 @@ import { Button, Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import Icon3D from '@/components/Icon3D';
 
-import { updatePlayerCredentials } from '@/services/player';
+import { updatePlayerCredentials } from '@/actions/playerActions';
 import PlayerCredentialsModal from '@/components/modals/PlayerCredentialsModal';
 
 function generatePassword() {

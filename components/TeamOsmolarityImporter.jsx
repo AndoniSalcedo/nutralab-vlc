@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import { Dropzone } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
-import { previewTeamOsmolarity, importTeamOsmolarity } from '@/services/hydration';
+import { previewTeamOsmolarity, importTeamOsmolarity } from '@/actions/hydrationActions';
 import {
   Alert,
   Badge,

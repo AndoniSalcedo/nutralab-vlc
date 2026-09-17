@@ -1,14 +1,26 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, Text, Group, Select, NumberInput, Grid, Stack, Title, Badge, Paper, Box } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
-import { useFoods } from '@/hooks/use-foods';
+import { getFoods } from '@/actions/foodActions';
 
 const EMPTY_FOOD = { kcal: 0, cho: 0, pro: 0, fat: 0 };
 
 export default function FoodCalculator() {
-  const { foods } = useFoods();
+  const [foods, setFoods] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    getFoods()
+      .then((items) => {
+        if (active) setFoods(items || []);
+      })
+      .catch((err) => console.error('Error cargando alimentos en calculadora:', err));
+    return () => {
+      active = false;
+    };
+  }, []);
   const foodOptions = useMemo(
     () => foods.map((food) => ({ value: food.id, label: food.name })),
     [foods]

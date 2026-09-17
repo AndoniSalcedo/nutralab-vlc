@@ -9,7 +9,18 @@ import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getPlayerByAuthUserIdSingle } from '@/repositories/playerRepository';
 import { getTecnicoByAuthUserId } from '@/repositories/tecnicoRepository';
 
-export async function loginAction({ email, password, expectedRole = null }) {
+export async function loginAction(emailOrPayload, passwordParam, expectedRoleParam) {
+  let email, password, expectedRole;
+  if (typeof emailOrPayload === 'object' && emailOrPayload !== null) {
+    email = emailOrPayload.email;
+    password = emailOrPayload.password;
+    expectedRole = emailOrPayload.expectedRole || null;
+  } else {
+    email = emailOrPayload;
+    password = passwordParam;
+    expectedRole = expectedRoleParam || null;
+  }
+
   const cleanEmail = String(email || '').trim().toLowerCase();
 
   if (!cleanEmail || !password) {
@@ -111,3 +122,5 @@ export async function logoutAction() {
 
   redirect(redirectUrl);
 }
+
+export { loginAction as login, logoutAction as logout };

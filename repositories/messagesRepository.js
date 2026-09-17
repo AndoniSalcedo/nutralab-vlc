@@ -1,4 +1,4 @@
-import { mockMessages, isMockPlayer, isMockTeam } from '@/lib/boneyardMockData';
+import { mockMessages, isMockPlayer, isMockTeam } from '@/config/boneyardMockData';
 
 export async function getMessages(supabase, equipoId, jugadorId) {
   if (isMockPlayer(jugadorId) || isMockTeam(equipoId)) {

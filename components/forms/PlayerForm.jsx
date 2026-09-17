@@ -26,7 +26,7 @@ import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
 import { IconUser, IconCheck, IconCamera, IconTrash } from '@/components/icons3d';
 import { useRouter } from 'next/navigation';
-import { deletePlayer, savePlayer } from '@/services/player';
+import { deletePlayer, savePlayer } from '@/actions/playerActions';
 import { AVAILABLE_MEALS, PLAYER_OBJECTIVES } from '@/config/nutrition-days';
 import { CLINICAL_TAGS, parsePlayerClinicalTags } from '@/config/clinical-tags';
 import { compressAvatar, avatarFromRecord, initials as getInitials } from '@/lib/utils/avatar';

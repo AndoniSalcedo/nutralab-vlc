@@ -12,6 +12,8 @@ import {
   unlinkTecnicoFromNutricionista,
   getNutricionistaTecnicoLink,
   assignTeamsToTecnico,
+  updateTecnicoAvatar,
+  removeTecnicoAvatar,
 } from '@/repositories/tecnicoRepository';
 
 async function findAuthUserByEmail(supabase, email) {
@@ -155,3 +157,91 @@ export async function registerTecnicoAction(payload) {
     throw dbError;
   }
 }
+
+export async function getTecnicos() {
+  const data = await getTecnicosAction();
+  return data.tecnicos || [];
+}
+
+export async function createTecnico(payload) {
+  const data = await createTecnicoAction(payload);
+  return data.tecnico;
+}
+
+export async function registerTecnico(payload) {
+  const data = await registerTecnicoAction(payload);
+  return data.tecnico;
+}
+
+export async function uploadTecnicoAvatarAction(tecnicoIdOrFormData, maybeFile) {
+  const user = await getUser();
+  if (!user) throw new Error('No autorizado');
+
+  let id;
+  let remove = false;
+  let avatarFile = null;
+
+  if (tecnicoIdOrFormData instanceof FormData) {
+    id = tecnicoIdOrFormData.get('id');
+    remove = tecnicoIdOrFormData.get('remove') === 'true';
+    avatarFile = tecnicoIdOrFormData.get('avatar');
+  } else {
+    id = tecnicoIdOrFormData;
+    if (maybeFile && typeof maybeFile === 'object' && 'remove' in maybeFile && maybeFile.remove) {
+      remove = true;
+    } else {
+      avatarFile = maybeFile;
+    }
+  }
+
+  if (!id && user.role === 'tecnico') {
+    id = user.id;
+  }
+  if (!id) throw new Error('Falta id del técnico');
+
+  const supabase = getSupabaseAdmin();
+
+  if (user.role === 'tecnico') {
+    if (String(user.id) !== String(id)) {
+      throw new Error('No tienes acceso a este técnico');
+    }
+  } else {
+    const ownerId = getOwnerId(user);
+    if (!ownerId) throw new Error('No autorizado');
+
+    const link = await getNutricionistaTecnicoLink(supabase, ownerId, id);
+    if (!link) throw new Error('No tienes acceso a este técnico');
+  }
+
+  if (remove) {
+    await removeTecnicoAvatar(supabase, id);
+    revalidatePath('/dashboard/tecnicos');
+    return { success: true, removed: true };
+  }
+
+  if (!avatarFile || !(avatarFile instanceof File)) {
+    throw new Error('Falta archivo de avatar');
+  }
+
+  const buffer = Buffer.from(await avatarFile.arrayBuffer());
+  const payload = {
+    avatar: `\\x${buffer.toString('hex')}`,
+    avatar_mime: avatarFile.type || 'image/webp',
+    avatar_size: avatarFile.size,
+  };
+
+  await updateTecnicoAvatar(supabase, id, payload);
+  revalidatePath('/dashboard/tecnicos');
+
+  return {
+    success: true,
+    avatar_mime: payload.avatar_mime,
+    avatar_size: payload.avatar_size,
+  };
+}
+
+export {
+  deleteTecnicoAction as deleteTecnico,
+  assignTeamsAction as assignTeams,
+  uploadTecnicoAvatarAction as uploadTecnicoAvatar,
+};

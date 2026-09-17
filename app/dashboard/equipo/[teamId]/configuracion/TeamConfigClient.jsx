@@ -9,7 +9,7 @@ import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, I
 import { NUTRITION_DAY_TYPES, OBJECTIVE_DAY_TYPE_MACROS, PLAYER_OBJECTIVES } from '@/config/nutrition-days';
 import { PLAN_THEME_PRESETS, DEFAULT_PLAN_COLORS } from '@/config/plan-themes';
 import { compressAvatar, initials } from '@/lib/utils/avatar';
-import { uploadTeamPhoto, removeTeamPhoto, updateTeam, saveTeamConfig } from '@/services/team';
+import { uploadTeamPhoto, removeTeamPhoto, updateTeam, saveTeamConfig } from '@/actions/teamActions';
 import { useRouter } from 'next/navigation';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import DayTypeModal from '@/components/modals/DayTypeModal';

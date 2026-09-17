@@ -108,3 +108,8 @@ export async function deleteEvolutionAction(id) {
   revalidatePath(`/dashboard/jugador/${evolucion.jugador_id}`);
   return { ok: true };
 }
+
+export {
+  saveEvolutionAction as saveEvolution,
+  deleteEvolutionAction as deleteEvolution,
+};

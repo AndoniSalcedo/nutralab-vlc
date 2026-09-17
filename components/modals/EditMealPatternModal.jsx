@@ -18,7 +18,7 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconSparkles, IconAlertCircle, IconCheck, IconX } from '@/components/icons3d';
-import { parseMealTree } from '@/services/meal';
+import { parseMealTree } from '@/actions/mealActions';
 import {
   getTreeProteinaOptions,
   getTreeHidratoOptions,

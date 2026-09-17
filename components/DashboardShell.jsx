@@ -20,13 +20,14 @@ import {
   Container,
   Group,
   Menu,
+  Text,
   UnstyledButton,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import Logo from "./Logo";
 import { initials } from "@/lib/utils";
 import { env } from "@/config/env";
-import { logout } from "@/services/auth";
+import { logout } from "@/actions/authActions";
 
 export default function DashboardShell({ children, user }) {
   const [opened, setOpened] = useState(false);
@@ -42,7 +43,9 @@ export default function DashboardShell({ children, user }) {
       ? `/api/media/tecnico-avatar?id=${user.id}`
       : user?.role === "jugador"
         ? `/api/media/player-avatar?id=${user.id}`
-        : undefined);
+        : user?.role === "admin" && (user?.external_admin_id || user?.id)
+          ? user?.avatar || undefined
+          : undefined);
 
   const handleLogout = async () => {
     await logout();
@@ -103,6 +106,23 @@ export default function DashboardShell({ children, user }) {
               </Menu.Target>
 
               <Menu.Dropdown>
+                {(user?.name || user?.email) && (
+                  <>
+                    <Box px="xs" py={6}>
+                      {user?.name && (
+                        <Text size="sm" fw={600} truncate>
+                          {user.name}
+                        </Text>
+                      )}
+                      {user?.email && (
+                        <Text size="xs" c="dimmed" truncate>
+                          {user.email}
+                        </Text>
+                      )}
+                    </Box>
+                    <Menu.Divider />
+                  </>
+                )}
                 <Menu.Item
                   leftSection={<IconUsersGroup size={16} stroke={1.5} />}
                   onClick={() => {

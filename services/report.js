@@ -23,3 +23,12 @@ export async function exportWeightsReport(payload) {
   }
   return res.blob();
 }
+
+export async function downloadAiPlanPdf(planId) {
+  const res = await fetch(`/api/reports/plan/${planId}`);
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'No se pudo descargar el PDF');
+  }
+  return res;
+}

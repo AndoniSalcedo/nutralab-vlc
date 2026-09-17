@@ -358,3 +358,10 @@ export async function updateSupplementationCatalogAction(payload) {
 
   throw new Error('Acción no soportada');
 }
+
+export {
+  getPlayerSupplementationAction as getPlayerSupplementation,
+  postPlayerSupplementationAction as postPlayerSupplementation,
+  getSupplementationCatalogAction as getSupplementationCatalog,
+  updateSupplementationCatalogAction as updateSupplementationCatalog,
+};

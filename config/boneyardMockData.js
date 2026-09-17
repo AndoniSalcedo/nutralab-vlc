@@ -59,6 +59,24 @@ export const mockTeams = [
       { id: 221, nombre: 'Sofía', apellidos: 'Jugador Dos', posicion: 'Mediocentro' },
       { id: 222, nombre: 'Mateo', apellidos: 'Jugador Tres', posicion: 'Defensa' }
     ]
+  },
+  {
+    ...mockTeam,
+    players_count: 3,
+    players: [
+      { id: 220, nombre: 'Carlos', apellidos: 'Jugador Uno', posicion: 'Delantero' },
+      { id: 221, nombre: 'Sofía', apellidos: 'Jugador Dos', posicion: 'Mediocentro' },
+      { id: 222, nombre: 'Mateo', apellidos: 'Jugador Tres', posicion: 'Defensa' }
+    ]
+  },
+  {
+    ...mockTeam,
+    players_count: 3,
+    players: [
+      { id: 220, nombre: 'Carlos', apellidos: 'Jugador Uno', posicion: 'Delantero' },
+      { id: 221, nombre: 'Sofía', apellidos: 'Jugador Dos', posicion: 'Mediocentro' },
+      { id: 222, nombre: 'Mateo', apellidos: 'Jugador Tres', posicion: 'Defensa' }
+    ]
   }
 ];
 

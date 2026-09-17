@@ -34,10 +34,10 @@ import {
   IconScale,
 } from '@/components/icons3d';
 
-import { savePlayerMeal } from '@/services/meal';
+import { savePlayerMeal } from '@/actions/mealActions';
 import { compressFoodPhoto } from '@/lib/utils/compress';
 import { notifications } from '@mantine/notifications';
-import { useFoods } from '@/hooks/use-foods';
+import { getFoods } from '@/actions/foodActions';
 
 const MEAL_TYPES = [
   { value: 'breakfast', label: 'Desayuno' },
@@ -110,8 +110,20 @@ const toValidDate = (value) => {
 };
 
 export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
-  const { foods, loading: foodsLoading } = useFoods();
+  const [foods, setFoods] = useState([]);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    getFoods()
+      .then((items) => {
+        if (active) setFoods(items || []);
+      })
+      .catch((err) => console.error('Error cargando alimentos:', err));
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const [takenAt, setTakenAt] = useState(new Date());
   const [dishName, setDishName] = useState('');
@@ -464,10 +476,9 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
               searchable
               clearable
               limit={25}
-              disabled={foodsLoading}
               variant="filled"
               radius="md"
-              nothingFoundMessage={foodsLoading ? 'Cargando alimentos…' : 'No hay alimentos'}
+              nothingFoundMessage="No hay alimentos"
             />
             <Group gap="xs" wrap="nowrap" align="flex-start">
               <NumberInput

@@ -2,8 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, Group, Text, Button, Select, Radio, Stack, Checkbox, Avatar, Box, ScrollArea } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import { notifications } from '@mantine/notifications';
-import { getTeams } from '@/services/team';
-import { transferPlayers } from '@/services/player';
+import { getTeams } from '@/actions/teamActions';
+import { transferPlayers } from '@/actions/playerActions';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 

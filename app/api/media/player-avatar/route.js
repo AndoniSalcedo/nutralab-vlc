@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
-import { forbidden, getOwnedPlayer, getAccessiblePlayer } from '@/lib/auth/team-access';
-import { getPlayerAvatar, updatePlayer } from '@/repositories/playerRepository';
+import { forbidden, getAccessiblePlayer } from '@/lib/auth/team-access';
+import { getPlayerAvatar } from '@/repositories/playerRepository';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,67 +56,6 @@ export async function GET(req) {
     });
   } catch (e) {
     console.error('Error in media/player-avatar GET:', e);
-    return NextResponse.json({ error: e.message }, { status: 500 });
-  }
-}
-
-export async function POST(req) {
-  try {
-    const user = await getUser();
-    if (!user) return forbidden('No autorizado');
-
-    const formData = await req.formData();
-    let id = formData.get('id');
-    const remove = formData.get('remove') === 'true';
-    const avatarFile = formData.get('avatar');
-
-    if (!id && user.role === 'jugador') {
-      id = user.id;
-    }
-    if (!id) return NextResponse.json({ error: 'Falta id del jugador' }, { status: 400 });
-
-    const supabase = getSupabaseAdmin();
-
-    if (user.role === 'jugador') {
-      if (String(user.id) !== String(id)) {
-        return forbidden('No tienes acceso a este jugador');
-      }
-    } else {
-      const owned = await getOwnedPlayer(supabase, user, id);
-      if (!owned) return forbidden('No tienes acceso a este jugador');
-    }
-
-    if (remove) {
-      await updatePlayer(supabase, id, {
-        avatar: null,
-        avatar_mime: null,
-        avatar_size: null,
-        updated_at: new Date().toISOString(),
-      });
-      return NextResponse.json({ success: true, removed: true });
-    }
-
-    if (!avatarFile || !(avatarFile instanceof File)) {
-      return NextResponse.json({ error: 'Falta archivo de avatar' }, { status: 400 });
-    }
-
-    const buffer = Buffer.from(await avatarFile.arrayBuffer());
-    const payload = {
-      avatar: `\\x${buffer.toString('hex')}`,
-      avatar_mime: avatarFile.type || 'image/webp',
-      avatar_size: avatarFile.size,
-      updated_at: new Date().toISOString(),
-    };
-
-    await updatePlayer(supabase, id, payload);
-
-    return NextResponse.json({
-      success: true,
-      avatar_mime: payload.avatar_mime,
-      avatar_size: payload.avatar_size,
-    });
-  } catch (e) {
-    console.error('Error in media/player-avatar POST:', e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }

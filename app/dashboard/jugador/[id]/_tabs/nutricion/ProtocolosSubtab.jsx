@@ -9,7 +9,7 @@ import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
-import { updatePlayerField } from '@/services/player';
+import { updatePlayerField } from '@/actions/playerActions';
 import ProtocolEditorModal from '@/components/modals/ProtocolEditorModal';
 import NothingFound from '@/components/NothingFound';
 import { PROTOCOL_ICON_MAP as AVAILABLE_ICONS } from '@/components/ProtocolIcon';

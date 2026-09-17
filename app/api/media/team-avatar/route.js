@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
-import { forbidden, getOwnedTeam } from '@/lib/auth/team-access';
-import { getTeamPhoto, updateTeam } from '@/repositories/teamRepository';
+import { forbidden } from '@/lib/auth/team-access';
+import { getTeamPhoto } from '@/repositories/teamRepository';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,57 +44,6 @@ export async function GET(req) {
     });
   } catch (e) {
     console.error('Error in media/team-avatar GET:', e);
-    return NextResponse.json({ error: e.message }, { status: 500 });
-  }
-}
-
-export async function POST(req) {
-  try {
-    const user = await getUser();
-    if (!user || user.role === 'jugador' || user.role === 'tecnico') return forbidden('No autorizado');
-
-    const formData = await req.formData();
-    const id = formData.get('id');
-    const remove = formData.get('remove') === 'true';
-    const fotoFile = formData.get('foto') || formData.get('avatar');
-
-    if (!id) return NextResponse.json({ error: 'Falta id del equipo' }, { status: 400 });
-
-    const supabase = getSupabaseAdmin();
-    const ownedTeam = await getOwnedTeam(supabase, user, id);
-    if (!ownedTeam) return forbidden('No tienes acceso a este equipo');
-
-    if (remove) {
-      await updateTeam(supabase, id, {
-        foto: null,
-        foto_mime: null,
-        foto_size: null,
-        updated_at: new Date().toISOString(),
-      });
-      return NextResponse.json({ success: true, removed: true });
-    }
-
-    if (!fotoFile || !(fotoFile instanceof File)) {
-      return NextResponse.json({ error: 'Falta archivo de imagen' }, { status: 400 });
-    }
-
-    const buffer = Buffer.from(await fotoFile.arrayBuffer());
-    const payload = {
-      foto: `\\x${buffer.toString('hex')}`,
-      foto_mime: fotoFile.type || 'image/webp',
-      foto_size: fotoFile.size,
-      updated_at: new Date().toISOString(),
-    };
-
-    await updateTeam(supabase, id, payload);
-
-    return NextResponse.json({
-      success: true,
-      foto_mime: payload.foto_mime,
-      foto_size: payload.foto_size,
-    });
-  } catch (e) {
-    console.error('Error in media/team-avatar POST:', e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }

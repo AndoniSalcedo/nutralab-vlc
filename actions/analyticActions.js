@@ -39,10 +39,17 @@ function extractAnalitica(message) {
   return parametros;
 }
 
-export async function uploadAnaliticaAction(formData) {
-  const archivo = formData.get('file');
-  const jugadorId = formData.get('jugador_id');
-  const fechaExtraccion = formData.get('fecha_extraccion');
+export async function uploadAnaliticaAction(fileOrFormData, jugadorIdParam, fechaParam) {
+  let archivo, jugadorId, fechaExtraccion;
+  if (fileOrFormData instanceof FormData) {
+    archivo = fileOrFormData.get('file');
+    jugadorId = fileOrFormData.get('jugador_id');
+    fechaExtraccion = fileOrFormData.get('fecha_extraccion');
+  } else {
+    archivo = fileOrFormData;
+    jugadorId = jugadorIdParam;
+    fechaExtraccion = fechaParam;
+  }
   if (!archivo || !jugadorId) throw new Error('Faltan datos');
 
   const supabase = getSupabaseAdmin();
@@ -152,3 +159,9 @@ export async function toggleAnaliticaVisibilityAction(id, visible_para_jugador) 
   revalidatePath(`/dashboard/jugador/${analitica.jugador_id}`);
   return { ok: true, analitica: data };
 }
+
+export {
+  uploadAnaliticaAction as uploadAnalitica,
+  deleteAnaliticaAction as deleteAnalitica,
+  toggleAnaliticaVisibilityAction as toggleAnaliticaVisibility,
+};

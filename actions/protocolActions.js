@@ -108,3 +108,8 @@ export async function batchImportProtocolsAction({ sourceTeamId, targetTeamId, p
     imported
   };
 }
+
+export {
+  transferProtocolAction as transferProtocol,
+  batchImportProtocolsAction as batchImportProtocols,
+};

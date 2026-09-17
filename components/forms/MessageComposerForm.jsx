@@ -5,7 +5,7 @@ import { Button, Group, MultiSelect, SegmentedControl, Stack, Textarea, TextInpu
 import { notifications } from '@mantine/notifications';
 import { IconSend } from '@/components/icons3d';
 import { useRouter } from 'next/navigation';
-import { sendMessage } from '@/services/message';
+import { sendMessage } from '@/actions/messageActions';
 
 export default function MessageComposerForm({
   players = [],

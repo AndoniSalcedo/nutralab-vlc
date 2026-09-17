@@ -22,10 +22,9 @@ import { getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/config/nutrition-
 import { CLINICAL_TAGS } from '@/config/clinical-tags';
 import { CampoEditable, ComidasEditable, PrepartidoEditable } from '../editable';
 import { latestMetricValue } from '@/lib/metrics/player';
-import { listPlayerMeals } from '@/services/meal';
-import { getAiPlans } from '@/services/plan';
+import { listPlayerMeals } from '@/actions/mealActions';
+import { getAiPlans } from '@/actions/planActions';
 import { getSubtabHeader } from '../subtab-config';
-import { useFoods } from '@/hooks/use-foods';
 import { JugadorHeaderCompactMobile } from '@/components/JugadorHeader';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import { usePlayerDashboard } from '../PlayerDashboardContext';
@@ -124,7 +123,6 @@ export default function PerfilSubtab({
   menus = [],
   readOnly = false,
 }) {
-  const { foods } = useFoods();
   const { user } = usePlayerDashboard();
   const [meals, setMeals] = useState([]);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
@@ -174,7 +172,7 @@ export default function PerfilSubtab({
     };
   }, [jugador?.id, selectedDate]);
 
-  const consumed = useMemo(() => calculateConsumedStats(meals, foods), [meals, foods]);
+  const consumed = useMemo(() => calculateConsumedStats(meals, []), [meals]);
 
   const pesoActual = latestMetricValue(evoluciones, 'peso_kg', jugador?.peso_kg);
   const weightKg = Number(pesoActual || 0);

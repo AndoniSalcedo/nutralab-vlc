@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { initials, filenameFromResponse, getPlayerAvatarUrl } from '@/lib/utils';
 import { Button, Group, Paper, Stack, Text, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Modal, Divider } from '@mantine/core';
-import { deletePlayer } from '@/services/player';
-import { getWeeklyMenus } from '@/services/menu';
+import { deletePlayer } from '@/actions/playerActions';
+import { getWeeklyMenus } from '@/actions/menuActions';
 import { generateWeeklySquadReport } from '@/services/report';
 import { notifications } from '@mantine/notifications';
 import { IconChevronDown, IconDots, IconDotsVertical } from '@/components/icons3d';

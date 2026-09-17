@@ -25,7 +25,7 @@ import {
 } from '@mantine/core';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import { notifications } from '@mantine/notifications';
-import { getSupplementationCatalog, updateSupplementationCatalog } from '@/services/supplement';
+import { getSupplementationCatalog, updateSupplementationCatalog } from '@/actions/supplementActions';
 import Icon3D, {
   IconJar,
   IconCardFile,

@@ -1,4 +1,4 @@
-import { mockMenus, isMockTeam } from '@/lib/boneyardMockData';
+import { mockMenus, isMockTeam } from '@/config/boneyardMockData';
 
 export async function getLatestMenu(supabase, equipoId) {
   if (!equipoId) return null;

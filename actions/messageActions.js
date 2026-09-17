@@ -68,3 +68,5 @@ export async function sendMessageAction(payload) {
   revalidatePath(`/dashboard/equipo/${teamId}`);
   return { messages: data || [] };
 }
+
+export { sendMessageAction as sendMessage };

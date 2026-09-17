@@ -61,3 +61,8 @@ export async function deletePesajeAction(id) {
   revalidatePath(`/dashboard/jugador/${pesaje.jugador_id}`);
   return { ok: true };
 }
+
+export {
+  savePesajeAction as savePesaje,
+  deletePesajeAction as deletePesaje,
+};

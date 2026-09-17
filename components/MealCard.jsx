@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react';
 import { AspectRatio, Badge, Box, Group, Image, Paper, Stack, Text, ActionIcon, Tooltip, Collapse, useMantineTheme, useComputedColorScheme } from "@mantine/core";
 import { IconClock, IconEdit, IconTrash } from '@/components/icons3d';
-import { useFoods } from '@/hooks/use-foods';
 
 const calcNutrient = (food, grams, key) => {
   const value = Number(food?.[key]);
@@ -83,8 +82,7 @@ function MealCardPlaceholder({ mealType }) {
   );
 }
 
-export default function MealCard({ m, onOpen, onEdit, onDelete }) {
-  const { foods } = useFoods();
+export default function MealCard({ m, onOpen, onEdit, onDelete, foods = [] }) {
   const { label } = metaFor(m.mealType);
   const time = new Date(m.takenAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const title = (m.dishName || '').trim() || label;

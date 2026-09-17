@@ -95,7 +95,18 @@ export async function updatePlayerFieldAction(id, field, value) {
   return { ok: true };
 }
 
-export async function updatePlayerCredentialsAction({ jugadorId, email, password }) {
+export async function updatePlayerCredentialsAction(jugadorIdOrPayload, emailParam, passwordParam) {
+  let jugadorId, email, password;
+  if (typeof jugadorIdOrPayload === 'object' && jugadorIdOrPayload !== null) {
+    jugadorId = jugadorIdOrPayload.jugadorId;
+    email = jugadorIdOrPayload.email;
+    password = jugadorIdOrPayload.password;
+  } else {
+    jugadorId = jugadorIdOrPayload;
+    email = emailParam;
+    password = passwordParam;
+  }
+
   const user = await getUser();
   if (user?.role !== 'admin') {
     throw new Error('No autorizado');
@@ -530,7 +541,16 @@ async function importGroups({ supabase, team, plan, players, decisions }) {
   return results;
 }
 
-export async function importPlayerExcelAction(formData) {
+export async function importPlayerExcelAction(formDataOrPayload) {
+  let formData = formDataOrPayload;
+  if (!(formDataOrPayload instanceof FormData)) {
+    formData = new FormData();
+    if (formDataOrPayload.file) formData.append('file', formDataOrPayload.file);
+    if (formDataOrPayload.modo) formData.append('modo', formDataOrPayload.modo);
+    if (formDataOrPayload.teamId) formData.append('team_id', formDataOrPayload.teamId);
+    if (formDataOrPayload.decisiones) formData.append('decisiones', JSON.stringify(formDataOrPayload.decisiones));
+  }
+
   const file = formData.get('file');
   const mode = cleanText(formData.get('modo') || 'preview');
   const teamId = cleanText(formData.get('team_id'));
@@ -579,3 +599,84 @@ export async function importPlayerExcelAction(formData) {
     resultados,
   };
 }
+
+export async function uploadPlayerAvatarAction(jugadorIdOrFormData, maybeFile) {
+  const user = await getUser();
+  if (!user) throw new Error('No autorizado');
+
+  let id;
+  let remove = false;
+  let avatarFile = null;
+
+  if (jugadorIdOrFormData instanceof FormData) {
+    id = jugadorIdOrFormData.get('id');
+    remove = jugadorIdOrFormData.get('remove') === 'true';
+    avatarFile = jugadorIdOrFormData.get('avatar');
+  } else {
+    id = jugadorIdOrFormData;
+    if (maybeFile && typeof maybeFile === 'object' && 'remove' in maybeFile && maybeFile.remove) {
+      remove = true;
+    } else {
+      avatarFile = maybeFile;
+    }
+  }
+
+  if (!id && user.role === 'jugador') {
+    id = user.id;
+  }
+  if (!id) throw new Error('Falta id del jugador');
+
+  const supabase = getSupabaseAdmin();
+
+  if (user.role === 'jugador') {
+    if (String(user.id) !== String(id)) {
+      throw new Error('No tienes acceso a este jugador');
+    }
+  } else {
+    const owned = await getOwnedPlayer(supabase, user, id);
+    if (!owned) throw new Error('No tienes acceso a este jugador');
+  }
+
+  if (remove) {
+    await updatePlayer(supabase, id, {
+      avatar: null,
+      avatar_mime: null,
+      avatar_size: null,
+      updated_at: new Date().toISOString(),
+    });
+    revalidatePath(`/dashboard/jugador/${id}`);
+    return { success: true, removed: true };
+  }
+
+  if (!avatarFile || !(avatarFile instanceof File)) {
+    throw new Error('Falta archivo de avatar');
+  }
+
+  const buffer = Buffer.from(await avatarFile.arrayBuffer());
+  const payload = {
+    avatar: `\\x${buffer.toString('hex')}`,
+    avatar_mime: avatarFile.type || 'image/webp',
+    avatar_size: avatarFile.size,
+    updated_at: new Date().toISOString(),
+  };
+
+  await updatePlayer(supabase, id, payload);
+  revalidatePath(`/dashboard/jugador/${id}`);
+
+  return {
+    success: true,
+    avatar_mime: payload.avatar_mime,
+    avatar_size: payload.avatar_size,
+  };
+}
+
+export {
+  updatePlayerCredentialsAction as updatePlayerCredentials,
+  updatePlayerPasswordAction as updatePlayerPassword,
+  updatePlayerFieldAction as updatePlayerField,
+  transferPlayersAction as transferPlayers,
+  savePlayerAction as savePlayer,
+  deletePlayerAction as deletePlayer,
+  importPlayerExcelAction as importPlayerExcel,
+  uploadPlayerAvatarAction as uploadPlayerAvatar,
+};

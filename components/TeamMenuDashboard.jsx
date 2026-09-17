@@ -15,7 +15,7 @@ import { notifications } from '@mantine/notifications';
 import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX, IconDotsVertical } from '@/components/icons3d';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import MenuSemanal, { formatWeek, WEEKDAY_ORDER } from '@/components/MenuSemanal';
-import { uploadWeeklyMenu, deleteWeeklyMenu, updateWeeklyMenu, createWeeklyMenu } from '@/services/menu';
+import { uploadWeeklyMenu, deleteWeeklyMenu, updateWeeklyMenu, createWeeklyMenu } from '@/actions/menuActions';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import CreateMenuModal from '@/components/modals/CreateMenuModal';
 import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
