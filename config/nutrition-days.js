@@ -86,10 +86,10 @@ export function getMealsForCount(count) {
 
 export function sortMeals(meals = []) {
   if (!Array.isArray(meals)) return [];
-  const order = [...STANDARD_MEALS, 'Post-entreno'].map((m) => m.toLowerCase());
+  const order = [...STANDARD_MEALS, 'Post-entreno'].map((m) => String(m).toLowerCase());
   return [...meals].sort((a, b) => {
-    const strA = String(a).trim().toLowerCase();
-    const strB = String(b).trim().toLowerCase();
+    const strA = String(a || '').trim().toLowerCase();
+    const strB = String(b || '').trim().toLowerCase();
     const ia = order.indexOf(strA);
     const ib = order.indexOf(strB);
     return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
@@ -110,9 +110,10 @@ export function getUserMeals(jugador) {
   }
 
   if (jugador.postentreno) {
-    const hasPost = meals.some(
-      (m) => m.toLowerCase() === 'post-entreno' || m.toLowerCase() === 'post entreno' || m.toLowerCase() === 'post'
-    );
+    const hasPost = meals.some((m) => {
+      const low = String(m || '').toLowerCase();
+      return low === 'post-entreno' || low === 'post entreno' || low === 'post';
+    });
     if (!hasPost) {
       meals.push('Post-entreno');
     }
@@ -121,8 +122,19 @@ export function getUserMeals(jugador) {
 }
 
 export function isMainMeal(mealName, mealConfig = null) {
-  if (mealConfig && typeof mealConfig === 'object' && mealConfig.isMain !== undefined) {
-    return Boolean(mealConfig.isMain);
+  if (typeof mealConfig === 'boolean') {
+    return mealConfig;
+  }
+  if (mealConfig && typeof mealConfig === 'object') {
+    if (mealConfig.isMainMeal !== undefined) {
+      return Boolean(mealConfig.isMainMeal);
+    }
+    if (mealConfig.value && typeof mealConfig.value === 'object' && mealConfig.value.isMainMeal !== undefined) {
+      return Boolean(mealConfig.value.isMainMeal);
+    }
+    if (mealConfig.isMain !== undefined) {
+      return Boolean(mealConfig.isMain);
+    }
   }
   const norm = String(mealName || '').toLowerCase().trim();
   return norm.includes('comida') || norm.includes('cena');
@@ -222,22 +234,27 @@ export function getUserMealsForDay(jugador, tipoDia, teamConfig, preMatchConfig 
     if (matchConfig && Array.isArray(matchConfig.ingestas) && matchConfig.ingestas.length > 0) {
       const matchMeals = [...matchConfig.ingestas];
       const hasPost = matchConfig.postentreno !== undefined ? Boolean(matchConfig.postentreno) : Boolean(jugador.postentreno);
-      const isAlreadyPost = matchMeals.some(
-        (m) => m.toLowerCase() === 'post-entreno' || m.toLowerCase() === 'post entreno' || m.toLowerCase() === 'post' || m.toLowerCase() === 'post-partido' || m.toLowerCase() === 'post partido'
-      );
+      const isAlreadyPost = matchMeals.some((m) => {
+        const low = String(m || '').toLowerCase();
+        return low === 'post-entreno' || low === 'post entreno' || low === 'post' || low === 'post-partido' || low === 'post partido';
+      });
       if (hasPost && !isAlreadyPost) {
         matchMeals.push('Post-entreno');
       } else if (!hasPost && isAlreadyPost) {
-        return sortMeals(matchMeals.filter(m => !(m.toLowerCase() === 'post-entreno' || m.toLowerCase() === 'post entreno' || m.toLowerCase() === 'post' || m.toLowerCase() === 'post-partido' || m.toLowerCase() === 'post partido')));
+        return sortMeals(matchMeals.filter((m) => {
+          const low = String(m || '').toLowerCase();
+          return !(low === 'post-entreno' || low === 'post entreno' || low === 'post' || low === 'post-partido' || low === 'post partido');
+        }));
       }
       return sortMeals(matchMeals);
     }
   }
 
-  const hasPostentrenoEnabled = jugador.postentreno;
+  const hasPostentrenoEnabled = Boolean(jugador.postentreno);
   if (!hasPostentrenoEnabled) {
     return sortMeals(baseMeals.filter((meal) => {
-      const isPost = meal.toLowerCase() === 'post-entreno' || meal.toLowerCase() === 'post entreno' || meal.toLowerCase() === 'post';
+      const low = String(meal || '').toLowerCase();
+      const isPost = low === 'post-entreno' || low === 'post entreno' || low === 'post';
       return !isPost;
     }));
   }
@@ -257,7 +274,8 @@ export function getUserMealsForDay(jugador, tipoDia, teamConfig, preMatchConfig 
   }
 
   return sortMeals(baseMeals.filter((meal) => {
-    const isPost = meal.toLowerCase() === 'post-entreno' || meal.toLowerCase() === 'post entreno' || meal.toLowerCase() === 'post';
+    const low = String(meal || '').toLowerCase();
+    const isPost = low === 'post-entreno' || low === 'post entreno' || low === 'post';
     if (isPost) {
       return tienePostentreno;
     }

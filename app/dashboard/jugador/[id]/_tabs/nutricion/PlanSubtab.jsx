@@ -1242,7 +1242,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
                                 const existingMeals = datos?.dias?.[dayKey]?.ingestas || [];
                                 const fallbackMeals = getUserMeals(jugador).map((name) => {
-                                  const existing = existingMeals.find(m => m.nombre.toLowerCase() === name.toLowerCase());
+                                  const existing = existingMeals.find(m => String(m?.nombre || '').toLowerCase() === String(name || '').toLowerCase());
                                   return {
                                     nombre: name,
                                     detalle: existing?.detalle || '',

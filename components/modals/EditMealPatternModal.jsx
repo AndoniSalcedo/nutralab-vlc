@@ -27,7 +27,7 @@ import {
   getTreeLacteoOptions,
   getTreeGrasaOptions,
 } from '@/config/food-tree-options';
-import { isMainMeal } from '@/config/nutrition-days';
+import { isMainMeal as checkIsMainMeal } from '@/config/nutrition-days';
 
 function ensureOptionsContain(options, currentValues) {
   if (!currentValues) return options;
@@ -62,7 +62,7 @@ export default function EditMealPatternModal({
   onSave,
   jugadorId = null,
 }) {
-  const [isMain, setIsMain] = useState(() => isMainMeal(mealName, value));
+  const [isMainMeal, setIsMainMeal] = useState(() => checkIsMainMeal(mealName, value));
   const [isComplete, setIsComplete] = useState(false);
   const [aiText, setAiText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -81,7 +81,7 @@ export default function EditMealPatternModal({
       setAiError(null);
       const val = value || {};
 
-      setIsMain(isMainMeal(mealName, val));
+      setIsMainMeal(checkIsMainMeal(mealName, val));
 
       // Detectar si es árbol completo
       const complete = Boolean(val.isComplete);
@@ -204,7 +204,7 @@ export default function EditMealPatternModal({
       : 'Rotación variada';
 
     const structuredMeal = {
-      isMain: Boolean(isMain),
+      isMainMeal: Boolean(isMainMeal),
       isComplete: isComplete || (!hasAlternatives && allParts.length === 0),
       proteina: isComplete || hasAlternatives ? [] : proteina,
       hidrato: isComplete || hasAlternatives ? [] : hidrato,
@@ -244,26 +244,26 @@ export default function EditMealPatternModal({
     >
       <Stack gap="md">
         {/* Jerarquía de ingesta: Comida Principal vs Toma Ligera */}
-        <Paper p="sm" withBorder radius="sm" bg={isMain ? 'blue.0' : 'gray.0'}>
+        <Paper p="sm" withBorder radius="sm" bg={isMainMeal ? 'blue.0' : 'gray.0'}>
           <Group justify="space-between" align="center">
             <Box style={{ flex: 1 }}>
               <Group gap={6} align="center">
-                <Text size="sm" fw={600} c={isMain ? 'blue.9' : 'dark.7'}>
-                  {isMain ? 'Comida principal' : 'Toma ligera / secundaria'}
+                <Text size="sm" fw={600} c={isMainMeal ? 'blue.9' : 'dark.7'}>
+                  {isMainMeal ? 'Comida principal' : 'Toma ligera / secundaria'}
                 </Text>
-                <Text size="11px" fw={600} c={isMain ? 'blue.7' : 'dimmed'}>
-                  ● {isMain ? 'Plato fuerte cocinado' : 'Desayuno / Merienda / Snack'}
+                <Text size="11px" fw={600} c={isMainMeal ? 'blue.7' : 'dimmed'}>
+                  ● {isMainMeal ? 'Plato fuerte cocinado' : 'Desayuno / Merienda / Snack'}
                 </Text>
               </Group>
               <Text size="xs" c="dimmed" mt={2}>
-                {isMain
+                {isMainMeal
                   ? 'Ingesta principal del día (almuerzo o cena). Permite carnes y pescados cocinados en cocina.'
                   : 'Toma secundaria o ligera. Enfocada en alimentos ligeros: huevos, lácteos, fiambres magros, conservas, panes y fruta.'}
               </Text>
             </Box>
             <Switch
-              checked={isMain}
-              onChange={(e) => setIsMain(e.currentTarget.checked)}
+              checked={isMainMeal}
+              onChange={(e) => setIsMainMeal(e.currentTarget.checked)}
               color="blue"
               size="md"
             />
@@ -446,8 +446,8 @@ export default function EditMealPatternModal({
             Resumen de la toma configurada:
           </Text>
           <Text size="xs" mb={3}>
-            <Text span fw={600} c={isMain ? 'blue.8' : 'dimmed'}>● Jerarquía: </Text>
-            <Text span c="dark.7" fw={500}>{isMain ? 'Comida principal' : 'Toma ligera / secundaria'}</Text>
+            <Text span fw={600} c={isMainMeal ? 'blue.8' : 'dimmed'}>● Jerarquía: </Text>
+            <Text span c="dark.7" fw={500}>{isMainMeal ? 'Comida principal' : 'Toma ligera / secundaria'}</Text>
           </Text>
           {isComplete ? (
             <Text size="xs" c="teal.8" fw={600}>

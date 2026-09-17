@@ -323,7 +323,7 @@ export function ComidasEditable({
             <Stack gap="xs">
               {activeMeals.map((meal) => {
                 const mealData = recsDefecto[meal] || {};
-                const isMain = isMainMeal(meal, mealData);
+                const isMainMealIntake = isMainMeal(meal, mealData);
                 const isCompl = Boolean(mealData.isComplete);
                 const hidratos = Array.isArray(mealData.hidrato) ? mealData.hidrato : mealData.hidrato ? [mealData.hidrato] : [];
                 const proteinas = Array.isArray(mealData.proteina) ? mealData.proteina : mealData.proteina ? [mealData.proteina] : [];
@@ -342,8 +342,8 @@ export function ComidasEditable({
                         <Text size="xs" fw={700} c="dark.8">
                           {meal}
                         </Text>
-                        <Text size="11px" fw={600} c={isMain ? 'blue.7' : 'dimmed'}>
-                          ● {isMain ? 'Comida principal' : 'Toma ligera'}
+                        <Text size="11px" fw={600} c={isMainMealIntake ? 'blue.7' : 'dimmed'}>
+                          ● {isMainMealIntake ? 'Comida principal' : 'Toma ligera'}
                         </Text>
                       </Group>
 
@@ -742,7 +742,7 @@ export function PrepartidoEditable({
                     {currentMeals.map((m) => {
                       const timing = getMealTimingBadge(opt.value, m);
                       const mealData = currentRecs[m] || {};
-                      const isMain = isMainMeal(m, mealData);
+                      const isMainMealIntake = isMainMeal(m, mealData);
                       const isCompl = Boolean(mealData.isComplete);
                       const hidratos = Array.isArray(mealData.hidrato) ? mealData.hidrato : mealData.hidrato ? [mealData.hidrato] : [];
                       const proteinas = Array.isArray(mealData.proteina) ? mealData.proteina : mealData.proteina ? [mealData.proteina] : [];
@@ -760,8 +760,8 @@ export function PrepartidoEditable({
                               <Text size="xs" fw={700} c="dark.8">
                                 {m} {timing ? `(${timing})` : ''}
                               </Text>
-                              <Text size="11px" fw={600} c={isMain ? 'blue.7' : 'dimmed'}>
-                                ● {isMain ? 'Comida principal' : 'Toma ligera'}
+                              <Text size="11px" fw={600} c={isMainMealIntake ? 'blue.7' : 'dimmed'}>
+                                ● {isMainMealIntake ? 'Comida principal' : 'Toma ligera'}
                               </Text>
                             </Group>
 
