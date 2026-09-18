@@ -98,7 +98,7 @@
       {
         "day": "martes",
         "meal": "Desayuno",
-        "text": "Desayuno Danjuma: \"Leche desnatada 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
+        "text": "Desayuno Danjuma: \"Leche entera alto proteína 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
       },
       {
         "day": "miercoles",
@@ -113,12 +113,12 @@
       {
         "day": "viernes",
         "meal": "Desayuno",
-        "text": "Desayuno Danjuma: \"Leche entera 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
+        "text": "Desayuno Danjuma: \"Leche desnatada 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
       },
       {
         "day": "sabado",
         "meal": "Desayuno",
-        "text": "Desayuno Danjuma: \"Leche entera alto proteína 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
+        "text": "Desayuno Danjuma: \"Leche entera 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
       },
       {
         "day": "domingo",
@@ -442,8 +442,17 @@
         }
       }
     },
-    "totalHallazgos": 0,
-    "hallazgos": [],
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "MONOTONÍA_PROTEÍNA_MISMO_DÍA",
+        "severity": "MEDIA",
+        "day": "miercoles",
+        "detail": "Misma proteína (pollo) en comida y cena",
+        "meals": "Comida: \"Puré de patata 245g, Pechuga de pollo 195g, Champiñón 80g, Cebolla 80g, Calabacín 80g, Pimiento rojo 50g, Zanahoria 80g, Brócoli 80g, AOVE 15g, Arándanos 80g\" vs Cena: \"Macarrones 90g, Hamburguesa de pollo 235g, Calabacín 80g, Frambuesas 200g, AOVE 5g\"",
+        "traceAnalysis": "Fuente Comida: menu_del_club | Fuente Cena: menu_del_club. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
+      }
+    ],
     "notasIntencionadas": []
   },
   {
@@ -519,8 +528,17 @@
         }
       }
     },
-    "totalHallazgos": 0,
-    "hallazgos": [],
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "MONOTONÍA_PROTEÍNA_MISMO_DÍA",
+        "severity": "MEDIA",
+        "day": "domingo",
+        "detail": "Misma proteína (pollo) en comida y cena",
+        "meals": "Comida: \"Arroz basmati 90g, Contramuslo de pollo deshuesado 350g, Espárragos verdes 80g, Arándanos 200g, AOVE 5g\" vs Cena: \"Gajos de patata 270g, Solomillos de pollo 300g, Acelga 80g, Naranja 200g, AOVE 20g\"",
+        "traceAnalysis": "Fuente Comida: menu_del_club | Fuente Cena: menu_del_club. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
+      }
+    ],
     "notasIntencionadas": []
   },
   {
@@ -539,9 +557,9 @@
       {
         "category": "MONOTONÍA_PROTEÍNA_MISMO_DÍA",
         "severity": "MEDIA",
-        "day": "viernes",
-        "detail": "Misma proteína (solomillo) en comida y cena",
-        "meals": "Comida: \"Cuscús 155g, Solomillo ibérico 195g, Ajo 5g, Arándanos 200g, AOVE 15g\" vs Cena: \"Puré de boniato 310g, Solomillo de ternera 235g, Rúcula 80g, Frambuesas 200g, AOVE 15g\"",
+        "day": "sabado",
+        "detail": "Misma proteína (cerdo) en comida y cena",
+        "meals": "Comida: \"Fusilli 120g, Secreto de cerdo 250g, Calabacín 80g, Frambuesas 200g, AOVE 5g\" vs Cena: \"Arroz basmati 95g, Solomillo de cerdo 225g, Remolacha 80g, Arándanos 200g, AOVE 15g\"",
         "traceAnalysis": "Fuente Comida: menu_del_club | Fuente Cena: menu_del_club. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
       }
     ],
@@ -558,14 +576,22 @@
       "tieneRecomendacionesDefecto": true,
       "detallesDefecto": {}
     },
-    "totalHallazgos": 1,
+    "totalHallazgos": 2,
     "hallazgos": [
       {
         "category": "MONOTONÍA_PROTEÍNA_MISMO_DÍA",
         "severity": "MEDIA",
         "day": "lunes",
         "detail": "Misma proteína (pollo) en comida y cena",
-        "meals": "Comida: \"Patata 365g, Contramuslo de pollo deshuesado 255g, Champiñón 80g, Cebolla 80g, Zanahoria 80g, AOVE 5g, Arándanos 80g\" vs Cena: \"Arroz 50g, Pechuga de pollo 230g, Cebolla 80g, Tomate 80g, Pimiento rojo 50g, Zanahoria 80g, AOVE 20g, Naranja 150g\"",
+        "meals": "Comida: \"Patata 450g, Contramuslo de pollo deshuesado 230g, Champiñón 80g, Cebolla 80g, Zanahoria 80g, Pimiento rojo 50g, AOVE 15g, Naranja 115g\" vs Cena: \"Arroz 80g, Pechuga de pollo 210g, Cebolla 80g, Tomate 80g, Pimiento rojo 50g, Zanahoria 80g, AOVE 25g, Arándanos 80g\"",
+        "traceAnalysis": "Fuente Comida: menu_del_club | Fuente Cena: menu_del_club. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
+      },
+      {
+        "category": "MONOTONÍA_PROTEÍNA_MISMO_DÍA",
+        "severity": "MEDIA",
+        "day": "miercoles",
+        "detail": "Misma proteína (pollo) en comida y cena",
+        "meals": "Comida: \"Pechuga de pollo 200g, Champiñón 80g, Cebolla 80g, Coliflor 80g, Patata 220g, Calabacín 80g, Pimiento rojo 50g, Zanahoria 80g, Brócoli 80g, AOVE 20g, Naranja 100g\" vs Cena: \"Quinoa 105g, Pechuga de pollo 190g, Judías verdes 80g, Naranja 200g, AOVE 15g\"",
         "traceAnalysis": "Fuente Comida: menu_del_club | Fuente Cena: menu_del_club. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
       }
     ],
@@ -673,21 +699,11 @@
         "category": "AVERSION_VERDURA_IGNORADA",
         "severity": "ALTA",
         "day": "lunes",
-        "meal": "Comida",
-        "detail": "Plato con verdura servido a jugador con aversión",
-        "source": "player_default_preference:Comida",
-        "traceAnalysis": "Jugador tiene aversión 'verdura'. Fuente: player_default_preference:Comida. Si la guarnición del menú incluye verdura y no se filtró, es bug de filtro.",
-        "rawMeal": "Ñoquis 215g, Corvina 250g, Pimiento rojo 50g, AOVE 20g, Arándanos 80g"
-      },
-      {
-        "category": "AVERSION_VERDURA_IGNORADA",
-        "severity": "ALTA",
-        "day": "lunes",
         "meal": "Cena",
         "detail": "Plato con verdura servido a jugador con aversión",
         "source": "player_default_preference:Cena",
         "traceAnalysis": "Jugador tiene aversión 'verdura'. Fuente: player_default_preference:Cena. Si la guarnición del menú incluye verdura y no se filtró, es bug de filtro.",
-        "rawMeal": "Arroz 55g, Pechuga de pollo 200g, Cebolla 80g, Tomate 80g, Pimiento rojo 50g, Zanahoria 80g, AOVE 20g, Frambuesas 100g"
+        "rawMeal": "Arroz 50g, Pechuga de pollo 205g, Cebolla 80g, Tomate 80g, Pimiento rojo 50g, Zanahoria 80g, AOVE 20g, Naranja 100g"
       },
       {
         "category": "AVERSION_VERDURA_IGNORADA",
@@ -697,7 +713,7 @@
         "detail": "Plato con verdura servido a jugador con aversión",
         "source": "player_default_preference:Comida",
         "traceAnalysis": "Jugador tiene aversión 'verdura'. Fuente: player_default_preference:Comida. Si la guarnición del menú incluye verdura y no se filtró, es bug de filtro.",
-        "rawMeal": "Pechuga de pollo 175g, Champiñón 80g, Cebolla 80g, Coliflor 80g, Gajos de patata 360g, AOVE 20g, Naranja 100g"
+        "rawMeal": "Pechuga de pollo 165g, Champiñón 80g, Cebolla 80g, Coliflor 80g, Gajos de patata 270g, Calabacín 80g, Pimiento rojo 50g, Zanahoria 80g, Brócoli 80g, AOVE 15g, Frambuesas 80g"
       },
       {
         "category": "AVERSION_VERDURA_IGNORADA",
@@ -707,7 +723,17 @@
         "detail": "Plato con verdura servido a jugador con aversión",
         "source": "player_default_preference:Comida",
         "traceAnalysis": "Jugador tiene aversión 'verdura'. Fuente: player_default_preference:Comida. Si la guarnición del menú incluye verdura y no se filtró, es bug de filtro.",
-        "rawMeal": "Fusilli 80g, Dorada 205g, Cebolla 80g, Puerro 80g, Brócoli 80g, AOVE 20g, Frambuesas 80g"
+        "rawMeal": "Pan 95g, Dorada 215g, Zanahoria 80g, Cebolla 80g, Puerro 80g, Brócoli 80g, AOVE 20g, Naranja 100g"
+      },
+      {
+        "category": "AVERSION_VERDURA_IGNORADA",
+        "severity": "ALTA",
+        "day": "sabado",
+        "meal": "Cena",
+        "detail": "Plato con verdura servido a jugador con aversión",
+        "source": "player_default_preference:Cena",
+        "traceAnalysis": "Jugador tiene aversión 'verdura'. Fuente: player_default_preference:Cena. Si la guarnición del menú incluye verdura y no se filtró, es bug de filtro.",
+        "rawMeal": "Gajos de boniato 100g, Presa ibérica 250g, AOVE 5g, Frambuesas 150g"
       }
     ],
     "notasIntencionadas": []
@@ -786,17 +812,8 @@
         }
       }
     },
-    "totalHallazgos": 1,
-    "hallazgos": [
-      {
-        "category": "MONOTONÍA_PROTEÍNA_MISMO_DÍA",
-        "severity": "MEDIA",
-        "day": "viernes",
-        "detail": "Misma proteína (solomillo) en comida y cena",
-        "meals": "Comida: \"Arroz 145g, Solomillos de pollo 185g, Tomate natural rallado 40g, Frambuesas 200g, AOVE 20g\" vs Cena: \"Fusilli 130g, Solomillo de ternera 160g, Champiñón 80g, Arándanos 200g, AOVE 15g\"",
-        "traceAnalysis": "Fuente Comida: menu_del_club | Fuente Cena: menu_del_club. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
-      }
-    ],
+    "totalHallazgos": 0,
+    "hallazgos": [],
     "notasIntencionadas": []
   },
   {
@@ -878,7 +895,7 @@
         "severity": "MEDIA",
         "day": "lunes",
         "detail": "Misma proteína (pollo) en comida y cena",
-        "meals": "Comida: \"Quinoa 160g, Contramuslo de pollo deshuesado 310g, Champiñón 80g, Cebolla 80g, Zanahoria 80g, AOVE 5g, Arándanos 180g, Pan 75g\" vs Cena: \"Arroz 165g, Pechuga de pollo 285g, Cebolla 80g, Tomate 80g, Pimiento rojo 50g, Zanahoria 80g, AOVE 25g, Frambuesas 80g\"",
+        "meals": "Comida: \"Boniato 310g, Pechuga de pollo 350g, Pimiento rojo 50g, AOVE 25g, Naranja 150g\" vs Cena: \"Arroz 165g, Pechuga de pollo 285g, Cebolla 80g, Tomate 80g, Pimiento rojo 50g, Zanahoria 80g, AOVE 25g, Frambuesas 80g\"",
         "traceAnalysis": "Fuente Comida: player_default_preference:Comida | Fuente Cena: player_default_preference:Cena. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
       }
     ],
@@ -895,8 +912,17 @@
       "tieneRecomendacionesDefecto": true,
       "detallesDefecto": {}
     },
-    "totalHallazgos": 0,
-    "hallazgos": [],
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "MONOTONÍA_PROTEÍNA_MISMO_DÍA",
+        "severity": "MEDIA",
+        "day": "martes",
+        "detail": "Misma proteína (ternera) en comida y cena",
+        "meals": "Comida: \"Gajos de patata 380g, Burger de ternera 255g, Champiñón 80g, Naranja 200g, AOVE 10g\" vs Cena: \"Puré de boniato 215g, Filete de ternera 215g, Ajo 5g, Frambuesas 200g, AOVE 15g\"",
+        "traceAnalysis": "Fuente Comida: menu_del_club | Fuente Cena: menu_del_club. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
+      }
+    ],
     "notasIntencionadas": []
   },
   {
@@ -925,8 +951,17 @@
       "tieneRecomendacionesDefecto": true,
       "detallesDefecto": {}
     },
-    "totalHallazgos": 0,
-    "hallazgos": [],
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "MONOTONÍA_PROTEÍNA_MISMO_DÍA",
+        "severity": "MEDIA",
+        "day": "sabado",
+        "detail": "Misma proteína (ternera) en comida y cena",
+        "meals": "Comida: \"Boniato 200g, Boloñesa de ternera 350g, Alcachofa 80g, Frambuesas 200g, AOVE 5g\" vs Cena: \"Espaguetis 50g, Burger de ternera 350g, Calabacín 80g, Naranja 200g, AOVE 5g\"",
+        "traceAnalysis": "Fuente Comida: menu_del_club | Fuente Cena: menu_del_club. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
+      }
+    ],
     "notasIntencionadas": []
   },
   {
@@ -1005,8 +1040,17 @@
         }
       }
     },
-    "totalHallazgos": 0,
-    "hallazgos": [],
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "MONOTONÍA_PROTEÍNA_MISMO_DÍA",
+        "severity": "MEDIA",
+        "day": "sabado",
+        "detail": "Misma proteína (ternera) en comida y cena",
+        "meals": "Comida: \"Gajos de patata 450g, Solomillo de ternera 240g, Remolacha 80g, Frambuesas 200g, AOVE 15g\" vs Cena: \"Fusilli 80g, Filete de ternera 215g, Espárragos verdes 80g, Arándanos 200g, AOVE 15g\"",
+        "traceAnalysis": "Fuente Comida: menu_del_club | Fuente Cena: menu_del_club. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
+      }
+    ],
     "notasIntencionadas": []
   },
   {
@@ -1093,8 +1137,17 @@
         }
       }
     },
-    "totalHallazgos": 0,
-    "hallazgos": [],
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "MONOTONÍA_PROTEÍNA_MISMO_DÍA",
+        "severity": "MEDIA",
+        "day": "viernes",
+        "detail": "Misma proteína (ternera) en comida y cena",
+        "meals": "Comida: \"Quinoa 145g, Entrecot de ternera 190g, Pimiento rojo 50g, Frambuesas 200g, AOVE 5g\" vs Cena: \"Gajos de patata 445g, Filete de ternera 230g, Puerro 80g, Frambuesas 200g, AOVE 25g\"",
+        "traceAnalysis": "Fuente Comida: player_default_preference:Comida | Fuente Cena: player_default_preference:Cena. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
+      }
+    ],
     "notasIntencionadas": []
   },
   {
