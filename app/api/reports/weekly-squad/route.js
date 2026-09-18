@@ -235,31 +235,46 @@ async function loadPlayersWithMeasurements(
         activePlan = { ...(activePlan || {}), datos: draftPlan };
       }
     } else if (!activePlan || forceRegenerate) {
-      const baseData = await generarDatosPlan({
-        jugador: player,
-        nombre: `Plan ${semana}`,
-        menu,
-        calendario,
-        preMatchConfig,
-        teamConfig: team.configuracion_nutricional
-      });
+      let planError = null;
+      try {
+        const baseData = await generarDatosPlan({
+          jugador: player,
+          nombre: `Plan ${semana}`,
+          menu,
+          calendario,
+          preMatchConfig,
+          teamConfig: team.configuracion_nutricional
+        });
 
-      if (persistPlans) {
-        activePlan = await savePlanForPlayer(
-          supabase,
-          { ...player, teamConfig: team.configuracion_nutricional },
-          activePlan,
-          baseData,
-          semana
-        );
-      } else {
-        activePlan = { ...(activePlan || {}), datos: baseData };
+        if (persistPlans) {
+          activePlan = await savePlanForPlayer(
+            supabase,
+            { ...player, teamConfig: team.configuracion_nutricional },
+            activePlan,
+            baseData,
+            semana
+          );
+        } else {
+          activePlan = { ...(activePlan || {}), datos: baseData };
+        }
+      } catch (err) {
+        console.warn(`[weekly-squad] No se pudo generar el plan para ${player.nombre || player.id}:`, err.message);
+        planError = err.message;
       }
+
+      return {
+        ...player,
+        plan: activePlan?.datos || null,
+        error: planError,
+        hasExistingPlan,
+        existingPlanName,
+      };
     }
 
     return {
       ...player,
-      plan: activePlan.datos,
+      plan: activePlan?.datos || null,
+      error: null,
       hasExistingPlan,
       existingPlanName,
     };
@@ -368,6 +383,7 @@ export async function POST(request) {
           apellidos: p.apellidos,
           posicion: p.posicion,
           plan: p.plan,
+          error: p.error || null,
           hasExistingPlan: Boolean(p.hasExistingPlan),
           existingPlanName: p.existingPlanName || null,
         })),
@@ -379,7 +395,12 @@ export async function POST(request) {
       });
     }
 
-    return renderReportResponse(meta, players, semana, team.configuracion_nutricional);
+    const playersToRender = players.filter((p) => p.plan);
+    if (!playersToRender.length) {
+      throw httpError('No se pudo generar ningún plan válido para los jugadores seleccionados', 400);
+    }
+
+    return renderReportResponse(meta, playersToRender, semana, team.configuracion_nutricional);
   } catch (error) {
     console.error('Error generating weekly squad report:', error);
     return jsonError(error);

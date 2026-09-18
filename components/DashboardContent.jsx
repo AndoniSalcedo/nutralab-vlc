@@ -460,13 +460,24 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       const data = await res.json();
       const chunkPreview = Array.isArray(data.preview) ? data.preview : [];
       const previewById = new Map(chunkPreview.map((item) => [String(item.id), item]));
-      const orderedChunkPreview = chunk.map((id) => previewById.get(String(id)));
+      const orderedChunkPreview = chunk.map((id) => previewById.get(String(id))).filter(Boolean);
 
-      if (orderedChunkPreview.some((item) => !item?.plan)) {
-        throw new Error('La API no devolvió todos los borradores de los jugadores.');
+      const validChunkPreviews = [];
+      for (const item of orderedChunkPreview) {
+        if (item?.plan) {
+          validChunkPreviews.push(item);
+        } else if (item?.error) {
+          const playerName = `${item.nombre || ''} ${item.apellidos || ''}`.trim() || `Jugador ${item.id}`;
+          notifications.show({
+            color: 'yellow',
+            title: `Plan omitido: ${playerName}`,
+            message: item.error,
+            autoClose: 8000,
+          });
+        }
       }
 
-      previews.push(...orderedChunkPreview);
+      previews.push(...validChunkPreviews);
       setReportProgress({
         current: Math.min(start + chunk.length, jugadorIds.length),
         total: jugadorIds.length,
@@ -474,9 +485,12 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       });
     }
 
-    if (!previews.length) throw new Error('No se generaron borradores para revisar.');
+    if (!previews.length) {
+      throw new Error('No se generaron borradores válidos para revisar. Comprueba que los jugadores tengan peso y número de comidas configurados.');
+    }
 
-    setReportWorkflow({ jugadorIds, previews, index: 0, approved: [] });
+    const validPlayerIds = previews.map((p) => p.id);
+    setReportWorkflow({ jugadorIds: validPlayerIds, previews, index: 0, approved: [] });
     setReviewPreview(previews[0]);
     setReviewOpened(true);
     setReviewLoading(false);
