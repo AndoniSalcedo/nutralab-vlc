@@ -1232,8 +1232,8 @@ export const FOODS_CRUDO = [
       "fructosa",
       "alto_fodmap"
     ],
-    "minGrams": 100,
-    "maxGrams": 220,
+    "minGrams": 20,
+    "maxGrams": 60,
     "treePath": [
       "frutas",
       "desecadas"
