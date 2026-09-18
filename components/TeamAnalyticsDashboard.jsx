@@ -76,7 +76,7 @@ function rangeLabel(p) {
   return `< ${p.rango_max} ${p.unidad || ''}`.trim();
 }
 
-export default function TeamAnalyticsDashboard({ players = [], analiticas = [], team: _team }) {
+export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }) {
   const router = useRouter();
   const [filterName, setFilterName] = useState('');
   const [filterPosition, setFilterPosition] = useState('');

@@ -54,7 +54,7 @@ function getInitialColors(teamData) {
   };
 }
 
-export default function TeamConfigClient({ team, user: _user, availableTeams: _availableTeams = [], readOnly = false }) {
+export default function TeamConfigClient({ team, readOnly = false }) {
   const router = useRouter();
   const [teamPhotoVersion, setTeamPhotoVersion] = useState(() => team.updated_at || Date.now());
   const [cropModalOpen, setCropModalOpen] = useState(false);

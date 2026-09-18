@@ -288,7 +288,7 @@ function checkFilterMatch(val, operator, filterVal) {
   }
 }
 
-export default function TeamEvolutionDashboard({ players = [], evolutions = [], team: _team }) {
+export default function TeamEvolutionDashboard({ players = [], evolutions = [] }) {
   const router = useRouter();
   const [viewMode, setViewMode] = useState('trends');
   const [position, setPosition] = useState('');

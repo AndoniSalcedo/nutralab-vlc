@@ -176,7 +176,6 @@ export function ComidasEditable({
   preentreno,
   jugadorId,
   recomendacionesDefecto = {},
-  _jugador = null,
   readOnly = false,
   icon3d = 'bowl',
 }) {
@@ -568,7 +567,6 @@ export function PrepartidoEditable({
   numComidas,
   postentreno,
   jugadorId,
-  _jugador = null,
   readOnly = false,
 }) {
   const router = useRouter();

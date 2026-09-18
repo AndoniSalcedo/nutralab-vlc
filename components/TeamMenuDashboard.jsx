@@ -20,7 +20,7 @@ import ConfirmModal from '@/components/modals/ConfirmModal';
 import CreateMenuModal from '@/components/modals/CreateMenuModal';
 import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
 
-export default function TeamMenuDashboard({ initialMenus = [], teamId, team: _team, readOnly = false }) {
+export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly = false }) {
   const [menus, setMenus] = useState(initialMenus);
   const [selectedMenu, setSelectedMenu] = useState(initialMenus[0] || null);
   const [viewMode, setViewMode] = useState('diaria'); // 'diaria' or 'semanal'

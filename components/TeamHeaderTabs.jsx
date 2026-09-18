@@ -47,8 +47,6 @@ const MOBILE_LABELS = {
 export default function TeamHeaderTabs({
   team,
   activeTab,
-  totalPlayers: _totalPlayers,
-  subtitle: _subtitle,
   avatarSlot,
   rightSection,
   teamPhotoVersion,

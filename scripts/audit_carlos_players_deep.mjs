@@ -15,7 +15,6 @@ for (const teamKey of ['team_7_valencia', 'team_8_futbol_elite']) {
     const trace = teamTraces[id] || {};
     const jugador = plan.jugador || trace.jugador || {};
     const aversiones = (jugador.aversiones || '').toLowerCase().split(',').map((s) => s.trim()).filter(Boolean);
-    const _intolerancias = (jugador.intolerancias || '').toLowerCase().split(',').map((s) => s.trim()).filter(Boolean);
 
     const issues = [];
     const intentionalNotes = [];

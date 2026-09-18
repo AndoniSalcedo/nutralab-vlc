@@ -9,14 +9,7 @@ const eslintConfig = [
         rules: {
           ...config.rules,
           'no-undef': 'error',
-          'no-unused-vars': [
-            'error',
-            {
-              argsIgnorePattern: '^_',
-              varsIgnorePattern: '^_',
-              caughtErrorsIgnorePattern: '^_'
-            }
-          ],
+          'no-unused-vars': 'error',
           'react-hooks/set-state-in-effect': 'off',
           'react-hooks/set-state-in-render': 'off',
           'react-hooks/purity': 'off',

@@ -40,7 +40,6 @@ for (const teamKey of TEAMS) {
     // Inspeccionar cada día
     const dias = plan.dias || {};
     for (const [dayKey, dayData] of Object.entries(dias)) {
-      const _dayType = dayData.tipoDia || 'entreno';
       const dayTrace = trace.etapa2_plan_base_y_presupuestos?.calendarioDias?.[dayKey] || {};
       const mealSources = trace.etapa3_fuentes_de_resolucion?.[dayKey] || [];
 

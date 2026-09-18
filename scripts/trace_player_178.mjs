@@ -240,7 +240,6 @@ const builtDinnerTree = foodTree.buildMealTree(mondayPauta, 'Cena', clinicalCata
 const contextualDinnerTree = foodTree.buildContextualPlayerFoodTree(playerFoodTree, { mealName: 'Cena' });
 const resolvedDinnerItems = foodTree.resolveMealTreeItemsForDay(
   builtDinnerTree,
-  0,
   'Cena',
   clinicalCatalog,
   jugador,

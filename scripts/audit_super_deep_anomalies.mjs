@@ -47,7 +47,6 @@ for (const teamKey of ['team_7_valencia', 'team_8_futbol_elite']) {
     // Analizar día a día
     const dias = plan.dias || {};
     for (const [dayKey, dayData] of Object.entries(dias)) {
-      const _dayTrace = trace.etapa2_plan_base_y_presupuestos?.calendarioDias?.[dayKey] || {};
       const sources = trace.etapa3_fuentes_de_resolucion?.[dayKey] || [];
       const ingestas = dayData.ingestas || [];
 

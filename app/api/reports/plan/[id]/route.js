@@ -14,7 +14,7 @@ import { getResolvedPlayerSupplementation } from '@/repositories/supplementation
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function GET(_request, { params }) {
+export async function GET(request, { params }) {
   try {
     const resolvedParams = await params;
     const planId = resolvedParams?.id;
