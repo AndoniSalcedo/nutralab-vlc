@@ -9,21 +9,6 @@
 
 export const FOODS_CRUDO = [
   {
-    "name": "Alitas de pollo",
-    "originalName": "Alitas de pollo",
-    "kcal": 203,
-    "cho": 0,
-    "pro": 18.3,
-    "fat": 15,
-    "tags": [],
-    "minGrams": 120,
-    "maxGrams": 350,
-    "treePath": [
-      "proteina",
-      "pollo"
-    ]
-  },
-  {
     "name": "Carne picada de pavo",
     "originalName": "Carne picada de pavo",
     "kcal": 115,
@@ -616,23 +601,6 @@ export const FOODS_CRUDO = [
     "treePath": [
       "lacteos",
       "leches"
-    ]
-  },
-  {
-    "name": "Maíz dulce",
-    "originalName": "Maíz dulce crudo",
-    "kcal": 86,
-    "cho": 19,
-    "pro": 3.2,
-    "fat": 1.2,
-    "tags": [
-      "alto_fodmap"
-    ],
-    "minGrams": 50,
-    "maxGrams": 170,
-    "treePath": [
-      "hidratos",
-      "otros_granos"
     ]
   },
   {
