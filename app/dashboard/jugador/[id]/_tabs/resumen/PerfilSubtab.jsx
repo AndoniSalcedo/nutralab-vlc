@@ -428,7 +428,7 @@ export default function PerfilSubtab({
                 <CampoEditable icon3d="warning" label="Aversiones" campo="aversiones" valor={jugador.aversiones || ''} jugadorId={jugador.id} readOnly={readOnly} />
                 <CampoEditable
                   icon3d="shield"
-                  label="Restricciones Clínicas / Alergias / Intolerancias"
+                  label="Restricciones Clínicas / Intolerancias"
                   campo="intolerancias"
                   valor={jugador.intolerancias || ''}
                   jugadorId={jugador.id}

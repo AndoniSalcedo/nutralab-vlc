@@ -305,7 +305,6 @@ async function run() {
         alturaCm: jugador.altura_cm,
         contextoClinico: jugador.contexto_clinico || null,
         intolerancias: jugador.intolerancias || null,
-        alergias: jugador.alergias || null,
         aversiones: jugador.aversiones || null,
         tieneConfigPrepartido: Boolean(jugador.config_prepartido && Object.keys(jugador.config_prepartido).length > 0),
         tieneRecomendacionesDefecto: Boolean(jugador.recomendaciones_defecto && Object.keys(jugador.recomendaciones_defecto).length > 0),

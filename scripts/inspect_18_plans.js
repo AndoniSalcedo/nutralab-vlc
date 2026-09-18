@@ -87,7 +87,6 @@ async function inspectPlans() {
       position: jugador.posicion || 'Sin posición',
       clinical: jugador.contexto_clinico || 'Ninguno',
       intolerances: jugador.intolerancias || 'Ninguna',
-      allergies: jugador.alergias || 'Ninguna',
       aversions: jugador.aversiones || 'Ninguna',
       preMatchConfig: jugador.config_prepartido ? Object.keys(jugador.config_prepartido) : [],
       raw_config_prepartido: jugador.config_prepartido || null,
@@ -120,7 +119,7 @@ async function inspectPlans() {
   for (const p of summary) {
     console.log(`--------------------------------------------------------------------------------`);
     console.log(`👤 JUGADOR: ${p.name} (ID: ${p.id}, Pos: ${p.position})`);
-    console.log(`   Clínico: ${p.clinical} | Intol: ${p.intolerances} | Alergias: ${p.allergies} | Aversiones: ${p.aversions}`);
+    console.log(`   Clínico: ${p.clinical} | Intol: ${p.intolerances} | Aversiones: ${p.aversions}`);
     console.log(`   Prepartido configs: ${p.preMatchConfig.join(', ') || 'Ninguna'}`);
     
     // Muestra Lunes (MD-1, víspera de partido), Martes (MD, partido), Miércoles (descanso), Jueves (entreno)

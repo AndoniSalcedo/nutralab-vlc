@@ -517,8 +517,8 @@ function PlayerDetailBreakdownPage({ player, plan, meta, teamConfig }) {
             </View>
             <View style={detailStyles.labelValue}>
               <Text style={detailStyles.label}>Restricciones Clínicas:</Text>
-              <Text style={[detailStyles.value, (p.intolerancias || p.alergias) ? { color: '#ff7e40', fontWeight: 700 } : {}]}>
-                {formatClinicalTags(p.intolerancias || p.alergias, { noIcons: true })}
+              <Text style={[detailStyles.value, p.intolerancias ? { color: '#ff7e40', fontWeight: 700 } : {}]}>
+                {formatClinicalTags(p.intolerancias, { noIcons: true })}
               </Text>
             </View>
           </View>

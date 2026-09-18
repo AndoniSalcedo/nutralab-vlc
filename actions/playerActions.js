@@ -63,7 +63,7 @@ async function findAuthUserByEmail(supabase, email) {
 
 const CAMPOS_PERMITIDOS = [
   'notas_hidratacion', 'notas_suplementacion', 'notas_protocolos',
-  'gustos_preferencias', 'aversiones', 'intolerancias', 'alergias',
+  'gustos_preferencias', 'aversiones', 'intolerancias',
   'contexto_clinico', 'objetivo', 'posicion', 'num_comidas', 'preentreno', 'postentreno', 'recomendaciones_defecto', 'config_prepartido',
   'porcentaje_grasa_objetivo', 'protocolos_custom',
 ];
@@ -292,7 +292,6 @@ export async function savePlayerAction(form) {
     contexto_clinico: String(form.get('contexto_clinico') || ''),
     aversiones: String(form.get('aversiones') || ''),
     intolerancias: String(form.get('intolerancias') || ''),
-    alergias: String(form.get('alergias') || ''),
     objetivo: String(form.get('objetivo') || ''),
     porcentaje_grasa_objetivo: form.has('porcentaje_grasa_objetivo') && form.get('porcentaje_grasa_objetivo')
       ? Math.round((Number(form.get('porcentaje_grasa_objetivo')) || 10) * 100) / 100

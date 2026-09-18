@@ -188,7 +188,6 @@ const trace = {
     numMeals: jugador.num_comidas,
     clinicalContext: jugador.contexto_clinico,
     intolerances: jugador.intolerancias,
-    allergies: jugador.alergias,
     aversions: jugador.aversiones,
     latestEvolution: evolutions?.at(-1) || null,
   },

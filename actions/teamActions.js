@@ -49,7 +49,6 @@ const PLAYER_COPY_FIELDS = [
   'gustos_preferencias',
   'aversiones',
   'intolerancias',
-  'alergias',
   'contexto_clinico',
   'preentreno',
   'postentreno',

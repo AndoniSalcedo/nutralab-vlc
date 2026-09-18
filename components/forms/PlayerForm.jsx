@@ -121,7 +121,7 @@ export default function PlayerForm({ initial, team }) {
 
   // Form states - Salud y Preferencias
   const [selectedClinicalTags, setSelectedClinicalTags] = useState(() =>
-    parsePlayerClinicalTags(initial?.intolerancias || initial?.alergias || [])
+    parsePlayerClinicalTags(initial?.intolerancias || [])
   );
   const [aversiones, setAversiones] = useState(initial?.aversiones ?? '');
   const [gustos, setGustos] = useState(initial?.gustos_preferencias ?? '');
@@ -158,7 +158,6 @@ export default function PlayerForm({ initial, team }) {
         formData.append('contexto_clinico', contexto);
         formData.append('aversiones', aversiones);
         formData.append('intolerancias', selectedClinicalTags.join(', '));
-        formData.append('alergias', '');
         formData.append('objetivo', objetivo);
         const fatVal = porcentajeGrasaObjetivo !== '' && porcentajeGrasaObjetivo !== null && porcentajeGrasaObjetivo !== undefined
           ? Math.round(Number(porcentajeGrasaObjetivo) * 100) / 100
@@ -382,7 +381,7 @@ export default function PlayerForm({ initial, team }) {
               <Divider mb="md" />
               <Stack gap="md">
                 <MultiSelect 
-                  label="Restricciones Clínicas / Alergias / Intolerancias"
+                  label="Restricciones Clínicas / Intolerancias"
                   description="Selecciona las condiciones médicas o restricciones fijas del jugador (filtrado 100% determinista en el catálogo oficial)"
                   placeholder="Ej. Celíaco / Sin Gluten, Sin Lactosa, Sin Cerdo, SIBO..."
                   data={CLINICAL_TAGS.map((t) => ({ value: t.value, label: t.label }))}

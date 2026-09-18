@@ -118,7 +118,7 @@
     "activeTags": [
       "sin_cerdo"
     ],
-    "foodsCount": 225,
+    "foodsCount": 224,
     "porkFoodsPresent": [],
     "branches": [
       {
@@ -147,9 +147,8 @@
       {
         "id": "proteina.pollo",
         "exists": true,
-        "leaves": 6,
+        "leaves": 5,
         "sample": [
-          "Alitas de pollo",
           "Carne picada de pollo",
           "Contramuslo de pollo deshuesado",
           "Hamburguesa de pollo",
@@ -185,7 +184,7 @@
         },
         "diaPartido": "sabado"
       },
-      "fecha": "2026-09-18T06:53:20.859Z"
+      "fecha": "2026-09-18T20:18:57.270Z"
     },
     "player": {
       "id": 178,
@@ -768,14 +767,14 @@
         }
       },
       {
-        "name": "Carne picada de pollo",
+        "name": "Contramuslo de pollo deshuesado",
         "grams": null,
         "food": {
-          "name": "Carne picada de pollo",
+          "name": "Contramuslo de pollo deshuesado",
           "minGrams": 100,
           "maxGrams": 350,
           "cho": 0,
-          "pro": 20.5,
+          "pro": 20,
           "tags": []
         }
       },
@@ -795,10 +794,10 @@
     "calibrationInput": [
       "Macarrones",
       "Patata",
-      "Carne picada de pollo",
+      "Contramuslo de pollo deshuesado",
       "AOVE"
     ],
-    "calibrated": "Macarrones 50g, Patata 150g, Carne picada de pollo 215g, AOVE 5g, Sandía 150g"
+    "calibrated": "Macarrones 55g, Patata 150g, Contramuslo de pollo deshuesado 215g, AOVE 5g, Nectarina 100g"
   },
   "stage5_defaultLunchRecommendation": {
     "raw": "Arroz o pasta con carne + vegetales + fruta",
@@ -854,123 +853,123 @@
     "lunes": [
       {
         "meal": "Desayuno",
-        "detail": "Leche de avena 170g"
+        "detail": "[Sin pauta definida para Desayuno]"
       },
       {
         "meal": "Almuerzo",
-        "detail": "Pan blanco de barra 80g, Pechuga de pavo (lonchas) 75g, 1 Clara"
+        "detail": "Pan 60g, 1 Huevo y 4 Claras"
       },
       {
         "meal": "Comida",
-        "detail": "Macarrones 170g, Pechuga de pollo 350g, Lechuga romana 50g, Tomate 80g, Pepino 80g, Pimiento 80g, Cebolla 80g, Ajo 5g, Queso parmesano 20g, AOVE 25g, Paraguayo 140g"
-      },
-      {
-        "meal": "Cena",
-        "detail": "Kiwi 200g, Yogur natural 250g"
-      }
-    ],
-    "martes": [
-      {
-        "meal": "Desayuno",
-        "detail": "Leche de avena 170g"
-      },
-      {
-        "meal": "Almuerzo",
-        "detail": "Pan blanco de barra 70g, Atún natural conserva aceite 50g, 1 Huevo y 1 Clara"
-      },
-      {
-        "meal": "Comida",
-        "detail": "Arroz blanco 170g, Ternera magra 350g, Champiñón 80g, Uvas 200g, AOVE 25g"
-      },
-      {
-        "meal": "Cena",
-        "detail": "Arándanos 200g, Yogur natural 250g"
-      }
-    ],
-    "miercoles": [
-      {
-        "meal": "Desayuno",
-        "detail": "Leche de avena 170g"
-      },
-      {
-        "meal": "Almuerzo",
-        "detail": "Pan blanco de barra 45g, 2 Huevos y 4 Claras"
-      },
-      {
-        "meal": "Comida",
-        "detail": "Arroz blanco 115g, Ternera magra 350g, Espárragos verdes 80g, Melón 200g, AOVE 25g"
-      },
-      {
-        "meal": "Cena",
-        "detail": "Mandarina 200g, Yogur natural 250g"
-      }
-    ],
-    "jueves": [
-      {
-        "meal": "Desayuno",
-        "detail": "Leche de avena 170g"
-      },
-      {
-        "meal": "Almuerzo",
-        "detail": "Pan blanco de barra 80g, Salmón ahumado 100g, 1 Clara"
-      },
-      {
-        "meal": "Comida",
-        "detail": "Arroz blanco 170g, Salmón 350g, Aguacate 30g, Pepino 80g, Zanahoria 80g, Espárragos verdes 80g, AOVE 5g, Plátano 100g"
+        "detail": "Patata 450g, Dorada 350g, Calabacín 80g, Zanahoria 80g, Puerro 80g, Cebolla 80g, AOVE 25g, Frambuesas 200g"
       },
       {
         "meal": "Cena",
         "detail": "Naranja 200g, Yogur natural 250g"
       }
     ],
-    "viernes": [
+    "martes": [
       {
         "meal": "Desayuno",
-        "detail": "Leche de avena 170g"
+        "detail": "[Sin pauta definida para Desayuno]"
       },
       {
         "meal": "Almuerzo",
-        "detail": "Pan blanco de barra 60g, 2 Huevos"
+        "detail": "Fajitas 120g, 1 Huevo y 8 Claras, 2 Huevos"
       },
       {
         "meal": "Comida",
-        "detail": "Macarrones 115g, Sardina 205g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Brócoli 80g, Calabacín 80g, AOVE 10g, Nectarina 100g"
+        "detail": "Arroz 50g, Macarrones 50g, Acelga 80g, Arándanos 200g, AOVE 5g"
       },
       {
         "meal": "Cena",
-        "detail": "Macarrones 65g, Patata 150g, Pechuga de pollo 235g, AOVE 20g, Pera 100g"
+        "detail": "Frambuesas 200g, Yogur natural 250g"
+      }
+    ],
+    "miercoles": [
+      {
+        "meal": "Desayuno",
+        "detail": "[Sin pauta definida para Desayuno]"
+      },
+      {
+        "meal": "Almuerzo",
+        "detail": "Fajitas 75g, Atún en conserva 60g, 1 Huevo y 8 Claras"
+      },
+      {
+        "meal": "Comida",
+        "detail": "Arroz 50g, Macarrones 50g, Rúcula 80g, Frambuesas 200g, AOVE 5g"
+      },
+      {
+        "meal": "Cena",
+        "detail": "Frambuesas 200g, Yogur natural 250g"
+      }
+    ],
+    "jueves": [
+      {
+        "meal": "Desayuno",
+        "detail": "[Sin pauta definida para Desayuno]"
+      },
+      {
+        "meal": "Almuerzo",
+        "detail": "Pan blanco 50g, 2 Huevos"
+      },
+      {
+        "meal": "Comida",
+        "detail": "Macarrones 125g, Pechuga de pollo 185g, Espárragos verdes 80g, AOVE 20g, Frambuesas 80g"
+      },
+      {
+        "meal": "Cena",
+        "detail": "Patata 235g, Pechuga de pavo 190g, Zanahoria 80g, Cebolla 80g, Pimiento rojo 50g, AOVE 20g, Naranja 150g"
+      }
+    ],
+    "viernes": [
+      {
+        "meal": "Desayuno",
+        "detail": "[Sin pauta definida para Desayuno]"
+      },
+      {
+        "meal": "Almuerzo",
+        "detail": "Fajitas 45g, 2 Huevos"
+      },
+      {
+        "meal": "Comida",
+        "detail": "Arroz 95g, Filete de ternera 235g, Calabacín 80g, Cebolla 80g, Puerro 80g, AOVE 20g, Arándanos 80g"
+      },
+      {
+        "meal": "Cena",
+        "detail": "Macarrones 55g, Patata 100g, Hamburguesa de pollo 220g, AOVE 5g, Frambuesas 150g"
       }
     ],
     "sabado": [
       {
         "meal": "Comida",
-        "detail": "Macarrones 160g, Hamburguesa de pollo 285g, Tomate 80g, Manzana 200g, AOVE 5g, Pan blanco de barra 80g"
+        "detail": "Macarrones 160g, Contramuslo de pollo deshuesado 190g, Tomate 80g, Frambuesas 200g, AOVE 10g, Pan 200g"
       },
       {
         "meal": "Merienda",
-        "detail": "Plátano 200g, Pera 200g"
+        "detail": "Tortitas de arroz 20g, Naranja 200g"
       },
       {
         "meal": "Cena",
-        "detail": "Macarrones 160g, Patata 150g, Carne picada de pollo 220g, AOVE 15g, Manzana 180g, Pan blanco de barra 75g"
+        "detail": "Macarrones 160g, Patata 100g, Pechuga de pollo 175g, AOVE 25g, Arándanos 180g, Pan 140g"
       }
     ],
     "domingo": [
       {
         "meal": "Desayuno",
-        "detail": "Leche de avena 170g"
+        "detail": "[Sin pauta definida para Desayuno]"
       },
       {
         "meal": "Almuerzo",
-        "detail": "Pan blanco de barra 50g, Salmón conserva aceite 105g, 1 Clara"
+        "detail": "Pan 75g, Atún en conserva 60g, 1 Huevo y 6 Claras"
       },
       {
         "meal": "Comida",
-        "detail": "Arroz blanco 115g, Ternera magra 350g, Tomate frito 80g, Ciruela 200g, AOVE 25g"
+        "detail": "Arroz 50g, Macarrones 50g, Espinaca 50g, Naranja 200g, AOVE 5g"
       },
       {
         "meal": "Cena",
-        "detail": "Fresas 200g, Yogur natural 250g"
+        "detail": "Frambuesas 200g, Yogur natural 250g"
       }
     ]
   }
