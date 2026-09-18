@@ -118,45 +118,54 @@
     "activeTags": [
       "sin_cerdo"
     ],
-    "foodsCount": 222,
+    "foodsCount": 225,
     "porkFoodsPresent": [],
     "branches": [
       {
         "id": "hidratos.pasta",
         "exists": true,
-        "leaves": 2,
+        "leaves": 4,
         "sample": [
           "Pasta de lenteja roja",
-          "Pasta de trigo"
+          "Macarrones",
+          "Espaguetis",
+          "Pasta de trigo sarraceno"
         ]
       },
       {
         "id": "hidratos.tuberculos",
         "exists": true,
-        "leaves": 4,
+        "leaves": 5,
         "sample": [
           "Boniato",
+          "Puré de boniato",
           "Ñoquis de patata",
           "Patata",
-          "Yuca"
+          "Puré de patata"
         ]
       },
       {
-        "id": "proteina.aves",
+        "id": "proteina.pollo",
         "exists": true,
-        "leaves": 11,
+        "leaves": 6,
         "sample": [
           "Alitas de pollo",
           "Carne picada de pollo",
           "Contramuslo de pollo deshuesado",
           "Hamburguesa de pollo",
           "Muslo de pollo",
-          "Pechuga de pollo",
+          "Pechuga de pollo"
+        ]
+      },
+      {
+        "id": "proteina.pavo",
+        "exists": true,
+        "leaves": 4,
+        "sample": [
           "Carne picada de pavo",
           "Chuletas de pavo",
           "Hamburguesa de pavo",
-          "Pechuga de pavo",
-          "Conejo"
+          "Pechuga de pavo"
         ]
       }
     ]
@@ -164,24 +173,19 @@
   "stage2_basePlan": {
     "meta": {
       "nombre": "Trace - Arnaut Danjuma",
-      "contexto": "semana_partido",
-      "contextoAdicional": "",
       "semanaMenu": "2026-09-14",
       "preMatchConfig": {
         "texto": "",
         "enabled": true,
         "horario": "tarde",
         "partidos": {
-          "martes": {
-            "horario": "noche"
-          },
-          "domingo": {
+          "sabado": {
             "horario": "noche"
           }
         },
         "diaPartido": "sabado"
       },
-      "fecha": "2026-09-16T07:08:38.137Z"
+      "fecha": "2026-09-18T06:53:20.859Z"
     },
     "player": {
       "id": 178,
@@ -252,45 +256,55 @@
         ]
       },
       "martes": {
-        "type": "partido",
+        "type": "entreno",
         "macros": {
-          "kcal": 3294,
+          "kcal": 2304,
           "protein": 157,
-          "carbs": 518,
-          "fat": 66
+          "carbs": 257,
+          "fat": 72
         },
         "budgets": [
           {
-            "nombre": "Comida",
+            "nombre": "Desayuno",
             "target": {
-              "kcal": 1098,
-              "p": 52,
-              "hc": 173,
-              "g": 22
+              "kcal": 426,
+              "p": 24,
+              "hc": 51,
+              "g": 14
             }
           },
           {
-            "nombre": "Merienda",
+            "nombre": "Almuerzo",
             "target": {
-              "kcal": 1098,
-              "p": 52,
-              "hc": 173,
-              "g": 22
+              "kcal": 231,
+              "p": 16,
+              "hc": 26,
+              "g": 7
+            }
+          },
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 925,
+              "p": 63,
+              "hc": 103,
+              "g": 29
             }
           },
           {
             "nombre": "Cena",
             "target": {
-              "kcal": 1098,
-              "p": 53,
-              "hc": 172,
+              "kcal": 722,
+              "p": 54,
+              "hc": 77,
               "g": 22
             }
           }
         ],
         "meals": [
+          "Desayuno",
+          "Almuerzo",
           "Comida",
-          "Merienda",
           "Cena"
         ]
       },
@@ -454,59 +468,6 @@
         ]
       },
       "sabado": {
-        "type": "entreno",
-        "macros": {
-          "kcal": 2304,
-          "protein": 157,
-          "carbs": 257,
-          "fat": 72
-        },
-        "budgets": [
-          {
-            "nombre": "Desayuno",
-            "target": {
-              "kcal": 426,
-              "p": 24,
-              "hc": 51,
-              "g": 14
-            }
-          },
-          {
-            "nombre": "Almuerzo",
-            "target": {
-              "kcal": 231,
-              "p": 16,
-              "hc": 26,
-              "g": 7
-            }
-          },
-          {
-            "nombre": "Comida",
-            "target": {
-              "kcal": 925,
-              "p": 63,
-              "hc": 103,
-              "g": 29
-            }
-          },
-          {
-            "nombre": "Cena",
-            "target": {
-              "kcal": 722,
-              "p": 54,
-              "hc": 77,
-              "g": 22
-            }
-          }
-        ],
-        "meals": [
-          "Desayuno",
-          "Almuerzo",
-          "Comida",
-          "Cena"
-        ]
-      },
-      "domingo": {
         "type": "partido",
         "macros": {
           "kcal": 3294,
@@ -548,6 +509,59 @@
           "Merienda",
           "Cena"
         ]
+      },
+      "domingo": {
+        "type": "descanso",
+        "macros": {
+          "kcal": 2022,
+          "protein": 166,
+          "carbs": 182,
+          "fat": 70
+        },
+        "budgets": [
+          {
+            "nombre": "Desayuno",
+            "target": {
+              "kcal": 370,
+              "p": 25,
+              "hc": 36,
+              "g": 14
+            }
+          },
+          {
+            "nombre": "Almuerzo",
+            "target": {
+              "kcal": 203,
+              "p": 17,
+              "hc": 18,
+              "g": 7
+            }
+          },
+          {
+            "nombre": "Comida",
+            "target": {
+              "kcal": 808,
+              "p": 66,
+              "hc": 73,
+              "g": 28
+            }
+          },
+          {
+            "nombre": "Cena",
+            "target": {
+              "kcal": 641,
+              "p": 58,
+              "hc": 55,
+              "g": 21
+            }
+          }
+        ],
+        "meals": [
+          "Desayuno",
+          "Almuerzo",
+          "Comida",
+          "Cena"
+        ]
       }
     }
   },
@@ -567,21 +581,25 @@
       },
       {
         "meal": "Cena",
-        "source": "pre_match_previous_dinner:noche"
+        "source": "buffet_or_default"
       }
     ],
     "martes": [
       {
-        "meal": "Comida",
-        "source": "pre_match_match_day:noche"
+        "meal": "Desayuno",
+        "source": "default_recommendation"
       },
       {
-        "meal": "Merienda",
-        "source": "pre_match_match_day:noche"
+        "meal": "Almuerzo",
+        "source": "default_recommendation"
+      },
+      {
+        "meal": "Comida",
+        "source": "buffet_or_default"
       },
       {
         "meal": "Cena",
-        "source": "pre_match_match_day:noche"
+        "source": "buffet_or_default"
       }
     ],
     "miercoles": [
@@ -635,10 +653,24 @@
       },
       {
         "meal": "Cena",
-        "source": "buffet_or_default"
+        "source": "pre_match_previous_dinner:noche"
       }
     ],
     "sabado": [
+      {
+        "meal": "Comida",
+        "source": "pre_match_match_day:noche"
+      },
+      {
+        "meal": "Merienda",
+        "source": "pre_match_match_day:noche"
+      },
+      {
+        "meal": "Cena",
+        "source": "pre_match_match_day:noche"
+      }
+    ],
+    "domingo": [
       {
         "meal": "Desayuno",
         "source": "default_recommendation"
@@ -653,28 +685,14 @@
       },
       {
         "meal": "Cena",
-        "source": "pre_match_previous_dinner:noche"
-      }
-    ],
-    "domingo": [
-      {
-        "meal": "Comida",
-        "source": "pre_match_match_day:noche"
-      },
-      {
-        "meal": "Merienda",
-        "source": "pre_match_match_day:noche"
-      },
-      {
-        "meal": "Cena",
-        "source": "pre_match_match_day:noche"
+        "source": "buffet_or_default"
       }
     ]
   },
   "stage4_mondayDinner": {
     "decision": {
       "dayType": "entreno",
-      "nextDayType": "partido",
+      "nextDayType": "entreno",
       "isNextDayMatch": true,
       "selectedHorario": "noche",
       "source": "config_prepartido.noche.recomendaciones.Cena",
@@ -701,7 +719,7 @@
         {
           "id": "patata",
           "label": "Patata",
-          "category": "cereales_y_tuberculos",
+          "category": "hidratos",
           "isGeneric": false,
           "foodName": "Patata"
         },
@@ -724,11 +742,10 @@
     },
     "resolvedBeforeCalibration": [
       {
-        "name": "Pasta de trigo",
+        "name": "Macarrones",
         "grams": null,
         "food": {
-          "name": "Pasta de trigo",
-          "category": "cereales_y_tuberculos",
+          "name": "Macarrones",
           "minGrams": 50,
           "maxGrams": 170,
           "cho": 75,
@@ -743,7 +760,6 @@
         "grams": null,
         "food": {
           "name": "Patata",
-          "category": "cereales_y_tuberculos",
           "minGrams": 150,
           "maxGrams": 450,
           "cho": 17.5,
@@ -752,15 +768,14 @@
         }
       },
       {
-        "name": "Pechuga de pollo",
+        "name": "Carne picada de pollo",
         "grams": null,
         "food": {
-          "name": "Pechuga de pollo",
-          "category": "carnes_y_aves",
+          "name": "Carne picada de pollo",
           "minGrams": 100,
           "maxGrams": 350,
           "cho": 0,
-          "pro": 22.5,
+          "pro": 20.5,
           "tags": []
         }
       },
@@ -769,7 +784,6 @@
         "grams": null,
         "food": {
           "name": "AOVE",
-          "category": "grasas_y_frutos_secos",
           "minGrams": 5,
           "maxGrams": 25,
           "cho": 0,
@@ -779,12 +793,12 @@
       }
     ],
     "calibrationInput": [
-      "Pasta de trigo",
+      "Macarrones",
       "Patata",
-      "Pechuga de pollo",
+      "Carne picada de pollo",
       "AOVE"
     ],
-    "calibrated": "Pasta de trigo 50g, Patata 150g, Pechuga de pollo 195g, AOVE 15g, Manzana 100g"
+    "calibrated": "Macarrones 50g, Patata 150g, Carne picada de pollo 215g, AOVE 5g, Sandía 150g"
   },
   "stage5_defaultLunchRecommendation": {
     "raw": "Arroz o pasta con carne + vegetales + fruta",
@@ -814,7 +828,7 @@
         {
           "id": "ternera_magra",
           "label": "Ternera magra",
-          "category": "carnes_y_aves",
+          "category": "proteina",
           "isGeneric": false,
           "foodName": "Ternera magra"
         },
@@ -844,29 +858,33 @@
       },
       {
         "meal": "Almuerzo",
-        "detail": "Pan blanco de barra 50g, 2 Huevos"
+        "detail": "Pan blanco de barra 80g, Pechuga de pavo (lonchas) 75g, 1 Clara"
       },
       {
         "meal": "Comida",
-        "detail": "Arroz blanco 75g, Dorada 265g, Zanahoria 80g, Cebolla 80g, Puerro 80g, Calabacín 80g, AOVE 15g, Plátano 100g"
+        "detail": "Macarrones 170g, Pechuga de pollo 350g, Lechuga romana 50g, Tomate 80g, Pepino 80g, Pimiento 80g, Cebolla 80g, Ajo 5g, Queso parmesano 20g, AOVE 25g, Paraguayo 140g"
       },
       {
         "meal": "Cena",
-        "detail": "Pasta de trigo 50g, Patata 150g, Muslo de pollo 245g, AOVE 5g, Manzana 100g"
+        "detail": "Kiwi 200g, Yogur natural 250g"
       }
     ],
     "martes": [
       {
-        "meal": "Comida",
-        "detail": "Pasta de trigo 170g, Carne picada de pollo 135g, Tomate 80g, Dátil 55g, AOVE 10g"
+        "meal": "Desayuno",
+        "detail": "Leche de avena 170g"
       },
       {
-        "meal": "Merienda",
-        "detail": "Plátano 100g, Sandía 100g"
+        "meal": "Almuerzo",
+        "detail": "Pan blanco de barra 70g, Atún natural conserva aceite 50g, 1 Huevo y 1 Clara"
+      },
+      {
+        "meal": "Comida",
+        "detail": "Arroz blanco 170g, Ternera magra 350g, Champiñón 80g, Uvas 200g, AOVE 25g"
       },
       {
         "meal": "Cena",
-        "detail": "Pasta de trigo 170g, Patata 150g, Alitas de pollo 150g, AOVE 5g, Manzana 125g"
+        "detail": "Arándanos 200g, Yogur natural 250g"
       }
     ],
     "miercoles": [
@@ -876,15 +894,15 @@
       },
       {
         "meal": "Almuerzo",
-        "detail": "Pan blanco de barra 35g, 1 Huevo y 2 Claras"
+        "detail": "Pan blanco de barra 45g, 2 Huevos y 4 Claras"
       },
       {
         "meal": "Comida",
-        "detail": "Arroz blanco 70g, Ternera magra 275g, Champiñón 80g, Pera 100g, AOVE 15g"
+        "detail": "Arroz blanco 115g, Ternera magra 350g, Espárragos verdes 80g, Melón 200g, AOVE 25g"
       },
       {
         "meal": "Cena",
-        "detail": "Arroz blanco 50g, Merluza 275g, Uvas 100g, Yogur natural 120g, AOVE 10g"
+        "detail": "Mandarina 200g, Yogur natural 250g"
       }
     ],
     "jueves": [
@@ -894,15 +912,15 @@
       },
       {
         "meal": "Almuerzo",
-        "detail": "Pan blanco de barra 50g, Salmón 100g, 1 Clara"
+        "detail": "Pan blanco de barra 80g, Salmón ahumado 100g, 1 Clara"
       },
       {
         "meal": "Comida",
-        "detail": "Arroz blanco 75g, Pechuga de pavo 210g, Aguacate 30g, Pepino 80g, Zanahoria 80g, Guisantes 80g, Cebolla 80g, AOVE 20g, Naranja 100g"
+        "detail": "Arroz blanco 170g, Salmón 350g, Aguacate 30g, Pepino 80g, Zanahoria 80g, Espárragos verdes 80g, AOVE 5g, Plátano 100g"
       },
       {
         "meal": "Cena",
-        "detail": "Arroz blanco 75g, Merluza 245g, Mandarina 100g, Yogur natural 120g, AOVE 15g"
+        "detail": "Naranja 200g, Yogur natural 250g"
       }
     ],
     "viernes": [
@@ -912,47 +930,47 @@
       },
       {
         "meal": "Almuerzo",
-        "detail": "Pan blanco de barra 50g, 2 Huevos"
+        "detail": "Pan blanco de barra 60g, 2 Huevos"
       },
       {
         "meal": "Comida",
-        "detail": "Arroz blanco 105g, Ternera magra 260g, Cebolla 80g, Manzana 100g, AOVE 15g"
+        "detail": "Macarrones 115g, Sardina 205g, Tomate 80g, Cebolla 80g, Zanahoria 80g, Brócoli 80g, Calabacín 80g, AOVE 10g, Nectarina 100g"
       },
       {
         "meal": "Cena",
-        "detail": "Arroz blanco 75g, Merluza 245g, Ciruela 100g, Yogur natural 120g, AOVE 15g"
+        "detail": "Macarrones 65g, Patata 150g, Pechuga de pollo 235g, AOVE 20g, Pera 100g"
       }
     ],
     "sabado": [
+      {
+        "meal": "Comida",
+        "detail": "Macarrones 160g, Hamburguesa de pollo 285g, Tomate 80g, Manzana 200g, AOVE 5g, Pan blanco de barra 80g"
+      },
+      {
+        "meal": "Merienda",
+        "detail": "Plátano 200g, Pera 200g"
+      },
+      {
+        "meal": "Cena",
+        "detail": "Macarrones 160g, Patata 150g, Carne picada de pollo 220g, AOVE 15g, Manzana 180g, Pan blanco de barra 75g"
+      }
+    ],
+    "domingo": [
       {
         "meal": "Desayuno",
         "detail": "Leche de avena 170g"
       },
       {
         "meal": "Almuerzo",
-        "detail": "Pan blanco de barra 50g, Salmón 100g, 1 Clara"
+        "detail": "Pan blanco de barra 50g, Salmón conserva aceite 105g, 1 Clara"
       },
       {
         "meal": "Comida",
-        "detail": "Arroz blanco 110g, Pulpo 350g, AOVE 25g, Mandarina 100g"
+        "detail": "Arroz blanco 115g, Ternera magra 350g, Tomate frito 80g, Ciruela 200g, AOVE 25g"
       },
       {
         "meal": "Cena",
-        "detail": "Pasta de trigo 50g, Patata 150g, Pechuga de pollo 195g, AOVE 15g, Manzana 100g"
-      }
-    ],
-    "domingo": [
-      {
-        "meal": "Comida",
-        "detail": "Pasta de trigo 160g, Muslo de pollo 135g, Tomate 80g, Piña pelada 180g, AOVE 5g, Pan blanco de barra 55g"
-      },
-      {
-        "meal": "Merienda",
-        "detail": "Plátano 200g"
-      },
-      {
-        "meal": "Cena",
-        "detail": "Pasta de trigo 170g, Patata 150g, Contramuslo de pollo deshuesado 135g, AOVE 5g, Pera 125g"
+        "detail": "Fresas 200g, Yogur natural 250g"
       }
     ]
   }

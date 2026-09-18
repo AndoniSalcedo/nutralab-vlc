@@ -615,28 +615,36 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   }
 
   function createEmptyPlan() {
-    setMode('create');
-    setNombre(modalNombre);
-    setSelectedMenuWeek(modalSelectedMenuWeek);
-    setContenido('');
+    try {
+      setMode('create');
+      setNombre(modalNombre);
+      setSelectedMenuWeek(modalSelectedMenuWeek);
+      setContenido('');
 
-    let resolvedMenu = null;
-    if (modalSelectedMenuWeek !== 'none' && modalSelectedMenuWeek) {
-      resolvedMenu = availableMenus.find(m => m.semana === modalSelectedMenuWeek) || null;
+      let resolvedMenu = null;
+      if (modalSelectedMenuWeek !== 'none' && modalSelectedMenuWeek) {
+        resolvedMenu = availableMenus.find(m => m.semana === modalSelectedMenuWeek) || null;
+      }
+
+      setDatos(buildBasePlanData({
+        jugador,
+        nombre: modalNombre,
+        menu: resolvedMenu,
+        calendario: modalCalendar,
+        preMatchConfig: modalPreMatchConfig,
+        teamConfig,
+        suplementacion: activeSupplements,
+      }));
+
+      setHasGeneratedAi(false);
+      setCreationModalOpened(false);
+    } catch (e) {
+      notifications.show({
+        color: 'red',
+        title: 'No se pudo crear la ficha',
+        message: e.message,
+      });
     }
-
-    setDatos(buildBasePlanData({
-      jugador,
-      nombre: modalNombre,
-      menu: resolvedMenu,
-      calendario: modalCalendar,
-      preMatchConfig: modalPreMatchConfig,
-      teamConfig,
-      suplementacion: activeSupplements,
-    }));
-
-    setHasGeneratedAi(false);
-    setCreationModalOpened(false);
   }
 
   async function generatePlanFromModal() {
