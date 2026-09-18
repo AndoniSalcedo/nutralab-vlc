@@ -2963,8 +2963,8 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Mejiilon en conserva (escabeche)",
-    "originalName": "mejiilon en conserva (escabeche)",
+    "name": "Mejillon en conserva (escabeche)",
+    "originalName": "mejillon en conserva (escabeche)",
     "kcal": 168,
     "cho": 4,
     "pro": 14,
@@ -3460,7 +3460,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
-      "marisco"
+      // FIXME: ver que hacer con el calamar
+      "pescado_blanco"
     ]
   },
   {
