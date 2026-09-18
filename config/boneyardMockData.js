@@ -55,44 +55,44 @@ export const mockTeams = [
     ...mockTeam,
     players_count: 3,
     players: [
-      { id: 220, nombre: 'Carlos', apellidos: 'Jugador Uno', posicion: 'Delantero' },
-      { id: 221, nombre: 'Sofía', apellidos: 'Jugador Dos', posicion: 'Mediocentro' },
-      { id: 222, nombre: 'Mateo', apellidos: 'Jugador Tres', posicion: 'Defensa' }
+      { id: 'mock', nombre: 'Carlos', apellidos: 'Jugador Uno', posicion: 'Delantero' },
+      { id: 'mock-2', nombre: 'Sofía', apellidos: 'Jugador Dos', posicion: 'Mediocentro' },
+      { id: 'mock-3', nombre: 'Mateo', apellidos: 'Jugador Tres', posicion: 'Defensa' }
     ]
   },
   {
     ...mockTeam,
     players_count: 3,
     players: [
-      { id: 220, nombre: 'Carlos', apellidos: 'Jugador Uno', posicion: 'Delantero' },
-      { id: 221, nombre: 'Sofía', apellidos: 'Jugador Dos', posicion: 'Mediocentro' },
-      { id: 222, nombre: 'Mateo', apellidos: 'Jugador Tres', posicion: 'Defensa' }
+      { id: 'mock', nombre: 'Carlos', apellidos: 'Jugador Uno', posicion: 'Delantero' },
+      { id: 'mock-2', nombre: 'Sofía', apellidos: 'Jugador Dos', posicion: 'Mediocentro' },
+      { id: 'mock-3', nombre: 'Mateo', apellidos: 'Jugador Tres', posicion: 'Defensa' }
     ]
   },
   {
     ...mockTeam,
     players_count: 3,
     players: [
-      { id: 220, nombre: 'Carlos', apellidos: 'Jugador Uno', posicion: 'Delantero' },
-      { id: 221, nombre: 'Sofía', apellidos: 'Jugador Dos', posicion: 'Mediocentro' },
-      { id: 222, nombre: 'Mateo', apellidos: 'Jugador Tres', posicion: 'Defensa' }
+      { id: 'mock', nombre: 'Carlos', apellidos: 'Jugador Uno', posicion: 'Delantero' },
+      { id: 'mock-2', nombre: 'Sofía', apellidos: 'Jugador Dos', posicion: 'Mediocentro' },
+      { id: 'mock-3', nombre: 'Mateo', apellidos: 'Jugador Tres', posicion: 'Defensa' }
     ]
   }
 ];
 
 export const mockPesajes = [
-  { id: 1, jugador_id: 220, fecha: '2026-06-01', peso_kg: 83.0 },
-  { id: 2, jugador_id: 220, fecha: '2026-06-15', peso_kg: 82.3 },
-  { id: 3, jugador_id: 220, fecha: '2026-07-01', peso_kg: 82.0 },
-  { id: 4, jugador_id: 220, fecha: '2026-07-08', peso_kg: 81.7 },
-  { id: 5, jugador_id: 220, fecha: '2026-07-15', peso_kg: 81.5 },
-  { id: 6, jugador_id: 221, fecha: '2026-07-15', peso_kg: 61.2 },
-  { id: 7, jugador_id: 222, fecha: '2026-07-15', peso_kg: 88.0 }
+  { id: 1, jugador_id: 'mock', fecha: '2026-06-01', peso_kg: 83.0 },
+  { id: 2, jugador_id: 'mock', fecha: '2026-06-15', peso_kg: 82.3 },
+  { id: 3, jugador_id: 'mock', fecha: '2026-07-01', peso_kg: 82.0 },
+  { id: 4, jugador_id: 'mock', fecha: '2026-07-08', peso_kg: 81.7 },
+  { id: 5, jugador_id: 'mock', fecha: '2026-07-15', peso_kg: 81.5 },
+  { id: 6, jugador_id: 'mock-2', fecha: '2026-07-15', peso_kg: 61.2 },
+  { id: 7, jugador_id: 'mock-3', fecha: '2026-07-15', peso_kg: 88.0 }
 ];
 
 export const mockPlayers = [
   {
-    id: 220,
+    id: 'mock',
     nombre: 'Carlos',
     apellidos: 'Jugador Uno',
     posicion: 'Delantero',
@@ -113,7 +113,7 @@ export const mockPlayers = [
     notas_protocolos: 'Seguir protocolo pre-partido estándar.'
   },
   {
-    id: 221,
+    id: 'mock-2',
     nombre: 'Sofía',
     apellidos: 'Jugador Dos',
     posicion: 'Mediocentro',
@@ -131,7 +131,7 @@ export const mockPlayers = [
     fecha_ultima_medicion: '2026-07-15'
   },
   {
-    id: 222,
+    id: 'mock-3',
     nombre: 'Mateo',
     apellidos: 'Jugador Tres',
     posicion: 'Defensa',
@@ -151,10 +151,10 @@ export const mockPlayers = [
 ];
 
 export const mockEvolutions = [
-  // Carlos (220)
+  // Carlos ('mock')
   {
     id: 1,
-    jugador_id: 220,
+    jugador_id: 'mock',
     fecha: '2026-05-15',
     peso_kg: 83.2,
     porcentaje_grasa: 12.5,
@@ -176,7 +176,7 @@ export const mockEvolutions = [
   },
   {
     id: 2,
-    jugador_id: 220,
+    jugador_id: 'mock',
     fecha: '2026-06-15',
     peso_kg: 82.1,
     porcentaje_grasa: 11.8,
@@ -198,7 +198,7 @@ export const mockEvolutions = [
   },
   {
     id: 3,
-    jugador_id: 220,
+    jugador_id: 'mock',
     fecha: '2026-07-15',
     peso_kg: 81.5,
     porcentaje_grasa: 11.2,
@@ -218,20 +218,20 @@ export const mockEvolutions = [
     mesomorfia: 4.7,
     ectomorfia: 2.3
   },
-  // Sofía (221)
+  // Sofía ('mock-2')
   {
     id: 4,
-    jugador_id: 221,
+    jugador_id: 'mock-2',
     fecha: '2026-07-15',
     peso_kg: 61.2,
     porcentaje_grasa: 14.5,
     peso_magro: 52.3,
     altura_cm: 168
   },
-  // Mateo (222)
+  // Mateo ('mock-3')
   {
     id: 5,
-    jugador_id: 222,
+    jugador_id: 'mock-3',
     fecha: '2026-07-15',
     peso_kg: 88.0,
     porcentaje_grasa: 13.8,
@@ -287,7 +287,7 @@ export const mockMenus = [
 export const mockAnalytics = [
   {
     id: 300,
-    jugador_id: 220,
+    jugador_id: 'mock',
     fecha_extraccion: '2026-07-01',
     visible_para_jugador: true,
     parametros: [
@@ -299,7 +299,7 @@ export const mockAnalytics = [
   },
   {
     id: 301,
-    jugador_id: 221,
+    jugador_id: 'mock-2',
     fecha_extraccion: '2026-07-01',
     visible_para_jugador: true,
     parametros: [
@@ -311,7 +311,7 @@ export const mockAnalytics = [
   },
   {
     id: 302,
-    jugador_id: 222,
+    jugador_id: 'mock-3',
     fecha_extraccion: '2026-07-01',
     visible_para_jugador: true,
     parametros: [
@@ -326,7 +326,7 @@ export const mockAnalytics = [
 export const mockHydration = [
   {
     id: 400,
-    jugador_id: 220,
+    jugador_id: 'mock',
     fecha: '2026-07-14',
     hora: '09:30',
     tipo: 'hydration',
@@ -337,7 +337,7 @@ export const mockHydration = [
   },
   {
     id: 401,
-    jugador_id: 220,
+    jugador_id: 'mock',
     fecha: '2026-07-15',
     hora: '09:00',
     tipo: 'hydration',
@@ -352,7 +352,7 @@ export const mockMessages = [
   {
     id: 500,
     equipo_id: 'mock',
-    jugador_id: 220,
+    jugador_id: 'mock',
     sender_id: 'tecnico',
     mensaje: 'Hola Carlos, recuerda tomar la creatina hoy después del entreno.',
     created_at: '2026-07-15T12:00:00Z'
@@ -362,7 +362,7 @@ export const mockMessages = [
 export const mockMeals = [
   {
     id: 9991,
-    jugador_id: 220,
+    jugador_id: 'mock',
     taken_at: '2026-07-16T08:30:00Z',
     dish_name: 'Huevos revueltos con tostada',
     meal_type: 'breakfast',
@@ -374,7 +374,7 @@ export const mockMeals = [
   },
   {
     id: 9992,
-    jugador_id: 220,
+    jugador_id: 'mock',
     taken_at: '2026-07-16T14:00:00Z',
     dish_name: 'Pollo con arroz y aguacate',
     meal_type: 'lunch',
@@ -394,8 +394,7 @@ export function isMockPlayer(playerId) {
   return (
     process.env.BONEYARD_MODE === 'true' ||
     String(playerId) === 'mock' ||
-    String(playerId).startsWith('mock') ||
-    [220, 221, 222].includes(Number(playerId))
+    String(playerId).startsWith('mock')
   );
 }
 

@@ -26,7 +26,8 @@ export async function getOwnedPlayer(supabase, user, playerId) {
 
 export async function getPlayerById(supabase, id) {
   if (isMockPlayer(id)) {
-    return mockPlayers[0];
+    const player = mockPlayers.find((p) => String(p.id) === String(id));
+    return player || mockPlayers[0];
   }
 
   const { data, error } = await supabase
@@ -41,7 +42,8 @@ export async function getPlayerById(supabase, id) {
 
 export async function getPlayerByIdMaybe(supabase, id) {
   if (isMockPlayer(id)) {
-    return mockPlayers[0];
+    const player = mockPlayers.find((p) => String(p.id) === String(id));
+    return player || mockPlayers[0];
   }
 
   const { data, error } = await supabase
@@ -150,7 +152,7 @@ export async function getPlayersByTeamIds(supabase, teamId, ids) {
 
 export async function getPlayersByMultipleTeamIds(supabase, teamIds) {
   if (!teamIds || teamIds.length === 0) return [];
-  if (teamIds.some(isMockTeam)) {
+  if (teamIds.every(isMockTeam)) {
     return mockPlayers;
   }
 
@@ -166,7 +168,8 @@ export async function getPlayersByMultipleTeamIds(supabase, teamIds) {
 
 export async function getPlayerWithTeamConfig(supabase, id) {
   if (isMockPlayer(id)) {
-    return { ...mockPlayers[0], equipos: mockTeam };
+    const player = mockPlayers.find((p) => String(p.id) === String(id)) || mockPlayers[0];
+    return { ...player, equipos: mockTeam };
   }
 
   const { data, error } = await supabase

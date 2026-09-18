@@ -31,7 +31,8 @@ export async function getEvolutionsByPlayerIdOrdered(supabase, playerId) {
 }
 
 export async function getEvolutionsByPlayerIdsSimple(supabase, playerIds) {
-  if (Array.isArray(playerIds) && playerIds.some(isMockPlayer)) {
+  if (!playerIds || playerIds.length === 0) return [];
+  if (Array.isArray(playerIds) && playerIds.every(isMockPlayer)) {
     return mockEvolutions;
   }
 
@@ -45,7 +46,8 @@ export async function getEvolutionsByPlayerIdsSimple(supabase, playerIds) {
 }
 
 export async function getEvolutionsByPlayerIds(supabase, playerIds) {
-  if (Array.isArray(playerIds) && playerIds.some(isMockPlayer)) {
+  if (!playerIds || playerIds.length === 0) return [];
+  if (Array.isArray(playerIds) && playerIds.every(isMockPlayer)) {
     return mockEvolutions;
   }
 

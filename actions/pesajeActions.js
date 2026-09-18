@@ -39,6 +39,10 @@ export async function savePesajeAction(body) {
   }
 
   revalidatePath(`/dashboard/jugador/${jugador_id}`);
+  if (ownedPlayer?.equipo_id) {
+    revalidatePath(`/dashboard/equipo/${ownedPlayer.equipo_id}`);
+  }
+  revalidatePath('/dashboard');
   return { ok: true, pesaje: data };
 }
 
@@ -59,6 +63,10 @@ export async function deletePesajeAction(id) {
 
   await deletePesaje(supabase, id);
   revalidatePath(`/dashboard/jugador/${pesaje.jugador_id}`);
+  if (ownedPlayer?.equipo_id) {
+    revalidatePath(`/dashboard/equipo/${ownedPlayer.equipo_id}`);
+  }
+  revalidatePath('/dashboard');
   return { ok: true };
 }
 

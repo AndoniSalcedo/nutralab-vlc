@@ -16,7 +16,8 @@ export async function getAnalyticsByPlayerId(supabase, playerId) {
 }
 
 export async function getAnalyticsByPlayerIds(supabase, playerIds) {
-  if (Array.isArray(playerIds) && playerIds.some(isMockPlayer)) {
+  if (!playerIds || playerIds.length === 0) return [];
+  if (Array.isArray(playerIds) && playerIds.every(isMockPlayer)) {
     return mockAnalytics;
   }
 

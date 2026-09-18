@@ -17,7 +17,7 @@ export async function getPesajesByPlayerId(supabase, playerId) {
 
 export async function getPesajesByPlayerIdsSimple(supabase, playerIds) {
   if (!playerIds || playerIds.length === 0) return [];
-  if (Array.isArray(playerIds) && playerIds.some(isMockPlayer)) {
+  if (Array.isArray(playerIds) && playerIds.every(isMockPlayer)) {
     return mockPesajes;
   }
 
@@ -33,7 +33,7 @@ export async function getPesajesByPlayerIdsSimple(supabase, playerIds) {
 
 export async function getPesajesByPlayerIds(supabase, playerIds) {
   if (!playerIds || playerIds.length === 0) return [];
-  if (Array.isArray(playerIds) && playerIds.some(isMockPlayer)) {
+  if (Array.isArray(playerIds) && playerIds.every(isMockPlayer)) {
     return mockPesajes;
   }
 
