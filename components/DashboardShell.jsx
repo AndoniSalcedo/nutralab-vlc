@@ -20,7 +20,6 @@ import {
   Container,
   Group,
   Menu,
-  Text,
   UnstyledButton,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";

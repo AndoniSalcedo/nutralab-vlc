@@ -231,29 +231,27 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Jamón cocido (York)",
-    "originalName": "Jamón cocido (York)",
-    "kcal": 111,
-    "cho": 1.4,
-    "pro": 18,
-    "fat": 3.5,
-    "tags": [
-      "cerdo"
-    ],
-    "minGrams": 25,
-    "maxGrams": 70,
+    "name": "Pechuga de pavo (lonchas)",
+    "originalName": "pechuga de pavo (lonchas)",
+    "kcal": 105,
+    "cho": 2,
+    "pro": 21,
+    "fat": 1.5,
+    "tags": [],
+    "minGrams": 30,
+    "maxGrams": 100,
     "treePath": [
       "proteina",
       "embutidos"
     ]
   },
   {
-    "name": "Jamón ibérico de bellota",
-    "originalName": "Jamón ibérico de bellota",
-    "kcal": 260,
-    "cho": 0.3,
-    "pro": 33,
-    "fat": 15,
+    "name": "Jamón cocido (York)",
+    "originalName": "Jamón cocido (York)",
+    "kcal": 111,
+    "cho": 1.4,
+    "pro": 18,
+    "fat": 3.5,
     "tags": [
       "cerdo"
     ],
