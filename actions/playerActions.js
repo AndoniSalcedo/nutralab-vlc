@@ -15,7 +15,7 @@ import {
 import {
   getPlayerById,
   getPlayerAuthUserId,
-  deletePlayer,
+  deletePlayer as deletePlayerInRepo,
   updatePlayer,
   insertPlayer,
   getOwnedPlayersByIds,
@@ -68,7 +68,7 @@ const CAMPOS_PERMITIDOS = [
   'porcentaje_grasa_objetivo', 'protocolos_custom',
 ];
 
-export async function updatePlayerFieldAction(id, field, value) {
+export async function updatePlayerField(id, field, value) {
   if (!id || !field || !CAMPOS_PERMITIDOS.includes(field)) {
     throw new Error('Campo no permitido: ' + field);
   }
@@ -95,7 +95,7 @@ export async function updatePlayerFieldAction(id, field, value) {
   return { ok: true };
 }
 
-export async function updatePlayerCredentialsAction(jugadorIdOrPayload, emailParam, passwordParam) {
+export async function updatePlayerCredentials(jugadorIdOrPayload, emailParam, passwordParam) {
   let jugadorId, email, password;
   if (typeof jugadorIdOrPayload === 'object' && jugadorIdOrPayload !== null) {
     jugadorId = jugadorIdOrPayload.jugadorId;
@@ -181,7 +181,7 @@ export async function updatePlayerCredentialsAction(jugadorIdOrPayload, emailPar
   return { credentials: updated };
 }
 
-export async function updatePlayerPasswordAction(password) {
+export async function updatePlayerPassword(password) {
   const user = await getUser();
   if (user?.role !== 'jugador' || !user?.supabase_uid) {
     throw new Error('No autorizado');
@@ -201,7 +201,7 @@ export async function updatePlayerPasswordAction(password) {
   return { ok: true };
 }
 
-export async function transferPlayersAction({ playerIds, targetTeamId, action }) {
+export async function transferPlayers({ playerIds, targetTeamId, action }) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
@@ -258,7 +258,7 @@ export async function transferPlayersAction({ playerIds, targetTeamId, action })
   }
 }
 
-export async function savePlayerAction(form) {
+export async function savePlayer(form) {
   const id = String(form.get('id') || '');
   const teamId = String(form.get('team_id') || '');
   const supabase = getSupabaseAdmin();
@@ -346,27 +346,28 @@ export async function savePlayerAction(form) {
   return { success: true };
 }
 
-export async function deletePlayerAction(id) {
+export async function deletePlayer(id) {
   if (!id) throw new Error('Falta id del jugador');
 
   const supabase = getSupabaseAdmin();
   const user = await getUser();
-
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, id);
-  if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+  const owned = await getOwnedPlayer(supabase, user, id);
+  if (!owned) throw new Error('No tienes acceso a este jugador');
 
   const jugador = await getPlayerAuthUserId(supabase, id);
 
-  await deletePlayer(supabase, id);
+  await deletePlayerInRepo(supabase, id);
   if (jugador?.auth_user_id) {
     await supabase.auth.admin.deleteUser(jugador.auth_user_id);
   }
 
-  revalidatePath(`/dashboard/equipo/${ownedPlayer.equipo_id}`);
+  if (owned?.equipo_id) {
+    revalidatePath(`/dashboard/equipo/${owned.equipo_id}`);
+  }
   return { success: true };
 }
 
@@ -540,7 +541,7 @@ async function importGroups({ supabase, team, plan, players, decisions }) {
   return results;
 }
 
-export async function importPlayerExcelAction(formDataOrPayload) {
+export async function importPlayerExcel(formDataOrPayload) {
   let formData = formDataOrPayload;
   if (!(formDataOrPayload instanceof FormData)) {
     formData = new FormData();
@@ -599,7 +600,7 @@ export async function importPlayerExcelAction(formDataOrPayload) {
   };
 }
 
-export async function uploadPlayerAvatarAction(jugadorIdOrFormData, maybeFile) {
+export async function uploadPlayerAvatar(jugadorIdOrFormData, maybeFile) {
   const user = await getUser();
   if (!user) throw new Error('No autorizado');
 
@@ -668,14 +669,3 @@ export async function uploadPlayerAvatarAction(jugadorIdOrFormData, maybeFile) {
     avatar_size: payload.avatar_size,
   };
 }
-
-export {
-  updatePlayerCredentialsAction as updatePlayerCredentials,
-  updatePlayerPasswordAction as updatePlayerPassword,
-  updatePlayerFieldAction as updatePlayerField,
-  transferPlayersAction as transferPlayers,
-  savePlayerAction as savePlayer,
-  deletePlayerAction as deletePlayer,
-  importPlayerExcelAction as importPlayerExcel,
-  uploadPlayerAvatarAction as uploadPlayerAvatar,
-};

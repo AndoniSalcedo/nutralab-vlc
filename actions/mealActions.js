@@ -39,7 +39,7 @@ function mapMealToClient(dbMeal) {
   };
 }
 
-export async function listPlayerMealsAction(jugadorId, { mealType, day } = {}) {
+export async function listPlayerMeals(jugadorId, { mealType, day } = {}) {
   if (!jugadorId) throw new Error('Falta jugador_id');
 
   const supabase = getSupabaseAdmin();
@@ -72,7 +72,7 @@ export async function listPlayerMealsAction(jugadorId, { mealType, day } = {}) {
   return (resultMeals || []).map(mapMealToClient);
 }
 
-export async function savePlayerMealAction(jugadorIdOrFormData, payload) {
+export async function savePlayerMeal(jugadorIdOrFormData, payload) {
   let formData;
   if (jugadorIdOrFormData instanceof FormData) {
     formData = jugadorIdOrFormData;
@@ -169,7 +169,7 @@ export async function savePlayerMealAction(jugadorIdOrFormData, payload) {
   return { success: true, meal: resultMeal };
 }
 
-export async function deletePlayerMealAction(id) {
+export async function deletePlayerMeal(id) {
   if (!id) throw new Error('Falta id');
 
   const supabase = getSupabaseAdmin();
@@ -194,7 +194,7 @@ export async function deletePlayerMealAction(id) {
   return { success: true };
 }
 
-export async function parseMealTreeAction(body) {
+export async function parseMealTree(body) {
   const user = await getUser();
   if (!user) {
     throw new Error('No autenticado');
@@ -210,10 +210,3 @@ export async function parseMealTreeAction(body) {
 
   return parseMealTreeWithAI({ ...parseInput, jugador });
 }
-
-export {
-  listPlayerMealsAction as listPlayerMeals,
-  savePlayerMealAction as savePlayerMeal,
-  deletePlayerMealAction as deletePlayerMeal,
-  parseMealTreeAction as parseMealTree,
-};

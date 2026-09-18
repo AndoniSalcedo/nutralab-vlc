@@ -6,4 +6,3 @@ export { default as SuplementacionWidget } from './SuplementacionWidget';
 export { default as ComedorWidget } from './ComedorWidget';
 export { default as EstrategiaWidget } from './EstrategiaWidget';
 export { default as BalanceNutricionalWidget } from './BalanceNutricionalWidget';
-export { default as WaterWidget } from './WaterWidget';

@@ -20,7 +20,7 @@ function normalizeRecipientIds(value) {
 }
 
 
-export async function sendMessageAction(payload) {
+export async function sendMessage(payload) {
   const user = await getUser();
   if (user?.role !== 'admin') {
     throw new Error('Sin permisos');
@@ -68,5 +68,3 @@ export async function sendMessageAction(payload) {
   revalidatePath(`/dashboard/equipo/${teamId}`);
   return { messages: data || [] };
 }
-
-export { sendMessageAction as sendMessage };

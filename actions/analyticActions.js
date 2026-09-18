@@ -39,7 +39,7 @@ function extractAnalitica(message) {
   return parametros;
 }
 
-export async function uploadAnaliticaAction(fileOrFormData, jugadorIdParam, fechaParam) {
+export async function uploadAnalitica(fileOrFormData, jugadorIdParam, fechaParam) {
   let archivo, jugadorId, fechaExtraccion;
   if (fileOrFormData instanceof FormData) {
     archivo = fileOrFormData.get('file');
@@ -118,7 +118,7 @@ export async function uploadAnaliticaAction(fileOrFormData, jugadorIdParam, fech
   return { ok: true, analitica: data };
 }
 
-export async function deleteAnaliticaAction(id) {
+export async function deleteAnalitica(id) {
   if (!id) throw new Error('Falta id');
 
   const supabase = getSupabaseAdmin();
@@ -138,7 +138,7 @@ export async function deleteAnaliticaAction(id) {
   return { ok: true };
 }
 
-export async function toggleAnaliticaVisibilityAction(id, visible_para_jugador) {
+export async function toggleAnaliticaVisibility(id, visible_para_jugador) {
   if (!id || typeof visible_para_jugador !== 'boolean') {
     throw new Error('Faltan datos');
   }
@@ -159,9 +159,3 @@ export async function toggleAnaliticaVisibilityAction(id, visible_para_jugador) 
   revalidatePath(`/dashboard/jugador/${analitica.jugador_id}`);
   return { ok: true, analitica: data };
 }
-
-export {
-  uploadAnaliticaAction as uploadAnalitica,
-  deleteAnaliticaAction as deleteAnalitica,
-  toggleAnaliticaVisibilityAction as toggleAnaliticaVisibility,
-};

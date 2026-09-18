@@ -13,7 +13,7 @@ import {
   updateHydrationRecord,
   upsertHydrationRecord,
   getHydrationRecordById,
-  deleteHydrationRecord
+  deleteHydrationRecord as deleteHydrationRecordInRepo
 } from '@/repositories/hydrationRepository';
 
 function normalizeRecordType(type) {
@@ -75,7 +75,7 @@ function getVal(row, headers, keys) {
   return null;
 }
 
-export async function getHydrationRecordsAction(jugadorId) {
+async function getHydrationRecords(jugadorId) {
   if (!jugadorId) throw new Error('Falta jugador_id');
 
   const supabase = getSupabaseAdmin();
@@ -91,7 +91,7 @@ export async function getHydrationRecordsAction(jugadorId) {
   return { records: data || [] };
 }
 
-export async function saveHydrationRecordAction(payload) {
+export async function saveHydrationRecord(payload) {
   const { jugador_id, id, fecha, hora, tipo, valor, unidad, estado, notas, cuestionario } = payload || {};
   if (!jugador_id) throw new Error('Falta jugador_id');
   if (!fecha) throw new Error('Falta fecha');
@@ -128,7 +128,7 @@ export async function saveHydrationRecordAction(payload) {
   return { success: true, record: resData };
 }
 
-export async function importHydrationRecordsAction(jugadorId, allImportRows) {
+export async function importHydrationRecords(jugadorId, allImportRows) {
   if (!jugadorId) throw new Error('Falta jugador_id');
   if (!Array.isArray(allImportRows)) throw new Error('Formato de datos no válido');
 
@@ -211,7 +211,7 @@ export async function importHydrationRecordsAction(jugadorId, allImportRows) {
   };
 }
 
-export async function deleteHydrationRecordAction(id) {
+export async function deleteHydrationRecord(id) {
   if (!id) throw new Error('Falta id');
 
   const supabase = getSupabaseAdmin();
@@ -226,12 +226,12 @@ export async function deleteHydrationRecordAction(id) {
   const ownedPlayer = await getOwnedPlayer(supabase, user, record.jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  await deleteHydrationRecord(supabase, id);
+  await deleteHydrationRecordInRepo(supabase, id);
   revalidatePath(`/dashboard/jugador/${record.jugador_id}`);
   return { success: true };
 }
 
-export async function importTeamOsmolarityAction(formDataOrFile, teamIdParam, decisionesParam) {
+export async function importTeamOsmolarity(formDataOrFile, teamIdParam, decisionesParam) {
   let formData = formDataOrFile;
   if (!(formDataOrFile instanceof FormData)) {
     formData = new FormData();
@@ -537,29 +537,19 @@ export async function importTeamOsmolarityAction(formDataOrFile, teamIdParam, de
   throw new Error('Modo de importación no soportado');
 }
 
-export async function previewTeamOsmolarityAction(file, teamId) {
+export async function previewTeamOsmolarity(file, teamId) {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('team_id', String(teamId));
   formData.append('mode', 'preview');
-  return await importTeamOsmolarityAction(formData);
+  return await importTeamOsmolarity(formData);
 }
 
-export async function refetchHydrationRecordsAction(jugadorId) {
-  const data = await getHydrationRecordsAction(jugadorId);
+export async function refetchHydrationRecords(jugadorId) {
+  const data = await getHydrationRecords(jugadorId);
   return {
     ok: true,
     records: data.records,
     json: async () => data,
   };
 }
-
-export {
-  saveHydrationRecordAction as saveHydrationRecord,
-  deleteHydrationRecordAction as deleteHydrationRecord,
-  importHydrationRecordsAction as importHydrationRecords,
-  getHydrationRecordsAction as getHydrationRecords,
-  importTeamOsmolarityAction as importTeamOsmolarity,
-  previewTeamOsmolarityAction as previewTeamOsmolarity,
-  refetchHydrationRecordsAction as refetchHydrationRecords,
-};

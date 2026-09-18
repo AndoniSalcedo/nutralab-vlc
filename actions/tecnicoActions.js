@@ -32,17 +32,17 @@ async function findAuthUserByEmail(supabase, email) {
   return null;
 }
 
-export async function getTecnicosAction() {
+export async function getTecnicos() {
   const user = await getUser();
   const ownerId = getOwnerId(user);
   if (!ownerId) throw new Error('No autorizado');
 
   const supabase = getSupabaseAdmin();
   const result = await getTecnicosByOwner(supabase, ownerId);
-  return { tecnicos: result || [] };
+  return result || [];
 }
 
-export async function createTecnicoAction(payload) {
+export async function createTecnico(payload) {
   const user = await getUser();
   const ownerId = getOwnerId(user);
   if (!ownerId) throw new Error('No autorizado');
@@ -58,10 +58,10 @@ export async function createTecnicoAction(payload) {
 
   await linkTecnicoToNutricionista(supabase, ownerId, tecnico.id);
   revalidatePath('/dashboard/tecnicos');
-  return { tecnico };
+  return tecnico;
 }
 
-export async function deleteTecnicoAction(id) {
+export async function deleteTecnico(id) {
   const user = await getUser();
   const ownerId = getOwnerId(user);
   if (!ownerId) throw new Error('No autorizado');
@@ -73,7 +73,7 @@ export async function deleteTecnicoAction(id) {
   return { ok: true };
 }
 
-export async function assignTeamsAction(tecnicoId, teamIds) {
+export async function assignTeams(tecnicoId, teamIds) {
   const user = await getUser();
   const ownerId = getOwnerId(user);
   if (!ownerId) throw new Error('No autorizado');
@@ -89,7 +89,7 @@ export async function assignTeamsAction(tecnicoId, teamIds) {
   return { ok: true };
 }
 
-export async function registerTecnicoAction(payload) {
+export async function registerTecnico(payload) {
   const nombre = String(payload?.nombre || '').trim();
   const apellidos = String(payload?.apellidos || '').trim();
   const email = String(payload?.email || '').trim().toLowerCase();
@@ -149,7 +149,7 @@ export async function registerTecnicoAction(payload) {
       owner_id: null,
     });
 
-    return { tecnico };
+    return tecnico;
   } catch (dbError) {
     if (isNewAuthUser && authUserId) {
       await supabase.auth.admin.deleteUser(authUserId);
@@ -158,22 +158,7 @@ export async function registerTecnicoAction(payload) {
   }
 }
 
-export async function getTecnicos() {
-  const data = await getTecnicosAction();
-  return data.tecnicos || [];
-}
-
-export async function createTecnico(payload) {
-  const data = await createTecnicoAction(payload);
-  return data.tecnico;
-}
-
-export async function registerTecnico(payload) {
-  const data = await registerTecnicoAction(payload);
-  return data.tecnico;
-}
-
-export async function uploadTecnicoAvatarAction(tecnicoIdOrFormData, maybeFile) {
+export async function uploadTecnicoAvatar(tecnicoIdOrFormData, maybeFile) {
   const user = await getUser();
   if (!user) throw new Error('No autorizado');
 
@@ -239,9 +224,3 @@ export async function uploadTecnicoAvatarAction(tecnicoIdOrFormData, maybeFile) 
     avatar_size: payload.avatar_size,
   };
 }
-
-export {
-  deleteTecnicoAction as deleteTecnico,
-  assignTeamsAction as assignTeams,
-  uploadTecnicoAvatarAction as uploadTecnicoAvatar,
-};

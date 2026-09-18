@@ -34,7 +34,7 @@ function canManage(user) {
   return user && user.role !== 'jugador';
 }
 
-export async function getPlayerSupplementationAction(requestedJugadorId) {
+export async function getPlayerSupplementation(requestedJugadorId) {
   const user = await getUser();
   if (!user) throw new Error('No autenticado');
 
@@ -76,7 +76,7 @@ export async function getPlayerSupplementationAction(requestedJugadorId) {
   };
 }
 
-export async function postPlayerSupplementationAction(jugadorIdParam, payload) {
+export async function postPlayerSupplementation(jugadorIdParam, payload) {
   const user = await getUser();
   if (!canManage(user) || user?.role === 'tecnico') {
     throw new Error('Sin permisos');
@@ -130,7 +130,7 @@ export async function postPlayerSupplementationAction(jugadorIdParam, payload) {
   throw new Error('Acción no soportada');
 }
 
-export async function getSupplementationCatalogAction() {
+export async function getSupplementationCatalog() {
   const user = await getUser();
   if (!user || user.role === 'jugador') {
     throw new Error('Sin permisos');
@@ -150,7 +150,7 @@ export async function getSupplementationCatalogAction() {
   };
 }
 
-export async function updateSupplementationCatalogAction(payload) {
+export async function updateSupplementationCatalog(payload) {
   const user = await getUser();
   if (!user || user.role !== 'admin') {
     throw new Error('Sin permisos');
@@ -358,10 +358,3 @@ export async function updateSupplementationCatalogAction(payload) {
 
   throw new Error('Acción no soportada');
 }
-
-export {
-  getPlayerSupplementationAction as getPlayerSupplementation,
-  postPlayerSupplementationAction as postPlayerSupplementation,
-  getSupplementationCatalogAction as getSupplementationCatalog,
-  updateSupplementationCatalogAction as updateSupplementationCatalog,
-};

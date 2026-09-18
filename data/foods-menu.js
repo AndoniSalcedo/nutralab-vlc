@@ -1747,7 +1747,7 @@ export const FOODS_MENU = [
   },
 ];
 
-export function normalizeFoodName(str) {
+function normalizeFoodName(str) {
   return String(str || '')
     .toLowerCase()
     .normalize('NFD')
@@ -1762,5 +1762,3 @@ export function normalizeFoodName(str) {
 FOODS_MENU.forEach((f) => {
   f.normalizedName = normalizeFoodName(f.name);
 });
-
-export default FOODS_MENU;

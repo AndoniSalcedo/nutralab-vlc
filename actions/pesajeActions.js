@@ -8,11 +8,11 @@ import {
   getPesajeById,
   updatePesaje,
   upsertPesaje,
-  deletePesaje
+  deletePesaje as deletePesajeInRepo
 } from '@/repositories/pesajeRepository';
 
 
-export async function savePesajeAction(body) {
+export async function savePesaje(body) {
   const { id, jugador_id, fecha, peso_kg } = body || {};
   if (!jugador_id || !fecha || peso_kg === undefined) {
     throw new Error('Faltan datos obligatorios');
@@ -46,7 +46,7 @@ export async function savePesajeAction(body) {
   return { ok: true, pesaje: data };
 }
 
-export async function deletePesajeAction(id) {
+export async function deletePesaje(id) {
   if (!id) throw new Error('Falta id del registro de peso');
 
   const supabase = getSupabaseAdmin();
@@ -61,7 +61,7 @@ export async function deletePesajeAction(id) {
   const ownedPlayer = await getOwnedPlayer(supabase, user, pesaje.jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  await deletePesaje(supabase, id);
+  await deletePesajeInRepo(supabase, id);
   revalidatePath(`/dashboard/jugador/${pesaje.jugador_id}`);
   if (ownedPlayer?.equipo_id) {
     revalidatePath(`/dashboard/equipo/${ownedPlayer.equipo_id}`);
@@ -69,8 +69,3 @@ export async function deletePesajeAction(id) {
   revalidatePath('/dashboard');
   return { ok: true };
 }
-
-export {
-  savePesajeAction as savePesaje,
-  deletePesajeAction as deletePesaje,
-};

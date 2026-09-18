@@ -97,7 +97,7 @@ function extractMenuData(message) {
   throw new Error('No se pudo extraer una estructura válida del menú desde el documento.');
 }
 
-export async function getWeeklyMenusAction(teamId, semana = null) {
+export async function getWeeklyMenus(teamId, semana = null) {
   if (!teamId) throw new Error('Falta equipo_id');
 
   const user = await getUser();
@@ -116,7 +116,7 @@ export async function getWeeklyMenusAction(teamId, semana = null) {
   return { menus: data || [] };
 }
 
-export async function createWeeklyMenuAction({ semana, equipo_id, dias }) {
+export async function createWeeklyMenu({ semana, equipo_id, dias }) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
@@ -132,7 +132,7 @@ export async function createWeeklyMenuAction({ semana, equipo_id, dias }) {
   return { ok: true, menu: data };
 }
 
-export async function uploadWeeklyMenuAction(fileOrFormData, weekDateParam, teamIdParam) {
+export async function uploadWeeklyMenu(fileOrFormData, weekDateParam, teamIdParam) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
@@ -259,7 +259,7 @@ IMPORTANTE:
   return { ok: true, menu: data };
 }
 
-export async function updateWeeklyMenuAction(id, dias) {
+export async function updateWeeklyMenu(id, dias) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
@@ -278,7 +278,7 @@ export async function updateWeeklyMenuAction(id, dias) {
   return { ok: true, menu: data };
 }
 
-export async function deleteWeeklyMenuAction(id) {
+export async function deleteWeeklyMenu(id) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
@@ -296,11 +296,3 @@ export async function deleteWeeklyMenuAction(id) {
   revalidatePath(`/dashboard/equipo/${menu.equipo_id}/menu`);
   return { ok: true };
 }
-
-export {
-  getWeeklyMenusAction as getWeeklyMenus,
-  createWeeklyMenuAction as createWeeklyMenu,
-  uploadWeeklyMenuAction as uploadWeeklyMenu,
-  updateWeeklyMenuAction as updateWeeklyMenu,
-  deleteWeeklyMenuAction as deleteWeeklyMenu,
-};

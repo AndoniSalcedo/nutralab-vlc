@@ -6,7 +6,7 @@ import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getOwnedTeam } from '@/lib/auth/team-access';
 import { updateTeamConfig } from '@/repositories/teamRepository';
 
-export async function transferProtocolAction(payload) {
+export async function transferProtocol(payload) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
@@ -60,7 +60,7 @@ export async function transferProtocolAction(payload) {
   };
 }
 
-export async function batchImportProtocolsAction({ sourceTeamId, targetTeamId, protocols }) {
+export async function batchImportProtocols({ sourceTeamId, targetTeamId, protocols }) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
@@ -108,8 +108,3 @@ export async function batchImportProtocolsAction({ sourceTeamId, targetTeamId, p
     imported
   };
 }
-
-export {
-  transferProtocolAction as transferProtocol,
-  batchImportProtocolsAction as batchImportProtocols,
-};

@@ -357,4 +357,5 @@ const foods = [
   { name: 'espárragos blancos - conserva', kcal: 20.0, cho: 2.5, pro: 1.8, fat: 0.2 },
   { name: 'alcachofa', kcal: 44.0, cho: 7.8, pro: 2.4, fat: 0.2 },
 ];
+// eslint-disable-next-line import-x/no-unused-modules
 export default foods;

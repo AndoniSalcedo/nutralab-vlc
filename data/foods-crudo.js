@@ -4244,5 +4244,3 @@ export function normalizeFoodName(str) {
 FOODS_CRUDO.forEach((f) => {
   f.normalizedName = normalizeFoodName(f.name);
 });
-
-export default FOODS_CRUDO;

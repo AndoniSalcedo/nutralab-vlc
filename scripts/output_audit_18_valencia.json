@@ -5,7 +5,6 @@
     "posicion": null,
     "aversiones": "Cerdo",
     "intolerancias": "sin_cerdo",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -94,7 +93,7 @@
       {
         "day": "lunes",
         "meal": "Desayuno",
-        "text": "Desayuno Danjuma: \"Leche desnatada 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
+        "text": "Desayuno Danjuma: \"Leche entera alto proteína 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
       },
       {
         "day": "martes",
@@ -104,7 +103,7 @@
       {
         "day": "miercoles",
         "meal": "Desayuno",
-        "text": "Desayuno Danjuma: \"Leche desnatada 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
+        "text": "Desayuno Danjuma: \"Leche entera alto proteína 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
       },
       {
         "day": "jueves",
@@ -114,12 +113,12 @@
       {
         "day": "viernes",
         "meal": "Desayuno",
-        "text": "Desayuno Danjuma: \"Leche desnatada 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
+        "text": "Desayuno Danjuma: \"Leche entera 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
       },
       {
         "day": "sabado",
         "meal": "Desayuno",
-        "text": "Desayuno Danjuma: \"Leche desnatada 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
+        "text": "Desayuno Danjuma: \"Leche entera alto proteína 250g\" (pautado en BD: \"café con leche, no quiere nada más\")"
       },
       {
         "day": "domingo",
@@ -134,7 +133,6 @@
     "posicion": null,
     "aversiones": "Espinacas, garbanzos, alubias",
     "intolerancias": "Ninguna",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -231,7 +229,6 @@
     "posicion": null,
     "aversiones": "Ninguna",
     "intolerancias": "Ninguna",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -283,7 +280,6 @@
     "posicion": null,
     "aversiones": "Ninguna",
     "intolerancias": "Ninguna",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -382,7 +378,6 @@
     "posicion": null,
     "aversiones": "Ninguna",
     "intolerancias": "Ninguna",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -457,7 +452,6 @@
     "posicion": null,
     "aversiones": "Ninguna",
     "intolerancias": "Ninguna",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -535,14 +529,22 @@
     "posicion": null,
     "aversiones": "Ninguna",
     "intolerancias": "Ninguna",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
       "detallesDefecto": {}
     },
-    "totalHallazgos": 0,
-    "hallazgos": [],
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "MONOTONÍA_PROTEÍNA_MISMO_DÍA",
+        "severity": "MEDIA",
+        "day": "viernes",
+        "detail": "Misma proteína (solomillo) en comida y cena",
+        "meals": "Comida: \"Cuscús 155g, Solomillo ibérico 195g, Ajo 5g, Arándanos 200g, AOVE 15g\" vs Cena: \"Puré de boniato 310g, Solomillo de ternera 235g, Rúcula 80g, Frambuesas 200g, AOVE 15g\"",
+        "traceAnalysis": "Fuente Comida: menu_del_club | Fuente Cena: menu_del_club. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
+      }
+    ],
     "notasIntencionadas": []
   },
   {
@@ -551,7 +553,6 @@
     "posicion": null,
     "aversiones": "Pescado y cerdo",
     "intolerancias": "sin_cerdo, sin_pescado",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -564,7 +565,7 @@
         "severity": "MEDIA",
         "day": "lunes",
         "detail": "Misma proteína (pollo) en comida y cena",
-        "meals": "Comida: \"Macarrones integrales 115g, Pechuga de pollo 190g, Pimiento rojo 50g, AOVE 20g, Naranja 100g\" vs Cena: \"Arroz 50g, Pechuga de pollo 235g, Cebolla 80g, Tomate 80g, Pimiento rojo 50g, Zanahoria 80g, AOVE 20g, Arándanos 100g\"",
+        "meals": "Comida: \"Patata 365g, Contramuslo de pollo deshuesado 255g, Champiñón 80g, Cebolla 80g, Zanahoria 80g, AOVE 5g, Arándanos 80g\" vs Cena: \"Arroz 50g, Pechuga de pollo 230g, Cebolla 80g, Tomate 80g, Pimiento rojo 50g, Zanahoria 80g, AOVE 20g, Naranja 150g\"",
         "traceAnalysis": "Fuente Comida: menu_del_club | Fuente Cena: menu_del_club. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
       }
     ],
@@ -576,7 +577,6 @@
     "posicion": null,
     "aversiones": "Verdura",
     "intolerancias": "Ninguna",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -667,7 +667,7 @@
         }
       }
     },
-    "totalHallazgos": 5,
+    "totalHallazgos": 4,
     "hallazgos": [
       {
         "category": "AVERSION_VERDURA_IGNORADA",
@@ -677,7 +677,7 @@
         "detail": "Plato con verdura servido a jugador con aversión",
         "source": "player_default_preference:Comida",
         "traceAnalysis": "Jugador tiene aversión 'verdura'. Fuente: player_default_preference:Comida. Si la guarnición del menú incluye verdura y no se filtró, es bug de filtro.",
-        "rawMeal": "Arroz integral 95g, Corvina 250g, Pimiento rojo 50g, AOVE 20g, Naranja 100g"
+        "rawMeal": "Ñoquis 215g, Corvina 250g, Pimiento rojo 50g, AOVE 20g, Arándanos 80g"
       },
       {
         "category": "AVERSION_VERDURA_IGNORADA",
@@ -687,17 +687,7 @@
         "detail": "Plato con verdura servido a jugador con aversión",
         "source": "player_default_preference:Cena",
         "traceAnalysis": "Jugador tiene aversión 'verdura'. Fuente: player_default_preference:Cena. Si la guarnición del menú incluye verdura y no se filtró, es bug de filtro.",
-        "rawMeal": "Arroz 50g, Pechuga de pollo 200g, Cebolla 80g, Tomate 80g, Pimiento rojo 50g, Zanahoria 80g, AOVE 20g, Arándanos 100g"
-      },
-      {
-        "category": "AVERSION_VERDURA_IGNORADA",
-        "severity": "ALTA",
-        "day": "martes",
-        "meal": "Cena",
-        "detail": "Plato con verdura servido a jugador con aversión",
-        "source": "player_default_preference:Cena",
-        "traceAnalysis": "Jugador tiene aversión 'verdura'. Fuente: player_default_preference:Cena. Si la guarnición del menú incluye verdura y no se filtró, es bug de filtro.",
-        "rawMeal": "Gajos de boniato 100g, Atún rojo 255g, AOVE 10g, Arándanos 150g"
+        "rawMeal": "Arroz 55g, Pechuga de pollo 200g, Cebolla 80g, Tomate 80g, Pimiento rojo 50g, Zanahoria 80g, AOVE 20g, Frambuesas 100g"
       },
       {
         "category": "AVERSION_VERDURA_IGNORADA",
@@ -707,7 +697,7 @@
         "detail": "Plato con verdura servido a jugador con aversión",
         "source": "player_default_preference:Comida",
         "traceAnalysis": "Jugador tiene aversión 'verdura'. Fuente: player_default_preference:Comida. Si la guarnición del menú incluye verdura y no se filtró, es bug de filtro.",
-        "rawMeal": "Puré de patata 280g, Pechuga de pollo 170g, Champiñón 80g, Cebolla 80g, Calabacín 80g, Pimiento rojo 50g, Zanahoria 80g, Brócoli 80g, AOVE 15g, Frambuesas 80g"
+        "rawMeal": "Pechuga de pollo 175g, Champiñón 80g, Cebolla 80g, Coliflor 80g, Gajos de patata 360g, AOVE 20g, Naranja 100g"
       },
       {
         "category": "AVERSION_VERDURA_IGNORADA",
@@ -717,7 +707,7 @@
         "detail": "Plato con verdura servido a jugador con aversión",
         "source": "player_default_preference:Comida",
         "traceAnalysis": "Jugador tiene aversión 'verdura'. Fuente: player_default_preference:Comida. Si la guarnición del menú incluye verdura y no se filtró, es bug de filtro.",
-        "rawMeal": "Espaguetis 80g, Dorada 205g, Cebolla 80g, Puerro 80g, Brócoli 80g, AOVE 20g, Naranja 100g"
+        "rawMeal": "Fusilli 80g, Dorada 205g, Cebolla 80g, Puerro 80g, Brócoli 80g, AOVE 20g, Frambuesas 80g"
       }
     ],
     "notasIntencionadas": []
@@ -728,7 +718,6 @@
     "posicion": null,
     "aversiones": "Ninguna",
     "intolerancias": "Ninguna",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -797,8 +786,17 @@
         }
       }
     },
-    "totalHallazgos": 0,
-    "hallazgos": [],
+    "totalHallazgos": 1,
+    "hallazgos": [
+      {
+        "category": "MONOTONÍA_PROTEÍNA_MISMO_DÍA",
+        "severity": "MEDIA",
+        "day": "viernes",
+        "detail": "Misma proteína (solomillo) en comida y cena",
+        "meals": "Comida: \"Arroz 145g, Solomillos de pollo 185g, Tomate natural rallado 40g, Frambuesas 200g, AOVE 20g\" vs Cena: \"Fusilli 130g, Solomillo de ternera 160g, Champiñón 80g, Arándanos 200g, AOVE 15g\"",
+        "traceAnalysis": "Fuente Comida: menu_del_club | Fuente Cena: menu_del_club. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
+      }
+    ],
     "notasIntencionadas": []
   },
   {
@@ -807,7 +805,6 @@
     "posicion": null,
     "aversiones": "Espinacas, cebolla pochada, queso frío, verdura cocinada, salsas",
     "intolerancias": "sin_pescado",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -881,7 +878,7 @@
         "severity": "MEDIA",
         "day": "lunes",
         "detail": "Misma proteína (pollo) en comida y cena",
-        "meals": "Comida: \"Arroz integral 200g, Contramuslo de pollo deshuesado 350g, Champiñón 80g, Cebolla 80g, Zanahoria 80g, AOVE 5g, Frambuesas 110g\" vs Cena: \"Arroz 165g, Pechuga de pollo 285g, Cebolla 80g, Tomate 80g, Pimiento rojo 50g, Zanahoria 80g, AOVE 25g, Arándanos 80g\"",
+        "meals": "Comida: \"Quinoa 160g, Contramuslo de pollo deshuesado 310g, Champiñón 80g, Cebolla 80g, Zanahoria 80g, AOVE 5g, Arándanos 180g, Pan 75g\" vs Cena: \"Arroz 165g, Pechuga de pollo 285g, Cebolla 80g, Tomate 80g, Pimiento rojo 50g, Zanahoria 80g, AOVE 25g, Frambuesas 80g\"",
         "traceAnalysis": "Fuente Comida: player_default_preference:Comida | Fuente Cena: player_default_preference:Cena. ¿Es bug?: Si ambas tomas son de menú, el menú del club ofreció esa proteína en ambos servicios o el selector de opciones eligió el plato con esa proteína."
       }
     ],
@@ -893,7 +890,6 @@
     "posicion": null,
     "aversiones": "Edulcorantes artificiales",
     "intolerancias": "sin_gluten, sin_lactosa",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -909,7 +905,6 @@
     "posicion": null,
     "aversiones": "Coliflor, brócoli, tomate muy maduro",
     "intolerancias": "Ninguna",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -925,7 +920,6 @@
     "posicion": "Defensa",
     "aversiones": "Cerdo",
     "intolerancias": "sin_cerdo",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -941,7 +935,6 @@
     "posicion": null,
     "aversiones": "Boniato, porridge de avena, ñoquis",
     "intolerancias": "Ninguna",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -1022,7 +1015,6 @@
     "posicion": null,
     "aversiones": "Cerdo",
     "intolerancias": "sin_cerdo",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -1038,7 +1030,6 @@
     "posicion": null,
     "aversiones": "Ninguna",
     "intolerancias": "Ninguna",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,
@@ -1112,7 +1103,6 @@
     "posicion": "Defensa",
     "aversiones": "Café",
     "intolerancias": "Ninguna",
-    "alergias": "Ninguna",
     "preferenciasCarlos": {
       "tienePrepartido": true,
       "tieneRecomendacionesDefecto": true,

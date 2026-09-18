@@ -3,7 +3,7 @@
 import { getUser } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 
-export async function getFoodsAction() {
+export async function getFoods() {
   const user = await getUser();
   if (!user) throw new Error('No autorizado');
 
@@ -22,5 +22,3 @@ export async function getFoodsAction() {
 
   return data || [];
 }
-
-export { getFoodsAction as getFoods };

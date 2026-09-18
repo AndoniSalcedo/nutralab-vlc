@@ -8,7 +8,7 @@ import {
   getEvolutionById,
   updateEvolution,
   upsertEvolution,
-  deleteEvolution
+  deleteEvolution as deleteEvolutionInRepo
 } from '@/repositories/evolutionRepository';
 
 const EVOLUTION_FIELDS = [
@@ -56,7 +56,7 @@ const EVOLUTION_FIELDS = [
 ];
 
 
-export async function saveEvolutionAction(body) {
+export async function saveEvolution(body) {
   const { id, jugador_id, fecha } = body || {};
   if (!jugador_id || !fecha) throw new Error('Faltan datos obligatorios');
 
@@ -89,7 +89,7 @@ export async function saveEvolutionAction(body) {
   return { ok: true, evolucion: data };
 }
 
-export async function deleteEvolutionAction(id) {
+export async function deleteEvolution(id) {
   if (!id) throw new Error('Falta id de la medición');
 
   const supabase = getSupabaseAdmin();
@@ -104,12 +104,7 @@ export async function deleteEvolutionAction(id) {
   const ownedPlayer = await getOwnedPlayer(supabase, user, evolucion.jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  await deleteEvolution(supabase, id);
+  await deleteEvolutionInRepo(supabase, id);
   revalidatePath(`/dashboard/jugador/${evolucion.jugador_id}`);
   return { ok: true };
 }
-
-export {
-  saveEvolutionAction as saveEvolution,
-  deleteEvolutionAction as deleteEvolution,
-};

@@ -13,8 +13,8 @@ import {
   getAiPlansByPlayerId,
   getAiPlanById,
   insertAiPlan,
-  updateAiPlan,
-  deleteAiPlan
+  updateAiPlan as updateAiPlanInRepo,
+  deleteAiPlan as deleteAiPlanInRepo
 } from '@/repositories/aiPlanRepository';
 import { getMenuByWeekAndTeam } from '@/repositories/menuRepository';
 
@@ -28,7 +28,7 @@ async function loadPlayerWithLatestMetrics(supabase, jugadorId) {
   return withLatestMeasurement(jugador, evoluciones || [], pesajes || []);
 }
 
-export async function getAiPlansAction(jugadorId, semana = null) {
+export async function getAiPlans(jugadorId, semana = null) {
   if (!jugadorId) throw new Error('Falta jugador_id');
 
   const supabase = getSupabaseAdmin();
@@ -46,7 +46,7 @@ export async function getAiPlansAction(jugadorId, semana = null) {
   return { planes: planes || [] };
 }
 
-export async function createAiPlanAction(payload) {
+async function createAiPlan(payload) {
   const {
     jugador,
     nombre,
@@ -113,7 +113,7 @@ export async function createAiPlanAction(payload) {
   return { plan };
 }
 
-export async function updateAiPlanAction(payload) {
+export async function updateAiPlan(payload) {
   const { id, nombre, contenido, datos } = payload || {};
   if (!id) throw new Error('Falta id del plan');
   const planNombre = String(nombre || '').trim();
@@ -137,7 +137,7 @@ export async function updateAiPlanAction(payload) {
   const sanitizedDatos = sanitizePlanData(datos, teamConfig);
   const finalContenido = String(contenido || '');
 
-  const plan = await updateAiPlan(supabase, id, {
+  const plan = await updateAiPlanInRepo(supabase, id, {
     nombre: planNombre,
     contenido: finalContenido,
     datos: sanitizedDatos,
@@ -150,7 +150,7 @@ export async function updateAiPlanAction(payload) {
   return { plan };
 }
 
-export async function deleteAiPlanAction(id) {
+export async function deleteAiPlan(id) {
   if (!id) throw new Error('Falta id del plan');
 
   const supabase = getSupabaseAdmin();
@@ -165,36 +165,28 @@ export async function deleteAiPlanAction(id) {
   const ownedPlayer = await getOwnedPlayer(supabase, user, plan.jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  await deleteAiPlan(supabase, id);
+  await deleteAiPlanInRepo(supabase, id);
   revalidatePath(`/dashboard/jugador/${plan.jugador_id}`);
   return { ok: true };
 }
 
-export async function generateAiPlanDraftAction({ jugador, nombre, calendario, semanaMenu, preMatchConfig }) {
-  return await createAiPlanAction({
+export async function generateAiPlanDraft({ jugador, nombre, calendario, semanaMenu, preMatchConfig }) {
+  return await createAiPlan({
     jugador,
     nombre,
     calendario,
     semanaMenu,
     preMatchConfig,
-    draftOnly: true,
+    guardar: false,
   });
 }
 
-export async function saveAiPlanAction({ jugador, nombre, datos, contenido }) {
-  return await createAiPlanAction({
+export async function saveAiPlan({ jugador, nombre, datos, contenido }) {
+  return await createAiPlan({
     jugador,
     nombre,
     datos,
     contenido,
+    guardar: true,
   });
 }
-
-export {
-  getAiPlansAction as getAiPlans,
-  createAiPlanAction as createAiPlan,
-  updateAiPlanAction as updateAiPlan,
-  deleteAiPlanAction as deleteAiPlan,
-  generateAiPlanDraftAction as generateAiPlanDraft,
-  saveAiPlanAction as saveAiPlan,
-};

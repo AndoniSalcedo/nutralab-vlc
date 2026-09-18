@@ -6,8 +6,8 @@ import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getOwnedTeam, getOwnerId } from '@/lib/auth/team-access';
 import {
   insertTeam,
-  deleteTeam,
-  updateTeam,
+  deleteTeam as deleteTeamInRepo,
+  updateTeam as updateTeamInRepo,
   getTeamsByOwner,
   getTeamByIdAndOwner,
   updateTeamConfig
@@ -152,7 +152,7 @@ async function copyPlayerAllHistory(supabase, sourcePlayerId, newPlayerId) {
   }
 }
 
-export async function getTeamsAction() {
+export async function getTeams() {
   const user = await getUser();
   const ownerId = getOwnerId(user);
   if (!ownerId) throw new Error('No autorizado');
@@ -162,7 +162,7 @@ export async function getTeamsAction() {
   return { equipos: teams || [] };
 }
 
-export async function createTeamAction(payload) {
+export async function createTeam(payload) {
   const user = await getUser();
   const ownerId = getOwnerId(user);
   if (!ownerId) throw new Error('No autorizado');
@@ -277,46 +277,39 @@ export async function createTeamAction(payload) {
   throw new Error('Acción no soportada');
 }
 
-export async function updateTeamAction(teamId, payload) {
-  const user = await getUser();
-  const ownerId = getOwnerId(user);
-  if (!ownerId) throw new Error('No autorizado');
-
+export async function updateTeam(teamId, payload) {
   const cleanTeamId = clean(teamId);
   const nombre = clean(payload?.nombre);
   const temporada = clean(payload?.temporada);
-  const descripcion = clean(payload?.descripcion) || null;
+  const descripcion = clean(payload?.descripcion);
 
-  if (!nombre) {
-    throw new Error('El nombre del equipo es obligatorio');
+  if (!cleanTeamId || !nombre) {
+    throw new Error('Faltan datos obligatorios');
   }
 
   const supabase = getSupabaseAdmin();
+  const user = await getUser();
   const team = await getOwnedTeam(supabase, user, cleanTeamId);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
-  const data = await updateTeam(supabase, team.id, { nombre, temporada, descripcion });
+  const data = await updateTeamInRepo(supabase, team.id, { nombre, temporada, descripcion });
   revalidatePath(`/dashboard/equipo/${cleanTeamId}`);
   revalidatePath('/dashboard');
   return { equipo: data };
 }
 
-export async function deleteTeamAction(teamId) {
-  const user = await getUser();
-  const ownerId = getOwnerId(user);
-  if (!ownerId) throw new Error('No autorizado');
-
-  const cleanTeamId = clean(teamId);
+export async function deleteTeam(teamId) {
   const supabase = getSupabaseAdmin();
-  const team = await getOwnedTeam(supabase, user, cleanTeamId);
+  const user = await getUser();
+  const team = await getOwnedTeam(supabase, user, teamId);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
-  await deleteTeam(supabase, team.id);
+  await deleteTeamInRepo(supabase, team.id);
   revalidatePath('/dashboard');
   return { ok: true };
 }
 
-export async function saveTeamConfigAction(teamId, configuracion_nutricional) {
+export async function saveTeamConfig(teamId, configuracion_nutricional) {
   const user = await getUser();
   const ownerId = getOwnerId(user);
   if (!user || user.role !== 'admin' || !ownerId) {
@@ -334,12 +327,7 @@ export async function saveTeamConfigAction(teamId, configuracion_nutricional) {
   return { success: true };
 }
 
-export async function getTeams() {
-  const data = await getTeamsAction();
-  return data.equipos || [];
-}
-
-export async function uploadTeamPhotoAction(teamIdOrFormData, maybeFile) {
+export async function uploadTeamPhoto(teamIdOrFormData, maybeFile) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
@@ -372,13 +360,17 @@ export async function uploadTeamPhotoAction(teamIdOrFormData, maybeFile) {
     updated_at: new Date().toISOString(),
   };
 
-  await updateTeam(supabase, id, payload);
+  await updateTeamInRepo(supabase, id, payload);
   revalidatePath('/dashboard');
   revalidatePath(`/dashboard/equipo/${id}`);
-  return { success: true, foto_mime: payload.foto_mime, foto_size: payload.foto_size };
+  return {
+    success: true,
+    foto_mime: payload.foto_mime,
+    foto_size: payload.foto_size,
+  };
 }
 
-export async function removeTeamPhotoAction(teamIdOrFormData) {
+export async function removeTeamPhoto(teamIdOrFormData) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
@@ -397,7 +389,7 @@ export async function removeTeamPhotoAction(teamIdOrFormData) {
   const ownedTeam = await getOwnedTeam(supabase, user, id);
   if (!ownedTeam) throw new Error('No tienes acceso a este equipo');
 
-  await updateTeam(supabase, id, {
+  await updateTeamInRepo(supabase, id, {
     foto: null,
     foto_mime: null,
     foto_size: null,
@@ -408,12 +400,3 @@ export async function removeTeamPhotoAction(teamIdOrFormData) {
   revalidatePath(`/dashboard/equipo/${id}`);
   return { success: true, removed: true };
 }
-
-export {
-  createTeamAction as createTeam,
-  updateTeamAction as updateTeam,
-  deleteTeamAction as deleteTeam,
-  saveTeamConfigAction as saveTeamConfig,
-  uploadTeamPhotoAction as uploadTeamPhoto,
-  removeTeamPhotoAction as removeTeamPhoto,
-};
