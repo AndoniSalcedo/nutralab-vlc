@@ -580,7 +580,7 @@ const coverStyles = StyleSheet.create({
   },
 });
 
-export function CoverPage({ meta, playerName }) {
+function CoverPage({ meta, playerName }) {
   const microcycle = toLines(meta.microcycle).slice(0, 7);
   const rules = toLines(meta.rules);
   const buffet = toLines(meta.buffet);

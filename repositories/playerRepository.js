@@ -40,21 +40,6 @@ export async function getPlayerById(supabase, id) {
   return data;
 }
 
-export async function getPlayerByIdMaybe(supabase, id) {
-  if (isMockPlayer(id)) {
-    const player = mockPlayers.find((p) => String(p.id) === String(id));
-    return player || mockPlayers[0];
-  }
-
-  const { data, error } = await supabase
-    .from('jugadores')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data;
-}
 
 export async function getPlayerAuthUserId(supabase, id) {
   const { data, error } = await supabase
