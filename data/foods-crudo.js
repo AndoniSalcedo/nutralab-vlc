@@ -1068,38 +1068,6 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Arándano congelada",
-    "originalName": "Arándano congelada",
-    "kcal": 55.9,
-    "cho": 14.21,
-    "pro": 0.69,
-    "fat": 0.29,
-    "tags": [],
-    "minGrams": 100,
-    "maxGrams": 220,
-    "treePath": [
-      "frutas"
-    ]
-  },
-  {
-    "name": "Arándano desecada",
-    "originalName": "Arándano desecada",
-    "kcal": 171,
-    "cho": 40.6,
-    "pro": 1.96,
-    "fat": 0.84,
-    "tags": [
-      "fructosa",
-      "alto_fodmap"
-    ],
-    "minGrams": 20,
-    "maxGrams": 60,
-    "treePath": [
-      "frutas",
-      "desecadas"
-    ]
-  },
-  {
     "name": "Arándanos",
     "originalName": "Arándano cruda",
     "kcal": 57,
@@ -1163,51 +1131,6 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Frambuesa congelada",
-    "originalName": "Frambuesa congelada",
-    "kcal": 51,
-    "cho": 11.76,
-    "pro": 1.18,
-    "fat": 0.69,
-    "tags": [],
-    "minGrams": 100,
-    "maxGrams": 220,
-    "treePath": [
-      "frutas"
-    ]
-  },
-  {
-    "name": "Fresa congelada",
-    "originalName": "Fresa congelada",
-    "kcal": 31.4,
-    "cho": 7.55,
-    "pro": 0.69,
-    "fat": 0.29,
-    "tags": [],
-    "minGrams": 100,
-    "maxGrams": 220,
-    "treePath": [
-      "frutas"
-    ]
-  },
-  {
-    "name": "Fresa desecada",
-    "originalName": "Fresa desecada",
-    "kcal": 96,
-    "cho": 21.56,
-    "pro": 1.96,
-    "fat": 0.84,
-    "tags": [
-      "fructosa"
-    ],
-    "minGrams": 20,
-    "maxGrams": 60,
-    "treePath": [
-      "frutas",
-      "desecadas"
-    ]
-  },
-  {
     "name": "Fresas",
     "originalName": "Fresa ",
     "kcal": 32,
@@ -1219,42 +1142,6 @@ export const FOODS_CRUDO = [
     "maxGrams": 220,
     "treePath": [
       "frutas"
-    ]
-  },
-  {
-    "name": "Higo seco",
-    "originalName": "Higo seco ",
-    "kcal": 249,
-    "cho": 64,
-    "pro": 3.3,
-    "fat": 0.9,
-    "tags": [
-      "fructosa",
-      "alto_fodmap"
-    ],
-    "minGrams": 20,
-    "maxGrams": 60,
-    "treePath": [
-      "frutas",
-      "desecadas"
-    ]
-  },
-  {
-    "name": "Higo seco desecada",
-    "originalName": "Higo seco desecada",
-    "kcal": 747,
-    "cho": 179.2,
-    "pro": 9.24,
-    "fat": 2.52,
-    "tags": [
-      "fructosa",
-      "alto_fodmap"
-    ],
-    "minGrams": 20,
-    "maxGrams": 60,
-    "treePath": [
-      "frutas",
-      "desecadas"
     ]
   },
   {
@@ -1303,41 +1190,6 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Mango congelada",
-    "originalName": "Mango congelada",
-    "kcal": 58.8,
-    "cho": 14.7,
-    "pro": 0.78,
-    "fat": 0.39,
-    "tags": [
-      "fructosa",
-      "alto_fodmap"
-    ],
-    "minGrams": 100,
-    "maxGrams": 220,
-    "treePath": [
-      "frutas"
-    ]
-  },
-  {
-    "name": "Mango desecada",
-    "originalName": "Mango desecada",
-    "kcal": 180,
-    "cho": 42,
-    "pro": 2.24,
-    "fat": 1.12,
-    "tags": [
-      "fructosa",
-      "alto_fodmap"
-    ],
-    "minGrams": 20,
-    "maxGrams": 60,
-    "treePath": [
-      "frutas",
-      "desecadas"
-    ]
-  },
-  {
     "name": "Manzana",
     "originalName": "Manzana ",
     "kcal": 52,
@@ -1367,24 +1219,6 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 220,
-    "treePath": [
-      "frutas",
-      "desecadas"
-    ]
-  },
-  {
-    "name": "Manzana desecada",
-    "originalName": "Manzana desecada",
-    "kcal": 156,
-    "cho": 38.64,
-    "pro": 0.84,
-    "fat": 0.56,
-    "tags": [
-      "fructosa",
-      "alto_fodmap"
-    ],
-    "minGrams": 20,
-    "maxGrams": 60,
     "treePath": [
       "frutas",
       "desecadas"
@@ -1433,23 +1267,6 @@ export const FOODS_CRUDO = [
     "maxGrams": 220,
     "treePath": [
       "frutas"
-    ]
-  },
-  {
-    "name": "Naranja desecada",
-    "originalName": "Naranja desecada",
-    "kcal": 141,
-    "cho": 33.04,
-    "pro": 2.52,
-    "fat": 0.28,
-    "tags": [
-      "fructosa"
-    ],
-    "minGrams": 20,
-    "maxGrams": 60,
-    "treePath": [
-      "frutas",
-      "desecadas"
     ]
   },
   {
@@ -1522,37 +1339,6 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Piña congelada",
-    "originalName": "Piña congelada",
-    "kcal": 49,
-    "cho": 12.84,
-    "pro": 0.49,
-    "fat": 0.1,
-    "tags": [],
-    "minGrams": 100,
-    "maxGrams": 220,
-    "treePath": [
-      "frutas"
-    ]
-  },
-  {
-    "name": "Piña desecada",
-    "originalName": "Piña desecada",
-    "kcal": 150,
-    "cho": 36.68,
-    "pro": 1.4,
-    "fat": 0.28,
-    "tags": [
-      "fructosa"
-    ],
-    "minGrams": 20,
-    "maxGrams": 60,
-    "treePath": [
-      "frutas",
-      "desecadas"
-    ]
-  },
-  {
     "name": "Piña pelada",
     "originalName": "Piña pelada",
     "kcal": 47.5,
@@ -1581,23 +1367,6 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Plátano desecada",
-    "originalName": "Plátano desecada",
-    "kcal": 267,
-    "cho": 63.84,
-    "pro": 3.08,
-    "fat": 0.84,
-    "tags": [
-      "fructosa"
-    ],
-    "minGrams": 20,
-    "maxGrams": 60,
-    "treePath": [
-      "frutas",
-      "desecadas"
-    ]
-  },
-  {
     "name": "Sandía",
     "originalName": "Sandía ",
     "kcal": 30,
@@ -1612,24 +1381,6 @@ export const FOODS_CRUDO = [
     "maxGrams": 220,
     "treePath": [
       "frutas"
-    ]
-  },
-  {
-    "name": "Uva desecada",
-    "originalName": "Uva desecada",
-    "kcal": 207,
-    "cho": 50.4,
-    "pro": 1.96,
-    "fat": 0.56,
-    "tags": [
-      "fructosa",
-      "alto_fodmap"
-    ],
-    "minGrams": 20,
-    "maxGrams": 60,
-    "treePath": [
-      "frutas",
-      "desecadas"
     ]
   },
   {
