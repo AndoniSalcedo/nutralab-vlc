@@ -199,7 +199,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false, initial
               )}
             </Group>
 
-            <Collapse in={!isMobile || expanded} transitionDuration={isMobile ? 200 : 0}>
+            <Collapse expanded={!isMobile || expanded} transitionDuration={isMobile ? 200 : 0}>
               <Stack gap="sm">
                 <SimpleGrid cols={2} spacing="xs">
                   <DatePickerInput

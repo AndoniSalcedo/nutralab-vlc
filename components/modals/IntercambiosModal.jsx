@@ -264,7 +264,6 @@ export default function IntercambiosModal({ opened, onClose }) {
                         radius="xl"
                         leftSection={<IconRefresh size={12} />}
                         onClick={resetCalculator}
-                        compact="true"
                       >
                         Limpiar
                       </Button>

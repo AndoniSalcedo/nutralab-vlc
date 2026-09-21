@@ -257,7 +257,7 @@ export default function MealCard({ m, onOpen, onEdit, onDelete, foods = [] }) {
         )}
       </Stack>
 
-      <Collapse in={expanded}>
+      <Collapse expanded={expanded}>
         <Stack gap="xs" p="md" pt={0} style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}>
           {ingredientsText && (
             <Box mt="xs">

@@ -57,13 +57,13 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
             )}
 
             {isMobile && (
-              <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="md">
+              <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="md" aria-label={expanded ? 'Ocultar opciones' : 'Mostrar opciones'}>
                 <IconChevronDown size={20} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: '200ms' }} />
               </ActionIcon>
             )}
           </Group>
 
-          <Collapse in={!isMobile || expanded} transitionDuration={isMobile ? 200 : 0}>
+          <Collapse expanded={!isMobile || expanded} transitionDuration={isMobile ? 200 : 0}>
             {!readOnly && isMobile && (
               <Button
                 radius="xl"
