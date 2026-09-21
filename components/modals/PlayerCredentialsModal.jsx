@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Modal,
   Stack,
   Text,
   TextInput,
@@ -10,6 +9,7 @@ import {
   Alert
 } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function PlayerCredentialsModal({
   opened,
@@ -27,7 +27,7 @@ export default function PlayerCredentialsModal({
   buttonLabel
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -89,6 +89,6 @@ export default function PlayerCredentialsModal({
           </Group>
         </Group>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

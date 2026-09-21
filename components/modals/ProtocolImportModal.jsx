@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  Modal, 
   Stack, 
   Select, 
   Button, 
@@ -16,6 +15,7 @@ import {
   ScrollArea,
   Table
 } from '@mantine/core';
+import ResponsiveModal from './ResponsiveModal';
 import { notifications } from '@mantine/notifications';
 import { IconDownload, IconShield } from '@/components/icons3d';
 import { getTeams } from '@/actions/teamActions';
@@ -159,7 +159,7 @@ export default function ProtocolImportModal({
   };
 
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -306,6 +306,6 @@ export default function ProtocolImportModal({
           </Group>
         </Stack>
       )}
-    </Modal>
+    </ResponsiveModal>
   );
 }

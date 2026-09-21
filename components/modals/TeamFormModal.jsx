@@ -1,7 +1,8 @@
 import React from 'react';
-import { Modal, Group, Text } from '@mantine/core';
+import { Group, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import TeamForm from '@/components/forms/TeamForm';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function TeamFormModal({
   opened,
@@ -23,7 +24,7 @@ export default function TeamFormModal({
   allPlayers,
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -59,6 +60,6 @@ export default function TeamFormModal({
         modalType={modal.type}
         allPlayers={allPlayers}
       />
-    </Modal>
+    </ResponsiveModal>
   );
 }

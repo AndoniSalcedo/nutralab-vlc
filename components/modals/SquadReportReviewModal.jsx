@@ -7,7 +7,6 @@ import {
   Checkbox,
   Divider,
   Group,
-  Modal,
   NumberInput,
   Paper,
   SimpleGrid,
@@ -29,6 +28,7 @@ import {
   IconUserCheck,
 } from '@/components/icons3d';
 import ConfirmModal from '@/components/modals/ConfirmModal';
+import ResponsiveModal from './ResponsiveModal';
 
 const DAYS_OF_WEEK = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
 
@@ -288,7 +288,7 @@ export default function SquadReportReviewModal({
 
   return (
     <>
-      <Modal
+      <ResponsiveModal
       opened={opened}
       onClose={onCancel}
       closeOnClickOutside={false}
@@ -826,7 +826,7 @@ export default function SquadReportReviewModal({
           </Group>
         </Group>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
 
     {/* Modal de confirmación para regenerar dieta si hay cambios manuales */}
     <ConfirmModal

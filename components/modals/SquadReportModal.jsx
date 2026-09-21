@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Modal,
   Box,
   Stack,
   Group,
@@ -30,6 +29,7 @@ import {
   IconSparkles,
   IconTrophy,
 } from '@/components/icons3d';
+import ResponsiveModal from './ResponsiveModal';
 
 const MATCH_SCHEDULE_OPTIONS = [
   { label: 'Mañana', value: 'manana' },
@@ -220,7 +220,7 @@ export default function SquadReportModal({
   generateReport
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -564,6 +564,6 @@ export default function SquadReportModal({
           </Group>
         </Stack>
       </Box>
-    </Modal>
+    </ResponsiveModal>
   );
 }

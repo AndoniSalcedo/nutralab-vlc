@@ -3,7 +3,6 @@
 import React, { useState, useCallback } from 'react';
 import Cropper from 'react-easy-crop';
 import {
-  Modal,
   Button,
   Group,
   Stack,
@@ -13,6 +12,7 @@ import {
   Tooltip,
   Box,
 } from '@mantine/core';
+import ResponsiveModal from './ResponsiveModal';
 import {
   IconZoomIn,
   IconZoomOut,
@@ -88,7 +88,7 @@ export default function ImageCropModal({
   };
 
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={handleClose}
       title={
@@ -216,6 +216,6 @@ export default function ImageCropModal({
           </Button>
         </Group>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

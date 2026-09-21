@@ -1,10 +1,11 @@
 import React from 'react';
-import { Modal, Stack, Box, Image, ActionIcon, Paper, Text } from '@mantine/core';
+import { Stack, Box, Image, ActionIcon, Paper, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function ImageViewerModal({ opened, onClose, viewer }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       size="lg"
@@ -40,6 +41,6 @@ export default function ImageViewerModal({ opened, onClose, viewer }) {
           </Paper>
         )}
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

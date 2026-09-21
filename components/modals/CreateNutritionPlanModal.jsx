@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Modal,
   Stack,
   TextInput,
   Select,
@@ -14,6 +13,7 @@ import {
   Badge,
 } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
+import ResponsiveModal from './ResponsiveModal';
 
 const MATCH_SCHEDULE_OPTIONS = [
   { label: 'Mañana', value: 'manana' },
@@ -24,7 +24,6 @@ const MATCH_SCHEDULE_OPTIONS = [
 export default function CreateNutritionPlanModal({
   opened,
   onClose,
-  isMobile,
   modalNombre,
   setModalNombre,
   modalSelectedMenuWeek,
@@ -54,10 +53,9 @@ export default function CreateNutritionPlanModal({
   const matchDaysInCalendar = dayKeys.filter((key) => modalCalendar[key] === 'partido');
 
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
-      fullScreen={isMobile}
       title={
         <Group gap="xs">
           <Icon3D name="brain" size={26} />
@@ -211,6 +209,6 @@ export default function CreateNutritionPlanModal({
           </Button>
         </Group>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

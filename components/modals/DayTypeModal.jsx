@@ -1,6 +1,7 @@
 import React from 'react';
-import { Modal, Stack, TextInput, Select, Button, Switch, Group, Text } from '@mantine/core';
+import { Stack, TextInput, Select, Button, Switch, Group, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function DayTypeModal({
   opened,
@@ -11,7 +12,7 @@ export default function DayTypeModal({
   handleSaveDayType
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={editingDayType?.key ? 'Editar Tipo de Día' : 'Nuevo Tipo de Día'}
@@ -66,6 +67,6 @@ export default function DayTypeModal({
           </Group>
         </Stack>
       )}
-    </Modal>
+    </ResponsiveModal>
   );
 }

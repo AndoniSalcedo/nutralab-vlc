@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react';
 import {
-  Modal,
   ScrollArea,
   TextInput,
   NumberInput,
@@ -29,6 +28,7 @@ import {
   IconRefresh,
 } from '@/components/icons3d';
 import FoodCalculator from '@/components/FoodCalculator';
+import ResponsiveModal from './ResponsiveModal';
 
 const INTERCAMBIOS_DATA = {
   proteinas: {
@@ -166,10 +166,9 @@ export default function IntercambiosModal({ opened, onClose }) {
   }, [activeCategory, searchQuery, showCalculator, selectedFoodObj, calcQty]);
 
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
-      fullScreen={isMobile}
       title={
         <Group gap="xs">
           <ThemeIcon color="nutralabColor" variant="light" radius="xl" size="lg">
@@ -424,6 +423,6 @@ export default function IntercambiosModal({ opened, onClose }) {
           </>
         )}
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Modal,
   Group,
   Text,
   Stack,
@@ -13,6 +12,7 @@ import {
   Anchor
 } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function MeasurementDetailModal({
   opened,
@@ -34,7 +34,7 @@ export default function MeasurementDetailModal({
   MEASUREMENT_DETAIL_SECTIONS
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -162,6 +162,6 @@ export default function MeasurementDetailModal({
           )}
         </Stack>
       )}
-    </Modal>
+    </ResponsiveModal>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Modal, Text } from '@mantine/core';
+import { Text } from '@mantine/core';
 import MealForm from '@/components/forms/MealForm';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function MealEditorModal({
   opened,
@@ -11,7 +12,7 @@ export default function MealEditorModal({
   onCancel,
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       size="lg"
@@ -26,6 +27,6 @@ export default function MealEditorModal({
         onSuccess={onSuccess}
         onCancel={onCancel}
       />
-    </Modal>
+    </ResponsiveModal>
   );
 }

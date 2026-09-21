@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Modal,
   Group,
   Text,
   Stack,
@@ -11,6 +10,7 @@ import {
   Button
 } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function EditRecordModal({
   opened,
@@ -21,7 +21,7 @@ export default function EditRecordModal({
   savingEdit
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -103,6 +103,6 @@ export default function EditRecordModal({
           </Button>
         </Group>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

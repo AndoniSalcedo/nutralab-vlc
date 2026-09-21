@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Stack, TextInput, Button, Group, ActionIcon, Text, Textarea, Select, Divider, Paper, ScrollArea, Box, Timeline, Tooltip, Switch } from '@mantine/core';
+import { Stack, TextInput, Button, Group, ActionIcon, Text, Textarea, Select, Divider, Paper, ScrollArea, Box, Timeline, Tooltip, Switch } from '@mantine/core';
+import ResponsiveModal from './ResponsiveModal';
 import { 
   IconArrowUp,
   IconArrowDown,
@@ -107,7 +108,7 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
   };
 
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={protocol ? 'Editar Protocolo' : 'Nuevo Protocolo'}
@@ -429,6 +430,6 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
           </Button>
         </Group>
       </Group>
-    </Modal>
+    </ResponsiveModal>
   );
 }

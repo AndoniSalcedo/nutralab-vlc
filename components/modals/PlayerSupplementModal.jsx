@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Modal,
   Group,
   Text,
   Stack,
@@ -12,6 +11,7 @@ import {
   Button
 } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function PlayerSupplementModal({
   opened,
@@ -27,7 +27,7 @@ export default function PlayerSupplementModal({
   handleAddExtra
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -133,6 +133,6 @@ export default function PlayerSupplementModal({
           </Stack>
         )}
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

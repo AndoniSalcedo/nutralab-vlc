@@ -1,7 +1,8 @@
 import React from 'react';
-import { Modal, Group, Text, Box, Timeline, Paper } from '@mantine/core';
+import { Group, Text, Box, Timeline, Paper } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import dayjs from 'dayjs';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function SupplementHistoryModal({
   opened,
@@ -10,7 +11,7 @@ export default function SupplementHistoryModal({
   catalogsById
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -53,6 +54,6 @@ export default function SupplementHistoryModal({
           </Paper>
         )}
       </Box>
-    </Modal>
+    </ResponsiveModal>
   );
 }

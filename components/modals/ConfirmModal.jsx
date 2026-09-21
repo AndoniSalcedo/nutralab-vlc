@@ -1,6 +1,7 @@
 import React from 'react';
-import { Modal, Text, Group, Button, Stack } from '@mantine/core';
+import { Text, Group, Button, Stack } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function ConfirmModal({
   opened,
@@ -14,7 +15,7 @@ export default function ConfirmModal({
   color = 'red'
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -55,6 +56,6 @@ export default function ConfirmModal({
           </Button>
         </Group>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

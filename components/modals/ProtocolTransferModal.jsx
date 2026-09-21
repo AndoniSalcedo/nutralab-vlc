@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  Modal, 
   Stack, 
   Select, 
   Button, 
@@ -15,6 +14,7 @@ import {
   Center,
   Box
 } from '@mantine/core';
+import ResponsiveModal from './ResponsiveModal';
 import { notifications } from '@mantine/notifications';
 import { IconFolderShare, IconArrowsExchange, IconClipboardList, IconShield } from '@/components/icons3d';
 import { getTeams } from '@/actions/teamActions';
@@ -137,7 +137,7 @@ export default function ProtocolTransferModal({
   };
 
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -262,6 +262,6 @@ export default function ProtocolTransferModal({
           </Group>
         </Stack>
       )}
-    </Modal>
+    </ResponsiveModal>
   );
 }

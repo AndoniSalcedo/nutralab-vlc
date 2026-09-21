@@ -1,6 +1,7 @@
 import React from 'react';
-import { Modal, Stack, PasswordInput, Group, Button, Text } from '@mantine/core';
+import { Stack, PasswordInput, Group, Button, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function PlayerPasswordModal({
   opened,
@@ -13,7 +14,7 @@ export default function PlayerPasswordModal({
   saving
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -39,6 +40,6 @@ export default function PlayerPasswordModal({
           </Button>
         </Group>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

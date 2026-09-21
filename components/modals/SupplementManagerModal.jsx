@@ -1,7 +1,8 @@
 import React from 'react';
-import { Modal, Group, Text } from '@mantine/core';
+import { Group, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import SupplementCatalogManager from '@/components/SupplementCatalogManager';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function SupplementManagerModal({
   opened,
@@ -13,7 +14,7 @@ export default function SupplementManagerModal({
   initialSelectedPlayerIds
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -36,6 +37,6 @@ export default function SupplementManagerModal({
         onTabChange={onTabChange}
         initialSelectedPlayerIds={initialSelectedPlayerIds}
       />
-    </Modal>
+    </ResponsiveModal>
   );
 }

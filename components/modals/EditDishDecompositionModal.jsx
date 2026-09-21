@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Modal,
   Stack,
   Text,
   Group,
@@ -13,6 +12,7 @@ import {
   Box,
 } from '@mantine/core';
 import { IconCheck, IconX, IconCooking } from '@/components/icons3d';
+import ResponsiveModal from './ResponsiveModal';
 import {
   getTreeProteinaOptions,
   getTreeHidratoOptions,
@@ -117,7 +117,7 @@ export default function EditDishDecompositionModal({
   }
 
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -284,6 +284,6 @@ export default function EditDishDecompositionModal({
           </Button>
         </Group>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

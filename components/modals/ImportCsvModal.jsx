@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Modal,
   Stack,
   Tabs,
   Group,
@@ -19,6 +18,7 @@ import {
   IconDownload,
   IconCheck
 } from '@/components/icons3d';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function ImportCsvModal({
   opened,
@@ -37,7 +37,7 @@ export default function ImportCsvModal({
   getRecordStatusConfig
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={() => {
         onClose();
@@ -205,6 +205,6 @@ export default function ImportCsvModal({
           </Button>
         </Group>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

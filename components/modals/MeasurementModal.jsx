@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Modal,
   Group,
   Text,
   Stack,
@@ -14,6 +13,7 @@ import {
 import { DateInput } from '@mantine/dates';
 import Icon3D from '@/components/Icon3D';
 import { MEASUREMENT_DETAIL_SECTIONS } from '@/lib/metrics/measurements';
+import ResponsiveModal from './ResponsiveModal';
 
 function dateValue(value) {
   return value ? new Date(`${value}T00:00:00`) : null;
@@ -39,7 +39,7 @@ export default function MeasurementModal({
   saving
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -126,6 +126,6 @@ export default function MeasurementModal({
           </Button>
         </Group>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Modal,
   Stack,
   Text,
   TextInput,
@@ -11,6 +10,7 @@ import {
   Button
 } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function CreateMenuModal({
   opened,
@@ -23,7 +23,7 @@ export default function CreateMenuModal({
   creatingEmpty
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -149,6 +149,6 @@ export default function CreateMenuModal({
           </Grid.Col>
         </Grid>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

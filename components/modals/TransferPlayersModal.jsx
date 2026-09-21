@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, Group, Text, Button, Select, Radio, Stack, Checkbox, Avatar, Box, ScrollArea } from '@mantine/core';
+import { Group, Text, Button, Select, Radio, Stack, Checkbox, Avatar, Box, ScrollArea } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
+import ResponsiveModal from './ResponsiveModal';
 import { notifications } from '@mantine/notifications';
 import { getTeams } from '@/actions/teamActions';
 import { transferPlayers } from '@/actions/playerActions';
@@ -84,7 +85,7 @@ export default function TransferPlayersModal({ opened, onClose, team, players = 
   };
 
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -192,6 +193,6 @@ export default function TransferPlayersModal({ opened, onClose, team, players = 
           </Button>
         </Group>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

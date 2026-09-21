@@ -1,12 +1,13 @@
 import React from 'react';
-import { Modal, Group, Text, Tabs } from '@mantine/core';
+import { Group, Text, Tabs } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import PlayerExcelImporter from '@/components/PlayerExcelImporter';
 import TeamOsmolarityImporter from '@/components/TeamOsmolarityImporter';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function ImportDataModal({ opened, onClose, team }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -37,6 +38,6 @@ export default function ImportDataModal({ opened, onClose, team }) {
           <TeamOsmolarityImporter team={team} />
         </Tabs.Panel>
       </Tabs>
-    </Modal>
+    </ResponsiveModal>
   );
 }

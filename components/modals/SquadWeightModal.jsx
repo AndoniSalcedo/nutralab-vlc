@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import {
-  Modal,
   Group,
   Text,
   Stack,
@@ -38,6 +37,7 @@ import {
   exportWeightExcel,
   downloadWeightPdf,
 } from '@/lib/io/weight-export';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function SquadWeightModal({ opened, onClose, players = [], team }) {
   const router = useRouter();
@@ -388,7 +388,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
   const playersWithWeightCount = preparedExportPlayers.filter((p) => p.hasWeight).length;
 
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -843,6 +843,6 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
           </Stack>
         </Tabs.Panel>
       </Tabs>
-    </Modal>
+    </ResponsiveModal>
   );
 }

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Modal, Group, Text } from '@mantine/core';
+import { Group, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import MessageComposerForm from '@/components/forms/MessageComposerForm';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function SendMessageModal({
   opened,
@@ -13,7 +14,7 @@ export default function SendMessageModal({
   forceRecipients
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -33,6 +34,6 @@ export default function SendMessageModal({
         defaultRecipientIds={defaultRecipientIds}
         forceRecipients={forceRecipients}
       />
-    </Modal>
+    </ResponsiveModal>
   );
 }

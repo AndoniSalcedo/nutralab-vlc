@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Modal,
   Stack,
   Text,
   Group,
@@ -16,6 +15,7 @@ import {
   Box,
   Divider,
 } from '@mantine/core';
+import ResponsiveModal from './ResponsiveModal';
 import { notifications } from '@mantine/notifications';
 import { IconSparkles, IconAlertCircle, IconCheck, IconX } from '@/components/icons3d';
 import { parseMealTree } from '@/actions/mealActions';
@@ -224,7 +224,7 @@ export default function EditMealPatternModal({
   }
 
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -510,6 +510,6 @@ export default function EditMealPatternModal({
           </Button>
         </Group>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Modal, Stack, Group, Text } from '@mantine/core';
+import { Stack, Group, Text } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { Dropzone } from '@mantine/dropzone';
 import Icon3D from '@/components/Icon3D';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function UploadAnaliticaModal({
   opened,
@@ -14,7 +15,7 @@ export default function UploadAnaliticaModal({
 }) {
 
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -78,6 +79,6 @@ export default function UploadAnaliticaModal({
           </div>
         </Dropzone>
       </Stack>
-    </Modal>
+    </ResponsiveModal>
   );
 }

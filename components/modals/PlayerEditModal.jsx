@@ -1,7 +1,8 @@
 import React from 'react';
-import { Modal, Group, Text } from '@mantine/core';
+import { Group, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import PlayerForm from '@/components/forms/PlayerForm';
+import ResponsiveModal from './ResponsiveModal';
 
 export default function PlayerEditModal({
   opened,
@@ -11,7 +12,7 @@ export default function PlayerEditModal({
   title = 'Editar jugador'
 }) {
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={
@@ -25,6 +26,6 @@ export default function PlayerEditModal({
       overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
     >
       {player && <PlayerForm initial={player} team={team} />}
-    </Modal>
+    </ResponsiveModal>
   );
 }
