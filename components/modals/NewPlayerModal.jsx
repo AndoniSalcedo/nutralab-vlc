@@ -1,12 +1,11 @@
 import React from 'react';
-import { Group, Text } from '@mantine/core';
+import { Modal, Group, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import PlayerForm from '@/components/forms/PlayerForm';
-import ResponsiveModal from './ResponsiveModal';
 
 export default function NewPlayerModal({ opened, onClose, team }) {
   return (
-    <ResponsiveModal
+    <Modal
       opened={opened}
       onClose={onClose}
       title={
@@ -20,6 +19,6 @@ export default function NewPlayerModal({ opened, onClose, team }) {
       overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
     >
       <PlayerForm initial={null} team={team} />
-    </ResponsiveModal>
+    </Modal>
   );
 }
