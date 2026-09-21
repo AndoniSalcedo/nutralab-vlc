@@ -4,13 +4,10 @@ import { useState } from "react";
 import {
   IconChevronDown,
   IconLogout,
-  IconReceipt,
   IconSettings,
   IconUserCog,
   IconUsersGroup,
   IconUserStar,
-  IconBook,
-  IconApple,
   IconShieldCheck,
 } from "@/components/icons3d";
 import {
@@ -148,33 +145,6 @@ export default function DashboardShell({ children, user }) {
                         Gestionar nutricionistas
                       </Menu.Item>
                     )}
-
-                    <Menu.Item
-                      leftSection={<IconReceipt size={16} stroke={1.5} />}
-                      component="a"
-                      href={`${frontendUrl}/dashboard/recipes`}
-                      onClick={() => setOpened(false)}
-                    >
-                      Recetario
-                    </Menu.Item>
-
-                    <Menu.Item
-                      leftSection={<IconBook size={16} stroke={1.5} />}
-                      component="a"
-                      href={`${frontendUrl}/dashboard/catalogs`}
-                      onClick={() => setOpened(false)}
-                    >
-                      Catálogos
-                    </Menu.Item>
-
-                    <Menu.Item
-                      leftSection={<IconApple size={16} stroke={1.5} />}
-                      component="a"
-                      href={`${frontendUrl}/dashboard/foods`}
-                      onClick={() => setOpened(false)}
-                    >
-                      Alimentos
-                    </Menu.Item>
 
                     <Menu.Divider />
 
