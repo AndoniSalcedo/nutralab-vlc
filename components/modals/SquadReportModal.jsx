@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Stack,
-  Group,
-  Text,
-  Paper,
-  ThemeIcon,
-  SimpleGrid,
-  TextInput,
-  Select,
   Button,
-  Textarea,
   Checkbox,
+  Divider,
+  Group,
+  Paper,
   ScrollArea,
-  Switch,
   SegmentedControl,
-  Badge,
+  SimpleGrid,
+  Stack,
+  Switch,
+  Text,
+  Textarea,
+  TextInput,
+  ThemeIcon,
+  Select,
 } from '@mantine/core';
+import Icon3D from '@/components/Icon3D';
 import {
-  IconFileText,
   IconCalendar,
   IconChefHat,
   IconCalendarEvent,
@@ -29,10 +29,12 @@ import {
   IconSparkles,
   IconTrophy,
 } from '@/components/icons3d';
+
 import ResponsiveModal from './ResponsiveModal';
 
 const MATCH_SCHEDULE_OPTIONS = [
   { label: 'Mañana', value: 'manana' },
+
   { label: 'Tarde', value: 'tarde' },
   { label: 'Noche', value: 'noche' },
 ];
@@ -217,34 +219,42 @@ export default function SquadReportModal({
   selectedPlayerIds,
   setSelectedPlayerIds,
   playersState,
-  generateReport
+  generateReport,
 }) {
+  const modalTitle = (
+    <Group justify="space-between" align="center" w="100%" pr={{ base: 2, sm: 16 }} wrap="nowrap">
+      <Group gap="xs" align="center" wrap="nowrap" style={{ minWidth: 0 }}>
+        <Icon3D name="document" size={22} />
+        <Text fw={700} fz={{ base: 'sm', sm: 'md' }} c="dark.6" truncate>
+          {reportModal.player ? `Informe: ${reportModal.player.nombre}` : 'Informe Semanal de Plantilla'}
+        </Text>
+      </Group>
+      <Group gap={4} align="center" wrap="nowrap" style={{ flexShrink: 0 }}>
+        <Text size="8px" c="#16a34a">●</Text>
+        <Text fz="xs" fw={700} c="dark.5">
+          {reportModal.player ? 'Individual' : `${selectedPlayerIds.length} seleccionados`}
+        </Text>
+      </Group>
+    </Group>
+  );
+
   return (
     <ResponsiveModal
       opened={opened}
       onClose={onClose}
-      title={
-        <Group gap="xs">
-          <IconFileText size={22} style={{ color: 'var(--mantine-color-nutralabColor-8)' }} />
-          <Stack gap={0}>
-            <Text fw={700} size="md" c="dark.5">
-              {reportModal.player ? `Informe de ${reportModal.player.nombre}` : 'Informe semanal de plantilla'}
-            </Text>
-            <Text size="xs" c="dimmed">
-              Configuración del plan y la estructura de la semana
-            </Text>
-          </Stack>
-        </Group>
-      }
-      size="1000px"
-      radius="lg"
-      overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
+      title={modalTitle}
+      size="1050px"
+      padding={{ base: 'xs', sm: 'md' }}
+      radius="xl"
     >
-      <Box style={{ position: 'relative', minHeight: generatingReport ? '450px' : 'auto' }}>
-        <AiGenerationOverlay opened={generatingReport} messages={SQUAD_GENERATION_MESSAGES} progress={reportProgress} />
-        <Stack gap="md">
-          {/* Panel 1: Datos de la Semana */}
-          <Paper p="md" radius="md" withBorder bg="gray.0" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
+      <Stack gap="xs" style={{ width: '100%', minWidth: 0, height: '100%' }}>
+        <Box style={{ position: 'relative', minHeight: generatingReport ? '450px' : 'auto', flex: 1 }}>
+          <AiGenerationOverlay opened={generatingReport} messages={SQUAD_GENERATION_MESSAGES} progress={reportProgress} />
+          <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 160px)', sm: '72vh' }} type="auto">
+            <Stack gap="md" pb="xs">
+              {/* Panel 1: Datos de la Semana */}
+              <Paper p="md" radius="md" withBorder bg="gray.0" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
+
             <Group gap="xs" mb="xs">
               <ThemeIcon color="nutralabColor" size="sm" radius="xl" variant="light">
                 <IconCalendar size={14} />
@@ -291,7 +301,7 @@ export default function SquadReportModal({
                 </Button>
 
                 {showAdvanced && (
-                  <Paper withBorder p="md" radius="md" mt="xs" style={{ background: '#ffffff', borderColor: '#e9ecef' }}>
+                  <Box mt="xs">
                     <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
                       <TextInput
                         label="Subtítulo"
@@ -314,8 +324,9 @@ export default function SquadReportModal({
                         onChange={(event) => updateReportField('handle', event.currentTarget.value)}
                       />
                     </SimpleGrid>
-                  </Paper>
+                  </Box>
                 )}
+
               </Box>
             </Stack>
           </Paper>
@@ -408,11 +419,14 @@ export default function SquadReportModal({
                     };
 
                     return (
-                      <Paper key={dayKey} p="xs" radius="md" withBorder bg="white">
+                      <Box key={dayKey} p="xs" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
                         <Group justify="space-between" align="center" mb="xs" wrap="wrap">
-                          <Badge color="red" variant="filled" size="md">
-                            Partido del {d.label}
-                          </Badge>
+                          <Group gap={6} align="center" wrap="nowrap" px={8} py={4} style={{ borderRadius: 6, backgroundColor: '#fef2f2', border: '1px solid #fecaca' }}>
+                            <Text size="8px" c="#dc2626">●</Text>
+                            <Text fw={700} fz="xs" c="#dc2626">
+                              Partido del {d.label}
+                            </Text>
+                          </Group>
 
                           <Stack gap={2} style={{ flexGrow: 1, maxWidth: '300px', minWidth: '240px' }}>
                             <Text size="xs" fw={600} c="dimmed">Horario del partido</Text>
@@ -440,7 +454,7 @@ export default function SquadReportModal({
                         <Text size="xs" c="dimmed" mt="xs">
                           Para cada jugador de la plantilla se inyectarán de forma independiente las ingestas, recomendaciones y pauta de 24h previas que tenga personalizadas en su perfil para partidos por la <strong>{dayConfig.horario === 'manana' ? 'Mañana' : dayConfig.horario === 'noche' ? 'Noche' : 'Tarde'}</strong>.
                         </Text>
-                      </Paper>
+                      </Box>
                     );
                   })
                 ) : (
@@ -483,7 +497,7 @@ export default function SquadReportModal({
                   </Button>
                 </Group>
               </Group>
-              <ScrollArea h={140} offsetScrollbars style={{ border: '1px solid var(--mantine-color-gray-2)', borderRadius: 'var(--mantine-radius-md)', padding: '8px', backgroundColor: '#ffffff' }}>
+              <ScrollArea h={140} offsetScrollbars style={{ padding: '4px' }}>
                 <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="xs">
                   {playersState.map((player) => {
                     const isSelected = selectedPlayerIds.includes(player.id);
@@ -543,27 +557,41 @@ export default function SquadReportModal({
                 value={reportForm.buffet}
                 onChange={(event) => updateReportField('buffet', event.currentTarget.value)}
               />
-            </Stack>
-          </Paper>
-
-          <Group justify="space-between" align="center" mt="xs">
-            <Text size="sm" c="dimmed">
-              {reportModal.player
-                ? 'Se generará un PDF individual en una sola página A4.'
-                : `Se generará un PDF con portada y ${selectedPlayerIds.length} fichas individuales.`}
-            </Text>
-            <Button
-              leftSection={<IconDownload size={16} />}
-              radius="xl"
-              color="nutralabColor.8"
-              loading={generatingReport}
-              onClick={generateReport}
-            >
-              Generar PDF
-            </Button>
-          </Group>
-        </Stack>
+              </Stack>
+            </Paper>
+          </Stack>
+        </ScrollArea.Autosize>
       </Box>
-    </ResponsiveModal>
-  );
+
+      {/* Barra inferior consistente con el formato de Intrapartido */}
+      <Divider mt="auto" />
+      <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
+        <Button
+          variant="subtle"
+          color="gray"
+          size="sm"
+          radius="xl"
+          style={{ flex: 1 }}
+          onClick={onClose}
+          disabled={generatingReport}
+        >
+          Cancelar
+        </Button>
+        <Button
+          variant="filled"
+          color="dark"
+          size="sm"
+          radius="xl"
+          style={{ flex: 1 }}
+          leftSection={<IconDownload size={15} />}
+          loading={generatingReport}
+          onClick={generateReport}
+        >
+          Generar PDF {selectedPlayerIds.length > 0 && !reportModal.player ? `(${selectedPlayerIds.length})` : ''}
+        </Button>
+      </Group>
+    </Stack>
+  </ResponsiveModal>
+);
 }
+

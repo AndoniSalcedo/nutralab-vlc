@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Modal, Drawer, Box, Text } from '@mantine/core';
+import { Modal, Drawer, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
 /**
@@ -9,9 +9,7 @@ import { useMediaQuery } from '@mantine/hooks';
  *
  * Componente unificado que muestra:
  * - Un <Modal> centrado en escritorio (> 768px).
- * - Un <Drawer position="bottom"> (bottom sheet nativo) en móvil (<= 768px).
- *
- * El contenido (`children`) es lo que varía entre casos de uso.
+ * - Un <Drawer> a pantalla completa (100% / 100dvh) en móvil (<= 768px).
  */
 export default function ResponsiveModal({
   opened,
@@ -22,13 +20,12 @@ export default function ResponsiveModal({
   radius = 'lg',
   padding = 'lg',
   mobilePosition = 'bottom',
-  mobileHeight = 'auto',
+  mobileHeight = '100%',
   withCloseButton = true,
   centered = true,
   zIndex = 1000,
   overlayProps = { backgroundOpacity: 0.55, blur: 4 },
   styles,
-  showDragHandle = true,
   ...props
 }) {
   const isMobile = useMediaQuery('(max-width: 48em)');
@@ -69,52 +66,43 @@ export default function ResponsiveModal({
     );
   }
 
-  // En móvil (<= 768px): Drawer tipo Bottom Sheet
+  // En móvil (<= 768px): Drawer a pantalla completa 100%
   return (
     <Drawer
       opened={opened}
       onClose={onClose}
       title={renderedTitle}
       position={mobilePosition}
-      size={mobileHeight}
+      size={mobileHeight || '100%'}
       withCloseButton={withCloseButton}
       zIndex={zIndex}
       padding={padding}
       overlayProps={overlayProps}
       styles={{
         content: {
-          borderTopLeftRadius: mobilePosition === 'bottom' ? 24 : 0,
-          borderTopRightRadius: mobilePosition === 'bottom' ? 24 : 0,
-          maxHeight: mobilePosition === 'bottom' ? '90dvh' : '100%',
+          borderTopLeftRadius: 0,
+          borderTopRightRadius: 0,
+          height: '100dvh',
+          maxHeight: '100dvh',
           display: 'flex',
           flexDirection: 'column',
           ...(typeof styles === 'object' && styles?.content ? styles.content : {}),
         },
         header: {
-          paddingBottom: 8,
+          paddingTop: 'max(12px, env(safe-area-inset-top, 12px))',
+          paddingBottom: 10,
           ...(typeof styles === 'object' && styles?.header ? styles.header : {}),
         },
         body: {
           overflowY: 'auto',
           flex: 1,
-          paddingBottom: 'calc(var(--mantine-spacing-lg) + env(safe-area-inset-bottom, 12px))',
+          paddingBottom: 'calc(var(--mantine-spacing-md) + env(safe-area-inset-bottom, 16px))',
           ...(typeof styles === 'object' && styles?.body ? styles.body : {}),
         },
         ...(typeof styles === 'object' ? styles : {}),
       }}
       {...props}
     >
-      {mobilePosition === 'bottom' && showDragHandle && (
-        <Box
-          style={{
-            width: 38,
-            height: 4,
-            borderRadius: 4,
-            backgroundColor: 'var(--mantine-color-gray-4)',
-            margin: '-4px auto 14px auto',
-          }}
-        />
-      )}
       {children}
     </Drawer>
   );

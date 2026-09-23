@@ -1,43 +1,108 @@
-import React from 'react';
-import { Group, Text, Tabs } from '@mantine/core';
+'use client';
+
+import React, { useState } from 'react';
+import {
+  Button,
+  Divider,
+  Group,
+  ScrollArea,
+  SegmentedControl,
+  Stack,
+  Text,
+
+} from '@mantine/core';
+
 import Icon3D from '@/components/Icon3D';
 import PlayerExcelImporter from '@/components/PlayerExcelImporter';
 import TeamOsmolarityImporter from '@/components/TeamOsmolarityImporter';
 import ResponsiveModal from './ResponsiveModal';
 
 export default function ImportDataModal({ opened, onClose, team }) {
+  const [activeTab, setActiveTab] = useState('metrics');
+
+  const modalTitle = (
+    <Group justify="space-between" align="center" w="100%" pr={{ base: 2, sm: 16 }} wrap="nowrap">
+      <Group gap="xs" align="center" wrap="nowrap" style={{ minWidth: 0 }}>
+        <Icon3D name="inbox" size={22} />
+        <Text fw={700} fz={{ base: 'sm', sm: 'md' }} c="dark.6" truncate>
+          Importar Datos
+        </Text>
+      </Group>
+      {team?.nombre && (
+        <Group gap={4} align="center" wrap="nowrap" style={{ flexShrink: 0 }}>
+          <Text size="8px" c="#2563eb">●</Text>
+          <Text fz="xs" fw={600} c="dark.5" truncate>
+            {team.nombre}
+          </Text>
+        </Group>
+      )}
+    </Group>
+  );
+
   return (
     <ResponsiveModal
       opened={opened}
       onClose={onClose}
-      title={
-        <Group gap="xs">
-          <Icon3D name="inbox" size={26} />
-          <Text fw={700}>Importar datos</Text>
-        </Group>
-      }
-      size="1200px"
-      radius="lg"
-      overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
+      title={modalTitle}
+      size="1100px"
+      padding={{ base: 'xs', sm: 'md' }}
+      radius="xl"
     >
-      <Tabs defaultValue="metrics" variant="outline" radius="md">
-        <Tabs.List grow mb="md">
-          <Tabs.Tab value="metrics" leftSection={<Icon3D name="document" size={20} />}>
-            Métricas (Excel de jugadores)
-          </Tabs.Tab>
-          <Tabs.Tab value="osmolarity" leftSection={<Icon3D name="droplet" size={20} />}>
-            Osmolaridad (CSV de equipo)
-          </Tabs.Tab>
-        </Tabs.List>
+      <Stack gap="xs" style={{ width: '100%', minWidth: 0, height: '100%' }}>
+        {/* Selector de tipo de importación con SegmentedControl */}
+        <SegmentedControl
+          value={activeTab}
+          onChange={setActiveTab}
+          data={[
+            {
+              value: 'metrics',
+              label: (
+                <Group gap={6} justify="center" wrap="nowrap">
+                  <Text fz="xs" fw={600}>Métricas</Text>
+                </Group>
+              ),
+            },
+            {
+              value: 'osmolarity',
+              label: (
+                <Group gap={6} justify="center" wrap="nowrap">
+                  <Text fz="xs" fw={600}>Osmolaridad</Text>
+                </Group>
+              ),
+            },
+          ]}
+          fullWidth
+          radius="xl"
+          size="xs"
+          color="dark"
+        />
 
-        <Tabs.Panel value="metrics">
-          <PlayerExcelImporter team={team} />
-        </Tabs.Panel>
+        {/* Área scrolleable ajustada para móvil (100dvh) y escritorio */}
+        <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 170px)', sm: 620 }} type="auto">
+          {activeTab === 'metrics' ? (
+            <PlayerExcelImporter team={team} />
+          ) : (
+            <TeamOsmolarityImporter team={team} />
+          )}
+        </ScrollArea.Autosize>
 
-        <Tabs.Panel value="osmolarity">
-          <TeamOsmolarityImporter team={team} />
-        </Tabs.Panel>
-      </Tabs>
+
+        {/* Barra inferior consistente */}
+        <Divider mt="auto" />
+        <Group justify="flex-end" align="center" wrap="nowrap" gap="xs">
+          <Button
+            variant="subtle"
+            color="gray"
+            size="sm"
+            radius="xl"
+            style={{ flex: { base: 1, sm: 'none' } }}
+            onClick={onClose}
+          >
+            Cerrar
+          </Button>
+        </Group>
+      </Stack>
     </ResponsiveModal>
   );
 }
+

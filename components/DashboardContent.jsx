@@ -24,6 +24,7 @@ import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import SquadReportModal from '@/components/modals/SquadReportModal';
 import SquadReportReviewModal from '@/components/modals/SquadReportReviewModal';
 import SquadWeightModal from '@/components/modals/SquadWeightModal';
+import IntrapartidoModal from '@/components/modals/IntrapartidoModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import TeamTecnicosConfig from '@/components/TeamTecnicosConfig';
 import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
@@ -811,6 +812,12 @@ export default function DashboardContent({ players = [], team, readOnly = false 
         Registrar pesajes
       </Menu.Item>
       <Menu.Item
+        leftSection={<Icon3D name="droplet" size={20} />}
+        onClick={() => setActiveModal('intrapartido')}
+      >
+        Control intrapartido
+      </Menu.Item>
+      <Menu.Item
         leftSection={<Icon3D name="document" size={20} />}
         onClick={() => openReportModal()}
       >
@@ -1233,6 +1240,13 @@ export default function DashboardContent({ players = [], team, readOnly = false 
 
         <SquadWeightModal
           opened={activeModal === 'weight'}
+          onClose={closeModal}
+          players={playersState}
+          team={team}
+        />
+
+        <IntrapartidoModal
+          opened={activeModal === 'intrapartido'}
           onClose={closeModal}
           players={playersState}
           team={team}
