@@ -655,20 +655,42 @@ export default function IntrapartidoModal({
               </Grid>
             </ScrollArea.Autosize>
 
-            {/* Barra inferior */}
+            {/* Barra inferior: alineada con el formato de dos columnas de las fases */}
             <Divider mt="auto" />
-            <Button
-              variant="filled"
-              color="dark"
-              size="sm"
-              radius="xl"
-              fullWidth
-              rightSection={<IconArrowRight size={15} />}
-              onClick={() => setCurrentStep('fases')}
-              disabled={session.starterIds.length === 0}
-            >
-              Continuar ({session.starterIds.length} titulares)
-            </Button>
+            <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
+              <Paper
+                radius="xl"
+                px="sm"
+                style={{
+                  flex: 1,
+                  height: 36,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  backgroundColor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                }}
+              >
+                <Text size="9px" c={session.starterIds.length === 11 ? 'teal.6' : 'orange.6'}>●</Text>
+                <Text fz="xs" fw={700} c="dark.6">
+                  {session.starterIds.length}/11 Titulares
+                </Text>
+              </Paper>
+
+              <Button
+                variant="filled"
+                color="dark"
+                size="sm"
+                radius="xl"
+                style={{ flex: 1, height: 36 }}
+                rightSection={<IconArrowRight size={14} />}
+                onClick={() => setCurrentStep('fases')}
+                disabled={session.starterIds.length === 0}
+              >
+                Continuar
+              </Button>
+            </Group>
           </Stack>
         )}
 
