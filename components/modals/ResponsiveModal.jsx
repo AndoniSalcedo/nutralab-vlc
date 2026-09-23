@@ -58,7 +58,23 @@ export default function ResponsiveModal({
         withCloseButton={withCloseButton}
         zIndex={zIndex}
         overlayProps={overlayProps}
-        styles={styles}
+        styles={{
+          ...(typeof styles === 'object' ? styles : {}),
+          content: {
+            maxHeight: '92vh',
+            display: 'flex',
+            flexDirection: 'column',
+            ...(typeof styles === 'object' && styles?.content ? styles.content : {}),
+          },
+          body: {
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            minHeight: 0,
+            overflowY: 'hidden',
+            ...(typeof styles === 'object' && styles?.body ? styles.body : {}),
+          },
+        }}
         {...props}
       >
         {children}
@@ -79,6 +95,7 @@ export default function ResponsiveModal({
       padding={padding}
       overlayProps={overlayProps}
       styles={{
+        ...(typeof styles === 'object' ? styles : {}),
         content: {
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
@@ -91,15 +108,18 @@ export default function ResponsiveModal({
         header: {
           paddingTop: 'max(12px, env(safe-area-inset-top, 12px))',
           paddingBottom: 10,
+          flexShrink: 0,
           ...(typeof styles === 'object' && styles?.header ? styles.header : {}),
         },
         body: {
-          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
           flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
           paddingBottom: 'calc(var(--mantine-spacing-md) + env(safe-area-inset-bottom, 16px))',
           ...(typeof styles === 'object' && styles?.body ? styles.body : {}),
         },
-        ...(typeof styles === 'object' ? styles : {}),
       }}
       {...props}
     >

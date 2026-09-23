@@ -489,15 +489,15 @@ export default function IntrapartidoModal({
       size="1100px"
       padding={{ base: 'xs', sm: 'md' }}
       radius="xl"
-      styles={{ body: { overflow: 'hidden' } }}
+      styles={{ body: { overflow: 'hidden', display: 'flex', flexDirection: 'column', flex: 1 } }}
     >
-      <Stack gap="xs" style={{ width: '100%', minWidth: 0, height: '100%' }}>
+      <Stack gap="xs" style={{ width: '100%', minWidth: 0, height: '100%', flex: 1, minHeight: 0 }}>
 
         {/* ============================================================= */}
         {/* PASO 1: CONVOCATORIA Y ONCE INICIAL                           */}
         {/* ============================================================= */}
         {currentStep === 'alineacion' && (
-          <Stack gap="xs" style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+          <Stack gap="xs" style={{ flex: 1, minHeight: 0, height: '100%' }}>
             {/* Metadatos del encuentro (inputs y selects alineados con el sistema visual) */}
             <SimpleGrid cols={{ base: 1, xs: 2, sm: 4 }} spacing="xs">
               <TextInput
@@ -575,7 +575,7 @@ export default function IntrapartidoModal({
             </Group>
 
             {/* Grid de jugadores interactivo */}
-            <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 310px)', sm: 380 }} type="auto">
+            <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 240px)', sm: 460 }} style={{ flex: 1, minHeight: 0 }} type="auto">
               <Grid gutter="xs">
                 {players
                   .filter((p) => {
@@ -655,40 +655,20 @@ export default function IntrapartidoModal({
               </Grid>
             </ScrollArea.Autosize>
 
-            {/* Barra inferior: alineada con el formato de dos columnas de las fases */}
+            {/* Barra inferior */}
             <Divider mt="auto" />
-            <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
-              <Paper
-                radius="xl"
-                px="sm"
-                style={{
-                  flex: 1,
-                  height: 36,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  backgroundColor: '#f8fafc',
-                  border: '1px solid #e2e8f0',
-                }}
-              >
-                <Text size="9px" c={session.starterIds.length === 11 ? 'teal.6' : 'orange.6'}>●</Text>
-                <Text fz="xs" fw={700} c="dark.6">
-                  {session.starterIds.length}/11 Titulares
-                </Text>
-              </Paper>
-
+            <Group wrap="nowrap" w="100%" style={{ flexShrink: 0 }}>
               <Button
                 variant="filled"
                 color="dark"
                 size="sm"
                 radius="xl"
-                style={{ flex: 1, height: 36 }}
+                fullWidth
                 rightSection={<IconArrowRight size={14} />}
                 onClick={() => setCurrentStep('fases')}
                 disabled={session.starterIds.length === 0}
               >
-                Continuar
+                Continuar ({session.starterIds.length} titulares)
               </Button>
             </Group>
           </Stack>
@@ -700,7 +680,7 @@ export default function IntrapartidoModal({
         {/* PASO 2: SEGUIMIENTO POR FASES DEL ENCUENTRO                   */}
         {/* ============================================================= */}
         {currentStep === 'fases' && (
-          <Stack gap="xs" style={{ flex: 1 }}>
+          <Stack gap="xs" style={{ flex: 1, minHeight: 0, height: '100%' }}>
             {/* Barra de herramientas móvil y escritorio */}
             <Stack gap={6}>
               {/* Selector de grupo en móvil: a ancho completo para dedos */}
@@ -782,7 +762,7 @@ export default function IntrapartidoModal({
             </Stack>
 
             {/* Lista directa y táctil de jugadores adaptada a móvil y escritorio */}
-            <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 215px)', sm: 500 }} type="auto">
+            <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 200px)', sm: 500 }} style={{ flex: 1, minHeight: 0 }} type="auto">
               <Stack gap={8}>
                 {currentPhasePlayers.length === 0 ? (
                   <Paper p="xl" radius="md" style={{ textAlign: 'center', backgroundColor: '#f8fafc' }}>
@@ -1061,7 +1041,7 @@ export default function IntrapartidoModal({
 
             {/* Barra inferior: botones al 50% de ancho en móvil para acceso con pulgares */}
             <Divider mt="auto" />
-            <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
+            <Group justify="space-between" align="center" wrap="nowrap" gap="xs" style={{ flexShrink: 0 }}>
               <Button
                 variant="subtle"
                 color="gray"
@@ -1113,7 +1093,7 @@ export default function IntrapartidoModal({
         {/* PASO 3: INFORME FINAL Y BALANCE NUTRICIONAL                    */}
         {/* ============================================================= */}
         {currentStep === 'resumen' && (
-          <Stack gap="xs" style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+          <Stack gap="xs" style={{ flex: 1, minHeight: 0, height: '100%' }}>
             <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
               <Text fz="xs" c="dimmed" truncate>
                 Cómputo global y desglose por jugador.
@@ -1193,7 +1173,7 @@ export default function IntrapartidoModal({
             </Paper>
 
             {/* Tabla scrolleable de desglose por jugador (vertical y horizontal con cabecera fija) */}
-            <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 310px)', sm: 340 }} type="auto" offsetScrollbars>
+            <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 260px)', sm: 380 }} style={{ flex: 1, minHeight: 0 }} type="auto" offsetScrollbars>
               <Table verticalSpacing="xs" highlightOnHover striped miw={{ base: 560, sm: 700 }}>
                 <Table.Thead bg="#f8fafc" style={{ position: 'sticky', top: 0, zIndex: 2 }}>
                   <Table.Tr>
@@ -1267,7 +1247,7 @@ export default function IntrapartidoModal({
 
             {/* Barra inferior */}
             <Divider mt="auto" />
-            <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
+            <Group justify="space-between" align="center" wrap="nowrap" gap="xs" style={{ flexShrink: 0 }}>
               <Button
                 variant="subtle"
                 color="gray"
