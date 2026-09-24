@@ -343,6 +343,17 @@ export async function savePlayer(form) {
     }
 
     if (newPlayer?.id) {
+      const emisor = {
+        tipo: 'nutricionista',
+        nombre: user?.name || 'Técnico / Nutricionista VBC',
+        id: user?.id,
+      };
+      const cliente = {
+        tipo: 'cliente',
+        nombre: `${payload.nombre} ${payload.apellidos || ''}`.trim(),
+        id: newPlayer.id,
+      };
+
       trackUsageEvent({
         app: 'nutralab-vlc',
         tenantId: targetTeam.id,
@@ -353,6 +364,8 @@ export async function savePlayer(form) {
         metadata: {
           jugadorId: newPlayer.id,
           equipoId: targetTeam.id,
+          emisor,
+          cliente,
         },
       });
     }
