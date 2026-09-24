@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedPlayer } from '@/lib/auth/team-access';
-import Anthropic from '@anthropic-ai/sdk';
+import { aiClient as client } from '@/lib/ai/client';
 import { env } from '@/config/env';
 import {
   insertAnalytics,
@@ -13,7 +13,6 @@ import {
   updateAnalyticsVisibility
 } from '@/repositories/analyticsRepository';
 
-const client = new Anthropic({ apiKey: env.AI_API_KEY });
 const ANALITICA_TOOL_NAME = 'guardar_analitica';
 const ANALITICA_MAX_TOKENS = env.ANALITICA_MAX_TOKENS;
 

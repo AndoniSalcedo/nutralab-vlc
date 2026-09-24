@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import Anthropic from '@anthropic-ai/sdk';
+import { aiClient as client } from '@/lib/ai/client';
 import { env } from '@/config/env';
 import { getUser } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
@@ -17,7 +17,6 @@ import { getPlayerById } from '@/repositories/playerRepository';
 import { enrichMenuWithDecomposedDishes } from '@/lib/ai/menu-decomposer';
 import { trackUsageEvent } from '@/lib/billing/client';
 
-const client = new Anthropic({ apiKey: env.AI_API_KEY });
 const MENU_TOOL_NAME = 'extraer_menu_semanal';
 const MENU_MAX_TOKENS = 8192;
 
