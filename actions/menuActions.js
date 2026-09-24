@@ -15,6 +15,7 @@ import {
 } from '@/repositories/menuRepository';
 import { getPlayerById } from '@/repositories/playerRepository';
 import { enrichMenuWithDecomposedDishes } from '@/lib/ai/menu-decomposer';
+import { trackUsageEvent } from '@/lib/billing/client';
 
 const client = new Anthropic({ apiKey: env.AI_API_KEY });
 const MENU_TOOL_NAME = 'extraer_menu_semanal';
@@ -255,6 +256,17 @@ IMPORTANTE:
   const enrichedDias = await enrichMenuWithDecomposedDishes(formattedDias);
 
   const data = await upsertMenu(supabase, { semana: finalSemana, equipo_id: equipoId, dias: enrichedDias, updated_at: new Date().toISOString() });
+
+  trackUsageEvent({
+    app: 'nutralab-vlc',
+    tenantId: team.id,
+    tenantName: team.nombre || 'Valencia Basket',
+    userId: user.id,
+    eventType: 'MENU_SEMANAL',
+    description: `Menú semanal extraído (${finalSemana})`,
+    metadata: { semana: finalSemana, equipoId },
+  });
+
   revalidatePath(`/dashboard/equipo/${equipoId}/menu`);
   return { ok: true, menu: data };
 }

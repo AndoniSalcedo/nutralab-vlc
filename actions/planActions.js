@@ -17,6 +17,7 @@ import {
   deleteAiPlan as deleteAiPlanInRepo
 } from '@/repositories/aiPlanRepository';
 import { getMenuByWeekAndTeam } from '@/repositories/menuRepository';
+import { trackUsageEvent } from '@/lib/billing/client';
 
 async function loadPlayerWithLatestMetrics(supabase, jugadorId) {
   const [jugador, evoluciones, pesajes] = await Promise.all([
@@ -81,7 +82,8 @@ async function createAiPlan(payload) {
     resolvedMenu = await getMenuByWeekAndTeam(supabase, semanaMenu, teamConfig?.equipo_id || jugadorConMetricas?.equipo_id);
   }
 
-  const generatedDatos = draftOnly || (!datos && (contenido === undefined || contenido === ''))
+  const isNewGeneration = draftOnly || (!datos && (contenido === undefined || contenido === ''));
+  const generatedDatos = isNewGeneration
     ? await generarDatosPlan({
         jugador: jugadorConMetricas,
         nombre: planNombre,
@@ -91,6 +93,18 @@ async function createAiPlan(payload) {
         preMatchConfig
       })
     : sanitizePlanData(datos, teamConfig);
+
+  if (isNewGeneration) {
+    trackUsageEvent({
+      app: 'nutralab-vlc',
+      tenantId: jugadorConMetricas?.equipo_id || jugador.id,
+      tenantName: jugadorConMetricas?.equipos?.nombre || 'Valencia Basket',
+      userId: user.id,
+      eventType: 'GENERACION_PLAN',
+      description: `Plan nutricional (${planNombre})`,
+      metadata: { jugadorId: jugador.id, tieneMenu: Boolean(resolvedMenu) },
+    });
+  }
 
   if (draftOnly) {
     return { datos: generatedDatos };

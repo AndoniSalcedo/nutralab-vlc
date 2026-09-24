@@ -27,6 +27,7 @@ import {
   getEvolutionByPlayerAndDate,
   updateEvolution,
 } from '@/repositories/evolutionRepository';
+import { trackUsageEvent } from '@/lib/billing/client';
 
 function getOwnerId(user) {
   if (!user || user.role === 'jugador' || user.role === 'tecnico') return null;
@@ -338,6 +339,21 @@ export async function savePlayer(form) {
         peso_kg: initialWeight,
         altura_cm: initialHeight,
         notas: 'Medición inicial al crear jugador',
+      });
+    }
+
+    if (newPlayer?.id) {
+      trackUsageEvent({
+        app: 'nutralab-vlc',
+        tenantId: targetTeam.id,
+        tenantName: targetTeam.nombre || 'Valencia Basket Club',
+        userId: user.id,
+        eventType: 'ALTA_JUGADOR',
+        description: `Alta inicial de jugador: ${payload.nombre} ${payload.apellidos}`.trim(),
+        metadata: {
+          jugadorId: newPlayer.id,
+          equipoId: targetTeam.id,
+        },
       });
     }
   }
