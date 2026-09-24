@@ -71,7 +71,7 @@ export default function ResponsiveModal({
             flexDirection: 'column',
             flex: 1,
             minHeight: 0,
-            overflowY: 'hidden',
+            overflowY: 'auto',
             ...(typeof styles === 'object' && styles?.body ? styles.body : {}),
           },
         }}

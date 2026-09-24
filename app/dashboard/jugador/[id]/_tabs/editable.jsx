@@ -17,12 +17,13 @@ import {
   NumberInput,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconEdit } from '@/components/icons3d';
+import { IconEdit, IconPlus } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/actions/playerActions';
 import { useRouter } from 'next/navigation';
 import { AVAILABLE_MEALS, getMealsForCount, sortMeals, isMainMeal } from '@/config/nutrition-days';
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
+import PrepartidoRoutineModal, { sortPreMatchMealsChronological, getMealTimingBadge } from '@/components/modals/PrepartidoRoutineModal';
 
 export function CampoEditable({
   label,
@@ -534,46 +535,18 @@ const SCHEDULE_OPTIONS = [
   { label: 'Noche', value: 'noche' },
 ];
 
-function sortPreMatchMealsChronological(scheduleKey, meals = []) {
-  if (!Array.isArray(meals)) return [];
-  // For match schedules, dinner is the 24h pre-match loading meal (the previous night!)
-  let order = ['cena', 'desayuno', 'almuerzo', 'comida', 'merienda', 'post-partido', 'post-entreno'];
-  if (scheduleKey === 'manana') {
-    order = ['cena', 'merienda', 'desayuno', 'almuerzo', 'comida', 'post-partido', 'post-entreno'];
-  }
-  return [...meals].sort((a, b) => {
-    const ia = order.indexOf(String(a).toLowerCase().trim());
-    const ib = order.indexOf(String(b).toLowerCase().trim());
-    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
-  });
-}
-
-function getMealTimingBadge(scheduleKey, mealName) {
-  const norm = String(mealName).toLowerCase().trim();
-  if (scheduleKey === 'manana') {
-    if (norm === 'cena' || norm === 'merienda') return 'Día anterior';
-    return 'Día de partido';
-  }
-  if (scheduleKey === 'tarde' || scheduleKey === 'noche') {
-    if (norm === 'cena') return 'Día anterior';
-    return 'Día de partido';
-  }
-  return null;
-}
-
 export function PrepartidoEditable({
   label,
   configPrepartido = {},
   numComidas,
   postentreno,
   jugadorId,
+  jugador,
   readOnly = false,
 }) {
   const router = useRouter();
-  const [editingSchedule, setEditingSchedule] = useState(null);
+  const [activeModalSchedule, setActiveModalSchedule] = useState(null);
   const [config, setConfig] = useState(() => configPrepartido || {});
-  const [saving, setSaving] = useState(false);
-  const [selectedPreMeal, setSelectedPreMeal] = useState(null);
 
   const defaultMeals = parseMeals(numComidas);
   const defaultPost = Boolean(postentreno);
@@ -589,361 +562,289 @@ export function PrepartidoEditable({
 
   const scheduleOptions = SCHEDULE_OPTIONS;
 
-  function handleUpdateSchedule(scheduleKey, updates) {
-    const currentCfg = config?.[scheduleKey] || {};
-    const currentMeals = Array.isArray(currentCfg.ingestas) ? currentCfg.ingestas : defaultMeals;
-    const currentPost = currentCfg.postentreno !== undefined ? Boolean(currentCfg.postentreno) : defaultPost;
-    const currentRecs = currentCfg.recomendaciones || {};
-
-    if (updates.ingestas && Array.isArray(updates.ingestas)) {
-      updates.ingestas = sortPreMatchMealsChronological(scheduleKey, updates.ingestas);
-    }
-
-    setConfig((prev) => ({
-      ...prev,
-      [scheduleKey]: {
-        ingestas: sortPreMatchMealsChronological(scheduleKey, currentMeals),
-        postentreno: currentPost,
-        recomendaciones: { ...currentRecs },
-        ...(prev?.[scheduleKey] || {}),
-        ...updates,
-      },
-    }));
-  }
-
-  async function saveSchedule(scheduleLabel, customConfig = null) {
-    setSaving(true);
-    try {
-      const toSave = customConfig ? { ...customConfig } : { ...config };
-      await updatePlayerField(jugadorId, 'config_prepartido', toSave);
-      if (customConfig) setConfig(customConfig);
-      else setConfig(toSave);
-      setEditingSchedule(null);
-      router.refresh();
-      notifications.show({
-        color: 'green',
-        title: 'Rutina guardada',
-        message: `La configuración para partidos por la ${scheduleLabel.toLowerCase()} se ha guardado correctamente.`,
-      });
-    } catch (e) {
-      notifications.show({
-        color: 'red',
-        title: 'No se pudo guardar',
-        message: e.message,
-      });
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleResetSchedule(scheduleKey, scheduleLabel) {
-    const next = { ...config };
-    delete next[scheduleKey];
-    await saveSchedule(scheduleLabel, next);
-  }
-
-  function handleCancel() {
-    try {
-      setConfig(JSON.parse(configStr));
-    } catch {
-      setConfig({});
-    }
-    setEditingSchedule(null);
-  }
-
   return (
     <BentoCard title={label} icon3d="flag" style={{ height: 'auto' }}>
       <Stack gap="sm">
         {scheduleOptions.map((opt) => {
           const cfg = config?.[opt.value];
           const hasCustomMeals = Array.isArray(cfg?.ingestas) && cfg.ingestas.length > 0;
-          const hasRecs = Boolean(cfg?.recomendaciones && Object.values(cfg.recomendaciones).some((v) => Boolean(v && (typeof v === 'object' || String(v).trim()))));
+          const hasRecs = Boolean(
+            cfg?.recomendaciones &&
+              Object.values(cfg.recomendaciones).some(
+                (v) => Boolean(v && (typeof v === 'object' || String(v).trim()))
+              )
+          );
           const hasLegacy = Boolean(cfg?.dia_anterior && String(cfg.dia_anterior).trim());
           const isConfigured = Boolean(cfg && (hasCustomMeals || hasRecs || hasLegacy));
 
-          const isEditingThis = editingSchedule === opt.value;
-          const currentMeals = sortPreMatchMealsChronological(opt.value, Array.isArray(cfg?.ingestas) ? cfg.ingestas : defaultMeals);
+          const currentMeals = sortPreMatchMealsChronological(
+            opt.value,
+            Array.isArray(cfg?.ingestas) ? cfg.ingestas : defaultMeals
+          );
           const currentPost = cfg?.postentreno !== undefined ? Boolean(cfg.postentreno) : defaultPost;
           const currentRecs = { ...(cfg?.recomendaciones || {}) };
           if (cfg?.dia_anterior && !currentRecs.Cena && !currentRecs.cena) {
             currentRecs.Cena = cfg.dia_anterior;
           }
-          const mealsList = cfg?.ingestas && cfg.ingestas.length > 0 ? sortPreMatchMealsChronological(opt.value, cfg.ingestas).join(', ') : 'Habituales';
+          const mealsList =
+            cfg?.ingestas && cfg.ingestas.length > 0
+              ? sortPreMatchMealsChronological(opt.value, cfg.ingestas).join(', ')
+              : 'Habituales';
 
-          if (!isEditingThis) {
-            if (!isConfigured) {
-              return (
-                <Paper key={opt.value} p="sm" withBorder radius="md">
-                  <Group justify="space-between" align="center" mb={4}>
-                    <Group gap="xs" align="center">
-                      <Text size="sm" fw={700} c="dark.7">
-                        Partido por la {opt.label}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        ● Sin configurar
-                      </Text>
-                    </Group>
-
-                    {!readOnly && (
-                      <Button
-                        variant="subtle"
-                        size="xs"
-                        radius="xl"
-                        disabled={editingSchedule !== null && editingSchedule !== opt.value}
-                        onClick={() => setEditingSchedule(opt.value)}
-                      >
-                        Configurar
-                      </Button>
-                    )}
-                  </Group>
-
-                  <Text size="xs" c="dimmed">
-                    Sin protocolo específico configurado. En días de partido por la {opt.label.toLowerCase()} se aplicará el menú del comedor de la ciudad deportiva o sus ingestas habituales.
-                  </Text>
-                </Paper>
-              );
-            }
-
+          if (!isConfigured) {
             return (
               <Paper key={opt.value} p="sm" withBorder radius="md">
-                <Group justify="space-between" align="center" mb={6}>
+                <Group justify="space-between" align="center" mb={4}>
                   <Group gap="xs" align="center">
                     <Text size="sm" fw={700} c="dark.7">
                       Partido por la {opt.label}
                     </Text>
-                    <Text size="xs" c="teal.7" fw={600}>
-                      ● Configurado ({currentMeals.length} {currentMeals.length === 1 ? 'ingesta' : 'ingestas'})
+                    <Text size="xs" c="dimmed">
+                      ● Sin configurar
                     </Text>
                   </Group>
 
                   {!readOnly && (
                     <Button
-                      variant="subtle"
+                      variant="light"
+                      color="blue"
                       size="xs"
                       radius="xl"
-                      disabled={editingSchedule !== null && editingSchedule !== opt.value}
-                      onClick={() => setEditingSchedule(opt.value)}
+                      leftSection={<IconPlus size={13} />}
+                      onClick={() =>
+                        setActiveModalSchedule({
+                          key: opt.value,
+                          label: opt.label,
+                          activeMeal: null,
+                        })
+                      }
                     >
-                      Editar tomas
+                      Configurar rutina
                     </Button>
                   )}
                 </Group>
 
-                <Stack gap={6}>
-                  <Text size="xs" c="dark.6">
-                    <Text span fw={600} c="dimmed">Ingestas pautadas: </Text>
-                    {mealsList} ({currentPost ? 'con toma post-partido' : 'sin post-partido'})
-                  </Text>
-
-                  {/* Detalle estructurado de cada comida */}
-                  <Stack gap="xs" mt={4}>
-                    {currentMeals.map((m) => {
-                      const timing = getMealTimingBadge(opt.value, m);
-                      const mealData = currentRecs[m] || {};
-                      const isMainMealIntake = isMainMeal(m, mealData);
-                      const isCompl = Boolean(mealData.isComplete);
-                      const hidratos = Array.isArray(mealData.hidrato) ? mealData.hidrato : mealData.hidrato ? [mealData.hidrato] : [];
-                      const proteinas = Array.isArray(mealData.proteina) ? mealData.proteina : mealData.proteina ? [mealData.proteina] : [];
-                      const verduras = Array.isArray(mealData.verdura) ? mealData.verdura : mealData.verdura ? [mealData.verdura] : [];
-                      const frutas = Array.isArray(mealData.fruta) ? mealData.fruta : mealData.fruta ? [mealData.fruta] : [];
-                      const lacteos = Array.isArray(mealData.lacteo) ? mealData.lacteo : mealData.lacteo ? [mealData.lacteo] : [];
-                      const grasa = mealData.grasa;
-
-                      const hasAnySpecific = hidratos.length > 0 || proteinas.length > 0 || verduras.length > 0 || frutas.length > 0 || lacteos.length > 0 || Boolean(grasa);
-
-                      return (
-                        <Paper key={m} p="xs" withBorder radius="sm" bg="gray.0">
-                          <Group justify="space-between" align="center" mb={2}>
-                            <Group gap="xs" align="center">
-                              <Text size="xs" fw={700} c="dark.8">
-                                {m} {timing ? `(${timing})` : ''}
-                              </Text>
-                              <Text size="11px" fw={600} c={isMainMealIntake ? 'blue.7' : 'dimmed'}>
-                                ● {isMainMealIntake ? 'Comida principal' : 'Toma ligera'}
-                              </Text>
-                            </Group>
-
-                            {!readOnly && (
-                              <Button
-                                variant="light"
-                                color="dark"
-                                size="compact-xs"
-                                radius="xl"
-                                leftSection={<IconEdit size={12} />}
-                                onClick={() => setSelectedPreMeal({ scheduleKey: opt.value, scheduleLabel: opt.label, meal: m })}
-                              >
-                                Configurar pauta
-                              </Button>
-                            )}
-                          </Group>
-
-                          {isCompl || !hasAnySpecific ? (
-                            <Text size="11px" c="dimmed">
-                              Rotación pre-partido completa (fácil digestión y carga energética equilibrada).
-                            </Text>
-                          ) : (
-                            <Stack gap={2} mt={2}>
-                              {hidratos.length > 0 && (
-                                <Text size="11px">
-                                  <Text span fw={600} c="orange.8">● Hidratos: </Text>
-                                  <Text span c="dark.6">{hidratos.join(', ')}</Text>
-                                </Text>
-                              )}
-                              {proteinas.length > 0 && (
-                                <Text size="11px">
-                                  <Text span fw={600} c="blue.8">● Proteínas: </Text>
-                                  <Text span c="dark.6">{proteinas.join(', ')}</Text>
-                                </Text>
-                              )}
-                              {verduras.length > 0 && (
-                                <Text size="11px">
-                                  <Text span fw={600} c="green.8">● Verduras: </Text>
-                                  <Text span c="dark.6">{verduras.join(', ')}</Text>
-                                </Text>
-                              )}
-                              {frutas.length > 0 && (
-                                <Text size="11px">
-                                  <Text span fw={600} c="pink.8">● Frutas: </Text>
-                                  <Text span c="dark.6">{frutas.join(', ')}</Text>
-                                </Text>
-                              )}
-                              {lacteos.length > 0 && (
-                                <Text size="11px">
-                                  <Text span fw={600} c="indigo.8">● Lácteos / Postres: </Text>
-                                  <Text span c="dark.6">{lacteos.join(', ')}</Text>
-                                </Text>
-                              )}
-                              {grasa && (
-                                <Text size="11px">
-                                  <Text span fw={600} c="yellow.9">● Grasa: </Text>
-                                  <Text span c="dark.6">{grasa}</Text>
-                                </Text>
-                              )}
-                            </Stack>
-                          )}
-                        </Paper>
-                      );
-                    })}
-                  </Stack>
-                </Stack>
+                <Text size="xs" c="dimmed">
+                  Sin protocolo específico configurado. En días de partido por la{' '}
+                  {opt.label.toLowerCase()} se aplicará el menú del comedor de la ciudad deportiva o sus
+                  ingestas habituales.
+                </Text>
               </Paper>
             );
           }
 
           return (
-            <Paper key={opt.value} p="sm" withBorder radius="md" bg="gray.0">
-              <Group justify="space-between" align="center" mb="sm" wrap="wrap">
+            <Paper key={opt.value} p="sm" withBorder radius="md">
+              <Group justify="space-between" align="center" mb={6}>
                 <Group gap="xs" align="center">
-                  <Text size="sm" fw={700} c="dark.8">
-                    Editando: Partidos por la {opt.label}
+                  <Text size="sm" fw={700} c="dark.7">
+                    Partido por la {opt.label}
                   </Text>
-                  {isConfigured ? (
-                    <Text size="xs" c="teal.7" fw={600}>● Configurado</Text>
-                  ) : (
-                    <Text size="xs" c="dimmed">● Sin configurar</Text>
-                  )}
+                  <Text size="xs" c="teal.7" fw={600}>
+                    ● Configurado ({currentMeals.length}{' '}
+                    {currentMeals.length === 1 ? 'ingesta' : 'ingestas'})
+                  </Text>
                 </Group>
-                <Group gap={6}>
-                  {isConfigured && (
-                    <Button
-                      variant="subtle"
-                      color="red"
-                      size="xs"
-                      radius="xl"
-                      onClick={() => handleResetSchedule(opt.value, opt.label)}
-                      disabled={saving}
-                    >
-                      Desactivar
-                    </Button>
-                  )}
-                  <Button variant="filled" size="xs" radius="xl" onClick={() => saveSchedule(opt.label)} loading={saving}>
-                    Guardar tomas
+
+                {!readOnly && (
+                  <Button
+                    variant="light"
+                    color="dark"
+                    size="xs"
+                    radius="xl"
+                    leftSection={<IconEdit size={13} />}
+                    onClick={() =>
+                      setActiveModalSchedule({
+                        key: opt.value,
+                        label: opt.label,
+                        activeMeal: null,
+                      })
+                    }
+                  >
+                    Editar rutina
                   </Button>
-                  <Button variant="subtle" color="gray" size="xs" radius="xl" onClick={handleCancel} disabled={saving}>
-                    Cancelar
-                  </Button>
-                </Group>
+                )}
               </Group>
 
-              <Stack gap="xs">
-                {/* 1º Ingestas que componen la rutina pre-partido */}
-                <Box>
-                  <Text size="xs" fw={700} c="dark.7" mb={2}>Ingestas del Protocolo Pre-Partido</Text>
-                  <Text size="11px" c="dimmed" mb={6}>
-                    Selecciona las ingestas que componen la rutina previa (incluyendo la cena de carga del día anterior):
+              <Stack gap={6}>
+                <Text size="xs" c="dark.6">
+                  <Text span fw={600} c="dimmed">
+                    Ingestas pautadas:{' '}
                   </Text>
-                  <MultiSelect
-                    placeholder="Ej. Cena, Desayuno, Comida, Merienda"
-                    data={AVAILABLE_MEALS}
-                    value={currentMeals}
-                    onChange={(val) => {
-                      const sorted = sortPreMatchMealsChronological(opt.value, val);
-                      const cleanRecs = { ...currentRecs };
-                      Object.keys(cleanRecs).forEach((k) => {
-                        if (!sorted.includes(k)) delete cleanRecs[k];
-                      });
-                      handleUpdateSchedule(opt.value, { ingestas: sorted, recomendaciones: cleanRecs });
-                    }}
-                    size="xs"
-                    searchable
-                    clearable
-                  />
-                  <Checkbox
-                    label="Incluir toma Post-partido / Batido de recuperación"
-                    checked={currentPost}
-                    onChange={(e) => handleUpdateSchedule(opt.value, { postentreno: e.currentTarget.checked })}
-                    mt="xs"
-                    size="xs"
-                  />
-                </Box>
+                  {mealsList} ({currentPost ? 'con toma post-partido' : 'sin post-partido'})
+                </Text>
+
+                {/* Detalle estructurado de cada comida */}
+                <Stack gap="xs" mt={4}>
+                  {currentMeals.map((m) => {
+                    const timing = getMealTimingBadge(opt.value, m);
+                    const mealData = currentRecs[m] || {};
+                    const isMainMealIntake = isMainMeal(m, mealData);
+                    const isCompl = Boolean(mealData.isComplete);
+                    const hidratos = Array.isArray(mealData.hidrato)
+                      ? mealData.hidrato
+                      : mealData.hidrato
+                      ? [mealData.hidrato]
+                      : [];
+                    const proteinas = Array.isArray(mealData.proteina)
+                      ? mealData.proteina
+                      : mealData.proteina
+                      ? [mealData.proteina]
+                      : [];
+                    const verduras = Array.isArray(mealData.verdura)
+                      ? mealData.verdura
+                      : mealData.verdura
+                      ? [mealData.verdura]
+                      : [];
+                    const frutas = Array.isArray(mealData.fruta)
+                      ? mealData.fruta
+                      : mealData.fruta
+                      ? [mealData.fruta]
+                      : [];
+                    const lacteos = Array.isArray(mealData.lacteo)
+                      ? mealData.lacteo
+                      : mealData.lacteo
+                      ? [mealData.lacteo]
+                      : [];
+                    const grasa = mealData.grasa;
+
+                    const hasAnySpecific =
+                      hidratos.length > 0 ||
+                      proteinas.length > 0 ||
+                      verduras.length > 0 ||
+                      frutas.length > 0 ||
+                      lacteos.length > 0 ||
+                      Boolean(grasa);
+
+                    return (
+                      <Paper key={m} p="xs" withBorder radius="sm" bg="gray.0">
+                        <Group gap="xs" align="center" mb={2}>
+                          <Text size="xs" fw={700} c="dark.8">
+                            {m} {timing ? `(${timing})` : ''}
+                          </Text>
+                          <Text size="11px" fw={600} c={isMainMealIntake ? 'blue.7' : 'dimmed'}>
+                            ● {isMainMealIntake ? 'Comida principal' : 'Toma ligera'}
+                          </Text>
+                        </Group>
+
+                        {isCompl || !hasAnySpecific ? (
+                          <Text size="11px" c="dimmed">
+                            Rotación pre-partido completa (fácil digestión y carga energética equilibrada).
+                          </Text>
+                        ) : (
+                          <Stack gap={2} mt={2}>
+                            {hidratos.length > 0 && (
+                              <Text size="11px">
+                                <Text span fw={600} c="orange.8">
+                                  ● Hidratos:{' '}
+                                </Text>
+                                <Text span c="dark.6">
+                                  {hidratos.join(', ')}
+                                </Text>
+                              </Text>
+                            )}
+                            {proteinas.length > 0 && (
+                              <Text size="11px">
+                                <Text span fw={600} c="blue.8">
+                                  ● Proteínas:{' '}
+                                </Text>
+                                <Text span c="dark.6">
+                                  {proteinas.join(', ')}
+                                </Text>
+                              </Text>
+                            )}
+                            {verduras.length > 0 && (
+                              <Text size="11px">
+                                <Text span fw={600} c="green.8">
+                                  ● Verduras:{' '}
+                                </Text>
+                                <Text span c="dark.6">
+                                  {verduras.join(', ')}
+                                </Text>
+                              </Text>
+                            )}
+                            {frutas.length > 0 && (
+                              <Text size="11px">
+                                <Text span fw={600} c="pink.8">
+                                  ● Frutas:{' '}
+                                </Text>
+                                <Text span c="dark.6">
+                                  {frutas.join(', ')}
+                                </Text>
+                              </Text>
+                            )}
+                            {lacteos.length > 0 && (
+                              <Text size="11px">
+                                <Text span fw={600} c="indigo.8">
+                                  ● Lácteos / Postres:{' '}
+                                </Text>
+                                <Text span c="dark.6">
+                                  {lacteos.join(', ')}
+                                </Text>
+                              </Text>
+                            )}
+                            {grasa && (
+                              <Text size="11px">
+                                <Text span fw={600} c="yellow.9">
+                                  ● Grasa:{' '}
+                                </Text>
+                                <Text span c="dark.6">
+                                  {grasa}
+                                </Text>
+                              </Text>
+                            )}
+                          </Stack>
+                        )}
+                      </Paper>
+                    );
+                  })}
+                </Stack>
               </Stack>
             </Paper>
           );
         })}
       </Stack>
 
-      {/* Modal para editar la pauta de una toma pre-partido */}
-      {selectedPreMeal && (
-        <EditMealPatternModal
-          opened={Boolean(selectedPreMeal)}
-          onClose={() => setSelectedPreMeal(null)}
-          mealName={selectedPreMeal.meal}
-          timing={`${selectedPreMeal.scheduleLabel} - ${getMealTimingBadge(selectedPreMeal.scheduleKey, selectedPreMeal.meal) || 'Día de partido'}`}
-          value={config?.[selectedPreMeal.scheduleKey]?.recomendaciones?.[selectedPreMeal.meal] || null}
+      {/* Modal unificado para configurar la rutina completa con todas sus pautas */}
+      {activeModalSchedule && (
+        <PrepartidoRoutineModal
+          opened={Boolean(activeModalSchedule)}
+          onClose={() => setActiveModalSchedule(null)}
+          scheduleKey={activeModalSchedule.key}
+          scheduleLabel={activeModalSchedule.label}
+          initialConfig={config?.[activeModalSchedule.key] || null}
           jugadorId={jugadorId}
-          onSave={async (updatedMeal) => {
-            const scheduleKey = selectedPreMeal.scheduleKey;
-            const currentCfg = config?.[scheduleKey] || {};
-            const currentRecs = { ...(currentCfg.recomendaciones || {}) };
-            currentRecs[selectedPreMeal.meal] = updatedMeal;
-
-            const newConfig = {
+          jugador={jugador}
+          initialActiveMeal={activeModalSchedule.activeMeal}
+          onSave={async (schedKey, schedConfig) => {
+            const toSave = {
               ...config,
-              [scheduleKey]: {
-                ...currentCfg,
-                recomendaciones: currentRecs,
-              },
+              [schedKey]: schedConfig,
             };
-
-            setConfig(newConfig);
-            try {
-              await updatePlayerField(jugadorId, 'config_prepartido', newConfig);
-              notifications.show({
-                color: 'teal',
-                title: 'Pauta pre-partido guardada',
-                message: `Pauta para ${selectedPreMeal.meal} guardada correctamente.`,
-              });
-              router.refresh();
-            } catch (err) {
-              notifications.show({
-                color: 'red',
-                title: 'Error al guardar',
-                message: err.message,
-              });
-            }
+            await updatePlayerField(jugadorId, 'config_prepartido', toSave);
+            setConfig(toSave);
+            router.refresh();
+            notifications.show({
+              color: 'teal',
+              title: 'Rutina pre-partido guardada',
+              message: `La rutina para partidos por la ${activeModalSchedule.label.toLowerCase()} se ha guardado correctamente.`,
+            });
+          }}
+          onDeactivate={async (schedKey) => {
+            const toSave = { ...config };
+            delete toSave[schedKey];
+            await updatePlayerField(jugadorId, 'config_prepartido', toSave);
+            setConfig(toSave);
+            router.refresh();
+            notifications.show({
+              color: 'teal',
+              title: 'Rutina desactivada',
+              message: `El protocolo pre-partido para partidos por la ${activeModalSchedule.label.toLowerCase()} se ha desactivado.`,
+            });
           }}
         />
       )}
     </BentoCard>
   );
 }
+
