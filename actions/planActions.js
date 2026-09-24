@@ -95,6 +95,16 @@ async function createAiPlan(payload) {
     : sanitizePlanData(datos, teamConfig);
 
   if (isNewGeneration) {
+    const isPlayer = user.role === 'jugador';
+    const emisor = isPlayer
+      ? { tipo: 'cliente', nombre: user.name || 'Jugador', id: user.id }
+      : { tipo: 'nutricionista', nombre: user.name || 'Técnico / Nutricionista VBC', id: user.id };
+    const cliente = {
+      tipo: 'cliente',
+      nombre: jugadorConMetricas?.nombre ? `${jugadorConMetricas.nombre} ${jugadorConMetricas.apellidos || ''}`.trim() : 'Jugador',
+      id: jugador.id,
+    };
+
     trackUsageEvent({
       app: 'nutralab-vlc',
       tenantId: jugadorConMetricas?.equipo_id || jugador.id,
@@ -102,7 +112,12 @@ async function createAiPlan(payload) {
       userId: user.id,
       eventType: 'GENERACION_PLAN',
       description: `Plan nutricional (${planNombre})`,
-      metadata: { jugadorId: jugador.id, tieneMenu: Boolean(resolvedMenu) },
+      metadata: {
+        jugadorId: jugador.id,
+        tieneMenu: Boolean(resolvedMenu),
+        emisor,
+        cliente,
+      },
     });
   }
 

@@ -256,6 +256,17 @@ IMPORTANTE:
 
   const data = await upsertMenu(supabase, { semana: finalSemana, equipo_id: equipoId, dias: enrichedDias, updated_at: new Date().toISOString() });
 
+  const emisor = {
+    tipo: 'nutricionista',
+    nombre: user?.name || 'Técnico / Nutricionista VBC',
+    id: user?.id,
+  };
+  const cliente = {
+    tipo: 'cliente',
+    nombre: team.nombre || 'Valencia Basket',
+    id: team.id,
+  };
+
   trackUsageEvent({
     app: 'nutralab-vlc',
     tenantId: team.id,
@@ -263,7 +274,12 @@ IMPORTANTE:
     userId: user.id,
     eventType: 'MENU_SEMANAL',
     description: `Menú semanal extraído (${finalSemana})`,
-    metadata: { semana: finalSemana, equipoId },
+    metadata: {
+      semana: finalSemana,
+      equipoId,
+      emisor,
+      cliente,
+    },
   });
 
   revalidatePath(`/dashboard/equipo/${equipoId}/menu`);
