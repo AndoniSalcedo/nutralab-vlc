@@ -50,7 +50,10 @@ import {
   IconUsers,
   IconX,
   IconDotsVertical,
+  IconFileTypePdf,
 } from '@/components/icons3d';
+import { exportEvolutionFiltersReport } from '@/services/report';
+import { notifications } from '@mantine/notifications';
 import NothingFound from '@/components/NothingFound';
 import PlayerSubtabControl from '@/app/dashboard/jugador/[id]/_tabs/PlayerSubtabControl';
 import { tabLabel } from '@/app/dashboard/jugador/[id]/_tabs/tab-label';
@@ -273,22 +276,59 @@ function sourceRows(medicion) {
   ].filter(([, value]) => hasMetricValue(value));
 }
 
-function checkFilterMatch(val, operator, filterVal) {
-  if (val === null || val === undefined || val === '') return false;
-  const numVal = Number(val);
-  const targetVal = Number(filterVal);
-  if (Number.isNaN(numVal) || Number.isNaN(targetVal)) return false;
-  switch (operator) {
+function checkRuleMatch(numVal, rule) {
+  const targetVal = Number(rule.value);
+  switch (rule.operator) {
     case '>': return numVal > targetVal;
     case '<': return numVal < targetVal;
     case '>=': return numVal >= targetVal;
     case '<=': return numVal <= targetVal;
     case '=': return numVal === targetVal;
+    case 'between': {
+      const val1 = Number(rule.value);
+      const val2 = Number(rule.valueTo);
+      if (Number.isNaN(val1) || Number.isNaN(val2)) return false;
+      const min = Math.min(val1, val2);
+      const max = Math.max(val1, val2);
+      return numVal >= min && numVal <= max;
+    }
     default: return false;
   }
 }
 
-export default function TeamEvolutionDashboard({ players = [], evolutions = [] }) {
+function evaluateValueAgainstRules(val, rulesForMetric) {
+  if (val === null || val === undefined || val === '') return null;
+  const numVal = Number(val);
+  if (Number.isNaN(numVal)) return null;
+
+  const specificRules = rulesForMetric.filter((r) => r.operator !== 'resto');
+  const restoRule = rulesForMetric.find((r) => r.operator === 'resto');
+
+  const matches = [];
+  for (const rule of specificRules) {
+    if (checkRuleMatch(numVal, rule)) {
+      matches.push(rule);
+    }
+  }
+
+  if (matches.length > 0) {
+    const redMatch = matches.find((r) => r.color === 'red');
+    if (redMatch) return { color: 'red', rule: redMatch };
+    const yellowMatch = matches.find((r) => r.color === 'yellow');
+    if (yellowMatch) return { color: 'yellow', rule: yellowMatch };
+    const greenMatch = matches.find((r) => r.color === 'green');
+    if (greenMatch) return { color: 'green', rule: greenMatch };
+    return { color: matches[0].color || 'red', rule: matches[0] };
+  }
+
+  if (restoRule) {
+    return { color: restoRule.color || 'green', rule: restoRule };
+  }
+
+  return null;
+}
+
+export default function TeamEvolutionDashboard({ players = [], evolutions = [], team = null }) {
   const router = useRouter();
   const [viewMode, setViewMode] = useState('trends');
   const [position, setPosition] = useState('');
@@ -309,6 +349,9 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
   const [newFilterMetric, setNewFilterMetric] = useState('porcentaje_grasa');
   const [newFilterOperator, setNewFilterOperator] = useState('>');
   const [newFilterValue, setNewFilterValue] = useState('');
+  const [newFilterValueTo, setNewFilterValueTo] = useState('');
+  const [newFilterColor, setNewFilterColor] = useState('red');
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
   // States for sorting the table
   const [sortField, setSortField] = useState('alerts');
@@ -514,43 +557,62 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
   }, [measuredDayRows, selectedDate]);
 
   const filteredPlayersTableData = useMemo(() => {
+    const filtersByMetric = new Map();
+    activeFilters.forEach((filter) => {
+      if (!filtersByMetric.has(filter.metric)) {
+        filtersByMetric.set(filter.metric, []);
+      }
+      filtersByMetric.get(filter.metric).push(filter);
+    });
+
     return measuredDayRows.map((row) => {
-      const alertMatches = {};
-      let totalAlerts = 0;
+      const cellMatches = {};
+      let redAlerts = 0;
+      let yellowAlerts = 0;
+      let greenMatches = 0;
 
       if (selectedDate === 'all') {
-        activeFilters.forEach((filter) => {
-          const config = ALL_METRICS_MAP.get(filter.metric);
-          if (config) {
-            row.records.forEach((record, idx) => {
-              const val = metricValue(record, config);
-              const matches = checkFilterMatch(val, filter.operator, filter.value);
-              if (matches) {
-                alertMatches[`${filter.metric}_${idx}`] = true;
-                totalAlerts += 1;
-              }
-            });
-          }
+        displayedMetrics.forEach((m) => {
+          const rules = filtersByMetric.get(m.key) || [];
+          if (rules.length === 0) return;
+
+          row.records.forEach((record, idx) => {
+            const val = metricValue(record, m);
+            const res = evaluateValueAgainstRules(val, rules);
+            if (res) {
+              cellMatches[`${m.key}_${idx}`] = res;
+              if (res.color === 'red') redAlerts += 1;
+              else if (res.color === 'yellow') yellowAlerts += 1;
+              else if (res.color === 'green') greenMatches += 1;
+            }
+          });
         });
       } else {
-        activeFilters.forEach((filter) => {
-          const config = ALL_METRICS_MAP.get(filter.metric);
-          const val = config ? metricValue(row.measurement, config) : null;
-          const matches = checkFilterMatch(val, filter.operator, filter.value);
-          if (matches) {
-            alertMatches[filter.metric] = true;
-            totalAlerts += 1;
+        displayedMetrics.forEach((m) => {
+          const rules = filtersByMetric.get(m.key) || [];
+          if (rules.length === 0) return;
+
+          const val = row.measuredOnDay ? metricValue(row.measurement, m) : null;
+          const res = evaluateValueAgainstRules(val, rules);
+          if (res) {
+            cellMatches[m.key] = res;
+            if (res.color === 'red') redAlerts += 1;
+            else if (res.color === 'yellow') yellowAlerts += 1;
+            else if (res.color === 'green') greenMatches += 1;
           }
         });
       }
 
       return {
         ...row,
-        alertMatches,
-        totalAlerts,
+        cellMatches,
+        redAlerts,
+        yellowAlerts,
+        greenMatches,
+        totalAlerts: redAlerts + yellowAlerts,
       };
     });
-  }, [measuredDayRows, activeFilters, ALL_METRICS_MAP, selectedDate]);
+  }, [measuredDayRows, activeFilters, displayedMetrics, selectedDate]);
 
   const sortedTableData = useMemo(() => {
     const data = [...filteredPlayersTableData];
@@ -574,10 +636,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
       }
 
       if (sortField === 'alerts') {
-        valA = a.totalAlerts;
-        valB = b.totalAlerts;
-        if (valA !== valB) {
-          return sortDirection === 'asc' ? valA - valB : valB - valA;
+        const scoreA = (a.redAlerts * 100) + (a.yellowAlerts * 10) - a.greenMatches;
+        const scoreB = (b.redAlerts * 100) + (b.yellowAlerts * 10) - b.greenMatches;
+        if (scoreA !== scoreB) {
+          return sortDirection === 'asc' ? scoreA - scoreB : scoreB - scoreA;
         }
         return playerName(a).localeCompare(playerName(b));
       }
@@ -604,8 +666,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
 
   const sortOptions = useMemo(() => {
     const options = [
-      { value: 'alerts_desc', label: 'Más Alertas' },
-      { value: 'alerts_asc', label: 'Menos Alertas' },
+      { value: 'alerts_desc', label: 'Más Alertas (Rojo primero)' },
+      { value: 'alerts_asc', label: 'Menos Alertas (En objetivo primero)' },
       { value: 'name_asc', label: 'Jugador (A-Z)' },
       { value: 'name_desc', label: 'Jugador (Z-A)' },
       { value: 'posicion_asc', label: 'Posición (A-Z)' },
@@ -633,7 +695,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
   const detailRawEntries = rawMetricEntries(detailMeasurement);
 
   function buildFiltersCsv(data, metricsList) {
-    const headers = ['Jugador', 'Posicion', 'Alertas'];
+    const headers = ['Jugador', 'Posicion', 'Alertas Rojas', 'Avisos Amarillos', 'En Objetivo'];
 
     if (selectedDate === 'all') {
       metricsList.forEach((m) => {
@@ -651,7 +713,9 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
       const line = [
         playerName(row),
         row.posicion || '',
-        row.totalAlerts,
+        row.redAlerts || 0,
+        row.yellowAlerts || 0,
+        row.greenMatches || 0,
       ];
 
       if (selectedDate === 'all') {
@@ -688,9 +752,136 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
     downloadCsv('evolucion-equipo.csv', buildTrendCsv(rows));
   }
 
+  async function handleDownloadPdf() {
+    if (sortedTableData.length === 0) return;
+    setIsDownloadingPdf(true);
+
+    try {
+      const columns = [];
+      if (selectedDate === 'all') {
+        displayedMetrics.forEach((m) => {
+          for (let idx = 0; idx < maxMeasurements; idx++) {
+            columns.push({
+              key: `${m.key}_${idx}`,
+              label: `${m.label} ${idx + 1}`,
+              unit: m.unit || '',
+            });
+          }
+        });
+      } else {
+        displayedMetrics.forEach((m) => {
+          columns.push({
+            key: m.key,
+            label: m.label,
+            unit: m.unit || '',
+          });
+        });
+      }
+
+      const rowsData = sortedTableData.map((row) => {
+        const cells = {};
+
+        if (selectedDate === 'all') {
+          displayedMetrics.forEach((m) => {
+            for (let idx = 0; idx < maxMeasurements; idx++) {
+              const record = row.records[idx] || null;
+              const val = record ? metricValue(record, m) : null;
+              const match = row.cellMatches?.[`${m.key}_${idx}`] || null;
+              const dateStr = record?.fecha ? formatShortDate(record.fecha) : '';
+              cells[`${m.key}_${idx}`] = {
+                value: metricDisplay(val, ''),
+                dateStr,
+                color: match ? match.color : null,
+              };
+            }
+          });
+        } else {
+          displayedMetrics.forEach((m) => {
+            const val = row.measuredOnDay ? metricValue(row.measurement, m) : null;
+            const match = row.cellMatches?.[m.key] || null;
+            cells[m.key] = {
+              value: metricDisplay(val, ''),
+              color: match ? match.color : null,
+            };
+          });
+        }
+
+        return {
+          id: row.id,
+          name: playerName(row),
+          posicion: row.posicion || '-',
+          redAlerts: row.redAlerts || 0,
+          yellowAlerts: row.yellowAlerts || 0,
+          greenMatches: row.greenMatches || 0,
+          cells,
+        };
+      });
+
+      const formattedFilters = activeFilters.map((f) => {
+        const config = ALL_METRICS_MAP.get(f.metric);
+        return {
+          id: f.id,
+          metric: f.metric,
+          label: config?.label || f.metric,
+          unit: config?.unit || '',
+          operator: f.operator,
+          value: f.value,
+          valueTo: f.valueTo || '',
+          color: f.color || 'red',
+        };
+      });
+
+      const summary = {
+        totalPlayers: sortedTableData.length,
+        totalWithRed: sortedTableData.filter((r) => r.redAlerts > 0).length,
+        totalWithYellow: sortedTableData.filter((r) => r.redAlerts === 0 && r.yellowAlerts > 0).length,
+        totalOptimal: sortedTableData.filter((r) => r.redAlerts === 0 && r.yellowAlerts === 0 && r.greenMatches > 0).length,
+        totalFilters: activeFilters.length,
+      };
+
+      const payload = {
+        teamName: team?.nombre || 'Plantilla',
+        dateContext: selectedDate === 'all' ? 'Temporada completa' : formatDate(currentDay),
+        season: selectedSeason ? formatSeasonOption(selectedSeason) : '',
+        selectedDate,
+        activeFilters: formattedFilters,
+        columns,
+        rows: rowsData,
+        summary,
+      };
+
+      const blob = await exportEvolutionFiltersReport(payload);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const safeTeam = (team?.nombre || 'Plantilla').replace(/[^a-zA-Z0-9_\-áéíóúÁÉÍÓÚñÑ]/g, '_');
+      const safeDate = selectedDate === 'all' ? 'Temporada' : (currentDay || 'Dia').replace(/[^a-zA-Z0-9_\-]/g, '_');
+      link.download = `Filtros_${safeTeam}_${safeDate}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+
+      notifications.show({
+        title: 'PDF descargado',
+        message: 'El informe de filtros se ha generado correctamente.',
+        color: 'green',
+      });
+    } catch (error) {
+      console.error('Error al generar PDF de filtros:', error);
+      notifications.show({
+        title: 'Error al exportar PDF',
+        message: error.message || 'No se pudo generar el documento PDF.',
+        color: 'red',
+      });
+    } finally {
+      setIsDownloadingPdf(false);
+    }
+  }
+
   return (
     <BoneyardSkeleton name="team-evolution" loading={false}>
-      {/* 1. BOTÓN DE CSV INTEGRADO EN LA CABECERA A LA ALTURA DEL NOMBRE */}
+      {/* 1. BOTÓN DE CSV Y PDF INTEGRADOS EN LA CABECERA A LA ALTURA DEL NOMBRE */}
       <TeamHeaderRightSection>
         <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
           <Box hiddenFrom="sm">
@@ -707,6 +898,15 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                 </ActionIcon>
               </Menu.Target>
               <Menu.Dropdown>
+                {viewMode === 'ranking' && (
+                  <Menu.Item
+                    leftSection={<IconFileTypePdf size={16} />}
+                    onClick={handleDownloadPdf}
+                    disabled={sortedTableData.length === 0}
+                  >
+                    Descargar PDF
+                  </Menu.Item>
+                )}
                 <Menu.Item
                   leftSection={<IconDownload size={16} />}
                   onClick={handleDownloadCsv}
@@ -717,6 +917,22 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
               </Menu.Dropdown>
             </Menu>
           </Box>
+
+          {viewMode === 'ranking' && (
+            <Button
+              visibleFrom="sm"
+              radius="xl"
+              size="xs"
+              variant="light"
+              color="grape"
+              leftSection={<IconFileTypePdf size={14} />}
+              onClick={handleDownloadPdf}
+              loading={isDownloadingPdf}
+              disabled={sortedTableData.length === 0}
+            >
+              PDF
+            </Button>
+          )}
 
           <Button
             visibleFrom="sm"
@@ -1370,12 +1586,19 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
 
                 <hr style={{ border: 0, borderTop: '1px solid var(--mantine-color-gray-2)', margin: '6px 0' }} />
 
-                <Text size="xs" fw={700} c="dark.5" tt="uppercase">
-                  Configurar Filtros de Alerta
-                </Text>
+                <hr style={{ border: 0, borderTop: '1px solid var(--mantine-color-gray-2)', margin: '6px 0' }} />
+
+                <Group justify="space-between" align="center" wrap="wrap">
+                  <Text size="xs" fw={700} c="dark.5" tt="uppercase">
+                    Configurar Reglas y Semaforización
+                  </Text>
+                  <Text size="xs" c="dimmed">
+                    Define umbrales en <Text span c="red.7" fw={700}>Rojo</Text> (alerta), <Text span c="yellow.8" fw={700}>Amarillo</Text> (aviso) u <Text span c="teal.7" fw={700}>Verde</Text> (objetivo)
+                  </Text>
+                </Group>
 
                 <Group gap="md" align="flex-end" wrap="wrap">
-                  <Box style={{ flex: 1, minWidth: 200 }}>
+                  <Box style={{ flex: 1, minWidth: 180 }}>
                     <Text size="xs" fw={700} c="dimmed" mb={5}>MÉTRICA</Text>
                     <Select
                       placeholder="Selecciona una métrica..."
@@ -1385,6 +1608,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                       onChange={(value) => {
                         setNewFilterMetric(value || '');
                         setNewFilterValue('');
+                        setNewFilterValueTo('');
                       }}
                       variant="filled"
                       radius="xl"
@@ -1394,7 +1618,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                     />
                   </Box>
 
-                  <Box style={{ width: 150 }}>
+                  <Box style={{ width: 170 }}>
                     <Text size="xs" fw={700} c="dimmed" mb={5}>CONDICIÓN</Text>
                     <Select
                       placeholder="Condición"
@@ -1404,9 +1628,17 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                         { value: '>=', label: 'Mayor o igual (>=)' },
                         { value: '<=', label: 'Menor o igual (<=)' },
                         { value: '=', label: 'Igual a (=)' },
+                        { value: 'between', label: 'Entre (rango A y B)' },
+                        { value: 'resto', label: 'Resto de valores' },
                       ]}
                       value={newFilterOperator}
-                      onChange={(value) => setNewFilterOperator(value || '>')}
+                      onChange={(value) => {
+                        const op = value || '>';
+                        setNewFilterOperator(op);
+                        if (op === 'resto') {
+                          setNewFilterColor('green');
+                        }
+                      }}
                       disabled={!newFilterMetric}
                       variant="filled"
                       radius="xl"
@@ -1415,30 +1647,109 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                     />
                   </Box>
 
-                  <Box style={{ width: 130 }}>
-                    <Text size="xs" fw={700} c="dimmed" mb={5}>UMBRAL</Text>
-                    <TextInput
-                      placeholder={
-                        ALL_METRICS_MAP.get(newFilterMetric)?.unit
-                          ? `Ej: 10`
-                          : 'Valor'
-                      }
-                      rightSection={
-                        ALL_METRICS_MAP.get(newFilterMetric)?.unit ? (
-                          <Text size="xs" c="dimmed" pr="xs">
-                            {ALL_METRICS_MAP.get(newFilterMetric).unit}
-                          </Text>
-                        ) : null
-                      }
-                      value={newFilterValue}
-                      onChange={(event) => setNewFilterValue(event.currentTarget.value)}
-                      disabled={!newFilterMetric}
-                      type="number"
-                      step="any"
-                      variant="filled"
-                      radius="xl"
-                      size="sm"
-                    />
+                  {newFilterOperator === 'between' ? (
+                    <Group gap={6} align="flex-end">
+                      <Box style={{ width: 85 }}>
+                        <Text size="xs" fw={700} c="dimmed" mb={5}>DESDE</Text>
+                        <TextInput
+                          placeholder="Mín"
+                          value={newFilterValue}
+                          onChange={(e) => setNewFilterValue(e.currentTarget.value)}
+                          type="number"
+                          step="any"
+                          variant="filled"
+                          radius="xl"
+                          size="sm"
+                        />
+                      </Box>
+                      <Box style={{ width: 85 }}>
+                        <Text size="xs" fw={700} c="dimmed" mb={5}>HASTA</Text>
+                        <TextInput
+                          placeholder="Máx"
+                          value={newFilterValueTo}
+                          onChange={(e) => setNewFilterValueTo(e.currentTarget.value)}
+                          type="number"
+                          step="any"
+                          variant="filled"
+                          radius="xl"
+                          size="sm"
+                        />
+                      </Box>
+                    </Group>
+                  ) : newFilterOperator === 'resto' ? (
+                    <Box style={{ width: 140 }}>
+                      <Text size="xs" fw={700} c="dimmed" mb={5}>APLICA A</Text>
+                      <TextInput
+                        value="Resto sin otra regla"
+                        readOnly
+                        disabled
+                        variant="filled"
+                        radius="xl"
+                        size="sm"
+                      />
+                    </Box>
+                  ) : (
+                    <Box style={{ width: 120 }}>
+                      <Text size="xs" fw={700} c="dimmed" mb={5}>UMBRAL</Text>
+                      <TextInput
+                        placeholder={
+                          ALL_METRICS_MAP.get(newFilterMetric)?.unit
+                            ? `Ej: 10`
+                            : 'Valor'
+                        }
+                        rightSection={
+                          ALL_METRICS_MAP.get(newFilterMetric)?.unit ? (
+                            <Text size="xs" c="dimmed" pr="xs">
+                              {ALL_METRICS_MAP.get(newFilterMetric).unit}
+                            </Text>
+                          ) : null
+                        }
+                        value={newFilterValue}
+                        onChange={(event) => setNewFilterValue(event.currentTarget.value)}
+                        disabled={!newFilterMetric}
+                        type="number"
+                        step="any"
+                        variant="filled"
+                        radius="xl"
+                        size="sm"
+                      />
+                    </Box>
+                  )}
+
+                  <Box>
+                    <Text size="xs" fw={700} c="dimmed" mb={5}>COLOR / ESTADO</Text>
+                    <Group gap={4}>
+                      <Button
+                        size="xs"
+                        radius="xl"
+                        variant={newFilterColor === 'red' ? 'filled' : 'subtle'}
+                        color="red"
+                        onClick={() => setNewFilterColor('red')}
+                        leftSection={<span style={{ fontSize: '9px' }}>●</span>}
+                      >
+                        Rojo
+                      </Button>
+                      <Button
+                        size="xs"
+                        radius="xl"
+                        variant={newFilterColor === 'yellow' ? 'filled' : 'subtle'}
+                        color="yellow"
+                        onClick={() => setNewFilterColor('yellow')}
+                        leftSection={<span style={{ fontSize: '9px' }}>●</span>}
+                      >
+                        Amarillo
+                      </Button>
+                      <Button
+                        size="xs"
+                        radius="xl"
+                        variant={newFilterColor === 'green' ? 'filled' : 'subtle'}
+                        color="green"
+                        onClick={() => setNewFilterColor('green')}
+                        leftSection={<span style={{ fontSize: '9px' }}>●</span>}
+                      >
+                        Verde
+                      </Button>
+                    </Group>
                   </Box>
 
                   <Button
@@ -1447,7 +1758,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                     size="sm"
                     leftSection={<IconPlus size={16} />}
                     onClick={() => {
-                      if (!newFilterMetric || newFilterValue === '') return;
+                      if (!newFilterMetric) return;
+                      if (newFilterOperator === 'between' && (newFilterValue === '' || newFilterValueTo === '')) return;
+                      if (newFilterOperator !== 'between' && newFilterOperator !== 'resto' && newFilterValue === '') return;
+
                       const id = Date.now().toString();
                       setActiveFilters([
                         ...activeFilters,
@@ -1456,16 +1770,27 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                           metric: newFilterMetric,
                           operator: newFilterOperator,
                           value: newFilterValue,
+                          valueTo: newFilterOperator === 'between' ? newFilterValueTo : '',
+                          color: newFilterColor,
                         },
                       ]);
                       if (!visibleMetricKeys.includes(newFilterMetric)) {
                         setVisibleMetricKeys([...visibleMetricKeys, newFilterMetric]);
                       }
-                      setNewFilterValue('');
+                      if (newFilterOperator === 'between') {
+                        setNewFilterValue('');
+                        setNewFilterValueTo('');
+                      } else if (newFilterOperator !== 'resto') {
+                        setNewFilterValue('');
+                      }
                     }}
-                    disabled={!newFilterMetric || newFilterValue === ''}
+                    disabled={
+                      !newFilterMetric ||
+                      (newFilterOperator === 'between' && (newFilterValue === '' || newFilterValueTo === '')) ||
+                      (newFilterOperator !== 'between' && newFilterOperator !== 'resto' && newFilterValue === '')
+                    }
                   >
-                    Añadir Filtro
+                    Añadir Regla
                   </Button>
 
                   <Box style={{ width: 220 }}>
@@ -1483,32 +1808,112 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                   </Box>
                 </Group>
 
-
                 <Box mt="xs">
-                  <Text size="xs" fw={700} c="dimmed" mb={8}>
-                    FILTROS ACTIVOS ({activeFilters.length})
-                  </Text>
+                  <Group justify="space-between" align="center" mb={8}>
+                    <Text size="xs" fw={700} c="dimmed">
+                      REGLAS Y FILTROS ACTIVOS ({activeFilters.length})
+                    </Text>
+                    <Group gap="xs">
+                      {newFilterMetric &&
+                        activeFilters.some((f) => f.metric === newFilterMetric) &&
+                        !activeFilters.some((f) => f.metric === newFilterMetric && f.operator === 'resto') && (
+                          <Button
+                            size="compact-xs"
+                            variant="light"
+                            color="green"
+                            radius="xl"
+                            leftSection={<IconPlus size={11} />}
+                            onClick={() => {
+                              const id = Date.now().toString();
+                              setActiveFilters([
+                                ...activeFilters,
+                                {
+                                  id,
+                                  metric: newFilterMetric,
+                                  operator: 'resto',
+                                  value: '',
+                                  valueTo: '',
+                                  color: 'green',
+                                },
+                              ]);
+                            }}
+                          >
+                            + Resto en verde ({ALL_METRICS_MAP.get(newFilterMetric)?.label || newFilterMetric})
+                          </Button>
+                        )}
+                      {activeFilters.length > 0 && (
+                        <Anchor
+                          component="button"
+                          type="button"
+                          size="xs"
+                          c="dimmed"
+                          onClick={() => setActiveFilters([])}
+                        >
+                          Limpiar todos
+                        </Anchor>
+                      )}
+                    </Group>
+                  </Group>
+
                   {activeFilters.length > 0 ? (
                     <Group gap="xs" wrap="wrap">
                       {activeFilters.map((filter) => {
                         const config = ALL_METRICS_MAP.get(filter.metric);
                         const label = config ? config.label : filter.metric;
                         const unit = config?.unit ? ` ${config.unit}` : '';
+                        const color = filter.color || 'red';
+
+                        let conditionText = '';
+                        if (filter.operator === 'resto') {
+                          conditionText = `${label}: Resto de valores`;
+                        } else if (filter.operator === 'between') {
+                          conditionText = `${label}: Entre ${filter.value} y ${filter.valueTo}${unit}`;
+                        } else {
+                          conditionText = `${label} ${filter.operator} ${filter.value}${unit}`;
+                        }
+
+                        const colorStyles = {
+                          red: {
+                            bg: 'red.0',
+                            border: '1px solid var(--mantine-color-red-2)',
+                            text: 'red.8',
+                            dot: 'red.6',
+                          },
+                          yellow: {
+                            bg: 'yellow.0',
+                            border: '1px solid var(--mantine-color-yellow-3)',
+                            text: 'yellow.9',
+                            dot: 'yellow.6',
+                          },
+                          green: {
+                            bg: 'green.0',
+                            border: '1px solid var(--mantine-color-green-2)',
+                            text: 'green.8',
+                            dot: 'green.6',
+                          },
+                        }[color] || {
+                          bg: 'red.0',
+                          border: '1px solid var(--mantine-color-red-2)',
+                          text: 'red.8',
+                          dot: 'red.6',
+                        };
+
                         return (
                           <Group
                             key={filter.id}
-                            gap={4}
+                            gap={6}
                             px={10}
                             py={3}
-                            bg="red.0"
-                            style={{ borderRadius: 16, border: '1px solid var(--mantine-color-red-2)' }}
+                            bg={colorStyles.bg}
+                            style={{ borderRadius: 16, border: colorStyles.border }}
                           >
-                            <Text size="xs" fw={700} c="red.8">
-                              {`${label} ${filter.operator} ${filter.value}${unit}`}
+                            <span style={{ fontSize: '8px', color: `var(--mantine-color-${colorStyles.dot})` }}>●</span>
+                            <Text size="xs" fw={700} c={colorStyles.text}>
+                              {conditionText}
                             </Text>
                             <ActionIcon
                               size="xs"
-                              color="red"
+                              color={color === 'yellow' ? 'yellow.8' : color}
                               radius="xl"
                               variant="subtle"
                               onClick={() =>
@@ -1525,7 +1930,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                     </Group>
                   ) : (
                     <Text size="xs" c="dimmed" fs="italic">
-                      No hay filtros activos. Las métricas de los jugadores se compararán con los filtros que agregues arriba.
+                      No hay filtros activos. Configura reglas con colores para resaltar alertas (rojo), advertencias (amarillo) o valores objetivo (verde).
                     </Text>
                   )}
                 </Box>
@@ -1547,7 +1952,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                   maxWidth: '100%',
                 }}
               >
-                <Group justify="space-between" p="md" pb="xs" align="center">
+                <Group justify="space-between" p="md" pb="xs" align="center" wrap="wrap">
                   <Box>
                     <Title order={4} fw={700} c="dark.5">
                       Tabla de Filtros de Plantilla
@@ -1565,14 +1970,47 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                       </Text>
                     </Text>
                   </Box>
-                  {activeFilters.length > 0 && (
-                    <Group gap={6} align="center" wrap="nowrap">
-                      <span style={{ fontSize: '8px', color: 'var(--mantine-color-red-6)' }}>●</span>
-                      <Text fz="xs" fw={700} c="red.8">
-                        {sortedTableData.filter((r) => r.totalAlerts > 0).length} de {sortedTableData.length} con alertas
-                      </Text>
-                    </Group>
-                  )}
+                  <Group gap="sm" align="center" wrap="wrap">
+                    {activeFilters.length > 0 && (
+                      <Group gap={10} align="center" wrap="nowrap">
+                        <Group gap={4} align="center">
+                          <span style={{ fontSize: '8px', color: 'var(--mantine-color-red-6)' }}>●</span>
+                          <Text fz="xs" fw={700} c="red.8">
+                            {sortedTableData.filter((r) => r.redAlerts > 0).length} alertas
+                          </Text>
+                        </Group>
+                        {sortedTableData.some((r) => r.yellowAlerts > 0) && (
+                          <Group gap={4} align="center">
+                            <span style={{ fontSize: '8px', color: 'var(--mantine-color-yellow-6)' }}>●</span>
+                            <Text fz="xs" fw={700} c="yellow.9">
+                              {sortedTableData.filter((r) => r.yellowAlerts > 0).length} avisos
+                            </Text>
+                          </Group>
+                        )}
+                        {sortedTableData.some((r) => r.greenMatches > 0) && (
+                          <Group gap={4} align="center">
+                            <span style={{ fontSize: '8px', color: 'var(--mantine-color-teal-6)' }}>●</span>
+                            <Text fz="xs" fw={700} c="teal.8">
+                              {sortedTableData.filter((r) => r.redAlerts === 0 && r.yellowAlerts === 0 && r.greenMatches > 0).length} en objetivo
+                            </Text>
+                          </Group>
+                        )}
+                      </Group>
+                    )}
+
+                    <Button
+                      size="xs"
+                      radius="xl"
+                      variant="light"
+                      color="grape"
+                      leftSection={<IconFileTypePdf size={14} />}
+                      onClick={handleDownloadPdf}
+                      loading={isDownloadingPdf}
+                      disabled={sortedTableData.length === 0}
+                    >
+                      Descargar PDF
+                    </Button>
+                  </Group>
                 </Group>
 
                 <ScrollArea style={{ width: '100%', minWidth: 0 }}>
@@ -1598,7 +2036,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                           </Text>
                         </Table.Th>
 
-                        <Table.Th w={100} style={{ textAlign: 'center' }}>
+                        <Table.Th w={110} style={{ textAlign: 'center' }}>
                           <Text fz="xs" fw={700} c="dark.4">
                             Alertas
                           </Text>
@@ -1698,16 +2136,49 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                           </Table.Td>
 
                           <Table.Td style={{ textAlign: 'center' }}>
-                            <Group gap={4} justify="center" align="center">
-                              <Text size="7px" c={row.totalAlerts > 0 ? 'red.6' : 'gray.4'}>●</Text>
-                              <Text
-                                fz="xs"
-                                fw={700}
-                                c={row.totalAlerts > 0 ? 'red.7' : 'dimmed'}
-                                style={{ fontVariantNumeric: 'tabular-nums' }}
-                              >
-                                {row.totalAlerts}
-                              </Text>
+                            <Group gap={6} justify="center" align="center" wrap="nowrap">
+                              {row.redAlerts > 0 && (
+                                <Group gap={2} align="center">
+                                  <span style={{ fontSize: '7px', color: 'var(--mantine-color-red-6)' }}>●</span>
+                                  <Text
+                                    fz="xs"
+                                    fw={700}
+                                    c="red.7"
+                                    style={{ fontVariantNumeric: 'tabular-nums' }}
+                                  >
+                                    {row.redAlerts}
+                                  </Text>
+                                </Group>
+                              )}
+                              {row.yellowAlerts > 0 && (
+                                <Group gap={2} align="center">
+                                  <span style={{ fontSize: '7px', color: 'var(--mantine-color-yellow-6)' }}>●</span>
+                                  <Text
+                                    fz="xs"
+                                    fw={700}
+                                    c="yellow.8"
+                                    style={{ fontVariantNumeric: 'tabular-nums' }}
+                                  >
+                                    {row.yellowAlerts}
+                                  </Text>
+                                </Group>
+                              )}
+                              {row.redAlerts === 0 && row.yellowAlerts === 0 && row.greenMatches > 0 && (
+                                <Group gap={2} align="center">
+                                  <span style={{ fontSize: '7px', color: 'var(--mantine-color-teal-6)' }}>●</span>
+                                  <Text
+                                    fz="xs"
+                                    fw={700}
+                                    c="teal.7"
+                                    style={{ fontVariantNumeric: 'tabular-nums' }}
+                                  >
+                                    {row.greenMatches}
+                                  </Text>
+                                </Group>
+                              )}
+                              {row.redAlerts === 0 && row.yellowAlerts === 0 && row.greenMatches === 0 && (
+                                <Text fz="xs" c="dimmed">-</Text>
+                              )}
                             </Group>
                           </Table.Td>
 
@@ -1716,30 +2187,51 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
                               return Array.from({ length: maxMeasurements }).map((_, idx) => {
                                 const record = row.records[idx] || null;
                                 const value = record ? metricValue(record, item) : null;
-                                const matches = row.alertMatches[`${item.key}_${idx}`];
+                                const match = row.cellMatches?.[`${item.key}_${idx}`];
                                 const dateStr = record?.fecha ? formatShortDate(record.fecha) : '';
+
+                                let cellStyle = {};
+                                if (match?.color === 'red') {
+                                  cellStyle = {
+                                    backgroundColor: 'var(--mantine-color-red-0)',
+                                    color: 'var(--mantine-color-red-8)',
+                                    fontWeight: 700,
+                                  };
+                                } else if (match?.color === 'yellow') {
+                                  cellStyle = {
+                                    backgroundColor: 'var(--mantine-color-yellow-0)',
+                                    color: 'var(--mantine-color-yellow-9)',
+                                    fontWeight: 700,
+                                  };
+                                } else if (match?.color === 'green') {
+                                  cellStyle = {
+                                    backgroundColor: 'var(--mantine-color-teal-0)',
+                                    color: 'var(--mantine-color-teal-9)',
+                                    fontWeight: 700,
+                                  };
+                                }
 
                                 return (
                                   <Table.Td
                                     key={`${item.key}_${idx}`}
                                     style={{
                                       borderLeft: idx === 0 ? '1px solid var(--mantine-color-gray-2)' : undefined,
-                                      ...(matches
-                                        ? {
-                                          backgroundColor: 'var(--mantine-color-red-0)',
-                                          color: 'var(--mantine-color-red-8)',
-                                          fontWeight: 700,
-                                          transition: 'background-color 0.2s ease',
-                                        }
-                                        : {}),
+                                      ...cellStyle,
+                                      transition: 'background-color 0.2s ease',
                                     }}
                                   >
                                     <Stack gap={1} align="center">
-                                      <Text fz="sm" fw={matches ? 700 : 500} ta="center">
+                                      <Text fz="sm" fw={match ? 700 : 500} ta="center">
                                         {metricDisplay(value, '')}
                                       </Text>
                                       {dateStr && (
-                                        <Text fz="9px" c="dimmed" fw={500} style={{ display: 'block' }} ta="center">
+                                        <Text
+                                          fz="9px"
+                                          c={match ? 'inherit' : 'dimmed'}
+                                          fw={500}
+                                          style={{ display: 'block', opacity: match ? 0.75 : 1 }}
+                                          ta="center"
+                                        >
                                           {dateStr}
                                         </Text>
                                       )}
@@ -1751,23 +2243,39 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [] }
 
                             const hasVal = row.measuredOnDay;
                             const value = hasVal ? metricValue(row.measurement, item) : null;
-                            const matches = row.alertMatches[item.key];
+                            const match = row.cellMatches?.[item.key];
+
+                            let cellStyle = {};
+                            if (match?.color === 'red') {
+                              cellStyle = {
+                                backgroundColor: 'var(--mantine-color-red-0)',
+                                color: 'var(--mantine-color-red-8)',
+                                fontWeight: 700,
+                              };
+                            } else if (match?.color === 'yellow') {
+                              cellStyle = {
+                                backgroundColor: 'var(--mantine-color-yellow-0)',
+                                color: 'var(--mantine-color-yellow-9)',
+                                fontWeight: 700,
+                              };
+                            } else if (match?.color === 'green') {
+                              cellStyle = {
+                                backgroundColor: 'var(--mantine-color-teal-0)',
+                                color: 'var(--mantine-color-teal-9)',
+                                fontWeight: 700,
+                              };
+                            }
 
                             return (
                               <Table.Td
                                 key={item.key}
-                                style={
-                                  matches
-                                    ? {
-                                      backgroundColor: 'var(--mantine-color-red-0)',
-                                      color: 'var(--mantine-color-red-8)',
-                                      fontWeight: 700,
-                                      transition: 'background-color 0.2s ease',
-                                    }
-                                    : undefined
-                                }
+                                style={{
+                                  ...cellStyle,
+                                  textAlign: 'center',
+                                  transition: 'background-color 0.2s ease',
+                                }}
                               >
-                                <Text fz="sm" fw={matches ? 700 : 500}>
+                                <Text fz="sm" fw={match ? 700 : 500} ta="center">
                                   {metricDisplay(value, '')}
                                 </Text>
                               </Table.Td>

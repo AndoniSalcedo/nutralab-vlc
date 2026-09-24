@@ -1,0 +1,76 @@
+import React from 'react';
+import { NextResponse } from 'next/server';
+import { renderToStream } from '@react-pdf/renderer';
+import { getUser } from '@/lib/auth/session';
+import { sanitizeFilename, pdfHeaders } from '@/lib/utils';
+import EvolutionFiltersReportDocument from '@/components/reports/EvolutionFiltersReportDocument';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+export async function POST(request) {
+  try {
+    const user = await getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const {
+      teamName = 'Plantilla',
+      dateContext = '',
+      season = '',
+      selectedDate = '',
+      activeFilters = [],
+      columns = [],
+      rows = [],
+      summary = {},
+    } = body || {};
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return NextResponse.json(
+        { error: 'No hay datos de jugadores para exportar' },
+        { status: 400 }
+      );
+    }
+
+    const docElement = React.createElement(EvolutionFiltersReportDocument, {
+      teamName,
+      dateContext,
+      season,
+      selectedDate,
+      activeFilters,
+      columns,
+      rows,
+      summary,
+    });
+
+    const stream = await renderToStream(docElement);
+
+    const chunks = [];
+    for await (const chunk of stream) {
+      chunks.push(chunk);
+    }
+
+    const buffer = Buffer.concat(chunks);
+    const uint8Array = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+
+    const safeTeam = sanitizeFilename(teamName, 'Equipo');
+    const safeDate = sanitizeFilename(
+      selectedDate === 'all' ? 'Temporada' : selectedDate || 'Filtros',
+      'Medicion'
+    );
+    const filename = `Filtros_${safeTeam}_${safeDate}.pdf`;
+
+    return new NextResponse(uint8Array, {
+      status: 200,
+      headers: pdfHeaders(filename, buffer.length),
+    });
+  } catch (error) {
+    console.error('Error al generar PDF de filtros de equipo:', error);
+    return NextResponse.json(
+      { error: error.message || 'Error al generar el documento PDF' },
+      { status: 500 }
+    );
+  }
+}

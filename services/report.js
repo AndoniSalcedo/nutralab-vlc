@@ -32,3 +32,17 @@ export async function downloadAiPlanPdf(planId) {
   }
   return res;
 }
+
+export async function exportEvolutionFiltersReport(payload) {
+  const res = await fetch('/api/reports/evolution-filters', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Error al generar el archivo PDF');
+  }
+  return res.blob();
+}
+
