@@ -12,6 +12,7 @@ import {
   MultiSelect,
   Paper,
   ScrollArea,
+  SegmentedControl,
   Select,
   SimpleGrid,
   Stack,
@@ -353,6 +354,12 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   const [newFilterColor, setNewFilterColor] = useState('red');
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
+  // Row filter mode:
+  // 'filter_rows': filter rows, only show players matching criteria
+  // 'color_only': show all players, only highlight cells with status colors
+  const [rowFilterMode, setRowFilterMode] = useState('filter_rows');
+  const [rowFilterTarget, setRowFilterTarget] = useState('alerts');
+
   // States for sorting the table
   const [sortField, setSortField] = useState('alerts');
   const [sortDirection, setSortDirection] = useState('desc');
@@ -614,8 +621,31 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
     });
   }, [measuredDayRows, activeFilters, displayedMetrics, selectedDate]);
 
+  const displayedPlayersTableData = useMemo(() => {
+    if (rowFilterMode !== 'filter_rows' || activeFilters.length === 0) {
+      return filteredPlayersTableData;
+    }
+
+    return filteredPlayersTableData.filter((row) => {
+      switch (rowFilterTarget) {
+        case 'alerts':
+          return row.redAlerts > 0 || row.yellowAlerts > 0;
+        case 'red':
+          return row.redAlerts > 0;
+        case 'yellow':
+          return row.yellowAlerts > 0;
+        case 'green':
+          return row.greenMatches > 0;
+        case 'any':
+          return row.redAlerts > 0 || row.yellowAlerts > 0 || row.greenMatches > 0;
+        default:
+          return row.redAlerts > 0 || row.yellowAlerts > 0;
+      }
+    });
+  }, [filteredPlayersTableData, rowFilterMode, rowFilterTarget, activeFilters.length]);
+
   const sortedTableData = useMemo(() => {
-    const data = [...filteredPlayersTableData];
+    const data = [...displayedPlayersTableData];
     data.sort((a, b) => {
       let valA, valB;
 
@@ -661,7 +691,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
       return sortDirection === 'asc' ? valA - valB : valB - valA;
     });
     return data;
-  }, [filteredPlayersTableData, sortField, sortDirection, ALL_METRICS_MAP, selectedDate]);
+  }, [displayedPlayersTableData, sortField, sortDirection, ALL_METRICS_MAP, selectedDate]);
 
 
   const sortOptions = useMemo(() => {
@@ -831,8 +861,23 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
         };
       });
 
+      const targetLabelMap = {
+        alerts: 'Con alertas (rojo / amarillo)',
+        red: 'Solo alertas críticas (rojo)',
+        yellow: 'Solo avisos (amarillo)',
+        green: 'Solo en objetivo (verde)',
+        any: 'Cualquier coincidencia',
+      };
+      const isFiltered = rowFilterMode === 'filter_rows' && activeFilters.length > 0;
+      const filterModeLabel = isFiltered
+        ? `Filtrado: ${targetLabelMap[rowFilterTarget] || 'Alertas'}`
+        : 'Plantilla completa (Semaforización)';
+
       const summary = {
         totalPlayers: sortedTableData.length,
+        totalSquad: filteredPlayersTableData.length,
+        isFiltered,
+        filterModeLabel,
         totalWithRed: sortedTableData.filter((r) => r.redAlerts > 0).length,
         totalWithYellow: sortedTableData.filter((r) => r.redAlerts === 0 && r.yellowAlerts > 0).length,
         totalOptimal: sortedTableData.filter((r) => r.redAlerts === 0 && r.yellowAlerts === 0 && r.greenMatches > 0).length,
@@ -1806,6 +1851,21 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                       allowDeselect={false}
                     />
                   </Box>
+
+                  <Box style={{ width: 200 }}>
+                    <Text size="xs" fw={700} c="dimmed" mb={5}>FILTRO DE FILAS</Text>
+                    <SegmentedControl
+                      size="sm"
+                      radius="xl"
+                      fullWidth
+                      value={rowFilterMode}
+                      onChange={setRowFilterMode}
+                      data={[
+                        { value: 'filter_rows', label: 'Filtrar filas' },
+                        { value: 'color_only', label: 'Solo colorear' },
+                      ]}
+                    />
+                  </Box>
                 </Group>
 
                 <Box mt="xs">
@@ -1958,7 +2018,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                       Tabla de Filtros de Plantilla
                     </Title>
                     <Text size="xs" c="dimmed">
-                      {selectedDate === 'all' ? 'Temporada completa' : formatDate(currentDay)} · {sortedTableData.length} jugadores · Ordenado por:{' '}
+                      {selectedDate === 'all' ? 'Temporada completa' : formatDate(currentDay)} · {rowFilterMode === 'filter_rows' && activeFilters.length > 0 ? `${sortedTableData.length} de ${filteredPlayersTableData.length} jugadores (filtrados)` : `${sortedTableData.length} jugadores`} · Ordenado por:{' '}
                       <Text span fw={700} c="grape.7">
                         {sortField === 'alerts'
                           ? 'Alertas'
@@ -1971,6 +2031,38 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     </Text>
                   </Box>
                   <Group gap="sm" align="center" wrap="wrap">
+                    <Group gap="xs" align="center" wrap="nowrap">
+                      <SegmentedControl
+                        size="xs"
+                        radius="xl"
+                        value={rowFilterMode}
+                        onChange={setRowFilterMode}
+                        data={[
+                          { value: 'filter_rows', label: 'Filtrar filas' },
+                          { value: 'color_only', label: 'Solo colorear' },
+                        ]}
+                      />
+
+                      {rowFilterMode === 'filter_rows' && (
+                        <Select
+                          size="xs"
+                          radius="xl"
+                          variant="filled"
+                          style={{ width: 170 }}
+                          value={rowFilterTarget}
+                          onChange={(val) => setRowFilterTarget(val || 'alerts')}
+                          allowDeselect={false}
+                          data={[
+                            { value: 'alerts', label: 'Con alertas (🔴/🟡)' },
+                            { value: 'red', label: 'Solo alertas (🔴)' },
+                            { value: 'yellow', label: 'Solo avisos (🟡)' },
+                            { value: 'green', label: 'Solo objetivo (🟢)' },
+                            { value: 'any', label: 'Cualquier regla' },
+                          ]}
+                        />
+                      )}
+                    </Group>
+
                     {activeFilters.length > 0 && (
                       <Group gap={10} align="center" wrap="nowrap">
                         <Group gap={4} align="center">
@@ -2306,8 +2398,12 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               <NothingFound
                 withPaper
                 icon={IconFilter}
-                title="Sin datos"
-                description="No hay jugadores medidos con la métrica seleccionada para los filtros de posición y temporada actuales."
+                title={rowFilterMode === 'filter_rows' && activeFilters.length > 0 ? "Sin jugadores coincidentes" : "Sin datos"}
+                description={
+                  rowFilterMode === 'filter_rows' && activeFilters.length > 0
+                    ? "Ningún jugador cumple con los criterios de filtrado actuales. Puedes cambiar a 'Solo colorear' para ver toda la plantilla."
+                    : "No hay jugadores medidos con la métrica seleccionada para los filtros de posición y temporada actuales."
+                }
               />
             )}
           </Stack>

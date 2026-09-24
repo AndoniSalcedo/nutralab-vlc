@@ -350,13 +350,15 @@ export default function EvolutionFiltersReportDocument({
             <Text style={styles.brandTitle}>NUTRALAB · VALENCIA CF</Text>
             <Text style={styles.title}>INFORME DE CONDICIONES Y FILTROS BIOMÉTRICOS</Text>
             <Text style={styles.subtitle}>
-              {teamName} · {dateContext} {season ? `· ${season}` : ''}
+              {teamName} · {dateContext} {season ? `· ${season}` : ''} {summary?.filterModeLabel ? `· ${summary.filterModeLabel}` : ''}
             </Text>
           </View>
           <View style={styles.headerRight}>
             <Text style={styles.teamBadge}>{teamName}</Text>
             <Text style={styles.metaText}>Generado: {generatedFormatted}</Text>
-            <Text style={styles.metaText}>Muestra: {totalPlayers} jugadores</Text>
+            <Text style={styles.metaText}>
+              Muestra: {totalPlayers} {summary?.isFiltered ? `de ${summary.totalSquad || totalPlayers} jugadores (filtrados)` : 'jugadores'}
+            </Text>
           </View>
         </View>
 
