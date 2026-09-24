@@ -9,12 +9,19 @@ const STATUS_COLORS = {
     border: '#fecaca',
     label: 'Alerta Crítica',
   },
+  orange: {
+    bg: '#fff7ed',
+    text: '#c2410c',
+    dot: '#f97316',
+    border: '#fed7aa',
+    label: 'Atención Alta',
+  },
   yellow: {
     bg: '#fffbeb',
     text: '#b45309',
     dot: '#f59e0b',
     border: '#fde68a',
-    label: 'Atención',
+    label: 'Aviso',
   },
   green: {
     bg: '#ecfdf5',
@@ -28,6 +35,7 @@ const STATUS_COLORS = {
 const styles = StyleSheet.create({
   page: {
     padding: 24,
+    paddingBottom: 28,
     fontFamily: 'Helvetica',
     fontSize: 7.5,
     color: '#1e293b',
@@ -179,10 +187,42 @@ const styles = StyleSheet.create({
     color: '#64748b',
   },
 
-  // Table
+  // Section Headings
+  sectionHeading: {
+    marginTop: 10,
+    marginBottom: 6,
+    paddingBottom: 3,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+  },
+  sectionTitle: {
+    fontSize: 8.5,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  sectionSubtitle: {
+    fontSize: 6.5,
+    color: '#64748b',
+  },
+  evolutionPageHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    borderBottomWidth: 1.5,
+    borderBottomColor: '#f97316',
+    paddingBottom: 7,
+    marginBottom: 10,
+  },
+
+  // Squad Table
   table: {
     width: '100%',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   tableHeader: {
     flexDirection: 'row',
@@ -194,17 +234,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   thCell: {
-    fontSize: 6.5,
+    fontSize: 6.2,
     fontWeight: 'bold',
     color: '#475569',
     textTransform: 'uppercase',
-    letterSpacing: 0.3,
+    letterSpacing: 0.25,
   },
   tableRow: {
     flexDirection: 'row',
     borderBottomWidth: 0.5,
     borderBottomColor: '#e2e8f0',
-    paddingVertical: 3.5,
+    paddingVertical: 3.2,
     paddingHorizontal: 4,
     alignItems: 'center',
   },
@@ -212,32 +252,56 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
   },
 
-  // Fixed Table Columns
+  // Fixed Table Columns - Optimized to maximize metric space
   colIdx: {
-    width: '3%',
+    width: '2.2%',
     textAlign: 'center',
   },
+  // In isAllDates summary table (includes TOMAS):
   colPlayer: {
-    width: '18%',
-    paddingRight: 4,
+    width: '12.8%',
+    paddingRight: 3,
   },
   colPosition: {
-    width: '8%',
+    width: '5.5%',
+    paddingRight: 2,
+  },
+  colTomas: {
+    width: '3%',
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   colStatus: {
-    width: '8%',
+    width: '5.5%',
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // In single date table (no TOMAS):
+  colPlayerSingle: {
+    width: '14.5%',
+    paddingRight: 3,
+  },
+  colPositionSingle: {
+    width: '6%',
+    paddingRight: 2,
+  },
+  colStatusSingle: {
+    width: '6.5%',
     textAlign: 'center',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   playerName: {
-    fontSize: 7.5,
+    fontSize: 7.2,
     fontWeight: 'bold',
     color: '#0f172a',
   },
   playerPosition: {
-    fontSize: 6.2,
+    fontSize: 6,
     color: '#64748b',
   },
 
@@ -245,31 +309,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 3,
+    gap: 2,
   },
   statusDotItem: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   statusDotMini: {
-    width: 3.5,
-    height: 3.5,
-    borderRadius: 1.75,
-    marginRight: 2,
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    marginRight: 1.5,
   },
   statusCountText: {
-    fontSize: 6.5,
+    fontSize: 6.2,
     fontWeight: 'bold',
   },
 
-  // Dynamic Metric Cells
+  // Dynamic Metric Cells (Squad Table)
   metricCell: {
     paddingHorizontal: 2,
     paddingVertical: 2,
     alignItems: 'center',
     justifyContent: 'center',
     textAlign: 'center',
-    borderRadius: 2,
+    borderRadius: 3,
+    marginHorizontal: 1,
   },
   metricValueText: {
     fontSize: 7.2,
@@ -282,21 +347,150 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
+  // Individual Player Evolution Cards
+  playerCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 5,
+    borderWidth: 0.75,
+    borderColor: '#cbd5e1',
+    marginBottom: 8,
+    padding: 6,
+  },
+  playerCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+    borderRadius: 3,
+    paddingVertical: 3.5,
+    paddingHorizontal: 6,
+    marginBottom: 4,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#e2e8f0',
+  },
+  playerCardHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 6,
+  },
+  playerCardName: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    color: '#0f172a',
+  },
+  playerCardPos: {
+    fontSize: 6.5,
+    color: '#64748b',
+  },
+  playerCardHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  playerCardTomasCount: {
+    fontSize: 6.2,
+    fontWeight: 'bold',
+    color: '#475569',
+    backgroundColor: '#f1f5f9',
+    borderWidth: 0.5,
+    borderColor: '#e2e8f0',
+    paddingVertical: 1.5,
+    paddingHorizontal: 4.5,
+    borderRadius: 3,
+  },
+  playerMatrixTable: {
+    width: '100%',
+  },
+  playerMatrixHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#f1f5f9',
+    borderBottomWidth: 0.75,
+    borderBottomColor: '#cbd5e1',
+    paddingVertical: 3,
+    paddingHorizontal: 3,
+    alignItems: 'center',
+  },
+  playerMatrixTh: {
+    fontSize: 6,
+    fontWeight: 'bold',
+    color: '#475569',
+    textTransform: 'uppercase',
+    letterSpacing: 0.2,
+  },
+  playerMatrixRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#f1f5f9',
+    paddingVertical: 2.2,
+    paddingHorizontal: 3,
+    alignItems: 'center',
+  },
+  playerMatrixRowAlt: {
+    backgroundColor: '#fbfcfd',
+  },
+  playerMatrixColMetric: {
+    width: '18%',
+    paddingRight: 3,
+  },
+  playerMatrixMetricName: {
+    fontSize: 6.8,
+    fontWeight: 'bold',
+    color: '#1e293b',
+  },
+  playerMatrixColUnit: {
+    width: '4.5%',
+    fontSize: 5.8,
+    color: '#64748b',
+  },
+  playerMatrixDateCell: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 1.8,
+    paddingHorizontal: 1,
+    borderRadius: 2.5,
+    marginHorizontal: 1,
+  },
+  playerMatrixValText: {
+    fontSize: 6.8,
+    textAlign: 'center',
+  },
+  playerMatrixColDiff: {
+    width: '9.5%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playerMatrixDiffText: {
+    fontSize: 6.5,
+    fontWeight: 'bold',
+    color: '#334155',
+    textAlign: 'center',
+  },
+
   // Footer
   footer: {
     position: 'absolute',
-    bottom: 16,
+    bottom: 14,
     left: 24,
     right: 24,
     borderTopWidth: 0.5,
     borderTopColor: '#e2e8f0',
-    paddingTop: 5,
+    paddingTop: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
     fontSize: 6.2,
     color: '#94a3b8',
   },
 });
+
+function formatMetricColHeader(label) {
+  if (!label) return '';
+  return label
+    .replace(' (Faulkner)', '')
+    .replace(' (Lee)', '')
+    .replace(' pliegues', '')
+    .replace('pliegues', '')
+    .trim();
+}
 
 function formatFilterDescription(filter) {
   const { label, operator, value, valueTo, unit } = filter;
@@ -311,10 +505,32 @@ function formatFilterDescription(filter) {
   return `${label} ${operator} ${value}${unitStr}`;
 }
 
+function computeMetricDiff(records, metricKey, unit) {
+  if (!Array.isArray(records) || records.length < 2) {
+    return { text: '-' };
+  }
+  const first = records[0]?.metrics?.[metricKey];
+  const last = records[records.length - 1]?.metrics?.[metricKey];
+
+  if (first?.raw == null || last?.raw == null || Number.isNaN(first.raw) || Number.isNaN(last.raw)) {
+    return { text: '-' };
+  }
+
+  const diff = Number(last.raw) - Number(first.raw);
+  if (Math.abs(diff) < 0.001) {
+    return { text: '0.0' };
+  }
+
+  const sign = diff > 0 ? '+' : '';
+  const text = `${sign}${diff.toFixed(1)}${unit ? ` ${unit}` : ''}`;
+  return { text };
+}
+
 export default function EvolutionFiltersReportDocument({
   teamName = 'Plantilla',
   dateContext = '',
   season = '',
+  isAllDates = false,
   activeFilters = [],
   columns = [],
   rows = [],
@@ -322,6 +538,7 @@ export default function EvolutionFiltersReportDocument({
 }) {
   const totalPlayers = summary.totalPlayers || rows.length;
   const totalWithRed = summary.totalWithRed || 0;
+  const totalWithOrange = summary.totalWithOrange || 0;
   const totalWithYellow = summary.totalWithYellow || 0;
   const totalOptimal = summary.totalOptimal || 0;
   const totalFiltersCount = activeFilters.length;
@@ -335,11 +552,11 @@ export default function EvolutionFiltersReportDocument({
     minute: '2-digit',
   }).format(now);
 
-  // Remaining width for metric columns
-  // Fixed cols: idx (3%) + player (18%) + position (8%) + status (8%) = 37%
-  // Metrics width = 63%
   const numMetricCols = Math.max(1, columns.length);
-  const metricColWidthPercent = `${(63 / numMetricCols).toFixed(2)}%`;
+  // Fixed cols for single date: idx (2.2%) + player (14.5%) + position (6%) + status (6.5%) = 29.2% -> metrics = 70.8%
+  const singleDateMetricColWidthPercent = `${(70.8 / numMetricCols).toFixed(2)}%`;
+  // Fixed cols for summary table in isAllDates: idx (2.2%) + player (12.8%) + position (5.5%) + tomas (3%) + status (5.5%) = 29% -> metrics = 71%
+  const summaryMetricColWidthPercent = `${(71 / numMetricCols).toFixed(2)}%`;
 
   return (
     <Document>
@@ -388,12 +605,12 @@ export default function EvolutionFiltersReportDocument({
 
           <View style={styles.kpiCol}>
             <View style={styles.kpiHeader}>
-              <View style={[styles.kpiDot, { backgroundColor: STATUS_COLORS.yellow.dot }]} />
-              <Text style={[styles.kpiLabel, { color: STATUS_COLORS.yellow.text }]}>ATENCIÓN / AVISO</Text>
+              <View style={[styles.kpiDot, { backgroundColor: STATUS_COLORS.orange.dot }]} />
+              <Text style={[styles.kpiLabel, { color: STATUS_COLORS.orange.text }]}>ATENCIÓN / AVISO</Text>
             </View>
             <View style={styles.kpiValueRow}>
-              <Text style={[styles.kpiValue, { color: STATUS_COLORS.yellow.text }]}>{totalWithYellow}</Text>
-              <Text style={styles.kpiSubtext}>jugadores (amarillo)</Text>
+              <Text style={[styles.kpiValue, { color: STATUS_COLORS.orange.text }]}>{totalWithOrange + totalWithYellow}</Text>
+              <Text style={styles.kpiSubtext}>naranja / amarillo</Text>
             </View>
           </View>
 
@@ -454,130 +671,483 @@ export default function EvolutionFiltersReportDocument({
           </View>
         )}
 
-        {/* Data Table */}
-        <View style={styles.table}>
-          {/* Table Header */}
-          <View style={styles.tableHeader} fixed>
-            <Text style={[styles.thCell, styles.colIdx]}>#</Text>
-            <Text style={[styles.thCell, styles.colPlayer]}>Jugador</Text>
-            <Text style={[styles.thCell, styles.colPosition]}>Posición</Text>
-            <Text style={[styles.thCell, styles.colStatus]}>Estado</Text>
+        {/* VIEW 1: SINGLE DATE SQUAD TABLE */}
+        {!isAllDates && (
+          <View style={styles.table}>
+            {/* Table Header */}
+            <View style={styles.tableHeader} fixed>
+              <Text style={[styles.thCell, styles.colIdx]}>#</Text>
+              <Text style={[styles.thCell, styles.colPlayerSingle]}>Jugador</Text>
+              <Text style={[styles.thCell, styles.colPositionSingle]}>Posición</Text>
+              <Text style={[styles.thCell, styles.colStatusSingle]}>Estado</Text>
 
-            {columns.map((col, idx) => (
-              <View
-                key={`${col.key}_${idx}`}
-                style={{
-                  width: metricColWidthPercent,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  paddingHorizontal: 2,
-                }}
-              >
-                <Text style={[styles.thCell, { textAlign: 'center' }]}>
-                  {col.label}
-                </Text>
-                {col.unit && (
-                  <Text style={{ fontSize: 5.2, color: '#64748b', textAlign: 'center' }}>
-                    ({col.unit})
+              {columns.map((col, idx) => (
+                <View
+                  key={`${col.key}_${idx}`}
+                  style={{
+                    width: singleDateMetricColWidthPercent,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingHorizontal: 2,
+                  }}
+                >
+                  <Text style={[styles.thCell, { textAlign: 'center' }]}>
+                    {formatMetricColHeader(col.label)}
                   </Text>
-                )}
-              </View>
-            ))}
-          </View>
-
-          {/* Table Rows */}
-          {rows.map((row, rowIdx) => {
-            const isAlt = rowIdx % 2 === 1;
-
-            return (
-              <View
-                key={row.id || rowIdx}
-                style={[styles.tableRow, isAlt ? styles.tableRowAlt : null]}
-                wrap={false}
-              >
-                <Text style={[styles.colIdx, { fontSize: 6.5, color: '#94a3b8' }]}>
-                  {rowIdx + 1}
-                </Text>
-
-                <View style={styles.colPlayer}>
-                  <Text style={styles.playerName}>{row.name}</Text>
+                  {col.unit && (
+                    <Text style={{ fontSize: 5.2, color: '#64748b', textAlign: 'center', marginTop: 1 }}>
+                      ({col.unit})
+                    </Text>
+                  )}
                 </View>
+              ))}
+            </View>
 
-                <View style={styles.colPosition}>
-                  <Text style={styles.playerPosition}>{row.posicion || '-'}</Text>
-                </View>
+            {/* Table Rows */}
+            {rows.map((row, rowIdx) => {
+              const isAlt = rowIdx % 2 === 1;
 
-                <View style={styles.colStatus}>
-                  <View style={styles.statusDotGroup}>
-                    {row.redAlerts > 0 && (
-                      <View style={styles.statusDotItem}>
-                        <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.red.dot }]} />
-                        <Text style={[styles.statusCountText, { color: STATUS_COLORS.red.text }]}>
-                          {row.redAlerts}
-                        </Text>
-                      </View>
-                    )}
-                    {row.yellowAlerts > 0 && (
-                      <View style={styles.statusDotItem}>
-                        <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.yellow.dot }]} />
-                        <Text style={[styles.statusCountText, { color: STATUS_COLORS.yellow.text }]}>
-                          {row.yellowAlerts}
-                        </Text>
-                      </View>
-                    )}
-                    {row.redAlerts === 0 && row.yellowAlerts === 0 && row.greenMatches > 0 && (
-                      <View style={styles.statusDotItem}>
-                        <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.green.dot }]} />
-                        <Text style={[styles.statusCountText, { color: STATUS_COLORS.green.text }]}>
-                          {row.greenMatches}
-                        </Text>
-                      </View>
-                    )}
-                    {row.redAlerts === 0 && row.yellowAlerts === 0 && row.greenMatches === 0 && (
-                      <Text style={{ fontSize: 6.5, color: '#94a3b8' }}>-</Text>
-                    )}
+              return (
+                <View
+                  key={row.id || rowIdx}
+                  style={[styles.tableRow, isAlt ? styles.tableRowAlt : null]}
+                  wrap={false}
+                >
+                  <Text style={[styles.colIdx, { fontSize: 6.5, color: '#94a3b8' }]}>
+                    {rowIdx + 1}
+                  </Text>
+
+                  <View style={styles.colPlayerSingle}>
+                    <Text style={styles.playerName}>{row.name}</Text>
                   </View>
-                </View>
 
-                {/* Metric Cells */}
-                {columns.map((col, cIdx) => {
-                  const cell = row.cells?.[col.key] || { value: '-', color: null };
-                  const colorConfig = cell.color ? STATUS_COLORS[cell.color] : null;
+                  <View style={styles.colPositionSingle}>
+                    <Text style={styles.playerPosition}>{row.posicion || '-'}</Text>
+                  </View>
 
-                  return (
-                    <View
-                      key={`${col.key}_${cIdx}`}
-                      style={[
-                        styles.metricCell,
-                        {
-                          width: metricColWidthPercent,
-                          backgroundColor: colorConfig ? colorConfig.bg : 'transparent',
-                        },
-                      ]}
-                    >
-                      <Text
+                  <View style={styles.colStatusSingle}>
+                    <View style={styles.statusDotGroup}>
+                      {row.redAlerts > 0 && (
+                        <View style={styles.statusDotItem}>
+                          <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.red.dot }]} />
+                          <Text style={[styles.statusCountText, { color: STATUS_COLORS.red.text }]}>
+                            {row.redAlerts}
+                          </Text>
+                        </View>
+                      )}
+                      {row.orangeAlerts > 0 && (
+                        <View style={styles.statusDotItem}>
+                          <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.orange.dot }]} />
+                          <Text style={[styles.statusCountText, { color: STATUS_COLORS.orange.text }]}>
+                            {row.orangeAlerts}
+                          </Text>
+                        </View>
+                      )}
+                      {row.yellowAlerts > 0 && (
+                        <View style={styles.statusDotItem}>
+                          <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.yellow.dot }]} />
+                          <Text style={[styles.statusCountText, { color: STATUS_COLORS.yellow.text }]}>
+                            {row.yellowAlerts}
+                          </Text>
+                        </View>
+                      )}
+                      {row.redAlerts === 0 && (row.orangeAlerts || 0) === 0 && row.yellowAlerts === 0 && row.greenMatches > 0 && (
+                        <View style={styles.statusDotItem}>
+                          <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.green.dot }]} />
+                          <Text style={[styles.statusCountText, { color: STATUS_COLORS.green.text }]}>
+                            {row.greenMatches}
+                          </Text>
+                        </View>
+                      )}
+                      {row.redAlerts === 0 && (row.orangeAlerts || 0) === 0 && row.yellowAlerts === 0 && row.greenMatches === 0 && (
+                        <Text style={{ fontSize: 6.5, color: '#94a3b8' }}>-</Text>
+                      )}
+                    </View>
+                  </View>
+
+                  {/* Metric Cells */}
+                  {columns.map((col, cIdx) => {
+                    const cell = row.cells?.[col.key] || { value: '-', color: null };
+                    const colorConfig = cell.color ? STATUS_COLORS[cell.color] : null;
+
+                    return (
+                      <View
+                        key={`${col.key}_${cIdx}`}
                         style={[
-                          styles.metricValueText,
+                          styles.metricCell,
                           {
-                            color: colorConfig ? colorConfig.text : '#1e293b',
-                            fontWeight: colorConfig ? 'bold' : 'normal',
+                            width: singleDateMetricColWidthPercent,
+                            backgroundColor: colorConfig ? colorConfig.bg : 'transparent',
+                            borderColor: colorConfig ? colorConfig.border : 'transparent',
+                            borderWidth: colorConfig ? 0.75 : 0,
                           },
                         ]}
                       >
-                        {cell.value}
-                      </Text>
-                      {cell.dateStr && (
-                        <Text style={styles.metricDateText}>
-                          {cell.dateStr}
+                        <Text
+                          style={[
+                            styles.metricValueText,
+                            {
+                              color: colorConfig ? colorConfig.text : '#0f172a',
+                              fontWeight: colorConfig ? 'bold' : 'normal',
+                            },
+                          ]}
+                        >
+                          {cell.value || '-'}
                         </Text>
-                      )}
-                    </View>
-                  );
-                })}
+                        {cell.dateStr ? (
+                          <Text style={styles.metricDateText}>
+                            {cell.dateStr}
+                          </Text>
+                        ) : null}
+                      </View>
+                    );
+                  })}
+                </View>
+              );
+            })}
+          </View>
+        )}
+
+        {/* VIEW 2: ALL DATES (EXECUTIVE SQUAD SUMMARY + DETAILED PLAYER EVOLUTION TABLES) */}
+        {isAllDates && (
+          <View>
+            {/* 1. Executive Squad Summary Section */}
+            <View style={styles.sectionHeading}>
+              <Text style={styles.sectionTitle}>Resumen General de Plantilla · Última Toma</Text>
+              <Text style={styles.sectionSubtitle}>
+                Valores actuales y alertas acumuladas en la temporada
+              </Text>
+            </View>
+
+            <View style={styles.table}>
+              {/* Summary Header */}
+              <View style={styles.tableHeader}>
+                <Text style={[styles.thCell, styles.colIdx]}>#</Text>
+                <Text style={[styles.thCell, styles.colPlayer]}>Jugador</Text>
+                <Text style={[styles.thCell, styles.colPosition]}>Posición</Text>
+                <Text style={[styles.thCell, styles.colTomas]}>Tomas</Text>
+                <Text style={[styles.thCell, styles.colStatus]}>Alertas</Text>
+
+                {columns.map((col, idx) => (
+                  <View
+                    key={`sum_${col.key}_${idx}`}
+                    style={{
+                      width: summaryMetricColWidthPercent,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingHorizontal: 2,
+                    }}
+                  >
+                    <Text style={[styles.thCell, { textAlign: 'center' }]}>
+                      {formatMetricColHeader(col.label)}
+                    </Text>
+                    {col.unit && (
+                      <Text style={{ fontSize: 5, color: '#64748b', textAlign: 'center', marginTop: 1 }}>
+                        ({col.unit})
+                      </Text>
+                    )}
+                  </View>
+                ))}
               </View>
-            );
-          })}
-        </View>
+
+              {/* Summary Rows */}
+              {rows.map((row, rowIdx) => {
+                const isAlt = rowIdx % 2 === 1;
+
+                return (
+                  <View
+                    key={`sum_row_${row.id || rowIdx}`}
+                    style={[styles.tableRow, isAlt ? styles.tableRowAlt : null]}
+                    wrap={false}
+                  >
+                    <Text style={[styles.colIdx, { fontSize: 6.5, color: '#94a3b8' }]}>
+                      {rowIdx + 1}
+                    </Text>
+
+                    <View style={styles.colPlayer}>
+                      <Text style={styles.playerName}>{row.name}</Text>
+                    </View>
+
+                    <View style={styles.colPosition}>
+                      <Text style={styles.playerPosition}>{row.posicion || '-'}</Text>
+                    </View>
+
+                    <View style={styles.colTomas}>
+                      <Text style={{ fontSize: 6.5, color: '#475569', fontWeight: 'bold' }}>
+                        {row.records?.length || 0}
+                      </Text>
+                    </View>
+
+                    <View style={styles.colStatus}>
+                      <View style={styles.statusDotGroup}>
+                        {row.redAlerts > 0 && (
+                          <View style={styles.statusDotItem}>
+                            <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.red.dot }]} />
+                            <Text style={[styles.statusCountText, { color: STATUS_COLORS.red.text }]}>
+                              {row.redAlerts}
+                            </Text>
+                          </View>
+                        )}
+                        {row.orangeAlerts > 0 && (
+                          <View style={styles.statusDotItem}>
+                            <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.orange.dot }]} />
+                            <Text style={[styles.statusCountText, { color: STATUS_COLORS.orange.text }]}>
+                              {row.orangeAlerts}
+                            </Text>
+                          </View>
+                        )}
+                        {row.yellowAlerts > 0 && (
+                          <View style={styles.statusDotItem}>
+                            <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.yellow.dot }]} />
+                            <Text style={[styles.statusCountText, { color: STATUS_COLORS.yellow.text }]}>
+                              {row.yellowAlerts}
+                            </Text>
+                          </View>
+                        )}
+                        {row.redAlerts === 0 && (row.orangeAlerts || 0) === 0 && row.yellowAlerts === 0 && row.greenMatches > 0 && (
+                          <View style={styles.statusDotItem}>
+                            <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.green.dot }]} />
+                            <Text style={[styles.statusCountText, { color: STATUS_COLORS.green.text }]}>
+                              {row.greenMatches}
+                            </Text>
+                          </View>
+                        )}
+                        {row.redAlerts === 0 && (row.orangeAlerts || 0) === 0 && row.yellowAlerts === 0 && row.greenMatches === 0 && (
+                          <Text style={{ fontSize: 6.5, color: '#94a3b8' }}>-</Text>
+                        )}
+                      </View>
+                    </View>
+
+                    {/* Metric Cells (Latest) */}
+                    {columns.map((col, cIdx) => {
+                      const cell = row.cells?.[col.key] || { value: '-', color: null };
+                      const colorConfig = cell.color ? STATUS_COLORS[cell.color] : null;
+
+                      return (
+                        <View
+                          key={`sum_cell_${col.key}_${cIdx}`}
+                          style={[
+                            styles.metricCell,
+                            {
+                              width: summaryMetricColWidthPercent,
+                              backgroundColor: colorConfig ? colorConfig.bg : 'transparent',
+                              borderColor: colorConfig ? colorConfig.border : 'transparent',
+                              borderWidth: colorConfig ? 0.75 : 0,
+                            },
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.metricValueText,
+                              {
+                                color: colorConfig ? colorConfig.text : '#0f172a',
+                                fontWeight: colorConfig ? 'bold' : 'normal',
+                              },
+                            ]}
+                          >
+                            {cell.value || '-'}
+                          </Text>
+                          {cell.dateStr ? (
+                            <Text style={styles.metricDateText}>
+                              {cell.dateStr}
+                            </Text>
+                          ) : null}
+                        </View>
+                      );
+                    })}
+                  </View>
+                );
+              })}
+            </View>
+
+            {/* 2. Detailed Player Evolution Section */}
+            <View break style={styles.evolutionPageHeader}>
+              <View style={styles.headerLeft}>
+                <Text style={styles.brandTitle}>NUTRALAB · SEGUIMIENTO INDIVIDUAL</Text>
+                <Text style={styles.title}>EVOLUCIÓN CRONOLÓGICA DETALLADA</Text>
+                <Text style={styles.subtitle}>
+                  {teamName} · Histórico completo de tomas con todas las métricas evaluadas ({rows.length} futbolistas)
+                </Text>
+              </View>
+              <View style={styles.headerRight}>
+                <Text style={styles.teamBadge}>{teamName}</Text>
+                <Text style={styles.metaText}>{season ? `${season} · ` : ''}Todas las tomas</Text>
+                <Text style={styles.metaText}>{totalPlayers} jugadores evaluados</Text>
+              </View>
+            </View>
+
+            {/* Individual Player Cards */}
+            {rows.map((row, pIdx) => {
+              const records = row.records || [];
+              const numRecords = records.length;
+              const dateColWidthPercent = numRecords > 0 ? `${(68 / numRecords).toFixed(2)}%` : '68%';
+
+              return (
+                <View key={`player_card_${row.id || pIdx}`} style={styles.playerCard} wrap={false}>
+                  {/* Card Header */}
+                  <View style={styles.playerCardHeader}>
+                    <View style={styles.playerCardHeaderLeft}>
+                      <Text style={styles.playerCardName}>
+                        {pIdx + 1}. {row.name}
+                      </Text>
+                      <Text style={styles.playerCardPos}>
+                        {row.posicion || 'Sin posición'}
+                      </Text>
+                    </View>
+
+                    <View style={styles.playerCardHeaderRight}>
+                      <Text style={styles.playerCardTomasCount}>
+                        {numRecords} {numRecords === 1 ? 'toma registrada' : 'tomas registradas'}
+                      </Text>
+
+                      <View style={styles.statusDotGroup}>
+                        {row.redAlerts > 0 && (
+                          <View style={styles.statusDotItem}>
+                            <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.red.dot }]} />
+                            <Text style={[styles.statusCountText, { color: STATUS_COLORS.red.text }]}>
+                              {row.redAlerts} críticas
+                            </Text>
+                          </View>
+                        )}
+                        {row.orangeAlerts > 0 && (
+                          <View style={styles.statusDotItem}>
+                            <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.orange.dot }]} />
+                            <Text style={[styles.statusCountText, { color: STATUS_COLORS.orange.text }]}>
+                              {row.orangeAlerts} atención
+                            </Text>
+                          </View>
+                        )}
+                        {row.yellowAlerts > 0 && (
+                          <View style={styles.statusDotItem}>
+                            <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.yellow.dot }]} />
+                            <Text style={[styles.statusCountText, { color: STATUS_COLORS.yellow.text }]}>
+                              {row.yellowAlerts} aviso
+                            </Text>
+                          </View>
+                        )}
+                        {row.redAlerts === 0 && (row.orangeAlerts || 0) === 0 && row.yellowAlerts === 0 && row.greenMatches > 0 && (
+                          <View style={styles.statusDotItem}>
+                            <View style={[styles.statusDotMini, { backgroundColor: STATUS_COLORS.green.dot }]} />
+                            <Text style={[styles.statusCountText, { color: STATUS_COLORS.green.text }]}>
+                              {row.greenMatches} en objetivo
+                            </Text>
+                          </View>
+                        )}
+                        {row.redAlerts === 0 && (row.orangeAlerts || 0) === 0 && row.yellowAlerts === 0 && row.greenMatches === 0 && (
+                          <Text style={{ fontSize: 6.2, color: '#94a3b8' }}>Sin alertas</Text>
+                        )}
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Player Evolution Matrix */}
+                  {numRecords === 0 ? (
+                    <Text style={{ fontSize: 6.5, color: '#94a3b8', fontStyle: 'italic', paddingVertical: 4 }}>
+                      Sin tomas registradas en este período
+                    </Text>
+                  ) : (
+                    <View style={styles.playerMatrixTable}>
+                      {/* Matrix Table Header */}
+                      <View style={styles.playerMatrixHeader}>
+                        <Text style={[styles.playerMatrixTh, styles.playerMatrixColMetric]}>
+                          MÉTRICA
+                        </Text>
+                        <Text style={[styles.playerMatrixTh, styles.playerMatrixColUnit]}>
+                          UD.
+                        </Text>
+
+                        {records.map((rec, rIdx) => (
+                          <View
+                            key={`rec_th_${rIdx}`}
+                            style={{
+                              width: dateColWidthPercent,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <Text style={[styles.playerMatrixTh, { textAlign: 'center' }]}>
+                              {numRecords > 6 ? `T${rIdx + 1}` : `Toma ${rIdx + 1}`}
+                            </Text>
+                            <Text style={{ fontSize: 5, color: '#64748b', textAlign: 'center', marginTop: 0.5 }}>
+                              {rec.dateStr}
+                            </Text>
+                          </View>
+                        ))}
+
+                        <View style={[styles.playerMatrixColDiff, { alignItems: 'center' }]}>
+                          <Text style={[styles.playerMatrixTh, { textAlign: 'center' }]}>
+                            EVOLUCIÓN
+                          </Text>
+                          <Text style={{ fontSize: 5, color: '#64748b', textAlign: 'center', marginTop: 0.5 }}>
+                            {numRecords >= 2 ? `T1 → T${numRecords}` : 'Diferencia'}
+                          </Text>
+                        </View>
+                      </View>
+
+                      {/* Matrix Rows per Metric */}
+                      {columns.map((col, cIdx) => {
+                        const isAlt = cIdx % 2 === 1;
+                        const diff = computeMetricDiff(records, col.key, col.unit);
+
+                        return (
+                          <View
+                            key={`matrix_row_${col.key}_${cIdx}`}
+                            style={[styles.playerMatrixRow, isAlt ? styles.playerMatrixRowAlt : null]}
+                          >
+                            <Text style={[styles.playerMatrixColMetric, styles.playerMatrixMetricName]}>
+                              {col.label}
+                            </Text>
+                            <Text style={[styles.playerMatrixColUnit, { color: '#64748b' }]}>
+                              {col.unit || '-'}
+                            </Text>
+
+                            {records.map((rec, rIdx) => {
+                              const cell = rec.metrics?.[col.key];
+                              const colorConfig = cell?.color ? STATUS_COLORS[cell.color] : null;
+
+                              return (
+                                <View
+                                  key={`rec_val_${col.key}_${rIdx}`}
+                                  style={[
+                                    styles.playerMatrixDateCell,
+                                    {
+                                      width: dateColWidthPercent,
+                                      backgroundColor: colorConfig ? colorConfig.bg : 'transparent',
+                                      borderColor: colorConfig ? colorConfig.border : 'transparent',
+                                      borderWidth: colorConfig ? 0.75 : 0,
+                                    },
+                                  ]}
+                                >
+                                  <Text
+                                    style={[
+                                      styles.playerMatrixValText,
+                                      {
+                                        color: colorConfig ? colorConfig.text : '#0f172a',
+                                        fontWeight: colorConfig ? 'bold' : 'normal',
+                                      },
+                                    ]}
+                                  >
+                                    {cell?.value || '-'}
+                                  </Text>
+                                </View>
+                              );
+                            })}
+
+                            <View style={styles.playerMatrixColDiff}>
+                              <Text style={styles.playerMatrixDiffText}>
+                                {diff.text}
+                              </Text>
+                            </View>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+          </View>
+        )}
 
         {/* Footer */}
         <View style={styles.footer} fixed>
