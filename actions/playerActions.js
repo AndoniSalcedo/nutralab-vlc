@@ -354,20 +354,24 @@ export async function savePlayer(form) {
         id: newPlayer.id,
       };
 
-      trackUsageEvent({
-        app: 'nutralab-vlc',
-        tenantId: targetTeam.id,
-        tenantName: targetTeam.nombre || 'Valencia FC',
-        userId: user.id,
-        eventType: 'ALTA_JUGADOR',
-        description: `Alta inicial de jugador: ${payload.nombre} ${payload.apellidos}`.trim(),
-        metadata: {
-          jugadorId: newPlayer.id,
-          equipoId: targetTeam.id,
-          emisor,
-          cliente,
-        },
-      });
+      try {
+        await trackUsageEvent({
+          app: 'nutralab-vlc',
+          tenantId: targetTeam.id,
+          tenantName: targetTeam.nombre || 'Valencia FC',
+          userId: user.id,
+          eventType: 'ALTA_JUGADOR',
+          description: `Alta inicial de jugador: ${payload.nombre} ${payload.apellidos}`.trim(),
+          metadata: {
+            jugadorId: newPlayer.id,
+            equipoId: targetTeam.id,
+            emisor,
+            cliente,
+          },
+        });
+      } catch (billingErr) {
+        console.warn('[playerActions] Error al reportar alta a billing:', billingErr.message);
+      }
     }
   }
 
@@ -544,21 +548,25 @@ async function importGroups({ supabase, team, plan, players, decisions, user }) 
             id: player.id,
           };
 
-          trackUsageEvent({
-            app: 'nutralab-vlc',
-            tenantId: team.id,
-            tenantName: team.nombre || 'Valencia FC',
-            userId: user?.id,
-            eventType: 'ALTA_JUGADOR',
-            description: `Alta inicial de jugador (Excel): ${player.nombre || ''} ${player.apellidos || ''}`.trim(),
-            metadata: {
-              jugadorId: player.id,
-              equipoId: team.id,
-              emisor,
-              cliente,
-              origen: 'excel',
-            },
-          });
+          try {
+            await trackUsageEvent({
+              app: 'nutralab-vlc',
+              tenantId: team.id,
+              tenantName: team.nombre || 'Valencia FC',
+              userId: user?.id,
+              eventType: 'ALTA_JUGADOR',
+              description: `Alta inicial de jugador (Excel): ${player.nombre || ''} ${player.apellidos || ''}`.trim(),
+              metadata: {
+                jugadorId: player.id,
+                equipoId: team.id,
+                emisor,
+                cliente,
+                origen: 'excel',
+              },
+            });
+          } catch (billingErr) {
+            console.warn('[playerActions] Error al reportar alta Excel a billing:', billingErr.message);
+          }
         }
       } else {
         player = playersById.get(String(decision.jugadorId));
