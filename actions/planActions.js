@@ -98,7 +98,7 @@ async function createAiPlan(payload) {
     const isPlayer = user.role === 'jugador';
     const emisor = isPlayer
       ? { tipo: 'cliente', nombre: user.name || 'Jugador', id: user.id }
-      : { tipo: 'nutricionista', nombre: user.name || 'Técnico / Nutricionista VBC', id: user.id };
+      : { tipo: 'nutricionista', nombre: user.name || 'Técnico / Nutricionista Valencia FC', id: user.id };
     const cliente = {
       tipo: 'cliente',
       nombre: jugadorConMetricas?.nombre ? `${jugadorConMetricas.nombre} ${jugadorConMetricas.apellidos || ''}`.trim() : 'Jugador',
@@ -108,7 +108,7 @@ async function createAiPlan(payload) {
     trackUsageEvent({
       app: 'nutralab-vlc',
       tenantId: jugadorConMetricas?.equipo_id || jugador.id,
-      tenantName: jugadorConMetricas?.equipos?.nombre || 'Valencia Basket',
+      tenantName: jugadorConMetricas?.equipos?.nombre || 'Valencia FC',
       userId: user.id,
       eventType: 'GENERACION_PLAN',
       description: `Plan nutricional (${planNombre})`,

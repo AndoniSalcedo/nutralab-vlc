@@ -345,7 +345,7 @@ export async function savePlayer(form) {
     if (newPlayer?.id) {
       const emisor = {
         tipo: 'nutricionista',
-        nombre: user?.name || 'Técnico / Nutricionista VBC',
+        nombre: user?.name || 'Técnico / Nutricionista Valencia FC',
         id: user?.id,
       };
       const cliente = {
@@ -357,7 +357,7 @@ export async function savePlayer(form) {
       trackUsageEvent({
         app: 'nutralab-vlc',
         tenantId: targetTeam.id,
-        tenantName: targetTeam.nombre || 'Valencia Basket Club',
+        tenantName: targetTeam.nombre || 'Valencia FC',
         userId: user.id,
         eventType: 'ALTA_JUGADOR',
         description: `Alta inicial de jugador: ${payload.nombre} ${payload.apellidos}`.trim(),
@@ -500,7 +500,7 @@ function resolveDecision(group, decisions) {
   return actionObj;
 }
 
-async function importGroups({ supabase, team, plan, players, decisions }) {
+async function importGroups({ supabase, team, plan, players, decisions, user }) {
   const playersById = new Map(players.map((player) => [String(player.id), player]));
   const results = [];
 
@@ -531,6 +531,35 @@ async function importGroups({ supabase, team, plan, players, decisions }) {
       if (decision.action === 'create') {
         player = await createPlayer(supabase, team.id, group);
         playersById.set(String(player.id), player);
+
+        if (player?.id) {
+          const emisor = {
+            tipo: 'nutricionista',
+            nombre: user?.name || 'Técnico / Nutricionista Valencia FC',
+            id: user?.id,
+          };
+          const cliente = {
+            tipo: 'cliente',
+            nombre: `${player.nombre || ''} ${player.apellidos || ''}`.trim(),
+            id: player.id,
+          };
+
+          trackUsageEvent({
+            app: 'nutralab-vlc',
+            tenantId: team.id,
+            tenantName: team.nombre || 'Valencia FC',
+            userId: user?.id,
+            eventType: 'ALTA_JUGADOR',
+            description: `Alta inicial de jugador (Excel): ${player.nombre || ''} ${player.apellidos || ''}`.trim(),
+            metadata: {
+              jugadorId: player.id,
+              equipoId: team.id,
+              emisor,
+              cliente,
+              origen: 'excel',
+            },
+          });
+        }
       } else {
         player = playersById.get(String(decision.jugadorId));
         if (!player) {
@@ -611,7 +640,7 @@ export async function importPlayerExcel(formDataOrPayload) {
   }
 
   const decisions = parseJson(formData.get('decisiones'), {});
-  const resultados = await importGroups({ supabase, team, plan, players, decisions });
+  const resultados = await importGroups({ supabase, team, plan, players, decisions, user });
   const okResults = resultados.filter((result) => !result.error && result.accion !== 'omitido');
 
   revalidatePath(`/dashboard/equipo/${team.id}`);

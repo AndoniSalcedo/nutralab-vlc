@@ -258,19 +258,19 @@ IMPORTANTE:
 
   const emisor = {
     tipo: 'nutricionista',
-    nombre: user?.name || 'Técnico / Nutricionista VBC',
+    nombre: user?.name || 'Técnico / Nutricionista Valencia FC',
     id: user?.id,
   };
   const cliente = {
     tipo: 'cliente',
-    nombre: team.nombre || 'Valencia Basket',
+    nombre: team.nombre || 'Valencia FC',
     id: team.id,
   };
 
   trackUsageEvent({
     app: 'nutralab-vlc',
     tenantId: team.id,
-    tenantName: team.nombre || 'Valencia Basket',
+    tenantName: team.nombre || 'Valencia FC',
     userId: user.id,
     eventType: 'MENU_SEMANAL',
     description: `Menú semanal extraído (${finalSemana})`,
