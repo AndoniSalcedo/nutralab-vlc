@@ -37,6 +37,7 @@ export default function UploadAnaliticaModal({
           valueFormat="DD/MM/YYYY"
           clearable
           maxDate={new Date()}
+          popoverProps={{ zIndex: 2500, withinPortal: true }}
         />
         <Dropzone
           onDrop={handleUpload}

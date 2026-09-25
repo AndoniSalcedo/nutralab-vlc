@@ -369,6 +369,7 @@ export default function TeamOsmolarityImporter({ team }) {
                             data={[{ value: 'skip', label: 'Omitir (No existe)' }]}
                             value="skip"
                             disabled
+                            comboboxProps={{ zIndex: 2500, withinPortal: true }}
                           />
                         ) : (
                           <Select
@@ -378,6 +379,7 @@ export default function TeamOsmolarityImporter({ team }) {
                             value={decisionValue(player)}
                             onChange={(val) => setDecision(player.key, val)}
                             allowDeselect={false}
+                            comboboxProps={{ zIndex: 2500, withinPortal: true }}
                           />
                         )}
                       </Table.Td>

@@ -586,6 +586,7 @@ export default function PlayerExcelImporter({ team }) {
                               value={decisionValue(player)}
                               onChange={(value) => setDecision(player.key, value)}
                               allowDeselect={false}
+                              comboboxProps={{ zIndex: 2500, withinPortal: true }}
                             />
                           ) : player.warnings?.length ? (
                             <Text size="xs" c="dimmed" lineClamp={2}>
@@ -622,6 +623,7 @@ export default function PlayerExcelImporter({ team }) {
                                     onChange={(dateVal) => setFallbackDate(player.key, m.id, dateInputToIso(dateVal))}
                                     valueFormat="DD/MM/YYYY"
                                     clearable
+                                    popoverProps={{ zIndex: 2500, withinPortal: true }}
                                   />
                                 ))}
                               </Stack>
