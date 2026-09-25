@@ -82,7 +82,8 @@ async function createAiPlan(payload) {
     resolvedMenu = await getMenuByWeekAndTeam(supabase, semanaMenu, teamConfig?.equipo_id || jugadorConMetricas?.equipo_id);
   }
 
-  const isNewGeneration = draftOnly || (!datos && (contenido === undefined || contenido === ''));
+  const isDraftOnly = draftOnly || payload?.guardar === false;
+  const isNewGeneration = isDraftOnly || (!datos && (contenido === undefined || contenido === ''));
   const generatedDatos = isNewGeneration
     ? await generarDatosPlan({
         jugador: jugadorConMetricas,
@@ -105,23 +106,27 @@ async function createAiPlan(payload) {
       id: jugador.id,
     };
 
-    trackUsageEvent({
-      app: 'nutralab-vlc',
-      tenantId: jugadorConMetricas?.equipo_id || jugador.id,
-      tenantName: jugadorConMetricas?.equipos?.nombre || 'Valencia FC',
-      userId: user.id,
-      eventType: 'GENERACION_PLAN',
-      description: `Plan nutricional (${planNombre})`,
-      metadata: {
-        jugadorId: jugador.id,
-        tieneMenu: Boolean(resolvedMenu),
-        emisor,
-        cliente,
-      },
-    });
+    try {
+      await trackUsageEvent({
+        app: 'nutralab-vlc',
+        tenantId: jugadorConMetricas?.equipo_id || jugador.id,
+        tenantName: jugadorConMetricas?.equipos?.nombre || 'Valencia FC',
+        userId: user.id,
+        eventType: 'GENERACION_PLAN',
+        description: `Plan nutricional (${planNombre})`,
+        metadata: {
+          jugadorId: jugador.id,
+          tieneMenu: Boolean(resolvedMenu),
+          emisor,
+          cliente,
+        },
+      });
+    } catch (billingErr) {
+      console.warn('[planActions] Error al reportar evento a billing:', billingErr.message);
+    }
   }
 
-  if (draftOnly) {
+  if (isDraftOnly) {
     return { datos: generatedDatos };
   }
 
@@ -206,6 +211,7 @@ export async function generateAiPlanDraft({ jugador, nombre, calendario, semanaM
     calendario,
     semanaMenu,
     preMatchConfig,
+    draftOnly: true,
     guardar: false,
   });
 }
