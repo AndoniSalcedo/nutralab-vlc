@@ -18,4 +18,5 @@ export const env = {
   ANALITICA_MAX_TOKENS: Number(process.env.ANALITICA_MAX_TOKENS) || 16000,
   BILLING_SERVICE_URL: process.env.BILLING_SERVICE_URL || 'http://localhost:3005',
   BILLING_API_KEY: process.env.BILLING_API_KEY || process.env.BILLING_TOKEN || '',
+  EXTERNAL_API_KEY: process.env.EXTERNAL_API_KEY || '',
 };

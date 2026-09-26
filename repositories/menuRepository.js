@@ -1,23 +1,5 @@
 import { mockMenus, isMockTeam } from '@/config/boneyardMockData';
 
-export async function getLatestMenu(supabase, equipoId) {
-  if (!equipoId) return null;
-  if (isMockTeam(equipoId)) {
-    return mockMenus[0] || null;
-  }
-
-  const { data, error } = await supabase
-    .from('menu_semanal')
-    .select('*')
-    .eq('equipo_id', equipoId)
-    .order('semana', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
-}
-
 export async function getMenusByTeam(supabase, teamId) {
   if (isMockTeam(teamId)) {
     return mockMenus;
