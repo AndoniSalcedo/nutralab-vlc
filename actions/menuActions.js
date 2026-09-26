@@ -164,7 +164,7 @@ export async function uploadWeeklyMenu(fileOrFormData, weekDateParam, teamIdPara
     : { type: 'document', source: { type: 'base64', media_type: mediaPDF, data: base64 } };
 
   const message = await client.messages.create({
-    model: env.CHAT_MODEL,
+    model: env.AI_MODEL,
     max_tokens: MENU_MAX_TOKENS,
     thinking: { type: 'disabled' },
     tool_choice: { type: 'tool', name: MENU_TOOL_NAME },

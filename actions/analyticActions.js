@@ -63,7 +63,7 @@ export async function uploadAnalitica(fileOrFormData, jugadorIdParam, fechaParam
   const base64 = buffer.toString('base64');
 
   const message = await client.messages.create({
-    model: env.CHAT_MODEL,
+    model: env.AI_MODEL,
     max_tokens: ANALITICA_MAX_TOKENS,
     thinking: { type: 'disabled' },
     tool_choice: { type: 'tool', name: ANALITICA_TOOL_NAME },

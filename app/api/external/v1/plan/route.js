@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { env } from '@/config/env';
 import { generarDatosPlan } from '@/lib/engine';
 import { trackUsageEvent } from '@/lib/billing/client';
 import {
@@ -95,7 +94,7 @@ function resolveTenantAuth(req) {
   }
 
   // 3. Variable EXTERNAL_API_KEY con tenant explícito en EXTERNAL_API_TENANT_ID (sin fallback por defecto)
-  const defaultToken = env.EXTERNAL_API_KEY || process.env.EXTERNAL_API_KEY || '';
+  const defaultToken = process.env.EXTERNAL_API_KEY || '';
   const explicitTenantId = (process.env.EXTERNAL_API_TENANT_ID || '').trim().toLowerCase();
 
   if (defaultToken && explicitTenantId) {
