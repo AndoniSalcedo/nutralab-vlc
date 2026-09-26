@@ -68,7 +68,7 @@ export default function ApiDocsPage() {
             Nutralab VLC · Swagger API Documentation
           </h1>
           <p style={{ margin: '4px 0 0', fontSize: 13, color: '#a5adcb' }}>
-            Documentación interactiva OpenAPI 3.0 para la generación de planes nutricionales externos (Hybrid)
+            Documentación interactiva OpenAPI 3.0 para la generación de planes nutricionales externos
           </p>
         </div>
         <a

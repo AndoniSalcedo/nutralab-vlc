@@ -105,7 +105,7 @@ const aversionesSchema = z
   .optional()
   .default([]);
 
-export const hybridPlanRequestSchema = z
+export const externalPlanRequestSchema = z
   .object({
     peso_kg: z
       .number({
