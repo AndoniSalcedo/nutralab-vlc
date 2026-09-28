@@ -534,7 +534,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 170,
     "treePath": [
       "hidratos",
-      "cereales_desayuno"
+      "cereales"
     ]
   },
   {
@@ -551,7 +551,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 170,
     "treePath": [
       "hidratos",
-      "cereales_desayuno"
+      "cereales"
     ]
   },
   {
@@ -951,7 +951,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 60,
     "treePath": [
       "hidratos",
-      "panes"
+      "cereales"
     ]
   },
   {
@@ -966,7 +966,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 60,
     "treePath": [
       "hidratos",
-      "panes"
+      "cereales"
     ]
   },
   {
@@ -1064,7 +1064,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 170,
     "treePath": [
       "hidratos",
-      "cereales_desayuno"
+      "cereales"
     ]
   },
   {

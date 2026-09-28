@@ -70,8 +70,8 @@ export function getTreeHidratoOptions() {
   tuberculos.forEach((f) => seen.add(f.name));
   const panes = FOODS_CRUDO.filter((f) => hasTreePath(f, 'panes'));
   panes.forEach((f) => seen.add(f.name));
-  const cerealesDesayuno = FOODS_CRUDO.filter((f) => hasTreePath(f, 'cereales_desayuno'));
-  cerealesDesayuno.forEach((f) => seen.add(f.name));
+  const cereales = FOODS_CRUDO.filter((f) => hasTreePath(f, 'cereales') || hasTreePath(f, 'cereales_desayuno'));
+  cereales.forEach((f) => seen.add(f.name));
   const granos = FOODS_CRUDO.filter((f) => hasTreePath(f, 'otros_granos'));
   const legumbres = FOODS_CRUDO.filter((f) => hasTreePath(f, 'legumbres'));
 
@@ -82,6 +82,7 @@ export function getTreeHidratoOptions() {
       { value: 'panes', label: 'Panes (Genérico adaptable)' },
       { value: 'tuberculos', label: 'Tubérculos (Genérico)' },
       { value: 'otros_granos', label: 'Otros granos culinarios (Quinoa, Cuscús, Bulgur)' },
+      { value: 'cereales', label: 'Cereales y Avena (Genérico)' },
       { value: 'cereales_desayuno', label: 'Cereales de desayuno y Avena (Genérico)' },
       { value: 'legumbres', label: 'Legumbres (Genérico)' },
     ]),
@@ -90,7 +91,7 @@ export function getTreeHidratoOptions() {
     { group: 'Tubérculos', items: mapFoodsToItems(tuberculos) },
     { group: 'Panes y Masas', items: mapFoodsToItems(panes) },
     { group: 'Granos Culinarios (Quinoa, Cuscús...)', items: mapFoodsToItems(granos) },
-    { group: 'Cereales de Desayuno y Avena', items: mapFoodsToItems(cerealesDesayuno) },
+    { group: 'Cereales y Avena', items: mapFoodsToItems(cereales) },
     { group: 'Legumbres', items: mapFoodsToItems(legumbres) },
   ];
 }

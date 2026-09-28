@@ -1006,7 +1006,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 20,
     maxGrams: 70,
-    treePath: ['hidratos', 'cereales_desayuno'],
+    treePath: ['hidratos', 'cereales'],
   },
   {
     name: 'Cereales de trigo sarraceno hinchados',
@@ -1018,7 +1018,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 40,
     maxGrams: 100,
-    treePath: ['hidratos', 'cereales_desayuno'],
+    treePath: ['hidratos', 'cereales'],
   },
   {
     name: 'Copos de avena',
@@ -1030,7 +1030,7 @@ export const FOODS_MENU = [
     tags: ['gluten'],
     minGrams: 50,
     maxGrams: 170,
-    treePath: ['hidratos', 'cereales_desayuno'],
+    treePath: ['hidratos', 'cereales'],
   },
   {
     name: 'Arroz con leche',
