@@ -84,9 +84,19 @@ export function getMealsForCount(count) {
     : [...STANDARD_MEALS];
 }
 
-export function sortMeals(meals = []) {
+export function sortMeals(meals = [], scheduleKey = null) {
   if (!Array.isArray(meals)) return [];
-  const order = [...STANDARD_MEALS, 'Post-entreno'].map((m) => String(m).toLowerCase());
+  let order;
+  if (scheduleKey === 'manana') {
+    order = ['desayuno', 'almuerzo', 'post-partido', 'post-entreno', 'post', 'comida', 'merienda', 'cena'];
+  } else if (scheduleKey === 'tarde') {
+    order = ['desayuno', 'almuerzo', 'comida', 'post-partido', 'post-entreno', 'post', 'merienda', 'cena'];
+  } else if (scheduleKey === 'noche') {
+    order = ['desayuno', 'almuerzo', 'comida', 'merienda', 'post-partido', 'post-entreno', 'post', 'cena'];
+  } else {
+    order = [...STANDARD_MEALS, 'Post-entreno'].map((m) => String(m).toLowerCase());
+  }
+
   return [...meals].sort((a, b) => {
     const strA = String(a || '').trim().toLowerCase();
     const strB = String(b || '').trim().toLowerCase();
@@ -224,6 +234,62 @@ export function getTeamDayTypeLabel(key, teamConfig) {
 
 
 
+export function isPreMatchPreviousDayMeal(scheduleKey, mealName) {
+  const norm = String(mealName || '').toLowerCase().trim();
+  if (scheduleKey === 'manana' || scheduleKey === 'tarde') {
+    return norm === 'cena' || norm === 'merienda';
+  }
+  if (scheduleKey === 'noche') {
+    return norm === 'cena';
+  }
+  return norm === 'cena';
+}
+
+export function isPreMatchMatchDayMeal(scheduleKey, mealName) {
+  const norm = String(mealName || '').toLowerCase().trim();
+  if (norm === 'post' || norm === 'post-entreno' || norm === 'post entreno' || norm === 'post-partido' || norm === 'post partido') {
+    return false;
+  }
+  if (isPreMatchPreviousDayMeal(scheduleKey, mealName)) {
+    return false;
+  }
+  if (scheduleKey === 'manana') {
+    return norm === 'desayuno' || norm === 'almuerzo';
+  }
+  if (scheduleKey === 'tarde') {
+    return norm === 'desayuno' || norm === 'almuerzo' || norm === 'comida';
+  }
+  if (scheduleKey === 'noche') {
+    return norm === 'desayuno' || norm === 'almuerzo' || norm === 'comida' || norm === 'merienda';
+  }
+  return false;
+}
+
+export function getMealTimingBadge(scheduleKey, mealName) {
+  return isPreMatchPreviousDayMeal(scheduleKey, mealName)
+    ? 'Día anterior · Carga 24h'
+    : 'Día de partido';
+}
+
+export function sortPreMatchMealsChronological(scheduleKey, meals = []) {
+  if (!Array.isArray(meals)) return [];
+  let order;
+  if (scheduleKey === 'manana') {
+    order = ['merienda', 'cena', 'desayuno', 'almuerzo', 'post-partido', 'post-entreno', 'post', 'comida', 'cena'];
+  } else if (scheduleKey === 'tarde') {
+    order = ['merienda', 'cena', 'desayuno', 'almuerzo', 'comida', 'post-partido', 'post-entreno', 'post'];
+  } else if (scheduleKey === 'noche') {
+    order = ['cena', 'desayuno', 'almuerzo', 'comida', 'merienda', 'post-partido', 'post-entreno', 'post'];
+  } else {
+    order = ['cena', 'desayuno', 'almuerzo', 'comida', 'merienda', 'post-partido', 'post-entreno', 'post'];
+  }
+  return [...meals].sort((a, b) => {
+    const ia = order.indexOf(String(a).toLowerCase().trim());
+    const ib = order.indexOf(String(b).toLowerCase().trim());
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  });
+}
+
 export function getUserMealsForDay(jugador, tipoDia, teamConfig, preMatchConfig = null, dayKey = null) {
   const baseMeals = getUserMeals(jugador);
   if (!jugador) return baseMeals;
@@ -231,23 +297,31 @@ export function getUserMealsForDay(jugador, tipoDia, teamConfig, preMatchConfig 
   if (tipoDia === 'partido' && preMatchConfig?.enabled) {
     const horario = preMatchConfig?.partidos?.[dayKey]?.horario || preMatchConfig?.horario || 'tarde';
     const matchConfig = jugador?.config_prepartido?.[horario];
-    if (matchConfig && Array.isArray(matchConfig.ingestas) && matchConfig.ingestas.length > 0) {
-      const matchMeals = [...matchConfig.ingestas];
-      const hasPost = matchConfig.postentreno !== undefined ? Boolean(matchConfig.postentreno) : Boolean(jugador.postentreno);
-      const isAlreadyPost = matchMeals.some((m) => {
+
+    // Ingestas pre-partido específicas del día de partido
+    const preMatchMeals = Array.isArray(matchConfig?.ingestas)
+      ? matchConfig.ingestas.filter((m) => isPreMatchMatchDayMeal(horario, m))
+      : [];
+
+    // Combinar las tomas base habituales del jugador con las tomas prepartido del día
+    // Manteniendo todas las tomas normales posteriores al partido (ej. Cena en noche, Comida/Cena en mañana)
+    const combinedMealsSet = new Set([
+      ...preMatchMeals,
+      ...baseMeals.filter((m) => {
         const low = String(m || '').toLowerCase();
-        return low === 'post-entreno' || low === 'post entreno' || low === 'post' || low === 'post-partido' || low === 'post partido';
-      });
-      if (hasPost && !isAlreadyPost) {
-        matchMeals.push('Post-entreno');
-      } else if (!hasPost && isAlreadyPost) {
-        return sortMeals(matchMeals.filter((m) => {
-          const low = String(m || '').toLowerCase();
-          return !(low === 'post-entreno' || low === 'post entreno' || low === 'post' || low === 'post-partido' || low === 'post partido');
-        }));
-      }
-      return sortMeals(matchMeals);
+        return !(low === 'post-entreno' || low === 'post entreno' || low === 'post' || low === 'post-partido' || low === 'post partido');
+      }),
+    ]);
+
+    const hasPost = matchConfig?.postentreno !== undefined
+      ? Boolean(matchConfig.postentreno)
+      : Boolean(jugador.postentreno);
+
+    if (hasPost) {
+      combinedMealsSet.add('Post-entreno');
     }
+
+    return sortMeals([...combinedMealsSet], horario);
   }
 
   const hasPostentrenoEnabled = Boolean(jugador.postentreno);

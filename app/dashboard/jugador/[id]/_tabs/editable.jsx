@@ -21,9 +21,16 @@ import { IconEdit, IconPlus } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/actions/playerActions';
 import { useRouter } from 'next/navigation';
-import { AVAILABLE_MEALS, getMealsForCount, sortMeals, isMainMeal } from '@/config/nutrition-days';
+import {
+  AVAILABLE_MEALS,
+  getMealsForCount,
+  sortMeals,
+  isMainMeal,
+  sortPreMatchMealsChronological,
+  getMealTimingBadge,
+} from '@/config/nutrition-days';
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
-import PrepartidoRoutineModal, { sortPreMatchMealsChronological, getMealTimingBadge } from '@/components/modals/PrepartidoRoutineModal';
+import PrepartidoRoutineModal from '@/components/modals/PrepartidoRoutineModal';
 
 export function CampoEditable({
   label,

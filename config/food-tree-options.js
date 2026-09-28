@@ -70,7 +70,7 @@ export function getTreeHidratoOptions() {
   tuberculos.forEach((f) => seen.add(f.name));
   const panes = FOODS_CRUDO.filter((f) => hasTreePath(f, 'panes'));
   panes.forEach((f) => seen.add(f.name));
-  const cereales = FOODS_CRUDO.filter((f) => hasTreePath(f, 'cereales') || hasTreePath(f, 'cereales_desayuno'));
+  const cereales = FOODS_CRUDO.filter((f) => hasTreePath(f, 'cereales'));
   cereales.forEach((f) => seen.add(f.name));
   const granos = FOODS_CRUDO.filter((f) => hasTreePath(f, 'otros_granos'));
   const legumbres = FOODS_CRUDO.filter((f) => hasTreePath(f, 'legumbres'));
@@ -83,7 +83,6 @@ export function getTreeHidratoOptions() {
       { value: 'tuberculos', label: 'Tubérculos (Genérico)' },
       { value: 'otros_granos', label: 'Otros granos culinarios (Quinoa, Cuscús, Bulgur)' },
       { value: 'cereales', label: 'Cereales y Avena (Genérico)' },
-      { value: 'cereales_desayuno', label: 'Cereales de desayuno y Avena (Genérico)' },
       { value: 'legumbres', label: 'Legumbres (Genérico)' },
     ]),
     { group: 'Pastas', items: mapFoodsToItems(pastas) },

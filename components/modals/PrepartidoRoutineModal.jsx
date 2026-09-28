@@ -38,54 +38,33 @@ import {
   getTreeGrasaOptions,
 } from '@/config/food-tree-options';
 import { getClinicalCatalogForPlayer } from '@/lib/nutrition/clinical-catalog';
-import { AVAILABLE_MEALS, isMainMeal as checkIsMainMeal } from '@/config/nutrition-days';
+import {
+  AVAILABLE_MEALS,
+  isMainMeal as checkIsMainMeal,
+  getMealTimingBadge,
+  sortPreMatchMealsChronological,
+} from '@/config/nutrition-days';
 
 const SCHEDULE_DETAILS = {
   manana: {
     label: 'Mañana',
     timeWindow: '12:00 - 14:00',
-    description: 'Partidos matinales. La cena anterior actúa como carga nutricional principal (24h previas).',
-    recommendedMeals: ['Cena', 'Desayuno'],
+    description: 'Partidos matinales. Merienda y cena anterior como recarga nutricional (24h previas).',
+    recommendedMeals: ['Merienda', 'Cena', 'Desayuno'],
   },
   tarde: {
     label: 'Tarde',
     timeWindow: '16:00 - 18:30',
-    description: 'Partidos por la tarde. Comida pre-partido como toma clave de recarga.',
-    recommendedMeals: ['Cena', 'Desayuno', 'Comida'],
+    description: 'Partidos por la tarde. Merienda y cena previa como recarga, y comida pre-partido.',
+    recommendedMeals: ['Merienda', 'Cena', 'Desayuno', 'Comida'],
   },
   noche: {
     label: 'Noche',
     timeWindow: '20:00 - 22:00',
-    description: 'Partidos nocturnos. Merienda previa de fácil digestión antes del calentamiento.',
+    description: 'Partidos nocturnos. Cena previa de recarga 24h y merienda previa de fácil digestión.',
     recommendedMeals: ['Cena', 'Desayuno', 'Comida', 'Merienda'],
   },
 };
-
-export function sortPreMatchMealsChronological(scheduleKey, meals = []) {
-  if (!Array.isArray(meals)) return [];
-  let order = ['cena', 'desayuno', 'almuerzo', 'comida', 'merienda', 'post-partido', 'post-entreno'];
-  if (scheduleKey === 'manana') {
-    order = ['cena', 'merienda', 'desayuno', 'almuerzo', 'comida', 'post-partido', 'post-entreno'];
-  }
-  return [...meals].sort((a, b) => {
-    const ia = order.indexOf(String(a).toLowerCase().trim());
-    const ib = order.indexOf(String(b).toLowerCase().trim());
-    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
-  });
-}
-
-export function getMealTimingBadge(scheduleKey, mealName) {
-  const norm = String(mealName).toLowerCase().trim();
-  if (scheduleKey === 'manana') {
-    if (norm === 'cena' || norm === 'merienda') return 'Día anterior · Carga 24h';
-    return 'Día de partido';
-  }
-  if (scheduleKey === 'tarde' || scheduleKey === 'noche') {
-    if (norm === 'cena') return 'Día anterior · Carga 24h';
-    return 'Día de partido';
-  }
-  return 'Día de partido';
-}
 
 /**
  * Extrae el conjunto de valores canónicos y válidos contenidos en las opciones del árbol
