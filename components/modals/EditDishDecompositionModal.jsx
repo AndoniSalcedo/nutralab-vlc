@@ -16,12 +16,17 @@ import ResponsiveModal from './ResponsiveModal';
 import {
   getTreeProteinaOptions,
   getTreeHidratoOptions,
+  getTreeVerduraOptions,
+  getTreeFrutaOptions,
+  getTreeLacteoOptions,
+  getTreeGrasaOptions,
 } from '@/config/food-tree-options';
-import { formatAstToText } from '@/lib/engine/meal-ast';
+import { convertDishToAst } from '@/lib/engine/meal-ast';
+import { getCanonicalFoodLabel } from '@/lib/engine';
 
 function ensureOptionsContain(options, currentValues) {
-  if (!currentValues) return options;
-  const valuesArray = Array.isArray(currentValues) ? currentValues : [currentValues];
+  if (!options) return [];
+  const valuesArray = Array.isArray(currentValues) ? currentValues : currentValues ? [currentValues] : [];
   const allExistingValues = new Set();
   options.forEach((group) => {
     if (group.items) {
@@ -32,15 +37,35 @@ function ensureOptionsContain(options, currentValues) {
   });
 
   const missing = valuesArray.filter((v) => v && !allExistingValues.has(v));
-  if (missing.length === 0) return options;
+  const combined = missing.length > 0
+    ? [
+      {
+        group: 'Valores Actuales Registrados',
+        items: missing.map((m) => ({ value: m, label: m })),
+      },
+      ...options,
+    ]
+    : options;
 
-  return [
-    {
-      group: 'Valores Actuales Registrados',
-      items: missing.map((m) => ({ value: m, label: m })),
-    },
-    ...options,
-  ];
+  // Defensive deduplication across all groups to guarantee Mantine receives unique option values
+  const seenValues = new Set();
+  return combined
+    .map((group) => {
+      if (group.items) {
+        const uniqueItems = group.items.filter((it) => {
+          const val = typeof it === 'string' ? it : it.value;
+          if (!val || seenValues.has(val)) return false;
+          seenValues.add(val);
+          return true;
+        });
+        return { ...group, items: uniqueItems };
+      }
+      const val = typeof group === 'string' ? group : group.value;
+      if (!val || seenValues.has(val)) return null;
+      seenValues.add(val);
+      return group;
+    })
+    .filter((g) => g && (!g.items || g.items.length > 0));
 }
 
 export default function EditDishDecompositionModal({
@@ -52,6 +77,10 @@ export default function EditDishDecompositionModal({
   const [nombre, setNombre] = useState('');
   const [proteina, setProteina] = useState([]);
   const [hidrato, setHidrato] = useState(null);
+  const [verdura, setVerdura] = useState([]);
+  const [fruta, setFruta] = useState([]);
+  const [lacteo, setLacteo] = useState([]);
+  const [grasa, setGrasa] = useState(null);
 
   useEffect(() => {
     if (dish) {
@@ -66,24 +95,43 @@ export default function EditDishDecompositionModal({
         (node.children || []).forEach(visit);
       };
       visit(dish.tree);
-      setProteina(items.filter((item) => item.category === 'proteina').map((item) => item.name));
-      setHidrato(items.find((item) => item.category === 'hidratos')?.name || null);
+
+      setProteina(items.filter((item) => ['proteina', 'proteinas'].includes(item.category)).map((item) => getCanonicalFoodLabel(item.name)));
+      setHidrato(getCanonicalFoodLabel(items.find((item) => ['hidratos', 'hidrato'].includes(item.category))?.name) || null);
+      setVerdura(items.filter((item) => ['verduras', 'verdura'].includes(item.category)).map((item) => getCanonicalFoodLabel(item.name)));
+      setFruta(items.filter((item) => ['frutas', 'fruta'].includes(item.category)).map((item) => getCanonicalFoodLabel(item.name)));
+      setLacteo(items.filter((item) => ['lacteos', 'lacteo'].includes(item.category)).map((item) => getCanonicalFoodLabel(item.name)));
+      setGrasa(getCanonicalFoodLabel(items.find((item) => ['grasas', 'grasa'].includes(item.category))?.name) || null);
     }
   }, [dish]);
 
   const baseProteinaOptions = useMemo(() => getTreeProteinaOptions(), []);
   const baseHidratoOptions = useMemo(() => getTreeHidratoOptions(), []);
+  const baseVerduraOptions = useMemo(() => getTreeVerduraOptions(), []);
+  const baseFrutaOptions = useMemo(() => getTreeFrutaOptions(), []);
+  const baseLacteoOptions = useMemo(() => getTreeLacteoOptions(), []);
+  const baseGrasaOptions = useMemo(() => getTreeGrasaOptions(), []);
 
   const proteinaOptions = useMemo(() => ensureOptionsContain(baseProteinaOptions, proteina), [baseProteinaOptions, proteina]);
   const hidratoOptions = useMemo(() => ensureOptionsContain(baseHidratoOptions, hidrato), [baseHidratoOptions, hidrato]);
+  const verduraOptions = useMemo(() => ensureOptionsContain(baseVerduraOptions, verdura), [baseVerduraOptions, verdura]);
+  const frutaOptions = useMemo(() => ensureOptionsContain(baseFrutaOptions, fruta), [baseFrutaOptions, fruta]);
+  const lacteoOptions = useMemo(() => ensureOptionsContain(baseLacteoOptions, lacteo), [baseLacteoOptions, lacteo]);
+  const grasaOptions = useMemo(() => ensureOptionsContain(baseGrasaOptions, grasa), [baseGrasaOptions, grasa]);
+
   function handleSave() {
-    const children = [
-      ...(hidrato ? [{ type: 'food', category: 'hidratos', name: hidrato }] : []),
-      ...proteina.map((name) => ({ type: 'food', category: 'proteina', name })),
-    ];
+    const dishLabel = (nombre || dish?.nombre || 'Plato').trim();
     const updated = {
-      nombre: nombre.trim(),
-      tree: { type: 'allOf', label: nombre.trim() || 'Plato', children },
+      nombre: dishLabel,
+      tree: convertDishToAst({
+        nombre: dishLabel,
+        hidrato,
+        proteina,
+        verdura,
+        fruta,
+        lacteo,
+        grasa,
+      }),
     };
 
     onSave(updated);
@@ -98,7 +146,7 @@ export default function EditDishDecompositionModal({
         <Group gap="xs">
           <IconCooking size={18} />
           <Text fw={700} size="sm" c="dark.5">
-            Ajustar desglose taxonómico del plato
+            Ajustar ingredientes y desglose del plato
           </Text>
         </Group>
       }
@@ -118,7 +166,9 @@ export default function EditDishDecompositionModal({
           <Text size="xs" c="dimmed" fw={600} tt="uppercase" style={{ letterSpacing: '0.5px' }}>
             Plato del Comedor
           </Text>
-          <Text size="sm" fw={700} c="dark.4">{formatAstToText(dish?.tree) || nombre}</Text>
+          <Text size="sm" fw={700} c="dark.5">
+            {dish?.nombre || nombre}
+          </Text>
         </Paper>
 
         <Stack gap="sm">
@@ -164,10 +214,87 @@ export default function EditDishDecompositionModal({
             />
           </Box>
 
-          <Text size="xs" c="dimmed">
-            Para editar este plato completo o representar alternativas, utiliza el AST generado y revisa la pauta en lugar de simplificarlo a un formulario de dos campos.
-          </Text>
+          {/* Verduras y Hortalizas */}
+          <Box>
+            <Group gap={6} mb={4}>
+              <Box style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--mantine-color-teal-6)' }} />
+              <Text size="xs" fw={600} c="dark.4">
+                Verduras y Hortalizas
+              </Text>
+            </Group>
+            <MultiSelect
+              data={verduraOptions}
+              value={verdura}
+              onChange={setVerdura}
+              placeholder="Seleccionar verduras (ej. Tomate, Calabacín, Espinacas, Brócoli...)"
+              searchable
+              clearable
+              nothingFoundMessage="No se encontró ninguna verdura"
+              radius="md"
+              size="xs"
+            />
+          </Box>
 
+          {/* Frutas */}
+          <Box>
+            <Group gap={6} mb={4}>
+              <Box style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--mantine-color-orange-6)' }} />
+              <Text size="xs" fw={600} c="dark.4">
+                Fruta (Postres o fresca)
+              </Text>
+            </Group>
+            <MultiSelect
+              data={frutaOptions}
+              value={fruta}
+              onChange={setFruta}
+              placeholder="Seleccionar fruta (ej. Fruta fresca genérica, Plátano, Manzana...)"
+              searchable
+              clearable
+              nothingFoundMessage="No se encontró ninguna fruta"
+              radius="md"
+              size="xs"
+            />
+          </Box>
+
+          {/* Lácteos y Yogures */}
+          <Box>
+            <Group gap={6} mb={4}>
+              <Box style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--mantine-color-cyan-6)' }} />
+              <Text size="xs" fw={600} c="dark.4">
+                Lácteos y Yogures (Postres o complementos)
+              </Text>
+            </Group>
+            <MultiSelect
+              data={lacteoOptions}
+              value={lacteo}
+              onChange={setLacteo}
+              placeholder="Seleccionar lácteo (ej. Yogur proteico natural, Kéfir, Queso fresco...)"
+              searchable
+              clearable
+              nothingFoundMessage="No se encontró ningún lácteo"
+              radius="md"
+              size="xs"
+            />
+          </Box>
+
+          {/* Grasa saludable */}
+          <Box>
+            <Group gap={6} mb={4}>
+              <Box style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--mantine-color-yellow-6)' }} />
+              <Text size="xs" fw={600} c="dark.4">
+                Grasa de cocinado / aliño
+              </Text>
+            </Group>
+            <Select
+              data={grasaOptions}
+              value={grasa}
+              onChange={setGrasa}
+              placeholder="AOVE, Aguacate, Frutos secos o sin grasa"
+              clearable
+              radius="md"
+              size="xs"
+            />
+          </Box>
         </Stack>
 
         <Group justify="flex-end" gap="xs" mt="xs">

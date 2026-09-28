@@ -11,7 +11,6 @@ import {
   Textarea,
   Alert,
   Box,
-  Divider,
 } from '@mantine/core';
 import ResponsiveModal from './ResponsiveModal';
 import { notifications } from '@mantine/notifications';
@@ -174,7 +173,7 @@ export default function EditMealPatternModal({
                 Rotación variada (pauta abierta)
               </Text>
               <Text size="xs" c="dimmed">
-                El jugador rota libremente entre las opciones aptas y saludables de la cocina sin restricciones fijas.
+                Sin pauta fija prescrita. El motor rotará libremente entre opciones aptas y equilibradas (menú de comedor si está disponible o catálogo general).
               </Text>
             </Box>
             <Switch
@@ -238,40 +237,39 @@ export default function EditMealPatternModal({
           </Paper>
         )}
 
-        {!isComplete ? (
-          <Stack gap="sm">
-            <Text size="xs" fw={700} c="dimmed" tt="uppercase">
-              Estructura de la pauta
+        <Paper p="sm" withBorder radius="md" bg={isComplete ? 'teal.0' : 'gray.0'} style={{ borderColor: isComplete ? 'var(--mantine-color-teal-2)' : undefined }}>
+          <Group justify="space-between" align="center" mb={4}>
+            <Text size="11px" fw={700} c="dimmed" tt="uppercase">
+              Resumen de la pauta ({mealName})
             </Text>
-            <Text size="sm" c="dark.7">{value?.tree ? value.label || aiText : 'Usa el asistente para crear la pauta con allOf/oneOf.'}</Text>
-          </Stack>
-        ) : (
-          <Box py="md" style={{ textAlign: 'center' }}>
-            <Text size="sm" c="teal.8" fw={500}>
-              ● Esta toma utilizará la rotación completa del buffet oficial del club.
+            <Text size="11px" fw={600} c={isMainMeal ? 'blue.7' : 'dimmed'}>
+              ● {isMainMeal ? 'Comida principal' : 'Toma ligera / secundaria'}
             </Text>
-          </Box>
-        )}
-
-        <Divider />
-
-        {/* Resumen tipográfico de la pauta */}
-        <Box>
-          <Text size="xs" fw={700} c="dimmed" mb={4}>
-            Resumen de la toma configurada:
-          </Text>
-          <Text size="xs" mb={3}>
-            <Text span fw={600} c={isMainMeal ? 'blue.8' : 'dimmed'}>● Jerarquía: </Text>
-            <Text span c="dark.7" fw={500}>{isMainMeal ? 'Comida principal' : 'Toma ligera / secundaria'}</Text>
-          </Text>
+          </Group>
           {isComplete ? (
-            <Text size="xs" c="teal.8" fw={600}>
-              ● Rotación variada y equilibrada
-            </Text>
+            <Stack gap={2}>
+              <Text size="xs" c="teal.9" fw={600}>
+                ● Rotación variada (pauta abierta)
+              </Text>
+              <Text size="11px" c="dimmed">
+                El motor seleccionará combinaciones equilibradas y rotatorias según las tolerancias del jugador (menú de comedor si está disponible o catálogo taxonómico general).
+              </Text>
+            </Stack>
+          ) : tree ? (
+            <Stack gap={2}>
+              <Text size="xs" fw={700} c="dark.8">
+                {astLabel}
+              </Text>
+              <Text size="11px" c="dimmed">
+                Pauta AST estructurada (conjunciones y opciones disyuntivas).
+              </Text>
+            </Stack>
           ) : (
-            <Text size="xs" c="dark.7">{value?.tree ? value.label || aiText : 'Sin pauta definida; usa el asistente para construir el AST.'}</Text>
+            <Text size="xs" c="dimmed">
+              {aiText.trim() ? aiText.trim() : 'Sin pauta definida; escribe en el asistente o activa rotación variada.'}
+            </Text>
           )}
-        </Box>
+        </Paper>
 
         {/* Acciones */}
         <Group justify="flex-end" gap="xs" mt="sm">

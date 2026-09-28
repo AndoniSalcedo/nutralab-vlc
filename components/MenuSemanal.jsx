@@ -24,6 +24,7 @@ import EditDishDecompositionModal from '@/components/modals/EditDishDecompositio
 import { formatAstToText } from '@/lib/engine/meal-ast';
 import NothingFound from '@/components/NothingFound';
 import { BentoCard } from '@/components/BentoItem';
+import { getCanonicalFoodLabel } from '@/lib/engine';
 
 // Standard Spanish weekday names to match database records
 export const WEEKDAY_ORDER = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
@@ -97,6 +98,80 @@ function isServiceEvent(text) {
   );
 }
 
+function getDishCategories(dishTree) {
+  if (!dishTree) return null;
+  const items = [];
+  const visit = (node) => {
+    if (!node) return;
+    if (node.type === 'food') {
+      items.push(node);
+      return;
+    }
+    (node.children || []).forEach(visit);
+  };
+  visit(dishTree);
+  if (items.length === 0) return null;
+  const proteina = items.filter((i) => ['proteina', 'proteinas'].includes(i.category)).map((i) => i.name);
+  const hidrato = items.filter((i) => ['hidrato', 'hidratos'].includes(i.category)).map((i) => i.name);
+  const verdura = items.filter((i) => ['verdura', 'verduras'].includes(i.category)).map((i) => i.name);
+  const fruta = items.filter((i) => ['fruta', 'frutas'].includes(i.category)).map((i) => i.name);
+  const lacteo = items.filter((i) => ['lacteo', 'lacteos'].includes(i.category)).map((i) => i.name);
+  const grasa = items.filter((i) => ['grasa', 'grasas'].includes(i.category)).map((i) => i.name);
+
+  const hasAny = proteina.length || hidrato.length || verdura.length || fruta.length || lacteo.length || grasa.length;
+  if (!hasAny) return null;
+
+  return { proteina, hidrato, verdura, fruta, lacteo, grasa };
+}
+
+function DishCategoryDots({ dishTree, size = '11px' }) {
+  if (!dishTree) return null;
+  const cats = getDishCategories(dishTree);
+  if (!cats) {
+    const text = formatAstToText(dishTree);
+    return text ? (
+      <Group gap={6} wrap="wrap" style={{ marginTop: 2 }}>
+        <Text size="xs" c="dark.6" fw={500} style={{ fontSize: size }}>{text}</Text>
+      </Group>
+    ) : null;
+  }
+
+  return (
+    <Group gap={6} wrap="wrap" style={{ marginTop: 2 }}>
+      {cats.proteina.map((p, idx) => (
+        <Text key={`p-${idx}`} size="xs" c="red.8" fw={600} style={{ fontSize: size }}>
+          ● {getCanonicalFoodLabel(p)}
+        </Text>
+      ))}
+      {cats.hidrato.map((h, idx) => (
+        <Text key={`h-${idx}`} size="xs" c="blue.8" fw={600} style={{ fontSize: size }}>
+          ● {getCanonicalFoodLabel(h)}
+        </Text>
+      ))}
+      {cats.verdura.map((v, idx) => (
+        <Text key={`v-${idx}`} size="xs" c="teal.8" fw={500} style={{ fontSize: size }}>
+          ● {getCanonicalFoodLabel(v)}
+        </Text>
+      ))}
+      {cats.fruta.map((f, idx) => (
+        <Text key={`f-${idx}`} size="xs" c="orange.8" fw={600} style={{ fontSize: size }}>
+          ● {getCanonicalFoodLabel(f)}
+        </Text>
+      ))}
+      {cats.lacteo.map((l, idx) => (
+        <Text key={`l-${idx}`} size="xs" c="cyan.8" fw={600} style={{ fontSize: size }}>
+          ● {getCanonicalFoodLabel(l)}
+        </Text>
+      ))}
+      {cats.grasa.map((g, idx) => (
+        <Text key={`g-${idx}`} size="xs" c="yellow.9" fw={500} style={{ fontSize: size }}>
+          ● {getCanonicalFoodLabel(g)}
+        </Text>
+      ))}
+    </Group>
+  );
+}
+
 function AgendaDishLine({ label, value, serviceTree = null }) {
   if (!value || value.toLowerCase() === 'sin registrar') return null;
   const options = value.split(/\s*\/\s*/);
@@ -115,11 +190,7 @@ function AgendaDishLine({ label, value, serviceTree = null }) {
               <Text size="xs" fw={isEvent ? 600 : 500} c={isEvent ? 'dimmed' : 'dark.4'} style={{ lineHeight: 1.3 }}>
                 {opt}
               </Text>
-              {dishTree && (
-                <Group gap={6} wrap="wrap" style={{ marginTop: 1 }}>
-                  <Text size="xs" c="dark.6" fw={500} style={{ fontSize: '10px' }}>{formatAstToText(dishTree)}</Text>
-                </Group>
-              )}
+              <DishCategoryDots dishTree={dishTree} size="10px" />
             </Box>
           );
         })}
@@ -245,11 +316,7 @@ function HeroDishSection({ title, label, value, color, serviceTree = null, onEdi
                 <Text size="sm" fw={isEvent ? 700 : 600} c={isEvent ? 'dimmed' : 'dark.4'} style={{ overflowWrap: 'anywhere', lineHeight: 1.4 }}>
                   {opt}
                 </Text>
-                {dishTree ? (
-                  <Group gap="xs" wrap="wrap" style={{ marginTop: 2 }}>
-                    <Text size="xs" c="dark.6" fw={500} style={{ fontSize: '11px' }}>{formatAstToText(dishTree)}</Text>
-                  </Group>
-                ) : null}
+                <DishCategoryDots dishTree={dishTree} size="11px" />
               </Stack>
               {onEditDish && !isEvent && (
                 <Tooltip label="Ajustar ingredientes de este plato" withArrow position="left">

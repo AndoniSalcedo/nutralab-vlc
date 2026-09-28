@@ -111,19 +111,66 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
     const day = currentDias.find((d) => d.dia === dayName);
     if (!day) return;
 
+    const normalizedTarget = String(updatedDish.nombre || '').toLowerCase().trim();
+
     ['comida', 'cena'].forEach((service) => {
       const serviceData = day[service];
-      if (!serviceData?.tree) return;
-      const root = serviceData.tree;
-      const visit = (node) => {
-        if (!node) return node;
-        if (node.type === 'allOf' && String(node.label || '').toLowerCase().trim() === String(updatedDish.nombre || '').toLowerCase().trim()) {
-          return updatedDish.tree;
+      if (!serviceData) return;
+
+      // Identify course if the dish text appears in primero, segundo, or postre
+      let matchedCourse = null;
+      for (const course of ['primero', 'segundo', 'postre']) {
+        const text = serviceData[course];
+        if (text && typeof text === 'string') {
+          const names = text.split('/').map((s) => s.trim().toLowerCase());
+          if (names.includes(normalizedTarget)) {
+            matchedCourse = course;
+            break;
+          }
         }
-        if (!Array.isArray(node.children)) return node;
-        return { ...node, children: node.children.map(visit) };
-      };
-      serviceData.tree = visit(root);
+      }
+
+      let replaced = false;
+      if (serviceData.tree) {
+        const root = serviceData.tree;
+        const visit = (node) => {
+          if (!node) return node;
+          if (node.type === 'allOf' && String(node.label || '').toLowerCase().trim() === normalizedTarget) {
+            replaced = true;
+            return {
+              ...updatedDish.tree,
+              ...(node.course ? { course: node.course } : {}),
+            };
+          }
+          if (!Array.isArray(node.children)) return node;
+          return { ...node, children: node.children.map(visit) };
+        };
+        serviceData.tree = visit(root);
+      }
+
+      // If the dish wasn't in the tree yet, append it under the correct course
+      if (!replaced && matchedCourse) {
+        if (!serviceData.tree || typeof serviceData.tree !== 'object') {
+          serviceData.tree = { type: 'allOf', label: 'Servicio de menú', children: [] };
+        }
+        if (!Array.isArray(serviceData.tree.children)) {
+          serviceData.tree.children = [];
+        }
+        let courseNode = serviceData.tree.children.find(
+          (c) => c.course === matchedCourse || String(c.label || '').toLowerCase() === matchedCourse
+        );
+        if (!courseNode) {
+          courseNode = { type: 'oneOf', label: matchedCourse, course: matchedCourse, children: [] };
+          serviceData.tree.children.push(courseNode);
+        }
+        if (!Array.isArray(courseNode.children)) {
+          courseNode.children = [];
+        }
+        courseNode.children.push({
+          ...updatedDish.tree,
+          ...(matchedCourse === 'postre' ? { course: 'postre' } : {}),
+        });
+      }
     });
 
     try {

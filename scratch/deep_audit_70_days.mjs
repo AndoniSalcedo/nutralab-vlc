@@ -4,6 +4,7 @@ import { withLatestMeasurement } from './lib/metrics/player.js';
 import { generarDatosPlan } from './lib/engine/generator.js';
 import { getFoodCategoryBranch } from './lib/engine/food-tree.js';
 import { getClinicalCatalogForPlayer } from './lib/nutrition/clinical-catalog.js';
+import { migratePlayerRecord, migrateMenu } from '../scripts/migrate-meals-to-ast.mjs';
 
 // 1. Conexión a Supabase
 const envContent = fs.readFileSync('.env.local', 'utf8');
@@ -79,7 +80,7 @@ async function runDeepAudit() {
   const startTime = Date.now();
 
   // 1. Cargar datos
-  const { data: jugadoresRaw, error: errJug } = await supabase
+  const { data: jugadoresDb, error: errJug } = await supabase
     .from('jugadores')
     .select('*, equipos(configuracion_nutricional)');
   if (errJug) throw errJug;
@@ -88,13 +89,17 @@ async function runDeepAudit() {
   const { data: pesajes } = await supabase.from('pesajes').select('*');
 
   // Menús disponibles en BD con días reales
-  const { data: rawMenus } = await supabase
+  const { data: rawMenusDb } = await supabase
     .from('menu_semanal')
     .select('*')
     .order('id', { ascending: false });
 
+  // Normalizar registros hacia AST canónico (simulando migración de BD)
+  const jugadoresRaw = (jugadoresDb || []).map((j) => migratePlayerRecord(j));
+  const rawMenus = (rawMenusDb || []).map((m) => migrateMenu(m));
+
   const validMenus = (rawMenus || []).filter((m) =>
-    Array.isArray(m.dias) && m.dias.some((d) => d.comida?.platos_desglosados?.length > 0 || d.cena?.platos_desglosados?.length > 0)
+    Array.isArray(m.dias) && m.dias.some((d) => d.comida?.tree || d.cena?.tree || d.comida?.platos_desglosados?.length > 0 || d.cena?.platos_desglosados?.length > 0)
   );
 
   console.log(`✓ Total Jugadores: ${jugadoresRaw.length}`);
@@ -317,10 +322,8 @@ async function runDeepAudit() {
           );
 
           if (isPreMatchMeal) {
-            let fatCount = 0;
             for (const item of parsed.items) {
               if (item.branch.fatBranch || /aove|aceite|mantequilla|frito/i.test(item.name)) {
-                fatCount++;
                 if (item.grams && item.grams > 35) {
                   report.incongruenciasEstructura.grasaElevadaEnPrepartido.push({
                     jugador: playerReady.nombre,

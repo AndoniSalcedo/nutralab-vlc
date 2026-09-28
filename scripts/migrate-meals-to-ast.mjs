@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
-import { convertLegacyToAst } from '../lib/engine/meal-ast.js';
+import { convertLegacyToAst, validateMealAst } from '../lib/engine/meal-ast.js';
 
 const PAGE_SIZE = 500;
 const DRY_RUN = !process.argv.includes('--write');
@@ -20,10 +20,17 @@ function readEnvFile() {
   return envVars;
 }
 
-function migrateDish(dish) {
-  if (!dish) return dish;
+export function migrateDish(dish) {
+  if (!dish) return null;
   const existingTree = dish.tree?.type ? dish.tree : null;
-  if (existingTree) return { nombre: dish.nombre, curso: dish.curso, tree: existingTree };
+  if (existingTree) {
+    if (existingTree.type === 'food' && (existingTree.name || existingTree.label)) {
+      return { nombre: dish.nombre, curso: dish.curso, tree: existingTree };
+    }
+    if ((existingTree.type === 'allOf' || existingTree.type === 'oneOf') && Array.isArray(existingTree.children) && existingTree.children.length > 0) {
+      return { nombre: dish.nombre, curso: dish.curso, tree: existingTree };
+    }
+  }
   if (Array.isArray(dish.alternativas) && dish.alternativas.length > 0) {
     throw new Error(`El plato "${dish.nombre || 'sin nombre'}" tiene alternativas legacy que requieren revisión manual.`);
   }
@@ -38,10 +45,11 @@ function migrateDish(dish) {
       if (name && name !== 'Sin grasa añadida') children.push({ type: 'food', category, name: String(name) });
     });
   }
+  if (children.length === 0) return null;
   return { nombre: dish.nombre, curso: dish.curso, tree: { type: 'allOf', label: dish.nombre || 'Plato', children } };
 }
 
-function migrateService(service) {
+export function migrateService(service) {
   if (!service || typeof service !== 'object') return service;
   const legacyDishes = Array.isArray(service.platos_desglosados) ? service.platos_desglosados : [];
   const dishes = legacyDishes.map(migrateDish).filter((dish) => dish?.tree);
@@ -51,7 +59,13 @@ function migrateService(service) {
     segundo: service.segundo || null,
     postre: service.postre || null,
   };
-  if (dishes.length === 0 && service.tree?.type) return { ...presentation, tree: service.tree };
+  if (dishes.length === 0) {
+    if (service.tree?.type) {
+      const val = validateMealAst({ type: 'meal', tree: service.tree });
+      if (val.valid) return { ...presentation, tree: service.tree };
+    }
+    return presentation;
+  }
   const courses = [];
   for (const course of ['primero', 'segundo', 'postre']) {
     const options = dishes.filter((dish) => dish.curso === course).map((dish) => ({
@@ -66,17 +80,29 @@ function migrateService(service) {
     : presentation;
 }
 
-function migratePlayerMeal(meal) {
+export function migratePlayerMeal(meal) {
   if (!meal) return null;
-  if (meal.type === 'complete' || meal.type === 'meal') return meal;
-  if (meal.tree && ['food', 'allOf', 'oneOf'].includes(meal.tree.type)) return convertLegacyToAst(meal);
-  if (typeof meal === 'string' || Array.isArray(meal.alternativas) || meal.isComplete === true) {
-    return convertLegacyToAst(meal);
+  let normalized;
+  if (meal.type === 'complete') {
+    normalized = meal;
+  } else if (meal.type === 'meal' && meal.tree) {
+    normalized = meal;
+  } else if (meal.tree || ['allOf', 'oneOf', 'food'].includes(meal.type)) {
+    normalized = convertLegacyToAst(meal);
+  } else if (typeof meal === 'string' || Array.isArray(meal.alternativas) || meal.isComplete === true || (typeof meal === 'object' && meal !== null)) {
+    normalized = convertLegacyToAst(meal);
+  } else {
+    throw new Error('La pauta no tiene AST ni una estructura legacy reconocida para conversión.');
   }
-  throw new Error('La pauta no tiene AST ni una estructura legacy reconocida para conversión.');
+
+  const validation = validateMealAst(normalized);
+  if (!validation.valid) {
+    throw new Error(`Pauta AST no válida: ${validation.error}`);
+  }
+  return normalized;
 }
 
-function migratePlayerRecord(player) {
+export function migratePlayerRecord(player) {
   const issues = [];
   const recommendations = {};
   for (const [mealName, meal] of Object.entries(player.recomendaciones_defecto || {})) {
@@ -112,10 +138,10 @@ function migratePlayerRecord(player) {
     }
     preMatch[schedule] = { ...rest, recomendaciones: migratedRecs };
   }
-  return { recomendaciones_defecto: recommendations, config_prepartido: preMatch, migrationIssues: issues };
+  return { ...player, recomendaciones_defecto: recommendations, config_prepartido: preMatch, migrationIssues: issues };
 }
 
-function migrateMenu(menu) {
+export function migrateMenu(menu) {
   const issues = [];
   const dias = (menu.dias || []).map((day) => {
     const nextDay = { dia: day.dia };
@@ -129,7 +155,7 @@ function migrateMenu(menu) {
     }
     return nextDay;
   });
-  return { dias, migrationIssues: issues };
+  return { ...menu, dias, migrationIssues: issues };
 }
 
 async function fetchAll(supabase, table, select) {
@@ -149,6 +175,16 @@ async function fetchAll(supabase, table, select) {
   }
 }
 
+function canonicalJson(obj) {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(canonicalJson);
+  const sorted = {};
+  for (const key of Object.keys(obj).sort()) {
+    sorted[key] = canonicalJson(obj[key]);
+  }
+  return sorted;
+}
+
 async function migrateTable({ supabase, table, idColumn, select, transform, backupRows }) {
   const rows = await fetchAll(supabase, table, select);
   let updated = 0;
@@ -161,7 +197,7 @@ async function migrateTable({ supabase, table, idColumn, select, transform, back
       const beforeRelevant = table === 'jugadores'
         ? { recomendaciones_defecto: row.recomendaciones_defecto || {}, config_prepartido: row.config_prepartido || {} }
         : { dias: row.dias || [] };
-      if (JSON.stringify(payload) === JSON.stringify(beforeRelevant)) {
+      if (JSON.stringify(canonicalJson(payload)) === JSON.stringify(canonicalJson(beforeRelevant))) {
         unchanged++;
         continue;
       }
@@ -193,9 +229,9 @@ async function main() {
     idColumn: 'id',
     select: 'id,nombre,recomendaciones_defecto,config_prepartido',
     transform: (player) => {
-      const { migrationIssues, ...payload } = migratePlayerRecord(player);
+      const { migrationIssues, recomendaciones_defecto, config_prepartido } = migratePlayerRecord(player);
       if (migrationIssues.length > 0) throw new Error(JSON.stringify(migrationIssues));
-      return payload;
+      return { recomendaciones_defecto, config_prepartido };
     },
     backupRows,
   });
@@ -205,9 +241,9 @@ async function main() {
     idColumn: 'id',
     select: 'id,semana,dias',
     transform: (menu) => {
-      const { migrationIssues, ...payload } = migrateMenu(menu);
+      const { migrationIssues, dias } = migrateMenu(menu);
       if (migrationIssues.length > 0) throw new Error(JSON.stringify(migrationIssues));
-      return payload;
+      return { dias };
     },
     backupRows,
   });
@@ -226,7 +262,14 @@ async function main() {
   if (report.totalErrors > 0) process.exitCode = 1;
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+const isMainScript = process.argv[1] && (
+  process.argv[1].endsWith('migrate-meals-to-ast.mjs') ||
+  process.argv[1].endsWith('migrate-meals-to-ast')
+);
+
+if (isMainScript) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}

@@ -17,12 +17,32 @@ function mapFoodsToItems(foods, seen = new Set()) {
   }, []);
 }
 
-function genericOptions(items) {
+function genericOptions(items, seen = null) {
+  if (seen) {
+    items.forEach((it) => {
+      const val = typeof it === 'string' ? it : it.value;
+      if (val) seen.add(val);
+    });
+  }
   return [{ group: 'Opciones Genéricas del Árbol', items }];
 }
 
 export function getTreeProteinaOptions() {
   const seen = new Set();
+  const generics = genericOptions([
+    { value: 'Pollo (Genérico)', label: 'Pollo (Genérico)' },
+    { value: 'Pavo (Genérico)', label: 'Pavo (Genérico)' },
+    { value: 'Conejo', label: 'Conejo' },
+    { value: 'Ternera / Vacuno (Genérico)', label: 'Ternera / Vacuno (Genérico)' },
+    { value: 'Cerdo fresco (Genérico)', label: 'Cerdo fresco (Genérico)' },
+    { value: 'Embutidos y Fiambres (Genérico)', label: 'Embutidos y Fiambres (Genérico)' },
+    { value: 'Pescado blanco (Genérico)', label: 'Pescado blanco (Genérico)' },
+    { value: 'Pescado azul (Genérico)', label: 'Pescado azul (Genérico)' },
+    { value: 'Marisco (Genérico)', label: 'Marisco (Genérico)' },
+    { value: 'Huevos (Genérico)', label: 'Huevos (Genérico)' },
+    { value: 'Proteína vegetal (Genérico)', label: 'Proteína vegetal (Genérico)' },
+  ], seen);
+
   const pollo = FOODS_CRUDO.filter((f) => hasTreePath(f, 'pollo'));
   const pavo = FOODS_CRUDO.filter((f) => hasTreePath(f, 'pavo'));
   const conejo = FOODS_CRUDO.filter((f) => hasTreePath(f, 'conejo'));
@@ -35,19 +55,7 @@ export function getTreeProteinaOptions() {
   const vegetalHuevos = FOODS_CRUDO.filter((f) => hasTreePath(f, 'huevos') || hasTreePath(f, 'vegetal_proteina'));
 
   return [
-    ...genericOptions([
-      { value: 'pollo', label: 'Pollo (Genérico)' },
-      { value: 'pavo', label: 'Pavo (Genérico)' },
-      { value: 'conejo', label: 'Conejo' },
-      { value: 'vacuno', label: 'Ternera / Vacuno (Genérico)' },
-      { value: 'cerdo', label: 'Cerdo fresco (Genérico)' },
-      { value: 'embutidos_fiambres', label: 'Embutidos y Fiambres (Genérico)' },
-      { value: 'pescado_blanco', label: 'Pescado blanco (Genérico)' },
-      { value: 'pescado_azul', label: 'Pescado azul (Genérico)' },
-      { value: 'marisco', label: 'Marisco (Genérico)' },
-      { value: 'huevos', label: 'Huevos (Genérico)' },
-      { value: 'vegetal_proteina', label: 'Proteína vegetal (Genérico)' },
-    ]),
+    ...generics,
     { group: 'Pollo', items: mapFoodsToItems(pollo, seen) },
     { group: 'Pavo y Conejo', items: mapFoodsToItems([...pavo, ...conejo], seen) },
     { group: 'Ternera y Carnes Rojas', items: mapFoodsToItems(ternera, seen) },
@@ -75,29 +83,31 @@ export function getTreeHidratoOptions() {
   const granos = FOODS_CRUDO.filter((f) => hasTreePath(f, 'otros_granos'));
   const legumbres = FOODS_CRUDO.filter((f) => hasTreePath(f, 'legumbres'));
 
+  const generics = genericOptions([
+    { value: 'Pasta (Grupo genérico)', label: 'Pasta (Grupo genérico)' },
+    { value: 'Arroz (Grupo genérico)', label: 'Arroz (Grupo genérico)' },
+    { value: 'Panes (Grupo genérico)', label: 'Panes (Grupo genérico)' },
+    { value: 'Tubérculos', label: 'Tubérculos (Genérico)' },
+    { value: 'Otros granos culinarios', label: 'Otros granos culinarios (Quinoa, Cuscús, Bulgur)' },
+    { value: 'Cereales y Avena (Genérico)', label: 'Cereales y Avena (Genérico)' },
+    { value: 'Legumbres', label: 'Legumbres (Genérico)' },
+  ], seen);
+
   return [
-    ...genericOptions([
-      { value: 'pasta', label: 'Pasta (Genérica adaptable)' },
-      { value: 'arroz', label: 'Arroz (Genérico adaptable)' },
-      { value: 'panes', label: 'Panes (Genérico adaptable)' },
-      { value: 'tuberculos', label: 'Tubérculos (Genérico)' },
-      { value: 'otros_granos', label: 'Otros granos culinarios (Quinoa, Cuscús, Bulgur)' },
-      { value: 'cereales', label: 'Cereales y Avena (Genérico)' },
-      { value: 'legumbres', label: 'Legumbres (Genérico)' },
-    ]),
-    { group: 'Pastas', items: mapFoodsToItems(pastas) },
-    { group: 'Arroces', items: mapFoodsToItems(arroces) },
-    { group: 'Tubérculos', items: mapFoodsToItems(tuberculos) },
-    { group: 'Panes y Masas', items: mapFoodsToItems(panes) },
-    { group: 'Granos Culinarios (Quinoa, Cuscús...)', items: mapFoodsToItems(granos) },
-    { group: 'Cereales y Avena', items: mapFoodsToItems(cereales) },
-    { group: 'Legumbres', items: mapFoodsToItems(legumbres) },
+    ...generics,
+    { group: 'Pastas', items: mapFoodsToItems(pastas, seen) },
+    { group: 'Arroces', items: mapFoodsToItems(arroces, seen) },
+    { group: 'Tubérculos', items: mapFoodsToItems(tuberculos, seen) },
+    { group: 'Panes y Masas', items: mapFoodsToItems(panes, seen) },
+    { group: 'Granos Culinarios (Quinoa, Cuscús...)', items: mapFoodsToItems(granos, seen) },
+    { group: 'Cereales y Avena', items: mapFoodsToItems(cereales, seen) },
+    { group: 'Legumbres', items: mapFoodsToItems(legumbres, seen) },
   ];
 }
 
 export function getTreeVerduraOptions() {
   return [
-    ...genericOptions([{ value: 'verduras', label: 'Verduras variadas (Genérico)' }]),
+    ...genericOptions([{ value: 'Verduras variadas', label: 'Verduras variadas (Genérico)' }]),
     { group: 'Verduras de Hoja Verde', items: mapFoodsToItems(FOODS_CRUDO.filter((f) => hasTreePath(f, 'hojas_verdes'))) },
     { group: 'Verduras y Hortalizas', items: mapFoodsToItems(FOODS_CRUDO.filter((f) => hasTreePath(f, 'hortalizas'))) },
   ];
@@ -108,7 +118,7 @@ export function getTreeFrutaOptions() {
   const desecadas = FOODS_CRUDO.filter((f) => hasTreePath(f, 'desecadas'));
 
   return [
-    ...genericOptions([{ value: 'frutas', label: 'Fruta fresca / de temporada (Genérica)' }]),
+    ...genericOptions([{ value: 'Fruta fresca', label: 'Fruta fresca / de temporada (Genérica)' }]),
     { group: 'Frutas Frescas', items: mapFoodsToItems(frescas) },
     { group: 'Frutas Desecadas y Compotas', items: mapFoodsToItems(desecadas) },
   ];
@@ -121,9 +131,9 @@ export function getTreeLacteoOptions() {
 
   return [
     ...genericOptions([
-      { value: 'yogures', label: 'Yogures (Genérico adaptable)' },
-      { value: 'leches', label: 'Leches (Genérico adaptable)' },
-      { value: 'quesos', label: 'Quesos (Genérico adaptable)' },
+      { value: 'Yogures (Grupo genérico)', label: 'Yogures (Grupo genérico)' },
+      { value: 'Leches (Grupo genérico)', label: 'Leches (Grupo genérico)' },
+      { value: 'Quesos (Grupo genérico)', label: 'Quesos (Grupo genérico)' },
     ]),
     { group: 'Yogures y Kéfir', items: mapFoodsToItems(yogures) },
     { group: 'Quesos', items: mapFoodsToItems(quesos) },

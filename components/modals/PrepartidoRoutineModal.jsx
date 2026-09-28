@@ -68,8 +68,7 @@ function buildMealPatternData(mealName, mealData = {}) {
 }
 
 function getMealSummaryText(mealData) {
-  if (!mealData) return 'Rotación variada (buffet oficial del club)';
-  if (mealData.type === 'complete') return 'Rotación variada (buffet oficial del club)';
+  if (!mealData || mealData.type === 'complete') return 'Rotación variada (pauta abierta)';
   return formatAstToText(mealData) || 'Sin pauta definida';
 }
 
@@ -187,13 +186,13 @@ function SingleMealPautaEditor({
         <Group justify="space-between" align="center">
           <Box style={{ flex: 1 }}>
             <Text size="xs" fw={700} c={isComplete ? 'teal.9' : 'dark.7'}>
-              Rotación variada (buffet oficial del club)
+              Rotación variada (pauta abierta)
             </Text>
             <Text size="11px" c="dimmed">
-              El jugador selecciona libremente entre las opciones aptas y de fácil digestión de la cocina del equipo.
+              Sin pauta fija. El motor rota entre opciones aptas y equilibradas (menú de comedor si está disponible o catálogo general).
             </Text>
           </Box>
-                        <Switch
+          <Switch
             checked={isComplete}
             onChange={(e) => onChange(e.currentTarget.checked
               ? { type: 'complete', raw: mealData.raw || '', label: 'Rotación variada', isMainMeal, unrecognized: [] }
@@ -204,7 +203,7 @@ function SingleMealPautaEditor({
         </Group>
       </Paper>
 
-      {/* 3. Configuración de Componentes (Asistente IA + MultiSelects filtrados por el perfil clínico del jugador) */}
+      {/* 3. Configuración de Componentes (Asistente IA + AST estructurado) */}
       {!isComplete ? (
         <Stack gap="xs">
           {/* Asistente IA de Clasificación */}
@@ -254,36 +253,31 @@ function SingleMealPautaEditor({
           </Paper>
 
           {mealData?.tree && (
-            <Paper p="xs" withBorder radius="sm" bg="blue.0">
-              <Text size="xs" fw={700} c="blue.9" mb={2}>
-                Pauta estructurada por IA (Árbol Sintáctico)
-              </Text>
-              <Text size="xs" c="dark.7">
+            <Paper p="xs" radius="md">
+              <Group justify="space-between" align="center" mb={2}>
+                <Text size="11px" fw={700} c="blue.9" tt="uppercase">
+                  Pauta estructurada ({mealName})
+                </Text>
+              </Group>
+              <Text size="xs" fw={700} c="dark.8">
                 {formatAstToText({ tree: mealData.tree })}
+              </Text>
+              <Text size="11px" c="dimmed" mt={3}>
+                La pauta se evalúa como AST (conjunciones y opciones disyuntivas) respetando las intolerancias del jugador.
               </Text>
             </Paper>
           )}
-          <Text size="xs" c="dimmed">
-            La pauta se edita como AST completo mediante el asistente; no se descompone en campos paralelos.
-          </Text>
         </Stack>
       ) : (
-        <Box py="sm" style={{ textAlign: 'center' }}>
-          <Text size="xs" c="teal.8" fw={600}>
-            ● Esta toma utilizará la rotación completa del buffet oficial del club.
+        <Paper p="xs" withBorder radius="md" bg="teal.0" style={{ borderColor: 'var(--mantine-color-teal-2)' }}>
+          <Text size="xs" c="teal.9" fw={600}>
+            ● Pauta abierta para {mealName}
           </Text>
-        </Box>
+          <Text size="11px" c="dimmed" mt={2}>
+            El motor seleccionará combinaciones equilibradas de forma rotatoria (menú del buffet si está disponible para comida/cena o catálogo taxonómico general).
+          </Text>
+        </Paper>
       )}
-
-      {/* Resumen en tiempo real de la toma */}
-      <Paper p="xs" radius="sm" bg="gray.1" withBorder>
-        <Text size="11px" fw={700} c="dimmed" tt="uppercase" mb={2}>
-          Resumen configurado para {mealName}:
-        </Text>
-        <Text size="xs" c="dark.7">
-          {getMealSummaryText(mealData)}
-        </Text>
-      </Paper>
     </Stack>
   );
 }
@@ -515,8 +509,8 @@ export default function PrepartidoRoutineModal({
 
   const isConfiguredAlready = Boolean(
     initialConfig &&
-      ((Array.isArray(initialConfig.ingestas) && initialConfig.ingestas.length > 0) ||
-        (initialConfig.recomendaciones && Object.keys(initialConfig.recomendaciones).length > 0))
+    ((Array.isArray(initialConfig.ingestas) && initialConfig.ingestas.length > 0) ||
+      (initialConfig.recomendaciones && Object.keys(initialConfig.recomendaciones).length > 0))
   );
 
   // Tomas disponibles para añadir que aún no están seleccionadas
