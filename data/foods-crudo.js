@@ -20,6 +20,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "pavo"
     ]
   },
@@ -35,6 +36,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "pollo"
     ]
   },
@@ -52,6 +54,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "vacuno"
     ]
   },
@@ -67,6 +70,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "pavo"
     ]
   },
@@ -84,6 +88,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 400,
     "treePath": [
       "proteina",
+      "carne",
       "vacuno"
     ]
   },
@@ -99,6 +104,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "conejo"
     ]
   },
@@ -114,6 +120,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "pollo"
     ]
   },
@@ -131,6 +138,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "vacuno"
     ]
   },
@@ -146,6 +154,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "pavo"
     ]
   },
@@ -161,6 +170,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "pollo"
     ]
   },
@@ -178,6 +188,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "vacuno"
     ]
   },
@@ -195,6 +206,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "vacuno"
     ]
   },
@@ -310,6 +322,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "pollo"
     ]
   },
@@ -325,6 +338,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "pavo"
     ]
   },
@@ -340,6 +354,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "pollo"
     ]
   },
@@ -357,6 +372,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "cerdo"
     ]
   },
@@ -374,6 +390,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "vacuno"
     ]
   },
@@ -391,6 +408,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "vacuno"
     ]
   },
@@ -2944,6 +2962,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "carne",
       "cerdo"
     ]
   },
@@ -3037,6 +3056,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_azul"
     ]
   },
@@ -3112,6 +3132,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_blanco"
     ]
   },
@@ -3130,6 +3151,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_blanco"
     ]
   },
@@ -3148,6 +3170,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_blanco"
     ]
   },
@@ -3200,6 +3223,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_azul"
     ]
   },
@@ -3229,13 +3253,14 @@ export const FOODS_CRUDO = [
     "pro": 15.6,
     "fat": 1.4,
     "tags": [
+      "pescado",
       "marisco"
     ],
     "minGrams": 100,
     "maxGrams": 350,
     "treePath": [
       "proteina",
-      // FIXME: ver que hacer con el calamar
+      "pescado",
       "pescado_blanco"
     ]
   },
@@ -3254,6 +3279,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_blanco"
     ]
   },
@@ -3272,6 +3298,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_blanco"
     ]
   },
@@ -3290,6 +3317,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_azul"
     ]
   },
@@ -3325,6 +3353,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_blanco"
     ]
   },
@@ -3343,6 +3372,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_blanco"
     ]
   },
@@ -3378,6 +3408,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_blanco"
     ]
   },
@@ -3396,6 +3427,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_blanco"
     ]
   },
@@ -3431,6 +3463,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_blanco"
     ]
   },
@@ -3449,6 +3482,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_azul"
     ]
   },
@@ -3521,6 +3555,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_azul"
     ]
   },
@@ -3539,6 +3574,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 350,
     "treePath": [
       "proteina",
+      "pescado",
       "pescado_azul"
     ]
   },

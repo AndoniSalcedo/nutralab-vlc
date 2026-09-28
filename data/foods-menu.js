@@ -18,7 +18,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pollo'],
+    treePath: ['proteina', 'carne', 'pollo'],
   },
   {
     name: 'Contramuslo de pollo deshuesado',
@@ -30,7 +30,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pollo'],
+    treePath: ['proteina', 'carne', 'pollo'],
   },
   {
     name: 'Solomillos de pollo',
@@ -42,7 +42,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pollo'],
+    treePath: ['proteina', 'carne', 'pollo'],
   },
   {
     name: 'Hamburguesa de pollo',
@@ -54,7 +54,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pollo'],
+    treePath: ['proteina', 'carne', 'pollo'],
   },
   {
     name: 'Boloñesa de pollo',
@@ -66,7 +66,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pollo'],
+    treePath: ['proteina', 'carne', 'pollo'],
   },
   {
     name: 'Pechuga de pavo',
@@ -78,7 +78,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pavo'],
+    treePath: ['proteina', 'carne', 'pavo'],
   },
   {
     name: 'Pavo al horno',
@@ -90,7 +90,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pavo'],
+    treePath: ['proteina', 'carne', 'pavo'],
   },
   {
     name: 'Chuleta de pavo',
@@ -102,7 +102,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pavo'],
+    treePath: ['proteina', 'carne', 'pavo'],
   },
   {
     name: 'Albóndigas de pavo',
@@ -114,7 +114,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pavo'],
+    treePath: ['proteina', 'carne', 'pavo'],
   },
   {
     name: 'Hamburguesa de pavo',
@@ -126,7 +126,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pavo'],
+    treePath: ['proteina', 'carne', 'pavo'],
   },
 
   // ------------------------------------------------------------------------
@@ -142,7 +142,7 @@ export const FOODS_MENU = [
     tags: ['cerdo'],
     minGrams: 80,
     maxGrams: 250,
-    treePath: ['proteina', 'cerdo'],
+    treePath: ['proteina', 'carne', 'cerdo'],
   },
   {
     name: 'Lomo de cerdo',
@@ -154,7 +154,7 @@ export const FOODS_MENU = [
     tags: ['cerdo'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'cerdo'],
+    treePath: ['proteina', 'carne', 'cerdo'],
   },
   {
     name: 'Solomillo de cerdo',
@@ -166,7 +166,7 @@ export const FOODS_MENU = [
     tags: ['cerdo'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'cerdo'],
+    treePath: ['proteina', 'carne', 'cerdo'],
   },
 
   // ------------------------------------------------------------------------
@@ -182,7 +182,7 @@ export const FOODS_MENU = [
     tags: ['carne_roja'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'vacuno'],
+    treePath: ['proteina', 'carne', 'vacuno'],
   },
   {
     name: 'Solomillo de ternera',
@@ -194,7 +194,7 @@ export const FOODS_MENU = [
     tags: ['carne_roja'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'vacuno'],
+    treePath: ['proteina', 'carne', 'vacuno'],
   },
   {
     name: 'Burger de ternera',
@@ -206,7 +206,7 @@ export const FOODS_MENU = [
     tags: ['carne_roja'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'vacuno'],
+    treePath: ['proteina', 'carne', 'vacuno'],
   },
   {
     name: 'Filete de ternera',
@@ -218,7 +218,7 @@ export const FOODS_MENU = [
     tags: ['carne_roja'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'vacuno'],
+    treePath: ['proteina', 'carne', 'vacuno'],
   },
   {
     name: 'Boloñesa de ternera',
@@ -230,7 +230,7 @@ export const FOODS_MENU = [
     tags: ['carne_roja'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'vacuno'],
+    treePath: ['proteina', 'carne', 'vacuno'],
   },
   {
     name: 'Hamburguesa de potro',
@@ -242,7 +242,7 @@ export const FOODS_MENU = [
     tags: ['carne_roja'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'vacuno'],
+    treePath: ['proteina', 'carne', 'vacuno'],
   },
   {
     name: 'Cordero (parte más magra)',
@@ -254,7 +254,7 @@ export const FOODS_MENU = [
     tags: ['carne_roja'],
     minGrams: 100,
     maxGrams: 300,
-    treePath: ['proteina', 'vacuno'],
+    treePath: ['proteina', 'carne', 'vacuno'],
   },
 
   // ------------------------------------------------------------------------
@@ -270,7 +270,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_azul'],
+    treePath: ['proteina', 'pescado', 'pescado_azul'],
   },
   {
     name: 'Atún de aleta amarilla',
@@ -282,7 +282,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_azul'],
+    treePath: ['proteina', 'pescado', 'pescado_azul'],
   },
   {
     name: 'Salmón',
@@ -294,7 +294,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_azul'],
+    treePath: ['proteina', 'pescado', 'pescado_azul'],
   },
   {
     name: 'Trucha',
@@ -306,7 +306,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_azul'],
+    treePath: ['proteina', 'pescado', 'pescado_azul'],
   },
   {
     name: 'Sardinas',
@@ -318,7 +318,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_azul'],
+    treePath: ['proteina', 'pescado', 'pescado_azul'],
   },
 
   // ------------------------------------------------------------------------
@@ -334,7 +334,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_blanco'],
+    treePath: ['proteina', 'pescado', 'pescado_blanco'],
   },
   {
     name: 'Lubina',
@@ -346,7 +346,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_blanco'],
+    treePath: ['proteina', 'pescado', 'pescado_blanco'],
   },
   {
     name: 'Merluza',
@@ -358,7 +358,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_blanco'],
+    treePath: ['proteina', 'pescado', 'pescado_blanco'],
   },
   {
     name: 'Bacalao',
@@ -370,7 +370,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_blanco'],
+    treePath: ['proteina', 'pescado', 'pescado_blanco'],
   },
   {
     name: 'Lenguado',
@@ -382,7 +382,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_blanco'],
+    treePath: ['proteina', 'pescado', 'pescado_blanco'],
   },
   {
     name: 'Rodaballo',
@@ -394,7 +394,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_blanco'],
+    treePath: ['proteina', 'pescado', 'pescado_blanco'],
   },
   {
     name: 'Corvina',
@@ -406,7 +406,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_blanco'],
+    treePath: ['proteina', 'pescado', 'pescado_blanco'],
   },
   {
     name: 'Rape',
@@ -418,7 +418,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_blanco'],
+    treePath: ['proteina', 'pescado', 'pescado_blanco'],
   },
   {
     name: 'Gallineta',
@@ -430,7 +430,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_blanco'],
+    treePath: ['proteina', 'pescado', 'pescado_blanco'],
   },
   {
     name: 'Emperador',
@@ -442,7 +442,7 @@ export const FOODS_MENU = [
     tags: ['pescado'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'pescado_blanco'],
+    treePath: ['proteina', 'pescado', 'pescado_blanco'],
   },
 
   // ------------------------------------------------------------------------
@@ -458,7 +458,7 @@ export const FOODS_MENU = [
     tags: ['marisco'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'cefalopodos'],
+    treePath: ['proteina', 'marisco'],
   },
   {
     name: 'Calamar',
@@ -467,10 +467,10 @@ export const FOODS_MENU = [
     cho: 1.3,
     pro: 16.0,
     fat: 1.2,
-    tags: ['marisco'],
+    tags: ['pescado', 'marisco'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'cefalopodos'],
+    treePath: ['proteina', 'pescado', 'pescado_blanco'],
   },
   {
     name: 'Pulpo',
@@ -482,7 +482,7 @@ export const FOODS_MENU = [
     tags: ['marisco'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'cefalopodos'],
+    treePath: ['proteina', 'marisco'],
   },
   {
     name: 'Colas de gamba',
@@ -494,7 +494,7 @@ export const FOODS_MENU = [
     tags: ['marisco'],
     minGrams: 100,
     maxGrams: 350,
-    treePath: ['proteina', 'cefalopodos'],
+    treePath: ['proteina', 'marisco'],
   },
 
   // ------------------------------------------------------------------------
@@ -1731,7 +1731,7 @@ export const FOODS_MENU = [
     tags: ["cerdo"],
     minGrams: 100,
     maxGrams: 250,
-    treePath: ["proteina", "cerdo"],
+    treePath: ['proteina', 'carne', 'cerdo'],
   },
   {
     name: "Solomillo ibérico",
@@ -1743,7 +1743,7 @@ export const FOODS_MENU = [
     tags: ["cerdo"],
     minGrams: 100,
     maxGrams: 250,
-    treePath: ["proteina", "cerdo"],
+    treePath: ['proteina', 'carne', 'cerdo'],
   },
 ];
 
