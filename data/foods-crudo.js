@@ -583,7 +583,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 170,
     "treePath": [
       "hidratos",
-      "otros_granos"
+      "arroz"
     ]
   },
   {
