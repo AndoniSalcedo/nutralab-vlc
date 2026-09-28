@@ -689,6 +689,9 @@ export default function PrepartidoRoutineModal({
 
                         <Tooltip label={`Quitar ${meal} del protocolo`} withArrow>
                           <ActionIcon
+                            component="div"
+                            role="button"
+                            tabIndex={0}
                             variant="subtle"
                             color="red"
                             size="sm"
@@ -696,6 +699,13 @@ export default function PrepartidoRoutineModal({
                             onClick={(e) => {
                               e.stopPropagation();
                               handleRemoveMeal(meal);
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                handleRemoveMeal(meal);
+                              }
                             }}
                           >
                             <IconTrash size={14} />

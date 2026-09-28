@@ -1,3 +1,4 @@
+/* eslint-disable import-x/no-unused-modules */
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';

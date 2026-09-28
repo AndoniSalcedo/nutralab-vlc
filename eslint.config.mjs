@@ -42,7 +42,7 @@ const eslintConfig = [
     },
     rules: {
       'import-x/no-unused-modules': [
-        'warn',
+        'error',
         {
           unusedExports: true,
           ignoreExports: [
