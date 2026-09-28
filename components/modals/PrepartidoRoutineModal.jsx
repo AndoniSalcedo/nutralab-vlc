@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Stack,
   Text,
@@ -8,7 +8,6 @@ import {
   Button,
   Paper,
   MultiSelect,
-  Select,
   Switch,
   Box,
   Divider,
@@ -29,16 +28,7 @@ import {
   IconAlertCircle,
 } from '@/components/icons3d';
 import { parseMealTree } from '@/actions/mealActions';
-import { formatAstToText, convertLegacyToAst } from '@/lib/engine/meal-ast';
-import {
-  getTreeProteinaOptions,
-  getTreeHidratoOptions,
-  getTreeVerduraOptions,
-  getTreeFrutaOptions,
-  getTreeLacteoOptions,
-  getTreeGrasaOptions,
-} from '@/config/food-tree-options';
-import { getClinicalCatalogForPlayer } from '@/lib/nutrition/clinical-catalog';
+import { formatAstToText, validateMealAst } from '@/lib/engine/meal-ast';
 import {
   AVAILABLE_MEALS,
   isMainMeal as checkIsMainMeal,
@@ -69,222 +59,32 @@ const SCHEDULE_DETAILS = {
 
 
 
-/**
- * Asegura que cualquier valor registrado previamente por el usuario
- * esté presente en las opciones del selector para que Mantine pueda renderizarlo.
- */
-function ensureOptionsContain(options = [], currentValues = []) {
-  if (!currentValues) return options;
-  const valuesArray = Array.isArray(currentValues) ? currentValues : [currentValues];
-  const allExistingValues = new Set();
-
-  options.forEach((group) => {
-    if (Array.isArray(group.items)) {
-      group.items.forEach((it) => allExistingValues.add(typeof it === 'string' ? it : it?.value));
-    } else if (group.value) {
-      allExistingValues.add(group.value);
-    }
-  });
-
-  const missing = valuesArray.filter((v) => v && !allExistingValues.has(v));
-  if (missing.length === 0) return options;
-
-  return [
-    {
-      group: 'Valores Registrados',
-      items: missing.map((m) => ({ value: m, label: m })),
-    },
-    ...options,
-  ];
-}
-
-function ensureGrasaOptionsContain(options = [], currentValue = null) {
-  if (!currentValue) return options;
-  const allExisting = new Set();
-  options.forEach((it) => {
-    allExisting.add(typeof it === 'string' ? it : it?.value);
-  });
-  if (allExisting.has(currentValue)) return options;
-  return [{ value: currentValue, label: currentValue }, ...options];
-}
-
-/**
- * Normaliza de forma inteligente un valor registrado previo hacia su
- * equivalente canónico en las opciones (insensible a mayúsculas/minúsculas y singular/plural).
- * Ej: "Arroz" -> "arroz", "Huevo" -> "huevos".
- * Si no encuentra coincidencia, conserva el valor original sin borrarlo.
- */
-function canonicalizeItem(raw, options = []) {
-  if (!raw || typeof raw !== 'string') return raw;
-  const norm = raw.toLowerCase().trim();
-
-  // 1. Coincidencia exacta insensible a mayúsculas/minúsculas con value o label
-  for (const group of options) {
-    const items = Array.isArray(group.items) ? group.items : [group];
-    for (const it of items) {
-      const val = typeof it === 'string' ? it : it?.value;
-      const lbl = typeof it === 'string' ? it : it?.label || val;
-      if (!val) continue;
-
-      if (val === raw) return val;
-      if (val.toLowerCase().trim() === norm) return val;
-      if (lbl.toLowerCase().trim() === norm) return val;
-    }
-  }
-
-  // 2. Coincidencia singular/plural (ej: "huevo" -> "huevos", "arroz" -> "arroz")
-  for (const group of options) {
-    const items = Array.isArray(group.items) ? group.items : [group];
-    for (const it of items) {
-      const val = typeof it === 'string' ? it : it?.value;
-      if (!val) continue;
-      const valLower = val.toLowerCase().trim();
-      if (
-        valLower === `${norm}s` ||
-        `${valLower}s` === norm ||
-        valLower === `${norm}es` ||
-        `${valLower}es` === norm
-      ) {
-        return val;
-      }
-    }
-  }
-
-  return raw;
-}
-
-function canonicalizeList(list, options = []) {
-  if (!Array.isArray(list)) return [];
-  const seen = new Set();
-  const res = [];
-  list.forEach((item) => {
-    if (!item) return;
-    const canon = canonicalizeItem(item, options);
-    if (!seen.has(canon)) {
-      seen.add(canon);
-      res.push(canon);
-    }
-  });
-  return res;
-}
-
 function buildMealPatternData(mealName, mealData = {}) {
   const isMain = mealData.isMainMeal !== undefined ? Boolean(mealData.isMainMeal) : checkIsMainMeal(mealName, mealData);
-  const isComplete = Boolean(mealData.isComplete);
-  const toArray = (v) => (Array.isArray(v) ? v : v ? [v] : []);
-
-  const hidrato = toArray(mealData.hidrato);
-  const proteina = toArray(mealData.proteina);
-  const verdura = toArray(mealData.verdura);
-  const fruta = toArray(mealData.fruta);
-  const lacteo = toArray(mealData.lacteo);
-  const grasa = mealData.grasa && mealData.grasa !== 'Sin grasa añadida' ? mealData.grasa : null;
-  const alternativas = Array.isArray(mealData.alternativas) ? mealData.alternativas : [];
-
-  const allParts = [...hidrato, ...proteina, ...verdura, ...fruta, ...lacteo, ...(grasa ? [grasa] : [])];
-  const hasAlternatives = !isComplete && alternativas.length > 0;
-
-  let finalTree = isComplete ? null : mealData.tree || null;
-  if (!finalTree && !isComplete && (hasAlternatives || allParts.length > 0)) {
-    const converted = convertLegacyToAst({
-      isComplete,
-      alternativas,
-      hidrato,
-      proteina,
-      verdura,
-      fruta,
-      lacteo,
-      grasa,
-      raw: mealData.raw || '',
-      label: mealData.label || '',
-    });
-    finalTree = converted.tree;
-  }
-
-  const finalLabel = finalTree
-    ? formatAstToText({ tree: finalTree })
-    : isComplete
-    ? 'Rotación variada'
-    : allParts.length > 0
-    ? allParts.join(' + ')
-    : 'Rotación variada';
-
   return {
+    ...mealData,
     isMainMeal: Boolean(isMain),
-    isComplete: isComplete || (!finalTree && allParts.length === 0),
-    tree: isComplete ? null : finalTree,
-    raw: mealData.raw || finalLabel,
-    label: finalLabel,
-    isValid: true,
-    unrecognized: [],
   };
 }
 
 function getMealSummaryText(mealData) {
   if (!mealData) return 'Rotación variada (buffet oficial del club)';
-  if (mealData.isComplete) return 'Rotación variada (buffet oficial del club)';
-  if (mealData.tree) return formatAstToText(mealData);
-  if (mealData.alternativas?.length > 0) {
-    return mealData.alternativas.map((a, i) => a.label || a.nombre || `Alternativa ${i + 1}`).join(' / ');
-  }
-  const parts = [];
-  const toArray = (v) => (Array.isArray(v) ? v : v ? [v] : []);
-  const h = toArray(mealData.hidrato);
-  const p = toArray(mealData.proteina);
-  const v = toArray(mealData.verdura);
-  const f = toArray(mealData.fruta);
-  const l = toArray(mealData.lacteo);
-  if (h.length > 0) parts.push(`Hidratos: ${h.join(', ')}`);
-  if (p.length > 0) parts.push(`Proteínas: ${p.join(', ')}`);
-  if (v.length > 0) parts.push(`Verduras: ${v.join(', ')}`);
-  if (f.length > 0) parts.push(`Frutas: ${f.join(', ')}`);
-  if (l.length > 0) parts.push(`Lácteos: ${l.join(', ')}`);
-  if (mealData.grasa) parts.push(`Grasa: ${mealData.grasa}`);
-  if (parts.length === 0) return 'Rotación variada (buffet oficial del club)';
-  return parts.join(' · ');
+  if (mealData.type === 'complete') return 'Rotación variada (buffet oficial del club)';
+  return formatAstToText(mealData) || 'Sin pauta definida';
 }
 
 /**
- * Editor individual para la pauta nutricional de una toma concreta.
- * Incorpora el asistente de IA para clasificar texto libre y selectores
- * MultiSelect con SOLO las opciones del catálogo que el jugador puede consumir.
+ * Editor individual de pauta MealAst.
+ * El asistente estructura la recomendación completa como allOf/oneOf/food.
  */
 function SingleMealPautaEditor({
   mealName,
   mealData = {},
   onChange,
-  baseFoodOptions,
   jugadorId = null,
-  jugador = null,
 }) {
   const isMainMeal = mealData.isMainMeal !== undefined ? Boolean(mealData.isMainMeal) : checkIsMainMeal(mealName, mealData);
-  const isComplete = Boolean(mealData.isComplete);
-
-  const toArray = (v) => (Array.isArray(v) ? v : v ? [v] : []);
-  const rawProteina = toArray(mealData.proteina);
-  const rawHidrato = toArray(mealData.hidrato);
-  const rawVerdura = toArray(mealData.verdura);
-  const rawFruta = toArray(mealData.fruta);
-  const rawLacteo = toArray(mealData.lacteo);
-  const rawGrasa = mealData.grasa && mealData.grasa !== 'Sin grasa añadida' ? mealData.grasa : null;
-  const alternativas = Array.isArray(mealData.alternativas) ? mealData.alternativas : [];
-
-  // Normalizar de forma inteligente los valores previos ("Arroz" -> "arroz", "Huevo" -> "huevos") sin perder datos
-  const proteina = useMemo(() => canonicalizeList(rawProteina, baseFoodOptions.proteina), [rawProteina, baseFoodOptions.proteina]);
-  const hidrato = useMemo(() => canonicalizeList(rawHidrato, baseFoodOptions.hidrato), [rawHidrato, baseFoodOptions.hidrato]);
-  const verdura = useMemo(() => canonicalizeList(rawVerdura, baseFoodOptions.verdura), [rawVerdura, baseFoodOptions.verdura]);
-  const fruta = useMemo(() => canonicalizeList(rawFruta, baseFoodOptions.fruta), [rawFruta, baseFoodOptions.fruta]);
-  const lacteo = useMemo(() => canonicalizeList(rawLacteo, baseFoodOptions.lacteo), [rawLacteo, baseFoodOptions.lacteo]);
-  const grasa = useMemo(() => (rawGrasa ? canonicalizeItem(rawGrasa, baseFoodOptions.grasa) : null), [rawGrasa, baseFoodOptions.grasa]);
-
-  // Asegurar que las opciones para cada selector incluyan los valores actuales (para que Mantine los pinte sin fallo)
-  const proteinaOptions = useMemo(() => ensureOptionsContain(baseFoodOptions.proteina, proteina), [baseFoodOptions.proteina, proteina]);
-  const hidratoOptions = useMemo(() => ensureOptionsContain(baseFoodOptions.hidrato, hidrato), [baseFoodOptions.hidrato, hidrato]);
-  const verduraOptions = useMemo(() => ensureOptionsContain(baseFoodOptions.verdura, verdura), [baseFoodOptions.verdura, verdura]);
-  const frutaOptions = useMemo(() => ensureOptionsContain(baseFoodOptions.fruta, fruta), [baseFoodOptions.fruta, fruta]);
-  const lacteoOptions = useMemo(() => ensureOptionsContain(baseFoodOptions.lacteo, lacteo), [baseFoodOptions.lacteo, lacteo]);
-  const grasaOptions = useMemo(() => ensureGrasaOptionsContain(baseFoodOptions.grasa, grasa), [baseFoodOptions.grasa, grasa]);
-
+  const isComplete = mealData.type === 'complete';
   const [aiText, setAiText] = useState(mealData.raw || '');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiError, setAiError] = useState(null);
@@ -297,15 +97,10 @@ function SingleMealPautaEditor({
   async function handleInterpretWithAI() {
     if (!aiText.trim()) {
       onChange({
-        isComplete: true,
-        proteina: [],
-        hidrato: [],
-        verdura: [],
-        fruta: [],
-        lacteo: [],
-        grasa: null,
-        alternativas: [],
+        type: 'complete',
         raw: '',
+        label: 'Rotación variada',
+        isMainMeal,
       });
       setAiError(null);
       return;
@@ -317,7 +112,7 @@ function SingleMealPautaEditor({
       const data = await parseMealTree({
         text: aiText,
         mealName: mealName || 'Comida',
-        jugadorId: jugadorId || jugador?.id || jugador?._id,
+        jugadorId,
       });
 
       const parsed = data.tree || Object.values(data.results || {})[0];
@@ -326,33 +121,22 @@ function SingleMealPautaEditor({
         return;
       }
 
-      if (parsed.isComplete || !parsed.tree) {
+      if (parsed.type === 'complete') {
         onChange({
-          isComplete: true,
-          tree: null,
-          proteina: [],
-          hidrato: [],
-          verdura: [],
-          fruta: [],
-          lacteo: [],
-          grasa: null,
-          alternativas: [],
+          type: 'complete',
           raw: aiText,
           label: 'Árbol completo (Rotación variada)',
+          isMainMeal,
         });
       } else {
+        const validation = validateMealAst({ type: 'meal', tree: parsed.tree });
+        if (!validation.valid) throw new Error(validation.error);
         onChange({
-          isComplete: false,
+          type: 'meal',
           tree: parsed.tree,
           label: parsed.label || formatAstToText({ tree: parsed.tree }),
           raw: aiText,
-          proteina: [],
-          hidrato: [],
-          verdura: [],
-          fruta: [],
-          lacteo: [],
-          grasa: null,
-          alternativas: [],
+          isMainMeal,
         });
       }
 
@@ -367,13 +151,6 @@ function SingleMealPautaEditor({
     } finally {
       setIsAnalyzing(false);
     }
-  }
-
-  function handleManualUpdate(patch) {
-    onChange({
-      ...patch,
-      alternativas: [],
-    });
   }
 
   return (
@@ -398,7 +175,7 @@ function SingleMealPautaEditor({
           </Box>
           <Switch
             checked={isMainMeal}
-            onChange={(e) => onChange({ isMainMeal: e.currentTarget.checked })}
+            onChange={(e) => onChange({ ...mealData, isMainMeal: e.currentTarget.checked })}
             color="blue"
             size="sm"
           />
@@ -416,9 +193,11 @@ function SingleMealPautaEditor({
               El jugador selecciona libremente entre las opciones aptas y de fácil digestión de la cocina del equipo.
             </Text>
           </Box>
-          <Switch
+                        <Switch
             checked={isComplete}
-            onChange={(e) => onChange({ isComplete: e.currentTarget.checked, alternativas: [] })}
+            onChange={(e) => onChange(e.currentTarget.checked
+              ? { type: 'complete', raw: mealData.raw || '', label: 'Rotación variada', isMainMeal, unrecognized: [] }
+              : { type: 'meal', tree: { type: 'allOf', children: [] }, raw: mealData.raw || '', isMainMeal, unrecognized: [] })}
             color="teal"
             size="sm"
           />
@@ -484,100 +263,9 @@ function SingleMealPautaEditor({
               </Text>
             </Paper>
           )}
-
-          {alternativas.length > 0 && (
-            <Paper p="xs" withBorder radius="sm" bg="yellow.0">
-              <Text size="xs" fw={700} c="yellow.9" mb={2}>
-                Alternativas completas detectadas
-              </Text>
-              <Text size="xs" c="dark.7">
-                {alternativas.map((a, i) => `${i > 0 ? ' / ' : ''}${a.label || a.nombre || `Alternativa ${i + 1}`}`).join('')}
-              </Text>
-              <Text size="11px" c="dimmed" mt={2}>
-                Se elegirá una opción entera sin mezclar ingredientes de otras alternativas.
-              </Text>
-            </Paper>
-          )}
-
-          <Group justify="space-between" align="center" mt={2}>
-            <Text size="11px" fw={700} c="dimmed" tt="uppercase">
-              Componentes del Catálogo Aptos para el Jugador
-            </Text>
-            <Text size="10px" c="dimmed">
-              Filtro clínico aplicado según alergias y preferencias
-            </Text>
-          </Group>
-
-          <MultiSelect
-            label="Hidratos de carbono y tubérculos"
-            placeholder="Buscar y seleccionar hidratos aptos..."
-            data={hidratoOptions}
-            value={hidrato}
-            onChange={(val) => handleManualUpdate({ hidrato: val })}
-            searchable
-            clearable
-            comboboxProps={{ zIndex: 2500, withinPortal: true }}
-            size="xs"
-          />
-
-          <MultiSelect
-            label="Proteínas"
-            placeholder="Buscar y seleccionar proteínas aptas..."
-            data={proteinaOptions}
-            value={proteina}
-            onChange={(val) => handleManualUpdate({ proteina: val })}
-            searchable
-            clearable
-            comboboxProps={{ zIndex: 2500, withinPortal: true }}
-            size="xs"
-          />
-
-          <MultiSelect
-            label="Verduras y ensaladas"
-            placeholder="Buscar y seleccionar verduras aptas..."
-            data={verduraOptions}
-            value={verdura}
-            onChange={(val) => handleManualUpdate({ verdura: val })}
-            searchable
-            clearable
-            comboboxProps={{ zIndex: 2500, withinPortal: true }}
-            size="xs"
-          />
-
-          <MultiSelect
-            label="Frutas"
-            placeholder="Buscar y seleccionar frutas aptas..."
-            data={frutaOptions}
-            value={fruta}
-            onChange={(val) => handleManualUpdate({ fruta: val })}
-            searchable
-            clearable
-            comboboxProps={{ zIndex: 2500, withinPortal: true }}
-            size="xs"
-          />
-
-          <MultiSelect
-            label="Lácteos, yogures y postres"
-            placeholder="Buscar y seleccionar lácteos o postres aptos..."
-            data={lacteoOptions}
-            value={lacteo}
-            onChange={(val) => handleManualUpdate({ lacteo: val })}
-            searchable
-            clearable
-            comboboxProps={{ zIndex: 2500, withinPortal: true }}
-            size="xs"
-          />
-
-          <Select
-            label="Grasa añadida / aliño"
-            placeholder="Seleccionar aliño ligero apto..."
-            data={grasaOptions}
-            value={grasa}
-            onChange={(val) => handleManualUpdate({ grasa: val })}
-            clearable
-            comboboxProps={{ zIndex: 2500, withinPortal: true }}
-            size="xs"
-          />
+          <Text size="xs" c="dimmed">
+            La pauta se edita como AST completo mediante el asistente; no se descompone en campos paralelos.
+          </Text>
         </Stack>
       ) : (
         <Box py="sm" style={{ textAlign: 'center' }}>
@@ -593,110 +281,11 @@ function SingleMealPautaEditor({
           Resumen configurado para {mealName}:
         </Text>
         <Text size="xs" c="dark.7">
-          {getMealSummaryText({ isComplete, alternativas, hidrato, proteina, verdura, fruta, lacteo, grasa })}
+          {getMealSummaryText(mealData)}
         </Text>
       </Paper>
     </Stack>
   );
-}
-
-/**
- * Filtra de forma no destructiva las opciones canónicas del árbol oficial
- * según el perfil clínico de un jugador concreto (alergias, intolerancias, etc.).
- * Mantiene intacto el archivo global config/food-tree-options.js.
- */
-function getPlayerFilteredFoodOptions(jugador) {
-  const rawProteina = getTreeProteinaOptions();
-  const rawHidrato = getTreeHidratoOptions();
-  const rawVerdura = getTreeVerduraOptions();
-  const rawFruta = getTreeFrutaOptions();
-  const rawLacteo = getTreeLacteoOptions();
-  const rawGrasa = getTreeGrasaOptions();
-
-  if (!jugador) {
-    return {
-      proteina: rawProteina,
-      hidrato: rawHidrato,
-      verdura: rawVerdura,
-      fruta: rawFruta,
-      lacteo: rawLacteo,
-      grasa: rawGrasa,
-    };
-  }
-
-  let clinicalCatalog;
-  try {
-    clinicalCatalog = getClinicalCatalogForPlayer(jugador);
-  } catch {
-    return {
-      proteina: rawProteina,
-      hidrato: rawHidrato,
-      verdura: rawVerdura,
-      fruta: rawFruta,
-      lacteo: rawLacteo,
-      grasa: rawGrasa,
-    };
-  }
-
-  const allowedFoodNames = new Set(
-    Array.isArray(clinicalCatalog?.foods) ? clinicalCatalog.foods.map((f) => f.name) : []
-  );
-  const activeTags = new Set(
-    Array.isArray(clinicalCatalog?.activeTags) ? clinicalCatalog.activeTags : []
-  );
-
-  const isVegan = activeTags.has('vegano');
-  const isVegetarian = activeTags.has('vegetariano') || isVegan;
-  const noMeat = activeTags.has('sin_carne_roja');
-  const noPork = activeTags.has('sin_cerdo');
-  const noFish = activeTags.has('sin_pescado') || isVegetarian;
-  const noSeafood = activeTags.has('sin_marisco') || isVegetarian;
-  const noEgg = activeTags.has('sin_huevo') || isVegan;
-  const noNuts = activeTags.has('sin_frutos_secos');
-
-  const isGenericForbidden = (val) => {
-    if (isVegetarian && (val === 'pollo' || val === 'pavo' || val === 'conejo')) return true;
-    if (noMeat && val === 'vacuno') return true;
-    if (noPork && (val === 'cerdo' || val === 'embutidos_fiambres')) return true;
-    if (noFish && (val === 'pescado_blanco' || val === 'pescado_azul')) return true;
-    if (noSeafood && val === 'marisco') return true;
-    if (noEgg && val === 'huevos') return true;
-    if (isVegan && (val === 'yogures' || val === 'quesos')) return true;
-    return false;
-  };
-
-  const filterGroups = (groups) => {
-    return groups
-      .map((g) => {
-        if (!Array.isArray(g.items)) return g;
-        const filteredItems = g.items.filter((it) => {
-          const val = typeof it === 'string' ? it : it?.value;
-          if (g.group === 'Opciones Genéricas del Árbol') {
-            return !isGenericForbidden(val);
-          }
-          return allowedFoodNames.has(val);
-        });
-        return { ...g, items: filteredItems };
-      })
-      .filter((g) => !Array.isArray(g.items) || g.items.length > 0);
-  };
-
-  const filterGrasa = (grasaList) => {
-    return grasaList.filter((item) => {
-      const val = typeof item === 'string' ? item : item?.value;
-      if (noNuts && val === 'Frutos secos') return false;
-      return true;
-    });
-  };
-
-  return {
-    proteina: filterGroups(rawProteina),
-    hidrato: filterGroups(rawHidrato),
-    verdura: filterGroups(rawVerdura),
-    fruta: filterGroups(rawFruta),
-    lacteo: filterGroups(rawLacteo),
-    grasa: filterGrasa(rawGrasa),
-  };
 }
 
 /**
@@ -717,7 +306,6 @@ export default function PrepartidoRoutineModal({
   onDeactivate,
   initialActiveMeal = null,
   jugadorId = null,
-  jugador = null,
 }) {
   const scheduleDetail = SCHEDULE_DETAILS[scheduleKey] || {
     label: scheduleLabel || scheduleKey,
@@ -736,8 +324,6 @@ export default function PrepartidoRoutineModal({
   // 5. Estado de guardado
   const [saving, setSaving] = useState(false);
 
-  // Opciones de alimentos cacheadas del árbol oficial, filtradas según el perfil clínico del jugador
-  const baseFoodOptions = useMemo(() => getPlayerFilteredFoodOptions(jugador), [jugador]);
 
   const recommendedMeals = scheduleDetail.recommendedMeals;
 
@@ -766,14 +352,9 @@ export default function PrepartidoRoutineModal({
         if (!currentRecs[m]) {
           currentRecs[m] = {
             isMainMeal: checkIsMainMeal(m, {}),
-            isComplete: true, // rotación variada por defecto
-            proteina: [],
-            hidrato: [],
-            verdura: [],
-            fruta: [],
-            lacteo: [],
-            grasa: null,
-            alternativas: [],
+            type: 'complete',
+            label: 'Rotación variada',
+            unrecognized: [],
             raw: '',
           };
         }
@@ -803,14 +384,9 @@ export default function PrepartidoRoutineModal({
         ...prev,
         [mealName]: {
           isMainMeal: checkIsMainMeal(mealName, {}),
-          isComplete: true,
-          proteina: [],
-          hidrato: [],
-          verdura: [],
-          fruta: [],
-          lacteo: [],
-          grasa: null,
-          alternativas: [],
+          type: 'complete',
+          label: 'Rotación variada',
+          unrecognized: [],
           raw: '',
         },
       }));
@@ -843,14 +419,9 @@ export default function PrepartidoRoutineModal({
           if (!copy[m]) {
             copy[m] = {
               isMainMeal: checkIsMainMeal(m, {}),
-              isComplete: true,
-              proteina: [],
-              hidrato: [],
-              verdura: [],
-              fruta: [],
-              lacteo: [],
-              grasa: null,
-              alternativas: [],
+              type: 'complete',
+              label: 'Rotación variada',
+              unrecognized: [],
               raw: '',
             };
           }
@@ -883,14 +454,9 @@ export default function PrepartidoRoutineModal({
         if (!copy[m]) {
           copy[m] = {
             isMainMeal: checkIsMainMeal(m, {}),
-            isComplete: true,
-            proteina: [],
-            hidrato: [],
-            verdura: [],
-            fruta: [],
-            lacteo: [],
-            grasa: null,
-            alternativas: [],
+            type: 'complete',
+            label: 'Rotación variada',
+            unrecognized: [],
             raw: '',
           };
         }
@@ -1149,9 +715,7 @@ export default function PrepartidoRoutineModal({
                         mealName={meal}
                         mealData={mealData}
                         onChange={(patch) => handleMealRecChange(meal, patch)}
-                        baseFoodOptions={baseFoodOptions}
                         jugadorId={jugadorId}
-                        jugador={jugador}
                       />
                     </Accordion.Panel>
                   </Accordion.Item>

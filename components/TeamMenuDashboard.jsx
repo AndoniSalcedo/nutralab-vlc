@@ -112,18 +112,18 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
     if (!day) return;
 
     ['comida', 'cena'].forEach((service) => {
-      if (day[service]?.platos_desglosados) {
-        const idx = day[service].platos_desglosados.findIndex(
-          (p) => p.nombre?.toLowerCase().trim() === updatedDish.nombre?.toLowerCase().trim()
-        );
-        if (idx !== -1) {
-          day[service].platos_desglosados[idx] = updatedDish;
-        } else {
-          day[service].platos_desglosados.push(updatedDish);
+      const serviceData = day[service];
+      if (!serviceData?.tree) return;
+      const root = serviceData.tree;
+      const visit = (node) => {
+        if (!node) return node;
+        if (node.type === 'allOf' && String(node.label || '').toLowerCase().trim() === String(updatedDish.nombre || '').toLowerCase().trim()) {
+          return updatedDish.tree;
         }
-      } else if (day[service]) {
-        day[service].platos_desglosados = [updatedDish];
-      }
+        if (!Array.isArray(node.children)) return node;
+        return { ...node, children: node.children.map(visit) };
+      };
+      serviceData.tree = visit(root);
     });
 
     try {

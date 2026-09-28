@@ -1,14 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Stack,
   Text,
   Group,
   Button,
   Paper,
-  MultiSelect,
-  Select,
   Switch,
   Textarea,
   Alert,
@@ -19,40 +17,8 @@ import ResponsiveModal from './ResponsiveModal';
 import { notifications } from '@mantine/notifications';
 import { IconSparkles, IconAlertCircle, IconCheck, IconX } from '@/components/icons3d';
 import { parseMealTree } from '@/actions/mealActions';
-import { formatAstToText, convertLegacyToAst } from '@/lib/engine/meal-ast';
-import {
-  getTreeProteinaOptions,
-  getTreeHidratoOptions,
-  getTreeVerduraOptions,
-  getTreeFrutaOptions,
-  getTreeLacteoOptions,
-  getTreeGrasaOptions,
-} from '@/config/food-tree-options';
+import { validateMealAst } from '@/lib/engine/meal-ast';
 import { isMainMeal as checkIsMainMeal } from '@/config/nutrition-days';
-
-function ensureOptionsContain(options, currentValues) {
-  if (!currentValues) return options;
-  const valuesArray = Array.isArray(currentValues) ? currentValues : [currentValues];
-  const allExistingValues = new Set();
-  options.forEach((group) => {
-    if (group.items) {
-      group.items.forEach((it) => allExistingValues.add(typeof it === 'string' ? it : it.value));
-    } else if (group.value) {
-      allExistingValues.add(group.value);
-    }
-  });
-
-  const missing = valuesArray.filter((v) => v && !allExistingValues.has(v));
-  if (missing.length === 0) return options;
-
-  return [
-    {
-      group: 'Valores Actuales Registrados',
-      items: missing.map((m) => ({ value: m, label: m })),
-    },
-    ...options,
-  ];
-}
 
 export default function EditMealPatternModal({
   opened,
@@ -69,14 +35,8 @@ export default function EditMealPatternModal({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiError, setAiError] = useState(null);
 
-  const [proteina, setProteina] = useState([]);
-  const [hidrato, setHidrato] = useState([]);
-  const [verdura, setVerdura] = useState([]);
-  const [fruta, setFruta] = useState([]);
-  const [lacteo, setLacteo] = useState([]);
-  const [grasa, setGrasa] = useState(null);
-  const [alternativas, setAlternativas] = useState([]);
   const [tree, setTree] = useState(null);
+  const [astLabel, setAstLabel] = useState('');
 
   useEffect(() => {
     if (opened) {
@@ -85,56 +45,23 @@ export default function EditMealPatternModal({
 
       setIsMainMeal(checkIsMainMeal(mealName, val));
       setTree(val.tree || null);
+      setAstLabel(val.label || '');
 
       // Detectar si es árbol completo
-      const complete = Boolean(val.isComplete);
+      const complete = val.type === 'complete';
       setIsComplete(complete);
 
       // Texto raw previo
       setAiText(val.raw || '');
 
-      // Listas tipadas
-      const toArray = (v) => (Array.isArray(v) ? v : v ? [v] : []);
-      setProteina(toArray(val.proteina));
-      setHidrato(toArray(val.hidrato));
-      setVerdura(toArray(val.verdura));
-      setFruta(toArray(val.fruta));
-      setLacteo(toArray(val.lacteo));
-      setGrasa(val.grasa || null);
-      setAlternativas(Array.isArray(val.alternativas) ? val.alternativas : []);
     }
   }, [opened, value, mealName]);
-
-  function updateManualValue(setter) {
-    return (nextValue) => {
-      setAlternativas([]);
-      setter(nextValue);
-    };
-  }
-
-  const baseProteinaOptions = useMemo(() => getTreeProteinaOptions(), []);
-  const baseHidratoOptions = useMemo(() => getTreeHidratoOptions(), []);
-  const baseVerduraOptions = useMemo(() => getTreeVerduraOptions(), []);
-  const baseFrutaOptions = useMemo(() => getTreeFrutaOptions(), []);
-  const baseLacteoOptions = useMemo(() => getTreeLacteoOptions(), []);
-  const baseGrasaOptions = useMemo(() => getTreeGrasaOptions(), []);
-
-  const proteinaOptions = useMemo(() => ensureOptionsContain(baseProteinaOptions, proteina), [baseProteinaOptions, proteina]);
-  const hidratoOptions = useMemo(() => ensureOptionsContain(baseHidratoOptions, hidrato), [baseHidratoOptions, hidrato]);
-  const verduraOptions = useMemo(() => ensureOptionsContain(baseVerduraOptions, verdura), [baseVerduraOptions, verdura]);
-  const frutaOptions = useMemo(() => ensureOptionsContain(baseFrutaOptions, fruta), [baseFrutaOptions, fruta]);
-  const lacteoOptions = useMemo(() => ensureOptionsContain(baseLacteoOptions, lacteo), [baseLacteoOptions, lacteo]);
 
   async function handleInterpretWithAI() {
     if (!aiText.trim()) {
       setIsComplete(true);
-      setProteina([]);
-      setHidrato([]);
-      setVerdura([]);
-      setFruta([]);
-      setLacteo([]);
-      setGrasa(null);
-      setAlternativas([]);
+      setTree(null);
+      setAstLabel('Rotación variada');
       setAiError(null);
       return;
     }
@@ -154,26 +81,16 @@ export default function EditMealPatternModal({
         return;
       }
 
-      if (mealData.isComplete || !mealData.tree) {
+      if (mealData.type === 'complete') {
         setIsComplete(true);
         setTree(null);
-        setProteina([]);
-        setHidrato([]);
-        setVerdura([]);
-        setFruta([]);
-        setLacteo([]);
-        setGrasa(null);
-        setAlternativas([]);
+        setAstLabel(mealData.label || '');
       } else {
+        const validation = validateMealAst({ type: 'meal', tree: mealData.tree });
+        if (!validation.valid) throw new Error(validation.error);
         setIsComplete(false);
         setTree(mealData.tree || null);
-        setProteina(mealData.alternativas?.length ? [] : (mealData.proteina || []));
-        setHidrato(mealData.alternativas?.length ? [] : (mealData.hidrato || []));
-        setVerdura(mealData.alternativas?.length ? [] : (mealData.verdura || []));
-        setFruta(mealData.alternativas?.length ? [] : (mealData.fruta || []));
-        setLacteo(mealData.alternativas?.length ? [] : (mealData.lacteo || []));
-        setGrasa(mealData.alternativas?.length ? null : (mealData.grasa || null));
-        setAlternativas(Array.isArray(mealData.alternativas) ? mealData.alternativas : []);
+        setAstLabel(mealData.label || '');
       }
 
       notifications.show({
@@ -190,53 +107,12 @@ export default function EditMealPatternModal({
   }
 
   function handleSave() {
-    const allParts = [
-      ...hidrato,
-      ...proteina,
-      ...verdura,
-      ...fruta,
-      ...lacteo,
-      ...(grasa && grasa !== 'Sin grasa añadida' ? [grasa] : []),
-    ];
-
-    const hasAlternatives = !isComplete && alternativas.length > 0;
-    const label = hasAlternatives
-      ? alternativas.map((alternative, index) => alternative.label || alternative.nombre || `Alternativa ${index + 1}`).join(' / ')
-      : isComplete
-      ? 'Rotación variada'
-      : allParts.length > 0
-      ? allParts.join(' + ')
-      : 'Rotación variada';
-
-    let finalTree = isComplete ? null : tree;
-    if (!finalTree && !isComplete && (hasAlternatives || allParts.length > 0)) {
-      const converted = convertLegacyToAst({
-        isComplete,
-        alternativas,
-        hidrato,
-        proteina,
-        verdura,
-        fruta,
-        lacteo,
-        grasa,
-        raw: aiText.trim(),
-        label,
-      });
-      finalTree = converted.tree;
-    }
-
-    const finalLabel = finalTree
-      ? formatAstToText({ tree: finalTree })
-      : label;
-
+    const converted = isComplete
+      ? { type: 'complete', raw: aiText.trim(), label: 'Rotación variada', unrecognized: [] }
+      : { type: 'meal', tree, raw: aiText.trim(), label: astLabel, unrecognized: [] };
     const structuredMeal = {
+      ...converted,
       isMainMeal: Boolean(isMainMeal),
-      isComplete: isComplete || (!finalTree && allParts.length === 0),
-      tree: isComplete ? null : finalTree,
-      raw: aiText.trim() || finalLabel,
-      label: finalLabel,
-      isValid: true,
-      unrecognized: [],
     };
 
     onSave(structuredMeal);
@@ -306,7 +182,7 @@ export default function EditMealPatternModal({
               onChange={(e) => {
                 const checked = e.currentTarget.checked;
                 setIsComplete(checked);
-                if (checked) setAlternativas([]);
+                if (checked) setTree(null);
               }}
               color="teal"
               size="md"
@@ -362,93 +238,12 @@ export default function EditMealPatternModal({
           </Paper>
         )}
 
-        {/* Selectores tipados por categoría */}
         {!isComplete ? (
           <Stack gap="sm">
-            {alternativas.length > 0 && (
-              <Paper p="xs" withBorder radius="sm" bg="yellow.0">
-                <Text size="xs" fw={700} c="yellow.9" mb={4}>
-                  Opciones completas detectadas
-                </Text>
-                <Text size="xs" c="dark.7">
-                  {alternativas.map((alternative, index) => (
-                    `${index > 0 ? ' / ' : ''}${alternative.label || alternative.nombre || `Alternativa ${index + 1}`}`
-                  )).join('')}
-                </Text>
-                <Text size="xs" c="dimmed" mt={4}>
-                  Se elegirá una opción entera; sus ingredientes no se mezclarán con los de las demás.
-                </Text>
-              </Paper>
-            )}
-
             <Text size="xs" fw={700} c="dimmed" tt="uppercase">
-              Componentes de la pauta
+              Estructura de la pauta
             </Text>
-
-            <MultiSelect
-              label="Hidratos de carbono y tubérculos"
-              placeholder="Seleccionar hidratos..."
-              data={hidratoOptions}
-              value={hidrato}
-              onChange={updateManualValue(setHidrato)}
-              searchable
-              clearable
-              size="xs"
-            />
-
-            <MultiSelect
-              label="Proteínas"
-              placeholder="Seleccionar fuentes de proteína..."
-              data={proteinaOptions}
-              value={proteina}
-              onChange={updateManualValue(setProteina)}
-              searchable
-              clearable
-              size="xs"
-            />
-
-            <MultiSelect
-              label="Verduras y ensaladas"
-              placeholder="Seleccionar verduras / hojas verdes..."
-              data={verduraOptions}
-              value={verdura}
-              onChange={updateManualValue(setVerdura)}
-              searchable
-              clearable
-              size="xs"
-            />
-
-            <MultiSelect
-              label="Frutas"
-              placeholder="Seleccionar frutas..."
-              data={frutaOptions}
-              value={fruta}
-              onChange={updateManualValue(setFruta)}
-              searchable
-              clearable
-              size="xs"
-            />
-
-            <MultiSelect
-              label="Lácteos, yogures y postres"
-              placeholder="Seleccionar lácteos o postres..."
-              data={lacteoOptions}
-              value={lacteo}
-              onChange={updateManualValue(setLacteo)}
-              searchable
-              clearable
-              size="xs"
-            />
-
-            <Select
-              label="Grasa añadida / aliño"
-              placeholder="Seleccionar grasa..."
-              data={baseGrasaOptions}
-              value={grasa}
-              onChange={updateManualValue(setGrasa)}
-              clearable
-              size="xs"
-            />
+            <Text size="sm" c="dark.7">{value?.tree ? value.label || aiText : 'Usa el asistente para crear la pauta con allOf/oneOf.'}</Text>
           </Stack>
         ) : (
           <Box py="md" style={{ textAlign: 'center' }}>
@@ -474,49 +269,7 @@ export default function EditMealPatternModal({
               ● Rotación variada y equilibrada
             </Text>
           ) : (
-            <Stack gap={3}>
-              {hidrato.length > 0 && (
-                <Text size="xs">
-                  <Text span fw={600} c="orange.8">● Hidratos: </Text>
-                  <Text span c="dark.6">{hidrato.join(', ')}</Text>
-                </Text>
-              )}
-              {proteina.length > 0 && (
-                <Text size="xs">
-                  <Text span fw={600} c="blue.8">● Proteínas: </Text>
-                  <Text span c="dark.6">{proteina.join(', ')}</Text>
-                </Text>
-              )}
-              {verdura.length > 0 && (
-                <Text size="xs">
-                  <Text span fw={600} c="green.8">● Verduras: </Text>
-                  <Text span c="dark.6">{verdura.join(', ')}</Text>
-                </Text>
-              )}
-              {fruta.length > 0 && (
-                <Text size="xs">
-                  <Text span fw={600} c="pink.8">● Frutas: </Text>
-                  <Text span c="dark.6">{fruta.join(', ')}</Text>
-                </Text>
-              )}
-              {lacteo.length > 0 && (
-                <Text size="xs">
-                  <Text span fw={600} c="indigo.8">● Lácteos / Postre: </Text>
-                  <Text span c="dark.6">{lacteo.join(', ')}</Text>
-                </Text>
-              )}
-              {grasa && (
-                <Text size="xs">
-                  <Text span fw={600} c="yellow.9">● Grasa: </Text>
-                  <Text span c="dark.6">{grasa}</Text>
-                </Text>
-              )}
-              {hidrato.length === 0 && proteina.length === 0 && verdura.length === 0 && fruta.length === 0 && lacteo.length === 0 && !grasa && (
-                <Text size="xs" c="dimmed" fs="italic">
-                  Ningún componente seleccionado (se aplicará rotación variada).
-                </Text>
-              )}
-            </Stack>
+            <Text size="xs" c="dark.7">{value?.tree ? value.label || aiText : 'Sin pauta definida; usa el asistente para construir el AST.'}</Text>
           )}
         </Box>
 

@@ -21,6 +21,7 @@ import {
   IconEdit,
 } from '@/components/icons3d';
 import EditDishDecompositionModal from '@/components/modals/EditDishDecompositionModal';
+import { formatAstToText } from '@/lib/engine/meal-ast';
 import NothingFound from '@/components/NothingFound';
 import { BentoCard } from '@/components/BentoItem';
 
@@ -63,13 +64,22 @@ function getTodayIndex() {
   return day === 0 ? 6 : day - 1; // Map Lunes to 0, Domingo to 6
 }
 
-function findDecomposedDish(dishText, platosDesglosados = []) {
-  if (!dishText || !Array.isArray(platosDesglosados)) return null;
-  const normOpt = dishText.toLowerCase().trim();
-  return platosDesglosados.find((p) => {
-    const pNorm = (p?.nombre || '').toLowerCase().trim();
-    return pNorm === normOpt || normOpt.includes(pNorm) || pNorm.includes(normOpt);
-  }) || null;
+function findDishAst(dishText, serviceTree, course = null) {
+  if (!dishText || !serviceTree) return null;
+  const normalizedDish = dishText.toLowerCase().trim();
+  let match = null;
+  const visit = (node, activeCourse = null) => {
+    if (!node || match) return;
+    const nodeCourse = node.course || activeCourse;
+    if (node.type === 'allOf' && String(node.label || '').toLowerCase().trim() === normalizedDish) {
+      if (course && nodeCourse && course !== nodeCourse) return;
+      match = node;
+      return;
+    }
+    (node.children || []).forEach((child) => visit(child, nodeCourse));
+  };
+  visit(serviceTree);
+  return match;
 }
 
 function isServiceEvent(text) {
@@ -87,7 +97,7 @@ function isServiceEvent(text) {
   );
 }
 
-function AgendaDishLine({ label, value, platosDesglosados = [] }) {
+function AgendaDishLine({ label, value, serviceTree = null }) {
   if (!value || value.toLowerCase() === 'sin registrar') return null;
   const options = value.split(/\s*\/\s*/);
   return (
@@ -98,46 +108,16 @@ function AgendaDishLine({ label, value, platosDesglosados = [] }) {
       <Stack gap={3} style={{ flex: 1 }}>
         {options.map((opt, idx) => {
           const isEvent = isServiceEvent(opt);
-          const dec = !isEvent ? findDecomposedDish(opt, platosDesglosados) : null;
-          const hasIngredients = dec && (
-            (dec.proteina && dec.proteina.length > 0) ||
-            dec.hidrato ||
-            (dec.verdura && dec.verdura.length > 0) ||
-            (dec.fruta && dec.fruta.length > 0) ||
-            (dec.lacteo && dec.lacteo.length > 0)
-          );
+          const course = label === '1º' ? 'primero' : label === '2º' ? 'segundo' : label === 'P' ? 'postre' : null;
+          const dishTree = !isEvent ? findDishAst(opt, serviceTree, course) : null;
           return (
             <Box key={idx}>
               <Text size="xs" fw={isEvent ? 600 : 500} c={isEvent ? 'dimmed' : 'dark.4'} style={{ lineHeight: 1.3 }}>
                 {opt}
               </Text>
-              {hasIngredients && (
+              {dishTree && (
                 <Group gap={6} wrap="wrap" style={{ marginTop: 1 }}>
-                  {dec.proteina?.map((p, pIdx) => (
-                    <Text key={pIdx} size="xs" c="red.8" fw={500} style={{ fontSize: '10px' }}>
-                      ● {p}
-                    </Text>
-                  ))}
-                  {dec.hidrato && (
-                    <Text size="xs" c="blue.8" fw={500} style={{ fontSize: '10px' }}>
-                      ● {dec.hidrato}
-                    </Text>
-                  )}
-                  {dec.verdura?.map((v, vIdx) => (
-                    <Text key={vIdx} size="xs" c="teal.8" fw={500} style={{ fontSize: '10px' }}>
-                      ● {v}
-                    </Text>
-                  ))}
-                  {dec.fruta?.map((f, fIdx) => (
-                    <Text key={fIdx} size="xs" c="orange.8" fw={500} style={{ fontSize: '10px' }}>
-                      ● {f}
-                    </Text>
-                  ))}
-                  {dec.lacteo?.map((l, lIdx) => (
-                    <Text key={lIdx} size="xs" c="cyan.8" fw={500} style={{ fontSize: '10px' }}>
-                      ● {l}
-                    </Text>
-                  ))}
+                  <Text size="xs" c="dark.6" fw={500} style={{ fontSize: '10px' }}>{formatAstToText(dishTree)}</Text>
                 </Group>
               )}
             </Box>
@@ -195,9 +175,9 @@ function AgendaDayRow({ dayData, weekStr }) {
               Comida
             </Text>
             <Stack gap={4}>
-              {dayData.comida?.primero && <AgendaDishLine label="1º" value={dayData.comida.primero} platosDesglosados={dayData.comida?.platos_desglosados} />}
-              {dayData.comida?.segundo && <AgendaDishLine label="2º" value={dayData.comida.segundo} platosDesglosados={dayData.comida?.platos_desglosados} />}
-              {dayData.comida?.postre && <AgendaDishLine label="P" value={dayData.comida.postre} platosDesglosados={dayData.comida?.platos_desglosados} />}
+              {dayData.comida?.primero && <AgendaDishLine label="1º" value={dayData.comida.primero} serviceTree={dayData.comida?.tree} />}
+              {dayData.comida?.segundo && <AgendaDishLine label="2º" value={dayData.comida.segundo} serviceTree={dayData.comida?.tree} />}
+              {dayData.comida?.postre && <AgendaDishLine label="P" value={dayData.comida.postre} serviceTree={dayData.comida?.tree} />}
               {!dayData.comida?.primero && !dayData.comida?.segundo && (
                 <Text size="xs" c="gray.4" fs="italic">Sin registrar</Text>
               )}
@@ -212,9 +192,9 @@ function AgendaDayRow({ dayData, weekStr }) {
               Cena
             </Text>
             <Stack gap={4}>
-              {dayData.cena?.primero && <AgendaDishLine label="1º" value={dayData.cena.primero} platosDesglosados={dayData.cena?.platos_desglosados} />}
-              {dayData.cena?.segundo && <AgendaDishLine label="2º" value={dayData.cena.segundo} platosDesglosados={dayData.cena?.platos_desglosados} />}
-              {dayData.cena?.postre && <AgendaDishLine label="P" value={dayData.cena.postre} platosDesglosados={dayData.cena?.platos_desglosados} />}
+              {dayData.cena?.primero && <AgendaDishLine label="1º" value={dayData.cena.primero} serviceTree={dayData.cena?.tree} />}
+              {dayData.cena?.segundo && <AgendaDishLine label="2º" value={dayData.cena.segundo} serviceTree={dayData.cena?.tree} />}
+              {dayData.cena?.postre && <AgendaDishLine label="P" value={dayData.cena.postre} serviceTree={dayData.cena?.tree} />}
               {!dayData.cena?.primero && !dayData.cena?.segundo && (
                 <Text size="xs" c="gray.4" fs="italic">Sin registrar</Text>
               )}
@@ -226,7 +206,7 @@ function AgendaDayRow({ dayData, weekStr }) {
   );
 }
 
-function HeroDishSection({ title, label, value, color, platosDesglosados = [], onEditDish = null }) {
+function HeroDishSection({ title, label, value, color, serviceTree = null, onEditDish = null }) {
   if (!value || value.toLowerCase() === 'sin registrar') {
     return (
       <Stack gap={2}>
@@ -256,52 +236,18 @@ function HeroDishSection({ title, label, value, color, platosDesglosados = [], o
       <Stack gap={6} pl={26}>
         {options.map((opt, idx) => {
           const isEvent = isServiceEvent(opt);
-          const dec = !isEvent ? findDecomposedDish(opt, platosDesglosados) : null;
-          const hasIngredients = dec && (
-            (dec.proteina && dec.proteina.length > 0) ||
-            dec.hidrato ||
-            (dec.verdura && dec.verdura.length > 0) ||
-            (dec.fruta && dec.fruta.length > 0) ||
-            (dec.lacteo && dec.lacteo.length > 0)
-          );
+          const dishTree = !isEvent
+            ? findDishAst(opt, serviceTree, title === 'Primer Plato' ? 'primero' : title === 'Segundo Plato' ? 'segundo' : 'postre')
+            : null;
           return (
             <Group key={idx} justify="space-between" align="flex-start" wrap="nowrap" style={{ width: '100%' }}>
               <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
                 <Text size="sm" fw={isEvent ? 700 : 600} c={isEvent ? 'dimmed' : 'dark.4'} style={{ overflowWrap: 'anywhere', lineHeight: 1.4 }}>
                   {opt}
                 </Text>
-                {hasIngredients ? (
+                {dishTree ? (
                   <Group gap="xs" wrap="wrap" style={{ marginTop: 2 }}>
-                    {dec.proteina?.map((p, pIdx) => (
-                      <Text key={pIdx} size="xs" c="red.8" fw={600} style={{ fontSize: '11px' }}>
-                        ● {p}
-                      </Text>
-                    ))}
-                    {dec.hidrato && (
-                      <Text size="xs" c="blue.8" fw={600} style={{ fontSize: '11px' }}>
-                        ● {dec.hidrato}
-                      </Text>
-                    )}
-                    {dec.verdura?.map((v, vIdx) => (
-                      <Text key={vIdx} size="xs" c="teal.8" fw={500} style={{ fontSize: '11px' }}>
-                        ● {v}
-                      </Text>
-                    ))}
-                    {dec.fruta?.map((f, fIdx) => (
-                      <Text key={fIdx} size="xs" c="orange.8" fw={600} style={{ fontSize: '11px' }}>
-                        ● {f}
-                      </Text>
-                    ))}
-                    {dec.lacteo?.map((l, lIdx) => (
-                      <Text key={lIdx} size="xs" c="cyan.8" fw={600} style={{ fontSize: '11px' }}>
-                        ● {l}
-                      </Text>
-                    ))}
-                    {dec.grasa && (
-                      <Text size="xs" c="yellow.9" fw={500} style={{ fontSize: '11px' }}>
-                        ● {dec.grasa}
-                      </Text>
-                    )}
+                    <Text size="xs" c="dark.6" fw={500} style={{ fontSize: '11px' }}>{formatAstToText(dishTree)}</Text>
                   </Group>
                 ) : null}
               </Stack>
@@ -312,7 +258,7 @@ function HeroDishSection({ title, label, value, color, platosDesglosados = [], o
                     variant="subtle"
                     color="gray"
                     aria-label={`Editar ${opt}`}
-                    onClick={() => onEditDish(dec || { nombre: opt, proteina: null, hidrato: null, verdura: null, fruta: null, lacteo: null, grasa: null })}
+                    onClick={() => onEditDish({ nombre: opt, tree: dishTree })}
                     style={{ opacity: 0.7, flexShrink: 0, marginTop: 2 }}
                   >
                     <IconEdit size={13} />
@@ -533,7 +479,7 @@ export default function MenuSemanal({
                 label="1º"
                 value={dayData.comida?.primero}
                 color="orange"
-                platosDesglosados={dayData.comida?.platos_desglosados}
+                serviceTree={dayData.comida?.tree}
                 onEditDish={onSaveDishDecomposition ? (dish) => setEditingDish(dish) : null}
               />
               <Divider style={{ borderColor: 'var(--mantine-color-gray-1)', borderStyle: 'dashed' }} />
@@ -542,7 +488,7 @@ export default function MenuSemanal({
                 label="2º"
                 value={dayData.comida?.segundo}
                 color="orange"
-                platosDesglosados={dayData.comida?.platos_desglosados}
+                serviceTree={dayData.comida?.tree}
                 onEditDish={onSaveDishDecomposition ? (dish) => setEditingDish(dish) : null}
               />
               {dayData.comida?.postre && (
@@ -553,7 +499,7 @@ export default function MenuSemanal({
                     label="P"
                     value={dayData.comida.postre}
                     color="orange"
-                    platosDesglosados={dayData.comida?.platos_desglosados}
+                    serviceTree={dayData.comida?.tree}
                     onEditDish={onSaveDishDecomposition ? (dish) => setEditingDish(dish) : null}
                   />
                 </>
@@ -571,7 +517,7 @@ export default function MenuSemanal({
                 label="1º"
                 value={dayData.cena?.primero}
                 color="blue"
-                platosDesglosados={dayData.cena?.platos_desglosados}
+                serviceTree={dayData.cena?.tree}
                 onEditDish={onSaveDishDecomposition ? (dish) => setEditingDish(dish) : null}
               />
               <Divider style={{ borderColor: 'var(--mantine-color-gray-1)', borderStyle: 'dashed' }} />
@@ -580,7 +526,7 @@ export default function MenuSemanal({
                 label="2º"
                 value={dayData.cena?.segundo}
                 color="blue"
-                platosDesglosados={dayData.cena?.platos_desglosados}
+                serviceTree={dayData.cena?.tree}
                 onEditDish={onSaveDishDecomposition ? (dish) => setEditingDish(dish) : null}
               />
               {dayData.cena?.postre && (
@@ -591,7 +537,7 @@ export default function MenuSemanal({
                     label="P"
                     value={dayData.cena.postre}
                     color="blue"
-                    platosDesglosados={dayData.cena?.platos_desglosados}
+                    serviceTree={dayData.cena?.tree}
                     onEditDish={onSaveDishDecomposition ? (dish) => setEditingDish(dish) : null}
                   />
                 </>

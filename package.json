@@ -14,7 +14,8 @@
     "bones:force": "boneyard-js build --no-scan --force --cookie \"boneyard_bypass=true\"",
     "db:migrate": "node scripts/db-migrate.js",
     "db:migrate:status": "node scripts/db-migrate.js --status",
-    "db:teams": "node scripts/db-migrate.js --schema=teams"
+    "db:teams": "node scripts/db-migrate.js --schema=teams",
+    "meals:migrate:ast": "node --loader ./scratch/loader.mjs scripts/migrate-meals-to-ast.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

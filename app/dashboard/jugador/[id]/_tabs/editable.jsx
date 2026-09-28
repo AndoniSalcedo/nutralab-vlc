@@ -31,7 +31,7 @@ import {
 } from '@/config/nutrition-days';
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
 import PrepartidoRoutineModal from '@/components/modals/PrepartidoRoutineModal';
-import { formatAstToText } from '@/lib/engine/meal-ast';
+import { convertLegacyToAst, formatAstToText } from '@/lib/engine/meal-ast';
 
 export function CampoEditable({
   label,
@@ -331,18 +331,9 @@ export function ComidasEditable({
             <Stack gap="xs">
               {activeMeals.map((meal) => {
                 const mealData = recsDefecto[meal] || {};
-                const isMainMealIntake = isMainMeal(meal, mealData);
-                const isCompl = Boolean(mealData.isComplete);
-                const hidratos = Array.isArray(mealData.hidrato) ? mealData.hidrato : mealData.hidrato ? [mealData.hidrato] : [];
-                const proteinas = Array.isArray(mealData.proteina) ? mealData.proteina : mealData.proteina ? [mealData.proteina] : [];
-                const verduras = Array.isArray(mealData.verdura) ? mealData.verdura : mealData.verdura ? [mealData.verdura] : [];
-                const frutas = Array.isArray(mealData.fruta) ? mealData.fruta : mealData.fruta ? [mealData.fruta] : [];
-                const lacteos = Array.isArray(mealData.lacteo) ? mealData.lacteo : mealData.lacteo ? [mealData.lacteo] : [];
-                const grasa = mealData.grasa;
-                const alternativas = Array.isArray(mealData.alternativas) ? mealData.alternativas : [];
+                const isMainMealIntake = mealData.isMainMeal ?? isMainMeal(meal, mealData);
                 const hasTree = Boolean(mealData.tree);
-
-                const hasAnySpecific = hasTree || alternativas.length > 0 || hidratos.length > 0 || proteinas.length > 0 || verduras.length > 0 || frutas.length > 0 || lacteos.length > 0 || Boolean(grasa);
+                const isComplete = mealData.type === 'complete';
 
                 return (
                   <Paper key={meal} p="xs" withBorder radius="sm">
@@ -370,7 +361,7 @@ export function ComidasEditable({
                       )}
                     </Group>
 
-                    {isCompl || !hasAnySpecific ? (
+                    {isComplete || !hasTree ? (
                       <Text size="11px" c="dimmed">
                         Rotación variada y completa del comedor oficial del club según preferencias.
                       </Text>
@@ -387,54 +378,7 @@ export function ComidasEditable({
                         )}
                       </Stack>
                     ) : (
-                      <Stack gap={2} mt={2}>
-                        {alternativas.length > 0 && (
-                          <Text size="11px">
-                            <Text span fw={600} c="yellow.9">● Alternativas completas: </Text>
-                            <Text span c="dark.6">
-                              {alternativas.map((alternative, index) => (
-                                `${index > 0 ? ' / ' : ''}${alternative.label || alternative.nombre || `Alternativa ${index + 1}`}`
-                              )).join('')}
-                            </Text>
-                          </Text>
-                        )}
-                        {hidratos.length > 0 && (
-                          <Text size="11px">
-                            <Text span fw={600} c="orange.8">● Hidratos: </Text>
-                            <Text span c="dark.6">{hidratos.join(', ')}</Text>
-                          </Text>
-                        )}
-                        {proteinas.length > 0 && (
-                          <Text size="11px">
-                            <Text span fw={600} c="blue.8">● Proteínas: </Text>
-                            <Text span c="dark.6">{proteinas.join(', ')}</Text>
-                          </Text>
-                        )}
-                        {verduras.length > 0 && (
-                          <Text size="11px">
-                            <Text span fw={600} c="green.8">● Verduras: </Text>
-                            <Text span c="dark.6">{verduras.join(', ')}</Text>
-                          </Text>
-                        )}
-                        {frutas.length > 0 && (
-                          <Text size="11px">
-                            <Text span fw={600} c="pink.8">● Frutas: </Text>
-                            <Text span c="dark.6">{frutas.join(', ')}</Text>
-                          </Text>
-                        )}
-                        {lacteos.length > 0 && (
-                          <Text size="11px">
-                            <Text span fw={600} c="indigo.8">● Lácteos / Postres: </Text>
-                            <Text span c="dark.6">{lacteos.join(', ')}</Text>
-                          </Text>
-                        )}
-                        {grasa && (
-                          <Text size="11px">
-                            <Text span fw={600} c="yellow.9">● Grasa: </Text>
-                            <Text span c="dark.6">{grasa}</Text>
-                          </Text>
-                        )}
-                      </Stack>
+                      <Text size="11px" c="dark.7">{formatAstToText(mealData)}</Text>
                     )}
                   </Paper>
                 );
@@ -455,7 +399,7 @@ export function ComidasEditable({
           jugadorId={jugadorId}
           onSave={async (updatedMeal) => {
             const newRecs = {
-              ...recsDefecto,
+              ...Object.fromEntries(Object.entries(recsDefecto).map(([name, meal]) => [name, convertLegacyToAst(meal)])),
               [selectedMealForModal]: updatedMeal,
             };
             setRecsDefecto(newRecs);
@@ -603,10 +547,9 @@ export function PrepartidoEditable({
             Array.isArray(cfg?.ingestas) ? cfg.ingestas : defaultMeals
           );
           const currentPost = cfg?.postentreno !== undefined ? Boolean(cfg.postentreno) : defaultPost;
-          const currentRecs = { ...(cfg?.recomendaciones || {}) };
-          if (cfg?.dia_anterior && !currentRecs.Cena && !currentRecs.cena) {
-            currentRecs.Cena = cfg.dia_anterior;
-          }
+          const currentRecs = Object.fromEntries(
+            Object.entries(cfg?.recomendaciones || {}).map(([name, meal]) => [name, convertLegacyToAst(meal)])
+          );
           const mealsList =
             cfg?.ingestas && cfg.ingestas.length > 0
               ? sortPreMatchMealsChronological(opt.value, cfg.ingestas).join(', ')
@@ -699,45 +642,10 @@ export function PrepartidoEditable({
                 <Stack gap="xs" mt={4}>
                   {currentMeals.map((m) => {
                     const timing = getMealTimingBadge(opt.value, m);
-                    const mealData = currentRecs[m] || {};
-                    const isMainMealIntake = isMainMeal(m, mealData);
-                    const isCompl = Boolean(mealData.isComplete);
-                    const hidratos = Array.isArray(mealData.hidrato)
-                      ? mealData.hidrato
-                      : mealData.hidrato
-                      ? [mealData.hidrato]
-                      : [];
-                    const proteinas = Array.isArray(mealData.proteina)
-                      ? mealData.proteina
-                      : mealData.proteina
-                      ? [mealData.proteina]
-                      : [];
-                    const verduras = Array.isArray(mealData.verdura)
-                      ? mealData.verdura
-                      : mealData.verdura
-                      ? [mealData.verdura]
-                      : [];
-                    const frutas = Array.isArray(mealData.fruta)
-                      ? mealData.fruta
-                      : mealData.fruta
-                      ? [mealData.fruta]
-                      : [];
-                    const lacteos = Array.isArray(mealData.lacteo)
-                      ? mealData.lacteo
-                      : mealData.lacteo
-                      ? [mealData.lacteo]
-                      : [];
-                    const grasa = mealData.grasa;
+                    const mealData = currentRecs[m] || { type: 'complete' };
+                    const isMainMealIntake = mealData.isMainMeal ?? isMainMeal(m, mealData);
+                    const isComplete = mealData.type === 'complete';
                     const hasTree = Boolean(mealData.tree);
-
-                    const hasAnySpecific =
-                      hasTree ||
-                      hidratos.length > 0 ||
-                      proteinas.length > 0 ||
-                      verduras.length > 0 ||
-                      frutas.length > 0 ||
-                      lacteos.length > 0 ||
-                      Boolean(grasa);
 
                     return (
                       <Paper key={m} p="xs" withBorder radius="sm" bg="gray.0">
@@ -750,7 +658,7 @@ export function PrepartidoEditable({
                           </Text>
                         </Group>
 
-                        {isCompl || !hasAnySpecific ? (
+                        {isComplete || !hasTree ? (
                           <Text size="11px" c="dimmed">
                             Rotación pre-partido completa (fácil digestión y carga energética equilibrada).
                           </Text>
@@ -767,68 +675,7 @@ export function PrepartidoEditable({
                             )}
                           </Stack>
                         ) : (
-                          <Stack gap={2} mt={2}>
-                            {hidratos.length > 0 && (
-                              <Text size="11px">
-                                <Text span fw={600} c="orange.8">
-                                  ● Hidratos:{' '}
-                                </Text>
-                                <Text span c="dark.6">
-                                  {hidratos.join(', ')}
-                                </Text>
-                              </Text>
-                            )}
-                            {proteinas.length > 0 && (
-                              <Text size="11px">
-                                <Text span fw={600} c="blue.8">
-                                  ● Proteínas:{' '}
-                                </Text>
-                                <Text span c="dark.6">
-                                  {proteinas.join(', ')}
-                                </Text>
-                              </Text>
-                            )}
-                            {verduras.length > 0 && (
-                              <Text size="11px">
-                                <Text span fw={600} c="green.8">
-                                  ● Verduras:{' '}
-                                </Text>
-                                <Text span c="dark.6">
-                                  {verduras.join(', ')}
-                                </Text>
-                              </Text>
-                            )}
-                            {frutas.length > 0 && (
-                              <Text size="11px">
-                                <Text span fw={600} c="pink.8">
-                                  ● Frutas:{' '}
-                                </Text>
-                                <Text span c="dark.6">
-                                  {frutas.join(', ')}
-                                </Text>
-                              </Text>
-                            )}
-                            {lacteos.length > 0 && (
-                              <Text size="11px">
-                                <Text span fw={600} c="indigo.8">
-                                  ● Lácteos / Postres:{' '}
-                                </Text>
-                                <Text span c="dark.6">
-                                  {lacteos.join(', ')}
-                                </Text>
-                              </Text>
-                            )}
-                            {grasa && (
-                              <Text size="11px">
-                                <Text span fw={600} c="yellow.9">
-                                  ● Grasa:{' '}
-                                </Text>
-                                <Text span c="dark.6">
-                                  {grasa}
-                                </Text>
-                              </Text>
-                            )}
-                          </Stack>
+                          <Text size="11px" c="dark.7">{formatAstToText(mealData)}</Text>
                         )}
                       </Paper>
                     );
@@ -856,6 +703,7 @@ export function PrepartidoEditable({
               ...config,
               [schedKey]: schedConfig,
             };
+            delete toSave[schedKey].dia_anterior;
             await updatePlayerField(jugadorId, 'config_prepartido', toSave);
             setConfig(toSave);
             router.refresh();
