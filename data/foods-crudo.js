@@ -907,23 +907,23 @@ export const FOODS_CRUDO = [
       "tuberculos"
     ]
   },
-  {
-    "name": "Picos / colines",
-    "originalName": "Picos / colines",
-    "kcal": 400,
-    "cho": 72,
-    "pro": 10,
-    "fat": 8,
-    "tags": [
-      "gluten"
-    ],
-    "minGrams": 30,
-    "maxGrams": 80,
-    "treePath": [
-      "hidratos",
-      "panes"
-    ]
-  },
+  // {
+  //   "name": "Picos / colines",
+  //   "originalName": "Picos / colines",
+  //   "kcal": 400,
+  //   "cho": 72,
+  //   "pro": 10,
+  //   "fat": 8,
+  //   "tags": [
+  //     "gluten"
+  //   ],
+  //   "minGrams": 30,
+  //   "maxGrams": 80,
+  //   "treePath": [
+  //     "hidratos",
+  //     "panes"
+  //   ]
+  // },
   {
     "name": "Quinoa",
     "originalName": "Quinoa crudo",
