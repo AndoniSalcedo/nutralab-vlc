@@ -260,9 +260,6 @@ export default function EditMealPatternModal({
               <Text size="xs" fw={700} c="dark.8">
                 {astLabel}
               </Text>
-              <Text size="11px" c="dimmed">
-                Pauta AST estructurada (conjunciones y opciones disyuntivas).
-              </Text>
             </Stack>
           ) : (
             <Text size="xs" c="dimmed">

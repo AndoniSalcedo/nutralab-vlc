@@ -262,9 +262,6 @@ function SingleMealPautaEditor({
               <Text size="xs" fw={700} c="dark.8">
                 {formatAstToText({ tree: mealData.tree })}
               </Text>
-              <Text size="11px" c="dimmed" mt={3}>
-                La pauta se evalúa como AST (conjunciones y opciones disyuntivas) respetando las intolerancias del jugador.
-              </Text>
             </Paper>
           )}
         </Stack>
