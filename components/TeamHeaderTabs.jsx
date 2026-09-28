@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   ActionIcon,
-  Anchor,
   Avatar,
   Box,
   FileButton,
@@ -125,16 +124,34 @@ export default function TeamHeaderTabs({
         <Group justify="space-between" align="center" wrap="nowrap" gap={{ base: 'xs', sm: 'md' }} style={{ width: '100%' }}>
           <Group gap={{ base: 'xs', sm: 'md' }} align="center" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
             <Tooltip label="Volver a equipos" position="right" withArrow>
-              <Anchor component={Link} href="/dashboard" style={{ textDecoration: 'none', flexShrink: 0 }}>
+              <Box style={{ flexShrink: 0 }}>
                 {/* En móvil: size 36, icono 20 */}
-                <ActionIcon hiddenFrom="sm" variant="subtle" color="gray" size={36} radius="xl">
+                <ActionIcon
+                  component={Link}
+                  href="/dashboard"
+                  hiddenFrom="sm"
+                  variant="subtle"
+                  color="gray"
+                  size={36}
+                  radius="xl"
+                  style={{ textDecoration: 'none' }}
+                >
                   <IconArrowLeft size={20} />
                 </ActionIcon>
                 {/* En escritorio: size 42, icono 26 (idéntico al del jugador) */}
-                <ActionIcon visibleFrom="sm" variant="subtle" color="gray" size={42} radius="xl" style={{ transition: 'transform 140ms ease' }}>
+                <ActionIcon
+                  component={Link}
+                  href="/dashboard"
+                  visibleFrom="sm"
+                  variant="subtle"
+                  color="gray"
+                  size={42}
+                  radius="xl"
+                  style={{ transition: 'transform 140ms ease', textDecoration: 'none' }}
+                >
                   <IconArrowLeft size={26} />
                 </ActionIcon>
-              </Anchor>
+              </Box>
             </Tooltip>
 
             {avatarSlot ? (

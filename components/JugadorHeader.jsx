@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   ActionIcon,
-  Anchor,
   Avatar,
   Box,
   Button,
@@ -33,11 +33,17 @@ function BackButton({ size = 42, iconSize = 26, equipoId }) {
   const url = equipoId ? `/dashboard/equipo/${equipoId}` : '/dashboard';
   return (
     <Tooltip label="Volver al listado" position="right" withArrow>
-      <Anchor href={url} style={{ textDecoration: 'none' }}>
-        <ActionIcon variant="subtle" color="gray" size={size} radius="xl" style={{ transition: 'transform 140ms ease' }}>
-          <IconArrowLeft size={iconSize} />
-        </ActionIcon>
-      </Anchor>
+      <ActionIcon
+        component={Link}
+        href={url}
+        variant="subtle"
+        color="gray"
+        size={size}
+        radius="xl"
+        style={{ transition: 'transform 140ms ease', textDecoration: 'none' }}
+      >
+        <IconArrowLeft size={iconSize} />
+      </ActionIcon>
     </Tooltip>
   );
 }
