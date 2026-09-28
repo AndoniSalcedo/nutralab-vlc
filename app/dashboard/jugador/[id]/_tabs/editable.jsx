@@ -31,6 +31,7 @@ import {
 } from '@/config/nutrition-days';
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
 import PrepartidoRoutineModal from '@/components/modals/PrepartidoRoutineModal';
+import { formatAstToText } from '@/lib/engine/meal-ast';
 
 export function CampoEditable({
   label,
@@ -339,8 +340,9 @@ export function ComidasEditable({
                 const lacteos = Array.isArray(mealData.lacteo) ? mealData.lacteo : mealData.lacteo ? [mealData.lacteo] : [];
                 const grasa = mealData.grasa;
                 const alternativas = Array.isArray(mealData.alternativas) ? mealData.alternativas : [];
+                const hasTree = Boolean(mealData.tree);
 
-                const hasAnySpecific = alternativas.length > 0 || hidratos.length > 0 || proteinas.length > 0 || verduras.length > 0 || frutas.length > 0 || lacteos.length > 0 || Boolean(grasa);
+                const hasAnySpecific = hasTree || alternativas.length > 0 || hidratos.length > 0 || proteinas.length > 0 || verduras.length > 0 || frutas.length > 0 || lacteos.length > 0 || Boolean(grasa);
 
                 return (
                   <Paper key={meal} p="xs" withBorder radius="sm">
@@ -372,6 +374,18 @@ export function ComidasEditable({
                       <Text size="11px" c="dimmed">
                         Rotación variada y completa del comedor oficial del club según preferencias.
                       </Text>
+                    ) : hasTree ? (
+                      <Stack gap={2} mt={2}>
+                        <Text size="11px">
+                          <Text span fw={600} c="teal.8">● Pauta: </Text>
+                          <Text span c="dark.7" fw={500}>{formatAstToText(mealData)}</Text>
+                        </Text>
+                        {mealData.raw && mealData.raw !== formatAstToText(mealData) && (
+                          <Text size="10px" c="dimmed" fs="italic">
+                            Indicación: &quot;{mealData.raw}&quot;
+                          </Text>
+                        )}
+                      </Stack>
                     ) : (
                       <Stack gap={2} mt={2}>
                         {alternativas.length > 0 && (
@@ -714,8 +728,10 @@ export function PrepartidoEditable({
                       ? [mealData.lacteo]
                       : [];
                     const grasa = mealData.grasa;
+                    const hasTree = Boolean(mealData.tree);
 
                     const hasAnySpecific =
+                      hasTree ||
                       hidratos.length > 0 ||
                       proteinas.length > 0 ||
                       verduras.length > 0 ||
@@ -738,6 +754,18 @@ export function PrepartidoEditable({
                           <Text size="11px" c="dimmed">
                             Rotación pre-partido completa (fácil digestión y carga energética equilibrada).
                           </Text>
+                        ) : hasTree ? (
+                          <Stack gap={2} mt={2}>
+                            <Text size="11px">
+                              <Text span fw={600} c="teal.8">● Pauta: </Text>
+                              <Text span c="dark.7" fw={500}>{formatAstToText(mealData)}</Text>
+                            </Text>
+                            {mealData.raw && mealData.raw !== formatAstToText(mealData) && (
+                              <Text size="10px" c="dimmed" fs="italic">
+                                Indicación: &quot;{mealData.raw}&quot;
+                              </Text>
+                            )}
+                          </Stack>
                         ) : (
                           <Stack gap={2} mt={2}>
                             {hidratos.length > 0 && (

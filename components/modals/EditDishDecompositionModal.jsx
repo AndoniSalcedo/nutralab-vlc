@@ -21,6 +21,7 @@ import {
   getTreeLacteoOptions,
   getTreeGrasaOptions,
 } from '@/config/food-tree-options';
+import { convertDishToAst } from '@/lib/engine/meal-ast';
 
 function ensureOptionsContain(options, currentValues) {
   if (!currentValues) return options;
@@ -111,6 +112,7 @@ export default function EditDishDecompositionModal({
       lacteo: lacteo.length > 0 ? lacteo : null,
       grasa: grasa && grasa !== 'Sin grasa añadida' ? grasa : null,
     };
+    updated.tree = convertDishToAst(updated);
 
     onSave(updated);
     onClose();

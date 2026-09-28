@@ -19,6 +19,7 @@ import ResponsiveModal from './ResponsiveModal';
 import { notifications } from '@mantine/notifications';
 import { IconSparkles, IconAlertCircle, IconCheck, IconX } from '@/components/icons3d';
 import { parseMealTree } from '@/actions/mealActions';
+import { formatAstToText, convertLegacyToAst } from '@/lib/engine/meal-ast';
 import {
   getTreeProteinaOptions,
   getTreeHidratoOptions,
@@ -75,6 +76,7 @@ export default function EditMealPatternModal({
   const [lacteo, setLacteo] = useState([]);
   const [grasa, setGrasa] = useState(null);
   const [alternativas, setAlternativas] = useState([]);
+  const [tree, setTree] = useState(null);
 
   useEffect(() => {
     if (opened) {
@@ -82,6 +84,7 @@ export default function EditMealPatternModal({
       const val = value || {};
 
       setIsMainMeal(checkIsMainMeal(mealName, val));
+      setTree(val.tree || null);
 
       // Detectar si es árbol completo
       const complete = Boolean(val.isComplete);
@@ -151,8 +154,9 @@ export default function EditMealPatternModal({
         return;
       }
 
-      if (mealData.isComplete) {
+      if (mealData.isComplete || !mealData.tree) {
         setIsComplete(true);
+        setTree(null);
         setProteina([]);
         setHidrato([]);
         setVerdura([]);
@@ -162,6 +166,7 @@ export default function EditMealPatternModal({
         setAlternativas([]);
       } else {
         setIsComplete(false);
+        setTree(mealData.tree || null);
         setProteina(mealData.alternativas?.length ? [] : (mealData.proteina || []));
         setHidrato(mealData.alternativas?.length ? [] : (mealData.hidrato || []));
         setVerdura(mealData.alternativas?.length ? [] : (mealData.verdura || []));
@@ -203,18 +208,33 @@ export default function EditMealPatternModal({
       ? allParts.join(' + ')
       : 'Rotación variada';
 
+    let finalTree = isComplete ? null : tree;
+    if (!finalTree && !isComplete && (hasAlternatives || allParts.length > 0)) {
+      const converted = convertLegacyToAst({
+        isComplete,
+        alternativas,
+        hidrato,
+        proteina,
+        verdura,
+        fruta,
+        lacteo,
+        grasa,
+        raw: aiText.trim(),
+        label,
+      });
+      finalTree = converted.tree;
+    }
+
+    const finalLabel = finalTree
+      ? formatAstToText({ tree: finalTree })
+      : label;
+
     const structuredMeal = {
       isMainMeal: Boolean(isMainMeal),
-      isComplete: isComplete || (!hasAlternatives && allParts.length === 0),
-      proteina: isComplete || hasAlternatives ? [] : proteina,
-      hidrato: isComplete || hasAlternatives ? [] : hidrato,
-      verdura: isComplete || hasAlternatives ? [] : verdura,
-      fruta: isComplete || hasAlternatives ? [] : fruta,
-      lacteo: isComplete || hasAlternatives ? [] : lacteo,
-      grasa: isComplete || hasAlternatives ? null : (grasa && grasa !== 'Sin grasa añadida' ? grasa : null),
-      alternativas: hasAlternatives ? alternativas : [],
-      raw: aiText.trim() || label,
-      label,
+      isComplete: isComplete || (!finalTree && allParts.length === 0),
+      tree: isComplete ? null : finalTree,
+      raw: aiText.trim() || finalLabel,
+      label: finalLabel,
       isValid: true,
       unrecognized: [],
     };

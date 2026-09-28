@@ -1,0 +1,3295 @@
+{
+  "totalJugadores": 88,
+  "planesGenerados": 880,
+  "totalDiasEvaluados": 6160,
+  "fallosEjecucion": [],
+  "duplicadosMismaToma": [],
+  "colisionesMismoDia": {
+    "arroz": [
+      {
+        "jugador": "César",
+        "dia": "W9 viernes",
+        "rama": "arroz",
+        "comida": "Arroz",
+        "cena": "Arroz"
+      },
+      {
+        "jugador": "Stole",
+        "dia": "W3 viernes",
+        "rama": "arroz",
+        "comida": "Arroz",
+        "cena": "Arroz blanco"
+      },
+      {
+        "jugador": "Stole",
+        "dia": "W9 viernes",
+        "rama": "arroz",
+        "comida": "Arroz",
+        "cena": "Arroz blanco"
+      },
+      {
+        "jugador": "Arnau",
+        "dia": "W3 viernes",
+        "rama": "arroz",
+        "comida": "Arroz",
+        "cena": "Arroz blanco"
+      },
+      {
+        "jugador": "Arnau",
+        "dia": "W7 viernes",
+        "rama": "arroz",
+        "comida": "Arroz",
+        "cena": "Arroz blanco"
+      }
+    ],
+    "tuberculos": [
+      {
+        "jugador": "Gonzalo ",
+        "dia": "W1 viernes",
+        "rama": "tuberculos",
+        "comida": "Gajos de boniato",
+        "cena": "Boniato"
+      },
+      {
+        "jugador": "Gonzalo ",
+        "dia": "W2 viernes",
+        "rama": "tuberculos",
+        "comida": "Gajos de boniato",
+        "cena": "Patata"
+      },
+      {
+        "jugador": "Gonzalo ",
+        "dia": "W4 viernes",
+        "rama": "tuberculos",
+        "comida": "Gajos de boniato",
+        "cena": "Patata"
+      },
+      {
+        "jugador": "Gonzalo ",
+        "dia": "W5 viernes",
+        "rama": "tuberculos",
+        "comida": "Puré de patata",
+        "cena": "Patata"
+      },
+      {
+        "jugador": "Gonzalo ",
+        "dia": "W6 viernes",
+        "rama": "tuberculos",
+        "comida": "Gajos de boniato",
+        "cena": "Boniato"
+      },
+      {
+        "jugador": "Gonzalo ",
+        "dia": "W7 viernes",
+        "rama": "tuberculos",
+        "comida": "Patata",
+        "cena": "Boniato"
+      },
+      {
+        "jugador": "Gonzalo ",
+        "dia": "W9 viernes",
+        "rama": "tuberculos",
+        "comida": "Gajos de boniato",
+        "cena": "Boniato"
+      }
+    ],
+    "pasta": [],
+    "mismaProteina": [
+      {
+        "jugador": "Jesús",
+        "dia": "W3 viernes",
+        "rama": "vacuno",
+        "comida": "Filete de ternera",
+        "cena": "Ternera magra"
+      },
+      {
+        "jugador": "Harvey",
+        "dia": "W6 viernes",
+        "rama": "pollo",
+        "comida": "Boloñesa de pollo",
+        "cena": "Pechuga de pollo"
+      },
+      {
+        "jugador": "Harvey",
+        "dia": "W10 viernes",
+        "rama": "pollo",
+        "comida": "Muslo de pollo",
+        "cena": "Pechuga de pollo"
+      }
+    ],
+    "mismoAlimentoExacto": [
+      {
+        "jugador": "Javi",
+        "dia": "W10 jueves",
+        "tipo": "carb",
+        "alimento": "Trigo sarraceno"
+      },
+      {
+        "jugador": "César",
+        "dia": "W9 viernes",
+        "tipo": "carb",
+        "alimento": "Arroz"
+      }
+    ]
+  },
+  "colisionesConsecutivas": {
+    "maxRachaCarb": {
+      "racha": 11,
+      "detalle": "Hugo (arroz) W2 sabado"
+    },
+    "maxRachaPro": {
+      "racha": 6,
+      "detalle": "Arnaut (vacuno) W3 miercoles"
+    },
+    "racha3Carb": [
+      {
+        "jugador": "Íker",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 domingo"
+      },
+      {
+        "jugador": "Íker",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 viernes"
+      },
+      {
+        "jugador": "Íker",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Íker",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Íker",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W4 lunes"
+      },
+      {
+        "jugador": "Íker",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Íker",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "Dieng",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Dieng",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 viernes"
+      },
+      {
+        "jugador": "Dieng",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "Dieng",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W4 domingo"
+      },
+      {
+        "jugador": "Dieng",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 miercoles"
+      },
+      {
+        "jugador": "Dieng",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Dieng",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W6 viernes"
+      },
+      {
+        "jugador": "Dieng",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Dieng",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 domingo"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 domingo"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 jueves"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 viernes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 7,
+        "dia": "W4 lunes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 viernes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 domingo"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W6 lunes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W6 martes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W6 miercoles"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 7,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 lunes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 domingo"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W10 lunes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W10 martes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W10 miercoles"
+      },
+      {
+        "jugador": "Wanjala",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 viernes"
+      },
+      {
+        "jugador": "Wanjala",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W1 sabado"
+      },
+      {
+        "jugador": "Wanjala",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Alberto",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 viernes"
+      },
+      {
+        "jugador": "Alberto",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W5 sabado"
+      },
+      {
+        "jugador": "Andrés",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 domingo"
+      },
+      {
+        "jugador": "Andrés",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 lunes"
+      },
+      {
+        "jugador": "Andrés",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W3 martes"
+      },
+      {
+        "jugador": "Andrés",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 sabado"
+      },
+      {
+        "jugador": "Fran",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W4 martes"
+      },
+      {
+        "jugador": "Fran",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 jueves"
+      },
+      {
+        "jugador": "Miguel",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 jueves"
+      },
+      {
+        "jugador": "Miguel",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 lunes"
+      },
+      {
+        "jugador": "Miguel",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Mouctar",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "Mouctar",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W7 martes"
+      },
+      {
+        "jugador": "Mouctar",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 domingo"
+      },
+      {
+        "jugador": "Mouctar",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W10 lunes"
+      },
+      {
+        "jugador": "Raúl",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 viernes"
+      },
+      {
+        "jugador": "Raúl",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Raúl",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 viernes"
+      },
+      {
+        "jugador": "Raúl",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Raúl",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Raúl",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W4 lunes"
+      },
+      {
+        "jugador": "Raúl",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W5 martes"
+      },
+      {
+        "jugador": "Raúl",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W7 martes"
+      },
+      {
+        "jugador": "Alex",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W2 lunes"
+      },
+      {
+        "jugador": "Alex",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "Alex",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 domingo"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 jueves"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 viernes"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W4 lunes"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 viernes"
+      },
+      {
+        "jugador": "Sadiq",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 jueves"
+      },
+      {
+        "jugador": "Sadiq",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 viernes"
+      },
+      {
+        "jugador": "Sadiq",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Sadiq",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Sadiq",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W4 lunes"
+      },
+      {
+        "jugador": "André",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W3 lunes"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 jueves"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W4 viernes"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 viernes"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W5 sabado"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 viernes"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W6 sabado"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W6 domingo"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Javi",
+        "rama": "otros_granos",
+        "racha": 3,
+        "dia": "W2 martes"
+      },
+      {
+        "jugador": "Javi",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Javi",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Javi",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "Javi",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Javi",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 jueves"
+      },
+      {
+        "jugador": "Javi",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W8 viernes"
+      },
+      {
+        "jugador": "Filip",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W5 martes"
+      },
+      {
+        "jugador": "Filip",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W7 martes"
+      },
+      {
+        "jugador": "Filip",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Filip",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 domingo"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 viernes"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W1 sabado"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W4 martes"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W4 domingo"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "Alberto",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 sabado"
+      },
+      {
+        "jugador": "Alberto",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Alberto",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W7 lunes"
+      },
+      {
+        "jugador": "Alberto",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Alberto",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Alberto",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "Alberto",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W7 domingo"
+      },
+      {
+        "jugador": "Alberto",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 miercoles"
+      },
+      {
+        "jugador": "Alberto",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W9 jueves"
+      },
+      {
+        "jugador": "Alberto",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Lucas",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Lucas",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 jueves"
+      },
+      {
+        "jugador": "Lucas",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 lunes"
+      },
+      {
+        "jugador": "Lucas",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 sabado"
+      },
+      {
+        "jugador": "Lucas",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 lunes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 martes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 miercoles"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W8 martes"
+      },
+      {
+        "jugador": "Panach",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 jueves"
+      },
+      {
+        "jugador": "Panach",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 lunes"
+      },
+      {
+        "jugador": "Panach",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 viernes"
+      },
+      {
+        "jugador": "Panach",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W5 sabado"
+      },
+      {
+        "jugador": "Raúl",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 viernes"
+      },
+      {
+        "jugador": "Raúl",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W1 sabado"
+      },
+      {
+        "jugador": "Raúl",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 jueves"
+      },
+      {
+        "jugador": "Raúl",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 sabado"
+      },
+      {
+        "jugador": "Sergi",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 miercoles"
+      },
+      {
+        "jugador": "Sergi",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Sergi",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Sergi",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "Julen",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 lunes"
+      },
+      {
+        "jugador": "Julen",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 domingo"
+      },
+      {
+        "jugador": "Julen",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 jueves"
+      },
+      {
+        "jugador": "Julen",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 domingo"
+      },
+      {
+        "jugador": "Julen",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 lunes"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 jueves"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 miercoles"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 jueves"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 miercoles"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W1 jueves"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W1 viernes"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W1 sabado"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 7,
+        "dia": "W1 domingo"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 viernes"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Gurenndal",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 viernes"
+      },
+      {
+        "jugador": "Gurenndal",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "Gurenndal",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 lunes"
+      },
+      {
+        "jugador": "Gurenndal",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 viernes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W1 sabado"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W1 domingo"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W2 lunes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 7,
+        "dia": "W2 martes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 8,
+        "dia": "W2 miercoles"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 9,
+        "dia": "W2 jueves"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 10,
+        "dia": "W2 viernes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 11,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 jueves"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 domingo"
+      },
+      {
+        "jugador": "Yarek",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 lunes"
+      },
+      {
+        "jugador": "Yarek",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 jueves"
+      },
+      {
+        "jugador": "Yarek",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 jueves"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 miercoles"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W1 jueves"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W1 viernes"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W1 sabado"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 7,
+        "dia": "W1 domingo"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W4 lunes"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 domingo"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 domingo"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 miercoles"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 domingo"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 miercoles"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 jueves"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W8 viernes"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W8 sabado"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 viernes"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W9 sabado"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W9 domingo"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 jueves"
+      },
+      {
+        "jugador": "Javi",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 jueves"
+      },
+      {
+        "jugador": "Javi",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 viernes"
+      },
+      {
+        "jugador": "Javi",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W5 sabado"
+      },
+      {
+        "jugador": "Javi",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 domingo"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 jueves"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W6 viernes"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W6 sabado"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 miercoles"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 miercoles"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 domingo"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W9 lunes"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W9 martes"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W9 miercoles"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 7,
+        "dia": "W9 jueves"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 jueves"
+      },
+      {
+        "jugador": "José",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 jueves"
+      },
+      {
+        "jugador": "José",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "José",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 miercoles"
+      },
+      {
+        "jugador": "José",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 jueves"
+      },
+      {
+        "jugador": "José",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W10 viernes"
+      },
+      {
+        "jugador": "José",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Lucas",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Lucas",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Luis",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 jueves"
+      },
+      {
+        "jugador": "Luis",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 lunes"
+      },
+      {
+        "jugador": "Mouctar",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 miercoles"
+      },
+      {
+        "jugador": "Mouctar",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 viernes"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 jueves"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 lunes"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 lunes"
+      },
+      {
+        "jugador": "Pablo",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W10 martes"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 lunes"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 miercoles"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W8 jueves"
+      },
+      {
+        "jugador": "Ramazani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 viernes"
+      },
+      {
+        "jugador": "Ramazani",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W1 sabado"
+      },
+      {
+        "jugador": "Ramazani",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W1 domingo"
+      },
+      {
+        "jugador": "Ramazani",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W2 lunes"
+      },
+      {
+        "jugador": "Ramazani",
+        "rama": "arroz",
+        "racha": 7,
+        "dia": "W2 martes"
+      },
+      {
+        "jugador": "Ramazani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 viernes"
+      },
+      {
+        "jugador": "Ramazani",
+        "rama": "otros_granos",
+        "racha": 3,
+        "dia": "W6 martes"
+      },
+      {
+        "jugador": "Ramazani",
+        "rama": "otros_granos",
+        "racha": 4,
+        "dia": "W6 miercoles"
+      },
+      {
+        "jugador": "Ramazani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Ramazani",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W10 domingo"
+      },
+      {
+        "jugador": "Renzo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 jueves"
+      },
+      {
+        "jugador": "Renzo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 sabado"
+      },
+      {
+        "jugador": "Renzo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 sabado"
+      },
+      {
+        "jugador": "Rubén",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 jueves"
+      },
+      {
+        "jugador": "Rubén",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W8 viernes"
+      },
+      {
+        "jugador": "Rubén",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 jueves"
+      },
+      {
+        "jugador": "Rubén",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W9 viernes"
+      },
+      {
+        "jugador": "Rubén",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W9 sabado"
+      },
+      {
+        "jugador": "Rubén",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 jueves"
+      },
+      {
+        "jugador": "Rubén",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W10 viernes"
+      },
+      {
+        "jugador": "Rubén",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Sadiq",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 jueves"
+      },
+      {
+        "jugador": "Sadiq",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 lunes"
+      },
+      {
+        "jugador": "Sadiq",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 lunes"
+      },
+      {
+        "jugador": "Sadiq",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Sadiq",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 jueves"
+      },
+      {
+        "jugador": "Stole",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 lunes"
+      },
+      {
+        "jugador": "Stole",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 miercoles"
+      },
+      {
+        "jugador": "Stole",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W8 jueves"
+      },
+      {
+        "jugador": "Stole",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W10 martes"
+      },
+      {
+        "jugador": "Thierry",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 lunes"
+      },
+      {
+        "jugador": "Thierry",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Unai",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 jueves"
+      },
+      {
+        "jugador": "Unai",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W1 viernes"
+      },
+      {
+        "jugador": "Unai",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W1 sabado"
+      },
+      {
+        "jugador": "Unai",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Vicent",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "Vicent",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Vicent",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W6 viernes"
+      },
+      {
+        "jugador": "Vicent",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 sabado"
+      },
+      {
+        "jugador": "Vicent",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W9 domingo"
+      },
+      {
+        "jugador": "Vicent",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 viernes"
+      },
+      {
+        "jugador": "Justin ",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 domingo"
+      },
+      {
+        "jugador": "Justin ",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 miercoles"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 jueves"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W3 viernes"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 viernes"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W5 sabado"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 miercoles"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 domingo"
+      },
+      {
+        "jugador": "José",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 jueves"
+      },
+      {
+        "jugador": "José",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W2 viernes"
+      },
+      {
+        "jugador": "José",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "José",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 viernes"
+      },
+      {
+        "jugador": "José",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "David",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "David",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W4 martes"
+      },
+      {
+        "jugador": "Sato",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 viernes"
+      },
+      {
+        "jugador": "Sato",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Sato",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W2 domingo"
+      },
+      {
+        "jugador": "Sato",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Sato",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W5 martes"
+      },
+      {
+        "jugador": "Sato",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Sato",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Rodrigo ",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 miercoles"
+      },
+      {
+        "jugador": "Rodrigo ",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W1 jueves"
+      },
+      {
+        "jugador": "Rodrigo ",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 jueves"
+      },
+      {
+        "jugador": "Rodrigo ",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 sabado"
+      },
+      {
+        "jugador": "Rodrigo ",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W6 domingo"
+      },
+      {
+        "jugador": "Rodrigo ",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Rodrigo ",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Rodrigo ",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 sabado"
+      },
+      {
+        "jugador": "Rodrigo ",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Luis",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W2 miercoles"
+      },
+      {
+        "jugador": "Luis",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Luis",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Luis",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W8 lunes"
+      },
+      {
+        "jugador": "Aimar",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 viernes"
+      },
+      {
+        "jugador": "Aimar",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Aimar",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Aimar",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Aimar",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 jueves"
+      },
+      {
+        "jugador": "André",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W2 lunes"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 lunes"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 martes"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W3 miercoles"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W3 jueves"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 miercoles"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W4 jueves"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W4 viernes"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "André",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 jueves"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 miercoles"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 jueves"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 lunes"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 domingo"
+      },
+      {
+        "jugador": "Baptiste",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 domingo"
+      },
+      {
+        "jugador": "Baptiste",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 domingo"
+      },
+      {
+        "jugador": "Baptiste",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W10 lunes"
+      },
+      {
+        "jugador": "César",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "César",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 viernes"
+      },
+      {
+        "jugador": "César",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W6 sabado"
+      },
+      {
+        "jugador": "Comert",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Comert",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 miercoles"
+      },
+      {
+        "jugador": "Comert",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Comert",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "Comert",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 domingo"
+      },
+      {
+        "jugador": "Comert",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 viernes"
+      },
+      {
+        "jugador": "Comert",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 miercoles"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 miercoles"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 lunes"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W2 domingo"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W5 martes"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 jueves"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 jueves"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 domingo"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 jueves"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 sabado"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 jueves"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W2 viernes"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 miercoles"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W5 jueves"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W5 viernes"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W5 sabado"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 7,
+        "dia": "W5 domingo"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 miercoles"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W10 martes"
+      },
+      {
+        "jugador": "David",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W2 lunes"
+      },
+      {
+        "jugador": "Diego",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W4 lunes"
+      },
+      {
+        "jugador": "Diego",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 miercoles"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 jueves"
+      },
+      {
+        "jugador": "Filip",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Filip",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 domingo"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 jueves"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W1 viernes"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W1 sabado"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 jueves"
+      },
+      {
+        "jugador": "Guido",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 lunes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 jueves"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 viernes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 miercoles"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W6 viernes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 lunes"
+      },
+      {
+        "jugador": "César",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W1 jueves"
+      },
+      {
+        "jugador": "César",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W2 lunes"
+      },
+      {
+        "jugador": "César",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "César",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W4 jueves"
+      },
+      {
+        "jugador": "César",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 viernes"
+      },
+      {
+        "jugador": "César",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W8 sabado"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W2 domingo"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W3 lunes"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W3 martes"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 7,
+        "dia": "W3 miercoles"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 8,
+        "dia": "W3 jueves"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W5 lunes"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W5 martes"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W5 miercoles"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 6,
+        "dia": "W5 jueves"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 7,
+        "dia": "W5 viernes"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 8,
+        "dia": "W5 sabado"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 miercoles"
+      },
+      {
+        "jugador": "Aaron",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 miercoles"
+      },
+      {
+        "jugador": "Aaron",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 jueves"
+      },
+      {
+        "jugador": "Aaron",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Aaron",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 sabado"
+      },
+      {
+        "jugador": "Aaron",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W8 domingo"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 viernes"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W4 martes"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 viernes"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 jueves"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W8 viernes"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W8 sabado"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W9 domingo"
+      },
+      {
+        "jugador": "Kayne",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W6 jueves"
+      },
+      {
+        "jugador": "Juan",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 lunes"
+      },
+      {
+        "jugador": "Juan",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W8 martes"
+      },
+      {
+        "jugador": "Juan",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 sabado"
+      },
+      {
+        "jugador": "Juan",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "tuberculos",
+        "racha": 3,
+        "dia": "W2 martes"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W4 martes"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W4 viernes"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W4 sabado"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W9 miercoles"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "otros_granos",
+        "racha": 3,
+        "dia": "W10 jueves"
+      },
+      {
+        "jugador": "Diego",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Diego",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W4 miercoles"
+      },
+      {
+        "jugador": "Gonzalo ",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W1 jueves"
+      },
+      {
+        "jugador": "Gonzalo ",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W2 miercoles"
+      },
+      {
+        "jugador": "Harvey",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Harvey",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W10 lunes"
+      },
+      {
+        "jugador": "Stole",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W3 viernes"
+      },
+      {
+        "jugador": "Stole",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W3 sabado"
+      },
+      {
+        "jugador": "Stole",
+        "rama": "arroz",
+        "racha": 5,
+        "dia": "W3 domingo"
+      },
+      {
+        "jugador": "Stole",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W5 sabado"
+      },
+      {
+        "jugador": "Stole",
+        "rama": "otros_granos",
+        "racha": 3,
+        "dia": "W9 martes"
+      },
+      {
+        "jugador": "Stole",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W10 lunes"
+      },
+      {
+        "jugador": "Stole",
+        "rama": "cereales",
+        "racha": 3,
+        "dia": "W10 jueves"
+      },
+      {
+        "jugador": "Arnau",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W7 viernes"
+      },
+      {
+        "jugador": "Arnau",
+        "rama": "arroz",
+        "racha": 4,
+        "dia": "W7 sabado"
+      },
+      {
+        "jugador": "Arnau",
+        "rama": "arroz",
+        "racha": 3,
+        "dia": "W8 domingo"
+      },
+      {
+        "jugador": "Arnau",
+        "rama": "pasta",
+        "racha": 3,
+        "dia": "W10 martes"
+      }
+    ],
+    "racha3Pro": [
+      {
+        "jugador": "Dieng",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W10 viernes"
+      },
+      {
+        "jugador": "Hugo",
+        "rama": "pescado_blanco",
+        "racha": 4,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Miguel",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W2 martes"
+      },
+      {
+        "jugador": "Alex",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W6 martes"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W1 miercoles"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W2 domingo"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "vacuno",
+        "racha": 4,
+        "dia": "W3 lunes"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "vacuno",
+        "racha": 5,
+        "dia": "W3 martes"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "vacuno",
+        "racha": 6,
+        "dia": "W3 miercoles"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W9 lunes"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W10 martes"
+      },
+      {
+        "jugador": "Arnaut",
+        "rama": "vacuno",
+        "racha": 4,
+        "dia": "W10 miercoles"
+      },
+      {
+        "jugador": "Sadiq",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "André",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W4 domingo"
+      },
+      {
+        "jugador": "André",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W6 miercoles"
+      },
+      {
+        "jugador": "André",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W7 domingo"
+      },
+      {
+        "jugador": "Filip",
+        "rama": "pollo",
+        "racha": 3,
+        "dia": "W7 domingo"
+      },
+      {
+        "jugador": "Filip",
+        "rama": "pollo",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W8 martes"
+      },
+      {
+        "jugador": "Pepelu",
+        "rama": "pescado_blanco",
+        "racha": 4,
+        "dia": "W8 miercoles"
+      },
+      {
+        "jugador": "Cenk",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W5 martes"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W8 martes"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "pescado_blanco",
+        "racha": 4,
+        "dia": "W8 miercoles"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W8 martes"
+      },
+      {
+        "jugador": "Ramazani",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W8 martes"
+      },
+      {
+        "jugador": "Justin ",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "David",
+        "rama": "pollo",
+        "racha": 3,
+        "dia": "W10 viernes"
+      },
+      {
+        "jugador": "David",
+        "rama": "pollo",
+        "racha": 4,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Sato",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W5 martes"
+      },
+      {
+        "jugador": "Sato",
+        "rama": "pollo",
+        "racha": 3,
+        "dia": "W9 martes"
+      },
+      {
+        "jugador": "Luis",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W8 miercoles"
+      },
+      {
+        "jugador": "Aimar",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W9 martes"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W4 martes"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W7 martes"
+      },
+      {
+        "jugador": "Dani",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W10 martes"
+      },
+      {
+        "jugador": "Dimitri",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W9 martes"
+      },
+      {
+        "jugador": "César",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W8 miercoles"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W6 miercoles"
+      },
+      {
+        "jugador": "Eray",
+        "rama": "pollo",
+        "racha": 3,
+        "dia": "W7 lunes"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W9 domingo"
+      },
+      {
+        "jugador": "Copete",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W10 viernes"
+      },
+      {
+        "jugador": "Kayne",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W3 martes"
+      },
+      {
+        "jugador": "Juan",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W1 miercoles"
+      },
+      {
+        "jugador": "Juan",
+        "rama": "pollo",
+        "racha": 3,
+        "dia": "W4 lunes"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "pollo",
+        "racha": 3,
+        "dia": "W1 sabado"
+      },
+      {
+        "jugador": "Jesús",
+        "rama": "pollo",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "pescado_azul",
+        "racha": 3,
+        "dia": "W4 domingo"
+      },
+      {
+        "jugador": "Cristian",
+        "rama": "pescado_blanco",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Diego",
+        "rama": "pollo",
+        "racha": 3,
+        "dia": "W3 martes"
+      },
+      {
+        "jugador": "Diego",
+        "rama": "vacuno",
+        "racha": 3,
+        "dia": "W8 sabado"
+      },
+      {
+        "jugador": "Harvey",
+        "rama": "pollo",
+        "racha": 3,
+        "dia": "W10 sabado"
+      },
+      {
+        "jugador": "Arnau",
+        "rama": "pollo",
+        "racha": 3,
+        "dia": "W10 sabado"
+      }
+    ]
+  },
+  "incongruenciasMacros": {
+    "kcalInvalida": [],
+    "desviacionKcalExcesiva": [],
+    "proteinaFueraDeRango": [],
+    "gramosAnomalos": []
+  },
+  "incongruenciasClinicas": {
+    "glutenEnCeliaco": [],
+    "lactosaEnIntolerante": [],
+    "cerdoEnSinCerdo": [],
+    "pescadoEnSinPescado": [],
+    "alimentoAversionServido": []
+  },
+  "incongruenciasEstructura": {
+    "diasFaltantes": [],
+    "ingestasVacias": [],
+    "cenaPerdidaEnPartido": [],
+    "grasaElevadaEnPrepartido": [
+      {
+        "jugador": "Dieng",
+        "ingesta": "Comida",
+        "alimento": "Tomate frito",
+        "gramos": 80,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Dieng",
+        "ingesta": "Comida",
+        "alimento": "Tomate frito",
+        "gramos": 80,
+        "dia": "W8 sabado"
+      },
+      {
+        "jugador": "Raúl",
+        "ingesta": "Comida",
+        "alimento": "Tomate frito",
+        "gramos": 80,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Dimitri",
+        "ingesta": "Comida",
+        "alimento": "Tomate frito",
+        "gramos": 80,
+        "dia": "W2 sabado"
+      },
+      {
+        "jugador": "Luis",
+        "ingesta": "Comida",
+        "alimento": "Tomate frito",
+        "gramos": 80,
+        "dia": "W8 sabado"
+      },
+      {
+        "jugador": "Kayne",
+        "ingesta": "Merienda",
+        "alimento": "Salmón conserva aceite",
+        "gramos": 50,
+        "dia": "W7 sabado"
+      }
+    ]
+  }
+}
