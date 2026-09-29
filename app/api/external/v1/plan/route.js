@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { generarDatosPlan } from '@/lib/engine';
 import { trackUsageEvent } from '@/lib/billing/client';
+import { GYM_TEAM_CONFIG } from '@/config/day-types/gym';
 import {
   externalPlanRequestSchema,
   normalizeNumComidas,
@@ -250,7 +251,7 @@ export async function POST(req) {
       nombre: 'Plan Nutricional',
       calendario,
       menu: null,
-      teamConfig: null,
+      teamConfig: GYM_TEAM_CONFIG,
       preMatchConfig: null,
       suplementacion: [],
     });

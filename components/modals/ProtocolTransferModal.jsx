@@ -19,7 +19,7 @@ import { notifications } from '@mantine/notifications';
 import { IconFolderShare, IconArrowsExchange, IconClipboardList, IconShield } from '@/components/icons3d';
 import { getTeams } from '@/actions/teamActions';
 import { transferProtocol } from '@/actions/protocolActions';
-import { NUTRITION_DAY_TYPES } from '@/config/nutrition-days';
+import { FOOTBALL_DAY_TYPES } from '@/config/day-types/football';
 
 export default function ProtocolTransferModal({ 
   opened, 
@@ -74,7 +74,7 @@ export default function ProtocolTransferModal({
     }
 
     const selectedTeam = teams.find((t) => String(t.id) === String(targetTeamId));
-    const targetDayTypes = selectedTeam?.configuracion_nutricional?.dayTypes || NUTRITION_DAY_TYPES;
+    const targetDayTypes = selectedTeam?.configuracion_nutricional?.dayTypes || FOOTBALL_DAY_TYPES;
 
     if (targetDayTypes.length > 0) {
       // Try to find matching dayTypeKey
@@ -90,7 +90,7 @@ export default function ProtocolTransferModal({
   }, [targetTeamId, protocol, teams]);
 
   const selectedTargetTeam = teams.find((t) => String(t.id) === String(targetTeamId));
-  const targetDayTypes = selectedTargetTeam?.configuracion_nutricional?.dayTypes || NUTRITION_DAY_TYPES;
+  const targetDayTypes = selectedTargetTeam?.configuracion_nutricional?.dayTypes || FOOTBALL_DAY_TYPES;
 
   const currentDayTypeObj = currentDayTypes.find((d) => d.key === protocol?.dayTypeKey);
 

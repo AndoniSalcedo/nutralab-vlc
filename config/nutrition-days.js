@@ -1,50 +1,8 @@
-export const NUTRITION_DAY_TYPES = [
-  {
-    key: 'descanso',
-    label: 'Descanso',
-    planLabel: 'Día descanso',
-    color: 'blue',
-    tienePostentreno: false,
-    tienePreentreno: false,
-  },
-  {
-    key: 'recuperacion',
-    label: 'Recuperación',
-    planLabel: 'Día recuperación',
-    color: 'teal',
-    tienePostentreno: false,
-    tienePreentreno: false,
-  },
-  {
-    key: 'entreno',
-    label: 'Entrenamiento',
-    planLabel: 'Día entrenamiento',
-    color: 'green',
-    tienePostentreno: true,
-    tienePreentreno: true,
-  },
-  {
-    key: 'doble',
-    label: 'Doble sesión',
-    planLabel: 'Día doble sesión',
-    color: 'orange',
-    tienePostentreno: true,
-    tienePreentreno: true,
-  },
-  {
-    key: 'partido',
-    label: 'Partido',
-    planLabel: 'Día partido',
-    color: 'red',
-    tienePostentreno: true,
-    tienePreentreno: true,
-  },
-];
-
+import { FOOTBALL_DAY_TYPES, FOOTBALL_OBJECTIVE_MACROS } from '@/config/day-types/football';
 
 
 function getNutritionDayType(key) {
-  return NUTRITION_DAY_TYPES.find((dayType) => dayType.key === key) || null;
+  return FOOTBALL_DAY_TYPES.find((dayType) => dayType.key === key) || null;
 }
 
 export function getDayTypeColor(key) {
@@ -160,43 +118,6 @@ export const PLAYER_OBJECTIVES = [
   { value: 'mejora_rendimiento', label: 'Mejora del Rendimiento Deportivo' },
 ];
 
-export const OBJECTIVE_DAY_TYPE_MACROS = {
-  perdida_grasa: {
-    descanso:      { kcalPerKg: 21.5, proteinGkg: 2.2,  carbsGkg: 2.15, fatGkg: 0.925 },
-    entreno:       { kcalPerKg: 25.5, proteinGkg: 2.1,  carbsGkg: 3.0,  fatGkg: 0.825 },
-    doble:         { kcalPerKg: 28.5, proteinGkg: 2.1,  carbsGkg: 4.0,  fatGkg: 0.75  },
-    recuperacion:  { kcalPerKg: 23.5, proteinGkg: 2.3,  carbsGkg: 2.5,  fatGkg: 0.85  },
-    partido:       { kcalPerKg: 42.5, proteinGkg: 1.9,  carbsGkg: 6.5,  fatGkg: 0.75  },
-  },
-  perdida_peso: {
-    descanso:      { kcalPerKg: 22.5, proteinGkg: 2.0,  carbsGkg: 2.4,  fatGkg: 0.925 },
-    entreno:       { kcalPerKg: 26.5, proteinGkg: 1.9,  carbsGkg: 3.1,  fatGkg: 0.875 },
-    doble:         { kcalPerKg: 29.5, proteinGkg: 1.9,  carbsGkg: 4.3,  fatGkg: 0.8   },
-    recuperacion:  { kcalPerKg: 24.5, proteinGkg: 2.1,  carbsGkg: 2.7,  fatGkg: 0.85  },
-    partido:       { kcalPerKg: 37.5, proteinGkg: 1.9,  carbsGkg: 6.25, fatGkg: 0.8   },
-  },
-  ganancia_musculo: {
-    descanso:      { kcalPerKg: 31.5, proteinGkg: 2.3,  carbsGkg: 3.5,  fatGkg: 1.05  },
-    entreno:       { kcalPerKg: 35.5, proteinGkg: 2.1,  carbsGkg: 5.0,  fatGkg: 1.0   },
-    doble:         { kcalPerKg: 39.5, proteinGkg: 2.1,  carbsGkg: 6.0,  fatGkg: 0.95  },
-    recuperacion:  { kcalPerKg: 32.5, proteinGkg: 2.4,  carbsGkg: 4.0,  fatGkg: 1.0   },
-    partido:       { kcalPerKg: 43.5, proteinGkg: 2.0,  carbsGkg: 7.0,  fatGkg: 0.9   },
-  },
-  mejora_condicion: {
-    descanso:      { kcalPerKg: 25.5, proteinGkg: 2.4,  carbsGkg: 3.0,  fatGkg: 0.9   },
-    entreno:       { kcalPerKg: 29.5, proteinGkg: 2.3,  carbsGkg: 4.0,  fatGkg: 0.85  },
-    doble:         { kcalPerKg: 32.5, proteinGkg: 2.3,  carbsGkg: 5.0,  fatGkg: 0.8   },
-    recuperacion:  { kcalPerKg: 27.5, proteinGkg: 2.5,  carbsGkg: 3.5,  fatGkg: 0.85  },
-    partido:       { kcalPerKg: 41.5, proteinGkg: 2.1,  carbsGkg: 6.5,  fatGkg: 0.8   },
-  },
-  mejora_rendimiento: {
-    descanso:      { kcalPerKg: 27.5, proteinGkg: 2.0,  carbsGkg: 3.5,  fatGkg: 0.95  },
-    entreno:       { kcalPerKg: 31.5, proteinGkg: 1.9,  carbsGkg: 4.5,  fatGkg: 0.9   },
-    doble:         { kcalPerKg: 36.5, proteinGkg: 1.9,  carbsGkg: 6.0,  fatGkg: 0.85  },
-    recuperacion:  { kcalPerKg: 28.5, proteinGkg: 2.1,  carbsGkg: 4.0,  fatGkg: 0.9   },
-    partido:       { kcalPerKg: 42.5, proteinGkg: 1.85, carbsGkg: 6.9,  fatGkg: 0.9   },
-  },
-};
 
 
 
@@ -209,7 +130,7 @@ export function getTeamNutritionDayTypes(teamConfig) {
   if (cfg?.dayTypes && Array.isArray(cfg.dayTypes) && cfg.dayTypes.length > 0) {
     return cfg.dayTypes;
   }
-  return NUTRITION_DAY_TYPES;
+  return FOOTBALL_DAY_TYPES;
 }
 
 export function getTeamObjectiveDayTypeMacros(teamConfig) {
@@ -217,7 +138,7 @@ export function getTeamObjectiveDayTypeMacros(teamConfig) {
   if (cfg?.objectiveMacros && Object.keys(cfg.objectiveMacros).length > 0) {
     return cfg.objectiveMacros;
   }
-  return OBJECTIVE_DAY_TYPE_MACROS;
+  return FOOTBALL_OBJECTIVE_MACROS;
 }
 
 function getTeamNutritionDayType(key, teamConfig) {

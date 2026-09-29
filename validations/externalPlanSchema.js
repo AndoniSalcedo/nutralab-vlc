@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import {
   PLAYER_OBJECTIVES,
-  NUTRITION_DAY_TYPES,
   AVAILABLE_MEALS,
 } from '@/config/nutrition-days';
+import { GYM_DAY_TYPES } from '@/config/day-types/gym';
 import { CLINICAL_TAGS } from '@/config/clinical-tags';
 
 const VALID_OBJECTIVES = PLAYER_OBJECTIVES.map((o) => o.value);
-const VALID_DAY_TYPES = NUTRITION_DAY_TYPES.map((d) => d.key);
+const VALID_DAY_TYPES = GYM_DAY_TYPES.map((d) => d.key);
 const VALID_CLINICAL_TAGS = CLINICAL_TAGS.map((t) => t.value);
 
 const VALID_CLINICAL_TAGS_SET = new Set(VALID_CLINICAL_TAGS);
