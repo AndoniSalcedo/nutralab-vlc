@@ -42,6 +42,24 @@ import ProtocolIcon from '@/components/ProtocolIcon';
 
 
 
+const DAY_LABELS = { lunes: 'Lunes', martes: 'Martes', miercoles: 'Miércoles', jueves: 'Jueves', viernes: 'Viernes', sabado: 'Sábado', domingo: 'Domingo' };
+
+/** Avisa de las referencias de las pautas del jugador que el motor no ha podido servir. */
+function notifyPlanWarnings(datos) {
+  const avisos = datos?.meta?.avisos || [];
+  if (avisos.length === 0) return;
+  const lines = avisos.slice(0, 4).map((a) => `${DAY_LABELS[a.dia] || a.dia} · ${a.ingesta}: ${a.mensaje}`);
+  if (avisos.length > 4) lines.push(`… y ${avisos.length - 4} aviso(s) más.`);
+  notifications.show({
+    color: 'orange',
+    title: 'Revisa las pautas del jugador',
+    message: lines.join('\n'),
+    autoClose: false,
+    withCloseButton: true,
+    styles: { description: { whiteSpace: 'pre-line' } },
+  });
+}
+
 function planLabel(plan) {
   const date = plan.updated_at || plan.created_at;
   const suffix = date ? ` · ${new Date(date).toLocaleDateString('es-ES')}` : '';
@@ -680,6 +698,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       setSelectedMenuWeek(modalSelectedMenuWeek);
 
       setDatos(data.datos || null);
+      notifyPlanWarnings(data.datos);
       setContenido('');
       setHasGeneratedAi(true);
       setMode('create');
@@ -761,6 +780,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         preMatchConfig: datos?.meta?.preMatchConfig || null,
       });
       setDatos(data.datos || null);
+      notifyPlanWarnings(data.datos);
       setContenido('');
       setHasGeneratedAi(true);
       notifications.update({

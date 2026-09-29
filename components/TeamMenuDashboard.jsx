@@ -85,6 +85,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
     setSaving(true);
     try {
       const data = await updateWeeklyMenu(selectedMenu.id, editedDias);
+      if (!data?.ok) throw new Error(data?.error || 'No se pudo guardar el menú.');
       setMenus((prev) => prev.map((m) => (m.id === selectedMenu.id ? data.menu : m)));
       setSelectedMenu(data.menu);
       setIsEditing(false);
@@ -175,6 +176,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
 
     try {
       const data = await updateWeeklyMenu(selectedMenu.id, currentDias);
+      if (!data?.ok) throw new Error(data?.error || 'No se pudo guardar el desglose del plato.');
       setMenus((prev) => prev.map((m) => (m.id === selectedMenu.id ? data.menu : m)));
       setSelectedMenu(data.menu);
       notifications.show({
@@ -262,6 +264,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
 
     try {
       const data = await uploadWeeklyMenu(file, weekDate, teamId);
+      if (!data?.ok) throw new Error(data?.error || 'No se pudo procesar el menú.');
 
       setMenus(prev => {
         const filtered = prev.filter(m => m.semana !== data.menu.semana);

@@ -112,6 +112,7 @@ function SingleMealPautaEditor({
         text: aiText,
         mealName: mealName || 'Comida',
         jugadorId,
+        isMainMeal,
       });
 
       if (data?.success === false) {
@@ -201,7 +202,7 @@ function SingleMealPautaEditor({
             checked={isComplete}
             onChange={(e) => onChange(e.currentTarget.checked
               ? { type: 'complete', raw: mealData.raw || '', label: 'Rotación variada', isMainMeal, unrecognized: [] }
-              : { type: 'meal', tree: { type: 'allOf', children: [] }, raw: mealData.raw || '', isMainMeal, unrecognized: [] })}
+              : { type: 'meal', tree: null, raw: mealData.raw || '', isMainMeal, unrecognized: [] })}
             color="teal"
             size="sm"
           />
@@ -242,6 +243,12 @@ function SingleMealPautaEditor({
                 maxRows={3}
                 size="xs"
               />
+
+              {!aiError && aiText.trim() && aiText.trim() !== String(mealData.raw || '').trim() && (
+                <Text size="11px" c="orange.8" fw={600}>
+                  Texto sin interpretar: pulsa «Interpretar con IA» para aplicarlo a la pauta.
+                </Text>
+              )}
 
               {aiError && (
                 <Alert
@@ -464,6 +471,16 @@ export default function PrepartidoRoutineModal({
 
   // Guardar todo concentrado garantizando que solo viajan datos del árbol
   async function handleSaveAll() {
+    const pendingMeals = selectedMeals.filter((m) => recs[m]?.type === 'meal' && !recs[m]?.tree);
+    if (pendingMeals.length > 0) {
+      notifications.show({
+        color: 'orange',
+        title: 'Pautas sin interpretar',
+        message: `Interpreta con IA la pauta de ${pendingMeals.join(', ')} o actívala como rotación variada antes de guardar.`,
+      });
+      return;
+    }
+
     setSaving(true);
     try {
       const finalMeals = sortPreMatchMealsChronological(scheduleKey, selectedMeals);

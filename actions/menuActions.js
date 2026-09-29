@@ -14,11 +14,32 @@ import {
   getMenusByTeamLimit
 } from '@/repositories/menuRepository';
 import { getPlayerById } from '@/repositories/playerRepository';
-import { enrichMenuWithDecomposedDishes } from '@/lib/ai/menu-decomposer';
+import { enrichMenuWithDecomposedDishes, decomposeDishesToAst, toDishNode } from '@/lib/ai/menu-decomposer';
+import { validateAstValue, astNodeSchema } from '@/validations/mealAstSchema';
 import { trackUsageEvent } from '@/lib/billing/client';
 
 const MENU_TOOL_NAME = 'extraer_menu_semanal';
 const MENU_MAX_TOKENS = 8192;
+
+/**
+ * Valida los AST de servicio (comida/cena) de cada día contra el contrato único y el árbol.
+ * Devuelve los días normalizados o el primer error encontrado.
+ */
+function validateMenuDias(dias) {
+  const normalized = [];
+  for (const day of dias || []) {
+    const next = { ...day };
+    for (const service of ['comida', 'cena']) {
+      const tree = day?.[service]?.tree;
+      if (!tree) continue;
+      const validation = validateAstValue(astNodeSchema, tree, { label: `Menú (${day.dia} · ${service})` });
+      if (!validation.success) return { success: false, error: validation.error };
+      next[service] = { ...day[service], tree: validation.data };
+    }
+    normalized.push(next);
+  }
+  return { success: true, data: normalized };
+}
 
 function parseDias(input) {
   if (!input) return null;
@@ -132,7 +153,20 @@ export async function createWeeklyMenu({ semana, equipo_id, dias }) {
   return { ok: true, menu: data };
 }
 
+/**
+ * Procesa el menú subido (IA de extracción + estructuración de platos como AST).
+ * Devuelve { ok: false, error } en lugar de lanzar para que el mensaje llegue al cliente en producción.
+ */
 export async function uploadWeeklyMenu(fileOrFormData, weekDateParam, teamIdParam) {
+  try {
+    return await processWeeklyMenuUpload(fileOrFormData, weekDateParam, teamIdParam);
+  } catch (err) {
+    console.error('[uploadWeeklyMenu]', err);
+    return { ok: false, error: err?.message || 'No se pudo procesar el menú.' };
+  }
+}
+
+async function processWeeklyMenuUpload(fileOrFormData, weekDateParam, teamIdParam) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
@@ -253,8 +287,10 @@ IMPORTANTE:
 
   const finalSemana = (semanaInicio && /^\d{4}-\d{2}-\d{2}$/.test(semanaInicio)) ? semanaInicio : semana;
   const enrichedDias = await enrichMenuWithDecomposedDishes(formattedDias);
+  const validation = validateMenuDias(enrichedDias);
+  if (!validation.success) throw new Error(validation.error);
 
-  const data = await upsertMenu(supabase, { semana: finalSemana, equipo_id: equipoId, dias: enrichedDias, updated_at: new Date().toISOString() });
+  const data = await upsertMenu(supabase, { semana: finalSemana, equipo_id: equipoId, dias: validation.data, updated_at: new Date().toISOString() });
 
   const emisor = {
     tipo: 'nutricionista',
@@ -300,7 +336,19 @@ export async function updateWeeklyMenu(id, dias) {
   const team = await getOwnedTeam(supabase, user, menu.equipo_id);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
-  const data = await updateMenu(supabase, id, { dias, updated_at: new Date().toISOString() });
+  // Los platos nuevos o renombrados se estructuran como AST; los ya estructurados se conservan.
+  // Los errores se devuelven (no se lanzan) para que el mensaje llegue al cliente en producción.
+  let enrichedDias;
+  try {
+    enrichedDias = await enrichMenuWithDecomposedDishes(dias);
+  } catch (err) {
+    console.error('[updateWeeklyMenu]', err);
+    return { ok: false, error: err?.message || 'No se pudieron estructurar los platos del menú.' };
+  }
+  const validation = validateMenuDias(enrichedDias);
+  if (!validation.success) return { ok: false, error: validation.error };
+
+  const data = await updateMenu(supabase, id, { dias: validation.data, updated_at: new Date().toISOString() });
   revalidatePath(`/dashboard/equipo/${menu.equipo_id}/menu`);
   return { ok: true, menu: data };
 }
@@ -322,4 +370,25 @@ export async function deleteWeeklyMenu(id) {
   await deleteMenu(supabase, id);
   revalidatePath(`/dashboard/equipo/${menu.equipo_id}/menu`);
   return { ok: true };
+}
+
+/**
+ * Interpreta la descripción de un plato del comedor y devuelve su AST.
+ * Devuelve { success: false, error } en lugar de lanzar para que el mensaje llegue al cliente.
+ */
+export async function interpretDishTree({ nombre, text } = {}) {
+  try {
+    const user = await getUser();
+    if (!user) return { success: false, error: 'No autenticado' };
+
+    const dishName = String(nombre || '').trim() || 'Plato';
+    const description = String(text || '').trim();
+    if (!description) return { success: false, error: 'Describe los ingredientes del plato.' };
+
+    const trees = await decomposeDishesToAst({ [dishName]: description });
+    return { success: true, tree: { ...toDishNode(trees[dishName]), label: dishName } };
+  } catch (err) {
+    console.error('[interpretDishTree]', err);
+    return { success: false, error: err?.message || 'Error al conectar con el servicio de IA.' };
+  }
 }

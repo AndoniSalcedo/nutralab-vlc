@@ -402,9 +402,10 @@ export function ComidasEditable({
               ...Object.fromEntries(Object.entries(recsDefecto).map(([name, meal]) => [name, convertLegacyToAst(meal)])),
               [selectedMealForModal]: updatedMeal,
             };
-            setRecsDefecto(newRecs);
             try {
-              await updatePlayerField(jugadorId, 'recomendaciones_defecto', newRecs);
+              const res = await updatePlayerField(jugadorId, 'recomendaciones_defecto', newRecs);
+              if (!res?.ok) throw new Error(res?.error || 'No se pudo guardar la pauta.');
+              setRecsDefecto(newRecs);
               notifications.show({
                 color: 'teal',
                 title: 'Pauta guardada',
@@ -704,7 +705,8 @@ export function PrepartidoEditable({
               [schedKey]: schedConfig,
             };
             delete toSave[schedKey].dia_anterior;
-            await updatePlayerField(jugadorId, 'config_prepartido', toSave);
+            const res = await updatePlayerField(jugadorId, 'config_prepartido', toSave);
+            if (!res?.ok) throw new Error(res?.error || 'No se pudo guardar la rutina pre-partido.');
             setConfig(toSave);
             router.refresh();
             notifications.show({
@@ -716,7 +718,8 @@ export function PrepartidoEditable({
           onDeactivate={async (schedKey) => {
             const toSave = { ...config };
             delete toSave[schedKey];
-            await updatePlayerField(jugadorId, 'config_prepartido', toSave);
+            const res = await updatePlayerField(jugadorId, 'config_prepartido', toSave);
+            if (!res?.ok) throw new Error(res?.error || 'No se pudo desactivar la rutina pre-partido.');
             setConfig(toSave);
             router.refresh();
             notifications.show({

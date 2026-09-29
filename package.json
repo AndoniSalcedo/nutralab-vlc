@@ -15,7 +15,8 @@
     "db:migrate": "node scripts/db-migrate.js",
     "db:migrate:status": "node scripts/db-migrate.js --status",
     "db:teams": "node scripts/db-migrate.js --schema=teams",
-    "meals:migrate:ast": "node --loader ./scratch/loader.mjs scripts/migrate-meals-to-ast.mjs"
+    "meals:migrate:ast": "node --loader ./scratch/loader.mjs scripts/migrate-meals-to-ast.mjs",
+    "meals:migrate:names": "node --loader ./scratch/loader.mjs scripts/migrate-ast-food-names.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

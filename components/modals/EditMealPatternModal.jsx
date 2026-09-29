@@ -36,6 +36,8 @@ export default function EditMealPatternModal({
 
   const [tree, setTree] = useState(null);
   const [astLabel, setAstLabel] = useState('');
+  // Texto al que corresponde el árbol actual (para no guardar texto sin interpretar).
+  const [interpretedText, setInterpretedText] = useState('');
 
   useEffect(() => {
     if (opened) {
@@ -52,6 +54,7 @@ export default function EditMealPatternModal({
 
       // Texto raw previo
       setAiText(val.raw || '');
+      setInterpretedText(String(val.raw || '').trim());
 
     }
   }, [opened, value, mealName]);
@@ -72,6 +75,7 @@ export default function EditMealPatternModal({
         text: aiText,
         mealName: mealName || 'Comida',
         jugadorId,
+        isMainMeal,
       });
 
       if (data?.success === false) {
@@ -96,6 +100,7 @@ export default function EditMealPatternModal({
         setTree(mealData.tree || null);
         setAstLabel(mealData.label || '');
       }
+      setInterpretedText(aiText.trim());
 
       notifications.show({
         color: 'teal',
@@ -111,6 +116,14 @@ export default function EditMealPatternModal({
   }
 
   function handleSave() {
+    if (!isComplete && !tree) {
+      setAiError('Pulsa "Interpretar con IA" para estructurar la pauta, o activa la rotación variada.');
+      return;
+    }
+    if (!isComplete && aiText.trim() !== interpretedText) {
+      setAiError('El texto ha cambiado desde la última interpretación: pulsa "Interpretar con IA" para aplicarlo.');
+      return;
+    }
     const converted = isComplete
       ? { type: 'complete', raw: aiText.trim(), label: 'Rotación variada', unrecognized: [] }
       : { type: 'meal', tree, raw: aiText.trim(), label: astLabel, unrecognized: [] };

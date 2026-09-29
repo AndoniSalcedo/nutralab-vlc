@@ -1,5 +1,6 @@
 'use server';
 
+import { validateAstValue, mealPatternsSchema, preMatchConfigSchema } from '@/validations/mealAstSchema';
 import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
@@ -89,6 +90,14 @@ export async function updatePlayerField(id, field, value) {
     parsedValue = Number.isFinite(num) && num > 0 ? Math.round(num * 100) / 100 : 10;
   } else if (field === 'protocolos_custom') {
     parsedValue = typeof value === 'object' && value !== null ? value : {};
+  } else if (field === 'recomendaciones_defecto' || field === 'config_prepartido') {
+    // Las pautas son AST nutricionales: se validan contra el contrato único antes de guardar.
+    // El error se devuelve (no se lanza) para que el mensaje llegue al cliente en producción.
+    const validation = field === 'recomendaciones_defecto'
+      ? validateAstValue(mealPatternsSchema, value || {}, { label: 'Pautas por defecto' })
+      : validateAstValue(preMatchConfigSchema, value || {}, { label: 'Protocolo pre-partido' });
+    if (!validation.success) return { ok: false, error: validation.error };
+    parsedValue = validation.data;
   }
 
   await updatePlayer(supabase, id, { [field]: parsedValue });

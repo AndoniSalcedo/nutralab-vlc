@@ -1428,10 +1428,10 @@ export const FOODS_CRUDO = [
       "fructosa",
       "alto_azufre"
     ],
-    "minGrams": 100,
-    "maxGrams": 220,
+    "minGrams": 10,
+    "maxGrams": 15,
     "treePath": [
-      "suplementos",
+      "complementos",
       "salsas"
     ]
   },
@@ -2799,10 +2799,10 @@ export const FOODS_CRUDO = [
     "pro": 4.4,
     "fat": 3.3,
     "tags": [],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 10,
+    "maxGrams": 15,
     "treePath": [
-      "suplementos",
+      "complementos",
       "salsas"
     ]
   },
@@ -2837,10 +2837,10 @@ export const FOODS_CRUDO = [
       "fruto_seco",
       "alto_fodmap"
     ],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 15,
+    "maxGrams": 30,
     "treePath": [
-      "suplementos",
+      "complementos",
       "salsas"
     ]
   },
@@ -2858,6 +2858,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 250,
     "treePath": [
       "grasas",
+      "frutos_secos",
       "semillas"
     ]
   },
@@ -2873,6 +2874,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 250,
     "treePath": [
       "grasas",
+      "frutos_secos",
       "semillas"
     ]
   },
@@ -2906,10 +2908,10 @@ export const FOODS_CRUDO = [
       "cerdo",
       "alto_fodmap"
     ],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 80,
+    "maxGrams": 120,
     "treePath": [
-      "suplementos",
+      "complementos",
       "salsas"
     ]
   },
@@ -2924,10 +2926,10 @@ export const FOODS_CRUDO = [
       "soja",
       "gluten"
     ],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 10,
+    "maxGrams": 15,
     "treePath": [
-      "suplementos",
+      "complementos",
       "salsas"
     ]
   },
@@ -2941,10 +2943,10 @@ export const FOODS_CRUDO = [
     "tags": [
       "soja"
     ],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 10,
+    "maxGrams": 15,
     "treePath": [
-      "suplementos",
+      "complementos",
       "salsas"
     ]
   },
@@ -2978,6 +2980,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 250,
     "treePath": [
       "grasas",
+      "frutos_secos",
       "semillas"
     ]
   },
@@ -2993,6 +2996,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 250,
     "treePath": [
       "grasas",
+      "frutos_secos",
       "semillas"
     ]
   },
@@ -3008,6 +3012,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 250,
     "treePath": [
       "grasas",
+      "frutos_secos",
       "semillas"
     ]
   },
@@ -3023,6 +3028,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 250,
     "treePath": [
       "grasas",
+      "frutos_secos",
       "semillas"
     ]
   },
@@ -3641,8 +3647,8 @@ export const FOODS_CRUDO = [
     "minGrams": 5,
     "maxGrams": 10,
     "treePath": [
-      "condimentos",
-      "aromaticas"
+      "complementos",
+      "condimentos"
     ]
   },
   {
@@ -3857,7 +3863,7 @@ export const FOODS_CRUDO = [
     "minGrams": 50,
     "maxGrams": 200,
     "treePath": [
-      "proteinas",
+      "proteina",
       "vegetal_proteina"
     ]
   },

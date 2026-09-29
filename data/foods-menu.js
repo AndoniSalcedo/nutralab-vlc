@@ -1706,8 +1706,8 @@ export const FOODS_MENU = [
     fat: 0.5,
     tags: ["alto_fodmap"],
     minGrams: 5,
-    maxGrams: 15,
-    treePath: ["verduras", "condimentos"],
+    maxGrams: 10,
+    treePath: ['complementos', 'condimentos'],
   },
   {
     name: "Zarangollo",
