@@ -6,6 +6,8 @@ import ResponsiveModal from './ResponsiveModal';
 export default function PlayerPasswordModal({
   opened,
   onClose,
+  currentPassword,
+  setCurrentPassword,
   password,
   setPassword,
   confirm,
@@ -28,6 +30,7 @@ export default function PlayerPasswordModal({
       overlayProps={{ backgroundOpacity: 0.55, blur: 4 }}
     >
       <Stack gap="md">
+        <PasswordInput label="Contraseña actual" autoComplete="current-password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
         <PasswordInput label="Nueva contraseña" value={password} onChange={(e) => setPassword(e.target.value)} />
         <PasswordInput label="Repetir contraseña" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
 

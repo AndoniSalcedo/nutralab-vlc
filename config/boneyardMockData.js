@@ -386,16 +386,18 @@ export const mockMeals = [
   }
 ];
 
+// Los datos mock (Boneyard) solo existen fuera de producción: en producción
+// ningún id ni variable de entorno puede activar el bypass de autorización.
+export function isBoneyardMode() {
+  return process.env.NODE_ENV !== 'production' && process.env.BONEYARD_MODE === 'true';
+}
+
 export function isMockTeam(teamId) {
-  return process.env.BONEYARD_MODE === 'true' || String(teamId) === 'mock';
+  if (process.env.NODE_ENV === 'production') return false;
+  return isBoneyardMode() || String(teamId) === 'mock';
 }
 
 export function isMockPlayer(playerId) {
-  return (
-    process.env.BONEYARD_MODE === 'true' ||
-    String(playerId) === 'mock' ||
-    String(playerId).startsWith('mock')
-  );
+  if (process.env.NODE_ENV === 'production') return false;
+  return isBoneyardMode() || String(playerId).startsWith('mock');
 }
-
-

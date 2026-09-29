@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
-import { forbidden } from '@/lib/auth/team-access';
+import { forbidden, getAccessibleTeam } from '@/lib/auth/team-access';
 import { getTeamPhoto } from '@/repositories/teamRepository';
+import { getPlayerById } from '@/repositories/playerRepository';
+import { imageResponse } from '@/lib/security/media';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,33 +19,26 @@ export async function GET(req) {
     if (!user) return forbidden('No autorizado');
 
     const supabase = getSupabaseAdmin();
-    const team = await getTeamPhoto(supabase, id);
 
+    // Solo el staff con acceso al equipo, o los jugadores de ese equipo.
+    if (user.role === 'jugador') {
+      const player = await getPlayerById(supabase, user.id);
+      if (!player || String(player.equipo_id) !== String(id)) {
+        return forbidden('No tienes acceso a este equipo');
+      }
+    } else {
+      const accessible = await getAccessibleTeam(supabase, user, id);
+      if (!accessible) return forbidden('No tienes acceso a este equipo');
+    }
+
+    const team = await getTeamPhoto(supabase, id);
     if (!team || !team.foto) {
       return NextResponse.json({ error: 'Foto no encontrada' }, { status: 404 });
     }
 
-    let buffer;
-    if (typeof team.foto === 'string') {
-      const hex = team.foto.startsWith('\\x') ? team.foto.slice(2) : team.foto;
-      buffer = Buffer.from(hex, 'hex');
-    } else if (Buffer.isBuffer(team.foto)) {
-      buffer = team.foto;
-    } else if (team.foto instanceof Uint8Array) {
-      buffer = Buffer.from(team.foto);
-    } else {
-      buffer = Buffer.from(team.foto);
-    }
-
-    return new NextResponse(buffer, {
-      headers: {
-        'Content-Type': team.foto_mime || 'image/webp',
-        'Content-Length': String(team.foto_size ?? buffer.length),
-        'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
-      },
-    });
+    return imageResponse(team.foto, team.foto_mime);
   } catch (e) {
     console.error('Error in media/team-avatar GET:', e);
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: 'Error al cargar la imagen' }, { status: 500 });
   }
 }

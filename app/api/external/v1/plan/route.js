@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { rateLimit, getClientIp } from '@/lib/security/rate-limit';
 import { generarDatosPlan } from '@/lib/engine';
 import { trackUsageEvent } from '@/lib/billing/client';
 import { GYM_TEAM_CONFIG } from '@/config/day-types/gym';
@@ -12,11 +13,35 @@ import {
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+// Autenticación por token Bearer (sin cookies), así que `*` no expone sesiones.
+// Para restringirlo, define EXTERNAL_API_ALLOWED_ORIGINS="https://a.com,https://b.com".
+const ALLOWED_ORIGINS = (process.env.EXTERNAL_API_ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': ALLOWED_ORIGINS.length ? ALLOWED_ORIGINS[0] : '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  ...(ALLOWED_ORIGINS.length ? { Vary: 'Origin' } : {}),
 };
+
+function corsHeadersFor(req) {
+  if (!ALLOWED_ORIGINS.length) return CORS_HEADERS;
+  const origin = req.headers.get('origin') || '';
+  return {
+    ...CORS_HEADERS,
+    'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
+  };
+}
+
+// Compara hashes de longitud fija: así ni el contenido ni la longitud del token se filtran por timing.
+function tokensMatch(expected, incoming) {
+  const a = crypto.createHash('sha256').update(String(expected).trim()).digest();
+  const b = crypto.createHash('sha256').update(String(incoming)).digest();
+  return crypto.timingSafeEqual(a, b);
+}
 
 function resolveTenantAuth(req) {
   const authHeader = req.headers.get('authorization') || '';
@@ -36,18 +61,15 @@ function resolveTenantAuth(req) {
           ok: false,
           error: 'No autorizado: Token de API no proporcionado. Incluye la cabecera Authorization: Bearer <token>.',
         },
-        { status: 401, headers: CORS_HEADERS }
+        { status: 401, headers: corsHeadersFor(req) }
       ),
     };
   }
 
-  const incomingBuf = Buffer.from(incomingToken);
-
   // 1. Tokens específicos por tenant en variables de entorno (ej. EXTERNAL_API_KEY_HYBRID, EXTERNAL_API_KEY_ACME...)
   for (const [envKey, envVal] of Object.entries(process.env)) {
     if (envKey.startsWith('EXTERNAL_API_KEY_') && envVal) {
-      const expectedBuf = Buffer.from(String(envVal).trim());
-      if (expectedBuf.length === incomingBuf.length && crypto.timingSafeEqual(expectedBuf, incomingBuf)) {
+      if (tokensMatch(envVal, incomingToken)) {
         const tenantId = envKey.replace('EXTERNAL_API_KEY_', '').toLowerCase();
         const tenantName = tenantId.charAt(0).toUpperCase() + tenantId.slice(1);
         return {
@@ -69,8 +91,7 @@ function resolveTenantAuth(req) {
       const keysMap = JSON.parse(process.env.EXTERNAL_API_KEYS);
       if (keysMap && typeof keysMap === 'object') {
         for (const [configuredToken, info] of Object.entries(keysMap)) {
-          const cfgBuf = Buffer.from(String(configuredToken).trim());
-          if (cfgBuf.length === incomingBuf.length && crypto.timingSafeEqual(cfgBuf, incomingBuf)) {
+          if (tokensMatch(configuredToken, incomingToken)) {
             const tenantId = info.tenantId ? String(info.tenantId).trim().toLowerCase() : null;
             if (!tenantId) {
               console.error('[External API Security] Token configurado en EXTERNAL_API_KEYS sin tenantId explícito.');
@@ -99,11 +120,7 @@ function resolveTenantAuth(req) {
   const explicitTenantId = (process.env.EXTERNAL_API_TENANT_ID || '').trim().toLowerCase();
 
   if (defaultToken && explicitTenantId) {
-    const expectedBuffer = Buffer.from(defaultToken.trim());
-    if (
-      expectedBuffer.length === incomingBuf.length &&
-      crypto.timingSafeEqual(expectedBuffer, incomingBuf)
-    ) {
+    if (tokensMatch(defaultToken, incomingToken)) {
       const tenantName = process.env.EXTERNAL_API_TENANT_NAME || (explicitTenantId.charAt(0).toUpperCase() + explicitTenantId.slice(1));
       return {
         valid: true,
@@ -124,15 +141,15 @@ function resolveTenantAuth(req) {
         ok: false,
         error: 'No autorizado: Token de API inválido o no reconocido',
       },
-      { status: 401, headers: CORS_HEADERS }
+      { status: 401, headers: corsHeadersFor(req) }
     ),
   };
 }
 
-export async function OPTIONS() {
+export async function OPTIONS(req) {
   return new NextResponse(null, {
     status: 204,
-    headers: CORS_HEADERS,
+    headers: corsHeadersFor(req),
   });
 }
 
@@ -180,9 +197,28 @@ function formatExternalPlan(rawPlan, { peso_kg, objetivo, normalizedNumComidas, 
 }
 
 export async function POST(req) {
+  // Límite por IP antes de comprobar el token (frena el adivinado de claves)...
+  const ip = getClientIp(req.headers);
+  const ipLimit = rateLimit(`ext-plan-ip:${ip}`, { limit: 60, windowMs: 60 * 1000 });
+  if (!ipLimit.ok) {
+    return NextResponse.json(
+      { ok: false, error: 'Demasiadas peticiones' },
+      { status: 429, headers: { ...corsHeadersFor(req), 'Retry-After': String(ipLimit.retryAfter) } }
+    );
+  }
+
   const auth = resolveTenantAuth(req);
   if (!auth.valid) {
     return auth.response;
+  }
+
+  // ...y por tenant tras autenticar.
+  const tenantLimit = rateLimit(`ext-plan-tenant:${auth.tenant.tenantId}`, { limit: 120, windowMs: 60 * 1000 });
+  if (!tenantLimit.ok) {
+    return NextResponse.json(
+      { ok: false, error: 'Límite de peticiones excedido' },
+      { status: 429, headers: { ...corsHeadersFor(req), 'Retry-After': String(tenantLimit.retryAfter) } }
+    );
   }
 
   let rawBody;
@@ -194,7 +230,7 @@ export async function POST(req) {
         ok: false,
         error: 'El cuerpo de la petición (body) debe ser un JSON válido',
       },
-      { status: 400, headers: CORS_HEADERS }
+      { status: 400, headers: corsHeadersFor(req) }
     );
   }
 
@@ -210,7 +246,7 @@ export async function POST(req) {
         error: 'Parámetros de entrada inválidos',
         details,
       },
-      { status: 400, headers: CORS_HEADERS }
+      { status: 400, headers: corsHeadersFor(req) }
     );
   }
 
@@ -298,16 +334,16 @@ export async function POST(req) {
           postentreno,
         }),
       },
-      { status: 200, headers: CORS_HEADERS }
+      { status: 200, headers: corsHeadersFor(req) }
     );
   } catch (err) {
     console.error('[External Plan API] Error generando el plan:', err);
     return NextResponse.json(
       {
         ok: false,
-        error: err.message || 'Error interno al generar el plan nutricional',
+        error: 'Error interno al generar el plan nutricional',
       },
-      { status: 500, headers: CORS_HEADERS }
+      { status: 500, headers: corsHeadersFor(req) }
     );
   }
 }

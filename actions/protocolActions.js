@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getOwnedTeam } from '@/lib/auth/team-access';
+import { assertPlainObject } from '@/lib/security/json';
 import { updateTeamConfig } from '@/repositories/teamRepository';
 
 export async function transferProtocol(payload) {
@@ -19,6 +20,10 @@ export async function transferProtocol(payload) {
 
   if (!sourceTeamId || !targetTeamId || !protocol || !targetDayTypeKey) {
     throw new Error('Parámetros incompletos para transferir el protocolo');
+  }
+  assertPlainObject(protocol, { maxBytes: 50_000, label: 'Protocolo' });
+  if (typeof targetDayTypeKey !== 'string' || targetDayTypeKey.length > 100) {
+    throw new Error('Tipo de día no válido');
   }
 
   const supabase = getSupabaseAdmin();
@@ -69,6 +74,7 @@ export async function batchImportProtocols({ sourceTeamId, targetTeamId, protoco
   if (!sourceTeamId || !targetTeamId || !Array.isArray(protocols) || protocols.length === 0) {
     throw new Error('Parámetros de importación incompletos');
   }
+  if (protocols.length > 100) throw new Error('Demasiados protocolos en una sola importación');
 
   const supabase = getSupabaseAdmin();
   const sourceTeam = await getOwnedTeam(supabase, user, sourceTeamId);
@@ -85,6 +91,7 @@ export async function batchImportProtocols({ sourceTeamId, targetTeamId, protoco
 
   const imported = [];
   for (const item of protocols) {
+    if (!item || typeof item !== 'object') continue;
     const src = sourceProtocols.find(p => p.id === item.id);
     if (!src) continue;
 

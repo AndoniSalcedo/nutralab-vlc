@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
-import { forbidden } from '@/lib/auth/team-access';
-import { getTecnicoById } from '@/repositories/tecnicoRepository';
+import { forbidden, getOwnerId } from '@/lib/auth/team-access';
+import { getTecnicoById, getNutricionistaTecnicoLink } from '@/repositories/tecnicoRepository';
+import { imageResponse } from '@/lib/security/media';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,33 +21,26 @@ export async function GET(req) {
     if (!id) return NextResponse.json({ error: 'Falta id del técnico' }, { status: 400 });
 
     const supabase = getSupabaseAdmin();
-    const tecnico = await getTecnicoById(supabase, id);
 
+    // Un técnico solo ve su propio avatar; un nutricionista, el de sus técnicos vinculados.
+    if (user.role === 'tecnico') {
+      if (String(user.id) !== String(id)) return forbidden('No tienes acceso a este técnico');
+    } else if (user.role === 'admin') {
+      const ownerId = getOwnerId(user);
+      const link = ownerId ? await getNutricionistaTecnicoLink(supabase, ownerId, id) : null;
+      if (!link) return forbidden('No tienes acceso a este técnico');
+    } else {
+      return forbidden('No tienes acceso a este técnico');
+    }
+
+    const tecnico = await getTecnicoById(supabase, id);
     if (!tecnico || !tecnico.avatar) {
       return NextResponse.json({ error: 'Avatar no encontrado' }, { status: 404 });
     }
 
-    let buffer;
-    if (typeof tecnico.avatar === 'string') {
-      const hex = tecnico.avatar.startsWith('\\x') ? tecnico.avatar.slice(2) : tecnico.avatar;
-      buffer = Buffer.from(hex, 'hex');
-    } else if (Buffer.isBuffer(tecnico.avatar)) {
-      buffer = tecnico.avatar;
-    } else if (tecnico.avatar instanceof Uint8Array) {
-      buffer = Buffer.from(tecnico.avatar);
-    } else {
-      buffer = Buffer.from(tecnico.avatar);
-    }
-
-    return new NextResponse(buffer, {
-      headers: {
-        'Content-Type': tecnico.avatar_mime || 'image/webp',
-        'Content-Length': String(tecnico.avatar_size ?? buffer.length),
-        'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
-      },
-    });
+    return imageResponse(tecnico.avatar, tecnico.avatar_mime);
   } catch (e) {
     console.error('Error in media/tecnico-avatar GET:', e);
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: 'Error al cargar la imagen' }, { status: 500 });
   }
 }

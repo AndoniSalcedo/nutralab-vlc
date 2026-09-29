@@ -29,6 +29,10 @@ export async function savePesaje(body) {
 
   let data;
   if (id) {
+    const existing = await getPesajeById(supabase, id);
+    if (!existing || String(existing.jugador_id) !== String(jugador_id)) {
+      throw new Error('Registro de peso no encontrado');
+    }
     data = await updatePesaje(supabase, id, { fecha, peso_kg });
   } else {
     data = await upsertPesaje(supabase, {

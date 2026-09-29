@@ -28,3 +28,6 @@ coverage
 *.swp
 *.swo
 *.swn          
+# Datos reales de jugadores / volcados de migraciones: nunca al repositorio
+scratch/*.json
+scratch/*.bak

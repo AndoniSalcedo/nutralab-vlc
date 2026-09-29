@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedPlayer } from '@/lib/auth/team-access';
+import { readDocumentUpload } from '@/lib/security/uploads';
+import { enforceRateLimit } from '@/lib/security/rate-limit';
 import { aiClient as client } from '@/lib/ai/client';
 import { env } from '@/config/env';
 import {
@@ -59,8 +61,10 @@ export async function uploadAnalitica(fileOrFormData, jugadorIdParam, fechaParam
   const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  const buffer = Buffer.from(await archivo.arrayBuffer());
-  const base64 = buffer.toString('base64');
+  // Solo PDF reales y de tamaño acotado (se envían a un servicio de IA de pago).
+  const upload = await readDocumentUpload(archivo);
+  await enforceRateLimit('ai-analitica', String(user.id), { limit: 15, windowMs: 60 * 60 * 1000 });
+  const base64 = upload.buffer.toString('base64');
 
   const message = await client.messages.create({
     model: env.AI_MODEL,
@@ -108,9 +112,9 @@ export async function uploadAnalitica(fileOrFormData, jugadorIdParam, fechaParam
 
   const data = await insertAnalytics(supabase, {
     jugador_id: parseInt(jugadorId),
-    fecha_extraccion: fechaExtraccion || null,
+    fecha_extraccion: fechaExtraccion && !Number.isNaN(Date.parse(String(fechaExtraccion))) ? fechaExtraccion : null,
     parametros,
-    pdf_nombre: archivo.name,
+    pdf_nombre: String(archivo.name || '').slice(0, 200),
   });
 
   revalidatePath(`/dashboard/jugador/${jugadorId}`);

@@ -63,6 +63,8 @@ function CredentialsWarning({ show }) {
 
 function PlayerLogoutButton({ menuItem = false }) {
   const handleLogout = async () => {
+    // Vacía cualquier caché del service worker antes de cerrar sesión.
+    try { navigator.serviceWorker?.controller?.postMessage('CLEAR_CACHES'); } catch {}
     await logout();
   };
 

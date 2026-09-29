@@ -4,10 +4,20 @@ import { buildSessionValue, COOKIE_NAME } from '@/lib/auth/session';
 import { env } from '@/config/env';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 
+// Solo se permiten rutas internas: evita open redirect (`//evil.com`, `https://evil.com`, `/\\evil.com`).
+function safeRedirectPath(value) {
+  const fallback = '/dashboard';
+  if (!value || typeof value !== 'string') return fallback;
+  if (!value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback;
+  return value;
+}
+
+const MAX_TOKEN_AGE_SECONDS = 5 * 60;
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const token = searchParams.get('token');
-  const url = searchParams.get('url') || '/dashboard';
+  const url = safeRedirectPath(searchParams.get('url'));
 
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url), 303);
@@ -15,8 +25,17 @@ export async function GET(request) {
 
   try {
     // Verify the JWT token from the backend
-    const decoded = jwt.verify(token, env.JWT_SECRET);
+    const decoded = jwt.verify(token, env.JWT_SECRET, { algorithms: ['HS256'] });
     const nutritionistId = decoded.id;
+    if (!nutritionistId) throw new Error('Token sin id de nutricionista');
+
+    // Sin `exp`, el token solo se acepta si es reciente (evita reutilizar enlaces viejos).
+    if (!decoded.exp) {
+      const issuedAt = Number(decoded.iat);
+      if (!issuedAt || Date.now() / 1000 - issuedAt > MAX_TOKEN_AGE_SECONDS) {
+        throw new Error('Token sin caducidad o demasiado antiguo');
+      }
+    }
 
     let nutriName = decoded.name;
     let nutriEmail = decoded.email;
@@ -53,19 +72,22 @@ export async function GET(request) {
       avatar: hasAvatar ? `/api/media/nutritionist-avatar?id=${nutritionistId}` : null,
     };
 
+    const SESSION_TTL_SECONDS = 60 * 60 * 12;
     const response = NextResponse.redirect(new URL(url, request.url), 303);
+    response.headers.set('Referrer-Policy', 'no-referrer');
+    response.headers.set('Cache-Control', 'no-store');
 
-    response.cookies.set(COOKIE_NAME, buildSessionValue(sessionObj), {
+    response.cookies.set(COOKIE_NAME, buildSessionValue(sessionObj, SESSION_TTL_SECONDS), {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 12,
+      maxAge: SESSION_TTL_SECONDS,
     });
 
     return response;
   } catch (err) {
-    console.error('Invalid token for auth-jump', err);
+    console.error('Invalid token for auth-jump:', err.message);
     return NextResponse.redirect(new URL('/login', request.url), 303);
   }
 }

@@ -6,6 +6,8 @@ import { env } from '@/config/env';
 import { getUser } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getOwnedTeam, getAccessibleTeam } from '@/lib/auth/team-access';
+import { readDocumentUpload } from '@/lib/security/uploads';
+import { enforceRateLimit } from '@/lib/security/rate-limit';
 import {
   upsertMenu,
   getMenuById,
@@ -188,14 +190,14 @@ async function processWeeklyMenuUpload(fileOrFormData, weekDateParam, teamIdPara
   const team = await getOwnedTeam(supabase, user, equipoId);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
-  const buffer = Buffer.from(await archivo.arrayBuffer());
-  const base64 = buffer.toString('base64');
-  const esImagen = archivo.type.startsWith('image/');
-  const mediaPDF = 'application/pdf';
+  // Tipo y tamaño se verifican sobre el contenido real, no sobre `archivo.type`.
+  const upload = await readDocumentUpload(archivo, { allowImages: true });
+  await enforceRateLimit('ai-menu-upload', String(user.id), { limit: 15, windowMs: 60 * 60 * 1000 });
+  const base64 = upload.buffer.toString('base64');
 
-  const contentItem = esImagen
-    ? { type: 'image', source: { type: 'base64', media_type: archivo.type, data: base64 } }
-    : { type: 'document', source: { type: 'base64', media_type: mediaPDF, data: base64 } };
+  const contentItem = upload.mime === 'application/pdf'
+    ? { type: 'document', source: { type: 'base64', media_type: upload.mime, data: base64 } }
+    : { type: 'image', source: { type: 'base64', media_type: upload.mime, data: base64 } };
 
   const message = await client.messages.create({
     model: env.AI_MODEL,
@@ -380,9 +382,10 @@ export async function interpretDishTree({ nombre, text } = {}) {
   try {
     const user = await getUser();
     if (!user) return { success: false, error: 'No autenticado' };
+    await enforceRateLimit('ai-dish-tree', String(user.id), { limit: 40, windowMs: 60 * 60 * 1000 });
 
     const dishName = String(nombre || '').trim() || 'Plato';
-    const description = String(text || '').trim();
+    const description = String(text || '').trim().slice(0, 2000);
     if (!description) return { success: false, error: 'Describe los ingredientes del plato.' };
 
     const trees = await decomposeDishesToAst({ [dishName]: description });

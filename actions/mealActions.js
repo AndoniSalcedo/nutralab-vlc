@@ -12,8 +12,12 @@ import {
   deleteMeal
 } from '@/repositories/mealsRepository';
 import { parseMealTreeWithAI } from '@/lib/ai/meal-tree-parser';
+import { enforceRateLimit } from '@/lib/security/rate-limit';
+import { readImageUpload, toByteaHex } from '@/lib/security/uploads';
 
 const DEFAULT_TZ = 'Europe/Madrid';
+const MEAL_TYPES = new Set(['breakfast', 'midMorning', 'lunch', 'snack', 'dinner', 'lateSnack']);
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function getDateStr(dateStr, tz = DEFAULT_TZ) {
   return new Date(dateStr).toLocaleDateString('sv-SE', { timeZone: tz });
@@ -54,6 +58,10 @@ export async function listPlayerMeals(jugadorId, { mealType, day } = {}) {
     if (String(user.id) !== String(jugadorId)) {
       throw new Error('No tienes acceso a este jugador');
     }
+  }
+
+  if (day && (!DAY_RE.test(String(day)) || Number.isNaN(Date.parse(`${day}T00:00:00Z`)))) {
+    throw new Error('Fecha no válida');
   }
 
   let resultMeals = [];
@@ -114,6 +122,7 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
 
   if (!jugadorId) throw new Error('Falta jugador_id');
   if (!mealType) throw new Error('Falta el tipo de ingesta');
+  if (!MEAL_TYPES.has(String(mealType))) throw new Error('Tipo de ingesta no válido');
 
   const user = await getUser();
   if (!user || user.role === 'tecnico') throw new Error('No autorizado');
@@ -126,6 +135,15 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
   } else {
     if (String(user.id) !== String(jugadorId)) {
       throw new Error('No tienes acceso a este jugador');
+    }
+  }
+
+  if (id) {
+    // El id llega del cliente: el registro debe pertenecer al jugador autorizado
+    // (si no, se podrían editar/reasignar comidas de otros jugadores).
+    const existing = await getMealById(supabase, id);
+    if (!existing || String(existing.jugador_id) !== String(jugadorId)) {
+      throw new Error('Comida no encontrada');
     }
   }
 
@@ -143,19 +161,19 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
 
   const mealPayload = {
     jugador_id: Number(jugadorId),
-    taken_at: takenAt ? new Date(takenAt).toISOString() : new Date().toISOString(),
+    taken_at: takenAt && !Number.isNaN(Date.parse(String(takenAt))) ? new Date(takenAt).toISOString() : new Date().toISOString(),
     dish_name: dishName ? String(dishName).trim() : null,
     meal_type: mealType,
     ingredients,
-    calories: calories ? Number(calories) : null,
-    notes: notes ? String(notes).trim() : null,
+    calories: calories && Number.isFinite(Number(calories)) ? Number(calories) : null,
+    notes: notes ? String(notes).trim().slice(0, 1000) : null,
   };
 
   if (photoFile && photoFile instanceof File && photoFile.size > 0) {
-    const photoBuffer = Buffer.from(await photoFile.arrayBuffer());
-    mealPayload.photo = `\\x${photoBuffer.toString('hex')}`;
-    mealPayload.photo_mime = photoFile.type;
-    mealPayload.photo_size = photoFile.size;
+    const image = await readImageUpload(photoFile);
+    mealPayload.photo = toByteaHex(image.buffer);
+    mealPayload.photo_mime = image.mime;
+    mealPayload.photo_size = image.size;
   }
 
   let resultMeal;
@@ -202,6 +220,8 @@ export async function parseMealTree(body) {
     if (!user) {
       return { success: false, error: 'No autenticado' };
     }
+
+    await enforceRateLimit('ai-parse-meal', String(user.id), { limit: 20, windowMs: 60 * 60 * 1000 });
 
     const { jugadorId = null, ...parseInput } = body || {};
 

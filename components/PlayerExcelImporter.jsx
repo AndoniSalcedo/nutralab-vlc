@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Dropzone } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
 import { importPlayerExcel } from '@/actions/playerActions';
-import * as XLSX from 'xlsx';
+import { downloadXlsx } from '@/lib/io/xlsx-download';
 import { DateInput } from '@mantine/dates';
 import {
   Alert,
@@ -38,7 +38,6 @@ import {
 import { useRouter } from 'next/navigation';
 
 const EXCEL_TYPES = [
-  'application/vnd.ms-excel',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ];
 
@@ -211,7 +210,7 @@ export default function PlayerExcelImporter({ team }) {
     setResults(null);
   }
 
-  function downloadTemplate(e) {
+  async function downloadTemplate(e) {
     e.stopPropagation();
     try {
       const headers = [
@@ -283,10 +282,11 @@ export default function PlayerExcelImporter({ team }) {
         '54.3'
       ];
       const data = [headers, sampleRow];
-      const worksheet = XLSX.utils.aoa_to_sheet(data);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Mediciones');
-      XLSX.writeFile(workbook, 'plantilla_jugadores_metricas.xlsx');
+      await downloadXlsx({
+        filename: 'plantilla_jugadores_metricas.xlsx',
+        sheetName: 'Mediciones',
+        rows: data,
+      });
     } catch (err) {
       notifications.show({
         color: 'red',
@@ -485,7 +485,7 @@ export default function PlayerExcelImporter({ team }) {
                 <Text ta="center" fw={700} fz="lg" mt="xl">
                   <Dropzone.Accept>¡Suelta el archivo aquí!</Dropzone.Accept>
                   <Dropzone.Reject>Solo Excel</Dropzone.Reject>
-                  <Dropzone.Idle>Subir Excel (.xls / .xlsx)</Dropzone.Idle>
+                  <Dropzone.Idle>Subir Excel (.xlsx)</Dropzone.Idle>
                 </Text>
 
                 <Text ta="center" size="sm" c="dimmed" mt={7}>

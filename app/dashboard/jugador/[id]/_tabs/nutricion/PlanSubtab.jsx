@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { filenameFromResponse, formatNumberDecimal, formatInteger as formatInt } from '@/lib/utils';
-import { marked } from 'marked';
+import { renderSafeMarkdown } from '@/lib/utils/markdown';
 import {
   Badge,
   Box,
@@ -573,8 +573,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
   const planHtml = useMemo(() => {
     if (!currentPlan?.contenido || currentDatos || mode !== 'view') return '';
-    marked.setOptions({ breaks: true, gfm: true });
-    return marked(currentPlan.contenido);
+    return renderSafeMarkdown(currentPlan.contenido);
   }, [currentPlan, currentDatos, mode]);
 
 

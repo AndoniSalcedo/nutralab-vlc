@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
 import { forbidden, getAccessiblePlayer } from '@/lib/auth/team-access';
 import { getMealPhotoWithMeta } from '@/repositories/mealsRepository';
+import { imageResponse } from '@/lib/security/media';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,49 +13,30 @@ export async function GET(req) {
     const id = searchParams.get('id');
     if (!id) return NextResponse.json({ error: 'Falta id' }, { status: 400 });
 
-    const supabase = getSupabaseAdmin();
-
     const user = await getUser();
     if (!user) return forbidden('No autorizado');
 
+    const supabase = getSupabaseAdmin();
     const meal = await getMealPhotoWithMeta(supabase, id);
     if (!meal) return NextResponse.json({ error: 'Comida no encontrada' }, { status: 404 });
 
-    const isPlayer = user.role === 'jugador';
-    if (!isPlayer) {
-      const accessiblePlayer = await getAccessiblePlayer(supabase, user, meal.jugador_id);
-      if (!accessiblePlayer) return forbidden('No tienes acceso a este jugador');
-    } else {
+    if (user.role === 'jugador') {
       if (String(user.id) !== String(meal.jugador_id)) {
         return forbidden('No tienes acceso a este jugador');
       }
+    } else {
+      const accessiblePlayer = await getAccessiblePlayer(supabase, user, meal.jugador_id);
+      if (!accessiblePlayer) return forbidden('No tienes acceso a este jugador');
     }
 
     if (!meal.photo) {
       return NextResponse.json({ error: 'Comida sin foto' }, { status: 404 });
     }
 
-    let buffer;
-    if (typeof meal.photo === 'string') {
-      const hex = meal.photo.startsWith('\\x') ? meal.photo.slice(2) : meal.photo;
-      buffer = Buffer.from(hex, 'hex');
-    } else if (Buffer.isBuffer(meal.photo)) {
-      buffer = meal.photo;
-    } else if (meal.photo instanceof Uint8Array) {
-      buffer = Buffer.from(meal.photo);
-    } else {
-      buffer = Buffer.from(meal.photo);
-    }
-
-    return new NextResponse(buffer, {
-      headers: {
-        'Content-Type': meal.photo_mime || 'image/webp',
-        'Content-Length': String(meal.photo_size ?? buffer.length),
-        'Cache-Control': 'public, max-age=31536000, immutable',
-      },
-    });
+    // Datos de salud: caché solo privada (nunca compartida por CDN/proxies).
+    return imageResponse(meal.photo, meal.photo_mime, { maxAge: 86400, immutable: true });
   } catch (e) {
     console.error('Error in media/meal-photo GET:', e);
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: 'Error al cargar la imagen' }, { status: 500 });
   }
 }

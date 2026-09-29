@@ -1,9 +1,9 @@
-# VCF Nutrición App Starter
+# Nutralab (VCF Nutrición)
 
-Base real para desplegar en Vercel con Supabase.
+Panel nutricional para staff, técnicos y jugadores. Next.js + Supabase, desplegable en Vercel.
 
 ## Qué incluye
-- Login privado solo staff
+- Login privado (nutricionistas, técnicos y jugadores)
 - Dashboard con jugadores de la tabla `jugadores`
 - Formulario de alta / edición / borrado
 - Cálculo automático con Cunningham
@@ -22,6 +22,8 @@ Base real para desplegar en Vercel con Supabase.
    npm run db:migrate:status
    ```
    Para que `supabase-js` pueda consultar ese schema, debes poner `SUPABASE_SCHEMA=teams` y exponer `teams` en Supabase: Project Settings -> API -> Exposed schemas. `SUPABASE_DB_URL` solo lo usa el runner de migraciones para conectar a Postgres; no expone el schema a la API REST de Supabase.
+
+   **Seguridad:** la app solo accede con la `service_role` key. La migración `20260930100000_security_hardening.sql` activa RLS (sin políticas) y retira permisos a `anon`/`authenticated` en el schema `teams`; aplícala siempre. Toda tabla nueva debe hacer `alter table ... enable row level security`.
 4. Comprueba que tu tabla `jugadores` tiene estas columnas:
    - nombre, apellidos, posicion
    - altura_cm, peso_kg, porcentaje_grasa, masa_magra_kg

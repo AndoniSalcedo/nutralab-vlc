@@ -1,9 +1,6 @@
-import { mockTeam, mockTeams, isMockTeam } from '@/config/boneyardMockData';
+import { mockTeam, mockTeams, isMockTeam, isBoneyardMode } from '@/config/boneyardMockData';
+import { getOwnerId } from '@/lib/auth/owner';
 
-function getOwnerId(user) {
-  if (!user || user.role === 'jugador') return null;
-  return String(user.external_admin_id || user.id || user.email || user.username || '').trim() || null;
-}
 
 export async function getOwnedTeam(supabase, user, teamId) {
   if (user?.isBoneyardBypass || isMockTeam(teamId)) {
@@ -25,7 +22,7 @@ export async function getOwnedTeam(supabase, user, teamId) {
 }
 
 export async function getTeamsByOwner(supabase, ownerId) {
-  if (ownerId === 'boneyard-mock-user' || process.env.BONEYARD_MODE === 'true') {
+  if (isBoneyardMode() || (process.env.NODE_ENV !== 'production' && ownerId === 'boneyard-mock-user')) {
     return mockTeams;
   }
 

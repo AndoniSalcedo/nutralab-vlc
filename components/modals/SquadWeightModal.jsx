@@ -318,7 +318,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
     }
   }
 
-  function handleExportExcel() {
+  async function handleExportExcel() {
     const selectedList = preparedExportPlayers.filter((p) =>
       selectedPlayerIds.has(String(p.id))
     );
@@ -331,13 +331,18 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
       return;
     }
 
-    exportWeightExcel({
-      teamName: team?.nombre || 'Plantilla',
-      fecha: dateToIso(exportDate),
-      fechaFormatted: formatFullDate(exportDate),
-      records: selectedList,
-      summary: exportSummary,
-    });
+    try {
+      await exportWeightExcel({
+        teamName: team?.nombre || 'Plantilla',
+        fecha: dateToIso(exportDate),
+        fechaFormatted: formatFullDate(exportDate),
+        records: selectedList,
+        summary: exportSummary,
+      });
+    } catch (err) {
+      notifications.show({ color: 'red', title: 'Error al generar el Excel', message: err.message });
+      return;
+    }
 
     notifications.show({
       color: 'green',

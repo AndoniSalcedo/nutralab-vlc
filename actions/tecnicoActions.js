@@ -4,6 +4,9 @@ import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getOwnerId } from '@/lib/auth/team-access';
+import { findAuthUserByEmail } from '@/lib/auth/auth-users';
+import { enforceRateLimit } from '@/lib/security/rate-limit';
+import { readImageUpload, toByteaHex } from '@/lib/security/uploads';
 import {
   getTecnicosByOwner,
   getTecnicoByEmail,
@@ -15,22 +18,6 @@ import {
   updateTecnicoAvatar,
   removeTecnicoAvatar,
 } from '@/repositories/tecnicoRepository';
-
-async function findAuthUserByEmail(supabase, email) {
-  let page = 1;
-  const perPage = 100;
-
-  while (page <= 20) {
-    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
-    if (error) throw error;
-    const found = data.users.find((user) => user.email?.toLowerCase() === email);
-    if (found) return found;
-    if (data.users.length < perPage) return null;
-    page += 1;
-  }
-
-  return null;
-}
 
 export async function getTecnicos() {
   const user = await getUser();
@@ -98,62 +85,49 @@ export async function registerTecnico(payload) {
   if (!nombre || !email || !password) {
     throw new Error('Faltan campos obligatorios');
   }
-  if (password.length < 8) {
+  if (!email.includes('@') || email.length > 254 || nombre.length > 100 || apellidos.length > 150) {
+    throw new Error('Datos no válidos');
+  }
+  if (password.length < 8 || password.length > 128) {
     throw new Error('La contraseña debe tener al menos 8 caracteres');
   }
 
+  // Endpoint público: limitar altas por IP y por email.
+  await enforceRateLimit('register-tecnico', email, { limit: 3, windowMs: 60 * 60 * 1000 });
+  await enforceRateLimit('register-tecnico-ip', '', { limit: 10, windowMs: 60 * 60 * 1000 });
+
   const supabase = getSupabaseAdmin();
   const existingTecnico = await getTecnicoByEmail(supabase, email);
-  if (existingTecnico) {
-    throw new Error('Este email ya está registrado como técnico. Puedes iniciar sesión directamente.');
+  const existingUser = existingTecnico ? null : await findAuthUserByEmail(supabase, email);
+
+  // Nunca se toca una cuenta existente: antes se le reseteaba la contraseña,
+  // lo que permitía a un anónimo apoderarse de cualquier usuario por su email.
+  if (existingTecnico || existingUser) {
+    throw new Error('No se puede registrar este email. Si ya tienes cuenta, inicia sesión o contacta con tu nutricionista.');
   }
 
-  const existingUser = await findAuthUserByEmail(supabase, email);
-  let authUserId = null;
-  let isNewAuthUser = false;
-
-  if (existingUser) {
-    authUserId = existingUser.id;
-    const { error: updateAuthError } = await supabase.auth.admin.updateUserById(authUserId, {
-      password,
-      email_confirm: true,
-      user_metadata: {
-        ...(existingUser.user_metadata || {}),
-        role: 'tecnico',
-        name: `${nombre} ${apellidos}`.trim(),
-      },
-    });
-    if (updateAuthError) throw updateAuthError;
-  } else {
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: {
-        role: 'tecnico',
-        name: `${nombre} ${apellidos}`.trim(),
-      },
-    });
-
-    if (authError) throw authError;
-    authUserId = authData.user.id;
-    isNewAuthUser = true;
-  }
+  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: {
+      role: 'tecnico',
+      name: `${nombre} ${apellidos}`.trim(),
+    },
+  });
+  if (authError) throw authError;
+  const authUserId = authData.user.id;
 
   try {
-    const tecnico = await createTecnicoRecord(supabase, {
+    return await createTecnicoRecord(supabase, {
       auth_user_id: authUserId,
       nombre,
       apellidos,
       email,
       owner_id: null,
     });
-
-    return tecnico;
   } catch (dbError) {
-    if (isNewAuthUser && authUserId) {
-      await supabase.auth.admin.deleteUser(authUserId);
-    }
+    await supabase.auth.admin.deleteUser(authUserId);
     throw dbError;
   }
 }
@@ -208,11 +182,11 @@ export async function uploadTecnicoAvatar(tecnicoIdOrFormData, maybeFile) {
     throw new Error('Falta archivo de avatar');
   }
 
-  const buffer = Buffer.from(await avatarFile.arrayBuffer());
+  const image = await readImageUpload(avatarFile);
   const payload = {
-    avatar: `\\x${buffer.toString('hex')}`,
-    avatar_mime: avatarFile.type || 'image/webp',
-    avatar_size: avatarFile.size,
+    avatar: toByteaHex(image.buffer),
+    avatar_mime: image.mime,
+    avatar_size: image.size,
   };
 
   await updateTecnicoAvatar(supabase, id, payload);

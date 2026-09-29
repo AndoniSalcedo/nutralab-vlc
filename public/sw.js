@@ -1,70 +1,56 @@
-const CACHE_NAME = 'nutralab-cache-v1';
+// Solo se cachean recursos estáticos públicos. Las páginas y respuestas RSC del
+// panel contienen datos de salud de usuarios autenticados: NUNCA se guardan en
+// caché, para que no queden en dispositivos compartidos tras cerrar sesión.
+const CACHE_NAME = 'nutralab-cache-v2';
 
-// Assets to precache immediately
 const PRECACHE_ASSETS = [
-  '/',
   '/manifest.json',
   '/favico_nutralab-32x32.png',
   '/favico_nutralab-192x192.png',
   '/favico_nutralab-512x512.png',
 ];
 
+const STATIC_PATH = /^\/(_next\/static\/|favico_|icons-3d\/|manifest\.json)/;
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(PRECACHE_ASSETS);
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS)).then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+    caches.keys()
+      // Borra también las cachés antiguas (v1) que contenían páginas del panel.
+      .then((names) => Promise.all(names.filter((n) => n !== CACHE_NAME).map((n) => caches.delete(n))))
+      .then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('fetch', (event) => {
-  // Only handle GET requests and skip browser extensions or foreign domains
-  if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
-    return;
+self.addEventListener('message', (event) => {
+  if (event.data === 'CLEAR_CACHES') {
+    event.waitUntil(caches.keys().then((names) => Promise.all(names.map((n) => caches.delete(n)))));
   }
+});
 
-  // Skip API routes so database calls always run live
-  if (event.request.url.includes('/api/')) {
-    return;
-  }
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+  if (!STATIC_PATH.test(url.pathname)) return; // páginas, RSC y /api/: siempre a red
 
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // Cache successful responses for our origin
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
+      return fetch(request).then((response) => {
         if (response && response.status === 200 && response.type === 'basic') {
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
         }
         return response;
-      })
-      .catch(() => {
-        // Network fallback to cache
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          // If the page request fails offline, fallback to root index
-          if (event.request.headers.get('accept')?.includes('text/html')) {
-            return caches.match('/');
-          }
-        });
-      })
+      });
+    })
   );
 });

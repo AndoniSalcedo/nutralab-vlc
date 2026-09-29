@@ -5,6 +5,12 @@ import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getOwnedPlayer, getOwnedTeam } from '@/lib/auth/team-access';
+import { getOwnerId } from '@/lib/auth/owner';
+import { findAuthUserByEmail } from '@/lib/auth/auth-users';
+import { enforceRateLimit } from '@/lib/security/rate-limit';
+import { readImageUpload, toByteaHex, MAX_DOCUMENT_BYTES } from '@/lib/security/uploads';
+import { createClient } from '@supabase/supabase-js';
+import { env } from '@/config/env';
 import { DEFAULT_PLAYER_MEALS_STRING } from '@/config/nutrition-days';
 import { toPositiveNumber as toNumber, cleanText } from '@/lib/utils';
 import {
@@ -30,11 +36,6 @@ import {
 } from '@/repositories/evolutionRepository';
 import { trackUsageEvent } from '@/lib/billing/client';
 
-function getOwnerId(user) {
-  if (!user || user.role === 'jugador' || user.role === 'tecnico') return null;
-  return String(user.external_admin_id || user.id || user.email || user.username || '').trim() || null;
-}
-
 function isValidPassword(password) {
   return typeof password === 'string' && password.length >= 8;
 }
@@ -45,22 +46,6 @@ function playerMetadata(jugador) {
     jugador_id: jugador.id,
     name: `${jugador.nombre} ${jugador.apellidos || ''}`.trim(),
   };
-}
-
-async function findAuthUserByEmail(supabase, email) {
-  let page = 1;
-  const perPage = 100;
-
-  while (page <= 20) {
-    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
-    if (error) throw error;
-    const found = data.users.find((user) => user.email?.toLowerCase() === email);
-    if (found) return found;
-    if (data.users.length < perPage) return null;
-    page += 1;
-  }
-
-  return null;
 }
 
 const CAMPOS_PERMITIDOS = [
@@ -156,29 +141,21 @@ export async function updatePlayerCredentials(jugadorIdOrPayload, emailParam, pa
     });
     if (error) throw error;
   } else {
+    // Si el email ya pertenece a otra cuenta NO se reutiliza ni se le cambia la
+    // contraseña: hacerlo permitiría a un admin tomar cuentas de otros tenants.
     const existingUser = await findAuthUserByEmail(supabase, cleanEmail);
-
     if (existingUser) {
-      authUserId = existingUser.id;
-      const { error } = await supabase.auth.admin.updateUserById(authUserId, {
-        password: cleanPassword,
-        email_confirm: true,
-        user_metadata: {
-          ...(existingUser.user_metadata || {}),
-          ...metadata,
-        },
-      });
-      if (error) throw error;
-    } else {
-      const { data, error } = await supabase.auth.admin.createUser({
-        email: cleanEmail,
-        password: cleanPassword,
-        email_confirm: true,
-        user_metadata: metadata,
-      });
-      if (error) throw error;
-      authUserId = data.user.id;
+      throw new Error('Ese correo ya está en uso por otra cuenta. Usa un correo distinto.');
     }
+
+    const { data, error } = await supabase.auth.admin.createUser({
+      email: cleanEmail,
+      password: cleanPassword,
+      email_confirm: true,
+      user_metadata: metadata,
+    });
+    if (error) throw error;
+    authUserId = data.user.id;
   }
 
   const updated = await updatePlayer(supabase, jugador.id, {
@@ -191,18 +168,40 @@ export async function updatePlayerCredentials(jugadorIdOrPayload, emailParam, pa
   return { credentials: updated };
 }
 
-export async function updatePlayerPassword(password) {
+export async function updatePlayerPassword(password, currentPassword) {
   const user = await getUser();
   if (user?.role !== 'jugador' || !user?.supabase_uid) {
     throw new Error('No autorizado');
   }
 
   const cleanPassword = String(password || '');
-  if (cleanPassword.length < 8) {
+  if (cleanPassword.length < 8 || cleanPassword.length > 128) {
     throw new Error('La contraseña debe tener al menos 8 caracteres');
   }
+  if (!currentPassword) {
+    throw new Error('Introduce tu contraseña actual');
+  }
+
+  await enforceRateLimit('change-password', String(user.id), { limit: 5, windowMs: 15 * 60 * 1000 });
 
   const supabase = getSupabaseAdmin();
+  const { data: authUser, error: getError } = await supabase.auth.admin.getUserById(user.supabase_uid);
+  if (getError || !authUser?.user?.email) {
+    throw new Error('No se pudo verificar tu cuenta');
+  }
+
+  // Verifica la contraseña actual con un cliente aislado (sin persistir sesión).
+  const verifier = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  const { error: verifyError } = await verifier.auth.signInWithPassword({
+    email: authUser.user.email,
+    password: String(currentPassword),
+  });
+  if (verifyError) {
+    throw new Error('La contraseña actual no es correcta');
+  }
+
   const { error } = await supabase.auth.admin.updateUserById(user.supabase_uid, {
     password: cleanPassword,
   });
@@ -317,7 +316,9 @@ export async function savePlayer(form) {
 
   if (form.has('config_prepartido')) {
     try {
-      payload.config_prepartido = JSON.parse(String(form.get('config_prepartido')));
+      const parsedConfig = JSON.parse(String(form.get('config_prepartido')));
+      const validation = validateAstValue(preMatchConfigSchema, parsedConfig || {}, { label: 'Protocolo pre-partido' });
+      payload.config_prepartido = validation.success ? validation.data : {};
     } catch {
       payload.config_prepartido = {};
     }
@@ -326,10 +327,10 @@ export async function savePlayer(form) {
   if (form.has('avatar')) {
     const avatarFile = form.get('avatar');
     if (avatarFile && avatarFile instanceof File && avatarFile.size > 0) {
-      const buffer = Buffer.from(await avatarFile.arrayBuffer());
-      payload.avatar = `\\x${buffer.toString('hex')}`;
-      payload.avatar_mime = avatarFile.type || 'image/webp';
-      payload.avatar_size = avatarFile.size;
+      const image = await readImageUpload(avatarFile);
+      payload.avatar = toByteaHex(image.buffer);
+      payload.avatar_mime = image.mime;
+      payload.avatar_size = image.size;
     }
   }
 
@@ -640,6 +641,9 @@ export async function importPlayerExcel(formDataOrPayload) {
   if (!file || typeof file.arrayBuffer !== 'function') {
     throw new Error('Sin archivo Excel');
   }
+  if (file.size > MAX_DOCUMENT_BYTES) {
+    throw new Error('El archivo Excel es demasiado grande');
+  }
 
   const supabase = getSupabaseAdmin();
   const user = await getUser();
@@ -651,7 +655,7 @@ export async function importPlayerExcel(formDataOrPayload) {
   if (!team) throw new Error('Debes importar dentro de un equipo propio');
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const parsed = parsePlayerExcel(buffer);
+  const parsed = await parsePlayerExcel(buffer);
   const players = await loadTeamPlayers(supabase, team.id);
   const plan = buildImportPlan(parsed, players);
 
@@ -734,11 +738,11 @@ export async function uploadPlayerAvatar(jugadorIdOrFormData, maybeFile) {
     throw new Error('Falta archivo de avatar');
   }
 
-  const buffer = Buffer.from(await avatarFile.arrayBuffer());
+  const image = await readImageUpload(avatarFile);
   const payload = {
-    avatar: `\\x${buffer.toString('hex')}`,
-    avatar_mime: avatarFile.type || 'image/webp',
-    avatar_size: avatarFile.size,
+    avatar: toByteaHex(image.buffer),
+    avatar_mime: image.mime,
+    avatar_size: image.size,
     updated_at: new Date().toISOString(),
   };
 

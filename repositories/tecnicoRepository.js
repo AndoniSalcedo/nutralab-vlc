@@ -1,4 +1,4 @@
-import { mockTeam, mockTeams, mockPlayers, isMockTeam, isMockPlayer } from '@/config/boneyardMockData';
+import { mockTeam, mockTeams, mockPlayers, isMockTeam, isMockPlayer, isBoneyardMode } from '@/config/boneyardMockData';
 
 export async function getTecnicosByOwner(supabase, ownerId) {
   const { data: links, error: linksError } = await supabase
@@ -184,7 +184,7 @@ export async function assignTeamsToTecnico(supabase, ownerId, tecnicoId, teamIds
 }
 
 export async function getTeamsByTecnico(supabase, tecnicoId) {
-  if (tecnicoId === 'boneyard-mock-user' || process.env.BONEYARD_MODE === 'true') {
+  if (isBoneyardMode() || (process.env.NODE_ENV !== 'production' && tecnicoId === 'boneyard-mock-user')) {
     return mockTeams;
   }
 

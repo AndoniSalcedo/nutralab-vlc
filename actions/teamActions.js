@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getOwnedTeam, getOwnerId } from '@/lib/auth/team-access';
+import { readImageUpload, toByteaHex } from '@/lib/security/uploads';
+import { assertPlainObject } from '@/lib/security/json';
 import {
   insertTeam,
   deleteTeam as deleteTeamInRepo,
@@ -322,6 +324,7 @@ export async function saveTeamConfig(teamId, configuracion_nutricional) {
     throw new Error('Equipo no encontrado o sin permisos');
   }
 
+  assertPlainObject(configuracion_nutricional, { label: 'Configuración nutricional' });
   await updateTeamConfig(supabase, teamId, configuracion_nutricional);
   revalidatePath(`/dashboard/equipo/${teamId}/configuracion`);
   return { success: true };
@@ -352,11 +355,11 @@ export async function uploadTeamPhoto(teamIdOrFormData, maybeFile) {
   const ownedTeam = await getOwnedTeam(supabase, user, id);
   if (!ownedTeam) throw new Error('No tienes acceso a este equipo');
 
-  const buffer = Buffer.from(await fotoFile.arrayBuffer());
+  const image = await readImageUpload(fotoFile);
   const payload = {
-    foto: `\\x${buffer.toString('hex')}`,
-    foto_mime: fotoFile.type || 'image/webp',
-    foto_size: fotoFile.size,
+    foto: toByteaHex(image.buffer),
+    foto_mime: image.mime,
+    foto_size: image.size,
     updated_at: new Date().toISOString(),
   };
 

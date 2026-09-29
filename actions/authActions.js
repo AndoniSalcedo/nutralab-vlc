@@ -8,6 +8,7 @@ import { buildSessionValue, COOKIE_NAME, getUser } from '@/lib/auth/session';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getPlayerByAuthUserIdSingle } from '@/repositories/playerRepository';
 import { getTecnicoByAuthUserId } from '@/repositories/tecnicoRepository';
+import { enforceRateLimit } from '@/lib/security/rate-limit';
 
 export async function login(emailOrPayload, passwordParam, expectedRoleParam) {
   let email, password, expectedRole;
@@ -26,6 +27,13 @@ export async function login(emailOrPayload, passwordParam, expectedRoleParam) {
   if (!cleanEmail || !password) {
     throw new Error('Email y contraseña son obligatorios');
   }
+  if (typeof password !== 'string' || password.length > 256 || cleanEmail.length > 254) {
+    throw new Error('Email o contraseña incorrectos');
+  }
+
+  // Frena la fuerza bruta: por IP+email y, más laxo, por IP.
+  await enforceRateLimit('login', cleanEmail, { limit: 8, windowMs: 15 * 60 * 1000 });
+  await enforceRateLimit('login-ip', '', { limit: 40, windowMs: 15 * 60 * 1000 });
 
   // Este endpoint corre en servidor, así que usamos la service key para no depender
   // de la publishable/anon key del cliente.
@@ -91,7 +99,7 @@ export async function login(emailOrPayload, passwordParam, expectedRoleParam) {
   }
 
   const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, buildSessionValue(sessionObj), {
+  cookieStore.set(COOKIE_NAME, buildSessionValue(sessionObj, maxAge), {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',
     sameSite: 'lax',

@@ -6,7 +6,7 @@ import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getAccessibleTeam } from '@/lib/auth/team-access';
 import { withLatestMeasurement } from '@/lib/metrics/player';
 import WeeklySquadReportDocument from '@/components/reports/WeeklySquadReportDocument';
-import { generarDatosPlan } from '@/lib/engine';
+import { generarDatosPlan, sanitizePlanData } from '@/lib/engine';
 import { sanitizeFilename, pdfHeaders as getPdfHeaders } from '@/lib/utils';
 import { getPlayerById, getPlayersByTeam } from '@/repositories/playerRepository';
 import { getTeamById } from '@/repositories/teamRepository';
@@ -55,6 +55,7 @@ function defaultMeta(meta = {}) {
 function httpError(message, status = 400) {
   const error = new Error(message);
   error.status = status;
+  error.expose = status < 500;
   return error;
 }
 
@@ -98,7 +99,7 @@ async function persistWeeklyReport(supabase, teamId, meta, semana) {
     });
   } catch (error) {
     console.error('Error saving weekly report configuration:', error);
-    throw httpError(`Error al guardar el informe en la base de datos: ${error.message}`, 500);
+    throw httpError('Error al guardar el informe en la base de datos', 500);
   }
 
   return semanaVal;
@@ -337,9 +338,11 @@ async function renderReportResponse(meta, players, semana, teamConfig) {
 }
 
 function jsonError(error, fallback = 'Error generando informe') {
+  if (!error?.expose) console.error('[weekly-squad]', error);
   return NextResponse.json(
-    { error: error.message || fallback },
-    { status: error.status || 500 }
+    // Los errores 5xx/desconocidos no exponen detalles internos al cliente.
+    { error: error?.expose ? error.message : fallback },
+    { status: error?.expose ? error.status : 500 }
   );
 }
 
@@ -378,7 +381,7 @@ export async function POST(request) {
     const draftPlans = new Map(
       draftPlayers
         .filter((item) => item?.id && item?.plan && typeof item.plan === 'object')
-        .map((item) => [String(item.id), item.plan])
+        .map((item) => [String(item.id), sanitizePlanData(item.plan, team.configuracion_nutricional)])
     );
 
     if (commitDraft && draftPlans.size !== jugadorIds.length) {

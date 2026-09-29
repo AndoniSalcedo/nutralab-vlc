@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Box, Group, Paper, Stack, Text } from '@mantine/core';
+import { Box, Group, Paper, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 
 // Umbrales de sodio en sudor (mg/L) según la escala del dispositivo

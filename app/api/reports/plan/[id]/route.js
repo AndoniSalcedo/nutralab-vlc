@@ -112,6 +112,7 @@ export async function GET(request, { params }) {
       headers: pdfHeaders(filename, buffer.length),
     });
   } catch (e) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    console.error('Error generando la ficha PDF del plan:', e);
+    return NextResponse.json({ error: 'Error al generar el documento PDF' }, { status: 500 });
   }
 }

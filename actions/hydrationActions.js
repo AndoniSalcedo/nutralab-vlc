@@ -1,5 +1,6 @@
 'use server';
 
+import { MAX_DOCUMENT_BYTES } from '@/lib/security/uploads';
 import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
@@ -82,9 +83,14 @@ async function getHydrationRecords(jugadorId) {
   const user = await getUser();
   if (!user) throw new Error('No autorizado');
 
-  const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
-  if (!accessiblePlayer && String(user.id) !== String(jugadorId)) {
-    throw new Error('No tienes acceso a este jugador');
+  // Un jugador solo ve lo suyo; el resto de roles deben tener acceso al jugador.
+  // (Antes se comparaba user.id con jugadorId sin mirar el rol, y un técnico
+  // con el mismo id numérico pasaba el filtro.)
+  if (user.role === 'jugador') {
+    if (String(user.id) !== String(jugadorId)) throw new Error('No tienes acceso a este jugador');
+  } else {
+    const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+    if (!accessiblePlayer) throw new Error('No tienes acceso a este jugador');
   }
 
   const data = await getHydrationRecordsByPlayerId(supabase, jugadorId);
@@ -247,6 +253,9 @@ export async function importTeamOsmolarity(formDataOrFile, teamIdParam, decision
 
   if (!file) {
     throw new Error('Archivo no proporcionado');
+  }
+  if (file.size > MAX_DOCUMENT_BYTES) {
+    throw new Error('El archivo es demasiado grande');
   }
   if (!teamId) {
     throw new Error('ID de equipo no proporcionado');

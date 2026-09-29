@@ -77,6 +77,11 @@ export async function saveEvolution(body) {
 
   let data;
   if (id) {
+    // El id llega del cliente: comprobar que el registro es del jugador autorizado.
+    const existing = await getEvolutionById(supabase, id);
+    if (!existing || String(existing.jugador_id) !== String(jugador_id)) {
+      throw new Error('Medición no encontrada');
+    }
     data = await updateEvolution(supabase, id, payload);
   } else {
     data = await upsertEvolution(supabase, {

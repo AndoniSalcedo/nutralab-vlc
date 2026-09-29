@@ -63,13 +63,23 @@ export async function saveWellnessRecord(payload) {
     if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
   }
 
+  const recordDate = fecha ? String(fecha) : todayStr();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(recordDate) || Number.isNaN(Date.parse(`${recordDate}T12:00:00Z`))) {
+    throw new Error('Fecha no válida');
+  }
+  // Los registros son del día: no se permiten fechas futuras ni muy antiguas.
+  const today = todayStr();
+  if (recordDate > today || recordDate < shiftDate(today, -WELLNESS_AVERAGE_DAYS)) {
+    throw new Error('La fecha del registro está fuera del rango permitido');
+  }
+
   const hasMolestia = molestia === true;
   const detalle = String(molestia_detalle || '').trim();
   if (hasMolestia && !detalle) throw new Error('Indica dónde y qué intensidad tiene la molestia');
 
   const recordPayload = {
     jugador_id: Number(jugador_id),
-    fecha: fecha || todayStr(),
+    fecha: recordDate,
     molestia: hasMolestia,
     molestia_detalle: hasMolestia ? detalle.slice(0, 280) : null,
     created_by: String(user.id || ''),
