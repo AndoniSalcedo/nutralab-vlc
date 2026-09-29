@@ -227,6 +227,7 @@ export default function ProtocolTransferModal({
             allowDeselect={false}
             size="sm"
             radius="md"
+            comboboxProps={{ zIndex: 2500, withinPortal: true }}
           />
 
           {/* Selección de Tipo de Día de Destino */}
@@ -243,6 +244,7 @@ export default function ProtocolTransferModal({
             allowDeselect={false}
             size="sm"
             radius="md"
+            comboboxProps={{ zIndex: 2500, withinPortal: true }}
           />
 
           <Group justify="flex-end" mt="md" pt="md" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>

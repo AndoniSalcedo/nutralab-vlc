@@ -190,6 +190,7 @@ export default function EditDishDecompositionModal({
               nothingFoundMessage="No se encontró ningún alimento"
               radius="md"
               size="xs"
+              comboboxProps={{ zIndex: 2500, withinPortal: true }}
             />
           </Box>
 
@@ -211,6 +212,7 @@ export default function EditDishDecompositionModal({
               nothingFoundMessage="No se encontró ningún hidrato"
               radius="md"
               size="xs"
+              comboboxProps={{ zIndex: 2500, withinPortal: true }}
             />
           </Box>
 
@@ -232,6 +234,7 @@ export default function EditDishDecompositionModal({
               nothingFoundMessage="No se encontró ninguna verdura"
               radius="md"
               size="xs"
+              comboboxProps={{ zIndex: 2500, withinPortal: true }}
             />
           </Box>
 
@@ -253,6 +256,7 @@ export default function EditDishDecompositionModal({
               nothingFoundMessage="No se encontró ninguna fruta"
               radius="md"
               size="xs"
+              comboboxProps={{ zIndex: 2500, withinPortal: true }}
             />
           </Box>
 
@@ -274,6 +278,7 @@ export default function EditDishDecompositionModal({
               nothingFoundMessage="No se encontró ningún lácteo"
               radius="md"
               size="xs"
+              comboboxProps={{ zIndex: 2500, withinPortal: true }}
             />
           </Box>
 
@@ -293,6 +298,7 @@ export default function EditDishDecompositionModal({
               clearable
               radius="md"
               size="xs"
+              comboboxProps={{ zIndex: 2500, withinPortal: true }}
             />
           </Box>
         </Stack>

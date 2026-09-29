@@ -188,6 +188,7 @@ export default function TransferPlayersModal({
           size="sm"
           nothingFoundMessage="No se encontraron otros equipos"
           required
+          comboboxProps={{ zIndex: 2500, withinPortal: true }}
         />
 
         {/* Barra de búsqueda y selección de jugadores */}

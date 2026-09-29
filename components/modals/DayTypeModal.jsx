@@ -40,6 +40,7 @@ export default function DayTypeModal({
             data={COLORS.map((c) => ({ value: c, label: c }))}
             value={editingDayType.color}
             onChange={(v) => setEditingDayType({ ...editingDayType, color: v })}
+            comboboxProps={{ zIndex: 2500, withinPortal: true }}
           />
           <Switch
             label="Incluir batido de proteínas (Post-entreno)"

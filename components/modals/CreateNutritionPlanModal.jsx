@@ -88,6 +88,7 @@ export default function CreateNutritionPlanModal({
             }))
           ]}
           allowDeselect={false}
+          comboboxProps={{ zIndex: 2500, withinPortal: true }}
         />
 
         <Paper p="sm" radius="md" withBorder bg="gray.0">
@@ -105,6 +106,7 @@ export default function CreateNutritionPlanModal({
                     setModalCalendar((prev) => ({ ...prev, [dayKey]: newType }));
                   }}
                   size="xs"
+                  comboboxProps={{ zIndex: 2500, withinPortal: true }}
                 />
               );
             })}

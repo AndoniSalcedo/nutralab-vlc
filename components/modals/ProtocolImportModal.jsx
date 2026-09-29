@@ -204,6 +204,7 @@ export default function ProtocolImportModal({
             allowDeselect={false}
             size="sm"
             radius="md"
+            comboboxProps={{ zIndex: 2500, withinPortal: true }}
           />
 
           <Box>
@@ -278,6 +279,7 @@ export default function ProtocolImportModal({
                               size="xs"
                               radius="md"
                               allowDeselect={false}
+                              comboboxProps={{ zIndex: 2500, withinPortal: true }}
                             />
                           </Table.Td>
                         </Table.Tr>
