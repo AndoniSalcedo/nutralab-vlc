@@ -34,6 +34,7 @@ export default function TransferPlayersModal({
   initialSelectedIds = [],
 }) {
   const [loading, setLoading] = useState(false);
+  const [loadingTeams, setLoadingTeams] = useState(false);
   const [teams, setTeams] = useState([]);
   const [targetTeamId, setTargetTeamId] = useState(null);
   const [action, setAction] = useState('move');
@@ -42,11 +43,20 @@ export default function TransferPlayersModal({
   const router = useRouter();
 
   const fetchTeams = async () => {
+    setLoadingTeams(true);
     try {
-      const allTeams = await getTeams();
-      setTeams(allTeams.filter((t) => t.id !== team?.id));
+      const res = await getTeams();
+      const list = Array.isArray(res) ? res : (res?.equipos || []);
+      const currentTeamId = team?.id ?? team;
+      const filtered = list.filter((t) => String(t.id) !== String(currentTeamId));
+      setTeams(filtered);
+      if (filtered.length === 1) {
+        setTargetTeamId(String(filtered[0].id));
+      }
     } catch (error) {
       console.error('Error fetching teams:', error);
+    } finally {
+      setLoadingTeams(false);
     }
   };
 
@@ -179,16 +189,16 @@ export default function TransferPlayersModal({
         {/* Selección del equipo destino */}
         <Select
           label="Equipo de destino"
-          placeholder="Selecciona un equipo de destino..."
+          placeholder={loadingTeams ? 'Cargando equipos...' : 'Selecciona un equipo de destino...'}
           data={teamOptions}
           value={targetTeamId}
           onChange={setTargetTeamId}
           searchable
           radius="md"
           size="sm"
-          nothingFoundMessage="No se encontraron otros equipos"
+          nothingFoundMessage={loadingTeams ? 'Cargando...' : 'No se encontraron otros equipos'}
+          disabled={loadingTeams || loading}
           required
-          comboboxProps={{ zIndex: 2500, withinPortal: true }}
         />
 
         {/* Barra de búsqueda y selección de jugadores */}

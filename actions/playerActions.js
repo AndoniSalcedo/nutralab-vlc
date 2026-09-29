@@ -233,11 +233,17 @@ export async function transferPlayers({ playerIds, targetTeamId, action }) {
   }
 
   if (action === 'move') {
+    const sourceTeamIds = new Set();
     for (const player of players) {
-      if (player.equipo_id === targetTeamId) continue;
+      if (player.equipo_id) sourceTeamIds.add(player.equipo_id);
+      if (String(player.equipo_id) === String(targetTeamId)) continue;
       await updatePlayer(supabase, player.id, { equipo_id: targetTeamId });
     }
+    sourceTeamIds.forEach((srcId) => {
+      revalidatePath(`/dashboard/equipo/${srcId}`);
+    });
     revalidatePath(`/dashboard/equipo/${targetTeamId}`);
+    revalidatePath('/dashboard');
     return { success: true, message: 'Jugadores movidos correctamente' };
   }
 
@@ -255,6 +261,7 @@ export async function transferPlayers({ playerIds, targetTeamId, action }) {
       await insertPlayersBulk(supabase, payloads);
     }
     revalidatePath(`/dashboard/equipo/${targetTeamId}`);
+    revalidatePath('/dashboard');
     return { success: true, message: 'Jugadores copiados correctamente' };
   }
 }

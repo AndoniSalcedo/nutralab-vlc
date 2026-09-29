@@ -188,7 +188,6 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
                                 size="xs"
                                 variant="filled"
                                 allowDeselect={false}
-                                comboboxProps={{ zIndex: 2500, withinPortal: true }}
                                 leftSection={AVAILABLE_ICONS[item.icon]}
                                 styles={{ input: { color: 'transparent' } }}
                                 renderOption={({ option }) => (

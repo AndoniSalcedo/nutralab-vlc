@@ -284,7 +284,7 @@ export default function IntercambiosModal({ opened, onClose }) {
                       }}
                       searchable
                       radius="md"
-                      comboboxProps={{ shadow: 'md', zIndex: 2500, withinPortal: true }}
+                      comboboxProps={{ shadow: 'md' }}
                     />
 
                     <NumberInput

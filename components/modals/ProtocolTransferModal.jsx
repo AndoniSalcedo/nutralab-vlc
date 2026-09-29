@@ -44,7 +44,8 @@ export default function ProtocolTransferModal({
       setTeamsLoading(true);
       getTeams()
         .then((teamList) => {
-          const others = (teamList || []).filter((t) => String(t.id) !== String(currentTeamId));
+          const list = Array.isArray(teamList) ? teamList : (teamList?.equipos || []);
+          const others = list.filter((t) => String(t.id) !== String(currentTeamId));
           setTeams(others);
           if (others.length > 0) {
             setTargetTeamId(String(others[0].id));
@@ -227,7 +228,6 @@ export default function ProtocolTransferModal({
             allowDeselect={false}
             size="sm"
             radius="md"
-            comboboxProps={{ zIndex: 2500, withinPortal: true }}
           />
 
           {/* Selección de Tipo de Día de Destino */}
@@ -244,7 +244,6 @@ export default function ProtocolTransferModal({
             allowDeselect={false}
             size="sm"
             radius="md"
-            comboboxProps={{ zIndex: 2500, withinPortal: true }}
           />
 
           <Group justify="flex-end" mt="md" pt="md" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>

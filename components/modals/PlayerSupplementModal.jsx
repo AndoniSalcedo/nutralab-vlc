@@ -73,7 +73,6 @@ export default function PlayerSupplementModal({
               clearable
               variant="filled"
               radius="md"
-              comboboxProps={{ zIndex: 2500, withinPortal: true }}
             />
           </Stack>
         ) : (
@@ -95,7 +94,6 @@ export default function PlayerSupplementModal({
                 onChange={(value) => setExtraForm((current) => ({ ...current, suplemento_id: value || '' }))}
                 variant="filled"
                 radius="md"
-                comboboxProps={{ zIndex: 2500, withinPortal: true }}
               />
               <TextInput
                 label="Dosis personalizada"

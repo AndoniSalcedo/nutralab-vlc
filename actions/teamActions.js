@@ -159,7 +159,7 @@ export async function getTeams() {
 
   const supabase = getSupabaseAdmin();
   const teams = await getTeamsByOwner(supabase, ownerId);
-  return { equipos: teams || [] };
+  return teams || [];
 }
 
 export async function createTeam(payload) {

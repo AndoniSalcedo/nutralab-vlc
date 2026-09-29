@@ -78,7 +78,6 @@ export default function EditRecordModal({
                 { value: 'Moderately Dehydrated', label: 'Deshidratación Moderada (Moderately)' },
                 { value: 'Severely Dehydrated', label: 'Deshidratación Severa (Severely)' },
               ]}
-            comboboxProps={{ zIndex: 2500, withinPortal: true }}
           />
         </SimpleGrid>
 

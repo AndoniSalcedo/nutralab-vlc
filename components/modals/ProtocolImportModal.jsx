@@ -45,7 +45,8 @@ export default function ProtocolImportModal({
       setTeamsLoading(true);
       getTeams()
         .then((teamList) => {
-          const others = (teamList || []).filter((t) => String(t.id) !== String(currentTeamId));
+          const list = Array.isArray(teamList) ? teamList : (teamList?.equipos || []);
+          const others = list.filter((t) => String(t.id) !== String(currentTeamId));
           setTeams(others);
           if (others.length > 0) {
             setSourceTeamId(String(others[0].id));
@@ -204,7 +205,6 @@ export default function ProtocolImportModal({
             allowDeselect={false}
             size="sm"
             radius="md"
-            comboboxProps={{ zIndex: 2500, withinPortal: true }}
           />
 
           <Box>
@@ -279,7 +279,6 @@ export default function ProtocolImportModal({
                               size="xs"
                               radius="md"
                               allowDeselect={false}
-                              comboboxProps={{ zIndex: 2500, withinPortal: true }}
                             />
                           </Table.Td>
                         </Table.Tr>

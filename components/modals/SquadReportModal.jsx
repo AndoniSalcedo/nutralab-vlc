@@ -357,7 +357,6 @@ export default function SquadReportModal({
                   }))
                 ]}
                 allowDeselect={false}
-                comboboxProps={{ zIndex: 2500, withinPortal: true }}
               />
             </Box>
           </Paper>
@@ -380,7 +379,6 @@ export default function SquadReportModal({
                   onChange={(val) => updateCalendarioDay(day.key, val)}
                   data={dayTypeOptions}
                   size="sm"
-                  comboboxProps={{ zIndex: 2500, withinPortal: true }}
                 />
               ))}
             </SimpleGrid>
