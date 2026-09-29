@@ -38,6 +38,7 @@ import {
   ComedorWidget,
   EstrategiaWidget,
   BalanceNutricionalWidget,
+  WellnessHexagonWidget,
 } from '@/components/widgets';
 
 dayjs.locale('es');
@@ -356,6 +357,12 @@ export default function PerfilSubtab({
               messages={messages}
             />
           </SimpleGrid>
+
+          {/* Bienestar diario: hexágono hoy vs media */}
+          <WellnessHexagonWidget
+            jugadorId={jugador.id}
+            canEdit={user?.role !== 'tecnico'}
+          />
 
           {/* Sudoración: ancho completo para la escala de sodio */}
           <SweatMetricWidget
