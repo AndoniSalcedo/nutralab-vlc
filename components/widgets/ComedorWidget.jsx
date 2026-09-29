@@ -88,9 +88,6 @@ export default function ComedorWidget({
                 <Text fz="sm" fw={500} c="dark.4" truncate style={{ flex: 1, paddingLeft: 8 }}>
                   {todayDiningMenu.primero}
                 </Text>
-                <Text fz="xs" fw={500} c="dimmed" style={{ flexShrink: 0 }}>
-                  Recarga
-                </Text>
               </Group>
             </Paper>
           )}
@@ -110,9 +107,6 @@ export default function ComedorWidget({
                 <Text fz="sm" fw={500} c="dark.4" truncate style={{ flex: 1, paddingLeft: 8 }}>
                   {todayDiningMenu.segundo}
                 </Text>
-                <Text fz="xs" fw={500} c="dimmed" style={{ flexShrink: 0 }}>
-                  Músculo
-                </Text>
               </Group>
             </Paper>
           )}
@@ -131,9 +125,6 @@ export default function ComedorWidget({
                 </Text>
                 <Text fz="sm" fw={500} c="dark.4" truncate style={{ flex: 1, paddingLeft: 8 }}>
                   {todayDiningMenu.postre}
-                </Text>
-                <Text fz="xs" fw={500} c="dimmed" style={{ flexShrink: 0 }}>
-                  Vitalidad
                 </Text>
               </Group>
             </Paper>
