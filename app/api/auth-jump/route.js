@@ -32,11 +32,6 @@ export async function GET(request) {
     const nutritionistId = decoded.id;
     if (!nutritionistId) throw new Error('Token sin id de nutricionista');
 
-    // El backend firma con el mismo secreto otros tokens (reset/invitación): solo
-    // vale el de propósito 'jump' emitido para un nutricionista/admin.
-    if (decoded.purpose !== 'jump' || !['nutritionist', 'admin'].includes(decoded.role)) {
-      throw new Error('Token con propósito o rol no válido');
-    }
     if (decoded.purpose !== JUMP_PURPOSE) throw new Error('Token de otro tipo');
     if (!ALLOWED_ROLES.includes(decoded.role)) throw new Error('Rol no permitido');
     // Siempre caduca (jwt.verify ya rechaza los vencidos); uno sin `exp` no es un token de salto válido
