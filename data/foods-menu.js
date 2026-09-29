@@ -1745,6 +1745,30 @@ export const FOODS_MENU = [
     maxGrams: 250,
     treePath: ['proteina', 'carne', 'cerdo'],
   },
+  {
+    name: 'Pancakes proteicos',
+    originalName: 'Pancakes proteicos de avena, claras y proteína de suero',
+    kcal: 215,
+    cho: 24,
+    pro: 20,
+    fat: 4,
+    tags: ['gluten', 'huevo', 'lactosa', 'proteina_vaca'],
+    minGrams: 80,
+    maxGrams: 200,
+    treePath: ['hidratos', 'preparados_desayuno'],
+  },
+  {
+    name: 'Crepes de avena',
+    originalName: 'Crepes de harina de avena, huevo y leche',
+    kcal: 190,
+    cho: 24,
+    pro: 9,
+    fat: 6,
+    tags: ['gluten', 'huevo', 'lactosa', 'proteina_vaca'],
+    minGrams: 60,
+    maxGrams: 180,
+    treePath: ['hidratos', 'preparados_desayuno'],
+  },
 ];
 
 function normalizeFoodName(str) {
