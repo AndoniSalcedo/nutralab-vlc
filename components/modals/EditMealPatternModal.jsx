@@ -74,6 +74,11 @@ export default function EditMealPatternModal({
         jugadorId,
       });
 
+      if (data?.success === false) {
+        setAiError(data.error || 'No se pudo interpretar la pauta.');
+        return;
+      }
+
       const mealData = data.tree || Object.values(data.results || {})[0];
       if (!mealData) {
         setAiError('Respuesta inesperada del analizador.');

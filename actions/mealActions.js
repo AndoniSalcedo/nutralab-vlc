@@ -194,19 +194,26 @@ export async function deletePlayerMeal(id) {
   return { success: true };
 }
 
+// Devuelve { success: false, error } en lugar de lanzar: en producción Next.js
+// oculta el mensaje de los errores lanzados en Server Actions (React error #441).
 export async function parseMealTree(body) {
-  const user = await getUser();
-  if (!user) {
-    throw new Error('No autenticado');
+  try {
+    const user = await getUser();
+    if (!user) {
+      return { success: false, error: 'No autenticado' };
+    }
+
+    const { jugadorId = null, ...parseInput } = body || {};
+
+    let jugador = null;
+    if (jugadorId) {
+      const supabase = getSupabaseAdmin();
+      jugador = await getOwnedPlayer(supabase, user, jugadorId);
+    }
+
+    return await parseMealTreeWithAI({ ...parseInput, jugador });
+  } catch (err) {
+    console.error('[parseMealTree]', err);
+    return { success: false, error: err?.message || 'Error al conectar con el servicio de IA.' };
   }
-
-  const { jugadorId = null, ...parseInput } = body || {};
-
-  let jugador = null;
-  if (jugadorId) {
-    const supabase = getSupabaseAdmin();
-    jugador = await getOwnedPlayer(supabase, user, jugadorId);
-  }
-
-  return parseMealTreeWithAI({ ...parseInput, jugador });
 }

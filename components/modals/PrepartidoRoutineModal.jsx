@@ -114,6 +114,11 @@ function SingleMealPautaEditor({
         jugadorId,
       });
 
+      if (data?.success === false) {
+        setAiError(data.error || 'No se pudo interpretar la pauta.');
+        return;
+      }
+
       const parsed = data.tree || Object.values(data.results || {})[0];
       if (!parsed) {
         setAiError('Respuesta inesperada del asistente de IA.');
