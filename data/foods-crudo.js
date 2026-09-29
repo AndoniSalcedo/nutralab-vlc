@@ -1463,7 +1463,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 25,
     "treePath": [
       "grasas",
-      "aceites"
+      "aceites",
+      "aceites_otros"
     ]
   },
   {
@@ -1478,7 +1479,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 25,
     "treePath": [
       "grasas",
-      "aceites"
+      "aceites",
+      "aceites_otros"
     ]
   },
   {
@@ -1620,7 +1622,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 40,
     "treePath": [
       "grasas",
-      "aceites"
+      "aceites",
+      "aceites_otros"
     ]
   },
   {

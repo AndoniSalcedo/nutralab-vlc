@@ -1190,7 +1190,7 @@ export const FOODS_MENU = [
     tags: ['lactosa', 'proteina_vaca'],
     minGrams: 10,
     maxGrams: 30,
-    treePath: ['grasas', 'aceites'],
+    treePath: ['grasas', 'aceites', 'aceites_otros'],
   },
   {
     name: 'AOVE',
