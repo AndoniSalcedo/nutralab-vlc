@@ -547,9 +547,5 @@ export async function previewTeamOsmolarity(file, teamId) {
 
 export async function refetchHydrationRecords(jugadorId) {
   const data = await getHydrationRecords(jugadorId);
-  return {
-    ok: true,
-    records: data.records,
-    json: async () => data,
-  };
+  return { ok: true, records: data.records };
 }

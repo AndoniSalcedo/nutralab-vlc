@@ -420,8 +420,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       // Refetch or update local state
       const refetchRes = await refetchHydrationRecords(jugadorId);
       if (refetchRes.ok) {
-        const freshData = await refetchRes.json();
-        setRegistros(freshData.records || []);
+        setRegistros(refetchRes.records || []);
       } else {
         window.location.reload();
       }
