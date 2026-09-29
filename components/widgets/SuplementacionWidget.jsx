@@ -165,15 +165,12 @@ export default function SuplementacionWidget({
 
       {/* Footer */}
       <Group
-        justify="space-between"
+        justify="flex-end"
         align="center"
         mt="xs"
         pt="xs"
         style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
       >
-        <Text fz="xs" c="dimmed" fw={500}>
-          Toca cada suplemento para marcarlo
-        </Text>
         <Text
           fz="xs"
           fw={600}
