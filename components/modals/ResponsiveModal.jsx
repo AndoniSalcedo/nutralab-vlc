@@ -23,7 +23,7 @@ export default function ResponsiveModal({
   mobileHeight = '100%',
   withCloseButton = true,
   centered = true,
-  zIndex = 1000,
+  zIndex = 200,
   overlayProps = { backgroundOpacity: 0.55, blur: 4 },
   styles,
   ...props
