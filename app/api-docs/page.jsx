@@ -6,50 +6,29 @@ export default function ApiDocsPage() {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    const cssId = 'swagger-ui-dist-css';
-    if (!document.getElementById(cssId)) {
-      const link = document.createElement('link');
-      link.id = cssId;
-      link.rel = 'stylesheet';
-      link.href = 'https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui.css';
-      document.head.appendChild(link);
-    }
+    let cancelled = false;
 
-    const initSwagger = () => {
-      if (window.SwaggerUIBundle && containerRef.current) {
-        window.SwaggerUIBundle({
-          url: '/api/openapi.json',
-          domNode: containerRef.current,
-          deepLinking: true,
-          persistAuthorization: true,
-          displayRequestDuration: true,
-          defaultModelsExpandDepth: 1,
-          presets: [
-            window.SwaggerUIBundle.presets.apis,
-            window.SwaggerUIStandalonePreset,
-          ].filter(Boolean),
-          layout: 'BaseLayout',
-        });
-      }
+    // Swagger UI se empaqueta desde node_modules (mismo origen) para cumplir la CSP.
+    import('swagger-ui-dist/swagger-ui-es-bundle.js').then(({ default: SwaggerUI }) => {
+      if (cancelled || !containerRef.current) return;
+      SwaggerUI({
+        url: '/api/openapi.json',
+        domNode: containerRef.current,
+        deepLinking: true,
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        defaultModelsExpandDepth: 1,
+      });
+    });
+
+    return () => {
+      cancelled = true;
     };
-
-    const bundleId = 'swagger-ui-dist-bundle';
-    const existingScript = document.getElementById(bundleId);
-    if (existingScript) {
-      initSwagger();
-      return;
-    }
-
-    const bundleScript = document.createElement('script');
-    bundleScript.id = bundleId;
-    bundleScript.src = 'https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-bundle.js';
-    bundleScript.async = true;
-    bundleScript.onload = initSwagger;
-    document.body.appendChild(bundleScript);
   }, []);
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#fafafa', paddingBottom: 48 }}>
+      <link rel="stylesheet" href="/swagger-ui/swagger-ui.css" />
       <div
         style={{
           backgroundColor: '#1c1f1a',
