@@ -342,8 +342,8 @@ export default function PerfilSubtab({
             mealsCount={meals.length}
           />
 
-          {/* Cabecera superior: 3 accesos rápidos perfectamente equilibrados */}
-          <SimpleGrid cols={{ base: 3, sm: 3 }} spacing={{ base: 'xs', sm: 'md' }}>
+          {/* Cabecera superior: accesos rápidos */}
+          <SimpleGrid cols={{ base: 2, sm: 2 }} spacing={{ base: 'xs', sm: 'md' }}>
             <PhysicalMetricWidget
               jugadorId={jugador.id}
               pesoActual={pesoActual}
@@ -351,16 +351,18 @@ export default function PerfilSubtab({
               semaforo={semaforo}
               formatMetricNumber={formatMetricNumber}
             />
-            <SweatMetricWidget
-              jugadorId={jugador.id}
-              latestSweat={latestSweat}
-              formatMetricNumber={formatMetricNumber}
-            />
             <StaffMessagesWidget
               jugadorId={jugador.id}
               messages={messages}
             />
           </SimpleGrid>
+
+          {/* Sudoración: ancho completo para la escala de sodio */}
+          <SweatMetricWidget
+            jugadorId={jugador.id}
+            latestSweat={latestSweat}
+            formatMetricNumber={formatMetricNumber}
+          />
 
           {/* Línea completa de Hidratación: básica, chula y sin sobrecarga */}
           <HydrationWidget
