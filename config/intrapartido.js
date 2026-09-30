@@ -2,6 +2,7 @@
  * Catálogo oficial de productos, momentos de partido y utilidades de cálculo
  * para el módulo de Hidratación y Nutrición Intrapartido.
  * Datos extraídos de las hojas 'Timing' y 'Composición' de Intrapartido.xlsx.
+ * Los ids de momento y de producto son los que se persisten en base de datos.
  */
 
 export const INTRAPARTIDO_TIMINGS = [
@@ -340,39 +341,19 @@ export function calculateNutrientTotals(intakes = []) {
 }
 
 /**
- * Genera una sesión de demostración inicial realista para que Carlos
- * vea la interfaz viva desde el primer momento.
+ * Sesión vacía de un partido nuevo (sin convocatoria ni tomas).
  */
-export function generateInitialMockSession(players = []) {
-  const samplePlayerIds = players.slice(0, 16).map((p) => String(p.id));
-  const starterIds = new Set(samplePlayerIds.slice(0, 11));
-
-  // Mapa de tomas: playerId -> { timingId: { productId: cantidad } }
-  const intakes = {};
-
-  samplePlayerIds.forEach((pId) => {
-    intakes[pId] = {
-      llegada: {},
-      calentamiento: {},
-      salida: {},
-      pausa1: {},
-      descanso: {},
-      pausa2: {},
-      final: {},
-    };
-  });
-
+export function createEmptySession() {
   return {
+    id: null,
     matchInfo: {
-      rival: 'Villarreal CF',
+      rival: '',
       competicion: 'LaLiga EA Sports',
       lugar: 'Mestalla',
       fecha: new Date().toISOString().split('T')[0],
     },
-    activeRosterIds: samplePlayerIds,
-    starterIds: Array.from(starterIds),
-    intakes,
+    activeRosterIds: [],
+    starterIds: [],
+    intakes: {},
   };
 }
-
-

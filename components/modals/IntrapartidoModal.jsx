@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ActionIcon,
   Avatar,
@@ -37,13 +37,19 @@ import {
 import Icon3D from '@/components/Icon3D';
 import ResponsiveModal from './ResponsiveModal';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
+import { downloadXlsx } from '@/lib/io/xlsx-download';
 import {
   INTRAPARTIDO_TIMINGS,
   INTRAPARTIDO_PRODUCTS,
   PRODUCTS_MAP,
   calculateNutrientTotals,
-  generateInitialMockSession,
-} from '@/data/intrapartido-mock';
+  createEmptySession,
+} from '@/config/intrapartido';
+import {
+  listIntrapartidoMatches,
+  getIntrapartidoMatch,
+  saveIntrapartidoMatch,
+} from '@/actions/intrapartidoActions';
 
 const COMPETITION_OPTIONS = [
   { value: 'LaLiga EA Sports', label: 'LaLiga EA Sports' },
@@ -99,9 +105,13 @@ export default function IntrapartidoModal({
   onClose,
   players = [],
   team = null,
+  readOnly = false,
 }) {
-  // Estado de la sesión del partido (en memoria)
-  const [session, setSession] = useState(() => generateInitialMockSession(players));
+  // Estado de la sesión del partido (se persiste al guardar)
+  const [session, setSession] = useState(() => createEmptySession());
+  const [savedMatches, setSavedMatches] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [loadingMatch, setLoadingMatch] = useState(false);
 
   // Paso principal del flujo: 'alineacion' -> 'fases' -> 'resumen'
   const [currentStep, setCurrentStep] = useState('alineacion');
@@ -130,6 +140,47 @@ export default function IntrapartidoModal({
   }, [session.starterIds]);
 
   const currentTiming = INTRAPARTIDO_TIMINGS[currentPhaseIndex] || INTRAPARTIDO_TIMINGS[0];
+
+  // Partidos guardados del equipo (se recargan cada vez que se abre el modal)
+  useEffect(() => {
+    if (!opened || !team?.id) return;
+    let cancelled = false;
+    listIntrapartidoMatches(team.id)
+      .then((res) => {
+        if (!cancelled) setSavedMatches(res.matches || []);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        notifications.show({ color: 'red', title: 'Error', message: err.message || 'No se pudieron cargar los partidos guardados.' });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [opened, team?.id]);
+
+  const handleNewMatch = () => {
+    setSession(createEmptySession());
+    setCurrentPhaseIndex(0);
+    setGroupFilter('titulares');
+  };
+
+  const handleLoadMatch = async (matchId) => {
+    if (!matchId) {
+      handleNewMatch();
+      return;
+    }
+    setLoadingMatch(true);
+    try {
+      const res = await getIntrapartidoMatch(team.id, matchId);
+      setSession(res.session);
+      setCurrentPhaseIndex(0);
+      setGroupFilter('titulares');
+    } catch (err) {
+      notifications.show({ color: 'red', title: 'Error', message: err.message || 'No se pudo cargar el partido.' });
+    } finally {
+      setLoadingMatch(false);
+    }
+  };
 
   // Actualizar metadatos del partido (rival, competición, lugar, fecha)
   const handleUpdateMatchInfo = (field, value) => {
@@ -381,21 +432,78 @@ export default function IntrapartidoModal({
     return map;
   }, [session.intakes, session.activeRosterIds]);
 
-  const handleExportExcel = () => {
-    notifications.show({
-      color: 'teal',
-      title: 'Informe generado',
-      message: 'Descargando informe detallado de hidratación intrapartido.',
+  const handleExportExcel = async () => {
+    const info = session.matchInfo || {};
+    const header = [
+      'Jugador',
+      'Rol',
+      ...INTRAPARTIDO_TIMINGS.map((t) => t.label),
+      'Líquidos (ml)',
+      'Carbohidratos (g)',
+      'Sodio (mg)',
+      'Potasio (mg)',
+      'Cafeína (mg)',
+      'Calorías (kcal)',
+    ];
+    const rows = [
+      ['NUTRALAB - CONTROL INTRAPARTIDO'],
+      ['Equipo:', team?.nombre || '', '', 'Fecha:', info.fecha || ''],
+      ['Rival:', info.rival || '', '', 'Competición:', info.competicion || ''],
+      ['Lugar:', info.lugar || ''],
+      [],
+      header,
+    ];
+
+    session.activeRosterIds.forEach((pId) => {
+      const player = allPlayersMap.get(pId);
+      if (!player) return;
+      const totals = playerNutrientsMap.get(pId) || calculateNutrientTotals([]);
+      const phases = INTRAPARTIDO_TIMINGS.map((t) =>
+        Object.entries(session.intakes[pId]?.[t.id] || {})
+          .map(([productId, qty]) => `${qty}x ${PRODUCTS_MAP.get(productId)?.nombre || productId}`)
+          .join(', '),
+      );
+      rows.push([
+        `${player.nombre} ${player.apellidos || ''}`.trim(),
+        starterSet.has(pId) ? 'Titular' : 'Suplente',
+        ...phases,
+        Math.round(totals.aguaMl),
+        Math.round(totals.carbsG * 10) / 10,
+        Math.round(totals.sodioMg),
+        Math.round(totals.potasioMg),
+        Math.round(totals.cafeinaMg),
+        Math.round(totals.kcal),
+      ]);
     });
+
+    try {
+      await downloadXlsx({
+        filename: `intrapartido-${info.fecha || 'partido'}.xlsx`,
+        sheetName: 'Intrapartido',
+        rows,
+        colWidths: [28, 10, ...INTRAPARTIDO_TIMINGS.map(() => 24), 14, 18, 12, 12, 12, 16],
+      });
+    } catch (err) {
+      notifications.show({ color: 'red', title: 'Error', message: err.message || 'No se pudo generar el Excel.' });
+    }
   };
 
-  const handleSaveSession = () => {
-    notifications.show({
-      color: 'teal',
-      title: 'Registro guardado',
-      message: 'Se han guardado las tomas de hidratación y nutrición del partido con éxito.',
-    });
-    onClose();
+  const handleSaveSession = async () => {
+    setSaving(true);
+    try {
+      const res = await saveIntrapartidoMatch(team.id, session);
+      setSession((prev) => ({ ...prev, id: res.id ?? prev.id }));
+      notifications.show({
+        color: 'teal',
+        title: 'Registro guardado',
+        message: 'Se han guardado las tomas de hidratación y nutrición del partido con éxito.',
+      });
+      onClose();
+    } catch (err) {
+      notifications.show({ color: 'red', title: 'No se pudo guardar', message: err.message || 'Inténtalo de nuevo.' });
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Título dinámico del modal
@@ -498,6 +606,38 @@ export default function IntrapartidoModal({
         {/* ============================================================= */}
         {currentStep === 'alineacion' && (
           <Stack gap="xs" style={{ flex: 1, minHeight: 0, height: '100%' }}>
+            {/* Partidos guardados: cargar uno existente o empezar uno nuevo */}
+            <Group gap="xs" wrap="nowrap" w="100%">
+              <Select
+                placeholder={savedMatches.length ? 'Cargar partido guardado...' : 'Sin partidos guardados'}
+                leftSection={<Icon3D name="document" size={16} />}
+                data={savedMatches.map((m) => ({
+                  value: String(m.id),
+                  label: `${m.fecha.split('-').reverse().join('/')} · ${m.rival || 'Sin rival'}`,
+                }))}
+                value={session.id}
+                onChange={handleLoadMatch}
+                disabled={savedMatches.length === 0 || loadingMatch}
+                variant="filled"
+                radius="xl"
+                size="xs"
+                clearable
+                style={{ flex: 1, minWidth: 0 }}
+                comboboxProps={{ zIndex: 2500, withinPortal: true }}
+              />
+              <Button
+                size="xs"
+                radius="xl"
+                variant="light"
+                color="dark"
+                leftSection={<IconPlus size={13} />}
+                onClick={handleNewMatch}
+                disabled={loadingMatch}
+              >
+                Nuevo
+              </Button>
+            </Group>
+
             {/* Metadatos del encuentro (inputs y selects alineados con el sistema visual) */}
             <SimpleGrid cols={{ base: 1, xs: 2, sm: 4 }} spacing="xs">
               <TextInput
@@ -1268,6 +1408,8 @@ export default function IntrapartidoModal({
                 style={{ flex: 1 }}
                 leftSection={<IconCheck size={14} />}
                 onClick={handleSaveSession}
+                loading={saving}
+                disabled={readOnly || !team?.id || session.activeRosterIds.length === 0}
               >
                 Guardar
               </Button>

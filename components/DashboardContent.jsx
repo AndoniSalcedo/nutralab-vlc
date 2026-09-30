@@ -1250,6 +1250,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
           onClose={closeModal}
           players={playersState}
           team={team}
+          readOnly={readOnly}
         />
 
         <Modal
