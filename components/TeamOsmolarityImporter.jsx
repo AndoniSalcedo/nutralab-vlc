@@ -210,7 +210,7 @@ export default function TeamOsmolarityImporter({ team }) {
   const selectedUpdateCount = Object.values(decisions).filter((d) => d.action === 'update').length;
 
   return (
-    <Paper radius="md" p="md" withBorder shadow="sm" bg="white">
+    <Paper radius={24} p="md" shadow="xs" bg="white">
       <Stack gap="md">
         <Group justify="space-between" align="center" wrap="wrap">
           <Group gap="sm">

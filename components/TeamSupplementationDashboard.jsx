@@ -10,7 +10,6 @@ import {
   Button,
   Group,
   Menu,
-  Paper,
   ScrollArea,
   Stack,
   Table,
@@ -24,6 +23,7 @@ import 'dayjs/locale/es';
 import SupplementManagerModal from '@/components/modals/SupplementManagerModal';
 import SupplementHistoryModal from '@/components/modals/SupplementHistoryModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
+import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
 
 dayjs.locale('es');
 
@@ -137,20 +137,14 @@ export default function TeamSupplementationDashboard({
 
       <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
 
-          <Paper
-            radius={24}
-            p={0}
-            bg="white"
-            style={{
-              position: 'relative',
-              borderRadius: 24,
-              boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
-              overflow: 'hidden',
-              width: '100%',
-              minWidth: 0,
-              maxWidth: '100%',
-            }}
+          <WidgetCard
+            icon="suplementacion"
+            title="Suplementación por jugador"
+            color="violet"
+            aside={<WidgetAside color="violet">{players.length} jugadores</WidgetAside>}
+            style={{ height: 'auto', width: '100%', minWidth: 0 }}
           >
+            <Box mx={-16} mb={-16}>
             <ScrollArea style={{ width: '100%', minWidth: 0 }}>
               <Table verticalSpacing="sm" highlightOnHover w="100%" miw={{ base: '100%', sm: 600 }}>
             <Table.Thead bg="rgba(248, 249, 250, 0.95)">
@@ -268,7 +262,8 @@ export default function TeamSupplementationDashboard({
             </Table.Tbody>
               </Table>
             </ScrollArea>
-          </Paper>
+            </Box>
+          </WidgetCard>
 
       <SupplementManagerModal
         opened={!!managerModal}

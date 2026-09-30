@@ -133,23 +133,27 @@ export default function SweatMetricWidget({
   const hasValue = val !== null && val !== undefined && val !== '' && Number.isFinite(numVal);
   const unit = latestSweat?.unidad || 'mg/L';
   const segmentIndex = hasValue ? getSegmentIndex(numVal) : getSegmentIndexFromEstado(latestSweat?.estado);
-  const statusSegment = segmentIndex >= 0 ? SODIUM_SEGMENTS[segmentIndex] : null;
   const lastDate = formatDate(latestSweat?.fecha);
 
   return (
     <WidgetCard
       id="widget-sudor"
+      color="orange"
       icon="running"
       title="Sudoración"
       aside={
-        <Text lh={1} mb="sm" style={{ fontVariantNumeric: 'tabular-nums' }}>
-          <Text span fz={28} fw={800} c="dark.6">
-            {formatMetricNumber(numVal, 0)}
-          </Text>{' '}
-          <Text span fz="xs" fw={600} c="dimmed">
-            {unit}
+        hasValue ? (
+          <Text lh={1} style={{ fontVariantNumeric: 'tabular-nums' }}>
+            <Text span fz={22} fw={800} c="dark.6">
+              {formatMetricNumber(numVal, 0)}
+            </Text>{' '}
+            <Text span fz="xs" fw={600} c="dimmed">
+              {unit}
+            </Text>
           </Text>
-        </Text>
+        ) : (
+          <WidgetAside>Sin datos</WidgetAside>
+        )
       }
       footer={`Sodio en sudor${lastDate ? ` · ${lastDate}` : ''}`}
       footerAction="Ver analítica"

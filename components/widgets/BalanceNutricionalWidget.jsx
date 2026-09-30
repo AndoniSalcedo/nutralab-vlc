@@ -63,6 +63,7 @@ export default function BalanceNutricionalWidget({
   return (
     <WidgetCard
       id="widget-balance-nutricional"
+      color="red"
       icon="fire"
       title="Balance nutricional"
       aside={

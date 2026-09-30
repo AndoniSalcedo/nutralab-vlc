@@ -2,10 +2,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Group, Stack, Text, ActionIcon, Tooltip } from '@mantine/core';
-import { IconBottle, IconPlus, IconMinus } from '@tabler/icons-react';
-import FillableIcon from '@/components/FillableIcon';
-import WidgetCard, { WidgetAside } from './WidgetCard';
+import { Box, Group, Stack, Text, ActionIcon, Button } from '@mantine/core';
+import { IconMinus } from '@tabler/icons-react';
+import WidgetCard, { WidgetAside, WidgetValue } from './WidgetCard';
 import { calculateHydration } from '@/lib/metrics/anthropometry';
 
 export default function HydrationWidget({
@@ -122,81 +121,63 @@ export default function HydrationWidget({
     <WidgetCard
       id="widget-water"
       icon="droplet"
-      title="Hidratación"
-      aside={<WidgetAside color={isGoalReached ? 'teal' : 'cyan'}>{percent}% objetivo</WidgetAside>}
-      footer={`Pauta para ${activeDayType} · ${targetL} L/día`}
-      footerAction="Ver analítica"
-      onFooterAction={goToAnalytics}
+      title="Agua"
+      color="blue"
+      fillPercent={percent}
+      fillColor={isGoalReached ? 'teal.1' : 'blue.1'}
+      fillWaveColor={isGoalReached ? 'teal.2' : 'blue.2'}
+      aside={<WidgetAside color={isGoalReached ? 'teal' : 'blue'}>{percent}%</WidgetAside>}
+      style={{ minHeight: 216 }}
     >
-      <Group justify="space-between" align="center" wrap="nowrap" gap="md">
-        {/* Litros del día + osmolaridad */}
-        <Stack gap={6} style={{ minWidth: 0, flex: 1 }}>
-          <Text lh={1} style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-            <Text span fz={28} fw={800} c={isGoalReached ? 'teal.7' : 'dark.6'}>
-              {drunk.toFixed(2)}
-            </Text>
-            <Text span fz="xs" fw={600} c="dimmed">
-              {' '}/ {targetL.toFixed(1)} L
-            </Text>
-          </Text>
-          <Group gap={6} align="center" wrap="nowrap" style={{ cursor: 'pointer' }} onClick={goToAnalytics}>
-            <Box style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `var(--mantine-color-${statusColor.replace('.', '-')})`, flexShrink: 0 }} />
-            <Text fz="xs" c="dimmed" lh={1.3}>
-              Osmolaridad <Text span inherit fw={700} c={statusColor}>{value ? formatMetricNumber(value, 0) : '—'} mOsm</Text> · {statusLabel}
-            </Text>
-          </Group>
-        </Stack>
-
-        {/* Lado derecho: Botón [-], Botella animada FillableIcon (60px), Botón [+] */}
-        <Group gap="xs" align="center" wrap="nowrap" style={{ flexShrink: 0 }}>
-          <Tooltip label="Restar 250ml (-0.25 L)" withArrow position="top">
-            <ActionIcon
-              size="lg"
-              variant="subtle"
-              color="gray"
-              radius="xl"
-              disabled={drunk <= 0}
-              onClick={() => handleUpdateWater(-0.25)}
-              aria-label="Restar 250ml"
-            >
-              <IconMinus size={18} stroke={2.5} />
-            </ActionIcon>
-          </Tooltip>
-
-          <Tooltip
-            label={`${drunk.toFixed(2)} L consumidos de ${targetL.toFixed(2)} L (${percent}%)`}
-            withArrow
-            position="top"
+      <Stack gap="sm" justify="space-between" h="100%">
+        <Box>
+          <WidgetValue
+            value={drunk.toFixed(2).replace('.', ',')}
+            unit={`/ ${targetL.toFixed(1).replace('.', ',')} L`}
+            color={isGoalReached ? 'teal.8' : 'dark.6'}
+            size={32}
+          />
+          <Text
+            fz="xs"
+            c="dimmed"
+            mt={6}
+            lh={1.35}
+            style={{ cursor: 'pointer' }}
+            onClick={goToAnalytics}
           >
-            <Box
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-              onClick={() => handleUpdateWater(0.25)}
-            >
-              <FillableIcon
-                Icon={IconBottle}
-                percent={percent}
-                size={60}
-                colorVar={isGoalReached ? 'teal-4' : 'cyan-4'}
-                iconColor={isGoalReached ? 'var(--mantine-color-teal-8)' : 'var(--mantine-color-cyan-8)'}
-                bgIconColor="var(--mantine-color-gray-3)"
-              />
-            </Box>
-          </Tooltip>
+            Osmolaridad{' '}
+            <Text span inherit fw={700} c={statusColor}>
+              {value ? `${formatMetricNumber(value, 0)} mOsm` : '—'}
+            </Text>{' '}
+            · {statusLabel}
+          </Text>
+        </Box>
 
-          <Tooltip label="Añadir 250ml (+0.25 L)" withArrow position="top">
-            <ActionIcon
-              size="lg"
-              variant="light"
-              color={isGoalReached ? 'teal' : 'blue'}
-              radius="xl"
-              onClick={() => handleUpdateWater(0.25)}
-              aria-label="Sumar 250ml"
-            >
-              <IconPlus size={18} stroke={2.5} />
-            </ActionIcon>
-          </Tooltip>
+        <Group gap={6} wrap="nowrap">
+          <ActionIcon
+            size={44}
+            variant="white"
+            color="gray"
+            radius="xl"
+            disabled={drunk <= 0}
+            onClick={() => handleUpdateWater(-0.25)}
+            aria-label="Restar 250 ml"
+          >
+            <IconMinus size={18} stroke={2.5} />
+          </ActionIcon>
+          <Button
+            flex={1}
+            h={44}
+            radius="xl"
+            color={isGoalReached ? 'teal' : 'blue'}
+            px={6}
+            onClick={() => handleUpdateWater(0.25)}
+            aria-label="Sumar 250 ml"
+          >
+            + 250 ml
+          </Button>
         </Group>
-      </Group>
+      </Stack>
     </WidgetCard>
   );
 }

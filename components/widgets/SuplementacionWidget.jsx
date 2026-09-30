@@ -10,7 +10,7 @@ import {
   UnstyledButton,
 } from '@mantine/core';
 import { IconCheck } from '@tabler/icons-react';
-import WidgetCard, { WidgetAside } from './WidgetCard';
+import WidgetCard from './WidgetCard';
 
 const DEFAULT_SUPPLEMENTS = [
   { id: 'cafeina', name: 'Cafeína Anhidra', dose: '200 mg', timing: '45m pre-partido / sesión intensa' },
@@ -70,15 +70,11 @@ export default function SuplementacionWidget({
   return (
     <WidgetCard
       id="widget-suplementacion"
+      color="violet"
       icon="suplementacion"
-      title="Suplementación diaria"
-      aside={
-        <WidgetAside color={isAllDone ? 'teal' : 'nutralabColor'}>
-          {isAllDone ? 'Completado' : `${completedCount}/${totalCount} tomas`}
-        </WidgetAside>
-      }
-      footer="Toca para marcar cada toma"
-      footerAction="Protocolo completo"
+      title="Suplementos"
+      footer={isAllDone ? '¡Todo tomado!' : `${completedCount}/${totalCount} tomas`}
+      footerAction="Protocolo"
       onFooterAction={() => router.push(`/dashboard/jugador/${jugadorId}/nutricion/suplementacion`)}
     >
       {/* Lista de tomas interactivas */}
@@ -129,21 +125,12 @@ export default function SuplementacionWidget({
                     >
                       {item.name}
                     </Text>
-                    <Text fz="xs" c="dimmed" truncate>
-                      {item.timing}
+                    <Text fz={11} c="dimmed" truncate>
+                      {item.dose}
                     </Text>
                   </Box>
                 </Group>
 
-                <Text
-                  fz="xs"
-                  fw={600}
-                  c={isChecked ? 'dimmed' : 'dark.4'}
-                  td={isChecked ? 'line-through' : undefined}
-                  style={{ flexShrink: 0, paddingLeft: 8 }}
-                >
-                  {item.dose}
-                </Text>
               </Group>
             </UnstyledButton>
           );

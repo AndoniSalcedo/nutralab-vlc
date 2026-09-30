@@ -63,6 +63,7 @@ export default function EstrategiaWidget({
   return (
     <WidgetCard
       id="widget-estrategia"
+      color="grape"
       icon="target"
       title={activeProtocol ? `Estrategia: ${activeProtocol.name}` : 'Estrategia del día'}
       aside={<WidgetAside color="nutralabColor" dot>{activeDayLabel}</WidgetAside>}

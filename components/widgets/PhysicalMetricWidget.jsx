@@ -90,6 +90,7 @@ export default function PhysicalMetricWidget({
       <Box h="100%">
         <WidgetCard
           id="widget-fisico"
+          color="green"
           icon="gym"
           title="Físico"
           onClick={() => router.push(`/dashboard/jugador/${jugadorId}/metricas/pesos`)}

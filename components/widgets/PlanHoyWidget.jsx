@@ -122,6 +122,7 @@ export default function PlanHoyWidget({ jugador, selectedDate = new Date() }) {
   return (
     <WidgetCard
       id="widget-plan-hoy"
+      color="teal"
       icon="calendar"
       title={title}
       aside={

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { initials, filenameFromResponse, getPlayerAvatarUrl } from '@/lib/utils';
-import { Button, Group, Paper, Stack, Text, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Modal, Divider } from '@mantine/core';
+import { Button, Group, Stack, Text, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Modal, Divider } from '@mantine/core';
 import { deletePlayer } from '@/actions/playerActions';
 import { getWeeklyMenus } from '@/actions/menuActions';
 import { generateWeeklySquadReport } from '@/services/report';
@@ -28,6 +28,7 @@ import IntrapartidoModal from '@/components/modals/IntrapartidoModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import TeamTecnicosConfig from '@/components/TeamTecnicosConfig';
 import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
+import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
 
 
 const PAGE_SIZE = 8;
@@ -971,19 +972,14 @@ export default function DashboardContent({ players = [], team, readOnly = false 
         {/* 3. LISTADO DE JUGADORES (TABLA) */}
         <Box style={{ width: '100%', minWidth: 0 }}>
           {filteredPlayers.length > 0 ? (
-            <Paper
-              radius={24}
-              p={0}
-              bg="white"
-              style={{
-                position: 'relative',
-                borderRadius: 24,
-                boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
-                overflow: 'hidden',
-                width: '100%',
-                minWidth: 0,
-              }}
+            <WidgetCard
+              icon="players"
+              title="Plantilla"
+              color="teal"
+              aside={<WidgetAside color="teal">{filteredPlayers.length} jugadores</WidgetAside>}
+              style={{ height: 'auto', width: '100%', minWidth: 0 }}
             >
+              <Box mx={-16} mb={-16}>
               <ScrollArea style={{ width: '100%', minWidth: 0 }}>
                 <Table verticalSpacing="sm" highlightOnHover w="100%" miw={{ base: '100%', sm: 760 }}>
                   <Table.Thead bg="rgba(248, 249, 250, 0.95)">
@@ -1162,7 +1158,8 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                   radius="xl"
                 />
               </Group>
-            </Paper>
+              </Box>
+            </WidgetCard>
           ) : (
             <NothingFound
               withPaper

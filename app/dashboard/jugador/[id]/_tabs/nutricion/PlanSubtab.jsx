@@ -1135,11 +1135,11 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
       <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         {loadingList ? (
-          <Paper p={{ base: 'md', sm: 'xl' }} radius="lg" withBorder shadow="sm" style={{ textAlign: 'center' }}>
+          <Paper p={{ base: 'md', sm: 'xl' }} radius={24} shadow="xs" style={{ textAlign: 'center' }}>
             <Loader size="lg" />
           </Paper>
         ) : isDocumentMode ? (
-          <Paper p={{ base: 'sm', sm: 'lg' }} radius="lg" withBorder shadow="sm" style={{ position: 'relative', overflow: 'hidden', minHeight: (actionType === 'generate' || (actionType === 'save' && !hasGeneratedAi)) ? '400px' : 'auto' }}>
+          <Paper p={{ base: 'sm', sm: 'lg' }} radius={24} shadow="xs" style={{ position: 'relative', overflow: 'hidden', minHeight: (actionType === 'generate' || (actionType === 'save' && !hasGeneratedAi)) ? '400px' : 'auto' }}>
             <AiGenerationOverlay opened={actionType === 'generate' || (actionType === 'save' && !hasGeneratedAi)} messages={INDIVIDUAL_GENERATION_MESSAGES} />
             <Stack gap="lg">
               <Group justify="space-between" align="flex-start" wrap="wrap">
@@ -1425,7 +1425,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         ) : currentDatos ? (
           <PlanFicha data={currentDatos} jugador={jugador} activeSupplements={activeSupplements} themeColors={themeOverride} />
         ) : planHtml ? (
-          <Paper p={{ base: 'sm', sm: 'xl' }} radius="lg" withBorder shadow="sm">
+          <Paper p={{ base: 'sm', sm: 'xl' }} radius={24} shadow="xs">
             <Badge mb="md" color="gray" variant="light">Plan legado</Badge>
             <Box className="plan-md" dangerouslySetInnerHTML={{ __html: planHtml }} />
           </Paper>

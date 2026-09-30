@@ -36,6 +36,7 @@ import { deleteIntrapartidoMatch } from '@/actions/intrapartidoActions';
 import { calculatePlayerTotals } from '@/config/intrapartido';
 import { exportIntrapartidoExcel } from '@/lib/io/intrapartido-export';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
+import { StatTile } from '@/components/widgets/WidgetCard';
 
 function formatDate(dateStr) {
   if (!dateStr) return 'Sin fecha';
@@ -149,14 +150,12 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
         />
       ) : (
         <>
-          <Paper p={{ base: 10, sm: 'md' }} radius="lg" shadow="sm" bg="white">
-            <SimpleGrid cols={{ base: 2, sm: 4 }} spacing={{ base: 'xs', sm: 'md' }}>
-              <Stat label="Partidos" value={matches.length} />
-              <Stat label="Líquidos / jugador" value={`${Math.round(averages.aguaMl)} ml`} />
-              <Stat label="Carbs / jugador" value={`${Math.round(averages.carbsG)} g`} />
-              <Stat label="Sodio / jugador" value={`${Math.round(averages.sodioMg)} mg`} />
-            </SimpleGrid>
-          </Paper>
+          <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
+            <StatTile icon="soccer" title="Partidos" color="teal" value={matches.length} caption="registrados" />
+            <StatTile icon="droplet" title="Líquidos" color="blue" value={Math.round(averages.aguaMl)} unit="ml" caption="por jugador" />
+            <StatTile icon="fire" title="Carbs" color="orange" value={Math.round(averages.carbsG)} unit="g" caption="por jugador" />
+            <StatTile icon="running" title="Sodio" color="red" value={Math.round(averages.sodioMg)} unit="mg" caption="por jugador" />
+          </SimpleGrid>
 
           <Stack gap="sm">
             {matches.map(({ session, perPlayer, totals }) => {
@@ -164,7 +163,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
               const expanded = expandedId === session.id;
 
               return (
-                <Paper key={session.id} radius="lg" shadow="sm" bg="white" p={{ base: 10, sm: 'md' }}>
+                <Paper key={session.id} radius={24} shadow="xs" bg="white" p={{ base: 10, sm: 'md' }}>
                   <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
                     <UnstyledButton
                       onClick={() => setExpandedId(expanded ? null : session.id)}

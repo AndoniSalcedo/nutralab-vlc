@@ -386,13 +386,13 @@ export default function TeamConfigClient({ team, readOnly = false }) {
   return (
     <BoneyardSkeleton name="team-config" loading={false}>
       <Stack gap="lg">
-        <Paper p="md" radius="lg" shadow="sm" withBorder>
+        <Paper p="md" radius={24} shadow="xs">
           <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
             <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
-              <IconSettings size={28} style={{ flexShrink: 0 }} />
+              <IconSettings size={20} style={{ flexShrink: 0 }} />
               <Box style={{ minWidth: 0 }}>
                 <Group gap="xs" align="center" wrap="wrap">
-                  <Title order={3} size="h4" fw={700} c="dark.5">General</Title>
+                  <Text fz={13} fw={700} c="dark.5">General</Text>
                   {hasInfoChanges && (
 
                     <Group gap={4} align="center" wrap="nowrap">
@@ -514,13 +514,13 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           </Group>
         </Paper>
 
-        <Paper p="md" radius="lg" shadow="sm" withBorder>
+        <Paper p="md" radius={24} shadow="xs">
           <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
             <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
-              <IconBook size={28} style={{ flexShrink: 0 }} />
+              <IconBook size={20} style={{ flexShrink: 0 }} />
               <Box style={{ minWidth: 0 }}>
                 <Group gap="xs" align="center" wrap="wrap">
-                  <Title order={3} size="h4" fw={700} c="dark.5">Textos Base para PDF</Title>
+                  <Text fz={13} fw={700} c="dark.5">Textos Base para PDF</Text>
                   {hasPdfChanges && (
                     <Group gap={4} align="center" wrap="nowrap">
                       <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
@@ -575,13 +575,13 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           </Stack>
         </Paper>
 
-        <Paper p="md" radius="lg" shadow="sm" withBorder>
+        <Paper p="md" radius={24} shadow="xs">
           <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
             <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
-              <IconPalette size={28} style={{ flexShrink: 0 }} />
+              <IconPalette size={20} style={{ flexShrink: 0 }} />
               <Box style={{ minWidth: 0 }}>
                 <Group gap="xs" align="center" wrap="wrap">
-                  <Title order={3} size="h4" fw={700} c="dark.5">Colores del Plan Nutricional</Title>
+                  <Text fz={13} fw={700} c="dark.5">Colores del Plan Nutricional</Text>
                   {hasColorChanges && (
                     <Group gap={4} align="center" wrap="nowrap">
                       <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
@@ -814,13 +814,13 @@ export default function TeamConfigClient({ team, readOnly = false }) {
 
 
 
-        <Paper p="md" radius="lg" shadow="sm" withBorder>
+        <Paper p="md" radius={24} shadow="xs">
           <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
             <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
-              <IconCalendarStats size={28} style={{ flexShrink: 0 }} />
+              <IconCalendarStats size={20} style={{ flexShrink: 0 }} />
               <Box style={{ minWidth: 0 }}>
                 <Group gap="xs" align="center" wrap="wrap">
-                  <Title order={3} size="h4" fw={700} c="dark.5">Tipos de Día</Title>
+                  <Text fz={13} fw={700} c="dark.5">Tipos de Día</Text>
                   {hasDayTypeChanges && (
                     <Group gap={4} align="center" wrap="nowrap">
                       <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
@@ -937,13 +937,13 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           )}
         </Paper>
 
-        <Paper p="md" radius="lg" shadow="sm" withBorder>
+        <Paper p="md" radius={24} shadow="xs">
           <Group justify="space-between" align="center" mb="md" wrap="wrap" gap="sm" style={{ width: '100%' }}>
             <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
-              <IconCalculator size={28} style={{ flexShrink: 0 }} />
+              <IconCalculator size={20} style={{ flexShrink: 0 }} />
               <Box style={{ minWidth: 0 }}>
                 <Group gap="xs" align="center" wrap="wrap">
-                  <Title order={3} size="h4" fw={700} c="dark.5">Multiplicadores por Objetivo</Title>
+                  <Text fz={13} fw={700} c="dark.5">Multiplicadores por Objetivo</Text>
                   {hasMacroChanges && (
                     <Group gap={4} align="center" wrap="nowrap">
                       <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>
@@ -1046,13 +1046,13 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           )}
         </Paper>
 
-        <Paper p="md" radius="lg" shadow="sm" withBorder>
+        <Paper p="md" radius={24} shadow="xs">
           <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
             <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
-              <IconClipboardList size={28} style={{ flexShrink: 0 }} />
+              <IconClipboardList size={20} style={{ flexShrink: 0 }} />
               <Box style={{ minWidth: 0 }}>
                 <Group gap="xs" align="center" wrap="wrap">
-                  <Title order={3} size="h4" fw={700} c="dark.5">Protocolos por Tipo de Día</Title>
+                  <Text fz={13} fw={700} c="dark.5">Protocolos por Tipo de Día</Text>
                   {hasProtocolChanges && (
                     <Group gap={4} align="center" wrap="nowrap">
                       <span style={{ fontSize: '7px', color: 'var(--mantine-color-orange-6)' }}>●</span>

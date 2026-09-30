@@ -10,7 +10,6 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  Title,
   Button,
   Table,
   ActionIcon,
@@ -33,7 +32,6 @@ import {
   IconDatabaseImport,
   IconCheck,
   IconCalendarStats,
-  IconAlertCircle,
   IconClock,
   IconChevronDown,
 } from '@/components/icons3d';
@@ -51,6 +49,8 @@ import {
 } from 'recharts';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
+import WidgetCard from '@/components/widgets/WidgetCard';
+import Icon3D from '@/components/Icon3D';
 
 const METRIC_TABS = {
   hydration: {
@@ -523,23 +523,32 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
 
     if (data.length === 0) {
       return (
-        <Paper p="xl" radius="lg" withBorder bg="white" shadow="sm">
-          <Stack align="center" gap="xs" ta="center">
-            <IconAlertCircle size={36} />
-            <Title order={4} c="dark.7">{metric.emptyTitle}</Title>
+        <WidgetCard
+          icon={isSweat ? 'running' : 'droplet'}
+          title={metric.chartTitle}
+          color={isSweat ? 'orange' : 'blue'}
+          style={{ height: 'auto' }}
+        >
+          <Stack align="center" gap="xs" ta="center" py="md">
+            <Icon3D name="warning" size={36} />
+            <Text fz="sm" fw={700} c="dark.6">{metric.emptyTitle}</Text>
             <Text size="xs" c="dimmed" maw={400} mx="auto">
               {metric.emptyText}
             </Text>
           </Stack>
-        </Paper>
+        </WidgetCard>
       );
     }
 
     return (
-      <Paper p="md" radius="lg" withBorder bg="white" shadow="sm">
+      <WidgetCard
+        icon={isSweat ? 'running' : 'droplet'}
+        title={metric.chartTitle}
+        color={isSweat ? 'orange' : 'blue'}
+        style={{ height: 'auto' }}
+      >
         <Stack gap="xs">
-          <Text size="xs" c="dimmed" tt="uppercase" fw={600}>{metric.chartTitle}</Text>
-          <Box h={140} mt="md">
+          <Box h={140} mt="xs">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                 <defs>
@@ -610,7 +619,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
             </ResponsiveContainer>
           </Box>
         </Stack>
-      </Paper>
+      </WidgetCard>
     );
   };
 
@@ -682,10 +691,12 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       </Paper>
 
       {/* Horizontal Charts Section */}
-      <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
-        {renderMetricChart('hydration', sortedHydrationChronological)}
-        {renderMetricChart('sweat', sortedSweatChronological)}
-      </SimpleGrid>
+      <Box px={{ base: 'sm', sm: 0 }}>
+        <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
+          {renderMetricChart('hydration', sortedHydrationChronological)}
+          {renderMetricChart('sweat', sortedSweatChronological)}
+        </SimpleGrid>
+      </Box>
 
       {/* Main Hydration Content & Timing Cards */}
       <Box px={{ base: 'sm', sm: 0 }} pb="sm">

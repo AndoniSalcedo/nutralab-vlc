@@ -21,7 +21,6 @@ import {
   Stack,
   Table,
   Text,
-  Title,
   ScrollArea,
   Modal,
   NumberInput,
@@ -36,6 +35,7 @@ import { IconEdit, IconPlus, IconScale, IconTrash } from '@/components/icons3d';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import { calculateSemaforo } from '@/lib/metrics/player';
+import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
 
 function fechaLabel(fecha) {
   if (!fecha) return 'Sin fecha';
@@ -201,16 +201,13 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
       ) : (
         <Grid gutter="lg">
           <Grid.Col span={12}>
-            <Paper p="md" radius="lg" withBorder bg="white">
-              <Group justify="space-between" align="flex-start" mb="xs">
-                <Box>
-                  <Text size="xs" c="dimmed" tt="uppercase" fw={600}>Peso Corporal</Text>
-                  <Title order={2} fw={700} c="dark.5" mt={4}>
-                    {selected ? `${selected.peso_kg} kg` : '-'}
-                  </Title>
-                </Box>
-
-                {(semaforo.hasPesajes || semaforo.hasReference) && (
+            <WidgetCard
+              icon="scale"
+              title="Peso corporal"
+              color="blue"
+              style={{ height: 'auto' }}
+              aside={
+                (semaforo.hasPesajes || semaforo.hasReference) ? (
                   <MantineTooltip
                     withArrow
                     multiline
@@ -230,29 +227,18 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
                       </Box>
                     }
                   >
-                    <Box style={{ textAlign: 'right', cursor: 'pointer' }}>
-                      <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb={4}>Estado Semáforo</Text>
-                      <Group gap={6} justify="flex-end" align="center">
-                        <Box
-                          style={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            backgroundColor: semaforo.color === 'green' ? '#2e7d32' : semaforo.color === 'yellow' ? '#f59f00' : '#e03131',
-                            boxShadow: `0 0 8px ${semaforo.color === 'green' ? '#2e7d32' : semaforo.color === 'yellow' ? '#f59f00' : '#e03131'}`,
-                          }}
-                        />
-                        <Text size="sm" fw={700} c={semaforo.color === 'green' ? 'green.8' : semaforo.color === 'yellow' ? 'orange.8' : 'red.8'}>
-                          {semaforo.label} ({semaforo.diff > 0 ? `+${semaforo.diff}` : semaforo.diff} kg)
-                        </Text>
-                      </Group>
-                      <Text size="xs" c="dimmed" mt={2}>
-                        Peso Ref ({semaforo.porcentajeGrasaObjetivo || 10}% gr): <b>{semaforo.pesoReferencia} kg</b>
-                      </Text>
+                    <Box style={{ cursor: 'pointer' }}>
+                      <WidgetAside color={semaforo.color === 'green' ? 'teal' : semaforo.color === 'yellow' ? 'yellow' : 'red'} dot>
+                        {semaforo.label} ({semaforo.diff > 0 ? `+${semaforo.diff}` : semaforo.diff} kg)
+                      </WidgetAside>
                     </Box>
                   </MantineTooltip>
-                )}
-              </Group>
+                ) : null
+              }
+            >
+              <Text fz={30} fw={800} c="dark.6" lh={1} lts={-0.8} mb="sm" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                {selected ? `${selected.peso_kg} kg` : '-'}
+              </Text>
 
               <Stack gap="md">
                 <Box h={250}>
@@ -375,7 +361,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
                   </Table>
                 </ScrollArea>
               </Stack>
-            </Paper>
+            </WidgetCard>
           </Grid.Col>
         </Grid>
       )}

@@ -1,13 +1,14 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Badge, Box, Button, Group, Paper, Stack, Text, Title, Collapse, ActionIcon } from '@mantine/core';
+import { Box, Button, Group, Paper, Stack, Text, Collapse, ActionIcon } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { IconInbox, IconPlus, IconChevronDown } from '@/components/icons3d';
 import SendMessageModal from '@/components/modals/SendMessageModal';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import NothingFound from '@/components/NothingFound';
+import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
 
 function formatDate(value) {
   if (!value) return '';
@@ -95,29 +96,23 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
         {messages.length > 0 ? (
           <Stack gap="sm">
             {messages.map((message) => (
-              <Paper key={message.id} p={{ base: 'sm', sm: 'md' }} radius="lg" withBorder bg="white" shadow="xs">
-                <Group justify="space-between" align="flex-start" gap="sm" mb="xs">
-                  <Box style={{ minWidth: 0 }}>
-                    <Group gap="xs" wrap="nowrap">
-                      <Title order={4} size="h5" fw={700} c="dark.5" style={{ overflowWrap: 'anywhere' }}>
-                        {message.titulo}
-                      </Title>
-                      {!message.jugador_id && (
-                        <Badge color="teal" variant="light" radius="sm">
-                          Equipo
-                        </Badge>
-                      )}
-                    </Group>
-                    <Text size="xs" c="dimmed">
-                      {formatDate(message.created_at)}
-                      {message.created_by_name ? ` · ${message.created_by_name}` : ''}
-                    </Text>
-                  </Box>
-                </Group>
-                <Text size="sm" c="dark.4" style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+              <WidgetCard
+                key={message.id}
+                icon="chat"
+                title={message.titulo}
+                color="indigo"
+                aside={
+                  <WidgetAside color={message.jugador_id ? 'gray' : 'teal'}>
+                    {message.jugador_id ? formatDate(message.created_at) : `Equipo · ${formatDate(message.created_at)}`}
+                  </WidgetAside>
+                }
+                footer={message.created_by_name ? `De ${message.created_by_name}` : undefined}
+                style={{ height: 'auto' }}
+              >
+                <Text size="sm" c="dark.4" lh={1.5} style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
                   {message.contenido}
                 </Text>
-              </Paper>
+              </WidgetCard>
             ))}
           </Stack>
         ) : (

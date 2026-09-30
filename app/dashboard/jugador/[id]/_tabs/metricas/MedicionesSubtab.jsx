@@ -26,12 +26,25 @@ import {
   Stack,
   Table,
   Text,
-  Title,
   ScrollArea,
 } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import SubtabHeader from '../SubtabHeader';
+import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
 import classes from '../SubtabSectionHeader.module.css';
+
+// Icono y color de categoría de cada métrica (mismo lenguaje que los widgets del Perfil)
+const METRIC_STYLE = {
+  peso_kg: { icon: 'scale', color: 'blue' },
+  porcentaje_grasa: { icon: 'fire', color: 'red' },
+  porcentaje_musculo: { icon: 'gym', color: 'green' },
+  suma_6_pliegues: { icon: 'target', color: 'orange' },
+  suma_8_pliegues: { icon: 'target', color: 'violet' },
+  perimetro_muslo_derecho: { icon: 'running', color: 'cyan' },
+  perimetro_muslo_izquierdo: { icon: 'running', color: 'teal' },
+  perimetro_pantorrilla_derecha: { icon: 'running_shoe', color: 'lime' },
+  perimetro_pantorrilla_izquierda: { icon: 'running_shoe', color: 'orange' },
+};
 import MeasurementModal from '@/components/modals/MeasurementModal';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
@@ -495,27 +508,16 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                     key={m.key}
                     span={{ base: 12, lg: m.key === 'peso_kg' ? 12 : 6 }}
                   >
-                    <Paper
-                      p="md"
-                      radius="lg"
-                      withBorder
-                      bg="white"
+                    <WidgetCard
+                      icon={(METRIC_STYLE[m.key] || {}).icon || 'chart'}
+                      title={m.label}
+                      color={(METRIC_STYLE[m.key] || {}).color || 'gray'}
+                      aside={d ? <WidgetAside color={d.color}>{d.val} {unit}</WidgetAside> : null}
+                      style={{ height: 'auto' }}
                     >
-                      <Group justify="space-between" align="flex-start" mb="xs">
-                        <Box>
-                          <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-                            {m.label}
-                          </Text>
-                          <Title order={2} fw={700} c="dark.5" mt={4}>
-                            {formatMetricValue(metricValue(selected, m), unit)}
-                          </Title>
-                        </Box>
-                        {d && (
-                          <Badge variant="light" color={d.color} size="sm">
-                            {d.val} {unit}
-                          </Badge>
-                        )}
-                      </Group>
+                      <Text fz={30} fw={800} c="dark.6" lh={1} lts={-0.8} mb="sm" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                        {formatMetricValue(metricValue(selected, m), unit)}
+                      </Text>
 
                       <Stack gap="md">
                         <Box h={180}>
@@ -631,7 +633,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                           </Table>
                         </ScrollArea>
                       </Stack>
-                    </Paper>
+                    </WidgetCard>
                   </Grid.Col>
                 );
               })}

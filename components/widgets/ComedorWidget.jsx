@@ -47,6 +47,7 @@ export default function ComedorWidget({
   return (
     <WidgetCard
       id="widget-comedor"
+      color="lime"
       icon="fork_and_knife"
       title="Comedor Ciudad Deportiva"
       aside={todayDiningMenu ? <WidgetAside color="nutralabColor">13:00 – 15:30</WidgetAside> : null}

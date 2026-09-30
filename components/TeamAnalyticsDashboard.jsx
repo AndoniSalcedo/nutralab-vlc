@@ -14,7 +14,6 @@ import {
   Stack,
   Table,
   Text,
-  Title,
   Tooltip,
   TextInput,
 } from '@mantine/core';
@@ -35,18 +34,15 @@ import {
   Line,
 } from 'recharts';
 import {
-  IconAlertTriangle,
   IconSearch,
   IconFilter,
-  IconUsers,
   IconTrendingUp,
-  IconActivity,
-  IconHistory,
   IconSortDescending,
   IconChartLine,
 } from '@/components/icons3d';
 import NothingFound from '@/components/NothingFound';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
+import WidgetCard, { StatTile } from '@/components/widgets/WidgetCard';
 
 function formatDate(dateStr) {
   if (!dateStr) return 'Sin fecha';
@@ -336,82 +332,23 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
     <BoneyardSkeleton name="team-analytics" loading={false}>
       <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
         {/* Resumen de analíticas en 1 sola fila compacta */}
-        <Paper p={{ base: 10, sm: 'md' }} radius="lg" shadow="sm" bg="white">
-          <SimpleGrid cols={4} spacing={{ base: 6, sm: 'md' }}>
-            {/* 1. Subidas */}
-            <Box style={{ minWidth: 0, textAlign: 'center' }}>
-              <Group gap={6} justify="center" wrap="nowrap">
-                <IconUsers size={18} />
-                <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
-                  Subidas
-                </Text>
-              </Group>
-              <Title order={3} fw={700} c="dark.5" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
-                {stats.playersWithRecords}/{stats.totalPlayers}
-              </Title>
-              <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
-                {stats.totalPlayers ? Math.round((stats.playersWithRecords / stats.totalPlayers) * 100) : 0}% plantilla
-              </Text>
-            </Box>
-
-            {/* 2. Con Alertas */}
-            <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
-              <Group gap={6} justify="center" wrap="nowrap">
-                <IconAlertTriangle size={18} />
-                <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
-                  Alertas
-                </Text>
-              </Group>
-              <Title order={3} fw={700} c={stats.activeAlertsCount > 0 ? 'red.6' : 'teal.7'} mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
-                {stats.activeAlertsCount}
-              </Title>
-              <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
-                con alertas
-              </Text>
-            </Box>
-
-            {/* 3. Parámetros Bajo */}
-            <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
-              <Group gap={6} justify="center" wrap="nowrap">
-                <IconActivity size={18} />
-                <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
-                  Bajos
-                </Text>
-              </Group>
-              <Title order={3} fw={700} c={stats.totalLowParams > 0 ? 'orange.7' : 'teal.7'} mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
-                {stats.totalLowParams}
-              </Title>
-              <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
-                bajo mín.{stats.totalHighParams > 0 ? ` · ${stats.totalHighParams} altos` : ''}
-              </Text>
-            </Box>
-
-            {/* 4. Total Registros */}
-            <Box style={{ minWidth: 0, textAlign: 'center', borderLeft: '1px solid var(--mantine-color-gray-2)' }}>
-              <Group gap={6} justify="center" wrap="nowrap">
-                <IconHistory size={18} />
-                <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
-                  Total
-                </Text>
-              </Group>
-              <Title order={3} fw={700} c="dark.5" mt={2} fz={{ base: 15, sm: 22 }} lh={1.1}>
-                {stats.totalRecords}
-              </Title>
-              <Text size="xs" c="dimmed" visibleFrom="xs" mt={2} truncate>
-                registros
-              </Text>
-            </Box>
-          </SimpleGrid>
-        </Paper>
+        <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
+          <StatTile icon="players" title="Subidas" color="teal" value={`${stats.playersWithRecords}/${stats.totalPlayers}`} caption={`${stats.totalPlayers ? Math.round((stats.playersWithRecords / stats.totalPlayers) * 100) : 0}% plantilla`} />
+          <StatTile icon="warning" title="Alertas" color={stats.activeAlertsCount > 0 ? 'red' : 'teal'} value={stats.activeAlertsCount} caption="con alertas" />
+          <StatTile icon="stats" title="Bajos" color={stats.totalLowParams > 0 ? 'orange' : 'teal'} value={stats.totalLowParams} caption={`bajo mín.${stats.totalHighParams > 0 ? ` · ${stats.totalHighParams} altos` : ''}`} />
+          <StatTile icon="history" title="Total" color="violet" value={stats.totalRecords} caption="registros" />
+        </SimpleGrid>
 
       {/* Sección 2: Análisis de Parámetro Clínico (Comparativa / Historial) */}
-      <Paper p="md" radius="lg" withBorder bg="white" style={{ width: '100%', minWidth: 0, overflow: 'hidden' }}>
+      <WidgetCard
+        icon="stethoscope"
+        title="Inspector de biomarcadores"
+        color="pink"
+        style={{ height: 'auto', width: '100%', minWidth: 0 }}
+      >
         <Stack gap="md">
           <Group justify="space-between" align="center" wrap="wrap" gap="sm">
-            <div>
-              <Title order={4} fw={700} c="dark.5">Inspector de Biomarcadores</Title>
-              <Text size="xs" c="dimmed">Compara o visualiza la evolución del biomarcador seleccionado</Text>
-            </div>
+            <Text size="xs" c="dimmed">Compara o visualiza la evolución del biomarcador seleccionado</Text>
             <Group gap="sm" wrap="wrap">
               <SegmentedControl
                 value={chartMode}
@@ -623,13 +560,17 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
             />
           )}
         </Stack>
-      </Paper>
+      </WidgetCard>
 
       {/* Sección 3: Listado general de la plantilla */}
-      <Paper radius="lg" p="md" bg="white" shadow="sm" style={{ overflow: 'hidden', width: '100%', minWidth: 0, maxWidth: '100%' }}>
+      <WidgetCard
+        icon="diario"
+        title="Listado clínico general"
+        color="indigo"
+        style={{ height: 'auto', width: '100%', minWidth: 0, maxWidth: '100%' }}
+      >
         <Stack gap="md" style={{ width: '100%', minWidth: 0 }}>
           <Group justify="space-between" align="center" wrap="wrap" gap="sm" w="100%">
-            <Title order={4} fw={700} c="dark.5">Listado Clínico General</Title>
             <Group gap="xs" wrap="wrap" w={{ base: '100%', sm: 'auto' }} style={{ flex: 1, minWidth: 0 }}>
               <TextInput
                 placeholder="Buscar por jugador..."
@@ -791,7 +732,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
             />
           )}
         </Stack>
-      </Paper>
+      </WidgetCard>
 
       </Stack>
     </BoneyardSkeleton>

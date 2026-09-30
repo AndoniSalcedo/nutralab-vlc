@@ -327,28 +327,27 @@ export default function PerfilSubtab({
 
       {/* Main Content wrapper: Con padding lateral adecuado en móvil (12px) y escritorio (16px) */}
       <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 12, sm: 'md' }}>
-        <Stack >
-          {/* =========================================================================
-              1. PRIMERO: PANEL DE RENDIMIENTO FLOTANTE (Sustituye a Bento Grid)
-             ========================================================================= */}
+        <Stack gap="md">
+          {/* Bento: teselas de 1 o 2 columnas; lo urgente arriba, las constantes en pares y el detalle debajo */}
+          <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
+            <Box style={{ gridColumn: 'span 2' }}>
+              <PlanHoyWidget jugador={jugador} selectedDate={selectedDate} />
+            </Box>
 
-          {/* Planificación nutricional del día (del último plan publicado) */}
-          <PlanHoyWidget jugador={jugador} selectedDate={selectedDate} />
+            <Box style={{ gridColumn: 'span 2' }}>
+              <BalanceNutricionalWidget
+                jugadorId={jugador.id}
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
+                activeDayType={activeDayType}
+                onDayTypeChange={setActiveDayType}
+                dayTypes={DAY_TYPES}
+                consumed={consumed}
+                target={{ kcal, protein, cho, fat }}
+                mealsCount={meals.length}
+              />
+            </Box>
 
-          <BalanceNutricionalWidget
-            jugadorId={jugador.id}
-            selectedDate={selectedDate}
-            onDateChange={setSelectedDate}
-            activeDayType={activeDayType}
-            onDayTypeChange={setActiveDayType}
-            dayTypes={DAY_TYPES}
-            consumed={consumed}
-            target={{ kcal, protein, cho, fat }}
-            mealsCount={meals.length}
-          />
-
-          {/* Cabecera superior: accesos rápidos */}
-          <SimpleGrid cols={2} spacing="md">
             <PhysicalMetricWidget
               jugadorId={jugador.id}
               pesoActual={pesoActual}
@@ -360,49 +359,48 @@ export default function PerfilSubtab({
               jugadorId={jugador.id}
               messages={messages}
             />
-          </SimpleGrid>
 
-          {/* Bienestar diario: hexágono hoy vs media */}
-          <WellnessHexagonWidget
-            jugadorId={jugador.id}
-            canEdit={user?.role !== 'tecnico'}
-          />
-
-          {/* Sudoración: ancho completo para la escala de sodio */}
-          <SweatMetricWidget
-            jugadorId={jugador.id}
-            latestSweat={latestSweat}
-            formatMetricNumber={formatMetricNumber}
-          />
-
-          {/* Línea completa de Hidratación: básica, chula y sin sobrecarga */}
-          <HydrationWidget
-            jugadorId={jugador.id}
-            jugador={jugador}
-            pesoActual={pesoActual}
-            activeDayType={activeDayType}
-            latestHydration={latestHydration}
-            formatMetricNumber={formatMetricNumber}
-          />
-
-          {/* Fila intermedia: Comedor primero y Suplementación debajo */}
-          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-            <ComedorWidget
+            <HydrationWidget
               jugadorId={jugador.id}
-              menus={menus}
-              selectedDate={selectedDate}
+              jugador={jugador}
+              pesoActual={pesoActual}
+              activeDayType={activeDayType}
+              latestHydration={latestHydration}
+              formatMetricNumber={formatMetricNumber}
             />
-            <SuplementacionWidget
-              jugadorId={jugador.id}
-            />
-          </SimpleGrid>
+            <SuplementacionWidget jugadorId={jugador.id} />
 
-          {/* Fila inferior: Estrategia del día */}
-          <EstrategiaWidget
-            jugador={jugador}
-            activeDayType={activeDayType}
-            activeDayLabel={activeDay?.label || 'Día activo'}
-          />
+            <Box style={{ gridColumn: 'span 2' }}>
+              <WellnessHexagonWidget
+                jugadorId={jugador.id}
+                canEdit={user?.role !== 'tecnico'}
+              />
+            </Box>
+
+            <Box style={{ gridColumn: 'span 2' }}>
+              <SweatMetricWidget
+                jugadorId={jugador.id}
+                latestSweat={latestSweat}
+                formatMetricNumber={formatMetricNumber}
+              />
+            </Box>
+
+            <Box style={{ gridColumn: 'span 2' }}>
+              <ComedorWidget
+                jugadorId={jugador.id}
+                menus={menus}
+                selectedDate={selectedDate}
+              />
+            </Box>
+
+            <Box style={{ gridColumn: 'span 2' }}>
+              <EstrategiaWidget
+                jugador={jugador}
+                activeDayType={activeDayType}
+                activeDayLabel={activeDay?.label || 'Día activo'}
+              />
+            </Box>
+          </Box>
 
           {/* =========================================================================
               3. TERCERO: PREFERENCIAS Y CONTEXTO CLÍNICO (Solo visible a técnicos/nutris)

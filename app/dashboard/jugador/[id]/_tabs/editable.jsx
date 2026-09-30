@@ -11,7 +11,6 @@ import {
   Text,
   Textarea,
   TextInput,
-  Title,
   MultiSelect,
   Checkbox,
   NumberInput,
@@ -32,6 +31,18 @@ import {
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
 import PrepartidoRoutineModal from '@/components/modals/PrepartidoRoutineModal';
 import { convertLegacyToAst, formatAstToText } from '@/lib/engine/meal-ast';
+import WidgetCard from '@/components/widgets/WidgetCard';
+
+// Color de categoría de cada campo del perfil (mismo criterio que las teselas del Perfil)
+const ICON_COLORS = {
+  target: 'red',
+  scale: 'teal',
+  apple: 'lime',
+  warning: 'orange',
+  shield: 'indigo',
+  stethoscope: 'pink',
+  bowl: 'blue',
+};
 
 export function CampoEditable({
   label,
@@ -100,7 +111,7 @@ export function CampoEditable({
   }
 
   return (
-    <BentoCard title={label} icon3d={icon3d} style={{ height: 'auto' }}>
+    <BentoCard title={label} icon3d={icon3d} color={ICON_COLORS[icon3d] || 'gray'} style={{ height: 'auto' }}>
       <Stack gap="xs">
         <Group justify="space-between" align="center">
           <Box style={{ flex: 1 }}>
@@ -239,7 +250,7 @@ export function ComidasEditable({
   const displayMeals = meals.length > 0 ? meals.join(', ') : 'Ninguna seleccionada';
 
   return (
-    <BentoCard title={label} icon3d={icon3d} style={{ height: 'auto' }}>
+    <BentoCard title={label} icon3d={icon3d} color={ICON_COLORS[icon3d] || 'gray'} style={{ height: 'auto' }}>
       <Stack gap="sm">
         {/* Cabecera de distribución general */}
         <Paper p="xs" withBorder radius="sm" bg="gray.0">
@@ -453,45 +464,46 @@ export function EditableSection({ title, defaultValue, onSave, readOnly = false 
   }
 
   return (
-    <Paper radius="lg" p="md" withBorder shadow="sm">
-      <Stack gap="md">
-        <Group justify="space-between">
-          <Title order={4}>{title}</Title>
-          <Group gap="xs">
-            {!readOnly && (
-              !editing ? (
-                <Button variant="light" size="xs" radius="xl" onClick={() => setEditing(true)} leftSection={<IconEdit size={14} />}>
-                  Editar
-                </Button>
-              ) : (
-                <>
-                  <Button variant="subtle" color="gray" size="xs" radius="xl" onClick={() => setEditing(false)}>
-                    Cancelar
+    <WidgetCard
+      icon="memo"
+      title={title}
+      color="orange"
+      style={{ height: 'auto' }}
+      aside={
+            <Group gap="xs">
+              {!readOnly && (
+                !editing ? (
+                  <Button variant="light" size="xs" radius="xl" onClick={() => setEditing(true)} leftSection={<IconEdit size={14} />}>
+                    Editar
                   </Button>
-                  <Button variant="filled" size="xs" radius="xl" onClick={handleSave} loading={saving}>
-                    Guardar
-                  </Button>
-                </>
-              )
-            )}
-          </Group>
-        </Group>
-
-        {editing ? (
-          <Textarea
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            rows={15}
-            size="sm"
-            styles={{ input: { lineHeight: 1.6 } }}
-          />
-        ) : (
-          <Text size="sm" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>
-            {value || 'Sin notas. Haz clic en Editar para personalizar.'}
-          </Text>
-        )}
-      </Stack>
-    </Paper>
+                ) : (
+                  <>
+                    <Button variant="subtle" color="gray" size="xs" radius="xl" onClick={() => setEditing(false)}>
+                      Cancelar
+                    </Button>
+                    <Button variant="filled" size="xs" radius="xl" onClick={handleSave} loading={saving}>
+                      Guardar
+                    </Button>
+                  </>
+                )
+              )}
+            </Group>
+      }
+    >
+      {editing ? (
+        <Textarea
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          rows={15}
+          size="sm"
+          styles={{ input: { lineHeight: 1.6 } }}
+        />
+      ) : (
+        <Text size="sm" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>
+          {value || 'Sin notas. Haz clic en Editar para personalizar.'}
+        </Text>
+      )}
+    </WidgetCard>
   );
 }
 
@@ -529,7 +541,7 @@ export function PrepartidoEditable({
   const scheduleOptions = SCHEDULE_OPTIONS;
 
   return (
-    <BentoCard title={label} icon3d="flag" style={{ height: 'auto' }}>
+    <BentoCard title={label} icon3d="flag" color="red" style={{ height: 'auto' }}>
       <Stack gap="sm">
         {scheduleOptions.map((opt) => {
           const cfg = config?.[opt.value];

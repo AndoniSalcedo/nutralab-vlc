@@ -183,7 +183,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
   }
 
   return (
-    <Paper p="md" radius="lg" shadow="sm" withBorder bg="white">
+    <Paper p="md" radius={24} shadow="xs" bg="white">
       <Group justify="space-between" align="center" wrap="wrap" gap="md" mb="lg">
         <Group gap="sm">
           <IconUserCheck size={28} style={{ flexShrink: 0 }} />

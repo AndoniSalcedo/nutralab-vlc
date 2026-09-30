@@ -203,6 +203,7 @@ export default function WellnessHexagonWidget({ jugadorId, canEdit = true }) {
   return (
     <WidgetCard
       id="widget-bienestar"
+      color="pink"
       icon="heart"
       title="Bienestar"
       aside={

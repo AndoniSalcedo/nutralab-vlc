@@ -346,8 +346,8 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
               <Paper
                 key={team.id}
                 p="md"
-                radius="lg"
-                shadow="sm"
+                radius={24}
+                shadow="xs"
                 bg="white"
                 style={{
                   cursor: 'pointer',

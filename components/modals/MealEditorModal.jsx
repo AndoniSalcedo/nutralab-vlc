@@ -17,7 +17,7 @@ export default function MealEditorModal({
       onClose={onClose}
       size="lg"
       centered
-      title={<Text fw={700}>{meal ? 'Editar Comida' : 'Registrar Comida'}</Text>}
+      title={<Text fw={700}>{meal?.id ? 'Editar Comida' : 'Registrar Comida'}</Text>}
       radius="lg"
       padding="lg"
     >

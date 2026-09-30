@@ -15,6 +15,7 @@ export default function StaffMessagesWidget({
   return (
     <WidgetCard
       id="widget-mensajes"
+      color="indigo"
       icon="chat"
       title="Mensajes"
       onClick={() => router.push(`/dashboard/jugador/${jugadorId}/resumen/mensajes`)}
