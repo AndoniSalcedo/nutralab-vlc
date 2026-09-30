@@ -12,13 +12,31 @@ const PRECACHE_ASSETS = [
 
 const STATIC_PATH = /^\/(_next\/static\/|favico_|icons-3d\/|manifest\.json)/;
 
+// En local (next dev) los chunks de /_next/static no cambian de URL: cachearlos sirve JS
+// obsoleto. Este SW se autodesinstala, vacía las cachés y recarga las pestañas abiertas.
+const IS_LOCAL = ['localhost', '127.0.0.1'].includes(self.location.hostname);
+
 self.addEventListener('install', (event) => {
+  if (IS_LOCAL) {
+    self.skipWaiting();
+    return;
+  }
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS)).then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener('activate', (event) => {
+  if (IS_LOCAL) {
+    event.waitUntil(
+      caches.keys()
+        .then((names) => Promise.all(names.map((n) => caches.delete(n))))
+        .then(() => self.registration.unregister())
+        .then(() => self.clients.matchAll({ type: 'window' }))
+        .then((clients) => clients.forEach((client) => client.navigate(client.url)))
+    );
+    return;
+  }
   event.waitUntil(
     caches.keys()
       // Borra también las cachés antiguas (v1) que contenían páginas del panel.
@@ -35,7 +53,7 @@ self.addEventListener('message', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  if (request.method !== 'GET') return;
+  if (IS_LOCAL || request.method !== 'GET') return;
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;

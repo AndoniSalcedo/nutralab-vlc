@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import {
   ActionIcon,
   Group,
-  Paper,
   Popover,
   Progress,
   RingProgress,
@@ -15,7 +14,7 @@ import {
 } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { IconCalendar } from '@/components/icons3d';
-import Icon3D from '@/components/Icon3D';
+import WidgetCard from './WidgetCard';
 
 function CompactMacroLine({ label, color, consumed = 0, target = 0 }) {
   const targetNum = target && Number(target) > 0 ? Number(target) : 0;
@@ -29,9 +28,9 @@ function CompactMacroLine({ label, color, consumed = 0, target = 0 }) {
         </Text>
         <Text fz="xs" fw={500} c="dimmed" style={{ fontVariantNumeric: 'tabular-nums' }}>
           <Text span fw={600} c="dark.5">
-            {consumed}g
+            {consumed}
           </Text>
-          /{target || '-'}g
+          {targetNum > 0 ? ` / ${Math.round(targetNum)} g` : ' g'}
         </Text>
       </Group>
       <Progress value={pct} color={color} size="xs" radius="xl" bg="gray.1" />
@@ -62,18 +61,12 @@ export default function BalanceNutricionalWidget({
   });
 
   return (
-    <Paper id="widget-balance-nutricional" shadow="sm" radius="lg" p={{ base: 'xs', sm: 'sm' }} bg="white">
-      {/* Cabecera: Título con icono unificado + Indicador de fecha y tipo de día */}
-      <Group justify="space-between" align="center" mb={6}>
-        <Group gap="xs" align="center">
-          <Icon3D name="fire" size={28} />
-          <Text fw={700} fz="sm" c="dark.5">
-            Balance Nutricional
-          </Text>
-        </Group>
-
-        {/* Selector de fecha */}
-        <Group gap={4} align="center">
+    <WidgetCard
+      id="widget-balance-nutricional"
+      icon="fire"
+      title="Balance nutricional"
+      aside={
+        <Group gap={2} align="center" wrap="nowrap">
           <Text fz="xs" fw={600} c="dimmed">
             {formattedDate}
           </Text>
@@ -112,10 +105,13 @@ export default function BalanceNutricionalWidget({
             </Popover.Dropdown>
           </Popover>
         </Group>
-      </Group>
-
+      }
+      footer={`${mealsCount} ${mealsCount === 1 ? 'comida registrada' : 'comidas registradas'}`}
+      footerAction="Ver diario"
+      onFooterAction={() => router.push(`/dashboard/jugador/${jugadorId}/resumen/diario`)}
+    >
       {/* Misma fila en 2 columnas (móvil y desktop): Columna 1 Ring de Calorías, Columna 2 Macros */}
-      <SimpleGrid cols={2} spacing={{ base: 'xs', sm: 'md' }} my={4} style={{ alignItems: 'center' }}>
+      <SimpleGrid cols={2} spacing={{ base: 'xs', sm: 'md' }} style={{ alignItems: 'center' }}>
         {/* Columna 1: Ring de calorías centrado */}
         <Stack align="center" justify="center" gap={0}>
           <RingProgress
@@ -136,9 +132,11 @@ export default function BalanceNutricionalWidget({
                 <Text fz="sm" fw={700} lh={1.1} c="dark.5" style={{ fontVariantNumeric: 'tabular-nums' }}>
                   {consumed.kcal}
                 </Text>
-                <Text fz="10px" c="dimmed" fw={500} style={{ fontVariantNumeric: 'tabular-nums' }}>
-                  / {target.kcal || '-'}
-                </Text>
+                {targetKcal > 0 && (
+                  <Text fz="10px" c="dimmed" fw={500} style={{ fontVariantNumeric: 'tabular-nums' }}>
+                    / {targetKcal}
+                  </Text>
+                )}
               </Stack>
             }
           />
@@ -166,28 +164,6 @@ export default function BalanceNutricionalWidget({
           />
         </Stack>
       </SimpleGrid>
-
-      {/* Pie de tarjeta idéntico al resto de widgets */}
-      <Group
-        justify="space-between"
-        align="center"
-        mt={6}
-        pt={6}
-        style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
-      >
-        <Text fz="xs" c="dimmed" fw={500}>
-          {mealsCount} comida(s) registrada(s)
-        </Text>
-        <Text
-          fz="xs"
-          fw={600}
-          c="dark.4"
-          style={{ cursor: 'pointer' }}
-          onClick={() => router.push(`/dashboard/jugador/${jugadorId}/resumen/diario`)}
-        >
-          Ver diario →
-        </Text>
-      </Group>
-    </Paper>
+    </WidgetCard>
   );
 }

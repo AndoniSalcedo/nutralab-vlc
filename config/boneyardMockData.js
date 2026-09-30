@@ -401,3 +401,35 @@ export function isMockPlayer(playerId) {
   if (process.env.NODE_ENV === 'production') return false;
   return isBoneyardMode() || String(playerId).startsWith('mock');
 }
+
+const mockPlanDay = (tipoDia, kcal, proteina, hidratos, grasa, ingestas) => ({ tipoDia, kcal, proteina, hidratos, grasa, ingestas });
+const mockEntrenoMeals = [
+  { nombre: 'Desayuno', detalle: '80 g de avena con 250 ml de leche, 1 plátano y 20 g de crema de cacahuete. Café solo.' },
+  { nombre: 'Almuerzo', detalle: 'Bocadillo de pan integral (100 g) con pavo y tomate. 1 pieza de fruta.' },
+  { nombre: 'Comida', detalle: '120 g de arroz, 180 g de pechuga de pollo a la plancha y ensalada con AOVE.' },
+  { nombre: 'Merienda', detalle: 'Yogur griego con 30 g de nueces y miel.' },
+  { nombre: 'Cena', detalle: '200 g de salmón al horno con patata asada (200 g) y verduras salteadas.' },
+];
+
+export const mockAiPlans = [
+  {
+    id: 'mock-plan',
+    jugador_id: 'mock',
+    nombre: 'Semana 40 · Microciclo competitivo',
+    created_at: '2026-09-28T09:00:00Z',
+    datos: {
+      meta: { nombre: 'Semana 40 · Microciclo competitivo', semanaMenu: null },
+      jugador: { nombre: 'Carlos Jugador Uno', posicion: 'Delantero' },
+      metricas: { peso: 81.5, grasa: 11.2 },
+      dias: {
+        lunes: mockPlanDay('descanso', 2600, 165, 290, 85, mockEntrenoMeals),
+        martes: mockPlanDay('entreno', 3200, 170, 420, 90, mockEntrenoMeals),
+        miercoles: mockPlanDay('entreno', 3200, 170, 420, 90, mockEntrenoMeals),
+        jueves: mockPlanDay('entreno', 3300, 170, 450, 90, mockEntrenoMeals),
+        viernes: mockPlanDay('entreno', 3400, 165, 480, 85, mockEntrenoMeals),
+        sabado: mockPlanDay('partido', 3600, 160, 540, 80, mockEntrenoMeals),
+        domingo: mockPlanDay('descanso', 2600, 165, 290, 85, mockEntrenoMeals),
+      },
+    },
+  },
+];

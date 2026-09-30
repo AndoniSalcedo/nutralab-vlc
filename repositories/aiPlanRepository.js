@@ -1,4 +1,8 @@
+import { mockAiPlans, isMockPlayer } from '@/config/boneyardMockData';
+
 export async function getAiPlansByPlayerId(supabase, jugadorId, semana = null) {
+  if (isMockPlayer(jugadorId)) return semana ? [] : mockAiPlans;
+
   let query = supabase
     .from('planes_ia')
     .select('*')

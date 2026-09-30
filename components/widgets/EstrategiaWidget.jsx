@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Group, Paper, Text, Timeline } from '@mantine/core';
-import Icon3D from '@/components/Icon3D';
+import WidgetCard, { WidgetAside } from './WidgetCard';
 import {
   IconActivity,
   IconApple,
@@ -61,30 +61,17 @@ export default function EstrategiaWidget({
   const hasTimeline = activeProtocol && Array.isArray(activeProtocol.timeline) && activeProtocol.timeline.length > 0;
 
   return (
-    <Paper
+    <WidgetCard
       id="widget-estrategia"
-      shadow="sm"
-      radius="lg"
-      p="md"
-      bg="white"
-      mt="md"
+      icon="target"
+      title={activeProtocol ? `Estrategia: ${activeProtocol.name}` : 'Estrategia del día'}
+      aside={<WidgetAside color="nutralabColor" dot>{activeDayLabel}</WidgetAside>}
+      footer="Pautas y timing de competición"
+      footerAction="Ver protocolos"
       onClick={() => router.push(`/dashboard/jugador/${jugador?.id}/nutricion/protocolos`)}
-      style={{ cursor: 'pointer' }}
     >
-      <Group justify="space-between" align="center" mb="sm">
-        <Group gap="xs" align="center">
-          <Icon3D name="target" size={28} />
-          <Text fw={700} fz="sm" c="dark.5">
-            {activeProtocol ? `Estrategia: ${activeProtocol.name}` : 'Estrategia del día'}
-          </Text>
-        </Group>
-        <Text fz="xs" fw={600} c="nutralabColor.8">
-          ● {activeDayLabel}
-        </Text>
-      </Group>
-
       {hasTimeline ? (
-        <Timeline bulletSize={26} lineWidth={2} color="nutralabColor" pl={4} my="xs">
+        <Timeline bulletSize={26} lineWidth={2} color="nutralabColor" pl={4}>
           {activeProtocol.timeline.map((item, idx) => {
             const IconComp = AVAILABLE_ICONS[item.icon] || IconFlag;
             return (
@@ -112,7 +99,7 @@ export default function EstrategiaWidget({
           })}
         </Timeline>
       ) : (
-        <Paper p="md" radius="md" bg="gray.0" withBorder mt="xs" ta="center">
+        <Paper p="md" radius="md" bg="gray.0" withBorder ta="center" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
           <Box mx="auto" mb={6}>
             <IconClipboardList size={32} />
           </Box>
@@ -125,21 +112,6 @@ export default function EstrategiaWidget({
         </Paper>
       )}
 
-      {/* Pie de tarjeta idéntico al de Suplementación y Comedor */}
-      <Group
-        justify="space-between"
-        align="center"
-        mt="xs"
-        pt="xs"
-        style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
-      >
-        <Text fz="xs" c="dimmed" fw={500}>
-          Pautas y timing de competición
-        </Text>
-        <Text fz="xs" fw={600} c="dark.4">
-          Ver protocolos →
-        </Text>
-      </Group>
-    </Paper>
+    </WidgetCard>
   );
 }

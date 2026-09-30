@@ -1,9 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Box, Group, Paper, Text } from '@mantine/core';
+import { Box, Group, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import Icon3D from '@/components/Icon3D';
+import WidgetCard, { WidgetAside } from './WidgetCard';
 import WellnessModal from '@/components/modals/WellnessModal';
 import { WELLNESS_ITEMS, WELLNESS_KEYS, wellnessScoreColor as scoreColor } from '@/config/wellness';
 import { getWellnessRecords, saveWellnessRecord } from '@/actions/wellnessActions';
@@ -60,12 +60,12 @@ function HexagonChart({ today, average }) {
       viewBox={`-50 0 ${VIEW + 100} ${VIEW}`}
       role="img"
       aria-label="Hexágono de bienestar"
-      style={{ width: '100%', maxWidth: 400, display: 'block', margin: '0 auto', overflow: 'visible' }}
+      style={{ width: '100%', maxWidth: 300, display: 'block', margin: '0 auto', overflow: 'visible' }}
     >
       <defs>
         <linearGradient id="wellness-bg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="var(--mantine-color-dark-6)" />
-          <stop offset="100%" stopColor="var(--mantine-color-dark-8)" />
+          <stop offset="0%" stopColor="var(--mantine-color-gray-0)" />
+          <stop offset="100%" stopColor="var(--mantine-color-gray-1)" />
         </linearGradient>
         <linearGradient id="wellness-today" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="var(--mantine-color-teal-4)" stopOpacity="0.75" />
@@ -74,13 +74,13 @@ function HexagonChart({ today, average }) {
       </defs>
 
       {/* Fondo y anillos 2-5 */}
-      <polygon points={outer} fill="url(#wellness-bg)" stroke="var(--mantine-color-dark-4)" strokeWidth="1.5" />
+      <polygon points={outer} fill="url(#wellness-bg)" stroke="var(--mantine-color-gray-3)" strokeWidth="1.5" />
       {RINGS.slice(0, -1).map((ring) => (
         <polygon
           key={ring}
           points={polygonPoints(WELLNESS_ITEMS.map(() => ring))}
           fill="none"
-          stroke="rgba(255,255,255,0.12)"
+          stroke="var(--mantine-color-gray-2)"
           strokeWidth="1"
         />
       ))}
@@ -88,7 +88,7 @@ function HexagonChart({ today, average }) {
       {/* Ejes */}
       {WELLNESS_ITEMS.map((item, i) => {
         const [x, y] = pointFor(i, 5);
-        return <line key={item.key} x1={CENTER} y1={CENTER} x2={x} y2={y} stroke="rgba(255,255,255,0.12)" strokeWidth="1" />;
+        return <line key={item.key} x1={CENTER} y1={CENTER} x2={x} y2={y} stroke="var(--mantine-color-gray-2)" strokeWidth="1" />;
       })}
 
       {/* Línea media */}
@@ -96,7 +96,7 @@ function HexagonChart({ today, average }) {
         <polygon
           points={polygonPoints(average)}
           fill="none"
-          stroke="var(--mantine-color-gray-3)"
+          stroke="var(--mantine-color-gray-5)"
           strokeWidth="2"
           strokeDasharray="5 4"
           strokeLinejoin="round"
@@ -109,14 +109,14 @@ function HexagonChart({ today, average }) {
           <polygon
             points={polygonPoints(today)}
             fill="url(#wellness-today)"
-            stroke="var(--mantine-color-teal-3)"
+            stroke="var(--mantine-color-teal-6)"
             strokeWidth="2.5"
             strokeLinejoin="round"
             style={{ transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)' }}
           />
           {today.map((v, i) => {
             const [x, y] = pointFor(i, v);
-            return <circle key={WELLNESS_ITEMS[i].key} cx={x} cy={y} r="3.5" fill="white" />;
+            return <circle key={WELLNESS_ITEMS[i].key} cx={x} cy={y} r="3.5" fill="white" stroke="var(--mantine-color-teal-6)" strokeWidth="1.5" />;
           })}
         </>
       )}
@@ -201,29 +201,30 @@ export default function WellnessHexagonWidget({ jugadorId, canEdit = true }) {
   };
 
   return (
-    <Paper id="widget-bienestar" shadow="sm" radius="lg" p={{ base: 'sm', sm: 'md' }} bg="white">
-      {/* Cabecera: título a la izquierda, nota global a la derecha */}
-      <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm" mb="xs">
-        <Group gap="xs" align="center" wrap="nowrap">
-          <Icon3D name="heart" size={28} />
-          <Box>
-            <Text fw={700} fz="sm" c="dark.5">Bienestar</Text>
-            <Text fz="xs" c="dimmed">Cuestionario diario</Text>
-          </Box>
-        </Group>
-
-        <Group gap={6} align="center" wrap="nowrap">
-          {delta !== null && (
-            <Text fz="xs" fw={700} c={delta >= 0 ? 'teal.7' : 'red.7'} style={{ whiteSpace: 'nowrap' }}>
-              {delta >= 0 ? '▲' : '▼'} {Math.abs(delta)} vs media
+    <WidgetCard
+      id="widget-bienestar"
+      icon="heart"
+      title="Bienestar"
+      aside={
+        overall !== null ? (
+          <Group gap={6} align="center" wrap="nowrap">
+            {delta !== null && (
+              <Text fz="xs" fw={700} c={delta >= 0 ? 'teal.7' : 'red.7'} style={{ whiteSpace: 'nowrap' }}>
+                {delta >= 0 ? '▲' : '▼'} {Math.abs(delta)} vs media
+              </Text>
+            )}
+            <Text fz={22} fw={800} lh={1} c={scoreColor(1 + (overall / 100) * 4)} style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {overall}
             </Text>
-          )}
-          <Text fz={{ base: 26, sm: 30 }} fw={800} lh={1} c={overall !== null ? scoreColor(1 + (overall / 100) * 4) : 'gray.4'} style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {overall ?? '--'}
-          </Text>
-        </Group>
-      </Group>
-
+          </Group>
+        ) : (
+          <WidgetAside>{loading ? 'Cargando…' : 'Sin registro hoy'}</WidgetAside>
+        )
+      }
+      footer={loading ? 'Cuestionario diario' : todayRecord ? 'Registro de hoy completado' : 'Cuestionario diario'}
+      footerAction={canEdit && !loading ? (todayRecord ? 'Editar' : 'Rellenar') : null}
+      onFooterAction={() => setModalOpen(true)}
+    >
       <HexagonChart today={todayValues} average={averageVals} />
 
       {/* Leyenda */}
@@ -245,24 +246,6 @@ export default function WellnessHexagonWidget({ jugadorId, canEdit = true }) {
         </Box>
       )}
 
-      {/* Pie de tarjeta idéntico al resto de widgets */}
-      <Group
-        justify="space-between"
-        align="center"
-        mt="xs"
-        pt="xs"
-        style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
-      >
-        <Text fz="xs" c="dimmed" fw={500}>
-          {loading ? 'Cargando…' : todayRecord ? 'Registro de hoy completado' : 'Sin registro hoy'}
-        </Text>
-        {canEdit && !loading && (
-          <Text fz="xs" fw={600} c="dark.4" style={{ cursor: 'pointer' }} onClick={() => setModalOpen(true)}>
-            {todayRecord ? 'Editar →' : 'Rellenar →'}
-          </Text>
-        )}
-      </Group>
-
       {canEdit && (
         <WellnessModal
           opened={modalOpen}
@@ -272,6 +255,6 @@ export default function WellnessHexagonWidget({ jugadorId, canEdit = true }) {
           saving={saving}
         />
       )}
-    </Paper>
+    </WidgetCard>
   );
 }

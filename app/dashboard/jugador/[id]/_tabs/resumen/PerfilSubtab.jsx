@@ -15,7 +15,7 @@ import {
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 
-import { IconClipboardList, IconChevronDown, IconCheck } from '@/components/icons3d';
+import { IconChevronDown, IconCheck } from '@/components/icons3d';
 
 import { calculateByObjective } from '@/lib/metrics/anthropometry';
 import { getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/config/nutrition-days';
@@ -39,6 +39,7 @@ import {
   EstrategiaWidget,
   BalanceNutricionalWidget,
   WellnessHexagonWidget,
+  PlanHoyWidget,
 } from '@/components/widgets';
 
 dayjs.locale('es');
@@ -331,6 +332,9 @@ export default function PerfilSubtab({
               1. PRIMERO: PANEL DE RENDIMIENTO FLOTANTE (Sustituye a Bento Grid)
              ========================================================================= */}
 
+          {/* Planificación nutricional del día (del último plan publicado) */}
+          <PlanHoyWidget jugador={jugador} selectedDate={selectedDate} />
+
           <BalanceNutricionalWidget
             jugadorId={jugador.id}
             selectedDate={selectedDate}
@@ -344,7 +348,7 @@ export default function PerfilSubtab({
           />
 
           {/* Cabecera superior: accesos rápidos */}
-          <SimpleGrid cols={{ base: 2, sm: 2 }} spacing={{ base: 'xs', sm: 'md' }}>
+          <SimpleGrid cols={2} spacing="md">
             <PhysicalMetricWidget
               jugadorId={jugador.id}
               pesoActual={pesoActual}
@@ -404,16 +408,14 @@ export default function PerfilSubtab({
               3. TERCERO: PREFERENCIAS Y CONTEXTO CLÍNICO (Solo visible a técnicos/nutris)
              ========================================================================= */}
           {!readOnly && (
-            <Paper p={{ base: 'md', sm: 'lg' }} bg="white" shadow="xs" radius="lg" withBorder>
-              <Group gap="sm" align="center" mb="md" wrap="nowrap">
-                <IconClipboardList size={28} />
-                <Box style={{ minWidth: 0 }}>
-                  <Title order={3} fw={700} c="dark.5" fz={{ base: 16, sm: 18 }} lineClamp={1}>Preferencias y contexto</Title>
-                  <Text size="sm" c="dimmed" lineClamp={1}>
-                    Información que condiciona el plan nutricional.
-                  </Text>
-                </Box>
-              </Group>
+            <Box mt="md">
+              {/* Encabezado de sección sobre el fondo, como en el Diario: evita tarjetas dentro de tarjetas */}
+              <Text fz="sm" fw={700} c="dimmed" tt="uppercase" lts={0.5}>
+                Preferencias y contexto
+              </Text>
+              <Text fz="xs" c="dimmed" mb="sm">
+                Información que condiciona el plan nutricional.
+              </Text>
 
               <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
                 <ComidasEditable label="Comidas diarias" numComidas={jugador.num_comidas} postentreno={jugador.postentreno} preentreno={jugador.preentreno} jugadorId={jugador.id} recomendacionesDefecto={jugador.recomendaciones_defecto} jugador={jugador} readOnly={readOnly} />
@@ -447,7 +449,7 @@ export default function PerfilSubtab({
                 />
                 <CampoEditable icon3d="stethoscope" label="Contexto clínico / Notas médicas" campo="contexto_clinico" valor={jugador.contexto_clinico || ''} jugadorId={jugador.id} readOnly={readOnly} />
               </SimpleGrid>
-            </Paper>
+            </Box>
           )}
 
         </Stack>

@@ -357,3 +357,45 @@ export function createEmptySession() {
     intakes: {},
   };
 }
+
+/**
+ * Convierte las filas de la BD de un partido (cabecera, convocados y tomas)
+ * en la sesión que usa la interfaz.
+ */
+export function buildSessionFromRows(match, convocados = [], tomas = []) {
+  const intakes = {};
+  convocados.forEach((c) => {
+    intakes[String(c.jugador_id)] = {};
+  });
+  tomas.forEach((t) => {
+    const pId = String(t.jugador_id);
+    if (!intakes[pId]) return;
+    intakes[pId][t.momento] = { ...(intakes[pId][t.momento] || {}), [t.producto_id]: t.cantidad };
+  });
+
+  return {
+    id: String(match.id),
+    matchInfo: {
+      rival: match.rival,
+      competicion: match.competicion,
+      lugar: match.lugar,
+      fecha: match.fecha,
+    },
+    activeRosterIds: convocados.map((c) => String(c.jugador_id)),
+    starterIds: convocados.filter((c) => c.titular).map((c) => String(c.jugador_id)),
+    intakes,
+  };
+}
+
+/**
+ * Totales nutricionales de las tomas de un jugador: { momento: { productoId: cantidad } }
+ */
+export function calculatePlayerTotals(playerIntakes = {}) {
+  const list = [];
+  Object.values(playerIntakes).forEach((productsMap) => {
+    Object.entries(productsMap).forEach(([productId, cantidad]) => {
+      list.push({ productId, cantidad });
+    });
+  });
+  return calculateNutrientTotals(list);
+}

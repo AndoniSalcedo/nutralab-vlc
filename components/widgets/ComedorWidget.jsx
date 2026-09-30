@@ -2,9 +2,8 @@
 
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Group, Paper, Stack, Text } from '@mantine/core';
-import { IconClock } from '@/components/icons3d';
-import Icon3D from '@/components/Icon3D';
+import { Group, Paper, Text } from '@mantine/core';
+import WidgetCard, { WidgetAside } from './WidgetCard';
 
 export default function ComedorWidget({
   jugadorId,
@@ -37,113 +36,46 @@ export default function ComedorWidget({
   }, [menus, selectedDate]);
 
   const hasMenus = Array.isArray(menus) && menus.length > 0;
+  const courses = todayDiningMenu
+    ? [
+      { label: 'Primero', value: todayDiningMenu.primero },
+      { label: 'Segundo', value: todayDiningMenu.segundo },
+      { label: 'Postre', value: todayDiningMenu.postre },
+    ].filter((c) => c.value)
+    : [];
 
   return (
-    <Paper
+    <WidgetCard
       id="widget-comedor"
-      shadow="sm"
-      radius="lg"
-      p="md"
-      bg="white"
-      style={{
-        height: '100%',
-        cursor: 'pointer',
-        transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-      }}
+      icon="fork_and_knife"
+      title="Comedor Ciudad Deportiva"
+      aside={todayDiningMenu ? <WidgetAside color="nutralabColor">13:00 – 15:30</WidgetAside> : null}
+      footer="Supervisado por nutrición"
+      footerAction={hasMenus ? 'Menú completo' : null}
       onClick={() => router.push(`/dashboard/jugador/${jugadorId}/nutricion/menu`)}
     >
-      {/* Cabecera con fondo blanco y acento naranja */}
-      <Group justify="space-between" align="center" mb="sm">
-        <Group gap="xs" align="center">
-          <Icon3D name="fork_and_knife" size={28} />
-          <Text fw={700} fz="sm" c="dark.5">
-            Comedor Ciudad Deportiva
-          </Text>
-        </Group>
-        {todayDiningMenu && (
-          <Group gap={5} align="center" wrap="nowrap">
-            <IconClock size={13} color="var(--mantine-color-nutralabColor-8)" />
-            <Text fz="xs" fw={600} c="nutralabColor.8">
-              13:00 - 15:30
-            </Text>
-          </Group>
-        )}
-      </Group>
-
-      {/* Si hay menú publicado para hoy: Platos estructurados */}
-      {todayDiningMenu ? (
-        <Stack gap={8}>
-          {todayDiningMenu.primero && (
-            <Paper
-              p="xs"
-              radius="md"
-              bg="gray.0"
-              withBorder
-              style={{ borderColor: 'var(--mantine-color-gray-2)' }}
+      {courses.length > 0 ? (
+        <Paper radius="md" bg="gray.0" withBorder style={{ borderColor: 'var(--mantine-color-gray-2)', overflow: 'hidden' }} mt="xs">
+          {courses.map((course, idx) => (
+            <Group
+              key={course.label}
+              gap="sm"
+              wrap="nowrap"
+              px="sm"
+              py={8}
+              style={{ borderTop: idx === 0 ? 0 : '1px solid var(--mantine-color-gray-2)' }}
             >
-              <Group justify="space-between" align="center" wrap="nowrap">
-                <Text fz="xs" fw={700} c="dark.5" tt="uppercase" style={{ flexShrink: 0 }}>
-                  1º Base
-                </Text>
-                <Text fz="sm" fw={500} c="dark.4" truncate style={{ flex: 1, paddingLeft: 8 }}>
-                  {todayDiningMenu.primero}
-                </Text>
-              </Group>
-            </Paper>
-          )}
-
-          {todayDiningMenu.segundo && (
-            <Paper
-              p="xs"
-              radius="md"
-              bg="gray.0"
-              withBorder
-              style={{ borderColor: 'var(--mantine-color-gray-2)' }}
-            >
-              <Group justify="space-between" align="center" wrap="nowrap">
-                <Text fz="xs" fw={700} c="dark.5" tt="uppercase" style={{ flexShrink: 0 }}>
-                  2º Proteína
-                </Text>
-                <Text fz="sm" fw={500} c="dark.4" truncate style={{ flex: 1, paddingLeft: 8 }}>
-                  {todayDiningMenu.segundo}
-                </Text>
-              </Group>
-            </Paper>
-          )}
-
-          {todayDiningMenu.postre && (
-            <Paper
-              p="xs"
-              radius="md"
-              bg="gray.0"
-              withBorder
-              style={{ borderColor: 'var(--mantine-color-gray-2)' }}
-            >
-              <Group justify="space-between" align="center" wrap="nowrap">
-                <Text fz="xs" fw={700} c="dark.5" tt="uppercase" style={{ flexShrink: 0 }}>
-                  Postre
-                </Text>
-                <Text fz="sm" fw={500} c="dark.4" truncate style={{ flex: 1, paddingLeft: 8 }}>
-                  {todayDiningMenu.postre}
-                </Text>
-              </Group>
-            </Paper>
-          )}
-        </Stack>
+              <Text fz={10} fw={700} c="dimmed" tt="uppercase" lts={0.5} w={58} style={{ flexShrink: 0 }}>
+                {course.label}
+              </Text>
+              <Text fz="sm" fw={500} c="dark.5" truncate style={{ flex: 1 }}>
+                {course.value}
+              </Text>
+            </Group>
+          ))}
+        </Paper>
       ) : (
-        /* Estado limpio si no hay servicio o no hay menú */
-        <Paper
-          p="md"
-          radius="md"
-          bg="gray.0"
-          withBorder
-          ta="center"
-          my="xs"
-          style={{ borderColor: 'var(--mantine-color-gray-2)' }}
-        >
-          <Box mx="auto" mb={6}>
-            <Icon3D name="fork_and_knife" size={32} />
-          </Box>
+        <Paper p="md" radius="md" bg="gray.0" withBorder ta="center" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
           <Text fz="xs" fw={700} c="dark.5">
             {!hasMenus ? 'Sin servicio de comedor' : 'Sin menú registrado para hoy'}
           </Text>
@@ -154,24 +86,6 @@ export default function ComedorWidget({
           </Text>
         </Paper>
       )}
-
-      {/* Pie de tarjeta con fondo blanco */}
-      <Group
-        justify="space-between"
-        align="center"
-        mt="xs"
-        pt="xs"
-        style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
-      >
-        <Text fz="xs" c="dimmed" fw={500}>
-          Supervisado por nutrición
-        </Text>
-        {hasMenus && (
-          <Text fz="xs" fw={600} c="dark.4">
-            Menú completo →
-          </Text>
-        )}
-      </Group>
-    </Paper>
+    </WidgetCard>
   );
 }

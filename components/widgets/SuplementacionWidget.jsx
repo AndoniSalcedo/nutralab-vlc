@@ -5,14 +5,12 @@ import { useRouter } from 'next/navigation';
 import {
   Box,
   Group,
-  Paper,
-  Progress,
   Stack,
   Text,
   UnstyledButton,
 } from '@mantine/core';
-import { IconCheck } from '@/components/icons3d';
-import Icon3D from '@/components/Icon3D';
+import { IconCheck } from '@tabler/icons-react';
+import WidgetCard, { WidgetAside } from './WidgetCard';
 
 const DEFAULT_SUPPLEMENTS = [
   { id: 'cafeina', name: 'Cafeína Anhidra', dose: '200 mg', timing: '45m pre-partido / sesión intensa' },
@@ -67,34 +65,22 @@ export default function SuplementacionWidget({
   }, [suppChecks, list]);
 
   const totalCount = list.length;
-  const progressPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   const isAllDone = totalCount > 0 && completedCount === totalCount;
 
   return (
-    <Paper id="widget-suplementacion" shadow="sm" radius="lg" p="md" bg="white" style={{ height: '100%' }}>
-      {/* Cabecera del widget */}
-      <Group justify="space-between" align="center" mb={6}>
-        <Group gap="xs" align="center">
-          <Icon3D name="suplementacion" size={28} />
-          <Text fw={700} fz="sm" c="dark.5">
-            Suplementación diaria
-          </Text>
-        </Group>
-        <Text fz="xs" fw={600} c={isAllDone ? 'teal.7' : 'nutralabColor.8'}>
-          {isAllDone ? '¡Todos completados!' : `${completedCount}/${totalCount} listos`}
-        </Text>
-      </Group>
-
-      {/* Barra de progreso de tomas diarias */}
-      <Progress
-        value={progressPct}
-        color={isAllDone ? 'teal' : 'nutralabColor'}
-        size="xs"
-        radius="xl"
-        mb="sm"
-        bg="gray.1"
-      />
-
+    <WidgetCard
+      id="widget-suplementacion"
+      icon="suplementacion"
+      title="Suplementación diaria"
+      aside={
+        <WidgetAside color={isAllDone ? 'teal' : 'nutralabColor'}>
+          {isAllDone ? 'Completado' : `${completedCount}/${totalCount} tomas`}
+        </WidgetAside>
+      }
+      footer="Toca para marcar cada toma"
+      footerAction="Protocolo completo"
+      onFooterAction={() => router.push(`/dashboard/jugador/${jugadorId}/nutricion/suplementacion`)}
+    >
       {/* Lista de tomas interactivas */}
       <Stack gap={6}>
         {list.map((item) => {
@@ -103,7 +89,8 @@ export default function SuplementacionWidget({
             <UnstyledButton
               key={item.id}
               onClick={() => handleToggle(item.id)}
-              p="xs"
+              px={4}
+              py={6}
               style={{
                 borderRadius: '8px',
                 backgroundColor: isChecked ? 'var(--mantine-color-gray-0)' : 'transparent',
@@ -163,25 +150,6 @@ export default function SuplementacionWidget({
         })}
       </Stack>
 
-      {/* Footer */}
-      <Group
-        justify="flex-end"
-        align="center"
-        mt="xs"
-        pt="xs"
-        style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
-      >
-        <Text
-          fz="xs"
-          fw={600}
-          c="dark.4"
-          style={{ cursor: 'pointer' }}
-          onClick={() => router.push(`/dashboard/jugador/${jugadorId}/nutricion/suplementacion`)}
-        >
-          Protocolo completo →
-        </Text>
-      </Group>
-    </Paper>
+    </WidgetCard>
   );
 }
-

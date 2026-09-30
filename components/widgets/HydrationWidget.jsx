@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Paper, Group, Stack, Text, ActionIcon, Tooltip } from '@mantine/core';
+import { Box, Group, Stack, Text, ActionIcon, Tooltip } from '@mantine/core';
 import { IconBottle, IconPlus, IconMinus } from '@tabler/icons-react';
 import FillableIcon from '@/components/FillableIcon';
-import Icon3D from '@/components/Icon3D';
+import WidgetCard, { WidgetAside } from './WidgetCard';
 import { calculateHydration } from '@/lib/metrics/anthropometry';
 
 export default function HydrationWidget({
@@ -116,54 +116,35 @@ export default function HydrationWidget({
     statusLabel = latestHydration.estado;
   }
 
+  const goToAnalytics = () => router.push(`/dashboard/jugador/${jugadorId}/metricas/hidratacion`);
+
   return (
-    <Paper
+    <WidgetCard
       id="widget-water"
-      radius="lg"
-      p={{ base: 'sm', sm: 'md' }}
-      bg="white"
-      shadow="sm"
+      icon="droplet"
+      title="Hidratación"
+      aside={<WidgetAside color={isGoalReached ? 'teal' : 'cyan'}>{percent}% objetivo</WidgetAside>}
+      footer={`Pauta para ${activeDayType} · ${targetL} L/día`}
+      footerAction="Ver analítica"
+      onFooterAction={goToAnalytics}
     >
-      {/* 1. Cabecera uniforme idéntica al resto de widgets del dashboard */}
-      <Group justify="space-between" align="center" mb="xs">
-        <Group gap="xs" align="center">
-          <Icon3D name="droplet" size={28} />
-          <Text fw={700} fz="sm" c="dark.5">
-            Hidratación
+      <Group justify="space-between" align="center" wrap="nowrap" gap="md">
+        {/* Litros del día + osmolaridad */}
+        <Stack gap={6} style={{ minWidth: 0, flex: 1 }}>
+          <Text lh={1} style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+            <Text span fz={28} fw={800} c={isGoalReached ? 'teal.7' : 'dark.6'}>
+              {drunk.toFixed(2)}
+            </Text>
+            <Text span fz="xs" fw={600} c="dimmed">
+              {' '}/ {targetL.toFixed(1)} L
+            </Text>
           </Text>
-        </Group>
-
-        {/* Litros consumidos / Objetivo diario en la cabecera */}
-        <Text
-          fz="sm"
-          fw={700}
-          c={isGoalReached ? 'teal.7' : 'dark.4'}
-          style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}
-        >
-          {drunk.toFixed(2)}L{' '}
-          <Text span fz="xs" fw={500} c="dimmed">
-            / {targetL.toFixed(1)}L
-          </Text>
-        </Text>
-      </Group>
-
-      {/* 2. Cuerpo del widget: Osmolaridad clínica destacada + Botella animada interactiva */}
-      <Group justify="space-between" align="center" wrap="nowrap" gap="md" my="xs">
-        {/* Lado izquierdo: Osmolaridad clínica con amplio espacio, visible y clara en móvil */}
-        <Stack
-          gap={4}
-          style={{ minWidth: 0, flex: 1, cursor: 'pointer' }}
-          onClick={() => router.push(`/dashboard/jugador/${jugadorId}/metricas/hidratacion`)}
-        >
-          <Group gap={6} align="center" wrap="nowrap">
-            <span style={{ fontSize: '9px', color: `var(--mantine-color-${statusColor})`, flexShrink: 0 }}>●</span>
-            <Text fz="xs" fw={700} c={statusColor}>
-              Osmolaridad: {value ? formatMetricNumber(value, 0) : '620'} mOsm
+          <Group gap={6} align="center" wrap="nowrap" style={{ cursor: 'pointer' }} onClick={goToAnalytics}>
+            <Box style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: `var(--mantine-color-${statusColor.replace('.', '-')})`, flexShrink: 0 }} />
+            <Text fz="xs" c="dimmed" lh={1.3}>
+              Osmolaridad <Text span inherit fw={700} c={statusColor}>{value ? formatMetricNumber(value, 0) : '—'} mOsm</Text> · {statusLabel}
             </Text>
           </Group>
-          <Text fz="xs" fw={500} c="dimmed">
-            Estado: <Text span fw={600} c="dark.4">{statusLabel}</Text> · {percent}% objetivo
-          </Text>
         </Stack>
 
         {/* Lado derecho: Botón [-], Botella animada FillableIcon (60px), Botón [+] */}
@@ -216,28 +197,6 @@ export default function HydrationWidget({
           </Tooltip>
         </Group>
       </Group>
-
-      {/* 3. Pie de tarjeta idéntico al resto de widgets */}
-      <Group
-        justify="space-between"
-        align="center"
-        mt="xs"
-        pt="xs"
-        style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
-      >
-        <Text fz="xs" c="dimmed" fw={500}>
-          Pauta para {activeDayType} ({targetL} L/día)
-        </Text>
-        <Text
-          fz="xs"
-          fw={600}
-          c="dark.4"
-          style={{ cursor: 'pointer' }}
-          onClick={() => router.push(`/dashboard/jugador/${jugadorId}/metricas/hidratacion`)}
-        >
-          Ver analítica →
-        </Text>
-      </Group>
-    </Paper>
+    </WidgetCard>
   );
 }

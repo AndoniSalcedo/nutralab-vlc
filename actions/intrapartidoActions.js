@@ -1,16 +1,18 @@
 'use server';
 
 import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedTeam, getAccessibleTeam } from '@/lib/auth/team-access';
 import { isMockTeam } from '@/config/boneyardMockData';
 import { assertPlainObject } from '@/lib/security/json';
-import { INTRAPARTIDO_TIMINGS, PRODUCTS_MAP } from '@/config/intrapartido';
+import { INTRAPARTIDO_TIMINGS, PRODUCTS_MAP, buildSessionFromRows } from '@/config/intrapartido';
 import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
 import {
   getIntrapartidoMatchesByTeamId,
   getIntrapartidoMatchById,
   saveIntrapartidoMatch as saveIntrapartidoMatchInRepo,
+  deleteIntrapartidoMatch as deleteIntrapartidoMatchInRepo,
 } from '@/repositories/intrapartidoRepository';
 
 const TIMING_IDS = new Set(INTRAPARTIDO_TIMINGS.map((t) => t.id));
@@ -50,31 +52,7 @@ export async function getIntrapartidoMatch(teamId, matchId) {
   if (!result) throw new Error('Partido no encontrado');
 
   const { match, convocados, tomas } = result;
-  const intakes = {};
-  convocados.forEach((c) => {
-    intakes[String(c.jugador_id)] = {};
-  });
-  tomas.forEach((t) => {
-    const pId = String(t.jugador_id);
-    if (!intakes[pId]) return;
-    intakes[pId][t.momento] = { ...(intakes[pId][t.momento] || {}), [t.producto_id]: t.cantidad };
-  });
-
-  return {
-    ok: true,
-    session: {
-      id: String(match.id),
-      matchInfo: {
-        rival: match.rival,
-        competicion: match.competicion,
-        lugar: match.lugar,
-        fecha: match.fecha,
-      },
-      activeRosterIds: convocados.map((c) => String(c.jugador_id)),
-      starterIds: convocados.filter((c) => c.titular).map((c) => String(c.jugador_id)),
-      intakes,
-    },
-  };
+  return { ok: true, session: buildSessionFromRows(match, convocados, tomas) };
 }
 
 export async function saveIntrapartidoMatch(teamId, session) {
@@ -140,5 +118,13 @@ export async function saveIntrapartidoMatch(teamId, session) {
     tomas,
   });
 
+  revalidatePath(`/dashboard/equipo/${teamId}/intrapartido`);
   return { ok: true, id: id == null ? null : String(id) };
+}
+
+export async function deleteIntrapartidoMatch(teamId, matchId) {
+  const { supabase } = await requireTeamAccess(teamId, { write: true });
+  await deleteIntrapartidoMatchInRepo(supabase, teamId, parseId(matchId, 'Partido'));
+  revalidatePath(`/dashboard/equipo/${teamId}/intrapartido`);
+  return { ok: true };
 }

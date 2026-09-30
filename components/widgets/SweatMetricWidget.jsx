@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Box, Group, Paper, Text } from '@mantine/core';
-import Icon3D from '@/components/Icon3D';
+import { Box, Text } from '@mantine/core';
+import WidgetCard, { WidgetAside } from './WidgetCard';
 
 // Umbrales de sodio en sudor (mg/L) según la escala del dispositivo
 const SODIUM_THRESHOLDS = [750, 1100, 1450];
@@ -137,69 +137,25 @@ export default function SweatMetricWidget({
   const lastDate = formatDate(latestSweat?.fecha);
 
   return (
-    <Paper
+    <WidgetCard
       id="widget-sudor"
-      shadow="sm"
-      radius="lg"
-      p={{ base: 'sm', sm: 'md' }}
-      bg="white"
-    >
-      {/* Cabecera: título a la izquierda, valor y estado a la derecha */}
-      <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm" mb="sm">
-        <Group gap="xs" align="center" wrap="nowrap">
-          <Icon3D name="running" size={28} />
-          <Text fw={700} fz="sm" c="dark.5">
-            Sudoración
+      icon="running"
+      title="Sudoración"
+      aside={
+        <Text lh={1} mb="sm" style={{ fontVariantNumeric: 'tabular-nums' }}>
+          <Text span fz={28} fw={800} c="dark.6">
+            {formatMetricNumber(numVal, 0)}
+          </Text>{' '}
+          <Text span fz="xs" fw={600} c="dimmed">
+            {unit}
           </Text>
-        </Group>
-
-        <Group gap={2} align="center" style={{ minWidth: 0 }}>
-          {statusSegment && (
-            <Text fz="xs" fw={700} c="orange.8" style={{ whiteSpace: 'nowrap' }} pr="xs">
-              {statusSegment.status}
-            </Text>
-          )}
-          {hasValue ? (
-            <Text lh={1} style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-              <Text span fz={{ base: 24, sm: 28 }} fw={800} c="orange.7">
-                {formatMetricNumber(numVal, 0)}
-              </Text>{' '}
-              <Text span fz="xs" fw={700} c="dimmed">
-                {unit}
-              </Text>
-            </Text>
-          ) : (
-            <Text fz="sm" fw={700} c="dimmed">
-              Sin datos
-            </Text>
-          )}
-
-        </Group>
-      </Group>
-
+        </Text>
+      }
+      footer={`Sodio en sudor${lastDate ? ` · ${lastDate}` : ''}`}
+      footerAction="Ver analítica"
+      onFooterAction={() => router.push(`/dashboard/jugador/${jugadorId}/metricas/hidratacion`)}
+    >
       <SodiumScale value={hasValue ? numVal : null} activeIndex={segmentIndex} />
-
-      {/* Pie de tarjeta idéntico al resto de widgets */}
-      <Group
-        justify="space-between"
-        align="center"
-        mt="xs"
-        pt="xs"
-        style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}
-      >
-        <Text fz="xs" c="dimmed" fw={500}>
-          Sodio en sudor{lastDate ? ` · ${lastDate}` : ''}
-        </Text>
-        <Text
-          fz="xs"
-          fw={600}
-          c="dark.4"
-          style={{ cursor: 'pointer' }}
-          onClick={() => router.push(`/dashboard/jugador/${jugadorId}/metricas/hidratacion`)}
-        >
-          Ver analítica →
-        </Text>
-      </Group>
-    </Paper>
+    </WidgetCard>
   );
 }

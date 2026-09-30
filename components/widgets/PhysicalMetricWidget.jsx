@@ -1,8 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Box, Paper, Stack, Text, Tooltip, Divider, Group } from '@mantine/core';
-import Icon3D from '@/components/Icon3D';
+import { Box, Stack, Text, Tooltip, Divider, Group } from '@mantine/core';
+import WidgetCard, { WidgetAside } from './WidgetCard';
+
+const STATUS_COLORS = { verde: 'teal', amarillo: 'yellow', rojo: 'red' };
 
 const statusConfigMap = {
   verde: {
@@ -85,46 +87,30 @@ export default function PhysicalMetricWidget({
       w={240}
       multiline
     >
-      <Paper
-        id="widget-fisico"
-        shadow="sm"
-        radius="lg"
-        p={{ base: 'xs', sm: 'sm' }}
-        bg="white"
-        h="100%"
-        onClick={() => router.push(`/dashboard/jugador/${jugadorId}/metricas/pesos`)}
-        style={{
-          cursor: 'pointer',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-        }}
-      >
-        <Stack align="center" justify="center" gap={4} w="100%" ta="center">
-          <Icon3D name="gym" size={44} style={{ marginBottom: 2 }} />
-
-          <Box style={{ width: '100%' }}>
-            <Text fz={{ base: 13, sm: 17 }} fw={700} c="dark.5" lh={1.1} truncate="end">
-              {pesoActual ? `${formatMetricNumber(pesoActual, 1)} kg` : '-'}
-            </Text>
+      <Box h="100%">
+        <WidgetCard
+          id="widget-fisico"
+          icon="gym"
+          title="Físico"
+          onClick={() => router.push(`/dashboard/jugador/${jugadorId}/metricas/pesos`)}
+        >
+          <Text fz={24} fw={800} c="dark.6" lh={1.1} style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+            {pesoActual ? formatMetricNumber(pesoActual, 1) : '—'}
+            <Text span fz="xs" fw={600} c="dimmed"> kg</Text>
+          </Text>
+          <Box mt={6} w="fit-content">
             {hasSemaforo ? (
-              <Text fz={{ base: 11, sm: 'xs' }} fw={600} style={{ color: cfg.color, whiteSpace: 'nowrap' }} mt={2}>
-                {formattedDiff ? `${formattedDiff} ${cfg.title}` : cfg.title}
-              </Text>
+              <WidgetAside color={STATUS_COLORS[status] || 'teal'} dot>
+                {formattedDiff ? `${formattedDiff} · ${cfg.title}` : cfg.title}
+              </WidgetAside>
             ) : (
-              <Text fz={{ base: 11, sm: 'xs' }} fw={600} c="teal.7" mt={2} style={{ whiteSpace: 'nowrap' }}>
-                {porcentajeGrasa ? `${formatMetricNumber(porcentajeGrasa, 1)}% gr` : (formattedDiff || 'Al día')}
-              </Text>
+              <WidgetAside color="teal">
+                {porcentajeGrasa ? `${formatMetricNumber(porcentajeGrasa, 1)}% grasa` : 'Al día'}
+              </WidgetAside>
             )}
           </Box>
-
-          <Text fz="xs" fw={600} c="dimmed" tt="uppercase" lts={0.5}>
-            Físico
-          </Text>
-        </Stack>
-      </Paper>
+        </WidgetCard>
+      </Box>
     </Tooltip>
   );
 }

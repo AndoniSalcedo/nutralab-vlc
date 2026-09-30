@@ -55,3 +55,77 @@ export async function saveIntrapartidoMatch(supabase, params) {
   if (error) throw error;
   return data;
 }
+
+export async function deleteIntrapartidoMatch(supabase, teamId, matchId) {
+  if (isMockTeam(teamId)) return;
+
+  const { error } = await supabase
+    .from('partidos_intrapartido')
+    .delete()
+    .eq('id', matchId)
+    .eq('equipo_id', teamId);
+
+  if (error) throw error;
+}
+
+// PostgREST devuelve como máximo 1000 filas por consulta: se pagina.
+async function fetchAllRows(buildQuery) {
+  const pageSize = 1000;
+  const rows = [];
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await buildQuery().range(from, from + pageSize - 1);
+    if (error) throw error;
+    rows.push(...(data || []));
+    if (!data || data.length < pageSize) break;
+  }
+  return rows;
+}
+
+/**
+ * Historial completo del equipo: cada partido con su convocatoria y sus tomas.
+ * @returns {Promise<Array<{ match: object, convocados: object[], tomas: object[] }>>}
+ */
+export async function getIntrapartidoHistoryByTeamId(supabase, teamId) {
+  const matches = await getIntrapartidoMatchesByTeamId(supabase, teamId);
+  if (matches.length === 0) return [];
+
+  const ids = matches.map((m) => m.id);
+  const [convocados, tomas] = await Promise.all([
+    fetchAllRows(() =>
+      supabase
+        .from('partido_convocados')
+        .select('partido_id,jugador_id,titular')
+        .in('partido_id', ids)
+        .order('partido_id')
+        .order('jugador_id'),
+    ),
+    fetchAllRows(() =>
+      supabase
+        .from('partido_tomas')
+        .select('partido_id,jugador_id,momento,producto_id,cantidad')
+        .in('partido_id', ids)
+        .order('partido_id')
+        .order('jugador_id')
+        .order('momento')
+        .order('producto_id'),
+    ),
+  ]);
+
+  const group = (rows) => {
+    const map = new Map();
+    rows.forEach((row) => {
+      const list = map.get(row.partido_id) || [];
+      list.push(row);
+      map.set(row.partido_id, list);
+    });
+    return map;
+  };
+  const convocadosByMatch = group(convocados);
+  const tomasByMatch = group(tomas);
+
+  return matches.map((match) => ({
+    match,
+    convocados: convocadosByMatch.get(match.id) || [],
+    tomas: tomasByMatch.get(match.id) || [],
+  }));
+}

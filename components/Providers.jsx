@@ -64,6 +64,13 @@ import CookieBanner from '@/components/legal/CookieBanner';
 
 export default function Providers({ children }) {
   useEffect(() => {
+    // En dev los chunks de /_next/static no cambian de URL: el SW (cache-first) serviría JS antiguo
+    if ('serviceWorker' in navigator && process.env.NODE_ENV !== 'production') {
+      navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((r) => r.unregister()));
+      caches.keys().then((names) => names.forEach((n) => caches.delete(n)));
+      return;
+    }
+
     if ('serviceWorker' in navigator) {
       const registerSW = () => {
         navigator.serviceWorker.register('/sw.js').then(

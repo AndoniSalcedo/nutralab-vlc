@@ -37,7 +37,7 @@ import {
 import Icon3D from '@/components/Icon3D';
 import ResponsiveModal from './ResponsiveModal';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
-import { downloadXlsx } from '@/lib/io/xlsx-download';
+import { exportIntrapartidoExcel } from '@/lib/io/intrapartido-export';
 import {
   INTRAPARTIDO_TIMINGS,
   INTRAPARTIDO_PRODUCTS,
@@ -106,6 +106,8 @@ export default function IntrapartidoModal({
   players = [],
   team = null,
   readOnly = false,
+  matchId = null,
+  onSaved,
 }) {
   // Estado de la sesión del partido (se persiste al guardar)
   const [session, setSession] = useState(() => createEmptySession());
@@ -158,20 +160,29 @@ export default function IntrapartidoModal({
     };
   }, [opened, team?.id]);
 
+  // Apertura desde el historial: editar un partido concreto o empezar uno nuevo
+  useEffect(() => {
+    if (!opened) return;
+    if (matchId) handleLoadMatch(matchId);
+    else handleNewMatch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [opened, matchId]);
+
   const handleNewMatch = () => {
     setSession(createEmptySession());
+    setCurrentStep('alineacion');
     setCurrentPhaseIndex(0);
     setGroupFilter('titulares');
   };
 
-  const handleLoadMatch = async (matchId) => {
-    if (!matchId) {
+  const handleLoadMatch = async (id) => {
+    if (!id) {
       handleNewMatch();
       return;
     }
     setLoadingMatch(true);
     try {
-      const res = await getIntrapartidoMatch(team.id, matchId);
+      const res = await getIntrapartidoMatch(team.id, id);
       setSession(res.session);
       setCurrentPhaseIndex(0);
       setGroupFilter('titulares');
@@ -433,56 +444,8 @@ export default function IntrapartidoModal({
   }, [session.intakes, session.activeRosterIds]);
 
   const handleExportExcel = async () => {
-    const info = session.matchInfo || {};
-    const header = [
-      'Jugador',
-      'Rol',
-      ...INTRAPARTIDO_TIMINGS.map((t) => t.label),
-      'Líquidos (ml)',
-      'Carbohidratos (g)',
-      'Sodio (mg)',
-      'Potasio (mg)',
-      'Cafeína (mg)',
-      'Calorías (kcal)',
-    ];
-    const rows = [
-      ['NUTRALAB - CONTROL INTRAPARTIDO'],
-      ['Equipo:', team?.nombre || '', '', 'Fecha:', info.fecha || ''],
-      ['Rival:', info.rival || '', '', 'Competición:', info.competicion || ''],
-      ['Lugar:', info.lugar || ''],
-      [],
-      header,
-    ];
-
-    session.activeRosterIds.forEach((pId) => {
-      const player = allPlayersMap.get(pId);
-      if (!player) return;
-      const totals = playerNutrientsMap.get(pId) || calculateNutrientTotals([]);
-      const phases = INTRAPARTIDO_TIMINGS.map((t) =>
-        Object.entries(session.intakes[pId]?.[t.id] || {})
-          .map(([productId, qty]) => `${qty}x ${PRODUCTS_MAP.get(productId)?.nombre || productId}`)
-          .join(', '),
-      );
-      rows.push([
-        `${player.nombre} ${player.apellidos || ''}`.trim(),
-        starterSet.has(pId) ? 'Titular' : 'Suplente',
-        ...phases,
-        Math.round(totals.aguaMl),
-        Math.round(totals.carbsG * 10) / 10,
-        Math.round(totals.sodioMg),
-        Math.round(totals.potasioMg),
-        Math.round(totals.cafeinaMg),
-        Math.round(totals.kcal),
-      ]);
-    });
-
     try {
-      await downloadXlsx({
-        filename: `intrapartido-${info.fecha || 'partido'}.xlsx`,
-        sheetName: 'Intrapartido',
-        rows,
-        colWidths: [28, 10, ...INTRAPARTIDO_TIMINGS.map(() => 24), 14, 18, 12, 12, 12, 16],
-      });
+      await exportIntrapartidoExcel({ session, players, team });
     } catch (err) {
       notifications.show({ color: 'red', title: 'Error', message: err.message || 'No se pudo generar el Excel.' });
     }
@@ -491,13 +454,13 @@ export default function IntrapartidoModal({
   const handleSaveSession = async () => {
     setSaving(true);
     try {
-      const res = await saveIntrapartidoMatch(team.id, session);
-      setSession((prev) => ({ ...prev, id: res.id ?? prev.id }));
+      await saveIntrapartidoMatch(team.id, session);
       notifications.show({
         color: 'teal',
         title: 'Registro guardado',
         message: 'Se han guardado las tomas de hidratación y nutrición del partido con éxito.',
       });
+      onSaved?.();
       onClose();
     } catch (err) {
       notifications.show({ color: 'red', title: 'No se pudo guardar', message: err.message || 'Inténtalo de nuevo.' });
