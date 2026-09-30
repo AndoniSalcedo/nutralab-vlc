@@ -8,6 +8,7 @@ import { readDocumentUpload } from '@/lib/security/uploads';
 import { enforceRateLimit } from '@/lib/security/rate-limit';
 import { aiClient as client } from '@/lib/ai/client';
 import { env } from '@/config/env';
+import { trackUsageEvent } from '@/lib/billing/client';
 import {
   insertAnalytics,
   getAnalyticsById,
@@ -116,6 +117,24 @@ export async function uploadAnalitica(fileOrFormData, jugadorIdParam, fechaParam
     parametros,
     pdf_nombre: String(archivo.name || '').slice(0, 200),
   });
+
+  try {
+    await trackUsageEvent({
+      app: 'nutralab-vlc',
+      tenantId: ownedPlayer.equipo_id || ownedPlayer.id,
+      userId: user.id,
+      eventType: 'ANALITICA_SANGRE',
+      description: `Analítica de sangre extraída (${String(archivo.name || 'PDF').slice(0, 100)})`,
+      metadata: {
+        jugadorId: ownedPlayer.id,
+        analiticaId: data?.id,
+        emisor: { tipo: 'nutricionista', nombre: user.name || 'Técnico / Nutricionista Valencia FC', id: user.id },
+        cliente: { tipo: 'cliente', nombre: 'Jugador', id: ownedPlayer.id },
+      },
+    });
+  } catch (billingErr) {
+    console.warn('[analyticActions] Error al reportar evento a billing:', billingErr.message);
+  }
 
   revalidatePath(`/dashboard/jugador/${jugadorId}`);
   return { ok: true, analitica: data };

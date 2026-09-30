@@ -3,9 +3,9 @@
 import { Box, Group, Paper, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 
-// Tesela común del bento del Perfil: fondo blanco sin borde, esquinas amplias y una
-// etiqueta con el color de su categoría (agua azul, suplementos violeta…) para que
-// cada dato se reconozca de un vistazo, al estilo de las apps de salud.
+// Tesela común del bento: fondo blanco sin borde y esquinas amplias. Títulos y enlaces
+// van siempre en tonos neutros; el color de la categoría vive solo en el icono 3D.
+// `color` se conserva como data-tone por si se quiere enganchar estilos por categoría.
 export default function WidgetCard({
   id,
   icon,
@@ -27,6 +27,7 @@ export default function WidgetCard({
   return (
     <Paper
       id={id}
+      data-tone={color}
       radius={24}
       p="md"
       bg={bg}

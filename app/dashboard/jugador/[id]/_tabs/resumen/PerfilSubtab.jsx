@@ -123,6 +123,7 @@ export default function PerfilSubtab({
   messages = [],
   registrosHidratacion = [],
   menus = [],
+  latestPlan = null,
   readOnly = false,
 }) {
   const { user } = usePlayerDashboard();
@@ -331,7 +332,7 @@ export default function PerfilSubtab({
           {/* Bento: teselas de 1 o 2 columnas; lo urgente arriba, las constantes en pares y el detalle debajo */}
           <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
             <Box style={{ gridColumn: 'span 2' }}>
-              <PlanHoyWidget jugador={jugador} selectedDate={selectedDate} />
+              <PlanHoyWidget jugador={jugador} plan={latestPlan} selectedDate={selectedDate} />
             </Box>
 
             <Box style={{ gridColumn: 'span 2' }}>

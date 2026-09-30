@@ -7,6 +7,7 @@ import { getAnalyticsByPlayerId } from '@/repositories/analyticsRepository';
 import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
 import { getPesajesByPlayerId } from '@/repositories/pesajeRepository';
 import { getMenusByTeam } from '@/repositories/menuRepository';
+import { getAiPlansByPlayerId } from '@/repositories/aiPlanRepository';
 import { getHydrationRecordsByPlayerId } from '@/repositories/hydrationRepository';
 import { getMessages } from '@/repositories/messagesRepository';
 import NothingFound from '@/components/NothingFound';
@@ -76,20 +77,25 @@ export default async function JugadorTabPage({ params }) {
   let registrosHidratacion = [];
   let messages = [];
   let menus = [];
+  let latestPlan = null;
   let jugador = rawJugador;
 
   try {
     if (activeTab === 'resumen') {
-      const [resEvoluciones, resPesajes, resHidratacion, resMenus] = await Promise.all([
+      const [resEvoluciones, resPesajes, resHidratacion, resMenus, resPlanes] = await Promise.all([
         getEvolutionsByPlayerId(supabase, id),
         getPesajesByPlayerId(supabase, id),
         getHydrationRecordsByPlayerId(supabase, id),
         rawJugador?.equipo_id ? getMenusByTeam(supabase, rawJugador.equipo_id) : [],
+        // El plan es opcional para el resumen: si falla, el widget muestra su estado vacío
+        getAiPlansByPlayerId(supabase, id).catch(() => []),
       ]);
       evoluciones = resEvoluciones;
       pesajes = resPesajes;
       registrosHidratacion = resHidratacion;
       menus = (resMenus || []).slice(0, 10);
+      // Ordenados por created_at desc: el primero es el último plan publicado
+      latestPlan = (resPlanes || [])[0] || null;
       jugador = withLatestMeasurement(rawJugador, evoluciones, pesajes);
       if (jugador?.equipo_id) {
         messages = await getMessages(supabase, jugador.equipo_id, id);
@@ -139,6 +145,7 @@ export default async function JugadorTabPage({ params }) {
         registrosHidratacion={registrosHidratacion}
         messages={messages}
         menus={menus}
+        latestPlan={latestPlan}
       />
     </BoneyardSkeleton>
   );

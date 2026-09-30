@@ -2,11 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Group, Paper, Skeleton, Text, UnstyledButton } from '@mantine/core';
+import { Box, Group, Paper, Text, UnstyledButton } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import { IconCheck } from '@tabler/icons-react';
 import WidgetCard, { WidgetAside } from './WidgetCard';
-import { getAiPlans } from '@/actions/planActions';
 import { sanitizePlanData } from '@/lib/engine';
 import { getDayTypeColor, getDayTypeLabel } from '@/config/nutrition-days';
 import { formatInteger as formatInt } from '@/lib/utils';
@@ -37,47 +36,14 @@ function isSameDay(a, b) {
   return fmt(a) === fmt(b);
 }
 
-function PlanHoySkeleton() {
-  return (
-    <Paper shadow="sm" radius="lg" p={{ base: 'sm', sm: 'md' }} bg="white" withBorder>
-      <Group justify="space-between" mb="sm">
-        <Skeleton height={28} width="40%" radius="md" />
-        <Skeleton height={14} width={90} radius="xl" />
-      </Group>
-      <Skeleton height={76} radius="md" mb="sm" />
-      <Skeleton height={48} radius="md" />
-    </Paper>
-  );
-}
-
-export default function PlanHoyWidget({ jugador, selectedDate = new Date() }) {
+export default function PlanHoyWidget({ jugador, plan: latestPlan = null, selectedDate = new Date() }) {
   const router = useRouter();
-  const [latestPlan, setLatestPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [pickedIdx, setPickedIdx] = useState(null);
-
+  // La hora actual se lee tras montar: el servidor y el navegador no comparten reloj ni zona horaria
+  const [now, setNow] = useState(null);
   useEffect(() => {
-    if (!jugador?.id) return;
-    let active = true;
-    setLoading(true);
-
-    // Sin filtro de semana: vienen ordenados por created_at desc, el primero es el último plan
-    getAiPlans(jugador.id)
-      .then(({ planes }) => {
-        if (active) setLatestPlan(planes?.[0] || null);
-      })
-      .catch((err) => {
-        console.error('Error fetching latest plan:', err);
-        if (active) setLatestPlan(null);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [jugador?.id]);
+    setNow(new Date());
+  }, []);
 
   // Al cambiar de día se vuelve a la ingesta que toca
   useEffect(() => {
@@ -94,17 +60,14 @@ export default function PlanHoyWidget({ jugador, selectedDate = new Date() }) {
 
   // Ingesta que toca ahora: -1 si no es hoy; meals.length si ya han pasado todas
   const currentIdx = useMemo(() => {
-    if (!isToday || meals.length === 0) return -1;
-    const now = new Date();
+    if (!now || !isToday || meals.length === 0) return -1;
     const hour = now.getHours() + now.getMinutes() / 60;
     const idx = meals.findIndex((m) => {
       const { until } = getMealSlot(m.nombre);
       return until != null && hour < until;
     });
     return idx === -1 ? meals.length : idx;
-  }, [meals, isToday]);
-
-  if (loading) return <PlanHoySkeleton />;
+  }, [meals, isToday, now]);
 
   const goToPlan = () => router.push(`/dashboard/jugador/${jugador.id}/nutricion/plan`);
   const hasPlan = Boolean(day && meals.length > 0);

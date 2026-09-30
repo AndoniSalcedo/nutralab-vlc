@@ -15,6 +15,7 @@ export default function ResumenTab({
   pesajes = [],
   registrosHidratacion = [],
   menus = [],
+  latestPlan = null,
   activeSubtab = 'perfil',
   onSubtabChange,
   readOnly = false,
@@ -51,6 +52,7 @@ export default function ResumenTab({
             messages={messages}
             registrosHidratacion={registrosHidratacion}
             menus={menus}
+            latestPlan={latestPlan}
             readOnly={readOnly}
             isPlayer={isPlayer}
           />
