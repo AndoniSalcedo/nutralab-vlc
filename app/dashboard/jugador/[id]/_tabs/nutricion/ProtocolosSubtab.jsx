@@ -204,6 +204,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
           ) : (
             <NothingFound
               title="Sin protocolos"
+              icon3d="chequered_flag"
               description="No hay protocolos configurados para este tipo de día."
               withPaper
               icon={IconClipboardList}

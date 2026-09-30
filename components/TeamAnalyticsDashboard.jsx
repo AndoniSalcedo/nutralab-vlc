@@ -552,6 +552,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
             <NothingFound
               icon={chartMode === 'historial' ? IconChartLine : IconTrendingUp}
               title={chartMode === 'historial' ? 'Sin historial disponible' : 'Sin datos del parámetro'}
+              icon3d="chart"
               description={
                 chartMode === 'historial'
                   ? `No hay registros históricos del parámetro "${selectedParam}".`
@@ -728,6 +729,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
             <NothingFound
               icon={IconSearch}
               title="Sin resultados"
+              icon3d="search"
               description="No hay jugadores que coincidan con los filtros aplicados."
             />
           )}

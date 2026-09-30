@@ -1,7 +1,7 @@
 import { IconUser, IconNotes, IconMail } from '@/components/icons3d';
-import { IconChartLine, IconReportMedical, IconDroplet, IconClipboardList } from '@/components/icons3d';
-import { IconBrain, IconBottle, IconToolsKitchen } from '@/components/icons3d';
-import { IconScale } from '@/components/icons3d';
+import { IconReportMedical, IconDroplet } from '@/components/icons3d';
+import { IconBrain, IconBottle } from '@/components/icons3d';
+import { IconScale, IconRuler2, IconBentoBox, IconFlag2 } from '@/components/icons3d';
 
 /**
  * Single source of truth for all player dashboard subtab configs.
@@ -45,7 +45,7 @@ const SUBTAB_CONFIGS = {
   metricas: {
     defaultSubtab: 'mediciones',
     tabs: [
-      { value: 'mediciones', icon: IconChartLine, label: 'Mediciones', mobileLabel: 'Med.' },
+      { value: 'mediciones', icon: IconRuler2, label: 'Mediciones', mobileLabel: 'Med.' },
       { value: 'pesos', icon: IconScale, label: 'Pesos', mobileLabel: 'Pesos' },
       { value: 'analiticas', icon: IconReportMedical, label: 'Analíticas', mobileLabel: 'Anali.' },
       { value: 'hidratacion', icon: IconDroplet, label: 'Hidratación', mobileLabel: 'Hidra.' },
@@ -58,7 +58,7 @@ const SUBTAB_CONFIGS = {
         subtitle: 'Historial de peso corporal.',
       },
       mediciones: {
-        icon: IconChartLine,
+        icon: IconRuler2,
         iconColor: 'cyan',
         title: 'Mediciones',
         subtitle: 'Historial de medidas y evolución.',
@@ -82,8 +82,8 @@ const SUBTAB_CONFIGS = {
     tabs: [
       { value: 'plan', icon: IconBrain, label: 'Plan nutricional', mobileLabel: 'Plan' },
       { value: 'suplementacion', icon: IconBottle, label: 'Suplementación', mobileLabel: 'Supl.' },
-      { value: 'menu', icon: IconToolsKitchen, label: 'Menú semanal', mobileLabel: 'Menú' },
-      { value: 'protocolos', icon: IconClipboardList, label: 'Protocolos', mobileLabel: 'Prot.' },
+      { value: 'menu', icon: IconBentoBox, label: 'Menú semanal', mobileLabel: 'Menú' },
+      { value: 'protocolos', icon: IconFlag2, label: 'Protocolos', mobileLabel: 'Prot.' },
     ],
     headers: {
       plan: {
@@ -99,13 +99,13 @@ const SUBTAB_CONFIGS = {
         subtitle: 'Asignación de catálogos.',
       },
       menu: {
-        icon: IconToolsKitchen,
+        icon: IconBentoBox,
         iconColor: 'teal',
         title: 'Menú comedor',
         subtitle: 'Comedor del equipo.',
       },
       protocolos: {
-        icon: IconClipboardList,
+        icon: IconFlag2,
         iconColor: 'dark',
         title: 'Protocolos',
         subtitle: 'Guía nutricional para distintos protocolos.',

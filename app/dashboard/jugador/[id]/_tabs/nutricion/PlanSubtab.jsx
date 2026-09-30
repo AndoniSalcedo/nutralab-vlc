@@ -1417,6 +1417,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
             <NothingFound
               icon={IconBrain}
               title="Sin planes nutricionales"
+              icon3d="salad"
               description="Todavía no hay planes nutricionales creados para este jugador."
               actionLabel={!readOnly ? 'Crear primera ficha' : undefined}
               onAction={!readOnly ? openCreateModal : undefined}

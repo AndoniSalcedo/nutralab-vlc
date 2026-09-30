@@ -194,6 +194,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
         <NothingFound
           icon={IconScale}
           title="Sin registros de peso"
+          icon3d="scale"
           description="Aún no hay registros de peso para este jugador."
           actionLabel={!readOnly ? 'Añadir primer peso' : undefined}
           onAction={!readOnly ? startNew : undefined}

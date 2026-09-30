@@ -423,13 +423,13 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                           <Menu.Item leftSection={<Icon3D name="evolucion" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/evolucion`)}>
                             Evolución equipo
                           </Menu.Item>
-                          <Menu.Item leftSection={<Icon3D name="stethoscope" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/analiticas`)}>
+                          <Menu.Item leftSection={<Icon3D name="microscope" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/analiticas`)}>
                             Analíticas equipo
                           </Menu.Item>
                           <Menu.Item leftSection={<Icon3D name="suplementacion" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/suplementacion`)}>
                             Suplementación
                           </Menu.Item>
-                          <Menu.Item leftSection={<Icon3D name="menu" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/menu`)}>
+                          <Menu.Item leftSection={<Icon3D name="bento_box" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/menu`)}>
                             Menú semanal
                           </Menu.Item>
                           <Menu.Item leftSection={<Icon3D name="configuracion" size={18} />} onClick={() => router.push(`/dashboard/equipo/${team.id}/configuracion`)}>

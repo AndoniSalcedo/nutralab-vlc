@@ -557,6 +557,7 @@ export default function MenuSemanal({
         withPaper
         icon={IconCooking}
         title="Sin menús"
+        icon3d="bento_box"
         description="No hay menús registrados. Sube la foto o PDF del menú de esta semana para empezar."
       />
     );

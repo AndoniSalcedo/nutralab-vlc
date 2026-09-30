@@ -43,10 +43,14 @@ export const ICON_CONFIG = {
 export const ICONS_3D_AVAILABLE = [
   'adhesive_bandage',
   'alarmclock',
+  'ambulance',
   'analiticas',
+  'anatomical_heart',
   'apple',
   'arrowleft',
   'avocado',
+  'balance_scale',
+  'banana',
   'barchart',
   'battery',
   'bed',
@@ -56,85 +60,150 @@ export const ICONS_3D_AVAILABLE = [
   'bolt',
   'bone',
   'book',
+  'bookmark',
   'bowl',
   'boxing_glove',
   'brain',
   'bread',
+  'broccoli',
   'bulb',
+  'busts',
   'butter',
   'calendar',
   'camera',
   'canned_food',
   'card_file_box',
   'card_index',
+  'carrot',
   'chart',
+  'chart_down',
+  'chart_up',
   'chat',
   'check',
+  'cheese',
+  'chequered_flag',
   'clipboard',
+  'cloud',
   'coffee',
+  'compass',
   'configuracion',
   'cooking',
+  'cookie',
+  'corn',
   'cross',
+  'crown',
   'cup',
   'dna',
   'document',
   'droplet',
   'edit',
+  'egg',
   'envelope',
   'evolucion',
   'eye',
   'fire',
+  'first_place',
+  'fish',
   'flag',
   'folder',
   'fork_and_knife',
+  'gem',
   'glass',
+  'goal_net',
+  'grapes',
   'gym',
+  'handshake',
   'heart',
+  'heart_fire',
+  'herb',
+  'honey',
+  'hospital',
   'hourglass',
   'inbox',
   'info',
   'jar',
   'key',
+  'knobs',
+  'label',
+  'laptop',
+  'leafy_green',
+  'ledger',
+  'lemon',
   'link',
   'lock',
+  'lungs',
   'meat',
   'medal',
+  'megaphone',
   'memo',
   'menu',
   'microscope',
+  'milk',
+  'mobile',
+  'moon',
+  'newspaper',
+  'numbers',
+  'olive',
+  'orange',
   'outbox',
   'package',
+  'paint_palette',
+  'paperclip',
+  'pasta',
+  'peanuts',
+  'petri_dish',
+  'picture',
   'pill',
   'pin',
+  'pineapple',
+  'pizza',
   'plantilla',
   'plate',
   'plus',
   'pot',
+  'potato',
+  'poultry',
   'printer',
   'refresh',
   'rice',
+  'rocket',
+  'ruler',
   'running',
   'running_shoe',
   'salad',
+  'salt',
   'sandwich',
   'scale',
   'search',
+  'seedling',
   'shield',
+  'sliders',
   'soccer',
   'sparkles',
+  'speech',
   'spiral_notepad',
+  'sports_medal',
+  'stadium',
   'star',
   'stethoscope',
   'stopwatch',
+  'strawberry',
+  'sun',
   'suplementacion',
   'syringe',
   'target',
+  'tea',
   'testtube',
+  'thermometer',
   'timer_clock',
+  'tooth',
   'trash',
   'trophy',
   'user',
   'warning',
+  'water_bottle',
+  'watermelon',
+  'xray',
 ];
 
 export const ALIASES = {
@@ -190,6 +259,45 @@ export const ALIASES = {
   diario: 'spiral_notepad',
   notepad: 'spiral_notepad',
   bandage: 'adhesive_bandage',
+  send: 'rocket',
+  launch: 'rocket',
+  progress: 'chart_up',
+  growth: 'chart_up',
+  decline: 'chart_down',
+  fruit: 'orange',
+  vegetable: 'carrot',
+  vegetables: 'broccoli',
+  protein: 'egg',
+  dairy: 'milk',
+  carbs: 'pasta',
+  fats: 'olive',
+  fiber: 'leafy_green',
+  hydration: 'water_bottle',
+  temperature: 'thermometer',
+  injury: 'ambulance',
+  heartbeat: 'heart_fire',
+  match: 'stadium',
+  goal: 'goal_net',
+  award: 'first_place',
+  premium: 'crown',
+  tag: 'label',
+  spreadsheet: 'ledger',
+  news: 'newspaper',
+  announcement: 'megaphone',
+  day: 'sun',
+  night: 'moon',
+  sleep: 'moon',
+  growth_plant: 'seedling',
+  palette: 'paint_palette',
+  image: 'picture',
+  photo: 'picture',
+  adjust: 'sliders',
+  measure: 'ruler',
+  lab: 'petri_dish',
+  calculator: 'numbers',
+  collaboration: 'handshake',
+  group: 'busts',
+  comment: 'speech',
 };
 
 export const TABLER_ICON_MAP = {
@@ -230,6 +338,7 @@ export const TABLER_ICON_MAP = {
   coffee: TablerIcons.IconCoffee,
   configuracion: TablerIcons.IconSettings,
   cooking: TablerIcons.IconToolsKitchen,
+  cookie: TablerIcons.IconCookie,
   cross: TablerIcons.IconX,
   cup: TablerIcons.IconCup,
   dna: TablerIcons.IconDna,
@@ -296,6 +405,74 @@ export const TABLER_ICON_MAP = {
   download: TablerIcons.IconDownload,
   upload: TablerIcons.IconUpload,
   logout: TablerIcons.IconLogout,
+  rocket: TablerIcons.IconRocket,
+  chart_up: TablerIcons.IconTrendingUp,
+  chart_down: TablerIcons.IconTrendingDown,
+  banana: TablerIcons.IconBanana || TablerIcons.IconApple,
+  carrot: TablerIcons.IconCarrot,
+  broccoli: TablerIcons.IconSalad,
+  egg: TablerIcons.IconEgg,
+  milk: TablerIcons.IconMilk,
+  cheese: TablerIcons.IconCheese,
+  fish: TablerIcons.IconFish,
+  strawberry: TablerIcons.IconApple,
+  orange: TablerIcons.IconApple,
+  grapes: TablerIcons.IconApple,
+  watermelon: TablerIcons.IconApple,
+  lemon: TablerIcons.IconLemon,
+  pineapple: TablerIcons.IconApple,
+  pasta: TablerIcons.IconSoup,
+  pizza: TablerIcons.IconPizza,
+  honey: TablerIcons.IconBucketDroplet,
+  olive: TablerIcons.IconLeaf,
+  peanuts: TablerIcons.IconGrain,
+  potato: TablerIcons.IconGrain,
+  corn: TablerIcons.IconWheat,
+  leafy_green: TablerIcons.IconLeaf,
+  salt: TablerIcons.IconSalt,
+  poultry: TablerIcons.IconMeat,
+  tea: TablerIcons.IconMug,
+  water_bottle: TablerIcons.IconBottle,
+  thermometer: TablerIcons.IconThermometer,
+  lungs: TablerIcons.IconLungs,
+  tooth: TablerIcons.IconMoodSmile,
+  heart_fire: TablerIcons.IconHeartbeat,
+  anatomical_heart: TablerIcons.IconHeartRateMonitor,
+  ambulance: TablerIcons.IconAmbulance,
+  hospital: TablerIcons.IconBuildingHospital,
+  xray: TablerIcons.IconScan,
+  goal_net: TablerIcons.IconBallFootball,
+  stadium: TablerIcons.IconBuildingStadium,
+  chequered_flag: TablerIcons.IconFlag2,
+  sports_medal: TablerIcons.IconMedal,
+  first_place: TablerIcons.IconAward,
+  crown: TablerIcons.IconCrown,
+  gem: TablerIcons.IconDiamond,
+  laptop: TablerIcons.IconDeviceLaptop,
+  mobile: TablerIcons.IconDeviceMobile,
+  cloud: TablerIcons.IconCloud,
+  paperclip: TablerIcons.IconPaperclip,
+  bookmark: TablerIcons.IconBookmark,
+  label: TablerIcons.IconTag,
+  ledger: TablerIcons.IconFileSpreadsheet,
+  newspaper: TablerIcons.IconNews,
+  megaphone: TablerIcons.IconSpeakerphone,
+  compass: TablerIcons.IconCompass,
+  sun: TablerIcons.IconSun,
+  moon: TablerIcons.IconMoon,
+  seedling: TablerIcons.IconPlant,
+  herb: TablerIcons.IconPlant2,
+  paint_palette: TablerIcons.IconPalette,
+  picture: TablerIcons.IconPhoto,
+  balance_scale: TablerIcons.IconScale,
+  sliders: TablerIcons.IconAdjustments,
+  knobs: TablerIcons.IconAdjustmentsHorizontal,
+  ruler: TablerIcons.IconRuler2,
+  petri_dish: TablerIcons.IconFlask,
+  numbers: TablerIcons.IconCalculator,
+  handshake: TablerIcons.IconHeartHandshake,
+  busts: TablerIcons.IconUsersGroup,
+  speech: TablerIcons.IconMessage,
 };
 
 const PRESET_SIZES = {
@@ -567,14 +744,14 @@ const makeIcon = (name3d, TablerComponent) => {
 };
 
 // Activity, Health & Medical
-export const IconActivity = makeIcon('chart', TablerIcons.IconActivity);
-export const IconActivityHeartbeat = makeIcon('heart', TablerIcons.IconActivityHeartbeat);
+export const IconActivity = makeIcon('stopwatch', TablerIcons.IconActivity);
+export const IconActivityHeartbeat = makeIcon('heart_fire', TablerIcons.IconActivityHeartbeat);
 export const IconHeart = makeIcon('heart', TablerIcons.IconHeart);
-export const IconReportMedical = makeIcon('stethoscope', TablerIcons.IconReportMedical);
+export const IconReportMedical = makeIcon('testtube', TablerIcons.IconReportMedical);
 export const IconStethoscope = makeIcon('stethoscope', TablerIcons.IconStethoscope);
 export const IconDna = makeIcon('dna', TablerIcons.IconDna);
 export const IconMicroscope = makeIcon('microscope', TablerIcons.IconMicroscope);
-export const IconTestPipe = makeIcon('testtube', TablerIcons.IconTestPipe);
+export const IconTestPipe = makeIcon('petri_dish', TablerIcons.IconTestPipe);
 
 // Alerts & Info
 export const IconAlertCircle = makeIcon('warning', TablerIcons.IconAlertCircle);
@@ -595,13 +772,13 @@ export const IconJar = makeIcon('jar', TablerIcons.IconBottle);
 export const IconPill = makeIcon('pill', TablerIcons.IconPill);
 export const IconBentoBox = makeIcon('bento_box', TablerIcons.IconBox);
 export const IconCooking = makeIcon('cooking', TablerIcons.IconToolsKitchen);
-export const IconWheat = TablerIcons.IconWheat;
+export const IconWheat = makeIcon('bread', TablerIcons.IconWheat);
 
 // Physical & Metrics
 export const IconDroplet = makeIcon('droplet', TablerIcons.IconDroplet);
 export const IconFlame = makeIcon('fire', TablerIcons.IconFlame);
 export const IconScale = makeIcon('scale', TablerIcons.IconScale);
-export const IconRuler2 = makeIcon('scale', TablerIcons.IconRuler2);
+export const IconRuler2 = makeIcon('ruler', TablerIcons.IconRuler2);
 export const IconBed = makeIcon('bed', TablerIcons.IconBed);
 export const IconRun = makeIcon('running', TablerIcons.IconRun);
 export const IconBarbell = makeIcon('gym', TablerIcons.IconBarbell);
@@ -611,26 +788,26 @@ export const IconHourglass = makeIcon('hourglass', TablerIcons.IconHourglass);
 // Charts & Analytics
 export const IconChartBar = makeIcon('barchart', TablerIcons.IconChartBar);
 export const IconChartLine = makeIcon('chart', TablerIcons.IconChartLine);
-export const IconReportAnalytics = makeIcon('stethoscope', TablerIcons.IconReportAnalytics);
-export const IconFileAnalytics = makeIcon('stethoscope', TablerIcons.IconFileAnalytics);
+export const IconReportAnalytics = makeIcon('analiticas', TablerIcons.IconReportAnalytics);
+export const IconFileAnalytics = makeIcon('analiticas', TablerIcons.IconFileAnalytics);
 export const IconTrendingUp = makeIcon('evolucion', TablerIcons.IconTrendingUp);
 export const IconTrophy = makeIcon('trophy', TablerIcons.IconTrophy);
 
 // Users & Squad
 export const IconUser = makeIcon('user', TablerIcons.IconUser);
-export const IconUserCheck = makeIcon('user', TablerIcons.IconUserCheck);
+export const IconUserCheck = makeIcon('handshake', TablerIcons.IconUserCheck);
 export const IconUserCog = makeIcon('configuracion', TablerIcons.IconUserCog);
 export const IconUserPlus = makeIcon('user', TablerIcons.IconUserPlus);
 export const IconUserStar = makeIcon('star', TablerIcons.IconUserStar);
 export const IconUsers = makeIcon('plantilla', TablerIcons.IconUsers);
-export const IconUsersGroup = makeIcon('plantilla', TablerIcons.IconUsersGroup);
+export const IconUsersGroup = makeIcon('busts', TablerIcons.IconUsersGroup);
 
 // Calendar & Time
 export const IconCalendar = makeIcon('calendar', TablerIcons.IconCalendar);
 export const IconCalendarEvent = makeIcon('calendar', TablerIcons.IconCalendarEvent);
 export const IconCalendarStats = makeIcon('calendar', TablerIcons.IconCalendarStats);
 export const IconClock = makeIcon('alarmclock', TablerIcons.IconClock);
-export const IconHistory = makeIcon('alarmclock', TablerIcons.IconHistory);
+export const IconHistory = makeIcon('hourglass', TablerIcons.IconHistory);
 
 // Navigation & Actions
 export const IconArrowLeft = makeIcon('arrowleft', TablerIcons.IconArrowLeft);
@@ -649,7 +826,7 @@ export const IconTrash = makeIcon('trash', TablerIcons.IconTrash);
 export const IconEdit = makeIcon('edit', TablerIcons.IconEdit);
 export const IconPencil = makeIcon('edit', TablerIcons.IconPencil);
 export const IconCheck = makeIcon('check', TablerIcons.IconCheck);
-export const IconDeviceFloppy = makeIcon('check', TablerIcons.IconDeviceFloppy);
+export const IconDeviceFloppy = makeIcon('bookmark', TablerIcons.IconDeviceFloppy);
 export const IconX = makeIcon('cross', TablerIcons.IconX);
 export const IconLogout = makeIcon('cross', TablerIcons.IconLogout);
 
@@ -657,8 +834,8 @@ export const IconLogout = makeIcon('cross', TablerIcons.IconLogout);
 export const IconClipboardList = makeIcon('clipboard', TablerIcons.IconClipboardList);
 export const IconDocument = makeIcon('document', TablerIcons.IconFileDescription || TablerIcons.IconFileText);
 export const IconFileText = makeIcon('document', TablerIcons.IconFileText);
-export const IconFileSpreadsheet = makeIcon('document', TablerIcons.IconFileSpreadsheet);
-export const IconFileTypePdf = makeIcon('document', TablerIcons.IconFileTypePdf);
+export const IconFileSpreadsheet = makeIcon('ledger', TablerIcons.IconFileSpreadsheet);
+export const IconFileTypePdf = makeIcon('newspaper', TablerIcons.IconFileTypePdf);
 export const IconBook = makeIcon('book', TablerIcons.IconBook);
 export const IconNotes = makeIcon('spiral_notepad', TablerIcons.IconNotes);
 export const IconCardFile = makeIcon('card_file_box', TablerIcons.IconFolders || TablerIcons.IconFolder);
@@ -666,7 +843,7 @@ export const IconFolders = makeIcon('card_file_box', TablerIcons.IconFolders);
 export const IconCopy = makeIcon('memo', TablerIcons.IconCopy);
 export const IconList = makeIcon('menu', TablerIcons.IconList);
 export const IconFolderShare = makeIcon('folder', TablerIcons.IconFolderShare);
-export const IconDatabase = makeIcon('folder', TablerIcons.IconDatabase);
+export const IconDatabase = makeIcon('card_file_box', TablerIcons.IconDatabase);
 export const IconDatabaseImport = makeIcon('inbox', TablerIcons.IconDatabaseImport);
 export const IconDownload = makeIcon('inbox', TablerIcons.IconDownload);
 export const IconInbox = makeIcon('inbox', TablerIcons.IconInbox);
@@ -675,12 +852,12 @@ export const IconUpload = makeIcon('outbox', TablerIcons.IconUpload);
 
 // Media & Device
 export const IconCamera = makeIcon('camera', TablerIcons.IconCamera);
-export const IconPhoto = makeIcon('camera', TablerIcons.IconPhoto);
+export const IconPhoto = makeIcon('picture', TablerIcons.IconPhoto);
 export const IconSearch = makeIcon('search', TablerIcons.IconSearch);
 export const IconZoomIn = makeIcon('search', TablerIcons.IconZoomIn);
 export const IconZoomOut = makeIcon('search', TablerIcons.IconZoomOut);
-export const IconFilter = makeIcon('target', TablerIcons.IconFilter);
-export const IconSortDescending = makeIcon('barchart', TablerIcons.IconSortDescending);
+export const IconFilter = makeIcon('sliders', TablerIcons.IconFilter);
+export const IconSortDescending = makeIcon('chart_down', TablerIcons.IconSortDescending);
 
 // Settings & Security
 export const IconSettings = makeIcon('configuracion', TablerIcons.IconSettings);
@@ -691,13 +868,66 @@ export const IconKey = makeIcon('key', TablerIcons.IconKey);
 
 // Communication & Extras
 export const IconMail = makeIcon('envelope', TablerIcons.IconMail);
-export const IconSend = makeIcon('chat', TablerIcons.IconSend);
+export const IconSend = makeIcon('rocket', TablerIcons.IconSend);
 export const IconBrain = makeIcon('brain', TablerIcons.IconBrain);
 export const IconSparkles = makeIcon('sparkles', TablerIcons.IconSparkles);
-export const IconPalette = makeIcon('sparkles', TablerIcons.IconPalette);
-export const IconCalculator = makeIcon('barchart', TablerIcons.IconCalculator);
+export const IconPalette = makeIcon('paint_palette', TablerIcons.IconPalette);
+export const IconCalculator = makeIcon('numbers', TablerIcons.IconCalculator);
 export const IconFlag = makeIcon('flag', TablerIcons.IconFlag);
 export const IconExternalLink = makeIcon('link', TablerIcons.IconExternalLink);
 export const IconEye = makeIcon('eye', TablerIcons.IconEye);
 export const IconBell = makeIcon('bell', TablerIcons.IconBell);
 export const IconCookie = makeIcon('cookie', TablerIcons.IconCookie);
+
+// Food (extended)
+export const IconBanana = makeIcon('banana', TablerIcons.IconBanana || TablerIcons.IconApple);
+export const IconCarrot = makeIcon('carrot', TablerIcons.IconCarrot);
+export const IconEgg = makeIcon('egg', TablerIcons.IconEgg);
+export const IconMilk = makeIcon('milk', TablerIcons.IconMilk);
+export const IconCheese = makeIcon('cheese', TablerIcons.IconCheese);
+export const IconFish = makeIcon('fish', TablerIcons.IconFish);
+export const IconLemon = makeIcon('lemon', TablerIcons.IconLemon);
+export const IconPizza = makeIcon('pizza', TablerIcons.IconPizza);
+export const IconLeaf = makeIcon('leafy_green', TablerIcons.IconLeaf);
+export const IconPlant = makeIcon('seedling', TablerIcons.IconPlant);
+export const IconPlant2 = makeIcon('herb', TablerIcons.IconPlant2);
+export const IconSalt = makeIcon('salt', TablerIcons.IconSalt);
+export const IconMug = makeIcon('tea', TablerIcons.IconMug);
+
+// Health & Medical (extended)
+export const IconThermometer = makeIcon('thermometer', TablerIcons.IconThermometer);
+export const IconLungs = makeIcon('lungs', TablerIcons.IconLungs);
+export const IconAmbulance = makeIcon('ambulance', TablerIcons.IconAmbulance);
+export const IconBuildingHospital = makeIcon('hospital', TablerIcons.IconBuildingHospital);
+export const IconScan = makeIcon('xray', TablerIcons.IconScan);
+export const IconHeartbeat = makeIcon('heart_fire', TablerIcons.IconHeartbeat);
+export const IconHeartRateMonitor = makeIcon('anatomical_heart', TablerIcons.IconHeartRateMonitor);
+export const IconFlask = makeIcon('petri_dish', TablerIcons.IconFlask);
+export const IconHeartHandshake = makeIcon('handshake', TablerIcons.IconHeartHandshake);
+
+// Sport & Achievements (extended)
+export const IconBuildingStadium = makeIcon('stadium', TablerIcons.IconBuildingStadium);
+export const IconBallFootball = makeIcon('goal_net', TablerIcons.IconBallFootball);
+export const IconFlag2 = makeIcon('chequered_flag', TablerIcons.IconFlag2);
+export const IconMedal = makeIcon('sports_medal', TablerIcons.IconMedal);
+export const IconAward = makeIcon('first_place', TablerIcons.IconAward);
+export const IconCrown = makeIcon('crown', TablerIcons.IconCrown);
+export const IconDiamond = makeIcon('gem', TablerIcons.IconDiamond);
+export const IconRocket = makeIcon('rocket', TablerIcons.IconRocket);
+export const IconTrendingDown = makeIcon('chart_down', TablerIcons.IconTrendingDown);
+
+// Tools, Devices & Misc (extended)
+export const IconDeviceLaptop = makeIcon('laptop', TablerIcons.IconDeviceLaptop);
+export const IconDeviceMobile = makeIcon('mobile', TablerIcons.IconDeviceMobile);
+export const IconCloud = makeIcon('cloud', TablerIcons.IconCloud);
+export const IconPaperclip = makeIcon('paperclip', TablerIcons.IconPaperclip);
+export const IconBookmark = makeIcon('bookmark', TablerIcons.IconBookmark);
+export const IconTag = makeIcon('label', TablerIcons.IconTag);
+export const IconNews = makeIcon('newspaper', TablerIcons.IconNews);
+export const IconSpeakerphone = makeIcon('megaphone', TablerIcons.IconSpeakerphone);
+export const IconMessage = makeIcon('speech', TablerIcons.IconMessage);
+export const IconCompass = makeIcon('compass', TablerIcons.IconCompass);
+export const IconSun = makeIcon('sun', TablerIcons.IconSun);
+export const IconMoon = makeIcon('moon', TablerIcons.IconMoon);
+export const IconAdjustments = makeIcon('sliders', TablerIcons.IconAdjustments);
+export const IconAdjustmentsHorizontal = makeIcon('knobs', TablerIcons.IconAdjustmentsHorizontal);

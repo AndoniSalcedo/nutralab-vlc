@@ -24,6 +24,7 @@ export default async function TeamSupplementationPage({ params, searchParams }) 
     return (
       <NothingFound
         title="Sin acceso"
+        icon3d="lock"
         description="No se pudo cargar este equipo o no tienes acceso."
         actionLabel="Volver a equipos"
         actionHref="/dashboard"

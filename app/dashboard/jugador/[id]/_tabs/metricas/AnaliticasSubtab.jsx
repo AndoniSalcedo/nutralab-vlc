@@ -380,6 +380,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
             <NothingFound
               icon={IconReportMedical}
               title="Sin analíticas"
+              icon3d="microscope"
               description="No hay analíticas subidas para este jugador."
               actionLabel={!readOnly ? 'Añadir primera analítica' : undefined}
               onAction={!readOnly ? startUpload : undefined}

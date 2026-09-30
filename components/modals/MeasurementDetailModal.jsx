@@ -39,7 +39,7 @@ export default function MeasurementDetailModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <Icon3D name="eye" size={26} />
+          <Icon3D name="ruler" size={26} />
           <Text fw={700}>
             {detailRow ? `${playerName(detailRow)} · ${formatDate(detailMeasurement?.fecha)}` : 'Detalle de medición'}
           </Text>

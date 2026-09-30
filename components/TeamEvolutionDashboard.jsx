@@ -71,8 +71,8 @@ const METRIC_STYLE = {
   peso_kg: { icon: 'scale', color: 'blue' },
   porcentaje_grasa: { icon: 'fire', color: 'red' },
   porcentaje_musculo: { icon: 'gym', color: 'green' },
-  suma_6_pliegues: { icon: 'target', color: 'orange' },
-  suma_8_pliegues: { icon: 'target', color: 'violet' },
+  suma_6_pliegues: { icon: 'ruler', color: 'orange' },
+  suma_8_pliegues: { icon: 'sliders', color: 'violet' },
   perimetro_muslo_derecho: { icon: 'running', color: 'cyan' },
   perimetro_muslo_izquierdo: { icon: 'running', color: 'teal' },
   perimetro_pantorrilla_derecha: { icon: 'running_shoe', color: 'lime' },
@@ -1359,6 +1359,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                 withPaper
                 icon={IconChartLine}
                 title="Sin datos"
+                icon3d="chart_down"
                 description="No hay mediciones para los filtros seleccionados."
               />
             )}
@@ -1467,6 +1468,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                 withPaper
                 icon={IconCalendarStats}
                 title="Sin mediciones ese día"
+                icon3d="ruler"
                 description="No hay jugadores medidos para la fecha seleccionada."
               />
             )}
@@ -2488,6 +2490,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                 withPaper
                 icon={IconFilter}
                 title={tableFilterMode === 'filter' && activeFilters.length > 0 ? "Sin jugadores coincidentes" : "Sin datos"}
+                icon3d="chart_down"
                 description={
                   tableFilterMode === 'filter' && activeFilters.length > 0
                     ? "Ningún jugador cumple con las reglas de filtrado activas. Puedes cambiar la acción en la tabla a 'Solo colorear' para ver toda la plantilla con sus celdas semaforizadas."

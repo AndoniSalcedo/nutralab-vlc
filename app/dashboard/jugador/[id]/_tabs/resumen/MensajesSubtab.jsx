@@ -119,6 +119,7 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
           <NothingFound
             icon={IconInbox}
             title="Sin mensajes"
+            icon3d="speech"
             description="Cuando el nutricionista envíe comunicaciones aparecerán aquí."
           />
         )}

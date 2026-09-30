@@ -19,6 +19,7 @@ export default async function TeamAnalyticsPage({ params }) {
     return (
       <NothingFound
         title="Sin acceso"
+        icon3d="lock"
         description="No se pudo cargar este equipo o no tienes acceso."
         actionLabel="Volver a equipos"
         actionHref="/dashboard"

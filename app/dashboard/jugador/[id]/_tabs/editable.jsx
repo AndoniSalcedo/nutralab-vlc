@@ -36,6 +36,8 @@ import WidgetCard from '@/components/widgets/WidgetCard';
 // Color de categoría de cada campo del perfil (mismo criterio que las teselas del Perfil)
 const ICON_COLORS = {
   target: 'red',
+  goal_net: 'red',
+  strawberry: 'pink',
   scale: 'teal',
   apple: 'lime',
   warning: 'orange',

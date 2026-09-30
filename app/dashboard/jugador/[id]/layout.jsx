@@ -19,6 +19,7 @@ export default async function JugadorLayout({ children, params }) {
       return (
         <NothingFound
           title="Sin acceso"
+          icon3d="lock"
           description="No tienes acceso a este jugador."
           actionLabel="Volver al panel"
           actionHref="/dashboard"
@@ -39,6 +40,7 @@ export default async function JugadorLayout({ children, params }) {
     return (
       <NothingFound
         title="Jugador no encontrado"
+        icon3d="search"
         description="No se pudo cargar la información del jugador o no existe."
         actionLabel="Volver al panel"
         actionHref="/dashboard"
@@ -51,6 +53,7 @@ export default async function JugadorLayout({ children, params }) {
     return (
       <NothingFound
         title="Sin acceso"
+        icon3d="lock"
         description="No tienes acceso a este jugador."
         actionLabel="Volver al panel"
         actionHref="/dashboard"

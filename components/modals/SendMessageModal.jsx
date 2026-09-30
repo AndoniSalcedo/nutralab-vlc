@@ -26,7 +26,7 @@ export default function SendMessageModal({
   const modalTitle = (
     <Group justify="space-between" align="center" w="100%" pr={{ base: 2, sm: 16 }} wrap="nowrap">
       <Group gap="xs" align="center" wrap="nowrap" style={{ minWidth: 0 }}>
-        <Icon3D name="chat" size={22} />
+        <Icon3D name="speech" size={22} />
         <Text fw={700} fz={{ base: 'sm', sm: 'md' }} c="dark.6" truncate>
           Enviar Mensaje
         </Text>

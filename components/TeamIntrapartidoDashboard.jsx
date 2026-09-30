@@ -145,7 +145,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
               ? 'Todavía no se ha registrado ningún control intrapartido.'
               : 'Registra el primer control intrapartido con el botón "Nuevo partido".'
           }
-          icon3d="droplet"
+          icon3d="stadium"
           withPaper
         />
       ) : (

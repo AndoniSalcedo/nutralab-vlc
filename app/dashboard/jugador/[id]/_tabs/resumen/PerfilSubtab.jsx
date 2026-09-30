@@ -419,7 +419,7 @@ export default function PerfilSubtab({
               <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
                 <ComidasEditable label="Comidas diarias" numComidas={jugador.num_comidas} postentreno={jugador.postentreno} preentreno={jugador.preentreno} jugadorId={jugador.id} recomendacionesDefecto={jugador.recomendaciones_defecto} jugador={jugador} readOnly={readOnly} />
                 <PrepartidoEditable label="Rutinas pre-partido" configPrepartido={jugador.config_prepartido} numComidas={jugador.num_comidas} postentreno={jugador.postentreno} jugadorId={jugador.id} jugador={jugador} readOnly={readOnly} />
-                <CampoEditable icon3d="target" label="Objetivo nutricional" campo="objetivo" valor={jugador.objetivo || ''} jugadorId={jugador.id} tipo="select" opciones={PLAYER_OBJECTIVES} readOnly={readOnly} />
+                <CampoEditable icon3d="goal_net" label="Objetivo nutricional" campo="objetivo" valor={jugador.objetivo || ''} jugadorId={jugador.id} tipo="select" opciones={PLAYER_OBJECTIVES} readOnly={readOnly} />
                 <CampoEditable
                   icon3d="scale"
                   label="% Grasa Objetivo (Semáforo)"
@@ -434,7 +434,7 @@ export default function PerfilSubtab({
                   suffix=" %"
                   readOnly={readOnly}
                 />
-                <CampoEditable icon3d="apple" label="Gustos y preferencias" campo="gustos_preferencias" valor={jugador.gustos_preferencias || ''} jugadorId={jugador.id} readOnly={readOnly} />
+                <CampoEditable icon3d="strawberry" label="Gustos y preferencias" campo="gustos_preferencias" valor={jugador.gustos_preferencias || ''} jugadorId={jugador.id} readOnly={readOnly} />
                 <CampoEditable icon3d="warning" label="Aversiones" campo="aversiones" valor={jugador.aversiones || ''} jugadorId={jugador.id} readOnly={readOnly} />
                 <CampoEditable
                   icon3d="shield"

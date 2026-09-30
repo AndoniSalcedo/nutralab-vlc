@@ -483,6 +483,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
             <NothingFound
               icon={IconRuler2}
               title="Sin mediciones"
+              icon3d="ruler"
               description="Aún no se han registrado mediciones corporales para este jugador."
               actionLabel={!readOnly ? 'Añadir primera medición' : undefined}
               onAction={!readOnly ? startNew : undefined}

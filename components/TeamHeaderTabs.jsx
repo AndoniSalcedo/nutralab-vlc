@@ -28,10 +28,10 @@ import Icon3D from '@/components/Icon3D';
 const TABS = [
   { value: 'plantilla', label: 'Plantilla', href: (id) => `/dashboard/equipo/${id}`, icon3d: 'plantilla' },
   { value: 'evolucion', label: 'Evolución', href: (id) => `/dashboard/equipo/${id}/evolucion`, icon3d: 'evolucion' },
-  { value: 'analiticas', label: 'Analíticas', href: (id) => `/dashboard/equipo/${id}/analiticas`, icon3d: 'stethoscope' },
-  { value: 'intrapartido', label: 'Intrapartido', href: (id) => `/dashboard/equipo/${id}/intrapartido`, icon3d: 'droplet' },
+  { value: 'analiticas', label: 'Analíticas', href: (id) => `/dashboard/equipo/${id}/analiticas`, icon3d: 'microscope' },
+  { value: 'intrapartido', label: 'Intrapartido', href: (id) => `/dashboard/equipo/${id}/intrapartido`, icon3d: 'stadium' },
   { value: 'suplementacion', label: 'Suplementación', href: (id) => `/dashboard/equipo/${id}/suplementacion`, icon3d: 'suplementacion' },
-  { value: 'menu', label: 'Menú semanal', href: (id) => `/dashboard/equipo/${id}/menu`, icon3d: 'fork_and_knife' },
+  { value: 'menu', label: 'Menú semanal', href: (id) => `/dashboard/equipo/${id}/menu`, icon3d: 'bento_box' },
   { value: 'configuracion', label: 'Configuración', href: (id) => `/dashboard/equipo/${id}/configuracion`, icon3d: 'configuracion' },
 ];
 
