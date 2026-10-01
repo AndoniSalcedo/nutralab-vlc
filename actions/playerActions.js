@@ -375,7 +375,7 @@ export async function savePlayer(form) {
         await trackUsageEvent({
           app: 'nutralab-vlc',
           tenantId: targetTeam.id,
-          tenantName: targetTeam.nombre || 'Valencia FC',
+          tenantName: targetTeam.nombre || 'Valencia C.F.',
           userId: user.id,
           eventType: 'ALTA_JUGADOR',
           description: `Alta inicial de jugador: ${payload.nombre} ${payload.apellidos}`.trim(),
@@ -569,7 +569,7 @@ async function importGroups({ supabase, team, plan, players, decisions, user }) 
             await trackUsageEvent({
               app: 'nutralab-vlc',
               tenantId: team.id,
-              tenantName: team.nombre || 'Valencia FC',
+              tenantName: team.nombre || 'Valencia C.F.',
               userId: user?.id,
               eventType: 'ALTA_JUGADOR',
               description: `Alta inicial de jugador (Excel): ${player.nombre || ''} ${player.apellidos || ''}`.trim(),

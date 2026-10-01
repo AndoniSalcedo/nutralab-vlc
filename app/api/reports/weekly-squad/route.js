@@ -275,7 +275,7 @@ async function loadPlayersWithMeasurements(
           await trackUsageEvent({
             app: 'nutralab-vlc',
             tenantId: team.id,
-            tenantName: team.nombre || 'Valencia FC',
+            tenantName: team.nombre || 'Valencia C.F.',
             userId: user?.id,
             eventType: 'GENERACION_PLAN',
             description: `Plan nutricional (${player.nombre || 'Jugador'} - ${semana || 'Semana'})`,

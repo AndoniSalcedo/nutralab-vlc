@@ -110,7 +110,7 @@ async function createAiPlan(payload) {
       await trackUsageEvent({
         app: 'nutralab-vlc',
         tenantId: jugadorConMetricas?.equipo_id || jugador.id,
-        tenantName: jugadorConMetricas?.equipos?.nombre || 'Valencia FC',
+        tenantName: jugadorConMetricas?.equipos?.nombre || 'Valencia C.F.',
         userId: user.id,
         eventType: 'GENERACION_PLAN',
         description: `Plan nutricional (${planNombre})`,

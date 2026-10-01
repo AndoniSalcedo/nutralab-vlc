@@ -301,14 +301,14 @@ IMPORTANTE:
   };
   const cliente = {
     tipo: 'cliente',
-    nombre: team.nombre || 'Valencia FC',
+    nombre: team.nombre || 'Valencia C.F.',
     id: team.id,
   };
 
   trackUsageEvent({
     app: 'nutralab-vlc',
     tenantId: team.id,
-    tenantName: team.nombre || 'Valencia FC',
+    tenantName: team.nombre || 'Valencia C.F.',
     userId: user.id,
     eventType: 'MENU_SEMANAL',
     description: `Menú semanal extraído (${finalSemana})`,
