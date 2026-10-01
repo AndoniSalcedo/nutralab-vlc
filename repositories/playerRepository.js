@@ -156,7 +156,7 @@ export async function getPlayerWithTeamConfig(supabase, id) {
 
   const { data, error } = await supabase
     .from('jugadores')
-    .select('*, equipos(configuracion_nutricional)')
+    .select('*, equipos(nombre, configuracion_nutricional)')
     .eq('id', id)
     .single();
 
