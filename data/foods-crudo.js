@@ -421,7 +421,7 @@ export const FOODS_CRUDO = [
     "fat": 0.6,
     "tags": [],
     "minGrams": 50,
-    "maxGrams": 170,
+    "maxGrams": 200,
     "treePath": [
       "hidratos",
       "arroz"
@@ -436,7 +436,7 @@ export const FOODS_CRUDO = [
     "fat": 0.6,
     "tags": [],
     "minGrams": 50,
-    "maxGrams": 170,
+    "maxGrams": 200,
     "treePath": [
       "hidratos",
       "arroz"
@@ -452,8 +452,8 @@ export const FOODS_CRUDO = [
       "lactosa",
       "proteina_vaca"
     ],
-    "minGrams": 50,
-    "maxGrams": 170,
+    "minGrams": 80,
+    "maxGrams": 200,
     "treePath": [
       "suplementos",
       "dulces_otros"
@@ -468,7 +468,7 @@ export const FOODS_CRUDO = [
     "fat": 2.7,
     "tags": [],
     "minGrams": 50,
-    "maxGrams": 170,
+    "maxGrams": 200,
     "treePath": [
       "hidratos",
       "arroz"
@@ -483,7 +483,7 @@ export const FOODS_CRUDO = [
     "fat": 0.6,
     "tags": [],
     "minGrams": 50,
-    "maxGrams": 170,
+    "maxGrams": 200,
     "treePath": [
       "hidratos",
       "arroz"
@@ -497,7 +497,7 @@ export const FOODS_CRUDO = [
     "pro": 1.6,
     "fat": 0.1,
     "tags": [],
-    "minGrams": 150,
+    "minGrams": 100,
     "maxGrams": 450,
     "defaultGrams": 250,
     "treePath": [
@@ -513,8 +513,8 @@ export const FOODS_CRUDO = [
     "pro": 1.6,
     "fat": 0.2,
     "tags": [],
-    "minGrams": 150,
-    "maxGrams": 450,
+    "minGrams": 100,
+    "maxGrams": 400,
     "defaultGrams": 250,
     "treePath": [
       "hidratos",
@@ -583,7 +583,7 @@ export const FOODS_CRUDO = [
       "gluten"
     ],
     "minGrams": 50,
-    "maxGrams": 170,
+    "maxGrams": 200,
     "treePath": [
       "hidratos",
       "otros_granos"
@@ -600,8 +600,8 @@ export const FOODS_CRUDO = [
       "gluten",
       "sin_lactosa_especial"
     ],
-    "minGrams": 50,
-    "maxGrams": 170,
+    "minGrams": 100,
+    "maxGrams": 300,
     "treePath": [
       "lacteos",
       "leches"
@@ -636,7 +636,7 @@ export const FOODS_CRUDO = [
       "gluten"
     ],
     "minGrams": 30,
-    "maxGrams": 80,
+    "maxGrams": 100,
     "treePath": [
       "hidratos",
       "panes"
@@ -772,7 +772,7 @@ export const FOODS_CRUDO = [
       "sin_gluten_especial"
     ],
     "minGrams": 30,
-    "maxGrams": 80,
+    "maxGrams": 100,
     "treePath": [
       "hidratos",
       "panes"
@@ -808,7 +808,7 @@ export const FOODS_CRUDO = [
       "sin_gluten_especial"
     ],
     "minGrams": 50,
-    "maxGrams": 170,
+    "maxGrams": 200,
     "treePath": [
       "hidratos",
       "pasta"
@@ -825,7 +825,7 @@ export const FOODS_CRUDO = [
       "gluten"
     ],
     "minGrams": 50,
-    "maxGrams": 170,
+    "maxGrams": 200,
     "treePath": [
       "hidratos",
       "pasta"
@@ -842,7 +842,7 @@ export const FOODS_CRUDO = [
       "gluten"
     ],
     "minGrams": 50,
-    "maxGrams": 170,
+    "maxGrams": 200,
     "treePath": [
       "hidratos",
       "pasta"
@@ -859,7 +859,7 @@ export const FOODS_CRUDO = [
       "sin_gluten_especial"
     ],
     "minGrams": 50,
-    "maxGrams": 170,
+    "maxGrams": 200,
     "treePath": [
       "hidratos",
       "pasta"
@@ -876,7 +876,7 @@ export const FOODS_CRUDO = [
       "sin_gluten_especial"
     ],
     "minGrams": 50,
-    "maxGrams": 170,
+    "maxGrams": 200,
     "treePath": [
       "hidratos",
       "pasta"
@@ -890,7 +890,7 @@ export const FOODS_CRUDO = [
     "pro": 2,
     "fat": 0.1,
     "tags": [],
-    "minGrams": 150,
+    "minGrams": 100,
     "maxGrams": 450,
     "defaultGrams": 250,
     "treePath": [
@@ -906,8 +906,8 @@ export const FOODS_CRUDO = [
     "pro": 2,
     "fat": 0.5,
     "tags": [],
-    "minGrams": 150,
-    "maxGrams": 450,
+    "minGrams": 100,
+    "maxGrams": 400,
     "defaultGrams": 250,
     "treePath": [
       "hidratos",
@@ -955,7 +955,7 @@ export const FOODS_CRUDO = [
     "fat": 6.1,
     "tags": [],
     "minGrams": 50,
-    "maxGrams": 170,
+    "maxGrams": 180,
     "treePath": [
       "hidratos",
       "otros_granos"
@@ -970,7 +970,7 @@ export const FOODS_CRUDO = [
     "fat": 2,
     "tags": [],
     "minGrams": 20,
-    "maxGrams": 60,
+    "maxGrams": 70,
     "treePath": [
       "hidratos",
       "cereales"
@@ -985,7 +985,7 @@ export const FOODS_CRUDO = [
     "fat": 2.2,
     "tags": [],
     "minGrams": 20,
-    "maxGrams": 60,
+    "maxGrams": 70,
     "treePath": [
       "hidratos",
       "cereales"
@@ -1035,7 +1035,7 @@ export const FOODS_CRUDO = [
     "tags": [
       "gluten"
     ],
-    "minGrams": 60,
+    "minGrams": 40,
     "maxGrams": 180,
     "treePath": [
       "hidratos",
@@ -1067,8 +1067,8 @@ export const FOODS_CRUDO = [
     "pro": 12.63,
     "fat": 3.57,
     "tags": [],
-    "minGrams": 50,
-    "maxGrams": 170,
+    "minGrams": 40,
+    "maxGrams": 100,
     "treePath": [
       "hidratos",
       "cereales"
@@ -1082,8 +1082,8 @@ export const FOODS_CRUDO = [
     "pro": 0.7,
     "fat": 0.3,
     "tags": [],
-    "minGrams": 100,
-    "maxGrams": 220,
+    "minGrams": 80,
+    "maxGrams": 200,
     "treePath": [
       "frutas"
     ]
@@ -1131,8 +1131,8 @@ export const FOODS_CRUDO = [
     "pro": 1.2,
     "fat": 0.7,
     "tags": [],
-    "minGrams": 100,
-    "maxGrams": 220,
+    "minGrams": 80,
+    "maxGrams": 200,
     "treePath": [
       "frutas"
     ]
@@ -1500,7 +1500,7 @@ export const FOODS_CRUDO = [
       "fruto_seco"
     ],
     "minGrams": 15,
-    "maxGrams": 30,
+    "maxGrams": 35,
     "defaultGrams": 25,
     "treePath": [
       "grasas",
@@ -1519,7 +1519,7 @@ export const FOODS_CRUDO = [
       "alto_fodmap"
     ],
     "minGrams": 15,
-    "maxGrams": 30,
+    "maxGrams": 35,
     "defaultGrams": 25,
     "treePath": [
       "grasas",
@@ -1553,7 +1553,7 @@ export const FOODS_CRUDO = [
       "fruto_seco"
     ],
     "minGrams": 15,
-    "maxGrams": 30,
+    "maxGrams": 35,
     "defaultGrams": 25,
     "treePath": [
       "grasas",
@@ -1607,8 +1607,8 @@ export const FOODS_CRUDO = [
       "lactosa",
       "proteina_vaca"
     ],
-    "minGrams": 15,
-    "maxGrams": 40,
+    "minGrams": 10,
+    "maxGrams": 30,
     "treePath": [
       "grasas",
       "aceites",
@@ -1626,7 +1626,7 @@ export const FOODS_CRUDO = [
       "fruto_seco"
     ],
     "minGrams": 15,
-    "maxGrams": 30,
+    "maxGrams": 35,
     "defaultGrams": 25,
     "treePath": [
       "grasas",
@@ -1776,10 +1776,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Leche desnatada",
     "originalName": "Leche desnatada",
-    "kcal": 39,
+    "kcal": 37,
     "cho": 5.28,
     "pro": 3.52,
-    "fat": 2.15,
+    "fat": 0.2,
     "tags": [
       "lactosa",
       "proteina_vaca"
@@ -1959,7 +1959,7 @@ export const FOODS_CRUDO = [
     "kcal": 112.7,
     "cho": 5.4,
     "pro": 19.8,
-    "fat": 4.6,
+    "fat": 1.4,
     "tags": [
       "lactosa",
       "proteina_vaca"
@@ -1977,7 +1977,7 @@ export const FOODS_CRUDO = [
     "kcal": 63.7,
     "cho": 3.3,
     "pro": 12.1,
-    "fat": 2.6,
+    "fat": 0.2,
     "tags": [
       "lactosa",
       "proteina_vaca"
@@ -2090,8 +2090,8 @@ export const FOODS_CRUDO = [
       "gluten",
       "proteina_vegetal"
     ],
-    "minGrams": 30,
-    "maxGrams": 150,
+    "minGrams": 100,
+    "maxGrams": 350,
     "treePath": [
       "proteina",
       "vegetal_proteina"
@@ -2145,7 +2145,7 @@ export const FOODS_CRUDO = [
       "proteina_vegetal"
     ],
     "minGrams": 100,
-    "maxGrams": 220,
+    "maxGrams": 350,
     "treePath": [
       "proteina",
       "vegetal_proteina"
@@ -2163,7 +2163,7 @@ export const FOODS_CRUDO = [
       "proteina_vegetal"
     ],
     "minGrams": 80,
-    "maxGrams": 200,
+    "maxGrams": 250,
     "treePath": [
       "proteina",
       "vegetal_proteina"
@@ -2181,7 +2181,7 @@ export const FOODS_CRUDO = [
       "proteina_vegetal"
     ],
     "minGrams": 100,
-    "maxGrams": 220,
+    "maxGrams": 300,
     "treePath": [
       "proteina",
       "vegetal_proteina"
@@ -2208,10 +2208,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Yogur griego natural desnatado",
     "originalName": "Yogur griego natural desnatado",
-    "kcal": 63.1,
+    "kcal": 59,
     "cho": 3.96,
     "pro": 9.9,
-    "fat": 3.25,
+    "fat": 0.4,
     "tags": [
       "lactosa",
       "proteina_vaca"
@@ -2298,10 +2298,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Yogur natural desnatado",
     "originalName": "Yogur natural desnatado",
-    "kcal": 39.6,
+    "kcal": 38,
     "cho": 5.17,
     "pro": 3.85,
-    "fat": 2.15,
+    "fat": 0.2,
     "tags": [
       "lactosa",
       "proteina_vaca"
@@ -2466,8 +2466,8 @@ export const FOODS_CRUDO = [
       "alto_fodmap",
       "proteina_vegetal"
     ],
-    "minGrams": 35,
-    "maxGrams": 80,
+    "minGrams": 30,
+    "maxGrams": 100,
     "treePath": [
       "proteina",
       "vegetal_proteina"
@@ -2592,8 +2592,8 @@ export const FOODS_CRUDO = [
       "carne_roja",
       "cerdo"
     ],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 100,
+    "maxGrams": 350,
     "treePath": [
       "proteina",
       "carnes_otras"
@@ -2740,8 +2740,8 @@ export const FOODS_CRUDO = [
       "fructosa",
       "lactosa"
     ],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 30,
+    "maxGrams": 150,
     "treePath": [
       "suplementos",
       "otros"
@@ -2776,8 +2776,8 @@ export const FOODS_CRUDO = [
       "fructosa",
       "alto_fodmap"
     ],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 15,
+    "maxGrams": 40,
     "treePath": [
       "suplementos",
       "otros"
@@ -2809,8 +2809,8 @@ export const FOODS_CRUDO = [
       "proteina_vaca",
       "lactosa"
     ],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 30,
+    "maxGrams": 125,
     "treePath": [
       "lacteos",
       "quesos"
@@ -2846,8 +2846,8 @@ export const FOODS_CRUDO = [
     "tags": [
       "fruto_seco"
     ],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 15,
+    "maxGrams": 35,
     "treePath": [
       "grasas",
       "frutos_secos",
@@ -2862,8 +2862,8 @@ export const FOODS_CRUDO = [
     "pro": 20.8,
     "fat": 51.5,
     "tags": [],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 15,
+    "maxGrams": 40,
     "treePath": [
       "grasas",
       "frutos_secos",
@@ -2945,15 +2945,15 @@ export const FOODS_CRUDO = [
   {
     "name": "Secreto de cerdo",
     "originalName": "Secreto de cerdo",
-    "kcal": 290,
+    "kcal": 198,
     "cho": 0,
-    "pro": 17.5,
-    "fat": 24,
+    "pro": 18.5,
+    "fat": 13.8,
     "tags": [
       "cerdo"
     ],
-    "minGrams": 100,
-    "maxGrams": 350,
+    "minGrams": 80,
+    "maxGrams": 250,
     "treePath": [
       "proteina",
       "carne",
@@ -2968,8 +2968,8 @@ export const FOODS_CRUDO = [
     "pro": 30.2,
     "fat": 49.1,
     "tags": [],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 15,
+    "maxGrams": 40,
     "treePath": [
       "grasas",
       "frutos_secos",
@@ -2984,8 +2984,8 @@ export const FOODS_CRUDO = [
     "pro": 16.5,
     "fat": 30.7,
     "tags": [],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 5,
+    "maxGrams": 25,
     "treePath": [
       "grasas",
       "frutos_secos",
@@ -3000,8 +3000,8 @@ export const FOODS_CRUDO = [
     "pro": 18.3,
     "fat": 42.2,
     "tags": [],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 5,
+    "maxGrams": 25,
     "treePath": [
       "grasas",
       "frutos_secos",
@@ -3016,8 +3016,8 @@ export const FOODS_CRUDO = [
     "pro": 17.7,
     "fat": 49.7,
     "tags": [],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 5,
+    "maxGrams": 25,
     "treePath": [
       "grasas",
       "frutos_secos",
@@ -3083,7 +3083,7 @@ export const FOODS_CRUDO = [
     "kcal": 220.4,
     "cho": 0,
     "pro": 27.3,
-    "fat": 1.05,
+    "fat": 12.3,
     "tags": [
       "pescado",
       "pescado_azul"
@@ -3413,9 +3413,9 @@ export const FOODS_CRUDO = [
   {
     "name": "Rape",
     "originalName": "Rape crudo",
-    "kcal": 82,
+    "kcal": 72,
     "cho": 0,
-    "pro": 18.7,
+    "pro": 15.3,
     "fat": 0.8,
     "tags": [
       "pescado",
@@ -3487,7 +3487,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Salmón conserva aceite",
     "originalName": "Salmón conserva aceite",
-    "kcal": 395.2,
+    "kcal": 306,
     "cho": 0,
     "pro": 21,
     "fat": 24.7,
@@ -3579,7 +3579,7 @@ export const FOODS_CRUDO = [
   {
     "name": "Sardina conserva aceite",
     "originalName": "Sardina conserva aceite",
-    "kcal": 395.2,
+    "kcal": 293,
     "cho": 0,
     "pro": 26.25,
     "fat": 20.9,
