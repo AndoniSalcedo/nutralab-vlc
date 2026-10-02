@@ -682,7 +682,7 @@ export const FOODS_MENU = [
     tags: ['gluten'],
     minGrams: 40,
     maxGrams: 180,
-    treePath: ['hidratos', 'panes'],
+    treePath: ['hidratos', 'wraps'],
   },
 
   // ------------------------------------------------------------------------

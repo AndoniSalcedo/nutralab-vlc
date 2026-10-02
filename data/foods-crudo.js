@@ -1005,7 +1005,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 170,
     "treePath": [
       "hidratos",
-      "panes"
+      "wraps"
     ]
   },
   {
@@ -1022,7 +1022,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 170,
     "treePath": [
       "hidratos",
-      "panes"
+      "wraps"
     ]
   },
   {
@@ -1039,7 +1039,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 180,
     "treePath": [
       "hidratos",
-      "panes"
+      "wraps"
     ]
   },
   {
