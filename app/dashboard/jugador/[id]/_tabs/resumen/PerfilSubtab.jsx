@@ -23,7 +23,7 @@ import { CLINICAL_TAGS } from '@/config/clinical-tags';
 import { CampoEditable, ComidasEditable, PrepartidoEditable } from '../editable';
 import { latestMetricValue } from '@/lib/metrics/player';
 import { listPlayerMeals } from '@/actions/mealActions';
-import { getAiPlans } from '@/actions/planActions';
+import { sanitizePlanData } from '@/lib/engine';
 import { getSubtabHeader } from '../subtab-config';
 import { JugadorHeaderCompactMobile } from '@/components/JugadorHeader';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
@@ -103,18 +103,7 @@ function calculateConsumedStats(meals, foods) {
   };
 }
 
-function getDayInfo(date) {
-  const temp = new Date(date);
-  const day = temp.getDay();
-  const diff = temp.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(temp.setDate(diff));
-  const mondayStr = monday.toLocaleDateString('sv-SE', { timeZone: 'Europe/Madrid' });
-
-  const keys = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-  const dayKey = keys[day];
-
-  return { mondayStr, dayKey };
-}
+const DAY_KEYS = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
 
 
 export default function PerfilSubtab({
@@ -138,42 +127,28 @@ export default function PerfilSubtab({
     if (!jugador?.id) return;
     let active = true;
 
-    const { mondayStr, dayKey } = getDayInfo(selectedDate);
     const dateStr = new Date(selectedDate).toLocaleDateString('sv-SE', { timeZone: 'Europe/Madrid' });
 
-    Promise.all([
-      listPlayerMeals(jugador.id, { day: dateStr }),
-      getAiPlans(jugador.id, mondayStr).catch((err) => {
-        console.error('Error fetching plan for week:', err);
-        return { planes: [] };
+    listPlayerMeals(jugador.id, { day: dateStr })
+      .then((mealsData) => {
+        if (active) setMeals(mealsData || []);
       })
-    ]).then(([mealsData, plansData]) => {
-      if (!active) return;
-
-      setMeals(mealsData || []);
-
-      const matchingPlan = plansData.planes?.[0] || null;
-
-      if (matchingPlan) {
-        const planDayType = matchingPlan.datos?.dias?.[dayKey]?.tipoDia;
-        if (planDayType) {
-          setActiveDayType(planDayType);
-        }
-      } else {
-        setActiveDayType('entreno');
-      }
-    }).catch((err) => {
-      console.error('Error in Resumen tab load:', err);
-      if (active) {
-        setMeals([]);
-        setActiveDayType('entreno');
-      }
-    });
+      .catch((err) => {
+        console.error('Error in Resumen tab load:', err);
+        if (active) setMeals([]);
+      });
 
     return () => {
       active = false;
     };
   }, [jugador?.id, selectedDate]);
+
+  // Mismo plan y misma lectura que "Plan de hoy": el tipo de día sale de latestPlan, no de una consulta aparte
+  useEffect(() => {
+    const plan = sanitizePlanData(latestPlan?.datos, jugador?.equipos?.configuracion_nutricional);
+    const dayKey = DAY_KEYS[new Date(selectedDate).getDay()];
+    setActiveDayType(plan?.dias?.[dayKey]?.tipoDia || defaultDiaType);
+  }, [latestPlan, selectedDate, jugador?.equipos?.configuracion_nutricional]);
 
   const consumed = useMemo(() => calculateConsumedStats(meals, []), [meals]);
 
