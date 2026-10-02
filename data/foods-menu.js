@@ -1111,10 +1111,10 @@ export const FOODS_MENU = [
   {
     "name": "Leche entera alto proteína",
     "originalName": "Leche entera alto proteína",
-    "kcal": 69,
-    "cho": 8.64,
-    "pro": 5.76,
-    "fat": 3.79,
+    "kcal": 73,
+    "cho": 4.8,
+    "pro": 6,
+    "fat": 3.3,
     "tags": [
       "lactosa",
       "proteina_vaca"
@@ -1359,7 +1359,7 @@ export const FOODS_MENU = [
     tags: [],
     minGrams: 150,
     maxGrams: 300,
-    treePath: ['suplementos', 'bebidas'],
+    treePath: ['frutas', 'zumos'],
   },
   {
     name: 'Infusiones',

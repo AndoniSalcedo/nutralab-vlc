@@ -1391,6 +1391,21 @@ export const FOODS_CRUDO = [
     ]
   },
   {
+    "name": "Zumo de naranja natural",
+    "originalName": "Zumo de naranja natural",
+    "kcal": 45,
+    "cho": 10.4,
+    "pro": 0.7,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 150,
+    "maxGrams": 300,
+    "treePath": [
+      "frutas",
+      "zumos"
+    ]
+  },
+  {
     "name": "Uvas",
     "originalName": "Uva ",
     "kcal": 69,
@@ -2438,8 +2453,8 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Lenteja",
-    "originalName": "Lenteja seca",
+    "name": "Lentejas",
+    "originalName": "Lentejas",
     "kcal": 353,
     "cho": 60,
     "pro": 25,
