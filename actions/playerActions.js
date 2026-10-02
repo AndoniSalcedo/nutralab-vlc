@@ -11,7 +11,7 @@ import { enforceRateLimit } from '@/lib/security/rate-limit';
 import { readImageUpload, toByteaHex, MAX_DOCUMENT_BYTES } from '@/lib/security/uploads';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '@/config/env';
-import { DEFAULT_PLAYER_MEALS_STRING } from '@/config/nutrition-days';
+import { DEFAULT_PLAYER_MEALS_STRING, normalizeObjective } from '@/config/nutrition-days';
 import { toPositiveNumber as toNumber, cleanText } from '@/lib/utils';
 import {
   TYPED_MEASUREMENT_FIELDS,
@@ -35,6 +35,10 @@ import {
   updateEvolution,
 } from '@/repositories/evolutionRepository';
 import { trackUsageEvent } from '@/lib/billing/client';
+import { personalizePautas, describeAjustes } from '@/lib/nutrition/pauta-personalization';
+
+// Campos del jugador que cambian lo que puede comer: al modificarlos se revisan sus pautas guardadas.
+const RESTRICTION_FIELDS = ['intolerancias', 'aversiones'];
 
 function isValidPassword(password) {
   return typeof password === 'string' && password.length >= 8;
@@ -73,6 +77,8 @@ export async function updatePlayerField(id, field, value) {
   if (field === 'porcentaje_grasa_objetivo') {
     const num = Number(value);
     parsedValue = Number.isFinite(num) && num > 0 ? Math.round(num * 100) / 100 : 10;
+  } else if (field === 'objetivo') {
+    parsedValue = normalizeObjective(value);
   } else if (field === 'protocolos_custom') {
     parsedValue = typeof value === 'object' && value !== null ? value : {};
   } else if (field === 'recomendaciones_defecto' || field === 'config_prepartido') {
@@ -85,9 +91,35 @@ export async function updatePlayerField(id, field, value) {
     parsedValue = validation.data;
   }
 
-  await updatePlayer(supabase, id, { [field]: parsedValue });
+  // Una pauta nunca guarda un alimento que el jugador no puede tomar, y al cambiar sus restricciones se revisan
+  // las pautas ya guardadas. Si algo se ajusta, se devuelve para que el usuario lo vea.
+  let ajustes = [];
+  const update = { [field]: parsedValue };
+  try {
+    const current = await getPlayerById(supabase, id);
+    const merged = { ...current, [field]: parsedValue };
+    if (field === 'recomendaciones_defecto' || field === 'config_prepartido') {
+      const result = personalizePautas(merged, { [field]: parsedValue });
+      update[field] = result[field];
+      ajustes = result.ajustes;
+    } else if (RESTRICTION_FIELDS.includes(field)) {
+      const result = personalizePautas(merged, {
+        recomendaciones_defecto: current?.recomendaciones_defecto,
+        config_prepartido: current?.config_prepartido,
+      });
+      if (result.ajustes.length > 0) {
+        update.recomendaciones_defecto = result.recomendaciones_defecto;
+        update.config_prepartido = result.config_prepartido;
+        ajustes = result.ajustes;
+      }
+    }
+  } catch (err) {
+    console.warn('[updatePlayerField] No se pudieron personalizar las pautas:', err.message);
+  }
+
+  await updatePlayer(supabase, id, update);
   revalidatePath(`/dashboard/jugador/${id}`);
-  return { ok: true };
+  return { ok: true, ...(ajustes.length > 0 ? { ajustes: describeAjustes(ajustes) } : {}) };
 }
 
 export async function updatePlayerCredentials(jugadorIdOrPayload, emailParam, passwordParam) {
@@ -308,7 +340,7 @@ export async function savePlayer(form) {
     contexto_clinico: String(form.get('contexto_clinico') || ''),
     aversiones: String(form.get('aversiones') || ''),
     intolerancias: String(form.get('intolerancias') || ''),
-    objetivo: String(form.get('objetivo') || ''),
+    objetivo: normalizeObjective(String(form.get('objetivo') || '')),
     porcentaje_grasa_objetivo: form.has('porcentaje_grasa_objetivo') && form.get('porcentaje_grasa_objetivo')
       ? Math.round((Number(form.get('porcentaje_grasa_objetivo')) || 10) * 100) / 100
       : 10,
@@ -322,6 +354,24 @@ export async function savePlayer(form) {
     } catch {
       payload.config_prepartido = {};
     }
+  }
+
+  // Las pautas guardadas deben valer al jugador con las restricciones que acaba de guardar el formulario.
+  let ajustes = [];
+  try {
+    const current = id ? await getPlayerById(supabase, id) : null;
+    const merged = { ...(current || {}), ...payload };
+    const result = personalizePautas(merged, {
+      recomendaciones_defecto: current?.recomendaciones_defecto,
+      config_prepartido: payload.config_prepartido ?? current?.config_prepartido,
+    });
+    ajustes = result.ajustes;
+    if (ajustes.length > 0) {
+      if (current?.recomendaciones_defecto) payload.recomendaciones_defecto = result.recomendaciones_defecto;
+      if (result.config_prepartido) payload.config_prepartido = result.config_prepartido;
+    }
+  } catch (err) {
+    console.warn('[savePlayer] No se pudieron personalizar las pautas:', err.message);
   }
 
   if (form.has('avatar')) {
@@ -393,7 +443,7 @@ export async function savePlayer(form) {
   }
 
   revalidatePath(`/dashboard/equipo/${targetTeam.id}`);
-  return { success: true };
+  return { success: true, ...(ajustes.length > 0 ? { ajustes: describeAjustes(ajustes) } : {}) };
 }
 
 export async function deletePlayer(id) {

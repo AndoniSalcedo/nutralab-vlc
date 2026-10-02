@@ -121,6 +121,11 @@ export const PLAYER_OBJECTIVES = [
 
 
 
+/** Objetivo válido del jugador: si el valor no es uno de PLAYER_OBJECTIVES (o falta), se usa el objetivo por defecto. */
+export function normalizeObjective(value) {
+  return PLAYER_OBJECTIVES.some((objective) => objective.value === value) ? value : DEFAULT_OBJECTIVE_KEY;
+}
+
 export function getObjectiveLabel(objectiveKey) {
   return PLAYER_OBJECTIVES.find((o) => o.value === objectiveKey)?.label || objectiveKey || '';
 }
