@@ -6,16 +6,12 @@ import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getAccessibleTeam } from '@/lib/auth/team-access';
 import { withLatestMeasurement } from '@/lib/metrics/player';
 import WeeklySquadReportDocument from '@/components/reports/WeeklySquadReportDocument';
-import { generarDatosPlan, sanitizePlanData } from '@/lib/engine';
+import { sanitizePlanData } from '@/lib/engine';
+import { generatePlanDraft, resolvePlanMenu, savePlan, withReportMeta } from '@/lib/plans/generate';
 import { sanitizeFilename, pdfHeaders as getPdfHeaders } from '@/lib/utils';
-import { getPlayerById, getPlayersByTeam } from '@/repositories/playerRepository';
-import { getTeamById } from '@/repositories/teamRepository';
-import { getWeeklyReport, upsertWeeklyReport } from '@/repositories/weeklyReportsRepository';
+import { getPlayersByTeam } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIds } from '@/repositories/evolutionRepository';
 import { getPesajesByPlayerIds } from '@/repositories/pesajeRepository';
-import { getMenuByWeekAndTeam } from '@/repositories/menuRepository';
-import { getAiPlansByPlayerIdsFull, updateAiPlan, insertAiPlan } from '@/repositories/aiPlanRepository';
-import { trackUsageEvent } from '@/lib/billing/client';
 
 
 export const dynamic = 'force-dynamic';
@@ -61,20 +57,6 @@ function httpError(message, status = 400) {
 
 
 async function resolveTeam(supabase, user, teamId) {
-  if (user.role === 'jugador') {
-    const player = await getPlayerById(supabase, user.id);
-    if (!player?.equipo_id) {
-      throw httpError('No tienes equipo asignado', 403);
-    }
-
-    const team = await getTeamById(supabase, player.equipo_id);
-    if (!team) {
-      throw httpError('No tienes acceso a este equipo', 403);
-    }
-
-    return team;
-  }
-
   const team = await getAccessibleTeam(supabase, user, teamId);
   if (!team) {
     throw httpError('No tienes acceso a este equipo', 403);
@@ -82,29 +64,6 @@ async function resolveTeam(supabase, user, teamId) {
 
   return team;
 }
-
-async function loadStoredMeta(supabase, teamId, semana) {
-  if (!semana) return defaultMeta();
-
-  const informe = await getWeeklyReport(supabase, teamId, semana);
-  return defaultMeta(informe?.meta);
-}
-
-async function persistWeeklyReport(supabase, teamId, meta, semana) {
-  const semanaVal = semana || new Date().toISOString().split('T')[0];
-  try {
-    await upsertWeeklyReport(supabase, teamId, semanaVal, {
-      ...meta,
-      semana: semanaVal,
-    });
-  } catch (error) {
-    console.error('Error saving weekly report configuration:', error);
-    throw httpError('Error al guardar el informe en la base de datos', 500);
-  }
-
-  return semanaVal;
-}
-
 
 async function runWithConcurrency(items, limit, fn) {
   const results = [];
@@ -122,68 +81,13 @@ async function runWithConcurrency(items, limit, fn) {
   return results;
 }
 
-async function savePlanForPlayer(supabase, player, activePlan, baseData, semana) {
-  const finalContenido = '';
-
-  if (activePlan) {
-    await updateAiPlan(supabase, activePlan.id, {
-      contexto: null,
-      contenido: finalContenido,
-      datos: baseData,
-      updated_at: new Date().toISOString(),
-    });
-    return { ...activePlan, datos: baseData };
-  }
-
-  const newPlan = await insertAiPlan(supabase, {
-    jugador_id: player.id,
-    nombre: `Plan ${semana}`,
-    contexto: null,
-    contenido: finalContenido,
-    datos: baseData,
-  });
-
-  return newPlan || { datos: baseData };
-}
-
-function isPlanForWeek(plan, semana) {
-  if (!plan) return false;
-  const planName = plan.nombre || '';
-  if (planName === `Plan ${semana}` || (typeof planName === 'string' && planName.includes(semana))) {
-    return true;
-  }
-  const meta = plan.datos?.meta;
-  if (meta?.semanaMenu && meta.semanaMenu === semana) {
-    return true;
-  }
-  if (meta?.semana && meta.semana === semana) {
-    return true;
-  }
-  const dateVal = meta?.fecha || plan.created_at;
-  if (dateVal && semana) {
-    const d = new Date(dateVal);
-    if (!Number.isNaN(d.getTime())) {
-      const day = d.getDay();
-      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-      const monday = new Date(d);
-      monday.setDate(diff);
-      const mStr = monday.toISOString().split('T')[0];
-      if (mStr === semana) return true;
-    }
-  }
-  return false;
-}
-
 async function loadPlayersWithMeasurements(
   supabase,
   team,
   jugadorIds,
   semana,
-  calendario,
   semanaMenu,
-  forceRegenerate = false,
-  preMatchConfig = null,
-  { persistPlans = true, draftPlans = null, user = null } = {}
+  { meta, nombre, persistPlans = true, draftPlans = null, user = null } = {}
 ) {
   const rawPlayers = await getPlayersByTeam(supabase, team.id);
   let players = rawPlayers || [];
@@ -202,118 +106,52 @@ async function loadPlayersWithMeasurements(
     getPesajesByPlayerIds(supabase, playerIds),
   ]);
 
-  // Load menu
-  let menu = null;
-  if (semanaMenu !== 'none') {
-    const menuWeekKey = semanaMenu || semana;
-    menu = await getMenuByWeekAndTeam(supabase, menuWeekKey, team.id);
-  }
+  const menu = await resolvePlanMenu(supabase, { semanaMenu, equipoId: team.id });
 
-  // Load all plans for these players
-  const allPlans = await getAiPlansByPlayerIdsFull(supabase, playerIds);
+  async function persist(player, datos) {
+    const saved = await savePlan(supabase, {
+      jugadorId: player.id,
+      nombre,
+      datos: withReportMeta(datos, meta),
+    });
+    return saved || { datos };
+  }
 
   const resolvedPlayers = await runWithConcurrency(players, 5, async (rawPlayer) => {
     const playerEvoluciones = (evoluciones || []).filter((item) => String(item.jugador_id) === String(rawPlayer.id));
     const playerPesajes = (pesajes || []).filter((item) => String(item.jugador_id) === String(rawPlayer.id));
     const player = withLatestMeasurement(rawPlayer, playerEvoluciones, playerPesajes);
 
-    // Find if player has plan for this week
-    const playerPlans = (allPlans || []).filter((p) => String(p.jugador_id) === String(player.id));
-    let activePlan = playerPlans.find((p) => p.nombre === `Plan ${semana}`) || playerPlans.find((p) => isPlanForWeek(p, semana));
-    const hasExistingPlan = Boolean(activePlan);
-    const existingPlanName = activePlan?.nombre || null;
+    let activePlan = null;
     const draftPlan = draftPlans?.get(String(player.id));
+    let planError = null;
 
     if (draftPlan) {
-      if (persistPlans) {
-        activePlan = await savePlanForPlayer(
-          supabase,
-          { ...player, teamConfig: team.configuracion_nutricional },
-          activePlan,
-          draftPlan,
-          semana
-        );
-      } else {
-        activePlan = { ...(activePlan || {}), datos: draftPlan };
-      }
-    } else if (!activePlan || forceRegenerate) {
-      let planError = null;
+      // Un fallo al guardar un borrador aprobado aborta la petición: no se entrega un PDF de planes sin guardar
+      activePlan = persistPlans ? await persist(player, draftPlan) : { datos: draftPlan };
+    } else {
       try {
-        const baseData = await generarDatosPlan({
+        const baseData = await generatePlanDraft(supabase, {
           jugador: player,
-          nombre: `Plan ${semana}`,
+          nombre,
           menu,
-          calendario,
-          preMatchConfig,
-          teamConfig: team.configuracion_nutricional
+          calendario: meta.calendario,
+          preMatchConfig: meta.preMatchConfig,
+          teamConfig: team.configuracion_nutricional,
+          equipoId: team.id,
+          equipoNombre: team.nombre,
+          semana,
+          user,
+          origen: 'informe_equipo',
         });
-
-        if (persistPlans) {
-          activePlan = await savePlanForPlayer(
-            supabase,
-            { ...player, teamConfig: team.configuracion_nutricional },
-            activePlan,
-            baseData,
-            semana
-          );
-        } else {
-          activePlan = { ...(activePlan || {}), datos: baseData };
-        }
-
-        // Reportar evento a Billing por generación de plan por jugador
-        try {
-          const isPlayerRole = user?.role === 'jugador';
-          const emisor = isPlayerRole
-            ? { tipo: 'cliente', nombre: user?.name || 'Jugador', id: user?.id }
-            : { tipo: 'nutricionista', nombre: user?.name || 'Técnico / Nutricionista Valencia FC', id: user?.id };
-          const cliente = {
-            tipo: 'cliente',
-            nombre: `${player.nombre || ''} ${player.apellidos || ''}`.trim() || 'Jugador',
-            id: player.id,
-          };
-
-          await trackUsageEvent({
-            app: 'nutralab-vlc',
-            tenantId: team.id,
-            tenantName: team.nombre || 'Valencia C.F.',
-            userId: user?.id,
-            eventType: 'GENERACION_PLAN',
-            description: `Plan nutricional (${player.nombre || 'Jugador'} - ${semana || 'Semana'})`,
-            metadata: {
-              jugadorId: player.id,
-              jugadorNombre: `${player.nombre || ''} ${player.apellidos || ''}`.trim(),
-              equipoId: team.id,
-              semana,
-              tieneMenu: Boolean(menu),
-              emisor,
-              cliente,
-              origen: 'informe_equipo',
-            },
-          });
-        } catch (billingErr) {
-          console.warn(`[weekly-squad] Error al reportar a billing para ${player.nombre || player.id}:`, billingErr.message);
-        }
+        activePlan = persistPlans ? await persist(player, baseData) : { datos: baseData };
       } catch (err) {
         console.warn(`[weekly-squad] No se pudo generar el plan para ${player.nombre || player.id}:`, err.message);
         planError = err.message;
       }
-
-      return {
-        ...player,
-        plan: activePlan?.datos || null,
-        error: planError,
-        hasExistingPlan,
-        existingPlanName,
-      };
     }
 
-    return {
-      ...player,
-      plan: activePlan?.datos || null,
-      error: null,
-      hasExistingPlan,
-      existingPlanName,
-    };
+    return { ...player, plan: activePlan?.datos || null, error: planError };
   });
 
   return resolvedPlayers;
@@ -358,24 +196,19 @@ export async function POST(request) {
     const body = await request.json();
     const meta = defaultMeta({ ...body?.meta, calendario: body?.calendario || body?.meta?.calendario });
     const jugadorIds = normalizeIds(body?.jugadorIds);
-    const calendario = meta.calendario;
     const semanaMenu = body?.semanaMenu || body?.meta?.semanaMenu;
 
     const team = await resolveTeam(supabase, user, body?.team_id);
     let semana = body?.meta?.semana;
-    const forceRegenerate = body?.forceRegenerate !== false;
     const generateOnly = !!body?.generateOnly;
     const previewOnly = !!body?.previewOnly;
     const commitDraft = !!body?.commitDraft;
     const downloadOnly = !!body?.downloadOnly;
 
-    if (!previewOnly && !commitDraft && !downloadOnly) {
-      semana = await persistWeeklyReport(supabase, team.id, { ...meta, semanaMenu }, semana);
-    }
-
     if (!semana) {
       semana = new Date().toISOString().split('T')[0];
     }
+    const nombre = String(body?.nombre || '').trim() || `Plan ${semana}`;
 
     const draftPlayers = Array.isArray(body?.draftPlayers) ? body.draftPlayers : [];
     const draftPlans = new Map(
@@ -391,24 +224,16 @@ export async function POST(request) {
     const hasDraftPlans = draftPlans.size > 0;
     const shouldPersist = !previewOnly && !downloadOnly;
 
-    const players = await loadPlayersWithMeasurements(
-      supabase,
-      team,
-      jugadorIds,
-      semana,
-      calendario,
-      semanaMenu,
-      forceRegenerate,
-      meta.preMatchConfig,
-      { persistPlans: shouldPersist, draftPlans: hasDraftPlans ? draftPlans : null, user }
-    );
+    const players = await loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, semanaMenu, {
+      meta,
+      nombre,
+      persistPlans: shouldPersist,
+      draftPlans: hasDraftPlans ? draftPlans : null,
+      user,
+    });
 
     if (commitDraft && players.length !== jugadorIds.length) {
       throw httpError('Alguno de los jugadores seleccionados no pertenece a este equipo', 403);
-    }
-
-    if (commitDraft) {
-      semana = await persistWeeklyReport(supabase, team.id, { ...meta, semanaMenu }, semana);
     }
 
     if (previewOnly || generateOnly) {
@@ -422,13 +247,7 @@ export async function POST(request) {
           posicion: p.posicion,
           plan: p.plan,
           error: p.error || null,
-          hasExistingPlan: Boolean(p.hasExistingPlan),
-          existingPlanName: p.existingPlanName || null,
         })),
-        hasAnyExistingPlan: players.some((p) => p.hasExistingPlan),
-        existingPlanPlayers: players
-          .filter((p) => p.hasExistingPlan)
-          .map((p) => `${p.nombre || 'Jugador'} ${p.apellidos || ''}`.trim()),
         semana,
       });
     }
@@ -441,48 +260,6 @@ export async function POST(request) {
     return renderReportResponse(meta, playersToRender, semana, team.configuracion_nutricional);
   } catch (error) {
     console.error('Error generating weekly squad report:', error);
-    return jsonError(error);
-  }
-}
-
-export async function GET(request) {
-  const user = await getUser();
-  if (!user) {
-    return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
-  }
-
-  const { searchParams } = new URL(request.url);
-  const semanaParam = searchParams.get('semana');
-  const paramJugadorId = searchParams.get('jugadorId');
-  const paramTeamId = searchParams.get('teamId');
-
-  const isPlayer = user.role === 'jugador';
-  const supabase = getSupabaseAdmin();
-
-  try {
-    let jugadorIds = normalizeIds(paramJugadorId ? [paramJugadorId] : []);
-
-    if (isPlayer) {
-      jugadorIds = [Number(user.id)];
-    }
-
-    const team = await resolveTeam(supabase, user, paramTeamId);
-    const meta = await loadStoredMeta(supabase, team.id, semanaParam);
-    const players = await loadPlayersWithMeasurements(
-      supabase,
-      team,
-      jugadorIds,
-      semanaParam,
-      meta?.calendario,
-      meta?.semanaMenu,
-      false,
-      meta?.preMatchConfig,
-      { user }
-    );
-
-    return renderReportResponse(meta, players, semanaParam, team.configuracion_nutricional);
-  } catch (error) {
-    console.error('Error generating weekly squad report (GET):', error);
     return jsonError(error);
   }
 }

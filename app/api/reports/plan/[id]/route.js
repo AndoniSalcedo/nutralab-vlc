@@ -8,7 +8,6 @@ import NutritionPlanCardDocument from '@/components/reports/NutritionPlanCardDoc
 import { sanitizeFilename, pdfHeaders } from '@/lib/utils';
 import { getAiPlanById } from '@/repositories/aiPlanRepository';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
-import { getWeeklyReport } from '@/repositories/weeklyReportsRepository';
 import { getResolvedPlayerSupplementation } from '@/repositories/supplementationRepository';
 
 export const dynamic = 'force-dynamic';
@@ -35,7 +34,6 @@ export async function GET(request, { params }) {
       if (!accessiblePlayer) return forbidden('No tienes acceso a este jugador');
     }
 
-    let weeklyReportMeta = null;
     const jugador = await getPlayerWithTeamConfig(supabase, plan.jugador_id);
 
     const teamConfig = jugador?.equipos?.configuracion_nutricional;
@@ -71,24 +69,7 @@ export async function GET(request, { params }) {
       }
     }
 
-    let semana = planData.meta?.semanaMenu;
-    if (!semana && planData.meta?.fecha) {
-      const d = new Date(planData.meta.fecha);
-      if (!Number.isNaN(d.getTime())) {
-        const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-        const monday = new Date(d);
-        monday.setDate(diff);
-        semana = monday.toISOString().split('T')[0];
-      }
-    }
-
-    if (jugador?.equipo_id && semana) {
-      const report = await getWeeklyReport(supabase, jugador.equipo_id, semana);
-      if (report) {
-        weeklyReportMeta = report.meta;
-      }
-    }
+    const weeklyReportMeta = planData.meta?.informe || null;
 
     const effectiveTeamConfig = {
       ...teamConfig,

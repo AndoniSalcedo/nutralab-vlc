@@ -62,16 +62,6 @@ export async function deleteAiPlan(supabase, id) {
   return true;
 }
 
-export async function getAiPlansByPlayerIdsFull(supabase, playerIds) {
-  const { data, error } = await supabase
-    .from('planes_ia')
-    .select('*')
-    .in('jugador_id', playerIds);
-
-  if (error) throw error;
-  return data || [];
-}
-
 export async function insertAiPlansBulk(supabase, payloads) {
   const { data, error } = await supabase
     .from('planes_ia')

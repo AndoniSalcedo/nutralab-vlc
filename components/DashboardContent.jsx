@@ -457,7 +457,6 @@ export default function DashboardContent({ players = [], team, readOnly = false 
 
       const res = await generateWeeklySquadReport(reportPayload(chunk, {
         previewOnly: true,
-        forceRegenerate: true,
       }));
       const data = await res.json();
       const chunkPreview = Array.isArray(data.preview) ? data.preview : [];
@@ -565,7 +564,6 @@ export default function DashboardContent({ players = [], team, readOnly = false 
 
     const res = await generateWeeklySquadReport(reportPayload(approvedIds, {
       commitDraft: true,
-      forceRegenerate: false,
       draftPlayers: approved,
     }));
     await downloadPdfFromResponse(res);
@@ -649,7 +647,6 @@ export default function DashboardContent({ players = [], team, readOnly = false 
     try {
       const res = await generateWeeklySquadReport(reportPayload([playerId], {
         previewOnly: true,
-        forceRegenerate: true,
       }));
       const data = await res.json();
       const newPreview = Array.isArray(data.preview) && data.preview[0];
@@ -664,8 +661,6 @@ export default function DashboardContent({ players = [], team, readOnly = false 
             ? {
                 ...p,
                 plan: newPreview.plan,
-                hasExistingPlan: typeof newPreview.hasExistingPlan === 'boolean' ? newPreview.hasExistingPlan : p.hasExistingPlan,
-                existingPlanName: newPreview.existingPlanName || p.existingPlanName,
               }
             : p
         );
@@ -675,8 +670,6 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       setReviewPreview((prev) => ({
         ...prev,
         plan: newPreview.plan,
-        hasExistingPlan: typeof newPreview.hasExistingPlan === 'boolean' ? newPreview.hasExistingPlan : prev?.hasExistingPlan,
-        existingPlanName: newPreview.existingPlanName || prev?.existingPlanName,
       }));
 
       notifications.show({
@@ -716,7 +709,6 @@ export default function DashboardContent({ players = [], team, readOnly = false 
 
       const res = await generateWeeklySquadReport(reportPayload([playerId], {
         downloadOnly: true,
-        forceRegenerate: false,
         draftPlayers: [{ id: playerId, plan: planToUse }],
       }));
 
@@ -771,7 +763,6 @@ export default function DashboardContent({ players = [], team, readOnly = false 
 
       const res = await generateWeeklySquadReport(reportPayload(allPlayerIds, {
         downloadOnly: true,
-        forceRegenerate: false,
         draftPlayers: allDrafts,
       }));
 
@@ -1211,8 +1202,6 @@ export default function DashboardContent({ players = [], team, readOnly = false 
           onRegenerate={regenerateCurrentPlayer}
           onDownloadSingle={downloadCurrentPlayerPdf}
           onDownloadAll={downloadAllPlayersPdf}
-          semana={reportForm?.semana}
-          allPreviews={reportWorkflow?.previews}
         />
 
         <NewPlayerModal

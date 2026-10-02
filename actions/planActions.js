@@ -4,7 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedPlayer, getAccessiblePlayer } from '@/lib/auth/team-access';
-import { sanitizePlanData, generarDatosPlan } from '@/lib/engine';
+import { sanitizePlanData } from '@/lib/engine';
+import { generatePlanDraft, resolvePlanMenu, savePlan } from '@/lib/plans/generate';
 import { withLatestMeasurement } from '@/lib/metrics/player';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
@@ -12,12 +13,9 @@ import { getPesajesByPlayerId } from '@/repositories/pesajeRepository';
 import {
   getAiPlansByPlayerId,
   getAiPlanById,
-  insertAiPlan,
   updateAiPlan as updateAiPlanInRepo,
   deleteAiPlan as deleteAiPlanInRepo
 } from '@/repositories/aiPlanRepository';
-import { getMenuByWeekAndTeam } from '@/repositories/menuRepository';
-import { trackUsageEvent } from '@/lib/billing/client';
 
 async function loadPlayerWithLatestMetrics(supabase, jugadorId) {
   const [jugador, evoluciones, pesajes] = await Promise.all([
@@ -75,72 +73,34 @@ async function createAiPlan(payload) {
   const jugadorConMetricas = await loadPlayerWithLatestMetrics(supabase, jugador.id);
   const teamConfig = jugadorConMetricas?.equipos?.configuracion_nutricional;
 
-  let resolvedMenu = undefined;
-  if (semanaMenu === 'none' || semanaMenu === null) {
-    resolvedMenu = null;
-  } else if (semanaMenu) {
-    resolvedMenu = await getMenuByWeekAndTeam(supabase, semanaMenu, teamConfig?.equipo_id || jugadorConMetricas?.equipo_id);
-  }
-
+  const equipoId = jugadorConMetricas?.equipo_id;
   const isDraftOnly = draftOnly || payload?.guardar === false;
   const isNewGeneration = isDraftOnly || (!datos && (contenido === undefined || contenido === ''));
+
   const generatedDatos = isNewGeneration
-    ? await generarDatosPlan({
+    ? await generatePlanDraft(supabase, {
         jugador: jugadorConMetricas,
         nombre: planNombre,
+        menu: await resolvePlanMenu(supabase, { semanaMenu, equipoId }),
         calendario,
-        menu: resolvedMenu,
+        preMatchConfig,
         teamConfig,
-        preMatchConfig
+        equipoId,
+        equipoNombre: jugadorConMetricas?.equipos?.nombre,
+        user,
+        origen: 'plan_individual',
       })
     : sanitizePlanData(datos, teamConfig);
-
-  if (isNewGeneration) {
-    const isPlayer = user.role === 'jugador';
-    const emisor = isPlayer
-      ? { tipo: 'cliente', nombre: user.name || 'Jugador', id: user.id }
-      : { tipo: 'nutricionista', nombre: user.name || 'Técnico / Nutricionista Valencia FC', id: user.id };
-    const cliente = {
-      tipo: 'cliente',
-      nombre: jugadorConMetricas?.nombre ? `${jugadorConMetricas.nombre} ${jugadorConMetricas.apellidos || ''}`.trim() : 'Jugador',
-      id: jugador.id,
-    };
-
-    try {
-      await trackUsageEvent({
-        app: 'nutralab-vlc',
-        tenantId: jugadorConMetricas?.equipo_id || jugador.id,
-        tenantName: jugadorConMetricas?.equipos?.nombre || 'Valencia C.F.',
-        userId: user.id,
-        eventType: 'GENERACION_PLAN',
-        description: `Plan nutricional (${planNombre})`,
-        metadata: {
-          jugadorId: jugador.id,
-          tieneMenu: Boolean(resolvedMenu),
-          emisor,
-          cliente,
-        },
-      });
-    } catch (billingErr) {
-      console.warn('[planActions] Error al reportar evento a billing:', billingErr.message);
-    }
-  }
 
   if (isDraftOnly) {
     return { datos: generatedDatos };
   }
 
-  const finalContenido = String(contenido || '');
-  const now = new Date().toISOString();
-  const plan = await insertAiPlan(supabase, {
-    jugador_id: jugador.id,
+  const plan = await savePlan(supabase, {
+    jugadorId: jugador.id,
     nombre: planNombre,
-    contexto: null,
-    contexto_adicional: null,
-    contenido: finalContenido,
     datos: generatedDatos,
-    created_at: now,
-    updated_at: now,
+    contenido: String(contenido || ''),
   });
 
   revalidatePath(`/dashboard/jugador/${jugador.id}`);

@@ -37,21 +37,6 @@ export async function getTeamsByOwner(supabase, ownerId) {
   return data || [];
 }
 
-export async function getTeamById(supabase, teamId) {
-  if (isMockTeam(teamId)) {
-    return mockTeam;
-  }
-
-  const { data, error } = await supabase
-    .from('equipos')
-    .select('*')
-    .eq('id', teamId)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
-}
-
 export async function getTeamByIdAndOwner(supabase, teamId, ownerId) {
   if (isMockTeam(teamId)) {
     return mockTeam;
