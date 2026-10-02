@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { ActionIcon, Combobox, createTheme, MantineProvider, Modal, MultiSelect, Popover, Select } from '@mantine/core';
+import { ActionIcon, Combobox, createTheme, HoverCard, MantineProvider, Menu, Modal, MultiSelect, Popover, Select, Tooltip } from '@mantine/core';
 
 const nutralabColor = [
   '#f5f6ef',
@@ -33,6 +33,21 @@ const theme = createTheme({
       },
     }),
     Popover: Popover.extend({
+      defaultProps: {
+        zIndex: 2500,
+      },
+    }),
+    Menu: Menu.extend({
+      defaultProps: {
+        zIndex: 2500,
+      },
+    }),
+    HoverCard: HoverCard.extend({
+      defaultProps: {
+        zIndex: 2500,
+      },
+    }),
+    Tooltip: Tooltip.extend({
       defaultProps: {
         zIndex: 2500,
       },

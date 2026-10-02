@@ -171,7 +171,7 @@ export default function PlayerTabs({
             bottom: 0,
             left: 0,
             right: 0,
-            zIndex: 300,
+            zIndex: 100, // por debajo de modales/drawers (200)
             backgroundColor: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',

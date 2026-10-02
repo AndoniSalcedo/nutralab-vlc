@@ -1,15 +1,20 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Modal, Drawer, Text } from '@mantine/core';
+import React from 'react';
+import { Modal, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
 /**
  * ResponsiveModal
  *
- * Componente unificado que muestra:
- * - Un <Modal> centrado en escritorio (> 768px).
- * - Un <Drawer> a pantalla completa (100% / 100dvh) en móvil (<= 768px).
+ * Usa SIEMPRE un único <Modal> de Mantine (nunca alterna con <Drawer>), de modo
+ * que al girar el móvil / redimensionar la ventana React no desmonta el árbol
+ * y el estado del formulario hijo no se pierde. Solo cambia la presentación:
+ * - Escritorio (> 768px): modal centrado.
+ * - Móvil (<= 768px): pantalla completa (100dvh), como un drawer.
+ *
+ * Escala de z-index (ver también components/Providers.jsx):
+ *   navegación inferior fija: 100  <  modal/drawer: 200  <  popovers/selects: 2500
  */
 export default function ResponsiveModal({
   opened,
@@ -19,21 +24,20 @@ export default function ResponsiveModal({
   size = 'md',
   radius = 'lg',
   padding = 'lg',
-  mobilePosition = 'bottom',
-  mobileHeight = '100%',
   withCloseButton = true,
   centered = true,
   zIndex = 200,
   overlayProps = { backgroundOpacity: 0.55, blur: 4 },
   styles,
+  // Props heredadas del Drawer: se ignoran para que no lleguen al <Modal>.
+  // eslint-disable-next-line no-unused-vars
+  mobilePosition,
+  // eslint-disable-next-line no-unused-vars
+  mobileHeight,
   ...props
 }) {
   const isMobile = useMediaQuery('(max-width: 48em)');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const custom = typeof styles === 'object' && styles ? styles : {};
 
   const renderedTitle =
     typeof title === 'string' ? (
@@ -44,72 +48,34 @@ export default function ResponsiveModal({
       title
     );
 
-  // Fallback seguro durante SSR / primer renderizado antes del hook
-  if (!mounted || !isMobile) {
-    return (
-      <Modal
-        opened={opened}
-        onClose={onClose}
-        title={renderedTitle}
-        centered={centered}
-        size={size}
-        radius={radius}
-        padding={padding}
-        withCloseButton={withCloseButton}
-        zIndex={zIndex}
-        overlayProps={overlayProps}
-        styles={{
-          ...(typeof styles === 'object' ? styles : {}),
-          content: {
-            maxHeight: '92vh',
-            display: 'flex',
-            flexDirection: 'column',
-            ...(typeof styles === 'object' && styles?.content ? styles.content : {}),
-          },
-          body: {
-            display: 'flex',
-            flexDirection: 'column',
-            flex: 1,
-            minHeight: 0,
-            overflowY: 'auto',
-            ...(typeof styles === 'object' && styles?.body ? styles.body : {}),
-          },
-        }}
-        {...props}
-      >
-        {children}
-      </Modal>
-    );
-  }
-
-  // En móvil (<= 768px): Drawer a pantalla completa 100%
   return (
-    <Drawer
+    <Modal
       opened={opened}
       onClose={onClose}
       title={renderedTitle}
-      position={mobilePosition}
-      size={mobileHeight || '100%'}
+      centered={centered && !isMobile}
+      fullScreen={isMobile}
+      size={size}
+      radius={isMobile ? 0 : radius}
+      padding={padding}
       withCloseButton={withCloseButton}
       zIndex={zIndex}
-      padding={padding}
       overlayProps={overlayProps}
+      transitionProps={isMobile ? { transition: 'slide-up', duration: 250 } : undefined}
       styles={{
-        ...(typeof styles === 'object' ? styles : {}),
+        ...custom,
         content: {
-          borderTopLeftRadius: 0,
-          borderTopRightRadius: 0,
-          height: '100dvh',
-          maxHeight: '100dvh',
+          maxHeight: isMobile ? '100dvh' : '92vh',
           display: 'flex',
           flexDirection: 'column',
-          ...(typeof styles === 'object' && styles?.content ? styles.content : {}),
+          ...custom.content,
         },
         header: {
-          paddingTop: 'max(12px, env(safe-area-inset-top, 12px))',
-          paddingBottom: 10,
           flexShrink: 0,
-          ...(typeof styles === 'object' && styles?.header ? styles.header : {}),
+          ...(isMobile
+            ? { paddingTop: 'max(12px, env(safe-area-inset-top, 12px))', paddingBottom: 10 }
+            : {}),
+          ...custom.header,
         },
         body: {
           display: 'flex',
@@ -117,13 +83,15 @@ export default function ResponsiveModal({
           flex: 1,
           minHeight: 0,
           overflowY: 'auto',
-          paddingBottom: 'calc(var(--mantine-spacing-md) + env(safe-area-inset-bottom, 16px))',
-          ...(typeof styles === 'object' && styles?.body ? styles.body : {}),
+          ...(isMobile
+            ? { paddingBottom: 'calc(var(--mantine-spacing-md) + env(safe-area-inset-bottom, 16px))' }
+            : {}),
+          ...custom.body,
         },
       }}
       {...props}
     >
       {children}
-    </Drawer>
+    </Modal>
   );
 }
