@@ -4063,6 +4063,25 @@ export const FOODS_CRUDO = [
     ]
   },
   {
+    "name": "Pancakes proteicos sin gluten",
+    "originalName": "Pancakes proteicos de avena sin gluten, claras y proteína de suero sin lactosa",
+    "kcal": 215,
+    "cho": 24,
+    "pro": 20,
+    "fat": 4,
+    "tags": [
+      "sin_gluten_especial",
+      "huevo",
+      "proteina_vaca"
+    ],
+    "minGrams": 80,
+    "maxGrams": 200,
+    "treePath": [
+      "hidratos",
+      "preparados_desayuno"
+    ]
+  },
+  {
     "name": "Crepes de avena",
     "originalName": "Crepes de harina de avena, huevo y leche",
     "kcal": 190,

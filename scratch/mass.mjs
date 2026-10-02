@@ -111,6 +111,7 @@ while (S.plans < N && attempts < N * 2) {
   });
   // hidrato repetido comida=cena, por contexto
   DAYS.forEach((dk, di) => { const arr = S.dayCarb?.[`${plan.__id}:${dk}`]; if (arr?.length !== 2) return; const proto = enabled && (cal[dk] === 'partido' || cal[DAYS[(di + 1) % 7]] === 'partido'); const ctx = `${useMenu ? 'con menú' : 'rotación'} | ${proto ? 'día de protocolo' : 'día normal'}`; const c = (S.dupCtx ||= {}); c[ctx] ||= { n: 0, dup: 0, fam: {} }; c[ctx].n++; if (arr[0] === arr[1] && arr[0] !== 'ninguno') { c[ctx].dup++; bump(c[ctx].fam, arr[0]); } });
+  DAYS.forEach((dk) => (mainProt[dk] || []).forEach((n) => { bump(S.protCount ||= {}, n); S.protTotal = (S.protTotal || 0) + 1; }));
   // variedad semanal
   const cnt = {}; DAYS.forEach((dk) => (mainProt[dk] || []).forEach((n) => bump(cnt, n)));
   for (const [n, c] of Object.entries(cnt)) if (c >= 4) issue('Misma proteína ≥4 veces en la semana', `${p.nombre.trim()}: ${n} ×${c}`);
@@ -130,6 +131,7 @@ const dupC = Object.values(S.dayCarb || {}).filter((a) => a.length === 2 && a[0]
 L.push(`\nEXTRA: misma familia de hidrato en comida y cena ${(100 * dupC / Math.max(1, totD)).toFixed(1)}% de días (${dupC}/${totD}) | tomas principales sin fruta ${(100 * (S.mainSinFruta || 0) / Math.max(1, S.mainN)).toFixed(0)}%`);
 const sameB = Object.values(S.bfast || {}).map((a) => 1 - new Set(a).size / a.length); L.push(`EXTRA: variedad de desayunos — repetición media de la misma composición en una semana ${(100 * mean(sameB)).toFixed(0)}%`);
 for (const [k, v] of Object.entries(S.dupCtx || {})) L.push(`   hidrato repetido [${k}]: ${(100 * v.dup / v.n).toFixed(1)}% (${v.dup}/${v.n}) familias ${JSON.stringify(v.fam)}`);
+L.push(`\nPROTEÍNAS DE COMIDA/CENA (reparto): ` + Object.entries(S.protCount || {}).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([k, v]) => `${k} ${(100 * v / S.protTotal).toFixed(1)}%`).join(' | ') + ` | alimentos distintos: ${Object.keys(S.protCount || {}).length}`);
 L.push(`\nlectura de alimentos: ${(100 * (1 - S.unparsed / S.tokens)).toFixed(1)}% de ${S.tokens}`);
 console.log(L.join('\n'));
 if (process.argv[3]) fs.writeFileSync(process.argv[3], JSON.stringify({ issues: S.issues, ex: S.ex, avisos: S.avisos, avisoEx: S.avisoEx }));
