@@ -590,22 +590,7 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Fideos de arroz",
-    "originalName": "Fideos de arroz",
-    "kcal": 364,
-    "cho": 80,
-    "pro": 7,
-    "fat": 0.6,
-    "tags": [],
-    "minGrams": 50,
-    "maxGrams": 170,
-    "treePath": [
-      "hidratos",
-      "arroz"
-    ]
-  },
-  {
-    "name": "Leche de avena",
+    "name": "Bebida de avena",
     "originalName": "Leche de avena",
     "kcal": 47,
     "cho": 6.7,
@@ -943,6 +928,21 @@ export const FOODS_CRUDO = [
   //   ]
   // },
   {
+    "name": "Noodles de arroz",
+    "originalName": "Noodles de arroz",
+    "kcal": 364,
+    "cho": 82,
+    "pro": 3.4,
+    "fat": 0.6,
+    "tags": [],
+    "minGrams": 50,
+    "maxGrams": 200,
+    "treePath": [
+      "hidratos",
+      "otros_granos"
+    ]
+  },
+  {
     "name": "Quinoa",
     "originalName": "Quinoa crudo",
     "kcal": 368,
@@ -1053,21 +1053,6 @@ export const FOODS_CRUDO = [
     "treePath": [
       "hidratos",
       "panes"
-    ]
-  },
-  {
-    "name": "Trigo sarraceno",
-    "originalName": "Trigo sarraceno crudo",
-    "kcal": 343,
-    "cho": 71.5,
-    "pro": 13.3,
-    "fat": 3.4,
-    "tags": [],
-    "minGrams": 50,
-    "maxGrams": 170,
-    "treePath": [
-      "hidratos",
-      "otros_granos"
     ]
   },
   {
