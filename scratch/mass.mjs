@@ -73,7 +73,7 @@ while (S.plans < N && attempts < N * 2) {
   const preMatchConfig = enabled ? { enabled: true, partidos, diaPartido: matchDays[0], horario: partidos[matchDays[0]].horario } : null;
   let plan; try { plan = await generarDatosPlan({ jugador: p, nombre: 't', calendario: cal, menu, teamConfig: p.equipos?.configuracion_nutricional || {}, preMatchConfig }); }
   catch (e) { bump(S.errors, `${calName}: ${e.message.slice(0, 120)}`); continue; }
-  S.plans++; const cat = getCat(p, menu); bump(S.perPlayer, `${p.nombre.trim()} ${p.apellidos || ''}`.trim());
+  S.plans++; plan.__id = S.plans; const cat = getCat(p, menu); bump(S.perPlayer, `${p.nombre.trim()} ${p.apellidos || ''}`.trim());
   for (const a of plan.meta.avisos || []) { { const mm = a.mensaje.match(/"([^"]+)".*?(?:sustituido por ([^.]+)\.|omitido)/); const key = `${p.nombre.trim()} | ${mm?.[1] || '?'} → ${mm?.[2] || 'omitido'} (${a.ingesta})`; bump(S.avisoFoods ||= {}, key); } const k = a.mensaje.replace(/"[^"]+"/g, '"X"').replace(/por [^.]*\./, 'por …'); bump(S.avisos, k); (S.avisoEx[k] ||= []).length < 3 && S.avisoEx[k].push(`${p.nombre.trim()} ${a.dia} ${a.ingesta}: ${a.mensaje.slice(0, 120)}`); }
   const mainProt = {};
   DAYS.forEach((dk, di) => {
@@ -82,6 +82,7 @@ while (S.plans < N && attempts < N * 2) {
     if (d.desviacionMacros) { S.dev.push({ k: d.desviacionMacros.kcal, p: d.desviacionMacros.proteina, tipo: d.tipoDia }); if (Math.abs(d.desviacionMacros.kcal) > 100) issue('Día con desvío > 100 kcal', `${tag}: ${Math.round(d.desviacionMacros.kcal)} kcal`); }
     else issue('Día sin cálculo completo (cierre parcial)', tag);
     if (d.ingestas.length < 3) issue('Día con menos de 3 tomas', tag);
+    if (p.postentreno && !d.ingestas.some((i) => /post/i.test(i.nombre)) && d.tipoDia !== 'descanso') issue('Jugador con post-entreno sin toma post', tag);
     const horario = enabled ? (d.tipoDia === 'partido' ? partidos[dk]?.horario : (cal[DAYS[(di + 1) % 7]] === 'partido' ? partidos[DAYS[(di + 1) % 7]]?.horario : null)) : null;
     for (const ing of d.ingestas) {
       const main = /Comida|Cena/i.test(ing.nombre); const served = parse(ing.detalle || '', cat); const names = served.filter((s) => s.f).map((s) => s.f.name);
@@ -90,6 +91,14 @@ while (S.plans < N && attempts < N * 2) {
       if (new Set(names).size !== names.length) issue('Alimento repetido dentro de la misma toma', `${tag} ${ing.nombre}: ${ing.detalle}`);
       for (const s of served) if (s.f && !cat.foodsByNormalizedName.has(normalizeFoodName(s.f.name))) issue('Alimento fuera del catálogo clínico del jugador', `${tag}: ${s.f.name}`);
       const kcal = ing.macrosReales?.kcal; if (kcal !== undefined && !/Post/i.test(ing.nombre)) { if (main && (kcal < 350 || kcal > 1700)) issue(`${ing.nombre} con kcal extremas`, `${tag}: ${kcal} kcal — ${ing.detalle.slice(0, 90)}`); if (!main && kcal > 1100) issue('Toma ligera con >1100 kcal', `${tag} ${ing.nombre}: ${kcal} kcal`); }
+      // --- comprobaciones adicionales
+      for (const sv of served) { const f = sv.f; if (!f || !(sv.g > 0)) continue; const tp = f.treePath || []; const isEgg = tp[1] === 'huevos'; const isOil = tp.includes('aceites'); const isBread = tp[1] === 'panes';
+        if (!isEgg && !isOil && sv.g > f.maxGrams + 0.01 && !(isBread && sv.g <= 150)) issue('Ración por encima del máximo del catálogo', `${tag} ${ing.nombre}: ${f.name} ${sv.g} g (máx ${f.maxGrams})`);
+        if (!isEgg && !isOil && sv.g < f.minGrams - 0.01 && f.treePath?.[0] !== 'grasas') issue('Ración por debajo del mínimo del catálogo', `${tag} ${ing.nombre}: ${f.name} ${sv.g} g (mín ${f.minGrams})`); }
+      if (main) { const protG = served.filter((s2) => s2.f?.treePath?.[0] === 'proteina' && !['huevos'].includes(s2.f.treePath[1])).reduce((a, s2) => a + s2.g / 100 * s2.f.pro, 0); const tot = ing.macrosReales?.proteina || 0; if (tot < 25) issue(`${ing.nombre} con menos de 25 g de proteína`, `${tag}: ${tot} g — ${ing.detalle.slice(0, 90)}`); if (tot > 110) issue(`${ing.nombre} con más de 110 g de proteína`, `${tag}: ${tot} g`);
+        if (!served.some((s2) => s2.f?.treePath?.[0] === 'frutas') && !/Post/i.test(ing.nombre)) bump(S, 'mainSinFruta'); S.mainN = (S.mainN || 0) + 1;
+        const carbFam = served.find((s2) => s2.f?.treePath?.[0] === 'hidratos' && ['arroz', 'pasta', 'tuberculos', 'otros_granos', 'legumbres'].includes(s2.f.treePath[1])); (S.dayCarb ||= {})[`${plan.__id}:${dk}`] = (S.dayCarb[`${plan.__id}:${dk}`] || []).concat(carbFam ? carbFam.f.treePath[1] : 'ninguno'); }
+      if (/Desayuno/i.test(ing.nombre)) { const hasProt = served.some((s2) => ['proteina'].includes(s2.f?.treePath?.[0]) || s2.f?.treePath?.[0] === 'lacteos' || /preparados/.test(s2.f?.treePath?.[1] || '')); if (!hasProt) issue('Desayuno sin proteína', `${tag}: ${ing.detalle.slice(0, 100)}`); (S.bfast ||= {})[`${plan.__id}`] = (S.bfast[`${plan.__id}`] || []).concat(ing.detalle.replace(/\d+g/g, '').slice(0, 60)); }
       if (main) { const mp = served.find((s) => s.f?.treePath?.[0] === 'proteina' && !['huevos', 'embutidos'].includes(s.f.treePath[1])); if (mp) mainProt[dk] = (mainProt[dk] || []).concat(mp.f.name); }
       // protocolo de partido
       if (horario && !/post/i.test(ing.nombre)) {
@@ -100,6 +109,8 @@ while (S.plans < N && attempts < N * 2) {
       }
     }
   });
+  // hidrato repetido comida=cena, por contexto
+  DAYS.forEach((dk, di) => { const arr = S.dayCarb?.[`${plan.__id}:${dk}`]; if (arr?.length !== 2) return; const proto = enabled && (cal[dk] === 'partido' || cal[DAYS[(di + 1) % 7]] === 'partido'); const ctx = `${useMenu ? 'con menú' : 'rotación'} | ${proto ? 'día de protocolo' : 'día normal'}`; const c = (S.dupCtx ||= {}); c[ctx] ||= { n: 0, dup: 0, fam: {} }; c[ctx].n++; if (arr[0] === arr[1] && arr[0] !== 'ninguno') { c[ctx].dup++; bump(c[ctx].fam, arr[0]); } });
   // variedad semanal
   const cnt = {}; DAYS.forEach((dk) => (mainProt[dk] || []).forEach((n) => bump(cnt, n)));
   for (const [n, c] of Object.entries(cnt)) if (c >= 4) issue('Misma proteína ≥4 veces en la semana', `${p.nombre.trim()}: ${n} ×${c}`);
@@ -115,6 +126,10 @@ L.push(`\nPROTOCOLOS DE PARTIDO: tomas con pauta esperada ${S.proto.expected} | 
 L.push(`\nAVISOS DEL MOTOR (${Object.values(S.avisos).reduce((a, b) => a + b, 0)}):`); for (const [k, v] of Object.entries(S.avisos).sort((a, b) => b[1] - a[1]).slice(0, 8)) L.push(`  ${String(v).padStart(5)}× ${k.slice(0, 150)}\n         ej: ${S.avisoEx[k][0]}`);
 L.push('\nSUSTITUCIONES/OMISIONES más frecuentes (jugador | alimento de la pauta → resultado):'); for (const [k, v] of Object.entries(S.avisoFoods || {}).sort((a, b) => b[1] - a[1]).slice(0, 25)) L.push(`  ${String(v).padStart(4)}× ${k}`);
 L.push(`\nHALLAZGOS:`); for (const [k, v] of Object.entries(S.issues).sort((a, b) => b[1] - a[1])) L.push(`  ${String(v).padStart(5)}× ${k}\n${S.ex[k].slice(0, 3).map((e) => '         ej: ' + e).join('\n')}`);
+const dupC = Object.values(S.dayCarb || {}).filter((a) => a.length === 2 && a[0] === a[1] && a[0] !== 'ninguno').length; const totD = Object.values(S.dayCarb || {}).filter((a) => a.length === 2).length;
+L.push(`\nEXTRA: misma familia de hidrato en comida y cena ${(100 * dupC / Math.max(1, totD)).toFixed(1)}% de días (${dupC}/${totD}) | tomas principales sin fruta ${(100 * (S.mainSinFruta || 0) / Math.max(1, S.mainN)).toFixed(0)}%`);
+const sameB = Object.values(S.bfast || {}).map((a) => 1 - new Set(a).size / a.length); L.push(`EXTRA: variedad de desayunos — repetición media de la misma composición en una semana ${(100 * mean(sameB)).toFixed(0)}%`);
+for (const [k, v] of Object.entries(S.dupCtx || {})) L.push(`   hidrato repetido [${k}]: ${(100 * v.dup / v.n).toFixed(1)}% (${v.dup}/${v.n}) familias ${JSON.stringify(v.fam)}`);
 L.push(`\nlectura de alimentos: ${(100 * (1 - S.unparsed / S.tokens)).toFixed(1)}% de ${S.tokens}`);
 console.log(L.join('\n'));
 if (process.argv[3]) fs.writeFileSync(process.argv[3], JSON.stringify({ issues: S.issues, ex: S.ex, avisos: S.avisos, avisoEx: S.avisoEx }));

@@ -1406,6 +1406,21 @@ export const FOODS_CRUDO = [
     ]
   },
   {
+    "name": "Zumo de manzana",
+    "originalName": "Zumo de manzana",
+    "kcal": 46,
+    "cho": 11.3,
+    "pro": 0.1,
+    "fat": 0.1,
+    "tags": [],
+    "minGrams": 150,
+    "maxGrams": 300,
+    "treePath": [
+      "frutas",
+      "zumos"
+    ]
+  },
+  {
     "name": "Uvas",
     "originalName": "Uva ",
     "kcal": 69,
@@ -2649,7 +2664,7 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Colacao",
+    "name": "Cacao (puro y en untable / Colacao)",
     "originalName": "Colacao",
     "kcal": 377,
     "cho": 78,
@@ -2657,11 +2672,11 @@ export const FOODS_CRUDO = [
     "fat": 2.5,
     "tags": [],
     "minGrams": 15,
-    "maxGrams": 25,
+    "maxGrams": 30,
     "defaultGrams": 20,
     "treePath": [
       "suplementos",
-      "otros"
+      "dulces_otros"
     ]
   },
   {

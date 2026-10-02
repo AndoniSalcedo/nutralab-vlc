@@ -1362,6 +1362,18 @@ export const FOODS_MENU = [
     treePath: ['frutas', 'zumos'],
   },
   {
+    name: 'Zumo de manzana',
+    originalName: 'Zumo de manzana',
+    kcal: 46,
+    cho: 11.3,
+    pro: 0.1,
+    fat: 0.1,
+    tags: [],
+    minGrams: 150,
+    maxGrams: 300,
+    treePath: ['frutas', 'zumos'],
+  },
+  {
     name: 'Infusiones',
     originalName: 'Té verde (infusión)',
     kcal: 1,
