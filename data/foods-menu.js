@@ -1055,7 +1055,7 @@ export const FOODS_MENU = [
     cho: 6.7,
     pro: 1,
     fat: 1.5,
-    tags: ['sin_lactosa_especial'],
+    tags: ['gluten', 'sin_lactosa_especial'],
     minGrams: 100,
     maxGrams: 300,
     treePath: ['lacteos', 'leches'],

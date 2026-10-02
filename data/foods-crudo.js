@@ -597,7 +597,8 @@ export const FOODS_CRUDO = [
     "pro": 1,
     "fat": 1.5,
     "tags": [
-      "gluten"
+      "gluten",
+      "sin_lactosa_especial"
     ],
     "minGrams": 50,
     "maxGrams": 170,
@@ -803,7 +804,8 @@ export const FOODS_CRUDO = [
     "pro": 26,
     "fat": 2.5,
     "tags": [
-      "alto_fodmap"
+      "alto_fodmap",
+      "sin_gluten_especial"
     ],
     "minGrams": 50,
     "maxGrams": 170,
@@ -870,7 +872,9 @@ export const FOODS_CRUDO = [
     "cho": 71,
     "pro": 12.5,
     "fat": 1.7,
-    "tags": [],
+    "tags": [
+      "sin_gluten_especial"
+    ],
     "minGrams": 50,
     "maxGrams": 170,
     "treePath": [
