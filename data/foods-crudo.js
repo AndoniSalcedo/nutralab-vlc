@@ -1908,7 +1908,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 60,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_frescos"
     ]
   },
   {
@@ -1926,7 +1927,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 60,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_frescos"
     ]
   },
   {
@@ -1944,7 +1946,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 60,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_curados"
     ]
   },
   {
@@ -1962,7 +1965,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 60,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_curados"
     ]
   },
   {
@@ -1980,7 +1984,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 150,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_frescos"
     ]
   },
   {
@@ -1998,7 +2003,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 150,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_frescos"
     ]
   },
   {
@@ -2016,7 +2022,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 150,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_frescos"
     ]
   },
   {
@@ -2034,7 +2041,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 150,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_frescos"
     ]
   },
   {
@@ -2052,7 +2060,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 150,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_frescos"
     ]
   },
   {
@@ -2070,7 +2079,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 60,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_curados"
     ]
   },
   {
@@ -2088,7 +2098,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 60,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_curados"
     ]
   },
   {
@@ -2106,7 +2117,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 150,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_frescos"
     ]
   },
   {
@@ -2843,7 +2855,8 @@ export const FOODS_CRUDO = [
     "maxGrams": 125,
     "treePath": [
       "lacteos",
-      "quesos"
+      "quesos",
+      "quesos_frescos"
     ]
   },
   {
