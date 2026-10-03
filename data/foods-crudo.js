@@ -466,7 +466,9 @@ export const FOODS_CRUDO = [
     "cho": 77,
     "pro": 7.5,
     "fat": 2.7,
-    "tags": [],
+    "tags": [
+      "alto_fibra"
+    ],
     "minGrams": 50,
     "maxGrams": 200,
     "treePath": [
@@ -529,7 +531,8 @@ export const FOODS_CRUDO = [
     "pro": 12.3,
     "fat": 1.3,
     "tags": [
-      "gluten"
+      "gluten",
+      "alto_fibra"
     ],
     "minGrams": 50,
     "maxGrams": 170,
@@ -652,7 +655,8 @@ export const FOODS_CRUDO = [
     "pro": 8.5,
     "fat": 1.7,
     "tags": [
-      "gluten"
+      "gluten",
+      "alto_fibra"
     ],
     "minGrams": 30,
     "maxGrams": 80,
@@ -703,7 +707,8 @@ export const FOODS_CRUDO = [
     "pro": 9,
     "fat": 3.5,
     "tags": [
-      "gluten"
+      "gluten",
+      "alto_fibra"
     ],
     "minGrams": 30,
     "maxGrams": 80,
@@ -737,7 +742,8 @@ export const FOODS_CRUDO = [
     "pro": 10,
     "fat": 8,
     "tags": [
-      "gluten"
+      "gluten",
+      "alto_fibra"
     ],
     "minGrams": 30,
     "maxGrams": 80,
@@ -754,7 +760,8 @@ export const FOODS_CRUDO = [
     "pro": 9,
     "fat": 3.4,
     "tags": [
-      "gluten"
+      "gluten",
+      "alto_fibra"
     ],
     "minGrams": 30,
     "maxGrams": 80,
@@ -807,7 +814,8 @@ export const FOODS_CRUDO = [
     "fat": 2.5,
     "tags": [
       "alto_fodmap",
-      "sin_gluten_especial"
+      "sin_gluten_especial",
+      "alto_fibra"
     ],
     "minGrams": 50,
     "maxGrams": 200,
@@ -955,7 +963,9 @@ export const FOODS_CRUDO = [
     "cho": 64.2,
     "pro": 14.1,
     "fat": 6.1,
-    "tags": [],
+    "tags": [
+      "alto_fibra"
+    ],
     "minGrams": 50,
     "maxGrams": 180,
     "treePath": [
@@ -1018,7 +1028,8 @@ export const FOODS_CRUDO = [
     "pro": 9,
     "fat": 8.2,
     "tags": [
-      "gluten"
+      "gluten",
+      "alto_fibra"
     ],
     "minGrams": 50,
     "maxGrams": 170,
@@ -1052,7 +1063,8 @@ export const FOODS_CRUDO = [
     "pro": 11,
     "fat": 5,
     "tags": [
-      "gluten"
+      "gluten",
+      "alto_fibra"
     ],
     "minGrams": 30,
     "maxGrams": 80,
@@ -2408,7 +2420,8 @@ export const FOODS_CRUDO = [
     "pro": 23,
     "fat": 0.8,
     "tags": [
-      "alto_fodmap"
+      "alto_fodmap",
+      "alto_fibra"
     ],
     "minGrams": 100,
     "maxGrams": 300,
@@ -2426,7 +2439,8 @@ export const FOODS_CRUDO = [
     "fat": 6,
     "tags": [
       "alto_fodmap",
-      "legumbres"
+      "legumbres",
+      "alto_fibra"
     ],
     "minGrams": 50,
     "maxGrams": 180,
@@ -2444,7 +2458,8 @@ export const FOODS_CRUDO = [
     "fat": 1.1,
     "tags": [
       "alto_fodmap",
-      "legumbres"
+      "legumbres",
+      "alto_fibra"
     ],
     "minGrams": 50,
     "maxGrams": 180,
@@ -4407,7 +4422,8 @@ export const FOODS_CRUDO = [
     "pro": 13.5,
     "fat": 2.2,
     "tags": [
-      "gluten"
+      "gluten",
+      "alto_fibra"
     ],
     "minGrams": 50,
     "maxGrams": 200,
@@ -4441,7 +4457,8 @@ export const FOODS_CRUDO = [
     "pro": 13.5,
     "fat": 2.2,
     "tags": [
-      "gluten"
+      "gluten",
+      "alto_fibra"
     ],
     "minGrams": 50,
     "maxGrams": 200,
@@ -4458,7 +4475,8 @@ export const FOODS_CRUDO = [
     "pro": 26,
     "fat": 1.5,
     "tags": [
-      "sin_gluten_especial"
+      "sin_gluten_especial",
+      "alto_fibra"
     ],
     "minGrams": 50,
     "maxGrams": 200,
@@ -4786,6 +4804,22 @@ export const FOODS_CRUDO = [
     "treePath": [
       "complementos",
       "condimentos"
+    ]
+  },
+  {
+    "name": "Harina de arroz",
+    "originalName": "Harina de arroz",
+    "kcal": 357,
+    "cho": 80,
+    "pro": 6,
+    "fat": 1.4,
+    "tags": [],
+    "minGrams": 30,
+    "maxGrams": 100,
+    "treePath": [
+      "hidratos",
+      "cereales",
+      "harinas"
     ]
   }
 ];
