@@ -59,7 +59,7 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Chuletas de pavo",
+    "name": "Chuleta de pavo",
     "originalName": "chuletas de pavo",
     "kcal": 118,
     "cho": 0,
@@ -111,10 +111,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Contramuslo de pollo deshuesado",
     "originalName": "Contramuslo de pollo deshuesado",
-    "kcal": 160,
+    "kcal": 154,
     "cho": 0,
-    "pro": 20,
-    "fat": 9,
+    "pro": 19.5,
+    "fat": 8.5,
     "tags": [],
     "minGrams": 100,
     "maxGrams": 350,
@@ -161,10 +161,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Hamburguesa de pollo",
     "originalName": "Hamburguesa de pollo crudo",
-    "kcal": 143,
-    "cho": 1,
-    "pro": 17,
-    "fat": 8,
+    "kcal": 145,
+    "cho": 1.8,
+    "pro": 19.5,
+    "fat": 6.7,
     "tags": [],
     "minGrams": 100,
     "maxGrams": 350,
@@ -329,10 +329,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Pechuga de pavo",
     "originalName": "Pechuga de pavo",
-    "kcal": 114,
+    "kcal": 111,
     "cho": 0,
-    "pro": 24,
-    "fat": 1.5,
+    "pro": 24.1,
+    "fat": 1.6,
     "tags": [],
     "minGrams": 100,
     "maxGrams": 350,
@@ -347,7 +347,7 @@ export const FOODS_CRUDO = [
     "originalName": "Pechuga de pollo",
     "kcal": 120,
     "cho": 0,
-    "pro": 22.5,
+    "pro": 23.5,
     "fat": 2.6,
     "tags": [],
     "minGrams": 100,
@@ -363,8 +363,8 @@ export const FOODS_CRUDO = [
     "originalName": "Solomillo de cerdo cruda",
     "kcal": 143,
     "cho": 0,
-    "pro": 21.5,
-    "fat": 5.5,
+    "pro": 22.8,
+    "fat": 5.4,
     "tags": [
       "cerdo"
     ],
@@ -430,9 +430,9 @@ export const FOODS_CRUDO = [
   {
     "name": "Arroz blanco",
     "originalName": "Arroz blanco crudo",
-    "kcal": 365,
-    "cho": 78,
-    "pro": 7.1,
+    "kcal": 360,
+    "cho": 80,
+    "pro": 7,
     "fat": 0.6,
     "tags": [],
     "minGrams": 50,
@@ -608,17 +608,17 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Ñoquis de patata",
+    "name": "Ñoquis",
     "originalName": "Ñoquis de patata",
-    "kcal": 150,
-    "cho": 31,
+    "kcal": 160,
+    "cho": 35,
     "pro": 3.5,
-    "fat": 0.8,
+    "fat": 0.5,
     "tags": [
       "gluten"
     ],
-    "minGrams": 150,
-    "maxGrams": 300,
+    "minGrams": 100,
+    "maxGrams": 350,
     "defaultGrams": 150,
     "treePath": [
       "hidratos",
@@ -626,7 +626,7 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Pan blanco de barra",
+    "name": "Pan blanco",
     "originalName": "Pan blanco de barra",
     "kcal": 265,
     "cho": 49,
@@ -962,7 +962,7 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Tortas de arroz",
+    "name": "Tortitas de arroz",
     "originalName": "Tortas de arroz",
     "kcal": 380,
     "cho": 82,
@@ -1060,12 +1060,12 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Trigo sarraceno hinchado",
+    "name": "Cereales de trigo sarraceno hinchados",
     "originalName": "Trigo sarraceno hinchado",
-    "kcal": 360.2,
-    "cho": 67.92,
-    "pro": 12.63,
-    "fat": 3.57,
+    "kcal": 360,
+    "cho": 68,
+    "pro": 12.6,
+    "fat": 3.6,
     "tags": [],
     "minGrams": 40,
     "maxGrams": 100,
@@ -1124,7 +1124,7 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Frambuesa",
+    "name": "Frambuesas",
     "originalName": "Frambuesa ",
     "kcal": 52,
     "cho": 12,
@@ -1538,7 +1538,7 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Anacardo (marañón)",
+    "name": "Anacardos",
     "originalName": "Anacardo (marañón)",
     "kcal": 553,
     "cho": 30.2,
@@ -1700,26 +1700,9 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Huevo entero tortilla",
-    "originalName": "Huevo entero tortilla",
-    "kcal": 193.8,
-    "cho": 1.1,
-    "pro": 13,
-    "fat": 13.75,
-    "tags": [
-      "huevo"
-    ],
-    "minGrams": 50,
-    "maxGrams": 160,
-    "treePath": [
-      "proteina",
-      "huevos"
-    ]
-  },
-  {
     "name": "Huevo entero",
     "originalName": "Huevo entero crudo",
-    "kcal": 160,
+    "kcal": 155,
     "cho": 1.1,
     "pro": 13,
     "fat": 11,
@@ -1842,10 +1825,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Leche entera alto proteína",
     "originalName": "Leche entera alto proteína",
-    "kcal": 69,
-    "cho": 8.64,
-    "pro": 5.76,
-    "fat": 3.79,
+    "kcal": 73,
+    "cho": 4.8,
+    "pro": 6,
+    "fat": 3.3,
     "tags": [
       "lactosa",
       "proteina_vaca"
@@ -2158,18 +2141,18 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Tofu firme",
+    "name": "Tofu",
     "originalName": "Tofu firme",
-    "kcal": 76,
-    "cho": 1.9,
-    "pro": 8.1,
-    "fat": 4.8,
+    "kcal": 123,
+    "cho": 2.1,
+    "pro": 12,
+    "fat": 7,
     "tags": [
       "soja",
       "proteina_vegetal"
     ],
-    "minGrams": 30,
-    "maxGrams": 150,
+    "minGrams": 100,
+    "maxGrams": 350,
     "treePath": [
       "proteina",
       "vegetal_proteina"
@@ -2267,9 +2250,9 @@ export const FOODS_CRUDO = [
   },
   {
     "name": "Yogur proteico natural",
-    "originalName": "Yogur High Protein natural (Danone)",
-    "kcal": 60,
-    "cho": 4,
+    "originalName": "Yogur proteico natural (Hacendado/Mercadona)",
+    "kcal": 57,
+    "cho": 3.9,
     "pro": 10,
     "fat": 0.2,
     "tags": [
@@ -2374,48 +2357,12 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Yogur proteico natural",
-    "originalName": "Yogur proteico natural (Hacendado/Mercadona)",
-    "kcal": 57,
-    "cho": 3.9,
-    "pro": 10,
-    "fat": 0.2,
-    "tags": [
-      "lactosa",
-      "proteina_vaca"
-    ],
-    "minGrams": 120,
-    "maxGrams": 250,
-    "treePath": [
-      "lacteos",
-      "yogures"
-    ]
-  },
-  {
     "name": "Yogur proteico sabor vainilla",
     "originalName": "Yogur proteico sabor vainilla (Hacendado/Mercadona)",
     "kcal": 65,
     "cho": 5.5,
     "pro": 10,
     "fat": 0.2,
-    "tags": [
-      "lactosa",
-      "proteina_vaca"
-    ],
-    "minGrams": 120,
-    "maxGrams": 250,
-    "treePath": [
-      "lacteos",
-      "yogures"
-    ]
-  },
-  {
-    "name": "Yogur proteico natural",
-    "originalName": "Yogur Proteína natural (Central Lechera Asturiana)",
-    "kcal": 62,
-    "cho": 4.5,
-    "pro": 10,
-    "fat": 1,
     "tags": [
       "lactosa",
       "proteina_vaca"
@@ -2463,17 +2410,18 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Garbanzo",
+    "name": "Garbanzos",
     "originalName": "Garbanzo seca",
     "kcal": 364,
     "cho": 61,
     "pro": 19,
     "fat": 6,
     "tags": [
-      "alto_fodmap"
+      "alto_fodmap",
+      "legumbres"
     ],
-    "minGrams": 100,
-    "maxGrams": 300,
+    "minGrams": 50,
+    "maxGrams": 180,
     "treePath": [
       "hidratos",
       "legumbres"
@@ -2487,10 +2435,11 @@ export const FOODS_CRUDO = [
     "pro": 25,
     "fat": 1.1,
     "tags": [
-      "alto_fodmap"
+      "alto_fodmap",
+      "legumbres"
     ],
-    "minGrams": 100,
-    "maxGrams": 300,
+    "minGrams": 50,
+    "maxGrams": 180,
     "treePath": [
       "hidratos",
       "legumbres"
@@ -2523,8 +2472,8 @@ export const FOODS_CRUDO = [
     "pro": 0.7,
     "fat": 0.2,
     "tags": [],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 150,
+    "maxGrams": 350,
     "treePath": [
       "suplementos",
       "bebidas"
@@ -3142,10 +3091,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Atún natural conserva natural",
     "originalName": "Atún natural conserva natural",
-    "kcal": 133.4,
+    "kcal": 101,
     "cho": 0,
-    "pro": 28.6,
-    "fat": 1.1,
+    "pro": 23.5,
+    "fat": 0.8,
     "tags": [
       "pescado",
       "pescado_azul"
@@ -3289,10 +3238,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Calamar",
     "originalName": "Calamar",
-    "kcal": 92,
-    "cho": 3.1,
-    "pro": 15.6,
-    "fat": 1.4,
+    "kcal": 80,
+    "cho": 1.3,
+    "pro": 16,
+    "fat": 1.2,
     "tags": [
       "pescado",
       "marisco"
@@ -3344,7 +3293,7 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Emperador (pez espada)",
+    "name": "Emperador",
     "originalName": "Emperador (pez espada) crudo",
     "kcal": 121,
     "cho": 0,
@@ -3382,10 +3331,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Lenguado",
     "originalName": "Lenguado",
-    "kcal": 86,
+    "kcal": 82,
     "cho": 0,
-    "pro": 16.5,
-    "fat": 1.9,
+    "pro": 17.1,
+    "fat": 1.3,
     "tags": [
       "pescado",
       "pescado_blanco"
@@ -3401,10 +3350,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Lubina",
     "originalName": "Lubina",
-    "kcal": 97,
+    "kcal": 84,
     "cho": 0,
     "pro": 18.4,
-    "fat": 2.5,
+    "fat": 1.1,
     "tags": [
       "pescado",
       "pescado_blanco"
@@ -3437,10 +3386,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Merluza",
     "originalName": "Merluza",
-    "kcal": 90,
+    "kcal": 73,
     "cho": 0,
-    "pro": 18,
-    "fat": 1.5,
+    "pro": 16.7,
+    "fat": 0.7,
     "tags": [
       "pescado",
       "pescado_blanco"
@@ -3511,10 +3460,10 @@ export const FOODS_CRUDO = [
   {
     "name": "Salmón",
     "originalName": "Salmón crudo",
-    "kcal": 208,
+    "kcal": 191,
     "cho": 0,
-    "pro": 20,
-    "fat": 13,
+    "pro": 20.3,
+    "fat": 12.1,
     "tags": [
       "pescado",
       "pescado_azul"
@@ -3601,12 +3550,12 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Sardina",
+    "name": "Sardinas",
     "originalName": "Sardina crudo",
-    "kcal": 208,
+    "kcal": 140,
     "cho": 0,
-    "pro": 25,
-    "fat": 11,
+    "pro": 18.1,
+    "fat": 7.5,
     "tags": [
       "pescado",
       "pescado_azul"
@@ -3641,9 +3590,9 @@ export const FOODS_CRUDO = [
     "name": "Sepia",
     "originalName": "Sepia",
     "kcal": 79,
-    "cho": 0.8,
-    "pro": 16.2,
-    "fat": 0.7,
+    "cho": 0.7,
+    "pro": 16.1,
+    "fat": 0.9,
     "tags": [
       "marisco"
     ],
@@ -4112,6 +4061,714 @@ export const FOODS_CRUDO = [
     "treePath": [
       "hidratos",
       "preparados_desayuno"
+    ]
+  },
+  {
+    "name": "Solomillos de pollo",
+    "originalName": "Solomillos de pollo",
+    "kcal": 110,
+    "cho": 0,
+    "pro": 23.5,
+    "fat": 1.5,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "carne",
+      "pollo"
+    ]
+  },
+  {
+    "name": "Boloñesa de pollo",
+    "originalName": "Boloñesa de pollo",
+    "kcal": 130,
+    "cho": 3.5,
+    "pro": 18,
+    "fat": 4.5,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "carne",
+      "pollo"
+    ]
+  },
+  {
+    "name": "Pavo al horno",
+    "originalName": "Pavo al horno",
+    "kcal": 135,
+    "cho": 0,
+    "pro": 23,
+    "fat": 4.5,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "carne",
+      "pavo"
+    ]
+  },
+  {
+    "name": "Albóndigas de pavo",
+    "originalName": "Albóndigas de pavo",
+    "kcal": 140,
+    "cho": 3,
+    "pro": 20,
+    "fat": 5.5,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "carne",
+      "pavo"
+    ]
+  },
+  {
+    "name": "Lomo de cerdo",
+    "originalName": "Lomo de cerdo",
+    "kcal": 135,
+    "cho": 0,
+    "pro": 22.5,
+    "fat": 4.8,
+    "tags": [
+      "cerdo"
+    ],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "carne",
+      "cerdo"
+    ]
+  },
+  {
+    "name": "Burger de ternera",
+    "originalName": "Burger de ternera",
+    "kcal": 145,
+    "cho": 1,
+    "pro": 20.5,
+    "fat": 6.8,
+    "tags": [
+      "carne_roja"
+    ],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "carne",
+      "vacuno"
+    ]
+  },
+  {
+    "name": "Filete de ternera",
+    "originalName": "Filete de ternera",
+    "kcal": 118,
+    "cho": 0,
+    "pro": 22.5,
+    "fat": 3.1,
+    "tags": [
+      "carne_roja"
+    ],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "carne",
+      "vacuno"
+    ]
+  },
+  {
+    "name": "Boloñesa de ternera",
+    "originalName": "Boloñesa de ternera",
+    "kcal": 155,
+    "cho": 3.5,
+    "pro": 17,
+    "fat": 7.5,
+    "tags": [
+      "carne_roja"
+    ],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "carne",
+      "vacuno"
+    ]
+  },
+  {
+    "name": "Hamburguesa de potro",
+    "originalName": "Hamburguesa de potro",
+    "kcal": 125,
+    "cho": 0.5,
+    "pro": 21.5,
+    "fat": 4,
+    "tags": [
+      "carne_roja"
+    ],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "carne",
+      "vacuno"
+    ]
+  },
+  {
+    "name": "Cordero (parte más magra)",
+    "originalName": "Cordero (parte más magra)",
+    "kcal": 155,
+    "cho": 0,
+    "pro": 21,
+    "fat": 7.8,
+    "tags": [
+      "carne_roja"
+    ],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "treePath": [
+      "proteina",
+      "carne",
+      "vacuno"
+    ]
+  },
+  {
+    "name": "Atún rojo",
+    "originalName": "Atún rojo",
+    "kcal": 144,
+    "cho": 0,
+    "pro": 23.3,
+    "fat": 4.9,
+    "tags": [
+      "pescado"
+    ],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "pescado",
+      "pescado_azul"
+    ]
+  },
+  {
+    "name": "Atún de aleta amarilla",
+    "originalName": "Atún de aleta amarilla",
+    "kcal": 130,
+    "cho": 0,
+    "pro": 24.5,
+    "fat": 3,
+    "tags": [
+      "pescado"
+    ],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "pescado",
+      "pescado_azul"
+    ]
+  },
+  {
+    "name": "Trucha",
+    "originalName": "Trucha",
+    "kcal": 119,
+    "cho": 0,
+    "pro": 20.5,
+    "fat": 3.5,
+    "tags": [
+      "pescado"
+    ],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "pescado",
+      "pescado_azul"
+    ]
+  },
+  {
+    "name": "Gallineta",
+    "originalName": "Gallineta",
+    "kcal": 92,
+    "cho": 0,
+    "pro": 18.5,
+    "fat": 1.5,
+    "tags": [
+      "pescado"
+    ],
+    "minGrams": 100,
+    "maxGrams": 350,
+    "treePath": [
+      "proteina",
+      "pescado",
+      "pescado_blanco"
+    ]
+  },
+  {
+    "name": "Presa ibérica",
+    "originalName": "Presa ibérica",
+    "kcal": 160,
+    "cho": 0,
+    "pro": 21,
+    "fat": 8.5,
+    "tags": [
+      "cerdo"
+    ],
+    "minGrams": 100,
+    "maxGrams": 250,
+    "treePath": [
+      "proteina",
+      "carne",
+      "cerdo"
+    ]
+  },
+  {
+    "name": "Solomillo ibérico",
+    "originalName": "Solomillo ibérico",
+    "kcal": 143,
+    "cho": 0,
+    "pro": 22,
+    "fat": 6,
+    "tags": [
+      "cerdo"
+    ],
+    "minGrams": 100,
+    "maxGrams": 250,
+    "treePath": [
+      "proteina",
+      "carne",
+      "cerdo"
+    ]
+  },
+  {
+    "name": "Pan",
+    "originalName": "Pan",
+    "kcal": 260,
+    "cho": 52,
+    "pro": 8.5,
+    "fat": 1.5,
+    "tags": [
+      "gluten"
+    ],
+    "minGrams": 40,
+    "maxGrams": 200,
+    "treePath": [
+      "hidratos",
+      "panes"
+    ]
+  },
+  {
+    "name": "Gajos de patata",
+    "originalName": "Gajos de patata",
+    "kcal": 77,
+    "cho": 17.5,
+    "pro": 2,
+    "fat": 0.1,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 450,
+    "treePath": [
+      "hidratos",
+      "tuberculos"
+    ]
+  },
+  {
+    "name": "Gajos de boniato",
+    "originalName": "Gajos de boniato",
+    "kcal": 86,
+    "cho": 20.1,
+    "pro": 1.6,
+    "fat": 0.1,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 450,
+    "treePath": [
+      "hidratos",
+      "tuberculos"
+    ]
+  },
+  {
+    "name": "Macarrones integrales",
+    "originalName": "Macarrones integrales",
+    "kcal": 348,
+    "cho": 65,
+    "pro": 13.5,
+    "fat": 2.2,
+    "tags": [
+      "gluten"
+    ],
+    "minGrams": 50,
+    "maxGrams": 200,
+    "treePath": [
+      "hidratos",
+      "pasta"
+    ]
+  },
+  {
+    "name": "Fusilli",
+    "originalName": "Fusilli",
+    "kcal": 371,
+    "cho": 75,
+    "pro": 13,
+    "fat": 1.5,
+    "tags": [
+      "gluten"
+    ],
+    "minGrams": 50,
+    "maxGrams": 200,
+    "treePath": [
+      "hidratos",
+      "pasta"
+    ]
+  },
+  {
+    "name": "Espaguetis integrales",
+    "originalName": "Espaguetis integrales",
+    "kcal": 348,
+    "cho": 65,
+    "pro": 13.5,
+    "fat": 2.2,
+    "tags": [
+      "gluten"
+    ],
+    "minGrams": 50,
+    "maxGrams": 200,
+    "treePath": [
+      "hidratos",
+      "pasta"
+    ]
+  },
+  {
+    "name": "Espirales de lentejas",
+    "originalName": "Espirales de lentejas",
+    "kcal": 334,
+    "cho": 50,
+    "pro": 26,
+    "fat": 1.5,
+    "tags": [
+      "sin_gluten_especial"
+    ],
+    "minGrams": 50,
+    "maxGrams": 200,
+    "treePath": [
+      "hidratos",
+      "pasta"
+    ]
+  },
+  {
+    "name": "Leche desnatada sin lactosa",
+    "originalName": "Leche desnatada sin lactosa",
+    "kcal": 35,
+    "cho": 4.9,
+    "pro": 3.4,
+    "fat": 0.1,
+    "tags": [
+      "sin_lactosa_especial",
+      "proteina_vaca"
+    ],
+    "minGrams": 150,
+    "maxGrams": 350,
+    "treePath": [
+      "lacteos",
+      "leches"
+    ]
+  },
+  {
+    "name": "Almendras laminadas tostadas",
+    "originalName": "Almendras laminadas tostadas",
+    "kcal": 579,
+    "cho": 21.6,
+    "pro": 21.2,
+    "fat": 49.9,
+    "tags": [
+      "fruto_seco"
+    ],
+    "minGrams": 15,
+    "maxGrams": 35,
+    "treePath": [
+      "grasas",
+      "frutos_secos"
+    ]
+  },
+  {
+    "name": "Pasta de aguacate",
+    "originalName": "Pasta de aguacate",
+    "kcal": 141,
+    "cho": 5.9,
+    "pro": 1.5,
+    "fat": 12,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 30,
+    "maxGrams": 100,
+    "treePath": [
+      "grasas",
+      "aguacate"
+    ]
+  },
+  {
+    "name": "Tomate natural rallado",
+    "originalName": "Tomate natural rallado",
+    "kcal": 18,
+    "cho": 3.9,
+    "pro": 0.9,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 40,
+    "maxGrams": 150,
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Pimiento rojo",
+    "originalName": "Pimiento rojo",
+    "kcal": 31,
+    "cho": 6,
+    "pro": 1,
+    "fat": 0.3,
+    "tags": [],
+    "minGrams": 50,
+    "maxGrams": 150,
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Zarangollo",
+    "originalName": "Zarangollo",
+    "kcal": 25,
+    "cho": 3.5,
+    "pro": 1.5,
+    "fat": 0.5,
+    "tags": [],
+    "minGrams": 80,
+    "maxGrams": 200,
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Infusiones",
+    "originalName": "Infusiones",
+    "kcal": 1,
+    "cho": 0.2,
+    "pro": 0,
+    "fat": 0,
+    "tags": [],
+    "minGrams": 150,
+    "maxGrams": 300,
+    "treePath": [
+      "suplementos",
+      "bebidas"
+    ]
+  },
+  {
+    "name": "Miel de Manuka",
+    "originalName": "Miel de Manuka",
+    "kcal": 310,
+    "cho": 82,
+    "pro": 0.3,
+    "fat": 0,
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ],
+    "minGrams": 15,
+    "maxGrams": 40,
+    "treePath": [
+      "suplementos",
+      "otros"
+    ]
+  },
+  {
+    "name": "Bebida de coco",
+    "originalName": "Bebida de coco",
+    "kcal": 20,
+    "cho": 2.7,
+    "pro": 0.1,
+    "fat": 1,
+    "tags": [],
+    "minGrams": 150,
+    "maxGrams": 350,
+    "treePath": [
+      "lacteos",
+      "leches"
+    ]
+  },
+  {
+    "name": "Yogur de coco",
+    "originalName": "Yogur de coco",
+    "kcal": 70,
+    "cho": 7,
+    "pro": 0.5,
+    "fat": 4.5,
+    "tags": [],
+    "minGrams": 120,
+    "maxGrams": 250,
+    "treePath": [
+      "lacteos",
+      "yogures"
+    ]
+  },
+  {
+    "name": "Pan de molde de avena",
+    "originalName": "Pan de molde de avena",
+    "kcal": 257,
+    "cho": 43,
+    "pro": 10,
+    "fat": 5,
+    "tags": [
+      "gluten"
+    ],
+    "minGrams": 30,
+    "maxGrams": 80,
+    "treePath": [
+      "hidratos",
+      "panes"
+    ]
+  },
+  {
+    "name": "Focaccia",
+    "originalName": "Focaccia",
+    "kcal": 293,
+    "cho": 45,
+    "pro": 8,
+    "fat": 9,
+    "tags": [
+      "gluten"
+    ],
+    "minGrams": 30,
+    "maxGrams": 100,
+    "treePath": [
+      "hidratos",
+      "panes"
+    ]
+  },
+  {
+    "name": "Cereales de chocolate de arroz",
+    "originalName": "Cereales de chocolate de arroz",
+    "kcal": 379,
+    "cho": 84,
+    "pro": 5,
+    "fat": 2.5,
+    "tags": [
+      "gluten"
+    ],
+    "minGrams": 30,
+    "maxGrams": 80,
+    "treePath": [
+      "hidratos",
+      "cereales"
+    ]
+  },
+  {
+    "name": "Queso edam en lonchas",
+    "originalName": "Queso edam en lonchas",
+    "kcal": 357,
+    "cho": 1.4,
+    "pro": 25,
+    "fat": 28,
+    "tags": [
+      "lactosa",
+      "proteina_vaca"
+    ],
+    "minGrams": 20,
+    "maxGrams": 60,
+    "treePath": [
+      "lacteos",
+      "quesos",
+      "quesos_curados"
+    ]
+  },
+  {
+    "name": "Mermelada",
+    "originalName": "Mermelada",
+    "kcal": 250,
+    "cho": 62,
+    "pro": 0.4,
+    "fat": 0.1,
+    "tags": [
+      "fructosa"
+    ],
+    "minGrams": 15,
+    "maxGrams": 40,
+    "treePath": [
+      "suplementos",
+      "otros"
+    ]
+  },
+  {
+    "name": "Panela",
+    "originalName": "Panela",
+    "kcal": 382,
+    "cho": 95,
+    "pro": 0.4,
+    "fat": 0.1,
+    "tags": [],
+    "minGrams": 5,
+    "maxGrams": 20,
+    "treePath": [
+      "suplementos",
+      "otros"
+    ]
+  },
+  {
+    "name": "Browniato",
+    "originalName": "Browniato",
+    "kcal": 230,
+    "cho": 30,
+    "pro": 6,
+    "fat": 9.5,
+    "tags": [
+      "huevo",
+      "gluten"
+    ],
+    "minGrams": 40,
+    "maxGrams": 100,
+    "treePath": [
+      "suplementos",
+      "dulces_otros"
+    ]
+  },
+  {
+    "name": "Nutable",
+    "originalName": "Nutable",
+    "kcal": 549,
+    "cho": 35,
+    "pro": 10,
+    "fat": 41,
+    "tags": [
+      "fruto_seco",
+      "fructosa"
+    ],
+    "minGrams": 15,
+    "maxGrams": 30,
+    "treePath": [
+      "suplementos",
+      "dulces_otros"
+    ]
+  },
+  {
+    "name": "Canela",
+    "originalName": "Canela",
+    "kcal": 247,
+    "cho": 55,
+    "pro": 4,
+    "fat": 1.2,
+    "tags": [],
+    "minGrams": 2,
+    "maxGrams": 5,
+    "treePath": [
+      "complementos",
+      "condimentos"
     ]
   }
 ];

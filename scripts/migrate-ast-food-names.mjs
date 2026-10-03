@@ -152,6 +152,34 @@ const REFERENCE_MAP = {
   'Maíz': null,
 };
 
+/**
+ * Alimentos renombrados o fusionados al unificar foods-menu con foods-crudo: el nombre antiguo pasa al nuevo
+ * antes de buscarlo en el árbol (algunos, como "Arroz", coincidirían si no con una rama genérica).
+ */
+const RENAMED_FOODS = {
+  'Huevo entero tortilla': 'Huevo entero',
+  'Huevo plancha': 'Huevo entero',
+  'Huevo duro': 'Huevo entero',
+  'Huevo cocido': 'Huevo entero',
+  'Colas de gamba': 'Gambas',
+  'Yogur de proteína': 'Yogur proteico natural',
+  'Judía verde': 'Judías verdes',
+  'Tofu firme': 'Tofu',
+  'Sardina': 'Sardinas',
+  'Chuletas de pavo': 'Chuleta de pavo',
+  'Atún en conserva': 'Atún natural conserva natural',
+  'Emperador (pez espada)': 'Emperador',
+  'Ñoquis de patata': 'Ñoquis',
+  'Arroz': 'Arroz blanco',
+  'Pan blanco de barra': 'Pan blanco',
+  'Anacardo (marañón)': 'Anacardos',
+  'Avellana': 'Avellanas',
+  'Frambuesa': 'Frambuesas',
+  'Garbanzo': 'Garbanzos',
+  'Tortas de arroz': 'Tortitas de arroz',
+  'Trigo sarraceno hinchado': 'Cereales de trigo sarraceno hinchados',
+};
+
 const fullTree = getFullFoodTree();
 
 /** Nombre canónico con la misma prioridad que el generador: alimento exacto primero, después rama. */
@@ -178,8 +206,10 @@ export function migrateAstNode(node, report) {
   if (!node || typeof node !== 'object') return null;
 
   if (node.type === 'food') {
-    const name = String(node.name || node.foodName || node.label || '').trim();
-    if (!name) return null;
+    const storedName = String(node.name || node.foodName || node.label || '').trim();
+    if (!storedName) return null;
+    const name = RENAMED_FOODS[storedName] || storedName;
+    if (name !== storedName) bump(report.renamed, `${storedName} → ${name}`);
     const canonical = canonicalName(name);
     if (canonical) {
       if (canonical !== name) bump(report.renamed, `${name} → ${canonical}`);
