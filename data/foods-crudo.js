@@ -598,13 +598,15 @@ export const FOODS_CRUDO = [
     "fat": 1.5,
     "tags": [
       "gluten",
-      "sin_lactosa_especial"
+      "sin_lactosa_especial",
+      "vegetal"
     ],
     "minGrams": 100,
     "maxGrams": 300,
     "treePath": [
       "lacteos",
-      "leches"
+      "leches",
+      "bebidas_vegetales"
     ]
   },
   {
@@ -1760,13 +1762,16 @@ export const FOODS_CRUDO = [
     "pro": 0.5,
     "fat": 1.1,
     "tags": [
-      "fruto_seco"
+      "fruto_seco",
+      "sin_lactosa_especial",
+      "vegetal"
     ],
     "minGrams": 150,
     "maxGrams": 350,
     "treePath": [
       "lacteos",
-      "leches"
+      "leches",
+      "bebidas_vegetales"
     ]
   },
   {
@@ -1777,13 +1782,16 @@ export const FOODS_CRUDO = [
     "pro": 3.3,
     "fat": 1.8,
     "tags": [
-      "soja"
+      "soja",
+      "sin_lactosa_especial",
+      "vegetal"
     ],
     "minGrams": 150,
     "maxGrams": 350,
     "treePath": [
       "lacteos",
-      "leches"
+      "leches",
+      "bebidas_vegetales"
     ]
   },
   {
@@ -3995,7 +4003,8 @@ export const FOODS_CRUDO = [
     "pro": 20,
     "fat": 0.5,
     "tags": [
-      "sin_lactosa_especial"
+      "sin_lactosa_especial",
+      "vegetal"
     ],
     "minGrams": 25,
     "maxGrams": 40,
@@ -4595,12 +4604,16 @@ export const FOODS_CRUDO = [
     "cho": 2.7,
     "pro": 0.1,
     "fat": 1,
-    "tags": [],
+    "tags": [
+      "sin_lactosa_especial",
+      "vegetal"
+    ],
     "minGrams": 150,
     "maxGrams": 350,
     "treePath": [
       "lacteos",
-      "leches"
+      "leches",
+      "bebidas_vegetales"
     ]
   },
   {
@@ -4610,12 +4623,16 @@ export const FOODS_CRUDO = [
     "cho": 7,
     "pro": 0.5,
     "fat": 4.5,
-    "tags": [],
+    "tags": [
+      "sin_lactosa_especial",
+      "vegetal"
+    ],
     "minGrams": 120,
     "maxGrams": 250,
     "treePath": [
       "lacteos",
-      "yogures"
+      "yogures",
+      "yogures_vegetales"
     ]
   },
   {
