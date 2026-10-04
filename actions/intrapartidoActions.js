@@ -1,6 +1,6 @@
 'use server';
 
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedTeam, getAccessibleTeam } from '@/lib/auth/team-access';
@@ -31,24 +31,24 @@ async function requireTeamAccess(teamId, { write }) {
   if (!user) throw new Error('No autorizado');
   if (write && (user.role === 'tecnico' || user.role === 'jugador')) throw new Error('No autorizado');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const team = write
-    ? await getOwnedTeam(supabase, user, teamId)
-    : await getAccessibleTeam(supabase, user, teamId);
+    ? await getOwnedTeam(db, user, teamId)
+    : await getAccessibleTeam(db, user, teamId);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
-  return { supabase, user };
+  return { db, user };
 }
 
 export async function listIntrapartidoMatches(teamId) {
-  const { supabase } = await requireTeamAccess(teamId, { write: false });
-  const matches = await getIntrapartidoMatchesByTeamId(supabase, teamId);
+  const { db } = await requireTeamAccess(teamId, { write: false });
+  const matches = await getIntrapartidoMatchesByTeamId(db, teamId);
   return { ok: true, matches };
 }
 
 export async function getIntrapartidoMatch(teamId, matchId) {
-  const { supabase } = await requireTeamAccess(teamId, { write: false });
-  const result = await getIntrapartidoMatchById(supabase, teamId, parseId(matchId, 'Partido'));
+  const { db } = await requireTeamAccess(teamId, { write: false });
+  const result = await getIntrapartidoMatchById(db, teamId, parseId(matchId, 'Partido'));
   if (!result) throw new Error('Partido no encontrado');
 
   const { match, convocados, tomas } = result;
@@ -56,7 +56,7 @@ export async function getIntrapartidoMatch(teamId, matchId) {
 }
 
 export async function saveIntrapartidoMatch(teamId, session) {
-  const { supabase, user } = await requireTeamAccess(teamId, { write: true });
+  const { db, user } = await requireTeamAccess(teamId, { write: true });
   assertPlainObject(session, { label: 'Sesión' });
   // Modo demo (boneyard): nada que persistir.
   if (isMockTeam(teamId)) return { ok: true, id: null };
@@ -79,7 +79,7 @@ export async function saveIntrapartidoMatch(teamId, session) {
   });
 
   // Todos los jugadores deben pertenecer al equipo indicado.
-  const teamPlayers = await getPlayersByTeamSelect(supabase, teamId, 'id');
+  const teamPlayers = await getPlayersByTeamSelect(db, teamId, 'id');
   const teamPlayerIds = new Set(teamPlayers.map((p) => Number(p.id)));
   rosterIds.forEach((id) => {
     if (!teamPlayerIds.has(id)) throw new Error('Hay jugadores que no pertenecen al equipo');
@@ -106,7 +106,7 @@ export async function saveIntrapartidoMatch(teamId, session) {
   });
 
   const matchId = session.id ? parseId(session.id, 'Partido') : null;
-  const id = await saveIntrapartidoMatchInRepo(supabase, {
+  const id = await saveIntrapartidoMatchInRepo(db, {
     matchId,
     teamId: parseId(teamId, 'Equipo'),
     rival: String(matchInfo.rival || '').trim().slice(0, 120),
@@ -123,8 +123,8 @@ export async function saveIntrapartidoMatch(teamId, session) {
 }
 
 export async function deleteIntrapartidoMatch(teamId, matchId) {
-  const { supabase } = await requireTeamAccess(teamId, { write: true });
-  await deleteIntrapartidoMatchInRepo(supabase, teamId, parseId(matchId, 'Partido'));
+  const { db } = await requireTeamAccess(teamId, { write: true });
+  await deleteIntrapartidoMatchInRepo(db, teamId, parseId(matchId, 'Partido'));
   revalidatePath(`/dashboard/equipo/${teamId}/intrapartido`);
   return { ok: true };
 }

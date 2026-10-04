@@ -2,10 +2,10 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
 import { env } from '@/config/env';
 import { buildSessionValue, COOKIE_NAME, getUser } from '@/lib/auth/session';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
+import { verifyAuthPassword } from '@/lib/auth/auth-users';
 import { getPlayerByAuthUserIdSingle } from '@/repositories/playerRepository';
 import { getTecnicoByAuthUserId } from '@/repositories/tecnicoRepository';
 import { enforceRateLimit } from '@/lib/security/rate-limit';
@@ -35,35 +35,32 @@ export async function login(emailOrPayload, passwordParam, expectedRoleParam) {
   await enforceRateLimit('login', cleanEmail, { limit: 8, windowMs: 15 * 60 * 1000 });
   await enforceRateLimit('login-ip', '', { limit: 40, windowMs: 15 * 60 * 1000 });
 
-  // Este endpoint corre en servidor, así que usamos la service key para no depender
-  // de la publishable/anon key del cliente.
-  const supabaseAuth = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-
-  const { data: authData, error: authError } = await supabaseAuth.auth.signInWithPassword({
-    email: cleanEmail,
-    password,
-  });
-
-  if (authError || !authData?.user) {
+  // La contraseña se comprueba contra auth.users (hash bcrypt de Supabase Auth) por la
+  // conexión directa a la BD, sin depender de la API de Supabase.
+  let supabaseUser = null;
+  try {
+    supabaseUser = await verifyAuthPassword(cleanEmail, password);
+  } catch (authError) {
     console.error('Login auth error:', authError?.message);
+    throw new Error('El inicio de sesión no está disponible temporalmente. Inténtalo más tarde.');
+  }
+
+  if (!supabaseUser) {
     throw new Error('Email o contraseña incorrectos');
   }
 
-  const supabaseUser = authData.user;
-  const supabaseAdmin = getSupabaseAdmin();
+  const db = getDb();
   let jugador = null;
   let tecnico = null;
 
   // Si esperamos rol jugador (o no se especifica rol), buscamos en la tabla jugadores
   if (expectedRole === 'jugador' || !expectedRole) {
-    jugador = await getPlayerByAuthUserIdSingle(supabaseAdmin, supabaseUser.id);
+    jugador = await getPlayerByAuthUserIdSingle(db, supabaseUser.id);
   }
 
   // Si esperamos rol técnico (o no se especifica rol y no era jugador), buscamos en tecnicos
   if (!jugador && (expectedRole === 'tecnico' || !expectedRole)) {
-    tecnico = await getTecnicoByAuthUserId(supabaseAdmin, supabaseUser.id);
+    tecnico = await getTecnicoByAuthUserId(db, supabaseUser.id);
   }
 
   if (!jugador && !tecnico) {

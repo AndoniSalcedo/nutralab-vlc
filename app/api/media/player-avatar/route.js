@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { forbidden, getAccessiblePlayer } from '@/lib/auth/team-access';
 import { getPlayerAvatar } from '@/repositories/playerRepository';
@@ -20,18 +20,18 @@ export async function GET(req) {
     }
     if (!id) return NextResponse.json({ error: 'Falta id del jugador' }, { status: 400 });
 
-    const supabase = getSupabaseAdmin();
+    const db = getDb();
 
     if (user.role === 'jugador') {
       if (String(user.id) !== String(id)) {
         return forbidden('No tienes acceso a este jugador');
       }
     } else {
-      const accessible = await getAccessiblePlayer(supabase, user, id);
+      const accessible = await getAccessiblePlayer(db, user, id);
       if (!accessible) return forbidden('No tienes acceso a este jugador');
     }
 
-    const player = await getPlayerAvatar(supabase, id);
+    const player = await getPlayerAvatar(db, id);
     if (!player || !player.avatar) {
       return NextResponse.json({ error: 'Avatar no encontrado' }, { status: 404 });
     }

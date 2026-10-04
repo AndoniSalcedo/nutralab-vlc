@@ -2,7 +2,7 @@ import React from 'react';
 import { NextResponse } from 'next/server';
 import { renderToStream } from '@react-pdf/renderer';
 import { getUser } from '@/lib/auth/session';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getAccessibleTeam } from '@/lib/auth/team-access';
 import { withLatestMeasurement } from '@/lib/metrics/player';
 import WeeklySquadReportDocument from '@/components/reports/WeeklySquadReportDocument';
@@ -56,8 +56,8 @@ function httpError(message, status = 400) {
 }
 
 
-async function resolveTeam(supabase, user, teamId) {
-  const team = await getAccessibleTeam(supabase, user, teamId);
+async function resolveTeam(db, user, teamId) {
+  const team = await getAccessibleTeam(db, user, teamId);
   if (!team) {
     throw httpError('No tienes acceso a este equipo', 403);
   }
@@ -82,14 +82,14 @@ async function runWithConcurrency(items, limit, fn) {
 }
 
 async function loadPlayersWithMeasurements(
-  supabase,
+  db,
   team,
   jugadorIds,
   semana,
   semanaMenu,
   { meta, nombre, persistPlans = true, draftPlans = null, user = null } = {}
 ) {
-  const rawPlayers = await getPlayersByTeam(supabase, team.id);
+  const rawPlayers = await getPlayersByTeam(db, team.id);
   let players = rawPlayers || [];
   if (jugadorIds.length) {
     const idsSet = new Set(jugadorIds.map(String));
@@ -102,14 +102,14 @@ async function loadPlayersWithMeasurements(
 
   const playerIds = players.map((player) => player.id);
   const [evoluciones, pesajes] = await Promise.all([
-    getEvolutionsByPlayerIds(supabase, playerIds),
-    getPesajesByPlayerIds(supabase, playerIds),
+    getEvolutionsByPlayerIds(db, playerIds),
+    getPesajesByPlayerIds(db, playerIds),
   ]);
 
-  const menu = await resolvePlanMenu(supabase, { semanaMenu, equipoId: team.id });
+  const menu = await resolvePlanMenu(db, { semanaMenu, equipoId: team.id });
 
   async function persist(player, datos) {
-    const saved = await savePlan(supabase, {
+    const saved = await savePlan(db, {
       jugadorId: player.id,
       nombre,
       datos: withReportMeta(datos, meta),
@@ -131,7 +131,7 @@ async function loadPlayersWithMeasurements(
       activePlan = persistPlans ? await persist(player, draftPlan) : { datos: draftPlan };
     } else {
       try {
-        const baseData = await generatePlanDraft(supabase, {
+        const baseData = await generatePlanDraft(db, {
           jugador: player,
           nombre,
           menu,
@@ -190,7 +190,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   }
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
 
   try {
     const body = await request.json();
@@ -198,7 +198,7 @@ export async function POST(request) {
     const jugadorIds = normalizeIds(body?.jugadorIds);
     const semanaMenu = body?.semanaMenu || body?.meta?.semanaMenu;
 
-    const team = await resolveTeam(supabase, user, body?.team_id);
+    const team = await resolveTeam(db, user, body?.team_id);
     let semana = body?.meta?.semana;
     const generateOnly = !!body?.generateOnly;
     const previewOnly = !!body?.previewOnly;
@@ -224,7 +224,7 @@ export async function POST(request) {
     const hasDraftPlans = draftPlans.size > 0;
     const shouldPersist = !previewOnly && !downloadOnly;
 
-    const players = await loadPlayersWithMeasurements(supabase, team, jugadorIds, semana, semanaMenu, {
+    const players = await loadPlayersWithMeasurements(db, team, jugadorIds, semana, semanaMenu, {
       meta,
       nombre,
       persistPlans: shouldPersist,

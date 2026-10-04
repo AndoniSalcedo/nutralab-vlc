@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import TeamsDashboard from '@/components/TeamsDashboard';
 import { getUser } from '@/lib/auth/session';
 import { getOwnerId } from '@/lib/auth/team-access';
@@ -12,12 +12,12 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function Dashboard() {
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   
   // Jugador flow
   if (user?.role === 'jugador') {
-    const jugador = await getPlayerById(supabase, user.id);
+    const jugador = await getPlayerById(db, user.id);
     
     if (!jugador) {
       return (
@@ -36,10 +36,10 @@ export default async function Dashboard() {
   if (user?.role === 'tecnico') {
     let teams = [];
     try {
-      const rawTeams = await getTeamsByTecnico(supabase, user.id);
+      const rawTeams = await getTeamsByTecnico(db, user.id);
       const teamIds = rawTeams.map((t) => t.id);
 
-      const jugadores = await getPlayersByMultipleTeamIds(supabase, teamIds);
+      const jugadores = await getPlayersByMultipleTeamIds(db, teamIds);
 
       const counts = new Map();
       const playersByTeam = new Map();
@@ -74,8 +74,8 @@ export default async function Dashboard() {
   let teams = [];
   try {
     const [resEquipos, resJugadores] = await Promise.all([
-      getTeamsByOwner(supabase, ownerId),
-      getPlayersByOwner(supabase, ownerId)
+      getTeamsByOwner(db, ownerId),
+      getPlayersByOwner(db, ownerId)
     ]);
 
     const counts = new Map();

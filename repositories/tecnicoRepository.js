@@ -1,25 +1,22 @@
+
 import { mockTeam, mockTeams, mockPlayers, isMockTeam, isMockPlayer, isBoneyardMode } from '@/config/boneyardMockData';
+import { selectFields } from '@/lib/db/prisma';
 
-export async function getTecnicosByOwner(supabase, ownerId) {
-  const { data: links, error: linksError } = await supabase
-    .from('nutricionista_tecnicos')
-    .select('tecnico_id, tecnicos(*)')
-    .eq('nutricionista_id', ownerId);
+export async function getTecnicosByOwner(db, ownerId) {
+  const links = await db.nutricionista_tecnicos.findMany({
+    where: { nutricionista_id: ownerId },
+    select: { tecnico_id: true, tecnicos: true },
+  });
 
-  if (linksError) throw linksError;
-
-  const tecnicos = (links || []).map((l) => l.tecnicos).filter(Boolean);
+  const tecnicos = links.map((l) => l.tecnicos).filter(Boolean);
   const tecnicoIds = tecnicos.map((t) => t.id);
 
   let assignments = [];
   if (tecnicoIds.length > 0) {
-    const { data, error } = await supabase
-      .from('tecnico_equipos')
-      .select('tecnico_id, equipo_id')
-      .in('tecnico_id', tecnicoIds);
-
-    if (error) throw error;
-    assignments = data || [];
+    assignments = await db.tecnico_equipos.findMany({
+      where: { tecnico_id: { in: tecnicoIds } },
+      select: { tecnico_id: true, equipo_id: true },
+    });
   }
 
   const assignmentsMap = new Map();
@@ -36,135 +33,99 @@ export async function getTecnicosByOwner(supabase, ownerId) {
   }));
 }
 
-export async function getTecnicoByEmail(supabase, email) {
-  const { data, error } = await supabase
-    .from('tecnicos')
-    .select('*')
-    .eq('email', email)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
+export async function getTecnicoByEmail(db, email) {
+  return db.tecnicos.findUnique({ where: { email } });
 }
 
-export async function getTecnicoById(supabase, id) {
-  const { data, error } = await supabase
-    .from('tecnicos')
-    .select('id, nombre, apellidos, email, avatar, avatar_mime, avatar_size, updated_at')
-    .eq('id', id)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
+export async function getTecnicoById(db, id) {
+  return db.tecnicos.findUnique({
+    where: { id },
+    select: selectFields('id, nombre, apellidos, email, avatar, avatar_mime, avatar_size, updated_at'),
+  });
 }
 
-export async function getTecnicoByAuthUserId(supabase, authUserId) {
-  const { data, error } = await supabase
-    .from('tecnicos')
-    .select('id, nombre, apellidos, email')
-    .eq('auth_user_id', authUserId)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
+export async function getTecnicoByAuthUserId(db, authUserId) {
+  return db.tecnicos.findUnique({
+    where: { auth_user_id: authUserId },
+    select: selectFields('id, nombre, apellidos, email'),
+  });
 }
 
-export async function createTecnicoRecord(supabase, { auth_user_id, nombre, apellidos, email, owner_id = null }) {
-  const { data, error } = await supabase
-    .from('tecnicos')
-    .insert({
+export async function createTecnicoRecord(db, { auth_user_id, nombre, apellidos, email, owner_id = null }) {
+  return db.tecnicos.create({
+    data: {
       auth_user_id,
       nombre,
       apellidos,
       email,
       owner_id,
-    })
-    .select('*')
-    .single();
-
-  if (error) throw error;
-  return data;
+    },
+  });
 }
 
-export async function linkTecnicoToNutricionista(supabase, ownerId, tecnicoId) {
-  const { error } = await supabase
-    .from('nutricionista_tecnicos')
-    .upsert({
-      nutricionista_id: ownerId,
-      tecnico_id: tecnicoId,
-      status: 'accepted',
-    }, { onConflict: 'nutricionista_id,tecnico_id' });
-
-  if (error) throw error;
+export async function linkTecnicoToNutricionista(db, ownerId, tecnicoId) {
+  const row = {
+    nutricionista_id: ownerId,
+    tecnico_id: tecnicoId,
+    status: 'accepted',
+  };
+  await db.nutricionista_tecnicos.upsert({
+    where: { nutricionista_id_tecnico_id: { nutricionista_id: ownerId, tecnico_id: tecnicoId } },
+    create: row,
+    update: row,
+  });
   return true;
 }
 
-export async function unlinkTecnicoFromNutricionista(supabase, ownerId, tecnicoId) {
-  const { error: deleteLinkErr } = await supabase
-    .from('nutricionista_tecnicos')
-    .delete()
-    .eq('nutricionista_id', ownerId)
-    .eq('tecnico_id', tecnicoId);
+export async function unlinkTecnicoFromNutricionista(db, ownerId, tecnicoId) {
+  await db.nutricionista_tecnicos.deleteMany({
+    where: { nutricionista_id: ownerId, tecnico_id: tecnicoId },
+  });
 
-  if (deleteLinkErr) throw deleteLinkErr;
+  const myTeams = await db.equipos.findMany({
+    where: { owner_id: ownerId },
+    select: { id: true },
+  });
 
-  const { data: myTeams } = await supabase
-    .from('equipos')
-    .select('id')
-    .eq('owner_id', ownerId);
-
-  const myTeamIds = (myTeams || []).map((t) => t.id);
+  const myTeamIds = myTeams.map((t) => t.id);
   if (myTeamIds.length > 0) {
-    await supabase
-      .from('tecnico_equipos')
-      .delete()
-      .eq('tecnico_id', tecnicoId)
-      .in('equipo_id', myTeamIds);
+    await db.tecnico_equipos.deleteMany({
+      where: { tecnico_id: tecnicoId, equipo_id: { in: myTeamIds } },
+    });
   }
 
   return true;
 }
 
-export async function getNutricionistaTecnicoLink(supabase, ownerId, tecnicoId) {
-  const { data, error } = await supabase
-    .from('nutricionista_tecnicos')
-    .select('id')
-    .eq('nutricionista_id', ownerId)
-    .eq('tecnico_id', tecnicoId)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
+export async function getNutricionistaTecnicoLink(db, ownerId, tecnicoId) {
+  return db.nutricionista_tecnicos.findUnique({
+    where: { nutricionista_id_tecnico_id: { nutricionista_id: ownerId, tecnico_id: tecnicoId } },
+    select: { id: true },
+  });
 }
 
-export async function assignTeamsToTecnico(supabase, ownerId, tecnicoId, teamIds) {
+export async function assignTeamsToTecnico(db, ownerId, tecnicoId, teamIds) {
   if (teamIds.length > 0) {
-    const { data: validTeams, error: teamsError } = await supabase
-      .from('equipos')
-      .select('id')
-      .eq('owner_id', ownerId)
-      .in('id', teamIds);
+    const validTeams = await db.equipos.findMany({
+      where: { owner_id: ownerId, id: { in: teamIds } },
+      select: { id: true },
+    });
 
-    if (teamsError) throw teamsError;
-    if ((validTeams || []).length !== teamIds.length) {
+    if (validTeams.length !== teamIds.length) {
       throw new Error('Intento de asignar equipos sin acceso');
     }
   }
 
-  const { data: myTeams } = await supabase
-    .from('equipos')
-    .select('id')
-    .eq('owner_id', ownerId);
-  const myTeamIds = (myTeams || []).map((t) => t.id);
+  const myTeams = await db.equipos.findMany({
+    where: { owner_id: ownerId },
+    select: { id: true },
+  });
+  const myTeamIds = myTeams.map((t) => t.id);
 
   if (myTeamIds.length > 0) {
-    const { error: deleteError } = await supabase
-      .from('tecnico_equipos')
-      .delete()
-      .eq('tecnico_id', tecnicoId)
-      .in('equipo_id', myTeamIds);
-
-    if (deleteError) throw deleteError;
+    await db.tecnico_equipos.deleteMany({
+      where: { tecnico_id: tecnicoId, equipo_id: { in: myTeamIds } },
+    });
   }
 
   if (teamIds.length > 0) {
@@ -173,97 +134,81 @@ export async function assignTeamsToTecnico(supabase, ownerId, tecnicoId, teamIds
       equipo_id: teamId,
     }));
 
-    const { error: insertError } = await supabase
-      .from('tecnico_equipos')
-      .insert(rows);
-
-    if (insertError) throw insertError;
+    await db.tecnico_equipos.createMany({ data: rows });
   }
 
   return true;
 }
 
-export async function getTeamsByTecnico(supabase, tecnicoId) {
+export async function getTeamsByTecnico(db, tecnicoId) {
   if (isBoneyardMode() || (process.env.NODE_ENV !== 'production' && tecnicoId === 'boneyard-mock-user')) {
     return mockTeams;
   }
 
-  const { data: assignedTeams, error } = await supabase
-    .from('tecnico_equipos')
-    .select('equipo_id, equipos(*)')
-    .eq('tecnico_id', tecnicoId);
+  const assignedTeams = await db.tecnico_equipos.findMany({
+    where: { tecnico_id: tecnicoId },
+    select: { equipo_id: true, equipos: true },
+  });
 
-  if (error) throw error;
-  return (assignedTeams || []).map((a) => a.equipos).filter(Boolean);
+  return assignedTeams.map((a) => a.equipos).filter(Boolean);
 }
 
-export async function getTecnicoTeam(supabase, tecnicoId, teamId) {
+export async function getTecnicoTeam(db, tecnicoId, teamId) {
   if (isMockTeam(teamId)) {
     return mockTeam;
   }
 
-  const { data, error } = await supabase
-    .from('tecnico_equipos')
-    .select('equipo_id, equipos(*)')
-    .eq('tecnico_id', tecnicoId)
-    .eq('equipo_id', teamId)
-    .maybeSingle();
+  const data = await db.tecnico_equipos.findFirst({
+    where: { tecnico_id: tecnicoId, equipo_id: teamId },
+    select: { equipo_id: true, equipos: true },
+  });
 
-  if (error) throw error;
   return data?.equipos || null;
 }
 
-export async function getTecnicoPlayer(supabase, tecnicoId, playerId) {
+export async function getTecnicoPlayer(db, tecnicoId, playerId) {
   if (isMockPlayer(playerId)) {
     return mockPlayers[0];
   }
 
-  const { data: jugador, error: jugadorError } = await supabase
-    .from('jugadores')
-    .select('id, equipo_id')
-    .eq('id', playerId)
-    .maybeSingle();
+  const jugador = await db.jugadores.findUnique({
+    where: { id: playerId },
+    select: { id: true, equipo_id: true },
+  });
 
-  if (jugadorError) throw jugadorError;
   if (!jugador) return null;
+  if (jugador.equipo_id === null) return null;
 
-  const { data: access, error: accessError } = await supabase
-    .from('tecnico_equipos')
-    .select('id')
-    .eq('tecnico_id', tecnicoId)
-    .eq('equipo_id', jugador.equipo_id)
-    .maybeSingle();
+  const access = await db.tecnico_equipos.findFirst({
+    where: { tecnico_id: tecnicoId, equipo_id: jugador.equipo_id },
+    select: { id: true },
+  });
 
-  if (accessError) throw accessError;
   return access ? jugador : null;
 }
 
-export async function updateTecnicoAvatar(supabase, id, { avatar, avatar_mime, avatar_size }) {
-  const { error } = await supabase
-    .from('tecnicos')
-    .update({
+export async function updateTecnicoAvatar(db, id, { avatar, avatar_mime, avatar_size }) {
+  await db.tecnicos.updateMany({
+    where: { id },
+    data: {
       avatar,
       avatar_mime,
       avatar_size,
       updated_at: new Date().toISOString(),
-    })
-    .eq('id', id);
-
-  if (error) throw error;
+    },
+  });
   return true;
 }
 
-export async function removeTecnicoAvatar(supabase, id) {
-  const { error } = await supabase
-    .from('tecnicos')
-    .update({
+export async function removeTecnicoAvatar(db, id) {
+  await db.tecnicos.updateMany({
+    where: { id },
+    data: {
       avatar: null,
       avatar_mime: null,
       avatar_size: null,
       updated_at: new Date().toISOString(),
-    })
-    .eq('id', id);
-
-  if (error) throw error;
+    },
+  });
   return true;
 }

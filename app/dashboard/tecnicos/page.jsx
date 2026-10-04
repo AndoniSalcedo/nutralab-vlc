@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getOwnerId } from '@/lib/auth/team-access';
 import { getTeamsByOwner } from '@/repositories/teamRepository';
@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function TecnicosPage() {
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
 
   if (!user || user.role !== 'admin') {
@@ -21,7 +21,7 @@ export default async function TecnicosPage() {
 
   let teams = [];
   try {
-    teams = await getTeamsByOwner(supabase, ownerId);
+    teams = await getTeamsByOwner(db, ownerId);
   } catch (err) {
     console.error('Error fetching teams for tecnicos page:', err);
   }

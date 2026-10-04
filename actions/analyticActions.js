@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedPlayer } from '@/lib/auth/team-access';
 import { readDocumentUpload } from '@/lib/security/uploads';
@@ -54,12 +54,12 @@ export async function uploadAnalitica(fileOrFormData, jugadorIdParam, fechaParam
   }
   if (!archivo || !jugadorId) throw new Error('Faltan datos');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
-  const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+  const ownedPlayer = await getOwnedPlayer(db, user, jugadorId);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
   // Solo PDF reales y de tamaño acotado (se envían a un servicio de IA de pago).
@@ -111,7 +111,7 @@ export async function uploadAnalitica(fileOrFormData, jugadorIdParam, fechaParam
 
   const parametros = extractAnalitica(message);
 
-  const data = await insertAnalytics(supabase, {
+  const data = await insertAnalytics(db, {
     jugador_id: parseInt(jugadorId),
     fecha_extraccion: fechaExtraccion && !Number.isNaN(Date.parse(String(fechaExtraccion))) ? fechaExtraccion : null,
     parametros,
@@ -143,19 +143,19 @@ export async function uploadAnalitica(fileOrFormData, jugadorIdParam, fechaParam
 export async function deleteAnalitica(id) {
   if (!id) throw new Error('Falta id');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const analitica = await getAnalyticsById(supabase, id);
+  const analitica = await getAnalyticsById(db, id);
   if (!analitica) throw new Error('Analítica no encontrada');
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, analitica.jugador_id);
+  const ownedPlayer = await getOwnedPlayer(db, user, analitica.jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  await deleteAnalytics(supabase, id);
+  await deleteAnalytics(db, id);
   revalidatePath(`/dashboard/jugador/${analitica.jugador_id}`);
   return { ok: true };
 }
@@ -165,19 +165,19 @@ export async function toggleAnaliticaVisibility(id, visible_para_jugador) {
     throw new Error('Faltan datos');
   }
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const analitica = await getAnalyticsById(supabase, id);
+  const analitica = await getAnalyticsById(db, id);
   if (!analitica) throw new Error('Analítica no encontrada');
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, analitica.jugador_id);
+  const ownedPlayer = await getOwnedPlayer(db, user, analitica.jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  const data = await updateAnalyticsVisibility(supabase, id, visible_para_jugador);
+  const data = await updateAnalyticsVisibility(db, id, visible_para_jugador);
   revalidatePath(`/dashboard/jugador/${analitica.jugador_id}`);
   return { ok: true, analitica: data };
 }

@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getAccessibleTeam } from '@/lib/auth/team-access';
 import TeamSupplementationDashboard from '@/components/TeamSupplementationDashboard';
@@ -15,10 +15,10 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function TeamSupplementationPage({ params, searchParams }) {
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   const { teamId } = await params;
-  const team = await getAccessibleTeam(supabase, user, teamId);
+  const team = await getAccessibleTeam(db, user, teamId);
 
   if (!team) {
     return (
@@ -40,16 +40,16 @@ export default async function TeamSupplementationPage({ params, searchParams }) 
   let catalogs = [];
 
   try {
-    players = await getPlayersByTeamSelect(supabase, team.id, 'id,nombre,apellidos,posicion,auth_email,avatar_size,updated_at');
+    players = await getPlayersByTeamSelect(db, team.id, 'id,nombre,apellidos,posicion,auth_email,avatar_size,updated_at');
 
     const playerIds = players.map((player) => player.id);
     
     if (playerIds.length) {
       const [resAssignments, resExtras, resHistory, resCatalogs] = await Promise.all([
-        getJugadorSuplementacionByPlayers(supabase, playerIds),
-        getJugadorSuplementosExtraByPlayers(supabase, playerIds),
-        getSuplementacionHistorialByPlayers(supabase, playerIds),
-        getAllSuplementacionListas(supabase)
+        getJugadorSuplementacionByPlayers(db, playerIds),
+        getJugadorSuplementosExtraByPlayers(db, playerIds),
+        getSuplementacionHistorialByPlayers(db, playerIds),
+        getAllSuplementacionListas(db)
       ]);
 
       assignments = resAssignments;

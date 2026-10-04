@@ -31,3 +31,6 @@ coverage
 # Datos reales de jugadores / volcados de migraciones: nunca al repositorio
 scratch/*.json
 scratch/*.bak
+
+# Copias locales de datos
+/backups

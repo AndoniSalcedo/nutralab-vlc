@@ -1,81 +1,54 @@
 import { mockHydration, isMockPlayer } from '@/config/boneyardMockData';
+import { upsertMany } from '@/lib/db/prisma';
 
-export async function getHydrationRecordsByPlayerId(supabase, playerId) {
+// `tipo` tiene valor por defecto en la tabla ('sosm'); la clave única lo incluye.
+const byJugadorFechaTipo = (row) => ({
+  jugador_id_fecha_tipo: { jugador_id: row.jugador_id, fecha: row.fecha, tipo: row.tipo ?? 'sosm' },
+});
+
+export async function getHydrationRecordsByPlayerId(db, playerId) {
   if (isMockPlayer(playerId)) {
     return mockHydration;
   }
 
-  const { data, error } = await supabase
-    .from('registros_hidratacion')
-    .select('*')
-    .eq('jugador_id', playerId)
-    .order('fecha', { ascending: true });
-
-  if (error) throw error;
-  return data || [];
+  return db.registros_hidratacion.findMany({
+    where: { jugador_id: playerId },
+    orderBy: { fecha: 'asc' },
+  });
 }
 
-export async function upsertHydrationRecords(supabase, records) {
-  const { data, error } = await supabase
-    .from('registros_hidratacion')
-    .upsert(records, { onConflict: 'jugador_id,fecha,tipo' })
-    .select('*');
-
-  if (error) throw error;
-  return data || [];
+export async function upsertHydrationRecords(db, records) {
+  return upsertMany(db, 'registros_hidratacion', records, byJugadorFechaTipo);
 }
 
-export async function updateHydrationRecord(supabase, id, jugadorId, payload) {
-  const { data, error } = await supabase
-    .from('registros_hidratacion')
-    .update(payload)
-    .eq('id', id)
-    .eq('jugador_id', jugadorId)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function updateHydrationRecord(db, id, jugadorId, payload) {
+  return db.registros_hidratacion.update({
+    where: { id, jugador_id: jugadorId },
+    data: payload,
+  });
 }
 
-export async function upsertHydrationRecord(supabase, payload) {
-  const { data, error } = await supabase
-    .from('registros_hidratacion')
-    .upsert(payload, { onConflict: 'jugador_id,fecha,tipo' })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function upsertHydrationRecord(db, payload) {
+  return db.registros_hidratacion.upsert({
+    where: byJugadorFechaTipo(payload),
+    create: payload,
+    update: payload,
+  });
 }
 
-export async function getHydrationRecordById(supabase, id) {
-  const { data, error } = await supabase
-    .from('registros_hidratacion')
-    .select('jugador_id')
-    .eq('id', id)
-    .single();
-
-  if (error) throw error;
-  return data || null;
+export async function getHydrationRecordById(db, id) {
+  return db.registros_hidratacion.findUniqueOrThrow({
+    where: { id },
+    select: { jugador_id: true },
+  });
 }
 
-export async function deleteHydrationRecord(supabase, id) {
-  const { error } = await supabase
-    .from('registros_hidratacion')
-    .delete()
-    .eq('id', id);
-
-  if (error) throw error;
+export async function deleteHydrationRecord(db, id) {
+  await db.registros_hidratacion.deleteMany({ where: { id } });
   return true;
 }
 
-export async function insertHydrationRecordsBulk(supabase, records) {
-  const { data, error } = await supabase
-    .from('registros_hidratacion')
-    .insert(records)
-    .select('*');
-
-  if (error) throw error;
-  return data || [];
+export async function insertHydrationRecordsBulk(db, records) {
+  if (!records?.length) return [];
+  return db.registros_hidratacion.createManyAndReturn({ data: records });
 }

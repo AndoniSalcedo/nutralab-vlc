@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getAccessibleTeam } from '@/lib/auth/team-access';
 import TeamMenuDashboard from '@/components/TeamMenuDashboard';
@@ -9,10 +9,10 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function TeamMenuPage({ params }) {
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   const { teamId } = await params;
-  const team = await getAccessibleTeam(supabase, user, teamId);
+  const team = await getAccessibleTeam(db, user, teamId);
 
   if (!team) {
     return (
@@ -29,7 +29,7 @@ export default async function TeamMenuPage({ params }) {
 
   let menus = [];
   try {
-    menus = await getMenusByTeam(supabase, team.id);
+    menus = await getMenusByTeam(db, team.id);
   } catch (error) {
     console.error('Error fetching weekly menus:', error);
   }

@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import TeamAnalyticsDashboard from '@/components/TeamAnalyticsDashboard';
 import { getUser } from '@/lib/auth/session';
 import { getAccessibleTeam } from '@/lib/auth/team-access';
@@ -10,10 +10,10 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function TeamAnalyticsPage({ params }) {
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   const { teamId } = await params;
-  const team = await getAccessibleTeam(supabase, user, teamId);
+  const team = await getAccessibleTeam(db, user, teamId);
 
   if (!team) {
     return (
@@ -32,11 +32,11 @@ export default async function TeamAnalyticsPage({ params }) {
   let analiticas = [];
 
   try {
-    players = await getPlayersByTeamSelectSimple(supabase, team.id);
+    players = await getPlayersByTeamSelectSimple(db, team.id);
 
     const playerIds = players.map((player) => player.id);
     if (playerIds.length) {
-      analiticas = await getAnalyticsByPlayerIds(supabase, playerIds);
+      analiticas = await getAnalyticsByPlayerIds(db, playerIds);
     }
   } catch (error) {
     console.error('Error fetching team analytics:', error);

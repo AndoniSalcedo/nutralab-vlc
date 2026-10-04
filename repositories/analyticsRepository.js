@@ -1,86 +1,49 @@
 import { mockAnalytics, isMockPlayer } from '@/config/boneyardMockData';
 
-export async function getAnalyticsByPlayerId(supabase, playerId) {
+export async function getAnalyticsByPlayerId(db, playerId) {
   if (isMockPlayer(playerId)) {
     return mockAnalytics;
   }
 
-  const { data, error } = await supabase
-    .from('analiticas')
-    .select('*')
-    .eq('jugador_id', playerId)
-    .order('fecha_extraccion', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
+  return db.analiticas.findMany({
+    where: { jugador_id: playerId },
+    orderBy: { fecha_extraccion: { sort: 'desc', nulls: 'first' } },
+  });
 }
 
-export async function getAnalyticsByPlayerIds(supabase, playerIds) {
+export async function getAnalyticsByPlayerIds(db, playerIds) {
   if (!playerIds || playerIds.length === 0) return [];
   if (Array.isArray(playerIds) && playerIds.every(isMockPlayer)) {
     return mockAnalytics;
   }
 
-  const { data, error } = await supabase
-    .from('analiticas')
-    .select('*')
-    .in('jugador_id', playerIds)
-    .order('fecha_extraccion', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
+  return db.analiticas.findMany({
+    where: { jugador_id: { in: playerIds } },
+    orderBy: { fecha_extraccion: { sort: 'desc', nulls: 'first' } },
+  });
 }
 
-export async function getAnalyticsById(supabase, id) {
-  const { data, error } = await supabase
-    .from('analiticas')
-    .select('id, jugador_id')
-    .eq('id', id)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
+export async function getAnalyticsById(db, id) {
+  return db.analiticas.findUnique({
+    where: { id },
+    select: { id: true, jugador_id: true },
+  });
 }
 
-export async function insertAnalytics(supabase, payload) {
-  const { data, error } = await supabase
-    .from('analiticas')
-    .insert(payload)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function insertAnalytics(db, payload) {
+  return db.analiticas.create({ data: payload });
 }
 
-export async function updateAnalyticsVisibility(supabase, id, visible_para_jugador) {
-  const { data, error } = await supabase
-    .from('analiticas')
-    .update({ visible_para_jugador })
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function updateAnalyticsVisibility(db, id, visible_para_jugador) {
+  return db.analiticas.update({ where: { id }, data: { visible_para_jugador } });
 }
 
-export async function deleteAnalytics(supabase, id) {
-  const { error } = await supabase
-    .from('analiticas')
-    .delete()
-    .eq('id', id);
-
-  if (error) throw error;
+export async function deleteAnalytics(db, id) {
+  await db.analiticas.deleteMany({ where: { id } });
   return true;
 }
 
-export async function insertAnalyticsBulk(supabase, payloads) {
-  const { data, error } = await supabase
-    .from('analiticas')
-    .insert(payloads)
-    .select();
-
-  if (error) throw error;
-  return data || [];
+export async function insertAnalyticsBulk(db, payloads) {
+  if (!payloads?.length) return [];
+  return db.analiticas.createManyAndReturn({ data: payloads });
 }

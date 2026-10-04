@@ -1,114 +1,89 @@
 import { isMockTeam } from '@/config/boneyardMockData';
+import { normalizeRows } from '@/lib/db/prisma';
 
-export async function getIntrapartidoMatchesByTeamId(supabase, teamId) {
+const MATCH_FIELDS = { id: true, rival: true, competicion: true, lugar: true, fecha: true };
+
+export async function getIntrapartidoMatchesByTeamId(db, teamId) {
   if (isMockTeam(teamId)) return [];
 
-  const { data, error } = await supabase
-    .from('partidos_intrapartido')
-    .select('id,rival,competicion,lugar,fecha')
-    .eq('equipo_id', teamId)
-    .order('fecha', { ascending: false })
-    .order('id', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
+  return db.partidos_intrapartido.findMany({
+    where: { equipo_id: teamId },
+    select: MATCH_FIELDS,
+    orderBy: [{ fecha: 'desc' }, { id: 'desc' }],
+  });
 }
 
-export async function getIntrapartidoMatchById(supabase, teamId, matchId) {
+export async function getIntrapartidoMatchById(db, teamId, matchId) {
   if (isMockTeam(teamId)) return null;
 
-  const { data: match, error } = await supabase
-    .from('partidos_intrapartido')
-    .select('id,rival,competicion,lugar,fecha')
-    .eq('id', matchId)
-    .eq('equipo_id', teamId)
-    .maybeSingle();
-
-  if (error) throw error;
+  const match = await db.partidos_intrapartido.findFirst({
+    where: { id: matchId, equipo_id: teamId },
+    select: MATCH_FIELDS,
+  });
   if (!match) return null;
 
   const [convocados, tomas] = await Promise.all([
-    supabase.from('partido_convocados').select('jugador_id,titular').eq('partido_id', match.id),
-    supabase.from('partido_tomas').select('jugador_id,momento,producto_id,cantidad').eq('partido_id', match.id),
+    db.partido_convocados.findMany({
+      where: { partido_id: match.id },
+      select: { jugador_id: true, titular: true },
+    }),
+    db.partido_tomas.findMany({
+      where: { partido_id: match.id },
+      select: { jugador_id: true, momento: true, producto_id: true, cantidad: true },
+    }),
   ]);
-  if (convocados.error) throw convocados.error;
-  if (tomas.error) throw tomas.error;
 
-  return { match, convocados: convocados.data || [], tomas: tomas.data || [] };
+  return { match, convocados, tomas };
 }
 
-export async function saveIntrapartidoMatch(supabase, params) {
+// Guardado atómico en la función SQL teams.guardar_intrapartido (crea/actualiza el partido
+// y reemplaza convocatoria y tomas en una transacción).
+export async function saveIntrapartidoMatch(db, params) {
   if (isMockTeam(params.teamId)) return null;
 
-  const { data, error } = await supabase.rpc('guardar_intrapartido', {
-    p_partido_id: params.matchId,
-    p_equipo_id: params.teamId,
-    p_rival: params.rival,
-    p_competicion: params.competicion,
-    p_lugar: params.lugar,
-    p_fecha: params.fecha,
-    p_created_by: params.createdBy,
-    p_convocados: params.convocados,
-    p_tomas: params.tomas,
-  });
+  const matchId = params.matchId === null || params.matchId === undefined ? null : String(params.matchId);
+  const rows = await db.$queryRaw`
+    select teams.guardar_intrapartido(
+      ${matchId}::bigint,
+      ${String(params.teamId)}::bigint,
+      ${params.rival}::text,
+      ${params.competicion}::text,
+      ${params.lugar}::text,
+      ${params.fecha}::date,
+      ${params.createdBy ?? null}::text,
+      ${JSON.stringify(params.convocados ?? [])}::jsonb,
+      ${JSON.stringify(params.tomas ?? [])}::jsonb
+    ) as id`;
 
-  if (error) throw error;
-  return data;
+  return normalizeRows(rows)[0]?.id ?? null;
 }
 
-export async function deleteIntrapartidoMatch(supabase, teamId, matchId) {
+export async function deleteIntrapartidoMatch(db, teamId, matchId) {
   if (isMockTeam(teamId)) return;
 
-  const { error } = await supabase
-    .from('partidos_intrapartido')
-    .delete()
-    .eq('id', matchId)
-    .eq('equipo_id', teamId);
-
-  if (error) throw error;
-}
-
-// PostgREST devuelve como máximo 1000 filas por consulta: se pagina.
-async function fetchAllRows(buildQuery) {
-  const pageSize = 1000;
-  const rows = [];
-  for (let from = 0; ; from += pageSize) {
-    const { data, error } = await buildQuery().range(from, from + pageSize - 1);
-    if (error) throw error;
-    rows.push(...(data || []));
-    if (!data || data.length < pageSize) break;
-  }
-  return rows;
+  await db.partidos_intrapartido.deleteMany({ where: { id: matchId, equipo_id: teamId } });
 }
 
 /**
  * Historial completo del equipo: cada partido con su convocatoria y sus tomas.
  * @returns {Promise<Array<{ match: object, convocados: object[], tomas: object[] }>>}
  */
-export async function getIntrapartidoHistoryByTeamId(supabase, teamId) {
-  const matches = await getIntrapartidoMatchesByTeamId(supabase, teamId);
+export async function getIntrapartidoHistoryByTeamId(db, teamId) {
+  const matches = await getIntrapartidoMatchesByTeamId(db, teamId);
   if (matches.length === 0) return [];
 
   const ids = matches.map((m) => m.id);
   const [convocados, tomas] = await Promise.all([
-    fetchAllRows(() =>
-      supabase
-        .from('partido_convocados')
-        .select('partido_id,jugador_id,titular')
-        .in('partido_id', ids)
-        .order('partido_id')
-        .order('jugador_id'),
-    ),
-    fetchAllRows(() =>
-      supabase
-        .from('partido_tomas')
-        .select('partido_id,jugador_id,momento,producto_id,cantidad')
-        .in('partido_id', ids)
-        .order('partido_id')
-        .order('jugador_id')
-        .order('momento')
-        .order('producto_id'),
-    ),
+    db.partido_convocados.findMany({
+      where: { partido_id: { in: ids } },
+      select: { partido_id: true, jugador_id: true, titular: true },
+      orderBy: [{ partido_id: 'asc' }, { jugador_id: 'asc' }],
+    }),
+    db.partido_tomas.findMany({
+      where: { partido_id: { in: ids } },
+      select: { partido_id: true, jugador_id: true, momento: true, producto_id: true, cantidad: true },
+      orderBy: [{ partido_id: 'asc' }, { jugador_id: 'asc' }, { momento: 'asc' }, { producto_id: 'asc' }],
+    }),
   ]);
 
   const group = (rows) => {

@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { withLatestMeasurement } from '@/lib/metrics/player';
 import { getAccessiblePlayer } from '@/lib/auth/team-access';
@@ -17,7 +17,7 @@ import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 export const dynamic = 'force-dynamic';
 
 export default async function JugadorTabPage({ params }) {
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   const isPlayer = user?.role === 'jugador';
   const DEFAULT_SUBTABS = {
@@ -31,7 +31,7 @@ export default async function JugadorTabPage({ params }) {
   const activeTab = resolvedParams.tab || 'resumen';
   const activeSubtab = resolvedParams.subtab?.[0] || DEFAULT_SUBTABS[activeTab] || 'perfil';
 
-  const rawJugador = await getPlayerWithTeamConfig(supabase, id);
+  const rawJugador = await getPlayerWithTeamConfig(db, id);
   if (!rawJugador) {
     return (
       <NothingFound
@@ -46,7 +46,7 @@ export default async function JugadorTabPage({ params }) {
   }
 
   if (!isPlayer) {
-    const accessiblePlayer = await getAccessiblePlayer(supabase, user, id);
+    const accessiblePlayer = await getAccessiblePlayer(db, user, id);
     if (!accessiblePlayer) {
       return (
         <NothingFound
@@ -86,12 +86,12 @@ export default async function JugadorTabPage({ params }) {
   try {
     if (activeTab === 'resumen') {
       const [resEvoluciones, resPesajes, resHidratacion, resMenus, resPlanes] = await Promise.all([
-        getEvolutionsByPlayerId(supabase, id),
-        getPesajesByPlayerId(supabase, id),
-        getHydrationRecordsByPlayerId(supabase, id),
-        rawJugador?.equipo_id ? getMenusByTeam(supabase, rawJugador.equipo_id) : [],
+        getEvolutionsByPlayerId(db, id),
+        getPesajesByPlayerId(db, id),
+        getHydrationRecordsByPlayerId(db, id),
+        rawJugador?.equipo_id ? getMenusByTeam(db, rawJugador.equipo_id) : [],
         // El plan es opcional para el resumen: si falla, el widget muestra su estado vacío
-        getAiPlansByPlayerId(supabase, id).catch(() => []),
+        getAiPlansByPlayerId(db, id).catch(() => []),
       ]);
       evoluciones = resEvoluciones;
       pesajes = resPesajes;
@@ -101,14 +101,14 @@ export default async function JugadorTabPage({ params }) {
       latestPlan = (resPlanes || [])[0] || null;
       jugador = withLatestMeasurement(rawJugador, evoluciones, pesajes);
       if (jugador?.equipo_id) {
-        messages = await getMessages(supabase, jugador.equipo_id, id);
+        messages = await getMessages(db, jugador.equipo_id, id);
       }
     } else if (activeTab === 'metricas') {
       const [resAnaliticas, resEvoluciones, resHidratacion, resPesajes] = await Promise.all([
-        getAnalyticsByPlayerId(supabase, id),
-        getEvolutionsByPlayerId(supabase, id),
-        getHydrationRecordsByPlayerId(supabase, id),
-        getPesajesByPlayerId(supabase, id),
+        getAnalyticsByPlayerId(db, id),
+        getEvolutionsByPlayerId(db, id),
+        getHydrationRecordsByPlayerId(db, id),
+        getPesajesByPlayerId(db, id),
       ]);
       analiticas = isPlayer ? resAnaliticas.filter(a => a.visible_para_jugador === true) : resAnaliticas;
       evoluciones = resEvoluciones;
@@ -117,9 +117,9 @@ export default async function JugadorTabPage({ params }) {
       registrosHidratacion = resHidratacion;
     } else if (activeTab === 'nutricion') {
       const [resMenus, resEvoluciones, resPesajes] = await Promise.all([
-        rawJugador?.equipo_id ? getMenusByTeam(supabase, rawJugador.equipo_id) : [],
-        getEvolutionsByPlayerId(supabase, id),
-        getPesajesByPlayerId(supabase, id),
+        rawJugador?.equipo_id ? getMenusByTeam(db, rawJugador.equipo_id) : [],
+        getEvolutionsByPlayerId(db, id),
+        getPesajesByPlayerId(db, id),
       ]);
       menus = resMenus.slice(0, 10);
       evoluciones = resEvoluciones;

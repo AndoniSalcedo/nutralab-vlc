@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getNutritionistAvatar } from '@/lib/db/nutralab';
 import { getUser } from '@/lib/auth/session';
 import { forbidden, getOwnerId } from '@/lib/auth/team-access';
 import { imageResponse } from '@/lib/security/media';
@@ -21,15 +21,9 @@ export async function GET(req) {
     if (!id) return NextResponse.json({ error: 'Falta id del nutricionista' }, { status: 400 });
     if (String(id) !== String(ownId)) return forbidden('No tienes acceso a este avatar');
 
-    const supabase = getSupabaseAdmin();
-    const { data: nutri, error } = await supabase
-      .schema('public')
-      .from('Nutritionist')
-      .select('id, avatar, avatarMime, avatarSize')
-      .eq('id', id)
-      .maybeSingle();
+    const nutri = await getNutritionistAvatar(id);
 
-    if (error || !nutri || !nutri.avatar) {
+    if (!nutri || !nutri.avatar) {
       return NextResponse.json({ error: 'Avatar no encontrado' }, { status: 404 });
     }
 

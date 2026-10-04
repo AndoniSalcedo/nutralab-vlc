@@ -1,6 +1,10 @@
-import { mockMeals, isMockPlayer } from '@/config/boneyardMockData';
 
-export async function getMealsFiltered(supabase, jugadorId, mealType, dayFromUTC, dayToUTC) {
+import { mockMeals, isMockPlayer } from '@/config/boneyardMockData';
+import { selectFields } from '@/lib/db/prisma';
+
+const MEAL_FIELDS = selectFields('id, jugador_id, taken_at, dish_name, meal_type, ingredients, calories, notes, photo_size, photo_mime, created_at');
+
+export async function getMealsFiltered(db, jugadorId, mealType, dayFromUTC, dayToUTC) {
   if (isMockPlayer(jugadorId)) {
     let result = mockMeals;
     if (mealType) {
@@ -9,78 +13,46 @@ export async function getMealsFiltered(supabase, jugadorId, mealType, dayFromUTC
     return result;
   }
 
-  let query = supabase
-    .from('comidas')
-    .select('id, jugador_id, taken_at, dish_name, meal_type, ingredients, calories, notes, photo_size, photo_mime, created_at')
-    .eq('jugador_id', jugadorId);
+  const where = { jugador_id: jugadorId };
 
   if (mealType) {
-    query = query.eq('meal_type', mealType);
+    where.meal_type = mealType;
   }
 
   if (dayFromUTC && dayToUTC) {
-    query = query.gte('taken_at', dayFromUTC).lte('taken_at', dayToUTC);
+    where.taken_at = { gte: dayFromUTC, lte: dayToUTC };
   }
 
-  query = query.order('taken_at', { ascending: false });
-
-  const { data, error } = await query;
-  if (error) throw error;
-  return data || [];
+  return db.comidas.findMany({
+    where,
+    select: MEAL_FIELDS,
+    orderBy: { taken_at: 'desc' },
+  });
 }
 
-export async function getMealById(supabase, id) {
-  const { data, error } = await supabase
-    .from('comidas')
-    .select('id, jugador_id, photo_size, photo_mime')
-    .eq('id', id)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
+export async function getMealById(db, id) {
+  return db.comidas.findUnique({
+    where: { id },
+    select: selectFields('id, jugador_id, photo_size, photo_mime'),
+  });
 }
 
-export async function insertMeal(supabase, payload) {
-  const { data, error } = await supabase
-    .from('comidas')
-    .insert(payload)
-    .select('id, jugador_id, taken_at, dish_name, meal_type, ingredients, calories, notes, photo_size, photo_mime, created_at')
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function insertMeal(db, payload) {
+  return db.comidas.create({ data: payload, select: MEAL_FIELDS });
 }
 
-export async function updateMeal(supabase, id, payload) {
-  const { data, error } = await supabase
-    .from('comidas')
-    .update(payload)
-    .eq('id', id)
-    .select('id, jugador_id, taken_at, dish_name, meal_type, ingredients, calories, notes, photo_size, photo_mime, created_at')
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function updateMeal(db, id, payload) {
+  return db.comidas.update({ where: { id }, data: payload, select: MEAL_FIELDS });
 }
 
-export async function deleteMeal(supabase, id) {
-  const { error } = await supabase
-    .from('comidas')
-    .delete()
-    .eq('id', id);
-
-  if (error) throw error;
+export async function deleteMeal(db, id) {
+  await db.comidas.deleteMany({ where: { id } });
   return true;
 }
 
-export async function getMealPhotoWithMeta(supabase, id) {
-  const { data, error } = await supabase
-    .from('comidas')
-    .select('jugador_id, photo, photo_mime, photo_size')
-    .eq('id', id)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
+export async function getMealPhotoWithMeta(db, id) {
+  return db.comidas.findUnique({
+    where: { id },
+    select: selectFields('jugador_id, photo, photo_mime, photo_size'),
+  });
 }
-

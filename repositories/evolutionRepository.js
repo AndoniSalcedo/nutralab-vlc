@@ -1,140 +1,88 @@
+
 import { mockEvolutions, isMockPlayer } from '@/config/boneyardMockData';
+import { selectFields } from '@/lib/db/prisma';
 
-export async function getEvolutionsByPlayerId(supabase, playerId) {
+export async function getEvolutionsByPlayerId(db, playerId) {
   if (isMockPlayer(playerId)) {
     return mockEvolutions;
   }
 
-  const { data, error } = await supabase
-    .from('evoluciones')
-    .select('*')
-    .eq('jugador_id', playerId)
-    .order('fecha', { ascending: true });
-
-  if (error) throw error;
-  return data || [];
+  return db.evoluciones.findMany({
+    where: { jugador_id: playerId },
+    orderBy: { fecha: 'asc' },
+  });
 }
 
-export async function getEvolutionsByPlayerIdOrdered(supabase, playerId) {
+export async function getEvolutionsByPlayerIdOrdered(db, playerId) {
   if (isMockPlayer(playerId)) {
     return mockEvolutions;
   }
 
-  const { data, error } = await supabase
-    .from('evoluciones')
-    .select('*')
-    .eq('jugador_id', playerId)
-    .order('fecha');
-
-  if (error) throw error;
-  return data || [];
+  return db.evoluciones.findMany({
+    where: { jugador_id: playerId },
+    orderBy: { fecha: 'asc' },
+  });
 }
 
-export async function getEvolutionsByPlayerIdsSimple(supabase, playerIds) {
+export async function getEvolutionsByPlayerIdsSimple(db, playerIds) {
   if (!playerIds || playerIds.length === 0) return [];
   if (Array.isArray(playerIds) && playerIds.every(isMockPlayer)) {
     return mockEvolutions;
   }
 
-  const { data, error } = await supabase
-    .from('evoluciones')
-    .select('jugador_id,fecha,peso_kg,porcentaje_grasa,peso_magro')
-    .in('jugador_id', playerIds);
-
-  if (error) throw error;
-  return data || [];
+  return db.evoluciones.findMany({
+    where: { jugador_id: { in: playerIds } },
+    select: selectFields('jugador_id,fecha,peso_kg,porcentaje_grasa,peso_magro'),
+  });
 }
 
-export async function getEvolutionsByPlayerIds(supabase, playerIds) {
+export async function getEvolutionsByPlayerIds(db, playerIds) {
   if (!playerIds || playerIds.length === 0) return [];
   if (Array.isArray(playerIds) && playerIds.every(isMockPlayer)) {
     return mockEvolutions;
   }
 
-  const { data, error } = await supabase
-    .from('evoluciones')
-    .select('*')
-    .in('jugador_id', playerIds)
-    .order('fecha', { ascending: true });
-
-  if (error) throw error;
-  return data || [];
+  return db.evoluciones.findMany({
+    where: { jugador_id: { in: playerIds } },
+    orderBy: { fecha: 'asc' },
+  });
 }
 
-export async function getEvolutionById(supabase, id) {
-  const { data, error } = await supabase
-    .from('evoluciones')
-    .select('id, jugador_id')
-    .eq('id', id)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
+export async function getEvolutionById(db, id) {
+  return db.evoluciones.findUnique({
+    where: { id },
+    select: { id: true, jugador_id: true },
+  });
 }
 
-export async function updateEvolution(supabase, id, payload) {
-  const { data, error } = await supabase
-    .from('evoluciones')
-    .update(payload)
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function updateEvolution(db, id, payload) {
+  return db.evoluciones.update({ where: { id }, data: payload });
 }
 
-export async function upsertEvolution(supabase, payload) {
-  const { data, error } = await supabase
-    .from('evoluciones')
-    .upsert(payload, { onConflict: 'jugador_id,fecha' })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function upsertEvolution(db, payload) {
+  return db.evoluciones.upsert({
+    where: { jugador_id_fecha: { jugador_id: payload.jugador_id, fecha: payload.fecha } },
+    create: payload,
+    update: payload,
+  });
 }
 
-export async function insertEvolutionsBulk(supabase, payloads) {
-  const { data, error } = await supabase
-    .from('evoluciones')
-    .insert(payloads)
-    .select('*');
-
-  if (error) throw error;
-  return data || [];
+export async function insertEvolutionsBulk(db, payloads) {
+  if (!payloads?.length) return [];
+  return db.evoluciones.createManyAndReturn({ data: payloads });
 }
 
-export async function deleteEvolution(supabase, id) {
-  const { error } = await supabase
-    .from('evoluciones')
-    .delete()
-    .eq('id', id);
-
-  if (error) throw error;
+export async function deleteEvolution(db, id) {
+  await db.evoluciones.deleteMany({ where: { id } });
   return true;
 }
 
-export async function getEvolutionByPlayerAndDate(supabase, playerId, date) {
-  const { data, error } = await supabase
-    .from('evoluciones')
-    .select('*')
-    .eq('jugador_id', playerId)
-    .eq('fecha', date)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
+export async function getEvolutionByPlayerAndDate(db, playerId, date) {
+  return db.evoluciones.findUnique({
+    where: { jugador_id_fecha: { jugador_id: playerId, fecha: date } },
+  });
 }
 
-export async function insertEvolution(supabase, payload) {
-  const { data, error } = await supabase
-    .from('evoluciones')
-    .insert(payload)
-    .select('*')
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function insertEvolution(db, payload) {
+  return db.evoluciones.create({ data: payload });
 }
-

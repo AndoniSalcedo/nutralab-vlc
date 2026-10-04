@@ -1,74 +1,38 @@
+
 import { mockAiPlans, isMockPlayer } from '@/config/boneyardMockData';
 
-export async function getAiPlansByPlayerId(supabase, jugadorId, semana = null) {
+export async function getAiPlansByPlayerId(db, jugadorId, semana = null) {
   if (isMockPlayer(jugadorId)) return semana ? [] : mockAiPlans;
 
-  let query = supabase
-    .from('planes_ia')
-    .select('*')
-    .eq('jugador_id', jugadorId);
-
+  const where = { jugador_id: jugadorId };
   if (semana) {
-    query = query.eq('datos->meta->>semanaMenu', semana);
+    where.datos = { path: ['meta', 'semanaMenu'], equals: semana };
   }
 
-  const { data, error } = await query.order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data || [];
+  return db.planes_ia.findMany({
+    where,
+    orderBy: { created_at: { sort: 'desc', nulls: 'first' } },
+  });
 }
 
-export async function getAiPlanById(supabase, id) {
-  const { data, error } = await supabase
-    .from('planes_ia')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
+export async function getAiPlanById(db, id) {
+  return db.planes_ia.findUnique({ where: { id } });
 }
 
-export async function insertAiPlan(supabase, payload) {
-  const { data, error } = await supabase
-    .from('planes_ia')
-    .insert(payload)
-    .select('*')
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function insertAiPlan(db, payload) {
+  return db.planes_ia.create({ data: payload });
 }
 
-export async function updateAiPlan(supabase, id, payload) {
-  const { data, error } = await supabase
-    .from('planes_ia')
-    .update(payload)
-    .eq('id', id)
-    .select('*')
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function updateAiPlan(db, id, payload) {
+  return db.planes_ia.update({ where: { id }, data: payload });
 }
 
-export async function deleteAiPlan(supabase, id) {
-  const { error } = await supabase
-    .from('planes_ia')
-    .delete()
-    .eq('id', id);
-
-  if (error) throw error;
+export async function deleteAiPlan(db, id) {
+  await db.planes_ia.deleteMany({ where: { id } });
   return true;
 }
 
-export async function insertAiPlansBulk(supabase, payloads) {
-  const { data, error } = await supabase
-    .from('planes_ia')
-    .insert(payloads)
-    .select('*');
-
-  if (error) throw error;
-  return data || [];
+export async function insertAiPlansBulk(db, payloads) {
+  if (!payloads?.length) return [];
+  return db.planes_ia.createManyAndReturn({ data: payloads });
 }
-

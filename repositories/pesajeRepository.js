@@ -1,92 +1,62 @@
 import { mockPesajes, isMockPlayer } from '@/config/boneyardMockData';
+import { selectFields } from '@/lib/db/prisma';
 
-export async function getPesajesByPlayerId(supabase, playerId) {
+export async function getPesajesByPlayerId(db, playerId) {
   if (isMockPlayer(playerId)) {
     return mockPesajes;
   }
 
-  const { data, error } = await supabase
-    .from('pesajes')
-    .select('*')
-    .eq('jugador_id', playerId)
-    .order('fecha', { ascending: true });
-
-  if (error) throw error;
-  return data || [];
+  return db.pesajes.findMany({
+    where: { jugador_id: playerId },
+    orderBy: { fecha: 'asc' },
+  });
 }
 
-export async function getPesajesByPlayerIdsSimple(supabase, playerIds) {
+export async function getPesajesByPlayerIdsSimple(db, playerIds) {
   if (!playerIds || playerIds.length === 0) return [];
   if (Array.isArray(playerIds) && playerIds.every(isMockPlayer)) {
     return mockPesajes;
   }
 
-  const { data, error } = await supabase
-    .from('pesajes')
-    .select('id,jugador_id,fecha,peso_kg')
-    .in('jugador_id', playerIds)
-    .order('fecha', { ascending: true });
-
-  if (error) throw error;
-  return data || [];
+  return db.pesajes.findMany({
+    where: { jugador_id: { in: playerIds } },
+    select: selectFields('id,jugador_id,fecha,peso_kg'),
+    orderBy: { fecha: 'asc' },
+  });
 }
 
-export async function getPesajesByPlayerIds(supabase, playerIds) {
+export async function getPesajesByPlayerIds(db, playerIds) {
   if (!playerIds || playerIds.length === 0) return [];
   if (Array.isArray(playerIds) && playerIds.every(isMockPlayer)) {
     return mockPesajes;
   }
 
-  const { data, error } = await supabase
-    .from('pesajes')
-    .select('*')
-    .in('jugador_id', playerIds)
-    .order('fecha', { ascending: true });
-
-  if (error) throw error;
-  return data || [];
+  return db.pesajes.findMany({
+    where: { jugador_id: { in: playerIds } },
+    orderBy: { fecha: 'asc' },
+  });
 }
 
-export async function getPesajeById(supabase, id) {
-  const { data, error } = await supabase
-    .from('pesajes')
-    .select('id, jugador_id')
-    .eq('id', id)
-    .maybeSingle();
-
-  if (error) throw error;
-  return data || null;
+export async function getPesajeById(db, id) {
+  return db.pesajes.findUnique({
+    where: { id },
+    select: { id: true, jugador_id: true },
+  });
 }
 
-export async function updatePesaje(supabase, id, payload) {
-  const { data, error } = await supabase
-    .from('pesajes')
-    .update(payload)
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function updatePesaje(db, id, payload) {
+  return db.pesajes.update({ where: { id }, data: payload });
 }
 
-export async function upsertPesaje(supabase, payload) {
-  const { data, error } = await supabase
-    .from('pesajes')
-    .upsert(payload, { onConflict: 'jugador_id,fecha' })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+export async function upsertPesaje(db, payload) {
+  return db.pesajes.upsert({
+    where: { jugador_id_fecha: { jugador_id: payload.jugador_id, fecha: payload.fecha } },
+    create: payload,
+    update: payload,
+  });
 }
 
-export async function deletePesaje(supabase, id) {
-  const { error } = await supabase
-    .from('pesajes')
-    .delete()
-    .eq('id', id);
-
-  if (error) throw error;
+export async function deletePesaje(db, id) {
+  await db.pesajes.deleteMany({ where: { id } });
   return true;
 }

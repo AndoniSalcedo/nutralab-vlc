@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { forbidden, getAccessiblePlayer } from '@/lib/auth/team-access';
 import { getMealPhotoWithMeta } from '@/repositories/mealsRepository';
@@ -16,8 +16,8 @@ export async function GET(req) {
     const user = await getUser();
     if (!user) return forbidden('No autorizado');
 
-    const supabase = getSupabaseAdmin();
-    const meal = await getMealPhotoWithMeta(supabase, id);
+    const db = getDb();
+    const meal = await getMealPhotoWithMeta(db, id);
     if (!meal) return NextResponse.json({ error: 'Comida no encontrada' }, { status: 404 });
 
     if (user.role === 'jugador') {
@@ -25,7 +25,7 @@ export async function GET(req) {
         return forbidden('No tienes acceso a este jugador');
       }
     } else {
-      const accessiblePlayer = await getAccessiblePlayer(supabase, user, meal.jugador_id);
+      const accessiblePlayer = await getAccessiblePlayer(db, user, meal.jugador_id);
       if (!accessiblePlayer) return forbidden('No tienes acceso a este jugador');
     }
 

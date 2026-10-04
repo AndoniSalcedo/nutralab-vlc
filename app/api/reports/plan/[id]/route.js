@@ -1,7 +1,7 @@
 import React from 'react';
 import { NextResponse } from 'next/server';
 import { renderToStream } from '@react-pdf/renderer';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { forbidden, getAccessiblePlayer } from '@/lib/auth/team-access';
 import NutritionPlanCardDocument from '@/components/reports/NutritionPlanCardDocument';
@@ -19,29 +19,29 @@ export async function GET(request, { params }) {
     const planId = resolvedParams?.id;
     if (!planId) return NextResponse.json({ error: 'Falta id del plan' }, { status: 400 });
 
-    const supabase = getSupabaseAdmin();
+    const db = getDb();
     const user = await getUser();
     if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
 
-    const plan = await getAiPlanById(supabase, planId);
+    const plan = await getAiPlanById(db, planId);
     if (!plan) return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 });
     if (!plan.datos) return NextResponse.json({ error: 'Este plan no tiene datos de ficha para PDF' }, { status: 400 });
 
     if (user.role === 'jugador') {
       if (String(user.id) !== String(plan.jugador_id)) return forbidden();
     } else {
-      const accessiblePlayer = await getAccessiblePlayer(supabase, user, plan.jugador_id);
+      const accessiblePlayer = await getAccessiblePlayer(db, user, plan.jugador_id);
       if (!accessiblePlayer) return forbidden('No tienes acceso a este jugador');
     }
 
-    const jugador = await getPlayerWithTeamConfig(supabase, plan.jugador_id);
+    const jugador = await getPlayerWithTeamConfig(db, plan.jugador_id);
 
     const teamConfig = jugador?.equipos?.configuracion_nutricional;
 
     const planData = { ...plan.datos };
     if (!Array.isArray(planData.suplementacion) || planData.suplementacion.length === 0) {
       const resolvedSupps = await getResolvedPlayerSupplementation(
-        supabase,
+        db,
         plan.jugador_id,
         planData.metricas?.peso || jugador?.peso_kg
       );

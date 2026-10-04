@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getAccessiblePlayer, getOwnedTeam } from '@/lib/auth/team-access';
 import { cleanText, toPositiveNumber, slugify as sharedSlugify } from '@/lib/utils';
 import { getPlayersByTeam, getPlayersByTeamIds } from '@/repositories/playerRepository';
@@ -46,9 +46,9 @@ export async function getPlayerSupplementation(requestedJugadorId) {
     throw new Error('Sin permisos');
   }
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   if (user?.role !== 'jugador') {
-    const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+    const accessiblePlayer = await getAccessiblePlayer(db, user, jugadorId);
     if (!accessiblePlayer) throw new Error('Sin permisos');
   }
 
@@ -59,11 +59,11 @@ export async function getPlayerSupplementation(requestedJugadorId) {
     asignacion,
     extras,
   ] = await Promise.all([
-    getAllSuplementos(supabase),
-    getAllSuplementacionListas(supabase),
-    getAllSuplementacionListaItems(supabase),
-    getJugadorSuplementacion(supabase, jugadorId),
-    getJugadorSuplementosExtra(supabase, jugadorId),
+    getAllSuplementos(db),
+    getAllSuplementacionListas(db),
+    getAllSuplementacionListaItems(db),
+    getJugadorSuplementacion(db, jugadorId),
+    getJugadorSuplementosExtra(db, jugadorId),
   ]);
 
   return {
@@ -84,16 +84,16 @@ export async function postPlayerSupplementation(jugadorIdParam, payload) {
 
   const action = cleanText(payload?.action);
   const jugadorId = toPositiveNumber(payload?.jugador_id || jugadorIdParam);
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
 
   if (!jugadorId) throw new Error('Falta jugador_id');
 
-  const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+  const accessiblePlayer = await getAccessiblePlayer(db, user, jugadorId);
   if (!accessiblePlayer) throw new Error('Sin permisos');
 
   if (action === 'set_list') {
     const listaId = toPositiveNumber(payload.lista_id);
-    const data = await upsertJugadorSuplementacion(supabase, {
+    const data = await upsertJugadorSuplementacion(db, {
       jugador_id: jugadorId,
       lista_id: listaId,
       updated_at: new Date().toISOString(),
@@ -106,7 +106,7 @@ export async function postPlayerSupplementation(jugadorIdParam, payload) {
     const suplementoId = toPositiveNumber(payload.suplemento_id);
     if (!suplementoId) throw new Error('Falta suplemento_id');
 
-    const data = await upsertJugadorSuplementosExtra(supabase, {
+    const data = await upsertJugadorSuplementosExtra(db, {
       jugador_id: jugadorId,
       suplemento_id: suplementoId,
       dose_override: cleanText(payload.dose_override) || null,
@@ -122,7 +122,7 @@ export async function postPlayerSupplementation(jugadorIdParam, payload) {
     const extraId = toPositiveNumber(payload.extra_id);
     if (!extraId) throw new Error('Falta extra_id');
 
-    await deleteJugadorSuplementosExtra(supabase, extraId, jugadorId);
+    await deleteJugadorSuplementosExtra(db, extraId, jugadorId);
     revalidatePath(`/dashboard/jugador/${jugadorId}`);
     return { ok: true };
   }
@@ -136,11 +136,11 @@ export async function getSupplementationCatalog() {
     throw new Error('Sin permisos');
   }
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const [suplementos, listas, items] = await Promise.all([
-    getAllSuplementos(supabase),
-    getAllSuplementacionListas(supabase),
-    getAllSuplementacionListaItems(supabase),
+    getAllSuplementos(db),
+    getAllSuplementacionListas(db),
+    getAllSuplementacionListaItems(db),
   ]);
 
   return {
@@ -157,7 +157,7 @@ export async function updateSupplementationCatalog(payload) {
   }
 
   const action = cleanText(payload?.action);
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
 
   if (action === 'create_supplement') {
     const nombre = cleanText(payload.nombre);
@@ -181,7 +181,7 @@ export async function updateSupplementationCatalog(payload) {
       updated_at: new Date().toISOString(),
     };
 
-    const data = await upsertSuplemento(supabase, body);
+    const data = await upsertSuplemento(db, body);
     revalidatePath('/dashboard');
     return { suplemento: data };
   }
@@ -209,7 +209,7 @@ export async function updateSupplementationCatalog(payload) {
       updated_at: new Date().toISOString(),
     };
 
-    const data = await updateSuplemento(supabase, id, body);
+    const data = await updateSuplemento(db, id, body);
     revalidatePath('/dashboard');
     return { suplemento: data };
   }
@@ -218,7 +218,7 @@ export async function updateSupplementationCatalog(payload) {
     const id = toPositiveNumber(payload.id);
     if (!id) throw new Error('ID de suplemento no válido');
 
-    await deleteSuplemento(supabase, id);
+    await deleteSuplemento(db, id);
     revalidatePath('/dashboard');
     return { ok: true };
   }
@@ -227,7 +227,7 @@ export async function updateSupplementationCatalog(payload) {
     const id = toPositiveNumber(payload.id);
     if (!id) throw new Error('ID de catálogo no válido');
 
-    await deleteSuplementacionLista(supabase, id);
+    await deleteSuplementacionLista(db, id);
     revalidatePath('/dashboard');
     return { ok: true };
   }
@@ -240,12 +240,12 @@ export async function updateSupplementationCatalog(payload) {
     const body = {
       slug,
       nombre,
-      orden: toPositiveNumber(payload.orden) || await nextListOrder(supabase),
+      orden: toPositiveNumber(payload.orden) || await nextListOrder(db),
       descripcion: cleanText(payload.descripcion) || null,
       updated_at: new Date().toISOString(),
     };
 
-    const data = await upsertSuplementacionLista(supabase, body);
+    const data = await upsertSuplementacionLista(db, body);
     revalidatePath('/dashboard');
     return { lista: data };
   }
@@ -255,7 +255,7 @@ export async function updateSupplementationCatalog(payload) {
     const suplementoId = toPositiveNumber(payload.suplemento_id);
     if (!listaId || !suplementoId) throw new Error('Falta catálogo o suplemento');
 
-    const existing = await getSuplementacionListaItemsByList(supabase, listaId);
+    const existing = await getSuplementacionListaItemsByList(db, listaId);
     const body = {
       lista_id: listaId,
       suplemento_id: suplementoId,
@@ -263,7 +263,7 @@ export async function updateSupplementationCatalog(payload) {
       notas: cleanText(payload.notas) || null,
     };
 
-    const data = await upsertSuplementacionListaItem(supabase, body);
+    const data = await upsertSuplementacionListaItem(db, body);
     revalidatePath('/dashboard');
     return { item: data };
   }
@@ -272,18 +272,18 @@ export async function updateSupplementationCatalog(payload) {
     const itemId = toPositiveNumber(payload.item_id);
     if (!itemId) throw new Error('Falta item_id');
 
-    await deleteSuplementacionListaItem(supabase, itemId);
+    await deleteSuplementacionListaItem(db, itemId);
     revalidatePath('/dashboard');
     return { ok: true };
   }
 
   if (action === 'assign_all') {
     const listaId = toPositiveNumber(payload.lista_id);
-    const team = await getOwnedTeam(supabase, user, payload.team_id);
+    const team = await getOwnedTeam(db, user, payload.team_id);
     if (!listaId) throw new Error('Selecciona un catálogo');
     if (!team) throw new Error('No tienes acceso a este equipo');
 
-    const players = await getPlayersByTeam(supabase, team.id);
+    const players = await getPlayersByTeam(db, team.id);
     const rows = (players || []).map((player) => ({
       jugador_id: player.id,
       lista_id: listaId,
@@ -291,7 +291,7 @@ export async function updateSupplementationCatalog(payload) {
     }));
 
     if (rows.length) {
-      await upsertJugadorSuplementacionBulk(supabase, rows);
+      await upsertJugadorSuplementacionBulk(db, rows);
     }
     revalidatePath(`/dashboard/equipo/${team.id}`);
     return { ok: true, assigned: rows.length };
@@ -306,10 +306,10 @@ export async function updateSupplementationCatalog(payload) {
     if (!listaId) throw new Error('Selecciona un catálogo');
     if (!jugadorIds.length) throw new Error('Debes seleccionar al menos un jugador');
 
-    const team = await getOwnedTeam(supabase, user, payload.team_id);
+    const team = await getOwnedTeam(db, user, payload.team_id);
     if (!team) throw new Error('No tienes acceso a este equipo');
 
-    const teamPlayers = await getPlayersByTeamIds(supabase, team.id, jugadorIds);
+    const teamPlayers = await getPlayersByTeamIds(db, team.id, jugadorIds);
     const rows = (teamPlayers || []).map((player) => ({
       jugador_id: player.id,
       lista_id: listaId,
@@ -317,7 +317,7 @@ export async function updateSupplementationCatalog(payload) {
     }));
 
     if (rows.length) {
-      await upsertJugadorSuplementacionBulk(supabase, rows);
+      await upsertJugadorSuplementacionBulk(db, rows);
     }
     revalidatePath(`/dashboard/equipo/${team.id}`);
     return { ok: true, assigned: rows.length };
@@ -334,10 +334,10 @@ export async function updateSupplementationCatalog(payload) {
     if (!suplementoIds.length) throw new Error('Selecciona al menos un suplemento');
     if (!jugadorIds.length) throw new Error('Debes seleccionar al menos un jugador');
 
-    const team = await getOwnedTeam(supabase, user, payload.team_id);
+    const team = await getOwnedTeam(db, user, payload.team_id);
     if (!team) throw new Error('No tienes acceso a este equipo');
 
-    const teamPlayers = await getPlayersByTeamIds(supabase, team.id, jugadorIds);
+    const teamPlayers = await getPlayersByTeamIds(db, team.id, jugadorIds);
     const rows = [];
     (teamPlayers || []).forEach((player) => {
       suplementoIds.forEach((supId) => {
@@ -350,7 +350,7 @@ export async function updateSupplementationCatalog(payload) {
     });
 
     if (rows.length) {
-      await upsertJugadorSuplementosExtraBulk(supabase, rows);
+      await upsertJugadorSuplementosExtraBulk(db, rows);
     }
     revalidatePath(`/dashboard/equipo/${team.id}`);
     return { ok: true, assigned: rows.length };

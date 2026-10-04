@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { forbidden, getAccessibleTeam } from '@/lib/auth/team-access';
 import { getTeamPhoto } from '@/repositories/teamRepository';
@@ -18,20 +18,20 @@ export async function GET(req) {
     const user = await getUser();
     if (!user) return forbidden('No autorizado');
 
-    const supabase = getSupabaseAdmin();
+    const db = getDb();
 
     // Solo el staff con acceso al equipo, o los jugadores de ese equipo.
     if (user.role === 'jugador') {
-      const player = await getPlayerById(supabase, user.id);
+      const player = await getPlayerById(db, user.id);
       if (!player || String(player.equipo_id) !== String(id)) {
         return forbidden('No tienes acceso a este equipo');
       }
     } else {
-      const accessible = await getAccessibleTeam(supabase, user, id);
+      const accessible = await getAccessibleTeam(db, user, id);
       if (!accessible) return forbidden('No tienes acceso a este equipo');
     }
 
-    const team = await getTeamPhoto(supabase, id);
+    const team = await getTeamPhoto(db, id);
     if (!team || !team.foto) {
       return NextResponse.json({ error: 'Foto no encontrada' }, { status: 404 });
     }

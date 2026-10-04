@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getOwnedPlayer, getOwnedTeam, getOwnerId } from '@/lib/auth/team-access';
 import { insertMessages } from '@/repositories/messagesRepository';
 
@@ -47,13 +47,13 @@ export async function sendMessage(payload) {
     created_by_name: user.name || user.username || 'Nutricionista',
   };
 
-  const supabase = getSupabaseAdmin();
-  const team = await getOwnedTeam(supabase, user, teamId);
+  const db = getDb();
+  const team = await getOwnedTeam(db, user, teamId);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
   if (!sendToAll) {
     for (const jugadorId of recipientIds) {
-      const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+      const ownedPlayer = await getOwnedPlayer(db, user, jugadorId);
       if (!ownedPlayer || String(ownedPlayer.equipo_id) !== String(team.id)) {
         throw new Error('Hay jugadores fuera de este equipo');
       }
@@ -64,7 +64,7 @@ export async function sendMessage(payload) {
     ? [{ ...base, owner_id: getOwnerId(user), equipo_id: team.id, jugador_id: null }]
     : recipientIds.map((jugadorId) => ({ ...base, owner_id: getOwnerId(user), equipo_id: team.id, jugador_id: jugadorId }));
 
-  const data = await insertMessages(supabase, rows);
+  const data = await insertMessages(db, rows);
   revalidatePath(`/dashboard/equipo/${teamId}`);
   return { messages: data || [] };
 }

@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getAccessiblePlayer } from '@/lib/auth/team-access';
 import JugadorHeader from '@/components/JugadorHeader';
@@ -8,13 +8,13 @@ import NothingFound from '@/components/NothingFound';
 import { Box } from '@mantine/core';
 
 export default async function JugadorLayout({ children, params }) {
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   const isPlayer = user?.role === 'jugador';
   const { id } = await params;
 
   if (!isPlayer) {
-    const accessiblePlayer = await getAccessiblePlayer(supabase, user, id);
+    const accessiblePlayer = await getAccessiblePlayer(db, user, id);
     if (!accessiblePlayer) {
       return (
         <NothingFound
@@ -31,7 +31,7 @@ export default async function JugadorLayout({ children, params }) {
 
   let jugador = null;
   try {
-    jugador = await getPlayerWithTeamConfig(supabase, id);
+    jugador = await getPlayerWithTeamConfig(db, id);
   } catch (err) {
     console.error('Error fetching jugador details:', err);
   }

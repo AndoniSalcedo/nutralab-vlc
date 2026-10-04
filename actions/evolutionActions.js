@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedPlayer } from '@/lib/auth/team-access';
 import {
@@ -60,12 +60,12 @@ export async function saveEvolution(body) {
   const { id, jugador_id, fecha } = body || {};
   if (!jugador_id || !fecha) throw new Error('Faltan datos obligatorios');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
-  const ownedPlayer = await getOwnedPlayer(supabase, user, jugador_id);
+  const ownedPlayer = await getOwnedPlayer(db, user, jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
   const payload = {};
@@ -78,13 +78,13 @@ export async function saveEvolution(body) {
   let data;
   if (id) {
     // El id llega del cliente: comprobar que el registro es del jugador autorizado.
-    const existing = await getEvolutionById(supabase, id);
+    const existing = await getEvolutionById(db, id);
     if (!existing || String(existing.jugador_id) !== String(jugador_id)) {
       throw new Error('Medición no encontrada');
     }
-    data = await updateEvolution(supabase, id, payload);
+    data = await updateEvolution(db, id, payload);
   } else {
-    data = await upsertEvolution(supabase, {
+    data = await upsertEvolution(db, {
       jugador_id,
       ...payload
     });
@@ -97,19 +97,19 @@ export async function saveEvolution(body) {
 export async function deleteEvolution(id) {
   if (!id) throw new Error('Falta id de la medición');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const evolucion = await getEvolutionById(supabase, id);
+  const evolucion = await getEvolutionById(db, id);
   if (!evolucion) throw new Error('Medición no encontrada');
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, evolucion.jugador_id);
+  const ownedPlayer = await getOwnedPlayer(db, user, evolucion.jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  await deleteEvolutionInRepo(supabase, id);
+  await deleteEvolutionInRepo(db, id);
   revalidatePath(`/dashboard/jugador/${evolucion.jugador_id}`);
   return { ok: true };
 }

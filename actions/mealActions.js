@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedPlayer, getAccessiblePlayer } from '@/lib/auth/team-access';
 import {
@@ -46,13 +46,13 @@ function mapMealToClient(dbMeal) {
 export async function listPlayerMeals(jugadorId, { mealType, day } = {}) {
   if (!jugadorId) throw new Error('Falta jugador_id');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user) throw new Error('No autorizado');
 
   const isPlayer = user.role === 'jugador';
   if (!isPlayer) {
-    const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+    const accessiblePlayer = await getAccessiblePlayer(db, user, jugadorId);
     if (!accessiblePlayer) throw new Error('No tienes acceso a este jugador');
   } else {
     if (String(user.id) !== String(jugadorId)) {
@@ -71,10 +71,10 @@ export async function listPlayerMeals(jugadorId, { mealType, day } = {}) {
     const toUTC = new Date(`${day}T23:59:59Z`);
     toUTC.setHours(toUTC.getHours() + 3);
     
-    resultMeals = await getMealsFiltered(supabase, jugadorId, mealType, fromUTC.toISOString(), toUTC.toISOString());
+    resultMeals = await getMealsFiltered(db, jugadorId, mealType, fromUTC.toISOString(), toUTC.toISOString());
     resultMeals = resultMeals.filter(m => getDateStr(m.taken_at) === day);
   } else {
-    resultMeals = await getMealsFiltered(supabase, jugadorId, mealType, null, null);
+    resultMeals = await getMealsFiltered(db, jugadorId, mealType, null, null);
   }
 
   return (resultMeals || []).map(mapMealToClient);
@@ -126,11 +126,11 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
 
   const user = await getUser();
   if (!user || user.role === 'tecnico') throw new Error('No autorizado');
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
 
   const isPlayer = user.role === 'jugador';
   if (!isPlayer) {
-    const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+    const ownedPlayer = await getOwnedPlayer(db, user, jugadorId);
     if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
   } else {
     if (String(user.id) !== String(jugadorId)) {
@@ -141,7 +141,7 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
   if (id) {
     // El id llega del cliente: el registro debe pertenecer al jugador autorizado
     // (si no, se podrían editar/reasignar comidas de otros jugadores).
-    const existing = await getMealById(supabase, id);
+    const existing = await getMealById(db, id);
     if (!existing || String(existing.jugador_id) !== String(jugadorId)) {
       throw new Error('Comida no encontrada');
     }
@@ -178,9 +178,9 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
 
   let resultMeal;
   if (id) {
-    resultMeal = await updateMeal(supabase, id, mealPayload);
+    resultMeal = await updateMeal(db, id, mealPayload);
   } else {
-    resultMeal = await insertMeal(supabase, mealPayload);
+    resultMeal = await insertMeal(db, mealPayload);
   }
 
   revalidatePath(`/dashboard/jugador/${jugadorId}`);
@@ -190,16 +190,16 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
 export async function deletePlayerMeal(id) {
   if (!id) throw new Error('Falta id');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'tecnico') throw new Error('No autorizado');
 
-  const meal = await getMealById(supabase, id);
+  const meal = await getMealById(db, id);
   if (!meal) throw new Error('Comida no encontrada');
 
   const isPlayer = user.role === 'jugador';
   if (!isPlayer) {
-    const ownedPlayer = await getOwnedPlayer(supabase, user, meal.jugador_id);
+    const ownedPlayer = await getOwnedPlayer(db, user, meal.jugador_id);
     if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
   } else {
     if (String(user.id) !== String(meal.jugador_id)) {
@@ -207,7 +207,7 @@ export async function deletePlayerMeal(id) {
     }
   }
 
-  await deleteMeal(supabase, id);
+  await deleteMeal(db, id);
   revalidatePath(`/dashboard/jugador/${meal.jugador_id}`);
   return { success: true };
 }
@@ -227,8 +227,8 @@ export async function parseMealTree(body) {
 
     let jugador = null;
     if (jugadorId) {
-      const supabase = getSupabaseAdmin();
-      jugador = await getOwnedPlayer(supabase, user, jugadorId);
+      const db = getDb();
+      jugador = await getOwnedPlayer(db, user, jugadorId);
     }
 
     return await parseMealTreeWithAI({ ...parseInput, jugador });

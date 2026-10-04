@@ -1,0 +1,482 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model analiticas {
+  id                   BigInt    @id @default(autoincrement())
+  jugador_id           BigInt
+  fecha_extraccion     DateTime? @db.Date
+  parametros           Json      @default("[]")
+  pdf_nombre           String?
+  created_at           DateTime? @default(now()) @db.Timestamptz(6)
+  visible_para_jugador Boolean?  @default(false)
+  jugadores            jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([jugador_id], map: "teams_analiticas_jugador_id_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model comidas {
+  id          BigInt    @id @default(autoincrement())
+  jugador_id  BigInt
+  taken_at    DateTime  @default(now()) @db.Timestamptz(6)
+  dish_name   String?
+  meal_type   String
+  ingredients String[]  @default([])
+  calories    Int?
+  notes       String?
+  photo       Bytes?
+  photo_mime  String?   @default("image/webp")
+  photo_size  Int?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  jugadores   jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([jugador_id, taken_at], map: "teams_comidas_jugador_taken_at_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model equipos {
+  id                        BigInt                  @id @default(autoincrement())
+  owner_id                  String
+  nombre                    String
+  temporada                 String
+  descripcion               String?
+  created_at                DateTime?               @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime?               @default(now()) @db.Timestamptz(6)
+  configuracion_nutricional Json?                   @default("{}")
+  foto                      Bytes?
+  foto_mime                 String?                 @default("image/webp")
+  foto_size                 Int?
+  informes_semanales        informes_semanales[]
+  jugadores                 jugadores[]
+  mensajes                  mensajes[]
+  menu_semanal              menu_semanal[]
+  partidos_intrapartido     partidos_intrapartido[]
+  tecnico_equipos           tecnico_equipos[]
+
+  @@index([owner_id, temporada], map: "teams_equipos_owner_temporada_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model evoluciones {
+  id                              BigInt    @id @default(autoincrement())
+  jugador_id                      BigInt
+  fecha                           DateTime  @db.Date
+  peso_kg                         Float?
+  porcentaje_grasa                Float?
+  suma_6_pliegues                 Float?
+  notas                           String?
+  created_at                      DateTime? @default(now()) @db.Timestamptz(6)
+  altura_cm                       Float?
+  pliegue_biceps                  Float?
+  pliegue_triceps                 Float?
+  pliegue_subescapular            Float?
+  pliegue_cresta_iliaca           Float?
+  pliegue_supraeliaco             Float?
+  pliegue_abdominal               Float?
+  pliegue_pantorrilla             Float?
+  pliegue_muslo                   Float?
+  suma_8_pliegues                 Float?
+  porcentaje_grasa_faulkner       Float?
+  porcentaje_grasa_yuhasz         Float?
+  peso_oseo                       Float?
+  peso_residual                   Float?
+  peso_graso                      Float?
+  peso_muscular                   Float?
+  peso_magro                      Float?
+  peso_deseable                   Float?
+  endomorfia                      Float?
+  mesomorfia                      Float?
+  ectomorfia                      Float?
+  perimetro_brazo_contraido       Float?
+  metricas_excel                  Json      @default("{}")
+  fuente_hoja                     String?
+  fuente_fila                     Int?
+  fecha_original_excel            DateTime? @db.Date
+  fecha_corregida                 Boolean   @default(false)
+  perimetro_pantorrilla_derecha   Float?
+  perimetro_pantorrilla_izquierda Float?
+  perimetro_muslo_derecho         Float?
+  perimetro_muslo_izquierdo       Float?
+  porcentaje_musculo              Float?
+  perimetro_brazo_relajado        Float?
+  perimetro_antebrazo             Float?
+  perimetro_muneca                Float?
+  diametro_humero                 Float?
+  diametro_femur                  Float?
+  diametro_muneca                 Float?
+  somatocarta_x                   Float?
+  somatocarta_y                   Float?
+  indice_ponderal                 Float?
+  jugadores                       jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([jugador_id, fecha])
+  @@index([jugador_id], map: "teams_evoluciones_jugador_id_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model informes_semanales {
+  id         BigInt    @id @default(autoincrement())
+  equipo_id  BigInt
+  semana     DateTime  @db.Date
+  meta       Json      @default("{}")
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+  equipos    equipos   @relation(fields: [equipo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([equipo_id, semana])
+  @@index([equipo_id, semana], map: "teams_informes_semanales_equipo_semana_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model jugador_suplementacion {
+  jugador_id            BigInt                 @id
+  lista_id              BigInt?
+  notas                 String?
+  updated_at            DateTime?              @default(now()) @db.Timestamptz(6)
+  created_at            DateTime?              @default(now()) @db.Timestamptz(6)
+  jugadores             jugadores              @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  suplementacion_listas suplementacion_listas? @relation(fields: [lista_id], references: [id], onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model jugador_suplementacion_historial {
+  id                    BigInt                 @id @default(autoincrement())
+  jugador_id            BigInt
+  lista_id              BigInt?
+  created_at            DateTime?              @default(now()) @db.Timestamptz(6)
+  jugadores             jugadores              @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  suplementacion_listas suplementacion_listas? @relation(fields: [lista_id], references: [id], onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model jugador_suplementos_extra {
+  id              BigInt      @id @default(autoincrement())
+  jugador_id      BigInt
+  suplemento_id   BigInt
+  dose_override   String?
+  timing_override String?
+  note_override   String?
+  created_at      DateTime?   @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime?   @default(now()) @db.Timestamptz(6)
+  jugadores       jugadores   @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  suplementos     suplementos @relation(fields: [suplemento_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([jugador_id, suplemento_id])
+  @@index([jugador_id], map: "teams_jugador_suplementos_extra_jugador_id_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model jugadores {
+  id                               BigInt                             @id @default(autoincrement())
+  auth_user_id                     String?                            @unique @db.Uuid
+  nombre                           String
+  apellidos                        String?
+  posicion                         String?
+  fecha_nacimiento                 DateTime?                          @db.Date
+  num_comidas                      String?
+  objetivo                         String?
+  gustos_preferencias              String?
+  aversiones                       String?
+  intolerancias                    String?
+  alergias                         String?
+  contexto_clinico                 String?
+  notas_hidratacion                String?
+  notas_suplementacion             String?
+  notas_protocolos                 String?
+  created_at                       DateTime?                          @default(now()) @db.Timestamptz(6)
+  updated_at                       DateTime?                          @default(now()) @db.Timestamptz(6)
+  auth_email                       String?
+  credentials_created_at           DateTime?                          @db.Timestamptz(6)
+  equipo_id                        BigInt?
+  postentreno                      Boolean?                           @default(false)
+  recomendaciones_defecto          Json?                              @default("{}")
+  preentreno                       Boolean?                           @default(false)
+  config_prepartido                Json?                              @default("{}")
+  avatar                           Bytes?
+  avatar_mime                      String?                            @default("image/webp")
+  avatar_size                      Int?
+  porcentaje_grasa_objetivo        Float?                             @default(10)
+  protocolos_custom                Json?                              @default("{}")
+  analiticas                       analiticas[]
+  comidas                          comidas[]
+  evoluciones                      evoluciones[]
+  jugador_suplementacion           jugador_suplementacion?
+  jugador_suplementacion_historial jugador_suplementacion_historial[]
+  jugador_suplementos_extra        jugador_suplementos_extra[]
+  equipos                          equipos?                           @relation(fields: [equipo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  mensajes                         mensajes[]
+  partido_convocados               partido_convocados[]
+  partido_tomas                    partido_tomas[]
+  pesajes                          pesajes[]
+  planes_ia                        planes_ia[]
+  registros_bienestar              registros_bienestar[]
+  registros_hidratacion            registros_hidratacion[]
+
+  @@index([auth_user_id], map: "teams_jugadores_auth_user_id_idx")
+  @@index([equipo_id], map: "teams_jugadores_equipo_id_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model mensajes {
+  id              BigInt     @id @default(autoincrement())
+  jugador_id      BigInt?
+  titulo          String
+  contenido       String
+  created_by      String?
+  created_by_name String?
+  created_at      DateTime?  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime?  @default(now()) @db.Timestamptz(6)
+  owner_id        String?
+  equipo_id       BigInt?
+  equipos         equipos?   @relation(fields: [equipo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  jugadores       jugadores? @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([created_at(sort: Desc)], map: "teams_mensajes_created_at_idx")
+  @@index([equipo_id], map: "teams_mensajes_equipo_id_idx")
+  @@index([jugador_id], map: "teams_mensajes_jugador_id_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model menu_semanal {
+  id         BigInt    @id @default(autoincrement())
+  semana     DateTime  @db.Date
+  dias       Json      @default("[]")
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  equipo_id  BigInt
+  equipos    equipos   @relation(fields: [equipo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([semana, equipo_id], map: "menu_semanal_semana_equipo_unique")
+  @@index([equipo_id], map: "teams_menu_semanal_equipo_id_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model nutricionista_tecnicos {
+  id               BigInt    @id @default(autoincrement())
+  nutricionista_id String
+  tecnico_id       BigInt
+  status           String    @default("accepted")
+  created_at       DateTime? @default(now()) @db.Timestamptz(6)
+  tecnicos         tecnicos  @relation(fields: [tecnico_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([nutricionista_id, tecnico_id])
+  @@index([nutricionista_id], map: "teams_nutricionista_tecnicos_nutricionista_id_idx")
+  @@index([tecnico_id], map: "teams_nutricionista_tecnicos_tecnico_id_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model partido_convocados {
+  partido_id            BigInt
+  jugador_id            BigInt
+  titular               Boolean               @default(false)
+  jugadores             jugadores             @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  partidos_intrapartido partidos_intrapartido @relation(fields: [partido_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([partido_id, jugador_id])
+  @@index([jugador_id], map: "teams_partido_convocados_jugador_idx")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model partido_tomas {
+  partido_id            BigInt
+  jugador_id            BigInt
+  momento               String
+  producto_id           String
+  cantidad              Int                   @db.SmallInt
+  jugadores             jugadores             @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  partidos_intrapartido partidos_intrapartido @relation(fields: [partido_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([partido_id, jugador_id, momento, producto_id])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model partidos_intrapartido {
+  id                 BigInt               @id @default(autoincrement())
+  equipo_id          BigInt
+  rival              String               @default("")
+  competicion        String               @default("")
+  lugar              String               @default("")
+  fecha              DateTime             @db.Date
+  created_by         String?
+  created_at         DateTime?            @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamptz(6)
+  partido_convocados partido_convocados[]
+  partido_tomas      partido_tomas[]
+  equipos            equipos              @relation(fields: [equipo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([equipo_id, fecha(sort: Desc)], map: "teams_partidos_intrapartido_equipo_fecha_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model pesajes {
+  id         BigInt    @id @default(autoincrement())
+  jugador_id BigInt
+  fecha      DateTime  @db.Date
+  peso_kg    Float
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+  jugadores  jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([jugador_id, fecha])
+  @@index([jugador_id], map: "teams_pesajes_jugador_id_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model planes_ia {
+  id                 BigInt    @id @default(autoincrement())
+  jugador_id         BigInt
+  nombre             String
+  contexto           String?
+  contexto_adicional String?
+  contenido          String    @default("")
+  updated_at         DateTime? @default(now()) @db.Timestamptz(6)
+  created_at         DateTime? @default(now()) @db.Timestamptz(6)
+  datos              Json?
+  jugadores          jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([jugador_id], map: "teams_planes_ia_jugador_id_idx")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model registros_bienestar {
+  id               BigInt    @id @default(autoincrement())
+  jugador_id       BigInt
+  fecha            DateTime  @db.Date
+  sueno            Int       @db.SmallInt
+  fatiga           Int       @db.SmallInt
+  dolor_muscular   Int       @db.SmallInt
+  estres           Int       @db.SmallInt
+  estado_animo     Int       @db.SmallInt
+  alimentacion     Int       @db.SmallInt
+  molestia         Boolean   @default(false)
+  molestia_detalle String?
+  created_by       String?
+  created_at       DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime? @default(now()) @db.Timestamptz(6)
+  jugadores        jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([jugador_id, fecha])
+  @@index([jugador_id, fecha], map: "teams_registros_bienestar_jugador_fecha_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model registros_hidratacion {
+  id           BigInt    @id @default(autoincrement())
+  jugador_id   BigInt
+  fecha        DateTime  @db.Date
+  hora         String?
+  tipo         String    @default("sosm")
+  valor        Float?
+  unidad       String?
+  estado       String?
+  notas        String?
+  cuestionario String?
+  created_at   DateTime? @default(now()) @db.Timestamptz(6)
+  jugadores    jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([jugador_id, fecha, tipo])
+  @@index([jugador_id, fecha], map: "teams_registros_hidratacion_jugador_fecha_idx")
+  @@index([jugador_id, fecha, tipo], map: "teams_registros_hidratacion_jugador_fecha_tipo_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model schema_migrations {
+  version    String   @id
+  name       String
+  file_name  String
+  applied_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model suplementacion_lista_items {
+  id                    BigInt                @id @default(autoincrement())
+  lista_id              BigInt
+  suplemento_id         BigInt
+  orden                 Int                   @default(0)
+  notas                 String?
+  created_at            DateTime?             @default(now()) @db.Timestamptz(6)
+  suplementacion_listas suplementacion_listas @relation(fields: [lista_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  suplementos           suplementos           @relation(fields: [suplemento_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([lista_id, suplemento_id])
+  @@index([lista_id], map: "teams_suplementacion_lista_items_lista_id_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model suplementacion_listas {
+  id                               BigInt                             @id @default(autoincrement())
+  slug                             String                             @unique
+  nombre                           String
+  orden                            Int
+  descripcion                      String?
+  created_at                       DateTime?                          @default(now()) @db.Timestamptz(6)
+  updated_at                       DateTime?                          @default(now()) @db.Timestamptz(6)
+  jugador_suplementacion           jugador_suplementacion[]
+  jugador_suplementacion_historial jugador_suplementacion_historial[]
+  suplementacion_lista_items       suplementacion_lista_items[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model suplementos {
+  id                         BigInt                       @id @default(autoincrement())
+  slug                       String                       @unique
+  nombre                     String
+  categoria                  String?
+  descripcion                String?
+  pauta                      String?
+  timing                     String?
+  dose_type                  String                       @default("fixed")
+  dose_unit                  String?
+  dose_min                   Float?
+  dose_max                   Float?
+  dose_text                  String?
+  notas                      String?
+  created_at                 DateTime?                    @default(now()) @db.Timestamptz(6)
+  updated_at                 DateTime?                    @default(now()) @db.Timestamptz(6)
+  jugador_suplementos_extra  jugador_suplementos_extra[]
+  suplementacion_lista_items suplementacion_lista_items[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model tecnico_equipos {
+  id         BigInt    @id @default(autoincrement())
+  tecnico_id BigInt
+  equipo_id  BigInt
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  equipos    equipos   @relation(fields: [equipo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tecnicos   tecnicos  @relation(fields: [tecnico_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([tecnico_id, equipo_id])
+  @@index([equipo_id], map: "teams_tecnico_equipos_equipo_id_idx")
+  @@index([tecnico_id], map: "teams_tecnico_equipos_tecnico_id_idx")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model tecnicos {
+  id                     BigInt                   @id @default(autoincrement())
+  auth_user_id           String?                  @unique @db.Uuid
+  nombre                 String
+  apellidos              String?
+  email                  String                   @unique
+  owner_id               String?
+  created_at             DateTime?                @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime?                @default(now()) @db.Timestamptz(6)
+  avatar                 Bytes?
+  avatar_mime            String?                  @default("image/webp")
+  avatar_size            Int?
+  nutricionista_tecnicos nutricionista_tecnicos[]
+  tecnico_equipos        tecnico_equipos[]
+
+  @@index([auth_user_id], map: "teams_tecnicos_auth_user_id_idx")
+  @@index([owner_id], map: "teams_tecnicos_owner_id_idx")
+}

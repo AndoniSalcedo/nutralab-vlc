@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import DashboardContent from '@/components/DashboardContent';
 import { getUser } from '@/lib/auth/session';
 import { withLatestMeasurement } from '@/lib/metrics/player';
@@ -12,10 +12,10 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function TeamDashboard({ params }) {
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   const { teamId } = await params;
-  const team = await getAccessibleTeam(supabase, user, teamId);
+  const team = await getAccessibleTeam(db, user, teamId);
 
   if (!team) {
     return (
@@ -33,7 +33,7 @@ export default async function TeamDashboard({ params }) {
   let players = [];
   try {
     const resJugadores = await getPlayersByTeamSelect(
-      supabase,
+      db,
       team.id,
       'id,nombre,apellidos,posicion,objetivo,porcentaje_grasa_objetivo,auth_user_id,auth_email,credentials_created_at,equipo_id,avatar_size,updated_at,fecha_nacimiento,num_comidas,gustos_preferencias,aversiones,intolerancias,contexto_clinico,postentreno,preentreno'
     );
@@ -43,8 +43,8 @@ export default async function TeamDashboard({ params }) {
     let pesajes = [];
     if (playerIds.length) {
       [evoluciones, pesajes] = await Promise.all([
-        getEvolutionsByPlayerIdsSimple(supabase, playerIds),
-        getPesajesByPlayerIdsSimple(supabase, playerIds),
+        getEvolutionsByPlayerIdsSimple(db, playerIds),
+        getPesajesByPlayerIdsSimple(db, playerIds),
       ]);
     }
 

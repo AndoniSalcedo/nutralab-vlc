@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { aiClient as client } from '@/lib/ai/client';
 import { env } from '@/config/env';
 import { getUser } from '@/lib/auth/session';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getOwnedTeam, getAccessibleTeam } from '@/lib/auth/team-access';
 import { readDocumentUpload } from '@/lib/security/uploads';
 import { enforceRateLimit } from '@/lib/security/rate-limit';
@@ -126,16 +126,16 @@ export async function getWeeklyMenus(teamId, semana = null) {
   const user = await getUser();
   if (!user) throw new Error('No autenticado');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   if (user.role === 'jugador') {
-    const player = await getPlayerById(supabase, user.id);
+    const player = await getPlayerById(db, user.id);
     if (String(player?.equipo_id) !== String(teamId)) throw new Error('No autorizado');
   } else {
-    const team = await getAccessibleTeam(supabase, user, teamId);
+    const team = await getAccessibleTeam(db, user, teamId);
     if (!team) throw new Error('No tienes acceso a este equipo');
   }
 
-  const data = await getMenusByTeamLimit(supabase, teamId, semana, 10);
+  const data = await getMenusByTeamLimit(db, teamId, semana, 10);
   return { menus: data || [] };
 }
 
@@ -146,11 +146,11 @@ export async function createWeeklyMenu({ semana, equipo_id, dias }) {
   }
   if (!semana || !equipo_id) throw new Error('Faltan datos');
 
-  const supabase = getSupabaseAdmin();
-  const team = await getOwnedTeam(supabase, user, equipo_id);
+  const db = getDb();
+  const team = await getOwnedTeam(db, user, equipo_id);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
-  const data = await upsertMenu(supabase, { semana, equipo_id, dias: dias || [], updated_at: new Date().toISOString() });
+  const data = await upsertMenu(db, { semana, equipo_id, dias: dias || [], updated_at: new Date().toISOString() });
   revalidatePath(`/dashboard/equipo/${equipo_id}/menu`);
   return { ok: true, menu: data };
 }
@@ -186,8 +186,8 @@ async function processWeeklyMenuUpload(fileOrFormData, weekDateParam, teamIdPara
   const semana = formData.get('semana');
   const equipoId = formData.get('equipo_id');
 
-  const supabase = getSupabaseAdmin();
-  const team = await getOwnedTeam(supabase, user, equipoId);
+  const db = getDb();
+  const team = await getOwnedTeam(db, user, equipoId);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
   // Tipo y tamaño se verifican sobre el contenido real, no sobre `archivo.type`.
@@ -292,7 +292,7 @@ IMPORTANTE:
   const validation = validateMenuDias(enrichedDias);
   if (!validation.success) throw new Error(validation.error);
 
-  const data = await upsertMenu(supabase, { semana: finalSemana, equipo_id: equipoId, dias: validation.data, updated_at: new Date().toISOString() });
+  const data = await upsertMenu(db, { semana: finalSemana, equipo_id: equipoId, dias: validation.data, updated_at: new Date().toISOString() });
 
   const emisor = {
     tipo: 'nutricionista',
@@ -331,11 +331,11 @@ export async function updateWeeklyMenu(id, dias) {
   }
   if (!id || !dias) throw new Error('Faltan datos');
 
-  const supabase = getSupabaseAdmin();
-  const menu = await getMenuById(supabase, id);
+  const db = getDb();
+  const menu = await getMenuById(db, id);
   if (!menu) throw new Error('Menú no encontrado');
 
-  const team = await getOwnedTeam(supabase, user, menu.equipo_id);
+  const team = await getOwnedTeam(db, user, menu.equipo_id);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
   // Los platos nuevos o renombrados se estructuran como AST; los ya estructurados se conservan.
@@ -350,7 +350,7 @@ export async function updateWeeklyMenu(id, dias) {
   const validation = validateMenuDias(enrichedDias);
   if (!validation.success) return { ok: false, error: validation.error };
 
-  const data = await updateMenu(supabase, id, { dias: validation.data, updated_at: new Date().toISOString() });
+  const data = await updateMenu(db, id, { dias: validation.data, updated_at: new Date().toISOString() });
   revalidatePath(`/dashboard/equipo/${menu.equipo_id}/menu`);
   return { ok: true, menu: data };
 }
@@ -362,14 +362,14 @@ export async function deleteWeeklyMenu(id) {
   }
   if (!id) throw new Error('Falta id');
 
-  const supabase = getSupabaseAdmin();
-  const menu = await getMenuById(supabase, id);
+  const db = getDb();
+  const menu = await getMenuById(db, id);
   if (!menu) throw new Error('Menú no encontrado');
 
-  const team = await getOwnedTeam(supabase, user, menu.equipo_id);
+  const team = await getOwnedTeam(db, user, menu.equipo_id);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
-  await deleteMenu(supabase, id);
+  await deleteMenu(db, id);
   revalidatePath(`/dashboard/equipo/${menu.equipo_id}/menu`);
   return { ok: true };
 }

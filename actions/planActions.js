@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedPlayer, getAccessiblePlayer } from '@/lib/auth/team-access';
 import { sanitizePlanData } from '@/lib/engine';
@@ -17,11 +17,11 @@ import {
   deleteAiPlan as deleteAiPlanInRepo
 } from '@/repositories/aiPlanRepository';
 
-async function loadPlayerWithLatestMetrics(supabase, jugadorId) {
+async function loadPlayerWithLatestMetrics(db, jugadorId) {
   const [jugador, evoluciones, pesajes] = await Promise.all([
-    getPlayerWithTeamConfig(supabase, jugadorId),
-    getEvolutionsByPlayerId(supabase, jugadorId),
-    getPesajesByPlayerId(supabase, jugadorId),
+    getPlayerWithTeamConfig(db, jugadorId),
+    getEvolutionsByPlayerId(db, jugadorId),
+    getPesajesByPlayerId(db, jugadorId),
   ]);
 
   return withLatestMeasurement(jugador, evoluciones || [], pesajes || []);
@@ -30,18 +30,18 @@ async function loadPlayerWithLatestMetrics(supabase, jugadorId) {
 export async function getAiPlans(jugadorId, semana = null) {
   if (!jugadorId) throw new Error('Falta jugador_id');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user) throw new Error('No autenticado');
   if (user.role === 'jugador' && String(user.id) !== String(jugadorId)) {
     throw new Error('Sin permisos');
   }
   if (user.role !== 'jugador') {
-    const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+    const accessiblePlayer = await getAccessiblePlayer(db, user, jugadorId);
     if (!accessiblePlayer) throw new Error('No tienes acceso a este jugador');
   }
 
-  const planes = await getAiPlansByPlayerId(supabase, jugadorId, semana);
+  const planes = await getAiPlansByPlayerId(db, jugadorId, semana);
   return { planes: planes || [] };
 }
 
@@ -61,16 +61,16 @@ async function createAiPlan(payload) {
   if (!jugador?.id) throw new Error('Falta jugador');
   if (!planNombre) throw new Error('El nombre del plan es obligatorio');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, jugador.id);
+  const ownedPlayer = await getOwnedPlayer(db, user, jugador.id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  const jugadorConMetricas = await loadPlayerWithLatestMetrics(supabase, jugador.id);
+  const jugadorConMetricas = await loadPlayerWithLatestMetrics(db, jugador.id);
   const teamConfig = jugadorConMetricas?.equipos?.configuracion_nutricional;
 
   const equipoId = jugadorConMetricas?.equipo_id;
@@ -78,10 +78,10 @@ async function createAiPlan(payload) {
   const isNewGeneration = isDraftOnly || (!datos && (contenido === undefined || contenido === ''));
 
   const generatedDatos = isNewGeneration
-    ? await generatePlanDraft(supabase, {
+    ? await generatePlanDraft(db, {
         jugador: jugadorConMetricas,
         nombre: planNombre,
-        menu: await resolvePlanMenu(supabase, { semanaMenu, equipoId }),
+        menu: await resolvePlanMenu(db, { semanaMenu, equipoId }),
         calendario,
         preMatchConfig,
         teamConfig,
@@ -96,7 +96,7 @@ async function createAiPlan(payload) {
     return { datos: generatedDatos };
   }
 
-  const plan = await savePlan(supabase, {
+  const plan = await savePlan(db, {
     jugadorId: jugador.id,
     nombre: planNombre,
     datos: generatedDatos,
@@ -113,25 +113,25 @@ export async function updateAiPlan(payload) {
   const planNombre = String(nombre || '').trim();
   if (!planNombre) throw new Error('El nombre del plan es obligatorio');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const currentPlan = await getAiPlanById(supabase, id);
+  const currentPlan = await getAiPlanById(db, id);
   if (!currentPlan) throw new Error('Plan no encontrado');
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, currentPlan.jugador_id);
+  const ownedPlayer = await getOwnedPlayer(db, user, currentPlan.jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  const jugadorConMetricas = await loadPlayerWithLatestMetrics(supabase, currentPlan.jugador_id);
+  const jugadorConMetricas = await loadPlayerWithLatestMetrics(db, currentPlan.jugador_id);
   const teamConfig = jugadorConMetricas?.equipos?.configuracion_nutricional;
 
   const sanitizedDatos = sanitizePlanData(datos, teamConfig);
   const finalContenido = String(contenido || '');
 
-  const plan = await updateAiPlanInRepo(supabase, id, {
+  const plan = await updateAiPlanInRepo(db, id, {
     nombre: planNombre,
     contenido: finalContenido,
     datos: sanitizedDatos,
@@ -147,19 +147,19 @@ export async function updateAiPlan(payload) {
 export async function deleteAiPlan(id) {
   if (!id) throw new Error('Falta id del plan');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const plan = await getAiPlanById(supabase, id);
+  const plan = await getAiPlanById(db, id);
   if (!plan) throw new Error('Plan no encontrado');
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, plan.jugador_id);
+  const ownedPlayer = await getOwnedPlayer(db, user, plan.jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  await deleteAiPlanInRepo(supabase, id);
+  await deleteAiPlanInRepo(db, id);
   revalidatePath(`/dashboard/jugador/${plan.jugador_id}`);
   return { ok: true };
 }

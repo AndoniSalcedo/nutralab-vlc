@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getOwnedTeam } from '@/lib/auth/team-access';
 import { assertPlainObject } from '@/lib/security/json';
 import { updateTeamConfig } from '@/repositories/teamRepository';
@@ -26,9 +26,9 @@ export async function transferProtocol(payload) {
     throw new Error('Tipo de día no válido');
   }
 
-  const supabase = getSupabaseAdmin();
-  const sourceTeam = await getOwnedTeam(supabase, user, sourceTeamId);
-  const targetTeam = await getOwnedTeam(supabase, user, targetTeamId);
+  const db = getDb();
+  const sourceTeam = await getOwnedTeam(db, user, sourceTeamId);
+  const targetTeam = await getOwnedTeam(db, user, targetTeamId);
 
   if (!sourceTeam || !targetTeam) {
     throw new Error('No tienes acceso a los equipos seleccionados');
@@ -46,13 +46,13 @@ export async function transferProtocol(payload) {
   targetProtocols.push(newProtocol);
   targetConfig.protocols = targetProtocols;
 
-  await updateTeamConfig(supabase, targetTeamId, targetConfig);
+  await updateTeamConfig(db, targetTeamId, targetConfig);
 
   if (action === 'move') {
     const sourceConfig = sourceTeam.configuracion_nutricional || {};
     const sourceProtocols = (sourceConfig.protocols || []).filter(p => p.id !== protocol.id);
     sourceConfig.protocols = sourceProtocols;
-    await updateTeamConfig(supabase, sourceTeamId, sourceConfig);
+    await updateTeamConfig(db, sourceTeamId, sourceConfig);
     revalidatePath(`/dashboard/equipo/${sourceTeamId}/configuracion`);
   }
 
@@ -76,9 +76,9 @@ export async function batchImportProtocols({ sourceTeamId, targetTeamId, protoco
   }
   if (protocols.length > 100) throw new Error('Demasiados protocolos en una sola importación');
 
-  const supabase = getSupabaseAdmin();
-  const sourceTeam = await getOwnedTeam(supabase, user, sourceTeamId);
-  const targetTeam = await getOwnedTeam(supabase, user, targetTeamId);
+  const db = getDb();
+  const sourceTeam = await getOwnedTeam(db, user, sourceTeamId);
+  const targetTeam = await getOwnedTeam(db, user, targetTeamId);
 
   if (!sourceTeam || !targetTeam) {
     throw new Error('No tienes acceso a los equipos seleccionados');
@@ -106,7 +106,7 @@ export async function batchImportProtocols({ sourceTeamId, targetTeamId, protoco
   }
 
   targetConfig.protocols = targetProtocols;
-  await updateTeamConfig(supabase, targetTeamId, targetConfig);
+  await updateTeamConfig(db, targetTeamId, targetConfig);
   revalidatePath(`/dashboard/equipo/${targetTeamId}/configuracion`);
 
   return {

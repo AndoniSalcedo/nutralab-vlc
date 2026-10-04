@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedPlayer, getAccessiblePlayer } from '@/lib/auth/team-access';
 import { WELLNESS_KEYS, WELLNESS_AVERAGE_DAYS } from '@/config/wellness';
@@ -30,19 +30,19 @@ function parseScore(value, key) {
 export async function getWellnessRecords(jugadorId) {
   if (!jugadorId) throw new Error('Falta jugador_id');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user) throw new Error('No autorizado');
 
   if (user.role === 'jugador') {
     if (String(user.id) !== String(jugadorId)) throw new Error('No tienes acceso a este jugador');
   } else {
-    const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+    const accessiblePlayer = await getAccessiblePlayer(db, user, jugadorId);
     if (!accessiblePlayer) throw new Error('No tienes acceso a este jugador');
   }
 
   const today = todayStr();
-  const records = await getWellnessRecordsByPlayerId(supabase, jugadorId, {
+  const records = await getWellnessRecordsByPlayerId(db, jugadorId, {
     from: shiftDate(today, -WELLNESS_AVERAGE_DAYS),
   });
   return { ok: true, today, records };
@@ -52,14 +52,14 @@ export async function saveWellnessRecord(payload) {
   const { jugador_id, fecha, molestia, molestia_detalle } = payload || {};
   if (!jugador_id) throw new Error('Falta jugador_id');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'tecnico') throw new Error('No autorizado');
 
   if (user.role === 'jugador') {
     if (String(user.id) !== String(jugador_id)) throw new Error('No tienes acceso a este jugador');
   } else {
-    const ownedPlayer = await getOwnedPlayer(supabase, user, jugador_id);
+    const ownedPlayer = await getOwnedPlayer(db, user, jugador_id);
     if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
   }
 
@@ -89,7 +89,7 @@ export async function saveWellnessRecord(payload) {
     recordPayload[key] = parseScore(payload[key], key);
   });
 
-  const record = await upsertWellnessRecord(supabase, recordPayload);
+  const record = await upsertWellnessRecord(db, recordPayload);
   revalidatePath(`/dashboard/jugador/${jugador_id}`);
   return { ok: true, record };
 }

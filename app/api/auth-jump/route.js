@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { buildSessionValue, COOKIE_NAME } from '@/lib/auth/session';
 import { env } from '@/config/env';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getNutritionistProfile } from '@/lib/db/nutralab';
 
 // Solo se permiten rutas internas: evita open redirect (`//evil.com`, `https://evil.com`, `/\\evil.com`).
 function safeRedirectPath(value) {
@@ -38,15 +38,13 @@ export async function GET(request) {
     if (!decoded.exp) throw new Error('Token sin caducidad');
 
     // La cuenta debe existir de verdad en Nutralab: si la consulta falla o no hay fila, no hay sesión
-    const supabase = getSupabaseAdmin();
-    const { data: nutri, error: nutriError } = await supabase
-      .schema('public')
-      .from('Nutritionist')
-      .select('id, name, email, avatarSize')
-      .eq('id', nutritionistId)
-      .maybeSingle();
+    let nutri;
+    try {
+      nutri = await getNutritionistProfile(nutritionistId);
+    } catch (nutriError) {
+      throw new Error(`No se pudo comprobar el nutricionista: ${nutriError.message}`);
+    }
 
-    if (nutriError) throw new Error(`No se pudo comprobar el nutricionista: ${nutriError.message}`);
     if (!nutri) throw new Error('Nutricionista inexistente');
 
     const nutriName = nutri.name || decoded.name;

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getOwnedTeam, getOwnerId } from '@/lib/auth/team-access';
 import { readImageUpload, toByteaHex } from '@/lib/security/uploads';
 import { assertPlainObject } from '@/lib/security/json';
@@ -59,9 +59,9 @@ const PLAYER_COPY_FIELDS = [
   'notas_protocolos',
 ];
 
-async function copyPlayerAllHistory(supabase, sourcePlayerId, newPlayerId) {
+async function copyPlayerAllHistory(db, sourcePlayerId, newPlayerId) {
   try {
-    const evolutions = await getEvolutionsByPlayerIdOrdered(supabase, sourcePlayerId);
+    const evolutions = await getEvolutionsByPlayerIdOrdered(db, sourcePlayerId);
     const evolutionPayloads = (evolutions || []).map((evo) => {
       const cleanEvo = { ...evo, jugador_id: newPlayerId };
       delete cleanEvo.id;
@@ -70,14 +70,14 @@ async function copyPlayerAllHistory(supabase, sourcePlayerId, newPlayerId) {
       return cleanEvo;
     });
     if (evolutionPayloads.length) {
-      await insertEvolutionsBulk(supabase, evolutionPayloads);
+      await insertEvolutionsBulk(db, evolutionPayloads);
     }
   } catch (e) {
     console.error(`Error copying evolutions for player ${sourcePlayerId}:`, e);
   }
 
   try {
-    const analitics = await getAnalyticsByPlayerId(supabase, sourcePlayerId);
+    const analitics = await getAnalyticsByPlayerId(db, sourcePlayerId);
     const analiticalPayloads = (analitics || []).map((item) => {
       const cleanItem = { ...item, jugador_id: newPlayerId };
       delete cleanItem.id;
@@ -86,14 +86,14 @@ async function copyPlayerAllHistory(supabase, sourcePlayerId, newPlayerId) {
       return cleanItem;
     });
     if (analiticalPayloads.length) {
-      await insertAnalyticsBulk(supabase, analiticalPayloads);
+      await insertAnalyticsBulk(db, analiticalPayloads);
     }
   } catch (e) {
     console.error(`Error copying analytics for player ${sourcePlayerId}:`, e);
   }
 
   try {
-    const hydrations = await getHydrationRecordsByPlayerId(supabase, sourcePlayerId);
+    const hydrations = await getHydrationRecordsByPlayerId(db, sourcePlayerId);
     const hydrationPayloads = (hydrations || []).map((item) => {
       const cleanItem = { ...item, jugador_id: newPlayerId };
       delete cleanItem.id;
@@ -102,14 +102,14 @@ async function copyPlayerAllHistory(supabase, sourcePlayerId, newPlayerId) {
       return cleanItem;
     });
     if (hydrationPayloads.length) {
-      await insertHydrationRecordsBulk(supabase, hydrationPayloads);
+      await insertHydrationRecordsBulk(db, hydrationPayloads);
     }
   } catch (e) {
     console.error(`Error copying hydration for player ${sourcePlayerId}:`, e);
   }
 
   try {
-    const aiPlans = await getAiPlansByPlayerId(supabase, sourcePlayerId);
+    const aiPlans = await getAiPlansByPlayerId(db, sourcePlayerId);
     const aiPlanPayloads = (aiPlans || []).map((item) => {
       const cleanItem = { ...item, jugador_id: newPlayerId };
       delete cleanItem.id;
@@ -118,27 +118,27 @@ async function copyPlayerAllHistory(supabase, sourcePlayerId, newPlayerId) {
       return cleanItem;
     });
     if (aiPlanPayloads.length) {
-      await insertAiPlansBulk(supabase, aiPlanPayloads);
+      await insertAiPlansBulk(db, aiPlanPayloads);
     }
   } catch (e) {
     console.error(`Error copying AI plans for player ${sourcePlayerId}:`, e);
   }
 
   try {
-    const suplementacion = await getJugadorSuplementacion(supabase, sourcePlayerId);
+    const suplementacion = await getJugadorSuplementacion(db, sourcePlayerId);
     if (suplementacion) {
       const cleanSupl = { ...suplementacion, jugador_id: newPlayerId };
       delete cleanSupl.id;
       delete cleanSupl.created_at;
       delete cleanSupl.updated_at;
-      await upsertJugadorSuplementacion(supabase, cleanSupl);
+      await upsertJugadorSuplementacion(db, cleanSupl);
     }
   } catch (e) {
     console.error(`Error copying supplementation for player ${sourcePlayerId}:`, e);
   }
 
   try {
-    const extras = await getJugadorSuplementosExtra(supabase, sourcePlayerId);
+    const extras = await getJugadorSuplementosExtra(db, sourcePlayerId);
     const extraPayloads = (extras || []).map((item) => {
       const cleanItem = { ...item, jugador_id: newPlayerId };
       delete cleanItem.id;
@@ -147,7 +147,7 @@ async function copyPlayerAllHistory(supabase, sourcePlayerId, newPlayerId) {
       return cleanItem;
     });
     if (extraPayloads.length) {
-      await upsertJugadorSuplementosExtraBulk(supabase, extraPayloads);
+      await upsertJugadorSuplementosExtraBulk(db, extraPayloads);
     }
   } catch (e) {
     console.error(`Error copying extra supplementation for player ${sourcePlayerId}:`, e);
@@ -159,8 +159,8 @@ export async function getTeams() {
   const ownerId = getOwnerId(user);
   if (!ownerId) throw new Error('No autorizado');
 
-  const supabase = getSupabaseAdmin();
-  const teams = await getTeamsByOwner(supabase, ownerId);
+  const db = getDb();
+  const teams = await getTeamsByOwner(db, ownerId);
   return teams || [];
 }
 
@@ -169,7 +169,7 @@ export async function createTeam(payload) {
   const ownerId = getOwnerId(user);
   if (!ownerId) throw new Error('No autorizado');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const action = clean(payload?.action || 'create');
 
   if (action === 'create') {
@@ -182,10 +182,10 @@ export async function createTeam(payload) {
       throw new Error('El nombre del equipo es obligatorio');
     }
 
-    const newTeam = await insertTeam(supabase, { owner_id: ownerId, nombre, temporada, descripcion });
+    const newTeam = await insertTeam(db, { owner_id: ownerId, nombre, temporada, descripcion });
 
     if (selectedPlayerIds && selectedPlayerIds.length > 0) {
-      const players = await getOwnedPlayersByIds(supabase, ownerId, selectedPlayerIds);
+      const players = await getOwnedPlayersByIds(db, ownerId, selectedPlayerIds);
       const foundIds = new Set(players.map((player) => String(player.id)));
       const missingIds = selectedPlayerIds.filter((playerId) => !foundIds.has(playerId));
       if (missingIds.length) throw new Error('Algún jugador seleccionado no pertenece a tus equipos');
@@ -198,7 +198,7 @@ export async function createTeam(payload) {
           PLAYER_COPY_FIELDS.map((field) => [field, player[field] ?? null])
         );
 
-        const newPlayer = await insertPlayer(supabase, { ...copyPayload, equipo_id: newTeam.id });
+        const newPlayer = await insertPlayer(db, { ...copyPayload, equipo_id: newTeam.id });
         copiedPlayers++;
         copiedPlayerSummaries.push({
           id: newPlayer.id,
@@ -207,7 +207,7 @@ export async function createTeam(payload) {
           posicion: newPlayer.posicion
         });
 
-        await copyPlayerAllHistory(supabase, sourcePlayerId, newPlayer.id);
+        await copyPlayerAllHistory(db, sourcePlayerId, newPlayer.id);
       }
       revalidatePath('/dashboard');
       return { equipo: newTeam, copiedPlayers, players: copiedPlayerSummaries };
@@ -226,7 +226,7 @@ export async function createTeam(payload) {
     const descripcion = hasDescripcion ? clean(payload.descripcion) || null : undefined;
     let sourceTeam = null;
     if (teamId) {
-      sourceTeam = await getOwnedTeam(supabase, user, teamId);
+      sourceTeam = await getOwnedTeam(db, user, teamId);
       if (!sourceTeam) throw new Error('No tienes acceso a este equipo');
     }
 
@@ -236,15 +236,15 @@ export async function createTeam(payload) {
 
     let players = [];
     if (selectedPlayerIds && selectedPlayerIds.length !== 0) {
-      players = await getOwnedPlayersByIds(supabase, ownerId, selectedPlayerIds);
+      players = await getOwnedPlayersByIds(db, ownerId, selectedPlayerIds);
       const foundIds = new Set(players.map((player) => String(player.id)));
       const missingIds = selectedPlayerIds.filter((playerId) => !foundIds.has(playerId));
       if (missingIds.length) throw new Error('Algún jugador seleccionado no pertenece a tus equipos');
     } else if (sourceTeam) {
-      players = await getPlayersByTeam(supabase, sourceTeam.id);
+      players = await getPlayersByTeam(db, sourceTeam.id);
     }
 
-    const newTeam = await insertTeam(supabase, {
+    const newTeam = await insertTeam(db, {
       owner_id: ownerId,
       nombre: nombre || (sourceTeam ? sourceTeam.nombre : 'Nuevo equipo'),
       temporada,
@@ -260,7 +260,7 @@ export async function createTeam(payload) {
         PLAYER_COPY_FIELDS.map((field) => [field, player[field] ?? null])
       );
 
-      const newPlayer = await insertPlayer(supabase, { ...copyPayload, equipo_id: newTeam.id });
+      const newPlayer = await insertPlayer(db, { ...copyPayload, equipo_id: newTeam.id });
       copiedPlayers++;
       copiedPlayerSummaries.push({
         id: newPlayer.id,
@@ -269,7 +269,7 @@ export async function createTeam(payload) {
         posicion: newPlayer.posicion
       });
 
-      await copyPlayerAllHistory(supabase, sourcePlayerId, newPlayer.id);
+      await copyPlayerAllHistory(db, sourcePlayerId, newPlayer.id);
     }
 
     revalidatePath('/dashboard');
@@ -289,24 +289,24 @@ export async function updateTeam(teamId, payload) {
     throw new Error('Faltan datos obligatorios');
   }
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
-  const team = await getOwnedTeam(supabase, user, cleanTeamId);
+  const team = await getOwnedTeam(db, user, cleanTeamId);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
-  const data = await updateTeamInRepo(supabase, team.id, { nombre, temporada, descripcion });
+  const data = await updateTeamInRepo(db, team.id, { nombre, temporada, descripcion });
   revalidatePath(`/dashboard/equipo/${cleanTeamId}`);
   revalidatePath('/dashboard');
   return { equipo: data };
 }
 
 export async function deleteTeam(teamId) {
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
-  const team = await getOwnedTeam(supabase, user, teamId);
+  const team = await getOwnedTeam(db, user, teamId);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
-  await deleteTeamInRepo(supabase, team.id);
+  await deleteTeamInRepo(db, team.id);
   revalidatePath('/dashboard');
   return { ok: true };
 }
@@ -318,14 +318,14 @@ export async function saveTeamConfig(teamId, configuracion_nutricional) {
     throw new Error('No autorizado');
   }
 
-  const supabase = getSupabaseAdmin();
-  const team = await getTeamByIdAndOwner(supabase, teamId, ownerId);
+  const db = getDb();
+  const team = await getTeamByIdAndOwner(db, teamId, ownerId);
   if (!team) {
     throw new Error('Equipo no encontrado o sin permisos');
   }
 
   assertPlainObject(configuracion_nutricional, { label: 'Configuración nutricional' });
-  await updateTeamConfig(supabase, teamId, configuracion_nutricional);
+  await updateTeamConfig(db, teamId, configuracion_nutricional);
   revalidatePath(`/dashboard/equipo/${teamId}/configuracion`);
   return { success: true };
 }
@@ -351,8 +351,8 @@ export async function uploadTeamPhoto(teamIdOrFormData, maybeFile) {
     throw new Error('Falta archivo de foto');
   }
 
-  const supabase = getSupabaseAdmin();
-  const ownedTeam = await getOwnedTeam(supabase, user, id);
+  const db = getDb();
+  const ownedTeam = await getOwnedTeam(db, user, id);
   if (!ownedTeam) throw new Error('No tienes acceso a este equipo');
 
   const image = await readImageUpload(fotoFile);
@@ -363,7 +363,7 @@ export async function uploadTeamPhoto(teamIdOrFormData, maybeFile) {
     updated_at: new Date().toISOString(),
   };
 
-  await updateTeamInRepo(supabase, id, payload);
+  await updateTeamInRepo(db, id, payload);
   revalidatePath('/dashboard');
   revalidatePath(`/dashboard/equipo/${id}`);
   return {
@@ -388,11 +388,11 @@ export async function removeTeamPhoto(teamIdOrFormData) {
 
   if (!id) throw new Error('Falta id del equipo');
 
-  const supabase = getSupabaseAdmin();
-  const ownedTeam = await getOwnedTeam(supabase, user, id);
+  const db = getDb();
+  const ownedTeam = await getOwnedTeam(db, user, id);
   if (!ownedTeam) throw new Error('No tienes acceso a este equipo');
 
-  await updateTeamInRepo(supabase, id, {
+  await updateTeamInRepo(db, id, {
     foto: null,
     foto_mime: null,
     foto_size: null,

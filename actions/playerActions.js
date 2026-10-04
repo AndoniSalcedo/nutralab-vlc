@@ -3,14 +3,12 @@
 import { validateAstValue, mealPatternsSchema, preMatchConfigSchema } from '@/validations/mealAstSchema';
 import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getOwnedPlayer, getOwnedTeam } from '@/lib/auth/team-access';
 import { getOwnerId } from '@/lib/auth/owner';
-import { findAuthUserByEmail } from '@/lib/auth/auth-users';
+import { findAuthUserByEmail, getAuthUserById, verifyAuthPassword, createAuthUser, updateAuthUser, deleteAuthUser } from '@/lib/auth/auth-users';
 import { enforceRateLimit } from '@/lib/security/rate-limit';
 import { readImageUpload, toByteaHex, MAX_DOCUMENT_BYTES } from '@/lib/security/uploads';
-import { createClient } from '@supabase/supabase-js';
-import { env } from '@/config/env';
 import { DEFAULT_PLAYER_MEALS_STRING, normalizeObjective } from '@/config/nutrition-days';
 import { toPositiveNumber as toNumber, cleanText } from '@/lib/utils';
 import {
@@ -64,13 +62,13 @@ export async function updatePlayerField(id, field, value) {
     throw new Error('Campo no permitido: ' + field);
   }
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, id);
+  const ownedPlayer = await getOwnedPlayer(db, user, id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
   let parsedValue = value;
@@ -96,7 +94,7 @@ export async function updatePlayerField(id, field, value) {
   let ajustes = [];
   const update = { [field]: parsedValue };
   try {
-    const current = await getPlayerById(supabase, id);
+    const current = await getPlayerById(db, id);
     const merged = { ...current, [field]: parsedValue };
     if (field === 'recomendaciones_defecto' || field === 'config_prepartido') {
       const result = personalizePautas(merged, { [field]: parsedValue });
@@ -117,7 +115,7 @@ export async function updatePlayerField(id, field, value) {
     console.warn('[updatePlayerField] No se pudieron personalizar las pautas:', err.message);
   }
 
-  await updatePlayer(supabase, id, update);
+  await updatePlayer(db, id, update);
   revalidatePath(`/dashboard/jugador/${id}`);
   return { ok: true, ...(ajustes.length > 0 ? { ajustes: describeAjustes(ajustes) } : {}) };
 }
@@ -150,50 +148,43 @@ export async function updatePlayerCredentials(jugadorIdOrPayload, emailParam, pa
     throw new Error('La contraseña debe tener al menos 8 caracteres');
   }
 
-  const supabase = getSupabaseAdmin();
-  const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+  const db = getDb();
+  const ownedPlayer = await getOwnedPlayer(db, user, jugadorId);
   if (!ownedPlayer) {
     throw new Error('No tienes acceso a este jugador');
   }
 
-  const jugador = await getPlayerById(supabase, jugadorId);
+  const jugador = await getPlayerById(db, jugadorId);
   if (!jugador) {
     throw new Error('Jugador no encontrado');
   }
 
-  let authUserId = jugador.auth_user_id;
   const metadata = playerMetadata(jugador);
 
-  if (authUserId) {
-    const { error } = await supabase.auth.admin.updateUserById(authUserId, {
-      email: cleanEmail,
-      password: cleanPassword,
-      email_confirm: true,
-      user_metadata: metadata,
-    });
-    if (error) throw error;
-  } else {
+  if (!jugador.auth_user_id) {
     // Si el email ya pertenece a otra cuenta NO se reutiliza ni se le cambia la
     // contraseña: hacerlo permitiría a un admin tomar cuentas de otros tenants.
-    const existingUser = await findAuthUserByEmail(supabase, cleanEmail);
+    const existingUser = await findAuthUserByEmail(db, cleanEmail);
     if (existingUser) {
       throw new Error('Ese correo ya está en uso por otra cuenta. Usa un correo distinto.');
     }
-
-    const { data, error } = await supabase.auth.admin.createUser({
-      email: cleanEmail,
-      password: cleanPassword,
-      email_confirm: true,
-      user_metadata: metadata,
-    });
-    if (error) throw error;
-    authUserId = data.user.id;
   }
 
-  const updated = await updatePlayer(supabase, jugador.id, {
-    auth_user_id: authUserId,
-    auth_email: cleanEmail,
-    credentials_created_at: new Date().toISOString(),
+  // Cuenta de acceso y ficha del jugador en una sola transacción: o se guardan las dos o ninguna.
+  const updated = await db.$transaction(async (tx) => {
+    let authUserId = jugador.auth_user_id;
+    if (authUserId) {
+      await updateAuthUser(authUserId, { email: cleanEmail, password: cleanPassword, userMetadata: metadata }, tx);
+    } else {
+      const created = await createAuthUser({ email: cleanEmail, password: cleanPassword, userMetadata: metadata }, tx);
+      authUserId = created.id;
+    }
+
+    return updatePlayer(tx, jugador.id, {
+      auth_user_id: authUserId,
+      auth_email: cleanEmail,
+      credentials_created_at: new Date().toISOString(),
+    });
   });
 
   revalidatePath(`/dashboard/jugador/${jugadorId}`);
@@ -216,28 +207,18 @@ export async function updatePlayerPassword(password, currentPassword) {
 
   await enforceRateLimit('change-password', String(user.id), { limit: 5, windowMs: 15 * 60 * 1000 });
 
-  const supabase = getSupabaseAdmin();
-  const { data: authUser, error: getError } = await supabase.auth.admin.getUserById(user.supabase_uid);
-  if (getError || !authUser?.user?.email) {
+  const authUser = await getAuthUserById(user.supabase_uid);
+  if (!authUser?.email) {
     throw new Error('No se pudo verificar tu cuenta');
   }
 
-  // Verifica la contraseña actual con un cliente aislado (sin persistir sesión).
-  const verifier = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_ANON_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  const { error: verifyError } = await verifier.auth.signInWithPassword({
-    email: authUser.user.email,
-    password: String(currentPassword),
-  });
-  if (verifyError) {
+  // Verifica la contraseña actual contra auth.users (sin crear sesión).
+  const verified = await verifyAuthPassword(authUser.email, String(currentPassword));
+  if (!verified || verified.id !== authUser.id) {
     throw new Error('La contraseña actual no es correcta');
   }
 
-  const { error } = await supabase.auth.admin.updateUserById(user.supabase_uid, {
-    password: cleanPassword,
-  });
-  if (error) throw error;
+  await updateAuthUser(user.supabase_uid, { password: cleanPassword });
 
   return { ok: true };
 }
@@ -261,13 +242,13 @@ export async function transferPlayers({ playerIds, targetTeamId, action }) {
     throw new Error('Acción inválida');
   }
 
-  const supabase = getSupabaseAdmin();
-  const targetTeam = await getOwnedTeam(supabase, user, targetTeamId);
+  const db = getDb();
+  const targetTeam = await getOwnedTeam(db, user, targetTeamId);
   if (!targetTeam) {
     throw new Error('No tienes acceso al equipo de destino');
   }
 
-  const players = await getOwnedPlayersByIds(supabase, ownerId, playerIds);
+  const players = await getOwnedPlayersByIds(db, ownerId, playerIds);
   if (players.length !== playerIds.length) {
     throw new Error('No tienes acceso a todos los jugadores seleccionados o algunos no existen');
   }
@@ -277,7 +258,7 @@ export async function transferPlayers({ playerIds, targetTeamId, action }) {
     for (const player of players) {
       if (player.equipo_id) sourceTeamIds.add(player.equipo_id);
       if (String(player.equipo_id) === String(targetTeamId)) continue;
-      await updatePlayer(supabase, player.id, { equipo_id: targetTeamId });
+      await updatePlayer(db, player.id, { equipo_id: targetTeamId });
     }
     sourceTeamIds.forEach((srcId) => {
       revalidatePath(`/dashboard/equipo/${srcId}`);
@@ -298,7 +279,7 @@ export async function transferPlayers({ playerIds, targetTeamId, action }) {
     });
 
     if (payloads.length > 0) {
-      await insertPlayersBulk(supabase, payloads);
+      await insertPlayersBulk(db, payloads);
     }
     revalidatePath(`/dashboard/equipo/${targetTeamId}`);
     revalidatePath('/dashboard');
@@ -309,7 +290,7 @@ export async function transferPlayers({ playerIds, targetTeamId, action }) {
 export async function savePlayer(form) {
   const id = String(form.get('id') || '');
   const teamId = String(form.get('team_id') || '');
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
 
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
@@ -318,12 +299,12 @@ export async function savePlayer(form) {
 
   let targetTeam = null;
   if (id) {
-    const ownedPlayer = await getOwnedPlayer(supabase, user, id);
+    const ownedPlayer = await getOwnedPlayer(db, user, id);
     if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
-    targetTeam = await getOwnedTeam(supabase, user, ownedPlayer.equipo_id);
+    targetTeam = await getOwnedTeam(db, user, ownedPlayer.equipo_id);
     if (!targetTeam) throw new Error('No tienes acceso a este equipo');
   } else {
-    targetTeam = await getOwnedTeam(supabase, user, teamId);
+    targetTeam = await getOwnedTeam(db, user, teamId);
     if (!targetTeam) throw new Error('Debes crear o seleccionar un equipo antes de añadir jugadores');
   }
 
@@ -359,7 +340,7 @@ export async function savePlayer(form) {
   // Las pautas guardadas deben valer al jugador con las restricciones que acaba de guardar el formulario.
   let ajustes = [];
   try {
-    const current = id ? await getPlayerById(supabase, id) : null;
+    const current = id ? await getPlayerById(db, id) : null;
     const merged = { ...(current || {}), ...payload };
     const result = personalizePautas(merged, {
       recomendaciones_defecto: current?.recomendaciones_defecto,
@@ -391,16 +372,16 @@ export async function savePlayer(form) {
   }
 
   if (id) {
-    await updatePlayer(supabase, id, payload);
+    await updatePlayer(db, id, payload);
     revalidatePath(`/dashboard/jugador/${id}`);
   } else {
-    const newPlayer = await insertPlayer(supabase, payload);
+    const newPlayer = await insertPlayer(db, payload);
 
     const initialWeight = form.get('initial_weight') ? toNumber(form.get('initial_weight')) : null;
     const initialHeight = form.get('initial_height') ? toNumber(form.get('initial_height')) : null;
 
     if (newPlayer?.id && (initialWeight !== null || initialHeight !== null)) {
-      await insertEvolution(supabase, {
+      await insertEvolution(db, {
         jugador_id: newPlayer.id,
         fecha: new Date().toISOString().split('T')[0],
         peso_kg: initialWeight,
@@ -449,20 +430,25 @@ export async function savePlayer(form) {
 export async function deletePlayer(id) {
   if (!id) throw new Error('Falta id del jugador');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const owned = await getOwnedPlayer(supabase, user, id);
+  const owned = await getOwnedPlayer(db, user, id);
   if (!owned) throw new Error('No tienes acceso a este jugador');
 
-  const jugador = await getPlayerAuthUserId(supabase, id);
+  const jugador = await getPlayerAuthUserId(db, id);
 
-  await deletePlayerInRepo(supabase, id);
+  await deletePlayerInRepo(db, id);
   if (jugador?.auth_user_id) {
-    await supabase.auth.admin.deleteUser(jugador.auth_user_id);
+    try {
+      await deleteAuthUser(jugador.auth_user_id);
+    } catch (authDeleteError) {
+      // El jugador ya está borrado; la cuenta de acceso queda huérfana pero sin perfil no puede entrar.
+      console.error('No se pudo borrar la cuenta de acceso del jugador:', authDeleteError.message);
+    }
   }
 
   if (owned?.equipo_id) {
@@ -488,12 +474,12 @@ function playerUpdatePayload(group, existingPlayer) {
   return payload;
 }
 
-async function loadTeamPlayers(supabase, teamId) {
-  return getPlayersByTeamSelect(supabase, teamId, 'id,nombre,apellidos,fecha_nacimiento');
+async function loadTeamPlayers(db, teamId) {
+  return getPlayersByTeamSelect(db, teamId, 'id,nombre,apellidos,fecha_nacimiento');
 }
 
-async function createPlayer(supabase, teamId, group) {
-  return insertPlayer(supabase, {
+async function createPlayer(db, teamId, group) {
+  return insertPlayer(db, {
     equipo_id: teamId,
     nombre: cleanText(group.nombre || group.nombreCompleto),
     apellidos: cleanText(group.apellidos),
@@ -504,10 +490,10 @@ async function createPlayer(supabase, teamId, group) {
   });
 }
 
-async function updatePlayerIfNeeded(supabase, player, group) {
+async function updatePlayerIfNeeded(db, player, group) {
   const payload = playerUpdatePayload(group, player);
   if (!Object.keys(payload).length) return player;
-  return updatePlayer(supabase, player.id, payload);
+  return updatePlayer(db, player.id, payload);
 }
 
 function measurementPayload(jugadorId, measurement, existing = null) {
@@ -540,16 +526,16 @@ function measurementPayload(jugadorId, measurement, existing = null) {
   return payload;
 }
 
-async function saveMeasurement(supabase, jugadorId, measurement) {
-  const existing = await getEvolutionByPlayerAndDate(supabase, jugadorId, measurement.fecha);
+async function saveMeasurement(db, jugadorId, measurement) {
+  const existing = await getEvolutionByPlayerAndDate(db, jugadorId, measurement.fecha);
   const payload = measurementPayload(jugadorId, measurement, existing);
 
   if (existing) {
-    await updateEvolution(supabase, existing.id, payload);
+    await updateEvolution(db, existing.id, payload);
     return 'actualizada';
   }
 
-  await insertEvolution(supabase, payload);
+  await insertEvolution(db, payload);
   return 'creada';
 }
 
@@ -571,7 +557,7 @@ function resolveDecision(group, decisions) {
   return actionObj;
 }
 
-async function importGroups({ supabase, team, plan, players, decisions, user }) {
+async function importGroups({ db, team, plan, players, decisions, user }) {
   const playersById = new Map(players.map((player) => [String(player.id), player]));
   const results = [];
 
@@ -600,7 +586,7 @@ async function importGroups({ supabase, team, plan, players, decisions, user }) 
       let playerAction = decision.action === 'create' ? 'creado' : 'actualizado';
 
       if (decision.action === 'create') {
-        player = await createPlayer(supabase, team.id, group);
+        player = await createPlayer(db, team.id, group);
         playersById.set(String(player.id), player);
 
         if (player?.id) {
@@ -640,7 +626,7 @@ async function importGroups({ supabase, team, plan, players, decisions, user }) 
         if (!player) {
           throw new Error('El jugador seleccionado no pertenece a este equipo');
         }
-        player = await updatePlayerIfNeeded(supabase, player, group);
+        player = await updatePlayerIfNeeded(db, player, group);
         playersById.set(String(player.id), player);
       }
 
@@ -652,7 +638,7 @@ async function importGroups({ supabase, team, plan, players, decisions, user }) 
           continue;
         }
         const measurementToSave = { ...measurement, fecha: finalDate };
-        const status = await saveMeasurement(supabase, player.id, measurementToSave);
+        const status = await saveMeasurement(db, player.id, measurementToSave);
         if (status === 'creada') baseResult.mediciones_creadas += 1;
         else baseResult.mediciones_actualizadas += 1;
       }
@@ -695,18 +681,18 @@ export async function importPlayerExcel(formDataOrPayload) {
     throw new Error('El archivo Excel es demasiado grande');
   }
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const team = await getOwnedTeam(supabase, user, teamId);
+  const team = await getOwnedTeam(db, user, teamId);
   if (!team) throw new Error('Debes importar dentro de un equipo propio');
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const parsed = await parsePlayerExcel(buffer);
-  const players = await loadTeamPlayers(supabase, team.id);
+  const players = await loadTeamPlayers(db, team.id);
   const plan = buildImportPlan(parsed, players);
 
   if (mode === 'preview') {
@@ -718,7 +704,7 @@ export async function importPlayerExcel(formDataOrPayload) {
   }
 
   const decisions = parseJson(formData.get('decisiones'), {});
-  const resultados = await importGroups({ supabase, team, plan, players, decisions, user });
+  const resultados = await importGroups({ db, team, plan, players, decisions, user });
   const okResults = resultados.filter((result) => !result.error && result.accion !== 'omitido');
 
   revalidatePath(`/dashboard/equipo/${team.id}`);
@@ -762,19 +748,19 @@ export async function uploadPlayerAvatar(jugadorIdOrFormData, maybeFile) {
   }
   if (!id) throw new Error('Falta id del jugador');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
 
   if (user.role === 'jugador') {
     if (String(user.id) !== String(id)) {
       throw new Error('No tienes acceso a este jugador');
     }
   } else {
-    const owned = await getOwnedPlayer(supabase, user, id);
+    const owned = await getOwnedPlayer(db, user, id);
     if (!owned) throw new Error('No tienes acceso a este jugador');
   }
 
   if (remove) {
-    await updatePlayer(supabase, id, {
+    await updatePlayer(db, id, {
       avatar: null,
       avatar_mime: null,
       avatar_size: null,
@@ -796,7 +782,7 @@ export async function uploadPlayerAvatar(jugadorIdOrFormData, maybeFile) {
     updated_at: new Date().toISOString(),
   };
 
-  await updatePlayer(supabase, id, payload);
+  await updatePlayer(db, id, payload);
   revalidatePath(`/dashboard/jugador/${id}`);
 
   return {

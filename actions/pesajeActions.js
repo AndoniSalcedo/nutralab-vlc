@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedPlayer } from '@/lib/auth/team-access';
 import {
@@ -18,24 +18,24 @@ export async function savePesaje(body) {
     throw new Error('Faltan datos obligatorios');
   }
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, jugador_id);
+  const ownedPlayer = await getOwnedPlayer(db, user, jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
   let data;
   if (id) {
-    const existing = await getPesajeById(supabase, id);
+    const existing = await getPesajeById(db, id);
     if (!existing || String(existing.jugador_id) !== String(jugador_id)) {
       throw new Error('Registro de peso no encontrado');
     }
-    data = await updatePesaje(supabase, id, { fecha, peso_kg });
+    data = await updatePesaje(db, id, { fecha, peso_kg });
   } else {
-    data = await upsertPesaje(supabase, {
+    data = await upsertPesaje(db, {
       jugador_id,
       fecha,
       peso_kg
@@ -53,19 +53,19 @@ export async function savePesaje(body) {
 export async function deletePesaje(id) {
   if (!id) throw new Error('Falta id del registro de peso');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const pesaje = await getPesajeById(supabase, id);
+  const pesaje = await getPesajeById(db, id);
   if (!pesaje) throw new Error('Registro de peso no encontrado');
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, pesaje.jugador_id);
+  const ownedPlayer = await getOwnedPlayer(db, user, pesaje.jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  await deletePesajeInRepo(supabase, id);
+  await deletePesajeInRepo(db, id);
   revalidatePath(`/dashboard/jugador/${pesaje.jugador_id}`);
   if (ownedPlayer?.equipo_id) {
     revalidatePath(`/dashboard/equipo/${ownedPlayer.equipo_id}`);

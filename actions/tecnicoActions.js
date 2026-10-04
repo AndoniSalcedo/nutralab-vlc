@@ -2,9 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getOwnerId } from '@/lib/auth/team-access';
-import { findAuthUserByEmail } from '@/lib/auth/auth-users';
+import { findAuthUserByEmail, createAuthUser } from '@/lib/auth/auth-users';
 import { enforceRateLimit } from '@/lib/security/rate-limit';
 import { readImageUpload, toByteaHex } from '@/lib/security/uploads';
 import {
@@ -24,8 +24,8 @@ export async function getTecnicos() {
   const ownerId = getOwnerId(user);
   if (!ownerId) throw new Error('No autorizado');
 
-  const supabase = getSupabaseAdmin();
-  const result = await getTecnicosByOwner(supabase, ownerId);
+  const db = getDb();
+  const result = await getTecnicosByOwner(db, ownerId);
   return result || [];
 }
 
@@ -37,13 +37,13 @@ export async function createTecnico(payload) {
   const email = String(payload?.email || '').trim().toLowerCase();
   if (!email) throw new Error('Falta el email del técnico');
 
-  const supabase = getSupabaseAdmin();
-  const tecnico = await getTecnicoByEmail(supabase, email);
+  const db = getDb();
+  const tecnico = await getTecnicoByEmail(db, email);
   if (!tecnico) {
     throw new Error('No se encontró ningún técnico registrado con este correo. Por favor, indícale al técnico que se registre primero en la pantalla de acceso.');
   }
 
-  await linkTecnicoToNutricionista(supabase, ownerId, tecnico.id);
+  await linkTecnicoToNutricionista(db, ownerId, tecnico.id);
   revalidatePath('/dashboard/tecnicos');
   return tecnico;
 }
@@ -54,8 +54,8 @@ export async function deleteTecnico(id) {
   if (!ownerId) throw new Error('No autorizado');
   if (!id) throw new Error('Falta id');
 
-  const supabase = getSupabaseAdmin();
-  await unlinkTecnicoFromNutricionista(supabase, ownerId, id);
+  const db = getDb();
+  await unlinkTecnicoFromNutricionista(db, ownerId, id);
   revalidatePath('/dashboard/tecnicos');
   return { ok: true };
 }
@@ -67,11 +67,11 @@ export async function assignTeams(tecnicoId, teamIds) {
   if (!tecnicoId) throw new Error('Falta tecnico_id');
 
   const teams = Array.isArray(teamIds) ? teamIds : [];
-  const supabase = getSupabaseAdmin();
-  const link = await getNutricionistaTecnicoLink(supabase, ownerId, tecnicoId);
+  const db = getDb();
+  const link = await getNutricionistaTecnicoLink(db, ownerId, tecnicoId);
   if (!link) throw new Error('No tienes acceso a este técnico');
 
-  await assignTeamsToTecnico(supabase, ownerId, tecnicoId, teams);
+  await assignTeamsToTecnico(db, ownerId, tecnicoId, teams);
   revalidatePath('/dashboard/tecnicos');
   return { ok: true };
 }
@@ -96,9 +96,9 @@ export async function registerTecnico(payload) {
   await enforceRateLimit('register-tecnico', email, { limit: 3, windowMs: 60 * 60 * 1000 });
   await enforceRateLimit('register-tecnico-ip', '', { limit: 10, windowMs: 60 * 60 * 1000 });
 
-  const supabase = getSupabaseAdmin();
-  const existingTecnico = await getTecnicoByEmail(supabase, email);
-  const existingUser = existingTecnico ? null : await findAuthUserByEmail(supabase, email);
+  const db = getDb();
+  const existingTecnico = await getTecnicoByEmail(db, email);
+  const existingUser = existingTecnico ? null : await findAuthUserByEmail(db, email);
 
   // Nunca se toca una cuenta existente: antes se le reseteaba la contraseña,
   // lo que permitía a un anónimo apoderarse de cualquier usuario por su email.
@@ -106,30 +106,25 @@ export async function registerTecnico(payload) {
     throw new Error('No se puede registrar este email. Si ya tienes cuenta, inicia sesión o contacta con tu nutricionista.');
   }
 
-  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: {
-      role: 'tecnico',
-      name: `${nombre} ${apellidos}`.trim(),
-    },
-  });
-  if (authError) throw authError;
-  const authUserId = authData.user.id;
+  // Cuenta de acceso y ficha del técnico en una sola transacción: o se crean las dos o ninguna.
+  return db.$transaction(async (tx) => {
+    const authUser = await createAuthUser({
+      email,
+      password,
+      userMetadata: {
+        role: 'tecnico',
+        name: `${nombre} ${apellidos}`.trim(),
+      },
+    }, tx);
 
-  try {
-    return await createTecnicoRecord(supabase, {
-      auth_user_id: authUserId,
+    return createTecnicoRecord(tx, {
+      auth_user_id: authUser.id,
       nombre,
       apellidos,
       email,
       owner_id: null,
     });
-  } catch (dbError) {
-    await supabase.auth.admin.deleteUser(authUserId);
-    throw dbError;
-  }
+  });
 }
 
 export async function uploadTecnicoAvatar(tecnicoIdOrFormData, maybeFile) {
@@ -158,7 +153,7 @@ export async function uploadTecnicoAvatar(tecnicoIdOrFormData, maybeFile) {
   }
   if (!id) throw new Error('Falta id del técnico');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
 
   if (user.role === 'tecnico') {
     if (String(user.id) !== String(id)) {
@@ -168,12 +163,12 @@ export async function uploadTecnicoAvatar(tecnicoIdOrFormData, maybeFile) {
     const ownerId = getOwnerId(user);
     if (!ownerId) throw new Error('No autorizado');
 
-    const link = await getNutricionistaTecnicoLink(supabase, ownerId, id);
+    const link = await getNutricionistaTecnicoLink(db, ownerId, id);
     if (!link) throw new Error('No tienes acceso a este técnico');
   }
 
   if (remove) {
-    await removeTecnicoAvatar(supabase, id);
+    await removeTecnicoAvatar(db, id);
     revalidatePath('/dashboard/tecnicos');
     return { success: true, removed: true };
   }
@@ -189,7 +184,7 @@ export async function uploadTecnicoAvatar(tecnicoIdOrFormData, maybeFile) {
     avatar_size: image.size,
   };
 
-  await updateTecnicoAvatar(supabase, id, payload);
+  await updateTecnicoAvatar(db, id, payload);
   revalidatePath('/dashboard/tecnicos');
 
   return {

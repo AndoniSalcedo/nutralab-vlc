@@ -2,7 +2,7 @@
 
 import { MAX_DOCUMENT_BYTES } from '@/lib/security/uploads';
 import { revalidatePath } from 'next/cache';
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getOwnedPlayer, getAccessiblePlayer, getOwnedTeam } from '@/lib/auth/team-access';
 import { toNumber as parseCsvNumber, parseDate as parseCsvDate, normalizeKey } from '@/lib/utils';
@@ -79,7 +79,7 @@ function getVal(row, headers, keys) {
 async function getHydrationRecords(jugadorId) {
   if (!jugadorId) throw new Error('Falta jugador_id');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user) throw new Error('No autorizado');
 
@@ -89,11 +89,11 @@ async function getHydrationRecords(jugadorId) {
   if (user.role === 'jugador') {
     if (String(user.id) !== String(jugadorId)) throw new Error('No tienes acceso a este jugador');
   } else {
-    const accessiblePlayer = await getAccessiblePlayer(supabase, user, jugadorId);
+    const accessiblePlayer = await getAccessiblePlayer(db, user, jugadorId);
     if (!accessiblePlayer) throw new Error('No tienes acceso a este jugador');
   }
 
-  const data = await getHydrationRecordsByPlayerId(supabase, jugadorId);
+  const data = await getHydrationRecordsByPlayerId(db, jugadorId);
   return { records: data || [] };
 }
 
@@ -102,13 +102,13 @@ export async function saveHydrationRecord(payload) {
   if (!jugador_id) throw new Error('Falta jugador_id');
   if (!fecha) throw new Error('Falta fecha');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, jugador_id);
+  const ownedPlayer = await getOwnedPlayer(db, user, jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
   const recordPayload = {
@@ -125,9 +125,9 @@ export async function saveHydrationRecord(payload) {
 
   let resData;
   if (id) {
-    resData = await updateHydrationRecord(supabase, id, Number(jugador_id), recordPayload);
+    resData = await updateHydrationRecord(db, id, Number(jugador_id), recordPayload);
   } else {
-    resData = await upsertHydrationRecord(supabase, recordPayload);
+    resData = await upsertHydrationRecord(db, recordPayload);
   }
 
   revalidatePath(`/dashboard/jugador/${jugador_id}`);
@@ -138,13 +138,13 @@ export async function importHydrationRecords(jugadorId, allImportRows) {
   if (!jugadorId) throw new Error('Falta jugador_id');
   if (!Array.isArray(allImportRows)) throw new Error('Formato de datos no válido');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, jugadorId);
+  const ownedPlayer = await getOwnedPlayer(db, user, jugadorId);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
   const recordsByDate = new Map();
@@ -206,7 +206,7 @@ export async function importHydrationRecords(jugadorId, allImportRows) {
     throw new Error('No se encontraron registros válidos para importar. Revisa el formato y las fechas.');
   }
 
-  await upsertHydrationRecords(supabase, recordsToUpsert);
+  await upsertHydrationRecords(db, recordsToUpsert);
   revalidatePath(`/dashboard/jugador/${jugadorId}`);
 
   return {
@@ -220,19 +220,19 @@ export async function importHydrationRecords(jugadorId, allImportRows) {
 export async function deleteHydrationRecord(id) {
   if (!id) throw new Error('Falta id');
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const record = await getHydrationRecordById(supabase, id);
+  const record = await getHydrationRecordById(db, id);
   if (!record) throw new Error('Registro no encontrado');
 
-  const ownedPlayer = await getOwnedPlayer(supabase, user, record.jugador_id);
+  const ownedPlayer = await getOwnedPlayer(db, user, record.jugador_id);
   if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
 
-  await deleteHydrationRecordInRepo(supabase, id);
+  await deleteHydrationRecordInRepo(db, id);
   revalidatePath(`/dashboard/jugador/${record.jugador_id}`);
   return { success: true };
 }
@@ -261,17 +261,17 @@ export async function importTeamOsmolarity(formDataOrFile, teamIdParam, decision
     throw new Error('ID de equipo no proporcionado');
   }
 
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
     throw new Error('No autorizado');
   }
 
-  const team = await getOwnedTeam(supabase, user, teamId);
+  const team = await getOwnedTeam(db, user, teamId);
   if (!team) throw new Error('No tienes acceso a este equipo');
 
   // Load players
-  const teamPlayers = await getPlayersByTeamSelect(supabase, team.id, 'id,nombre,apellidos,fecha_nacimiento');
+  const teamPlayers = await getPlayersByTeamSelect(db, team.id, 'id,nombre,apellidos,fecha_nacimiento');
 
   // Read CSV file content
   const fileBuffer = Buffer.from(await file.arrayBuffer());
@@ -526,7 +526,7 @@ export async function importTeamOsmolarity(formDataOrFile, teamIdParam, decision
     }
 
     if (recordsToUpsert.length > 0) {
-      await upsertHydrationRecords(supabase, recordsToUpsert);
+      await upsertHydrationRecords(db, recordsToUpsert);
     }
 
     revalidatePath(`/dashboard/equipo/${team.id}`);

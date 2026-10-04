@@ -1,4 +1,4 @@
-import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getAccessibleTeam } from '@/lib/auth/team-access';
 import { buildSessionFromRows } from '@/config/intrapartido';
@@ -11,10 +11,10 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function TeamIntrapartidoPage({ params }) {
-  const supabase = getSupabaseAdmin();
+  const db = getDb();
   const user = await getUser();
   const { teamId } = await params;
-  const team = await getAccessibleTeam(supabase, user, teamId);
+  const team = await getAccessibleTeam(db, user, teamId);
 
   if (!team) {
     return (
@@ -34,8 +34,8 @@ export default async function TeamIntrapartidoPage({ params }) {
 
   try {
     const [playersRes, history] = await Promise.all([
-      getPlayersByTeamSelectSimple(supabase, team.id),
-      getIntrapartidoHistoryByTeamId(supabase, team.id),
+      getPlayersByTeamSelectSimple(db, team.id),
+      getIntrapartidoHistoryByTeamId(db, team.id),
     ]);
     players = playersRes;
     sessions = history.map(({ match, convocados, tomas }) => buildSessionFromRows(match, convocados, tomas));
