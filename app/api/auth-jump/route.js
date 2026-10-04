@@ -42,7 +42,7 @@ export async function GET(request) {
     const { data: nutri, error: nutriError } = await supabase
       .schema('public')
       .from('Nutritionist')
-      .select('id, name, email, avatar, avatarSize, avatarMime')
+      .select('id, name, email, avatarSize')
       .eq('id', nutritionistId)
       .maybeSingle();
 
@@ -51,7 +51,7 @@ export async function GET(request) {
 
     const nutriName = nutri.name || decoded.name;
     const nutriEmail = nutri.email || decoded.email;
-    const hasAvatar = Boolean(nutri.avatar && (nutri.avatarSize || nutri.avatar.length > 0));
+    const hasAvatar = Boolean(nutri.avatarSize);
 
     const sessionObj = {
       external_admin_id: nutritionistId,
