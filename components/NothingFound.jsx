@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Button, Group, Paper, Stack, Text } from '@mantine/core';
 import { IconInbox, USE_3D_ICONS } from '@/components/icons3d';
 import Link from 'next/link';
