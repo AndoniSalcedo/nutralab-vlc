@@ -3,9 +3,6 @@ const isProduction = process.env.NODE_ENV === 'production';
 const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build';
 
 const DEV_FALLBACKS = {
-  NEXT_PUBLIC_SUPABASE_URL: 'http://localhost:54321',
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: 'anon-key',
-  SUPABASE_SERVICE_ROLE_KEY: 'service-role-key',
   JWT_SECRET: 'jwt-secret',
 };
 
@@ -25,11 +22,7 @@ function requiredEnv(name) {
 // Los secretos se resuelven de forma perezosa (getter) para que importar este
 // módulo desde el cliente o durante el build no falle ni exponga nada.
 export const env = {
-  get NEXT_PUBLIC_SUPABASE_URL() { return requiredEnv('NEXT_PUBLIC_SUPABASE_URL'); },
-  get NEXT_PUBLIC_SUPABASE_ANON_KEY() { return requiredEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY'); },
-  get SUPABASE_SERVICE_ROLE_KEY() { return requiredEnv('SUPABASE_SERVICE_ROLE_KEY'); },
   get JWT_SECRET() { return requiredEnv('JWT_SECRET'); },
-  SUPABASE_SCHEMA: process.env.SUPABASE_SCHEMA || 'teams',
   NEXT_PUBLIC_FRONTEND_URL: process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://nutralab.vercel.app',
   NODE_ENV: process.env.NODE_ENV || 'development',
   OPEN_ROUTER_API: process.env.OPEN_ROUTER_API || process.env.OPENROUTER_API_KEY || process.env.AI_API_KEY || '',
