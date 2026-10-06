@@ -2,467 +2,465 @@ import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { sanitizePlanData } from '@/lib/engine';
 import { getTeamDayTypeColor, getTeamDayTypeLabel } from '@/config/nutrition-days';
-import { formatNumberDecimal } from '@/lib/utils';
+import { buildPlanTokens } from '@/config/plan-themes';
+import { formatInteger, formatNumberDecimal } from '@/lib/utils';
 
-const DAY_TYPE_COLORS = {
-  teal: '#1fb5a9',
-  orange: '#ff7e40',
-  purple: '#b86ff6',
-  green: '#54d38a',
-  blue: '#3b82f6',
-  red: '#ef4444',
-  muted: '#a5adcb',
-};
+const LEFT_DAYS = ['lunes', 'martes', 'miercoles', 'jueves'];
+const RIGHT_DAYS = ['viernes', 'sabado', 'domingo'];
 
-const styles = StyleSheet.create({
+function makeStyles(k) {
+  const u = (n) => Math.round(n * k * 100) / 100;
+  return StyleSheet.create({
   page: {
     fontFamily: 'Helvetica',
-    fontSize: 6.8,
-    paddingHorizontal: 22,
-    paddingVertical: 18,
+    fontSize: u(6.8),
   },
-  header: {
+  hero: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    borderBottomWidth: 1.5,
-    borderBottomColor: '#1fb5a9',
-    paddingBottom: 6,
-    marginBottom: 8,
+    alignItems: 'flex-end',
+    paddingHorizontal: u(26),
+    paddingTop: u(18),
+    paddingBottom: u(15),
   },
-  headerLeft: {
-    flexDirection: 'column',
-  },
-  title: {
-    fontSize: 20,
+  heroClub: {
+    fontSize: u(6.4),
     fontWeight: 700,
     textTransform: 'uppercase',
+    letterSpacing: 1.6,
+    marginBottom: u(7),
   },
-  subtitle: {
-    fontSize: 8.5,
+  heroName: {
+    fontSize: u(26),
     fontWeight: 700,
-    textTransform: 'uppercase',
-    marginTop: 2,
+    lineHeight: 1,
   },
-  headerRight: {
-    textAlign: 'right',
-    justifyContent: 'flex-end',
+  heroPosition: {
+    fontSize: u(8.5),
+    marginTop: u(5),
+    letterSpacing: 0.4,
   },
-  teamText: {
-    fontSize: 8,
-    fontWeight: 700,
-    color: '#a5adcb',
+  heroRight: {
+    alignItems: 'flex-end',
   },
-  metaText: {
-    fontSize: 6.5,
-    color: '#a5adcb',
-    marginTop: 2,
+  heroPlan: {
+    fontSize: u(6.4),
+    marginBottom: u(7),
   },
-  metricsBand: {
+  tiles: {
     flexDirection: 'row',
-    gap: 6,
-    marginBottom: 8,
+    gap: u(5),
   },
-  metricBox: {
-    flex: 1,
-    borderWidth: 0.5,
-    borderRadius: 4,
-    paddingVertical: 4,
-    alignItems: 'center',
+  tile: {
+    width: u(60),
+    borderRadius: u(5),
+    paddingVertical: u(5),
+    paddingHorizontal: u(7),
   },
-  metricLabel: {
-    color: '#a5adcb',
-    fontSize: 5.5,
+  tileLabel: {
+    fontSize: u(5.3),
     textTransform: 'uppercase',
-    marginBottom: 1,
+    letterSpacing: 0.9,
+    marginBottom: u(2),
   },
-  metricValue: {
-    fontSize: 9.5,
+  tileValue: {
+    fontSize: u(11.5),
     fontWeight: 700,
+  },
+  body: {
+    flex: 1,
+    paddingHorizontal: u(26),
+    paddingTop: u(14),
+    paddingBottom: u(10),
   },
   contentGrid: {
     flexDirection: 'row',
-    gap: 8,
+    gap: u(10),
     flex: 1,
   },
   column: {
     flex: 1,
     flexDirection: 'column',
-    gap: 8,
+    justifyContent: 'space-between',
+    gap: u(7),
   },
-  dayBox: {
-    borderRadius: 6,
-    borderWidth: 0.5,
-    padding: 6,
-    flex: 1,
+  card: {
+    borderRadius: u(7),
+    borderWidth: 0.6,
+    padding: u(8),
   },
   dayHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+  },
+  dayTitleGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   dayName: {
-    fontSize: 9.5,
+    fontSize: u(10.5),
+    fontWeight: 700,
+    marginRight: u(6),
+  },
+  pill: {
+    borderRadius: u(8),
+    paddingVertical: u(1.8),
+    paddingHorizontal: u(6),
+    fontSize: u(5.7),
     fontWeight: 700,
     textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
-  dayIndicator: {
-    fontSize: 5.8,
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    letterSpacing: 0.3,
-  },
-  macrosLine: {
-    fontSize: 6.2,
-    color: '#a5adcb',
-    marginBottom: 2,
+  kcal: {
+    fontSize: u(11),
     fontWeight: 700,
   },
-  macroDiagnostics: {
-    fontSize: 5.5,
-    color: '#a5adcb',
-    marginBottom: 1.5,
+  kcalUnit: {
+    fontSize: u(6),
+    fontWeight: 400,
   },
-  mealsList: {
-    flexDirection: 'column',
-    gap: 2.5,
+  macroRow: {
+    flexDirection: 'row',
+    marginTop: u(5),
+    gap: u(11),
+  },
+  macroItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  macroText: {
+    fontSize: u(6.5),
+  },
+  meals: {
+    marginTop: u(6),
+    gap: u(2),
   },
   mealRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    borderRadius: 3,
-    padding: 3,
-    marginBottom: 2,
+    borderRadius: u(4),
+    paddingVertical: u(3),
+    paddingHorizontal: u(5),
   },
   mealName: {
+    width: u(54),
+    fontSize: u(5.9),
     fontWeight: 700,
-    width: 58,
-    fontSize: 6.2,
     textTransform: 'uppercase',
+    letterSpacing: 0.4,
+    paddingTop: u(0.5),
   },
   mealDetail: {
     flex: 1,
-    fontSize: 6.2,
-    lineHeight: 1.15,
+    fontSize: u(6.6),
+    lineHeight: 1.22,
   },
-  notesBox: {
-    borderWidth: 0.5,
-    borderRadius: 6,
-    padding: 6,
-    flex: 1,
-  },
-  notesTitle: {
-    fontSize: 8,
+  panelTitle: {
+    fontSize: u(6.8),
     fontWeight: 700,
     textTransform: 'uppercase',
-    marginBottom: 4,
+    letterSpacing: 1.1,
+    paddingBottom: u(4),
+    marginBottom: u(4),
+    borderBottomWidth: 0.5,
   },
-  noteItem: {
-    fontSize: 6.2,
-    lineHeight: 1.2,
-    marginBottom: 3,
+  itemRow: {
+    paddingVertical: u(3),
+    paddingHorizontal: u(5),
+    borderRadius: u(4),
+    marginBottom: u(2),
   },
-  supplementsBox: {
-    borderWidth: 0.5,
-    borderRadius: 6,
-    padding: 6,
-    flex: 1,
-  },
-  supplementsTitle: {
-    fontSize: 8,
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    marginBottom: 4,
-  },
-  supplementRow: {
-    marginBottom: 3,
-    padding: 2.5,
-    borderRadius: 3,
-  },
-  supplementHeader: {
+  itemHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  supplementName: {
-    fontSize: 6.5,
-    fontWeight: 700,
-  },
-  supplementDose: {
-    fontSize: 5.6,
-    fontWeight: 700,
-    paddingHorizontal: 3.5,
-    paddingVertical: 0.8,
-    borderRadius: 2.5,
-  },
-  supplementMeta: {
-    fontSize: 5.5,
-    marginTop: 1,
-  },
-  protocolsBox: {
-    borderWidth: 0.5,
-    borderRadius: 6,
-    padding: 6,
+  itemTitle: {
     flex: 1,
-    marginBottom: 4,
+    fontSize: u(6.9),
+    fontWeight: 700,
   },
-  protocolTitle: {
-    fontSize: 8,
+  badge: {
+    fontSize: u(5.8),
+    fontWeight: 700,
+    borderRadius: u(3),
+    paddingHorizontal: u(4),
+    paddingVertical: u(1),
+    marginLeft: u(5),
+  },
+  itemTitleBlock: {
+    fontSize: u(6.9),
+    fontWeight: 700,
+  },
+  itemMeta: {
+    fontSize: u(6),
+    marginTop: u(1),
+    lineHeight: 1.25,
+  },
+  subTitle: {
+    fontSize: u(5.8),
     fontWeight: 700,
     textTransform: 'uppercase',
-    marginBottom: 4,
+    letterSpacing: 0.9,
+    marginTop: u(4),
+    marginBottom: u(3),
   },
-  protocolRow: {
-    marginBottom: 3,
-    padding: 3,
-    borderRadius: 3,
-  },
-  protocolStepHeader: {
+  checkRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 1,
+    alignItems: 'flex-start',
   },
-  protocolStepTitle: {
-    fontSize: 6.5,
-    fontWeight: 700,
+  checkBox: {
+    width: u(5),
+    height: u(5),
+    borderRadius: u(1.3),
+    borderWidth: 0.8,
+    marginRight: u(5),
+    marginTop: u(1.2),
   },
-  protocolTimeBadge: {
-    fontSize: 5.6,
-    fontWeight: 700,
-    paddingHorizontal: 3.5,
-    paddingVertical: 0.8,
-    borderRadius: 2.5,
+  noteRow: {
+    flexDirection: 'row',
+    marginBottom: u(3),
   },
-  protocolStepDesc: {
-    fontSize: 5.8,
-    marginTop: 1,
-    lineHeight: 1.15,
+  noteDot: {
+    width: u(2.8),
+    height: u(2.8),
+    borderRadius: u(2),
+    marginRight: u(6),
+    marginTop: u(2.7),
   },
-  protocolChecklistTitle: {
-    fontSize: 6,
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    marginTop: 3,
-    marginBottom: 2,
+  noteText: {
+    flex: 1,
+    fontSize: u(6.6),
+    lineHeight: 1.3,
   },
   footer: {
-    marginTop: 8,
-    borderTopWidth: 0.5,
-    borderTopColor: '#2d335a',
-    paddingTop: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    color: '#a5adcb',
-    fontSize: 6,
+    borderTopWidth: 0.5,
+    paddingTop: u(5),
+    marginTop: u(8),
+    fontSize: u(5.8),
   },
-});
-
-function formatWeight(value) {
-  return formatNumberDecimal(value, ' kg', 1);
+  });
 }
 
-function formatGrasa(value) {
-  return formatNumberDecimal(value, ' %', 1);
+const styleCache = new Map();
+function getStyles(k) {
+  if (!styleCache.has(k)) styleCache.set(k, makeStyles(k));
+  return styleCache.get(k);
 }
 
-function formatNumber(value, unit = '') {
-  return formatNumberDecimal(value, unit, 0);
+function formatDate(date) {
+  const d = date ? new Date(date) : new Date();
+  return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(
+    Number.isNaN(d.getTime()) ? new Date() : d
+  );
 }
 
-function formatSigned(value, unit = '') {
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric)) return '—';
-  const sign = numeric > 0 ? '+' : '';
-  return `${sign}${formatNumber(numeric, unit)}`;
+/**
+ * La ficha es una sola página A4. Si el contenido no cabe, react-pdf crea una segunda página,
+ * así que se estima la altura necesaria y se reduce proporcionalmente tipografía y espacios
+ * (factor `k`, mínimo 0.68) hasta que quepa.
+ */
+const A4_HEIGHT = 841.89;
+const CHARS_PER_LINE = 58; // caracteres por línea del detalle de una comida con k = 1
+const MIN_SCALE = 0.68;
+
+function estimateHeight(plan, { supplements, protocols, notes }, k) {
+  const cpl = CHARS_PER_LINE / k;
+  const lines = (text, per = cpl * 1.2) => Math.max(1, Math.ceil(String(text || '').length / per));
+
+  const day = (dayKey) => {
+    const d = plan?.dias?.[dayKey];
+    if (!d) return 0;
+    const meals = (d.ingestas || []).reduce((n, m) => n + lines(m.detalle, cpl) * 8.1 + 8, 0);
+    return 46 + meals;
+  };
+  const sum = (keys) => keys.reduce((n, key) => n + day(key), 0) + (keys.length - 1) * 7;
+
+  const suppH = supplements.length
+    ? 28 + supplements.reduce((n, x) => n + 15 + (x.timing ? 8 : 0) + (x.notas ? 8 * lines(x.notas) : 0), 0)
+    : 0;
+  const protH = protocols.reduce(
+    (n, pr) =>
+      n + 28 +
+      (pr.timeline || []).reduce((m, step) => m + 15 + (step.description ? 8 * lines(step.description) : 0), 0) +
+      (pr.checklist?.length ? 14 + pr.checklist.reduce((m, c) => m + 15 + (c.description ? 8 * lines(c.description) : 0), 0) : 0),
+    0
+  );
+  const notesH = notes.length ? 28 + notes.reduce((n, x) => n + 4 + 8.6 * lines(x), 0) : 0;
+
+  const left = sum(['lunes', 'martes', 'miercoles', 'jueves']) + (suppH ? 7 + suppH : 0);
+  const right = sum(['viernes', 'sabado', 'domingo']) + (protH ? 7 + protH : 0) + (notesH ? 7 + notesH : 0);
+  return (Math.max(left, right) + 100 /* cabecera */ + 38 /* pie y márgenes */) * k;
 }
 
-function renderMacroDiagnostics(dayData) {
-  if (dayData.macrosReales) {
-    return (
-      <>
-        <Text style={styles.macroDiagnostics}>
-          Calculado {formatNumber(dayData.macrosReales.kcal, ' kcal')} · P {formatNumber(dayData.macrosReales.proteina, 'g')} · HC {formatNumber(dayData.macrosReales.hidratos, 'g')} · G {formatNumber(dayData.macrosReales.grasa, 'g')}
-        </Text>
-        <Text style={styles.macroDiagnostics}>
-          Desviación {formatSigned(dayData.desviacionMacros?.kcal, ' kcal')} · P {formatSigned(dayData.desviacionMacros?.proteina, 'g')} · HC {formatSigned(dayData.desviacionMacros?.hidratos, 'g')} · G {formatSigned(dayData.desviacionMacros?.grasa, 'g')}
-        </Text>
-      </>
-    );
+function estimateScale(plan, content) {
+  for (let k = 1; k > MIN_SCALE; k -= 0.02) {
+    if (estimateHeight(plan, content, k) <= A4_HEIGHT) return Math.round(k * 100) / 100;
   }
-  if (dayData.cierreMacros?.estado === 'parcial') {
-    return (
-      <Text style={styles.macroDiagnostics}>
-        Cierre parcial: {dayData.cierreMacros.ingestasCalculadas}/{dayData.cierreMacros.ingestasTotales} ingestas calculadas; se muestra el objetivo teórico.
-      </Text>
-    );
-  }
-  return null;
+  return MIN_SCALE;
+}
+
+function MacroItem({ label, value, t, st }) {
+  return (
+    <Text style={[st.macroText, { color: t.itemText }]}>
+      {label} <Text style={{ color: t.cardBodyText, fontWeight: 700 }}>{formatInteger(value)} g</Text>
+    </Text>
+  );
+}
+
+function Day({ dayData, teamConfig, t, st }) {
+  const colorName = getTeamDayTypeColor(dayData.tipoDia, teamConfig);
+  const label = getTeamDayTypeLabel(dayData.tipoDia, teamConfig);
+  return (
+    <View style={[st.card, { backgroundColor: t.boxBg, borderColor: t.boxBorder }]}>
+      <View style={st.dayHeader}>
+        <View style={st.dayTitleGroup}>
+          <Text style={[st.dayName, { color: t.cardBodyText }]}>{dayData.label}</Text>
+          <Text style={[st.pill, { color: t.dayColor(colorName), backgroundColor: t.dayTint(colorName) }]}>{label}</Text>
+        </View>
+        <Text style={[st.kcal, { color: t.cardBodyText }]}>
+          {formatInteger(dayData.kcal)} <Text style={[st.kcalUnit, { color: t.muted }]}>kcal</Text>
+        </Text>
+      </View>
+
+      <View style={st.macroRow}>
+        <MacroItem label="Proteína" value={dayData.proteina} t={t} st={st} />
+        <MacroItem label="Hidratos" value={dayData.hidratos} t={t} st={st} />
+        <MacroItem label="Grasa" value={dayData.grasa} t={t} st={st} />
+      </View>
+
+      <View style={st.meals}>
+        {dayData.ingestas.map((meal, index) => (
+          <View key={index} style={[st.mealRow, { backgroundColor: t.itemBg }]} wrap={false}>
+            <Text style={[st.mealName, { color: t.accentText }]}>{meal.nombre}</Text>
+            <Text style={[st.mealDetail, { color: t.itemText }]}>{meal.detalle || '—'}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function Panel({ title, t, st, children }) {
+  return (
+    <View style={[st.card, { backgroundColor: t.boxBg, borderColor: t.boxBorder }]}>
+      <Text style={[st.panelTitle, { color: t.accentText, borderBottomColor: t.boxBorder }]}>{title}</Text>
+      {children}
+    </View>
+  );
 }
 
 export function PlanCardPage({ plan, teamConfig }) {
+  const t = buildPlanTokens(teamConfig?.planColors);
   const clubName = teamConfig?.nombre || 'Club';
-  const planColors = teamConfig?.planColors || {
-    cardTopBg: '#254d5c',
-    cardTopText: '#cad6df',
-    cardBodyBg: '#101229',
-    cardBodyText: '#ffffff',
-    boxBg: '#151932',
-    boxBorder: '#2d335a',
-    itemBg: '#1d1f46',
-    accentText: '#ffa94d',
-    itemText: '#dee2e6',
-  };
 
   const notes = plan?.notas?.length ? plan.notas : [];
   const supplements = Array.isArray(plan?.suplementacion) ? plan.suplementacion : [];
   const protocols = Array.isArray(plan?.protocolos) ? plan.protocolos : [];
+  const st = getStyles(estimateScale(plan, { supplements, protocols, notes }));
 
-  const leftDays = ['lunes', 'martes', 'miercoles', 'jueves'];
-  const rightDays = ['viernes', 'sabado', 'domingo'];
+  const stats = [
+    ['Peso', formatNumberDecimal(plan?.metricas?.peso, ' kg', 1)],
+    ['Grasa', formatNumberDecimal(plan?.metricas?.grasa, ' %', 1)],
+    ['Músculo', formatNumberDecimal(plan?.metricas?.pesoMuscular, ' %', 1)],
+  ];
 
   return (
-    <Page size="A4" style={[styles.page, { backgroundColor: planColors.cardBodyBg, color: planColors.cardBodyText }]} wrap={false}>
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Text style={[styles.title, { color: planColors.cardBodyText }]}>{plan?.jugador?.nombre || 'Jugador'}</Text>
-          <Text style={[styles.subtitle, { color: planColors.accentText }]}>{plan?.jugador?.posicion || 'Sin posición'}</Text>
+    <Page size="A4" style={[st.page, { backgroundColor: t.cardBodyBg, color: t.cardBodyText }]}>
+      <View style={[st.hero, { backgroundColor: t.cardTopBg }]}>
+        <View>
+          <Text style={[st.heroClub, { color: t.topMuted }]}>{clubName} · Nutrición deportiva</Text>
+          <Text style={[st.heroName, { color: t.cardTopText }]}>{plan?.jugador?.nombre || 'Jugador'}</Text>
+          <Text style={[st.heroPosition, { color: t.topMuted }]}>{plan?.jugador?.posicion || 'Sin posición'}</Text>
         </View>
-        <View style={styles.headerRight}>
-          <Text style={styles.teamText}>{teamConfig?.nombre?.toUpperCase() || ''} · NUTRICIÓN DEPORTIVA</Text>
-          <Text style={styles.metaText}>{plan?.meta?.nombre || 'Plan de Nutrición'}</Text>
-        </View>
-      </View>
-
-      <View style={styles.metricsBand}>
-        <View style={[styles.metricBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
-          <Text style={styles.metricLabel}>Peso</Text>
-          <Text style={[styles.metricValue, { color: planColors.accentText }]}>{formatWeight(plan?.metricas?.peso)}</Text>
-        </View>
-        <View style={[styles.metricBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
-          <Text style={styles.metricLabel}>Grasa</Text>
-          <Text style={[styles.metricValue, { color: planColors.cardBodyText }]}>{formatGrasa(plan?.metricas?.grasa)}</Text>
-        </View>
-        <View style={[styles.metricBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
-          <Text style={styles.metricLabel}>Músculo</Text>
-          <Text style={[styles.metricValue, { color: DAY_TYPE_COLORS.green }]}>{formatGrasa(plan?.metricas?.pesoMuscular)}</Text>
-        </View>
-      </View>
-
-      <View style={styles.contentGrid}>
-        <View style={styles.column}>
-          {leftDays.map((dayKey) => {
-            const dayData = plan.dias[dayKey];
-            const color = DAY_TYPE_COLORS[getTeamDayTypeColor(dayData.tipoDia, teamConfig)] || DAY_TYPE_COLORS.green;
-            const label = getTeamDayTypeLabel(dayData.tipoDia, teamConfig);
-            return (
-              <View key={dayKey} style={[styles.dayBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
-                <View style={[styles.dayHeader, { borderBottomColor: planColors.boxBorder }]}>
-                  <Text style={[styles.dayName, { color: planColors.cardBodyText }]}>{dayData.label}</Text>
-                  <Text style={[styles.dayIndicator, { color }]}>● {label}</Text>
-                </View>
-                <Text style={styles.macrosLine}>
-                  Objetivo {formatNumber(dayData.kcal, ' kcal')} · P {formatNumber(dayData.proteina, 'g')} · HC {formatNumber(dayData.hidratos, 'g')} · G {formatNumber(dayData.grasa, 'g')}
-                </Text>
-                {renderMacroDiagnostics(dayData)}
-                <View style={styles.mealsList}>
-                  {dayData.ingestas.map((meal, index) => (
-                    <View key={index} style={[styles.mealRow, { backgroundColor: planColors.itemBg }]}>
-                      <Text style={[styles.mealName, { color: planColors.accentText }]}>{meal.nombre}</Text>
-                      <Text style={[styles.mealDetail, { color: planColors.itemText }]}>{meal.detalle}</Text>
-                    </View>
-                  ))}
-                </View>
+        <View style={st.heroRight}>
+          <Text style={[st.heroPlan, { color: t.topMuted }]}>{plan?.meta?.nombre || 'Plan de nutrición'} · {formatDate(plan?.meta?.fecha)}</Text>
+          <View style={st.tiles}>
+            {stats.map(([label, value]) => (
+              <View key={label} style={[st.tile, { backgroundColor: t.topTile }]}>
+                <Text style={[st.tileLabel, { color: t.topMuted }]}>{label}</Text>
+                <Text style={[st.tileValue, { color: t.cardTopText }]}>{value}</Text>
               </View>
-            );
-          })}
-
-          {supplements.length > 0 && (
-            <View style={[styles.supplementsBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
-              <Text style={[styles.supplementsTitle, { color: planColors.accentText, borderBottomColor: planColors.boxBorder }]}>Suplementación Pautada</Text>
-              {supplements.map((supp, index) => (
-                <View key={index} style={[styles.supplementRow, { backgroundColor: planColors.itemBg, borderBottomColor: planColors.boxBorder }]}>
-                  <View style={styles.supplementHeader}>
-                    <Text style={[styles.supplementName, { color: planColors.cardBodyText }]}>{supp.nombre}</Text>
-                    {supp.dosis ? <Text style={[styles.supplementDose, { color: planColors.accentText, borderColor: planColors.boxBorder }]}>{supp.dosis}</Text> : null}
-                  </View>
-                  {supp.timing ? <Text style={[styles.supplementMeta, { color: planColors.itemText }]}>Momento: {supp.timing}</Text> : null}
-                  {supp.notas ? <Text style={[styles.supplementMeta, { color: planColors.itemText }]}>{supp.notas}</Text> : null}
-                </View>
-              ))}
-            </View>
-          )}
-        </View>
-
-        <View style={styles.column}>
-          {rightDays.map((dayKey) => {
-            const dayData = plan.dias[dayKey];
-            const color = DAY_TYPE_COLORS[getTeamDayTypeColor(dayData.tipoDia, teamConfig)] || DAY_TYPE_COLORS.green;
-            const label = getTeamDayTypeLabel(dayData.tipoDia, teamConfig);
-            return (
-              <View key={dayKey} style={[styles.dayBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
-                <View style={[styles.dayHeader, { borderBottomColor: planColors.boxBorder }]}>
-                  <Text style={[styles.dayName, { color: planColors.cardBodyText }]}>{dayData.label}</Text>
-                  <Text style={[styles.dayIndicator, { color }]}>● {label}</Text>
-                </View>
-                <Text style={styles.macrosLine}>
-                  Objetivo {formatNumber(dayData.kcal, ' kcal')} · P {formatNumber(dayData.proteina, 'g')} · HC {formatNumber(dayData.hidratos, 'g')} · G {formatNumber(dayData.grasa, 'g')}
-                </Text>
-                {renderMacroDiagnostics(dayData)}
-                <View style={styles.mealsList}>
-                  {dayData.ingestas.map((meal, index) => (
-                    <View key={index} style={[styles.mealRow, { backgroundColor: planColors.itemBg }]}>
-                      <Text style={[styles.mealName, { color: planColors.accentText }]}>{meal.nombre}</Text>
-                      <Text style={[styles.mealDetail, { color: planColors.itemText }]}>{meal.detalle}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            );
-          })}
-
-          {protocols.length > 0 && protocols.map((prot, pIdx) => (
-            <View key={prot.id || pIdx} style={[styles.protocolsBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
-              <Text style={[styles.protocolTitle, { color: planColors.accentText, borderBottomColor: planColors.boxBorder }]}>{prot.name || 'Protocolo de Partido'}</Text>
-              {prot.timeline?.map((step, sIdx) => (
-                <View key={step.id || sIdx} style={[styles.protocolRow, { backgroundColor: planColors.itemBg, borderBottomColor: planColors.boxBorder }]}>
-                  <View style={styles.protocolStepHeader}>
-                    <Text style={[styles.protocolStepTitle, { color: planColors.cardBodyText }]}>
-                      {step.icon && !step.icon.startsWith('Icon') ? `${step.icon} ` : ''}{step.title}
-                    </Text>
-                    {step.timeLabel ? <Text style={[styles.protocolTimeBadge, { color: planColors.accentText, borderColor: planColors.boxBorder }]}>{step.timeLabel}</Text> : null}
-                  </View>
-                  {step.description ? <Text style={[styles.protocolStepDesc, { color: planColors.itemText }]}>{step.description}</Text> : null}
-                </View>
-              ))}
-              {prot.checklist?.length > 0 && (
-                <View style={{ marginTop: 2 }}>
-                  <Text style={[styles.protocolChecklistTitle, { color: planColors.accentText }]}>Checklist</Text>
-                  {prot.checklist.map((item, cIdx) => (
-                    <View key={item.id || cIdx} style={[styles.protocolRow, { backgroundColor: planColors.itemBg, borderBottomColor: planColors.boxBorder }]}>
-                      <Text style={[styles.protocolStepTitle, { color: planColors.cardBodyText }]}>✓ {item.title}</Text>
-                      {item.description ? <Text style={[styles.protocolStepDesc, { color: planColors.itemText }]}>{item.description}</Text> : null}
-                    </View>
-                  ))}
-                </View>
-              )}
-            </View>
-          ))}
-
-          {notes.length > 0 && (
-            <View style={[styles.notesBox, { backgroundColor: planColors.boxBg, borderColor: planColors.boxBorder }]}>
-              <Text style={[styles.notesTitle, { color: planColors.accentText }]}>Indicaciones de la semana</Text>
-              {notes.map((note, index) => (
-                <Text key={index} style={[styles.noteItem, { color: planColors.itemText }]}>• {note}</Text>
-              ))}
-            </View>
-          )}
+            ))}
+          </View>
         </View>
       </View>
 
-      <View style={[styles.footer, { borderTopColor: planColors.boxBorder }]}>
-        <Text>{clubName} · Nutrición Deportiva y Rendimiento</Text>
-        <Text>Generado automáticamente por Nutralab</Text>
+      <View style={st.body}>
+        <View style={st.contentGrid}>
+          <View style={st.column}>
+            {LEFT_DAYS.map((dayKey) => (
+              <Day key={dayKey} dayData={plan.dias[dayKey]} teamConfig={teamConfig} t={t} st={st} />
+            ))}
+
+            {supplements.length > 0 && (
+              <Panel title="Suplementación pautada" t={t} st={st}>
+                {supplements.map((supp, index) => (
+                  <View key={index} style={[st.itemRow, { backgroundColor: t.itemBg }]} wrap={false}>
+                    <View style={st.itemHeader}>
+                      <Text style={[st.itemTitle, { color: t.cardBodyText }]}>{supp.nombre}</Text>
+                      {supp.dosis ? <Text style={[st.badge, { color: t.accentText, backgroundColor: t.chipBg }]}>{supp.dosis}</Text> : null}
+                    </View>
+                    {supp.timing ? <Text style={[st.itemMeta, { color: t.itemText }]}>{supp.timing}</Text> : null}
+                    {supp.notas ? <Text style={[st.itemMeta, { color: t.muted }]}>{supp.notas}</Text> : null}
+                  </View>
+                ))}
+              </Panel>
+            )}
+          </View>
+
+          <View style={st.column}>
+            {RIGHT_DAYS.map((dayKey) => (
+              <Day key={dayKey} dayData={plan.dias[dayKey]} teamConfig={teamConfig} t={t} st={st} />
+            ))}
+
+            {protocols.map((prot, pIdx) => (
+              <Panel key={prot.id || pIdx} title={prot.name || 'Protocolo de partido'} t={t} st={st}>
+                {prot.timeline?.map((step, sIdx) => (
+                  <View key={step.id || sIdx} style={[st.itemRow, { backgroundColor: t.itemBg }]} wrap={false}>
+                    <View style={st.itemHeader}>
+                      <Text style={[st.itemTitle, { color: t.cardBodyText }]}>{step.title}</Text>
+                      {step.timeLabel ? <Text style={[st.badge, { color: t.accentText, backgroundColor: t.chipBg }]}>{step.timeLabel}</Text> : null}
+                    </View>
+                    {step.description ? <Text style={[st.itemMeta, { color: t.itemText }]}>{step.description}</Text> : null}
+                  </View>
+                ))}
+                {prot.checklist?.length > 0 && (
+                  <View>
+                    <Text style={[st.subTitle, { color: t.muted }]}>Checklist</Text>
+                    {prot.checklist.map((item, cIdx) => (
+                      <View key={item.id || cIdx} style={[st.itemRow, st.checkRow, { backgroundColor: t.itemBg }]} wrap={false}>
+                        <View style={[st.checkBox, { borderColor: t.accentText }]} />
+                        <View style={{ flex: 1 }}>
+                          <Text style={[st.itemTitleBlock, { color: t.cardBodyText }]}>{item.title}</Text>
+                          {item.description ? <Text style={[st.itemMeta, { color: t.itemText }]}>{item.description}</Text> : null}
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </Panel>
+            ))}
+
+            {notes.length > 0 && (
+              <Panel title="Indicaciones de la semana" t={t} st={st}>
+                {notes.map((note, index) => (
+                  <View key={index} style={st.noteRow}>
+                    <View style={[st.noteDot, { backgroundColor: t.accentText }]} />
+                    <Text style={[st.noteText, { color: t.itemText }]}>{note}</Text>
+                  </View>
+                ))}
+              </Panel>
+            )}
+          </View>
+        </View>
+
+        <View style={[st.footer, { borderTopColor: t.boxBorder }]}>
+          <Text style={{ color: t.muted }}>{clubName} · Nutrición deportiva y rendimiento</Text>
+        </View>
       </View>
     </Page>
   );
@@ -476,163 +474,135 @@ function toLines(value) {
     .filter(Boolean);
 }
 
-function formatDate(date = new Date()) {
-  return new Intl.DateTimeFormat('es-ES', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date);
-}
-
 const coverStyles = StyleSheet.create({
   page: {
-    backgroundColor: '#10142f',
-    color: '#f7f8ff',
-    padding: 28,
     fontFamily: 'Helvetica',
-    fontSize: 7.8,
+    fontSize: 8,
+  },
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 32,
+    paddingVertical: 9,
+    fontSize: 6.8,
+  },
+  body: {
+    paddingHorizontal: 32,
+    paddingTop: 26,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    paddingBottom: 12,
+    marginBottom: 18,
     borderBottomWidth: 1,
-    borderBottomColor: '#1fb5a9',
-    paddingBottom: 10,
-    marginBottom: 12,
   },
   title: {
-    fontSize: 31,
+    fontSize: 32,
     fontWeight: 700,
-    lineHeight: 1.02,
-    maxWidth: 310,
+    lineHeight: 1.05,
+    maxWidth: 340,
   },
   subtitle: {
-    color: '#1fb5a9',
-    textTransform: 'uppercase',
-    letterSpacing: 1.6,
-    fontSize: 8.5,
-    fontWeight: 700,
-    marginTop: 5,
+    fontSize: 9.5,
+    marginTop: 7,
   },
   rightHeader: {
     textAlign: 'right',
-    color: '#a5adcb',
-    paddingTop: 10,
-    maxWidth: 205,
+    maxWidth: 200,
+    lineHeight: 1.4,
   },
   rightStrong: {
-    color: '#ffffff',
-    fontSize: 9.5,
+    fontSize: 10,
     fontWeight: 700,
-    marginBottom: 2,
-  },
-  section: {
-    marginBottom: 8,
-  },
-  sectionTitle: {
-    color: '#1fb5a9',
-    textTransform: 'uppercase',
-    letterSpacing: 1.8,
-    fontSize: 8.2,
-    fontWeight: 700,
-    marginBottom: 5,
-  },
-  paragraph: {
-    lineHeight: 1.25,
-    marginBottom: 3,
-  },
-  lineItem: {
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#2d335a',
-    paddingBottom: 3,
-    marginBottom: 3,
-    lineHeight: 1.2,
   },
   columns: {
     flexDirection: 'row',
+    gap: 24,
   },
   col: {
-    flexGrow: 1,
-    flexBasis: 0,
-    marginRight: 10,
+    flex: 1,
   },
-  colLast: {
-    marginRight: 0,
+  section: {
+    marginBottom: 16,
   },
-  box: {
-    backgroundColor: '#20284b',
-    borderRadius: 7,
-    padding: 7,
-    marginBottom: 7,
+  sectionTitle: {
+    fontSize: 7,
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: 1.1,
+    paddingBottom: 4,
+    borderBottomWidth: 0.5,
+  },
+  line: {
+    paddingVertical: 4.5,
+    borderBottomWidth: 0.4,
+    lineHeight: 1.3,
   },
   footer: {
     position: 'absolute',
-    left: 36,
-    right: 36,
-    bottom: 20,
+    left: 32,
+    right: 32,
+    bottom: 22,
     borderTopWidth: 0.5,
-    borderTopColor: '#2d335a',
-    paddingTop: 8,
+    paddingTop: 7,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    color: '#a5adcb',
-    fontSize: 6.7,
+    fontSize: 6.5,
   },
 });
 
-function CoverPage({ meta, playerName }) {
-  const microcycle = toLines(meta.microcycle).slice(0, 7);
-  const rules = toLines(meta.rules);
-  const buffet = toLines(meta.buffet);
+function CoverSection({ title, lines, bullet, t }) {
+  return (
+    <View style={coverStyles.section}>
+      <Text style={[coverStyles.sectionTitle, { color: t.accentText, borderBottomColor: t.cardBodyText }]}>{title}</Text>
+      {lines.map((line) => (
+        <Text key={line} style={[coverStyles.line, { color: t.itemText, borderBottomColor: t.boxBorder }]}>
+          {bullet ? '–  ' : ''}{line}
+        </Text>
+      ))}
+    </View>
+  );
+}
+
+function CoverPage({ meta, playerName, teamConfig }) {
+  const t = buildPlanTokens(teamConfig?.planColors);
 
   return (
-    <Page size="A4" style={coverStyles.page}>
-      <View style={coverStyles.header}>
-        <View>
-          <Text style={coverStyles.title}>{meta.title || 'Informe semanal'}</Text>
-          <Text style={coverStyles.subtitle}>{meta.subtitle || `Plan nutricional · ${playerName}`}</Text>
-        </View>
-        <View style={coverStyles.rightHeader}>
-          <Text style={coverStyles.rightStrong}>{meta.team || ''}</Text>
-          <Text>{meta.author || 'Nutralab'}</Text>
-          <Text>{meta.handle || ''}</Text>
-        </View>
+    <Page size="A4" style={[coverStyles.page, { backgroundColor: t.cardBodyBg, color: t.cardBodyText }]}>
+      <View style={[coverStyles.topBar, { backgroundColor: t.cardTopBg, color: t.cardTopText }]}>
+        <Text>{meta.team || teamConfig?.nombre || ''} · Nutrición deportiva</Text>
+        <Text>{formatDate()}</Text>
       </View>
 
-      <View style={coverStyles.columns}>
-        <View style={coverStyles.col}>
-          <View style={coverStyles.section}>
-            <Text style={coverStyles.sectionTitle}>Calendario de la semana</Text>
-            <View style={coverStyles.box}>
-              {microcycle.map((line) => (
-                <Text key={line} style={coverStyles.lineItem}>{line}</Text>
-              ))}
-            </View>
+      <View style={coverStyles.body}>
+        <View style={[coverStyles.header, { borderBottomColor: t.cardBodyText }]}>
+          <View>
+            <Text style={[coverStyles.title, { color: t.cardBodyText }]}>{meta.title || 'Informe semanal'}</Text>
+            <Text style={[coverStyles.subtitle, { color: t.accentText }]}>{meta.subtitle || `Plan nutricional · ${playerName}`}</Text>
           </View>
-          <View style={coverStyles.section}>
-            <Text style={coverStyles.sectionTitle}>Equipamiento del buffet</Text>
-            <View style={coverStyles.box}>
-              {buffet.map((line) => (
-                <Text key={line} style={coverStyles.paragraph}>{line}</Text>
-              ))}
-            </View>
+          <View style={coverStyles.rightHeader}>
+            <Text style={[coverStyles.rightStrong, { color: t.cardBodyText }]}>{meta.team || ''}</Text>
+            <Text style={{ color: t.muted }}>{meta.author || 'Nutralab'}</Text>
+            <Text style={{ color: t.muted }}>{meta.handle || ''}</Text>
           </View>
         </View>
-        <View style={[coverStyles.col, coverStyles.colLast]}>
-          <View style={coverStyles.section}>
-            <Text style={coverStyles.sectionTitle}>Reglas de la semana</Text>
-            <View style={coverStyles.box}>
-              {rules.map((line) => (
-                <Text key={line} style={coverStyles.lineItem}>• {line}</Text>
-              ))}
-            </View>
+
+        <View style={coverStyles.columns}>
+          <View style={coverStyles.col}>
+            <CoverSection title="Calendario de la semana" lines={toLines(meta.microcycle).slice(0, 7)} t={t} />
+            <CoverSection title="Equipamiento del buffet" lines={toLines(meta.buffet)} t={t} />
+          </View>
+          <View style={coverStyles.col}>
+            <CoverSection title="Reglas de la semana" lines={toLines(meta.rules)} bullet t={t} />
           </View>
         </View>
       </View>
 
-      <View style={coverStyles.footer} fixed>
-        <Text>{meta.author || 'Nutralab'} · {meta.team || ''} · {meta.handle || ''}</Text>
-        <Text>Documento generado {formatDate()}</Text>
+      <View style={[coverStyles.footer, { borderTopColor: t.boxBorder }]} fixed>
+        <Text style={{ color: t.muted }}>{meta.author || 'Nutralab'} · {meta.team || ''} · {meta.handle || ''}</Text>
+        <Text style={{ color: t.muted }}>Documento generado {formatDate()}</Text>
       </View>
     </Page>
   );
@@ -644,7 +614,7 @@ export default function NutritionPlanCardDocument({ data, weeklyReportMeta, team
   return (
     <Document title={plan.meta?.nombre || 'Ficha nutricional'} author="Nutralab" subject="Ficha nutricional">
       {weeklyReportMeta && (
-        <CoverPage meta={weeklyReportMeta} playerName={plan.jugador?.nombre || 'Jugador'} />
+        <CoverPage meta={weeklyReportMeta} playerName={plan.jugador?.nombre || 'Jugador'} teamConfig={teamConfig} />
       )}
       <PlanCardPage plan={plan} teamConfig={teamConfig} />
     </Document>
