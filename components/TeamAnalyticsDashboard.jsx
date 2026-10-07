@@ -353,8 +353,8 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
               <SegmentedControl
                 value={chartMode}
                 onChange={setChartMode}
-                size="xs"
-                radius="md"
+                size="sm"
+                radius="xl"
                 data={[
                   { value: 'comparativa', label: 'Comparativa' },
                   { value: 'historial', label: 'Historial' },
@@ -368,7 +368,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                 allowDeselect={false}
                 searchable
                 variant="default"
-                radius="md"
+                radius="xl"
                 size="sm"
                 style={{ flex: '1 1 200px', minWidth: 0 }}
                 w={{ base: '100%', sm: 'auto' }}
@@ -440,7 +440,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
               <Grid.Col span={{ base: 12, md: 4 }}>
                 {paramStats && (
                   <Stack gap="md" justify="center" h="100%">
-                    <Paper p="sm" radius="md" style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', border: '1px solid rgba(108, 112, 90, 0.12)' }}>
+                    <Paper p="sm" radius="lg" style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', border: '1px solid rgba(108, 112, 90, 0.12)' }}>
                       <Text size="xs" c="var(--nutra-salvia, #6C705A)" tt="uppercase" fw={700} mb={4}>Resumen del parámetro</Text>
                       <Group justify="space-between" wrap="nowrap" mb={4}>
                         <Text size="xs" fw={500}>Media del equipo</Text>
@@ -457,7 +457,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                         <Text size="xs" fw={600} c="var(--nutra-salvia, #6C705A)">{paramStats.totalCount}</Text>
                       </Group>
                     </Paper>
-                    <Paper p="sm" radius="md" style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', border: '1px solid rgba(108, 112, 90, 0.12)' }}>
+                    <Paper p="sm" radius="lg" style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', border: '1px solid rgba(108, 112, 90, 0.12)' }}>
                       <Text size="xs" c="var(--nutra-salvia, #6C705A)" tt="uppercase" fw={700} mb={8}>Distribución</Text>
                       <Stack gap={6}>
                         <Group justify="space-between" wrap="nowrap">

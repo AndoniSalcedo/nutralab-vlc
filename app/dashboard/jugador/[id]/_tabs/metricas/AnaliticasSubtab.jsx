@@ -299,7 +299,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
             )}
 
             {isMobile && (
-              <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="md" aria-label={expanded ? 'Ocultar opciones' : 'Mostrar opciones'}>
+              <ActionIcon variant="light" color="gray" onClick={toggleExpanded} size="lg" radius="xl" aria-label={expanded ? 'Ocultar opciones' : 'Mostrar opciones'}>
                 <IconChevronDown size={20} style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: '200ms' }} />
               </ActionIcon>
             )}
@@ -356,7 +356,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
                 allowDeselect={false}
                 searchable
                 variant="filled"
-                radius="md"
+                radius="xl"
                 disabled={sorted.length === 0}
                 leftSection={<IconFileAnalytics size={16} />}
               />
