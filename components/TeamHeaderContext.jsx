@@ -9,14 +9,26 @@ const TeamHeaderSlotContext = createContext(null);
 
 export function TeamHeaderSlotProvider({ children }) {
   const [rightSlotEl, setRightSlotElState] = useState(null);
+  const [desktopRightSlotEl, setDesktopRightSlotElState] = useState(null);
+  const [mobileRightSlotEl, setMobileRightSlotElState] = useState(null);
   const [desktopFiltersSlotEl, setDesktopFiltersSlotElState] = useState(null);
   const [mobileFiltersSlotEl, setMobileFiltersSlotElState] = useState(null);
   const [hasRightSection, setHasRightSection] = useState(false);
+  const [hasDesktopRightSection, setHasDesktopRightSection] = useState(false);
+  const [hasMobileRightSection, setHasMobileRightSection] = useState(false);
   const [hasDesktopFilters, setHasDesktopFilters] = useState(false);
   const [hasMobileFilters, setHasMobileFilters] = useState(false);
 
   const setRightSlotEl = useCallback((el) => {
     setRightSlotElState(el);
+  }, []);
+
+  const setDesktopRightSlotEl = useCallback((el) => {
+    setDesktopRightSlotElState(el);
+  }, []);
+
+  const setMobileRightSlotEl = useCallback((el) => {
+    setMobileRightSlotElState(el);
   }, []);
 
   const setDesktopFiltersSlotEl = useCallback((el) => {
@@ -37,6 +49,28 @@ export function TeamHeaderSlotProvider({ children }) {
     observer.observe(rightSlotEl, { childList: true });
     return () => observer.disconnect();
   }, [rightSlotEl]);
+
+  useEffect(() => {
+    if (!desktopRightSlotEl) return;
+    const checkDesktopRight = () => {
+      setHasDesktopRightSection(desktopRightSlotEl.childNodes.length > 0);
+    };
+    checkDesktopRight();
+    const observer = new MutationObserver(checkDesktopRight);
+    observer.observe(desktopRightSlotEl, { childList: true });
+    return () => observer.disconnect();
+  }, [desktopRightSlotEl]);
+
+  useEffect(() => {
+    if (!mobileRightSlotEl) return;
+    const checkMobileRight = () => {
+      setHasMobileRightSection(mobileRightSlotEl.childNodes.length > 0);
+    };
+    checkMobileRight();
+    const observer = new MutationObserver(checkMobileRight);
+    observer.observe(mobileRightSlotEl, { childList: true });
+    return () => observer.disconnect();
+  }, [mobileRightSlotEl]);
 
   useEffect(() => {
     if (!desktopFiltersSlotEl) return;
@@ -64,12 +98,18 @@ export function TeamHeaderSlotProvider({ children }) {
     <TeamHeaderSlotContext.Provider
       value={{
         rightSlotEl,
+        desktopRightSlotEl,
+        mobileRightSlotEl,
         desktopFiltersSlotEl,
         mobileFiltersSlotEl,
         setRightSlotEl,
+        setDesktopRightSlotEl,
+        setMobileRightSlotEl,
         setDesktopFiltersSlotEl,
         setMobileFiltersSlotEl,
-        hasRightSection,
+        hasRightSection: hasRightSection || hasDesktopRightSection || hasMobileRightSection,
+        hasDesktopRightSection,
+        hasMobileRightSection,
         hasDesktopFilters,
         hasMobileFilters,
       }}
@@ -86,13 +126,18 @@ export function useTeamHeaderSlot() {
 export function TeamHeaderRightSection({ children }) {
   const context = useTeamHeaderSlot();
   const [mounted, setMounted] = useState(false);
+  const isDesktop = useMediaQuery('(min-width: 48em)', false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted || !context?.rightSlotEl) return null;
-  return createPortal(children, context.rightSlotEl);
+  const target = isDesktop
+    ? (context?.desktopRightSlotEl || context?.rightSlotEl)
+    : (context?.mobileRightSlotEl || context?.rightSlotEl);
+
+  if (!mounted || !target) return null;
+  return createPortal(children, target);
 }
 
 export function TeamHeaderFilters({ children }) {

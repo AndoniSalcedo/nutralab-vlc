@@ -476,6 +476,7 @@ function JugadorHeaderMobile({ jugador, isAdmin, isPlayer, hasCredentials, onEdi
   );
 }
 
+// eslint-disable-next-line import-x/no-unused-modules
 export default function JugadorHeader({ jugador, user, forceMobile = false, embedded = false }) {
   const [opened, setOpened] = useState(false);
   const matchesMobileViewport = useMediaQuery('(max-width: 48em)');

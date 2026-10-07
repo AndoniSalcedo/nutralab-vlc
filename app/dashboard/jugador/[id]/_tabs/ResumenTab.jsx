@@ -4,6 +4,7 @@ import { Box, Paper, Stack } from '@mantine/core';
 import { tabLabel } from './tab-label';
 import { getSubtabControlData } from './subtab-config';
 import PlayerSubtabControl from './PlayerSubtabControl';
+import headerClasses from './SubtabSectionHeader.module.css';
 import MensajesSubtab from './resumen/MensajesSubtab';
 import PerfilSubtab from './resumen/PerfilSubtab';
 import DiarioComidasSubtab from './resumen/DiarioComidasSubtab';
@@ -26,15 +27,7 @@ export default function ResumenTab({
       <Paper
         p="xs"
         bg="white"
-        radius={0}
-        style={{
-          zIndex: 99,
-          position: 'sticky',
-          top: 0,
-          clipPath: 'inset(0 -100% 0 -100%)',
-          width: '100%',
-          boxShadow: '-2px -1px 2px -1px rgba(0,0,0,0.1), 2px -1px 2px -1px rgba(0,0,0,0.1)',
-        }}
+        className={headerClasses.subtabsHeader}
       >
         <PlayerSubtabControl
           value={activeSubtab}

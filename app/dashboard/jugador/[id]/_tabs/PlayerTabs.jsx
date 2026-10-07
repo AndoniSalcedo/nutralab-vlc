@@ -1,11 +1,12 @@
 'use client';
 
-import { Box, Group, Tabs, Text, rem } from '@mantine/core';
+import { Box, Group, Tabs, Text } from '@mantine/core';
 import { IconChartBar, IconClipboardList, IconSalad } from '@/components/icons3d';
 import { useParams, useRouter } from 'next/navigation';
 import MetricasTab from './MetricasTab';
 import NutricionTab from './NutricionTab';
 import ResumenTab from './ResumenTab';
+import PlayerSidebar from './PlayerSidebar';
 import classes from './PlayerTabs.module.css';
 import { PlayerDashboardProvider } from './PlayerDashboardContext';
 import PlayerTutorial from '@/components/tutorials/PlayerTutorial';
@@ -65,105 +66,103 @@ export default function PlayerTabs({
     router.replace(`/dashboard/jugador/${jugador.id}/${nextTab}/${nextSubtab}`, { scroll: false });
   }
 
-  const activeTabStyle = (value) => {
-    const isActive = activeTab === value;
-    return {
-      border: 'none',
-      borderBottom: 'none',
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-      backgroundColor: isActive ? 'white' : 'transparent',
-      color: isActive ? 'var(--mantine-color-dark-6)' : 'var(--mantine-color-gray-6)',
-      fontWeight: isActive ? 700 : 600,
-      boxShadow: isActive ? '0 0 2px 0 rgba(0,0,0,0.1)' : 'none',
-      clipPath: isActive ? 'inset(-10px -10px 0 -10px)' : 'none',
-      position: 'relative',
-      zIndex: isActive ? 3 : 1,
-    };
-  };
-
   const mobileTabs = [
     { value: 'resumen', label: 'Resumen', icon: IconClipboardList },
     { value: 'nutricion', label: 'Nutrición', icon: IconSalad },
     { value: 'metricas', label: 'Métricas', icon: IconChartBar },
   ];
 
+  const content = children ? children : (
+    <Tabs value={activeTab} keepMounted={false}>
+      <Tabs.Panel value="resumen">
+        <ResumenTab
+          jugador={jugador}
+          evoluciones={evoluciones}
+          messages={messages}
+          activeSubtab={activeTab === 'resumen' ? activeSubtab : DEFAULT_SUBTABS.resumen}
+          onSubtabChange={(value) => navigate('resumen', value)}
+          readOnly={readOnly}
+          isPlayer={isPlayer}
+        />
+      </Tabs.Panel>
+
+      <Tabs.Panel value="metricas">
+        <MetricasTab
+          jugador={jugador}
+          analiticas={analiticas}
+          evoluciones={evoluciones}
+          pesajes={pesajes}
+          registrosHidratacion={registrosHidratacion}
+          activeSubtab={activeTab === 'metricas' ? activeSubtab : DEFAULT_SUBTABS.metricas}
+          onSubtabChange={(value) => navigate('metricas', value)}
+          readOnly={readOnly}
+        />
+      </Tabs.Panel>
+
+      <Tabs.Panel value="nutricion">
+        <NutricionTab
+          jugador={jugador}
+          menus={menus}
+          activeSubtab={activeTab === 'nutricion' ? activeSubtab : DEFAULT_SUBTABS.nutricion}
+          onSubtabChange={(value) => navigate('nutricion', value)}
+          readOnly={readOnly}
+        />
+      </Tabs.Panel>
+    </Tabs>
+  );
+
   return (
     <PlayerDashboardProvider user={user}>
       {isPlayer && <PlayerTutorial jugador={jugador} />}
-      <Tabs
-        className={classes.tabs}
-        value={activeTab}
-        onChange={(value) => value && navigate(value)}
-        variant="outline"
-        color="dark"
-        keepMounted={false}
-        styles={{
-          root: { marginBottom: 0 },
-          list: {
-            backgroundColor: 'transparent',
-            border: 'none',
-            borderBottom: 'none',
-          },
-          tab: {
-            fontSize: rem(15),
-            fontWeight: 600,
-            padding: `${rem(11)} ${rem(20)}`,
-            border: 'none',
-            borderBottom: 'none',
-            backgroundColor: 'transparent',
-            transition: 'all 150ms ease',
-          },
-        }}
-      >
-        <Tabs.List grow visibleFrom="sm" style={{ border: 'none', borderBottom: 'none' }}>
-          <Tabs.Tab id="tab-nav-resumen" value="resumen" leftSection={<IconClipboardList size={18} />} style={activeTabStyle('resumen')}>Resumen</Tabs.Tab>
-          <Tabs.Tab id="tab-nav-metricas" value="metricas" leftSection={<IconChartBar size={18} />} style={activeTabStyle('metricas')}>Métricas</Tabs.Tab>
-          <Tabs.Tab id="tab-nav-nutricion" value="nutricion" leftSection={<IconSalad size={18} />} style={activeTabStyle('nutricion')}>Nutrición</Tabs.Tab>
-        </Tabs.List>
 
-        <Box>
-          {children ? children : (
-            <>
-              <Tabs.Panel value="resumen">
-                <ResumenTab
-                  jugador={jugador}
-                  evoluciones={evoluciones}
-                  messages={messages}
-                  activeSubtab={activeTab === 'resumen' ? activeSubtab : DEFAULT_SUBTABS.resumen}
-                  onSubtabChange={(value) => navigate('resumen', value)}
-                  readOnly={readOnly}
-                  isPlayer={isPlayer}
-                />
-              </Tabs.Panel>
+      <Box className={classes.tabs} style={{ width: '100%', minWidth: 0 }}>
+        {/* Layout en Escritorio: Sidebar Lateral + Contenido Principal */}
+        <Box
+          style={{
+            display: 'flex',
+            gap: 20,
+            alignItems: 'flex-start',
+            width: '100%',
+            minWidth: 0,
+          }}
+        >
+          {/* Sidebar lateral en escritorio con foto ampliada, equipo y tabs estilo Apple Settings */}
+          <Box
+            visibleFrom="sm"
+            style={{
+              width: 280,
+              minWidth: 280,
+              maxWidth: 280,
+              position: 'sticky',
+              top: 16,
+              alignSelf: 'flex-start',
+              zIndex: 40,
+            }}
+          >
+            <PlayerSidebar
+              jugador={jugador}
+              user={user}
+              activeTab={activeTab}
+              onTabChange={(val) => navigate(val)}
+              readOnly={readOnly}
+              isPlayer={isPlayer}
+            />
+          </Box>
 
-              <Tabs.Panel value="metricas">
-                <MetricasTab
-                  jugador={jugador}
-                  analiticas={analiticas}
-                  evoluciones={evoluciones}
-                  pesajes={pesajes}
-                  registrosHidratacion={registrosHidratacion}
-                  activeSubtab={activeTab === 'metricas' ? activeSubtab : DEFAULT_SUBTABS.metricas}
-                  onSubtabChange={(value) => navigate('metricas', value)}
-                  readOnly={readOnly}
-                />
-              </Tabs.Panel>
-
-              <Tabs.Panel value="nutricion">
-                <NutricionTab
-                  jugador={jugador}
-                  menus={menus}
-                  activeSubtab={activeTab === 'nutricion' ? activeSubtab : DEFAULT_SUBTABS.nutricion}
-                  onSubtabChange={(value) => navigate('nutricion', value)}
-                  readOnly={readOnly}
-                />
-              </Tabs.Panel>
-            </>
-          )}
+          {/* Área de Contenido Principal a la derecha (subtabs pegadas al nav y extendidas) */}
+          <Box
+            style={{
+              flex: 1,
+              minWidth: 0,
+              width: '100%',
+              maxWidth: '100%',
+            }}
+          >
+            {content}
+          </Box>
         </Box>
 
-        {/* BARRA DE NAVEGACIÓN INFERIOR FIJA PARA MÓVILES (Idéntica en tamaño y diseño a la del equipo) */}
+        {/* BARRA DE NAVEGACIÓN INFERIOR FIJA PARA MÓVILES */}
         <Box
           hiddenFrom="sm"
           style={{
@@ -171,7 +170,7 @@ export default function PlayerTabs({
             bottom: 0,
             left: 0,
             right: 0,
-            zIndex: 100, // por debajo de modales/drawers (200)
+            zIndex: 100,
             backgroundColor: 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
@@ -244,7 +243,7 @@ export default function PlayerTabs({
             })}
           </Group>
         </Box>
-      </Tabs>
+      </Box>
     </PlayerDashboardProvider>
   );
 }

@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { Paper, Stack, Box, Group, Title, Text } from '@mantine/core';
 import { tabLabel } from '@/app/dashboard/jugador/[id]/_tabs/tab-label';
 import { getSubtabControlData, resolveSubtab, getSubtabHeader } from '@/app/dashboard/jugador/[id]/_tabs/subtab-config';
+import headerClasses from '@/app/dashboard/jugador/[id]/_tabs/SubtabSectionHeader.module.css';
 import PlayerSubtabControl from '@/app/dashboard/jugador/[id]/_tabs/PlayerSubtabControl';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
@@ -26,16 +27,7 @@ export default function PlayerSubtabLoading() {
       <Paper
         p="xs"
         bg="white"
-        radius={0}
-        style={{
-          zIndex: 99,
-          position: 'sticky',
-          top: 0,
-          clipPath: 'inset(0 -100% 0 -100%)',
-          width: '100%',
-          border: 'none',
-          boxShadow: '-2px -1px 2px -1px rgba(0,0,0,0.1), 2px -1px 2px -1px rgba(0,0,0,0.1)',
-        }}
+        className={headerClasses.subtabsHeader}
       >
         <PlayerSubtabControl
           value={activeSubtab}
@@ -49,17 +41,7 @@ export default function PlayerSubtabLoading() {
         <Paper
           p={{ base: 'sm', sm: 'md' }}
           bg="white"
-          radius={0}
-          style={{
-            borderBottomLeftRadius: 24,
-            borderBottomRightRadius: 24,
-            zIndex: 1,
-            position: 'relative',
-            marginTop: -1,
-            border: 'none',
-            boxShadow: '0 2px 2px -1px rgba(0,0,0,0.1), -2px 1px 2px -1px rgba(0,0,0,0.1), 2px 1px 2px -1px rgba(0,0,0,0.1)',
-            clipPath: 'inset(1px -100% -100% -100%)',
-          }}
+          className={headerClasses.mobileSticky}
         >
             <Group justify="space-between" align="center" wrap="wrap" gap="sm">
               <Group gap="sm" align="center" wrap="nowrap">

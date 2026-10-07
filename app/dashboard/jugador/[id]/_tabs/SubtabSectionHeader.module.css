@@ -1,5 +1,6 @@
 .mobileSticky {
-  border-top: 0 !important;
+  border: none !important;
+  border-top: none !important;
   border-left: none !important;
   border-right: none !important;
   border-bottom: none !important;
@@ -8,13 +9,39 @@
   border-bottom-left-radius: 24px !important;
   border-bottom-right-radius: 24px !important;
   margin-top: -1px !important;
-  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1), -2px 1px 2px -1px rgba(0, 0, 0, 0.1), 2px 1px 2px -1px rgba(0, 0, 0, 0.1) !important;
-  clip-path: inset(1px -100% -100% -100%) !important;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.1) !important;
+  clip-path: inset(0 -20px -20px -20px) !important;
+  position: relative;
+  z-index: 1;
 
   @media (max-width: 48em) {
     position: sticky;
     /* 10px Paper padding × 2 + 4px control padding × 2 + 16px icon/label + 8px label padding × 2. */
     top: 60px;
     z-index: 98;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    clip-path: none !important;
+  }
+}
+
+.subtabsHeader {
+  border-top-left-radius: 24px !important;
+  border-top-right-radius: 24px !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.1) !important;
+  clip-path: inset(-20px -20px 0 -20px) !important;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  width: 100%;
+
+  @media (max-width: 48em) {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    clip-path: none !important;
   }
 }

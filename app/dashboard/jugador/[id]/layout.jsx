@@ -1,11 +1,9 @@
 import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getAccessiblePlayer } from '@/lib/auth/team-access';
-import JugadorHeader from '@/components/JugadorHeader';
 import PlayerTabs from './_tabs/PlayerTabs';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
 import NothingFound from '@/components/NothingFound';
-import { Box } from '@mantine/core';
 
 export default async function JugadorLayout({ children, params }) {
   const db = getDb();
@@ -63,20 +61,13 @@ export default async function JugadorLayout({ children, params }) {
   }
 
   return (
-    <>
-      {/* En escritorio la ficha del jugador conserva su cabecera actual. En móvil
-          se muestra dentro de Resumen > Perfil para dejar libre la parte superior. */}
-      <Box visibleFrom="sm">
-        <JugadorHeader jugador={jugador} user={user} />
-      </Box>
-      <PlayerTabs
-        jugador={jugador}
-        user={user}
-        readOnly={isPlayer || user?.role === 'tecnico'}
-        isPlayer={isPlayer}
-      >
-        {children}
-      </PlayerTabs>
-    </>
+    <PlayerTabs
+      jugador={jugador}
+      user={user}
+      readOnly={isPlayer || user?.role === 'tecnico'}
+      isPlayer={isPlayer}
+    >
+      {children}
+    </PlayerTabs>
   );
 }
