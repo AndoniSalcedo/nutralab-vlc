@@ -32,15 +32,15 @@ const TZ = 'Europe/Madrid';
 
 // Tomas del día en orden cronológico; `optional` se oculta si está vacía
 const MEAL_SLOTS = [
-  { key: 'breakfast', label: 'Desayuno', color: 'blue', time: '08:30' },
-  { key: 'midMorning', label: 'Almuerzo', color: 'teal', time: '11:30' },
-  { key: 'lunch', label: 'Comida', color: 'green', time: '14:00' },
-  { key: 'snack', label: 'Merienda', color: 'pink', time: '17:30' },
-  { key: 'dinner', label: 'Cena', color: 'grape', time: '21:00' },
-  { key: 'lateSnack', label: 'Re-cena', color: 'indigo', time: '23:00', optional: true },
+  { key: 'breakfast', label: 'Desayuno', color: 'salvia', time: '08:30' },
+  { key: 'midMorning', label: 'Almuerzo', color: 'salvia', time: '11:30' },
+  { key: 'lunch', label: 'Comida', color: 'bosque', time: '14:00' },
+  { key: 'snack', label: 'Merienda', color: 'salvia', time: '17:30' },
+  { key: 'dinner', label: 'Cena', color: 'bosque', time: '21:00' },
+  { key: 'lateSnack', label: 'Re-cena', color: 'salvia', time: '23:00', optional: true },
 ];
 const SLOT_BY_KEY = Object.fromEntries(MEAL_SLOTS.map((s) => [s.key, s]));
-const OTHER_SLOT = { key: 'other', label: 'Otros', color: 'gray' };
+const OTHER_SLOT = { key: 'other', label: 'Otros', color: 'salvia' };
 const WEEKDAYS = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
 
 const slotColor = (key, shade = 5) => `var(--mantine-color-${(SLOT_BY_KEY[key] || OTHER_SLOT).color}-${shade})`;
@@ -652,7 +652,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
                   id="btn-add-meal"
                   size="xs"
                   radius="xl"
-                  color="blue"
+                  color="lima"
                   leftSection={<IconPlus size={isMobile ? 14 : 16} />}
                   style={{ flexShrink: 0 }}
                   disabled={!canAdd}
@@ -676,7 +676,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
         </Paper>
 
         {/* Contenido del día */}
-        <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+        <Box py={{ base: 'sm', sm: 'md' }}>
           {loading ? (
             <BoneyardSkeleton name="diario-comidas" loading={true} />
           ) : (

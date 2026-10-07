@@ -1,19 +1,90 @@
 'use client';
 
 import { useEffect } from 'react';
-import { ActionIcon, Combobox, createTheme, HoverCard, MantineProvider, Menu, Modal, MultiSelect, Popover, Select, Tooltip } from '@mantine/core';
+import { ActionIcon, Button, Combobox, createTheme, HoverCard, MantineProvider, Menu, Modal, MultiSelect, Popover, Select, Tooltip } from '@mantine/core';
 
+// Bosque: #1F2A24 (Texto primario, superficies de prestigio y menú lateral)
+const bosque = [
+  '#edf2ee',
+  '#d7e2da',
+  '#b2c5b7',
+  '#8da894',
+  '#688a71',
+  '#4d6b53',
+  '#364f3d',
+  '#27372c',
+  '#1F2A24', // 8: Bosque base
+  '#141c18', // 9: Bosque deep
+];
+
+// Salvia: #6C705A (Textos secundarios, datos y acentos neutros cálidos)
+const salvia = [
+  '#f6f7f3',
+  '#e8eae1',
+  '#d2d6c6',
+  '#bcc2aa',
+  '#a4aa8e',
+  '#8c9273',
+  '#6C705A', // 6: Salvia base
+  '#5a5e4b',
+  '#474a3b',
+  '#33352a',
+];
+
+// Hueso: #F8F7F4 (Fondo general del lienzo de la aplicación calibrado)
+const hueso = [
+  '#fdfcfb',
+  '#faf9f7',
+  '#F8F7F4', // 2: Hueso base
+  '#f3f1ea',
+  '#eae6dd',
+  '#dfd8cb',
+  '#cfc5b3',
+  '#b8ab96',
+  '#9c8d76',
+  '#7a6d59',
+];
+
+// Lima: #C1F080 (Acento quirúrgico <5%, estados activos y CTAs prioritarios)
+const lima = [
+  '#f7fde9',
+  '#eefbc8',
+  '#e2f9a2',
+  '#D5F677',
+  '#C1F080', // 4: Lima base
+  '#a9de50',
+  '#8ec42b',
+  '#719e1f',
+  '#557816',
+  '#3a520d',
+];
+
+// Arcilla: #B8674A (Alertas, desvíos fisiológicos y valores fuera de rango)
+const arcilla = [
+  '#fdf6f3',
+  '#fae8e2',
+  '#f3cfc3',
+  '#ebb3a1',
+  '#e0937c',
+  '#d2785a',
+  '#B8674A', // 6: Arcilla base
+  '#9e5239',
+  '#81422c',
+  '#5c2d1d',
+];
+
+// Escala armónica de nutralabColor para retrocompatibilidad total
 const nutralabColor = [
-  '#f5f6ef',
-  '#e5e6e0',
-  '#d1d2ca',
-  '#b8baad',
-  '#a2a594',
-  '#949784',
-  '#8d917a',
-  '#7a7d68',
-  '#6c705a',
-  '#5c6049',
+  '#F8F7F4', // 0: Hueso calibrado
+  '#e8eae1', // 1: Salvia light
+  '#d2d6c6', // 2: Salvia soft
+  '#bcc2aa', // 3: Salvia tint
+  '#a4aa8e', // 4: Salvia medium
+  '#6C705A', // 5: Salvia
+  '#4d6b53', // 6: Bosque light
+  '#364f3d', // 7: Bosque mid
+  '#1F2A24', // 8: Bosque base
+  '#141c18', // 9: Bosque deep
 ];
 
 const theme = createTheme({
@@ -21,7 +92,27 @@ const theme = createTheme({
   headings: {
     fontFamily: 'var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   },
+  autoContrast: true,
+  primaryColor: 'bosque',
+  primaryShade: { light: 8, dark: 8 },
   components: {
+    Button: Button.extend({
+      defaultProps: {
+        radius: 'xl',
+      },
+      styles: (t, props) => {
+        if (props.color === 'lima' && (!props.variant || props.variant === 'filled')) {
+          return {
+            root: {
+              backgroundColor: '#C1F080',
+              color: '#1F2A24',
+              fontWeight: 700,
+            },
+          };
+        }
+        return {};
+      },
+    }),
     ActionIcon: ActionIcon.extend({
       defaultProps: {
         radius: 'xl',
@@ -69,9 +160,13 @@ const theme = createTheme({
     }),
   },
   colors: {
+    bosque,
+    salvia,
+    hueso,
+    lima,
+    arcilla,
     nutralabColor,
   },
-  primaryColor: 'nutralabColor',
 });
 
 import { Notifications } from '@mantine/notifications';

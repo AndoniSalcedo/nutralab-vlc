@@ -293,10 +293,10 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
             <Group gap="sm" style={{ minWidth: 0, flex: 1 }}>
               <Icon3D name="soccer" size={44} style={{ flexShrink: 0 }} />
               <Box style={{ minWidth: 0, flex: 1 }}>
-                <Title order={2} size="h3" fw={700} c="dark.5" lh={1.2}>
+                <Title order={2} size="h3" fw={700} c="var(--nutra-bosque, #1F2A24)" lh={1.2}>
                   Equipos
                 </Title>
-                <Text size="xs" c="dimmed" mt={2} lineClamp={1}>
+                <Text size="xs" style={{ color: 'var(--nutra-salvia, #6C705A)' }} mt={2} lineClamp={1}>
                   Selecciona un equipo para abrir su dashboard.
                 </Text>
               </Box>
@@ -305,6 +305,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
               <Button
                 radius="xl"
                 size="xs"
+                color="lima"
                 leftSection={<IconPlus size={14} />}
                 onClick={openCreate}
                 w={{ base: '100%', sm: 'auto' }}
@@ -321,7 +322,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
               value={search}
               onChange={(event) => setSearch(event.currentTarget.value)}
               radius="xl"
-              variant="filled"
+              variant="default"
               style={{ flex: '1 1 200px', minWidth: 0 }}
               w={{ base: '100%', sm: 'auto' }}
             />
@@ -332,7 +333,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
               onChange={(value) => setSeason(value || '')}
               leftSection={<IconCalendarStats size={16} />}
               radius="xl"
-              variant="filled"
+              variant="default"
               allowDeselect={false}
               style={{ flex: '1 1 180px', minWidth: 0 }}
               w={{ base: '100%', sm: 'auto' }}
@@ -346,12 +347,11 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
               <Paper
                 key={team.id}
                 p="md"
-                radius={24}
                 shadow="xs"
                 bg="white"
+                className="bento-card-hover"
                 style={{
                   cursor: 'pointer',
-                  transition: 'transform 120ms ease, box-shadow 120ms ease',
                 }}
                 onClick={() => router.push(`/dashboard/equipo/${team.id}`)}
               >
@@ -362,12 +362,12 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                         src={team.foto_size ? `/api/media/team-avatar?id=${team.id}&t=${team.updated_at || ''}` : undefined}
                         size={48}
                         radius="md"
-                        color="nutralabColor"
+                        color="bosque"
                         style={{
                           border: '1.5px solid rgba(222, 226, 230, 0.7)',
                           fontWeight: 600,
                           backgroundColor: '#ffffff',
-                          color: 'var(--mantine-color-nutralabColor-9)',
+                          color: 'var(--nutra-bosque)',
                           flexShrink: 0,
                         }}
                         imageProps={{
@@ -383,14 +383,14 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
 
                       <Box style={{ minWidth: 0, flex: 1 }}>
                         <Group gap={6} wrap="nowrap" align="center">
-                          <Title order={4} size="h5" fw={700} c="dark.5" lh={1.2} lineClamp={1}>
+                          <Title order={4} size="h5" fw={700} c="var(--nutra-bosque, #1F2A24)" lh={1.2} lineClamp={1}>
                             {team.nombre}
                           </Title>
-                          <Text size="xs" fw={500} c="dimmed" style={{ flexShrink: 0 }}>
+                          <Text size="xs" fw={500} style={{ color: 'var(--nutra-salvia, #6C705A)', flexShrink: 0 }}>
                             · {team.temporada}
                           </Text>
                         </Group>
-                        <Text size="xs" c="dimmed" lineClamp={1} mt={2}>
+                        <Text size="xs" style={{ color: 'var(--nutra-salvia, #6C705A)' }} lineClamp={1} mt={2}>
                           {team.descripcion || 'Sin descripción'}
                         </Text>
                       </Box>
@@ -436,7 +436,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                             Configuración
                           </Menu.Item>
                           <Menu.Divider />
-                          <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => handleDeleteTeam(team)}>
+                          <Menu.Item color="arcilla" leftSection={<IconTrash size={14} />} onClick={() => handleDeleteTeam(team)}>
                             Eliminar
                           </Menu.Item>
                         </Menu.Dropdown>

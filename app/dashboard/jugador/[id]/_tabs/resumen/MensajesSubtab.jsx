@@ -48,8 +48,7 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
               <Button
                 radius="xl"
                 size="xs"
-                color="blue"
-                variant="light"
+                color="lima"
                 leftSection={<IconPlus size={14} />}
                 onClick={open}
               >
@@ -69,8 +68,7 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
               <Button
                 radius="xl"
                 size="xs"
-                color="blue"
-                variant="light"
+                color="lima"
                 leftSection={<IconPlus size={14} />}
                 onClick={open}
                 fullWidth
@@ -92,7 +90,7 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
         onSent={close}
       />
 
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+      <Box py={{ base: 'sm', sm: 'md' }}>
         {messages.length > 0 ? (
           <Stack gap="sm">
             {messages.map((message) => (

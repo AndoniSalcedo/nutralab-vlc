@@ -32,49 +32,42 @@ export const TEAM_TABS = [
     label: 'Plantilla',
     href: (id) => `/dashboard/equipo/${id}`,
     icon3d: 'plantilla',
-    gradient: 'linear-gradient(135deg, #0A84FF 0%, #0066CC 100%)',
   },
   {
     value: 'evolucion',
     label: 'Evolución',
     href: (id) => `/dashboard/equipo/${id}/evolucion`,
     icon3d: 'evolucion',
-    gradient: 'linear-gradient(135deg, #AF52DE 0%, #8E44AD 100%)',
   },
   {
     value: 'analiticas',
     label: 'Analíticas',
     href: (id) => `/dashboard/equipo/${id}/analiticas`,
     icon3d: 'microscope',
-    gradient: 'linear-gradient(135deg, #FF9500 0%, #E67E22 100%)',
   },
   {
     value: 'intrapartido',
     label: 'Intrapartido',
     href: (id) => `/dashboard/equipo/${id}/intrapartido`,
     icon3d: 'stadium',
-    gradient: 'linear-gradient(135deg, #34C759 0%, #28A745 100%)',
   },
   {
     value: 'suplementacion',
     label: 'Suplementación',
     href: (id) => `/dashboard/equipo/${id}/suplementacion`,
     icon3d: 'suplementacion',
-    gradient: 'linear-gradient(135deg, #5856D6 0%, #4B0082 100%)',
   },
   {
     value: 'menu',
     label: 'Menú semanal',
     href: (id) => `/dashboard/equipo/${id}/menu`,
     icon3d: 'bento_box',
-    gradient: 'linear-gradient(135deg, #FF2D55 0%, #E0245E 100%)',
   },
   {
     value: 'configuracion',
     label: 'Configuración',
     href: (id) => `/dashboard/equipo/${id}/configuracion`,
     icon3d: 'configuracion',
-    gradient: 'linear-gradient(135deg, #8E8E93 0%, #636366 100%)',
   },
 ];
 
@@ -149,11 +142,10 @@ export default function TeamSidebar({
   return (
     <>
       <Paper
+        className="nutra-sidebar"
         radius={24}
         p="md"
-        bg="white"
         style={{
-          boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
           width: '100%',
         }}
       >
@@ -167,7 +159,7 @@ export default function TeamSidebar({
               color="gray"
               size={36}
               radius="xl"
-              style={{ textDecoration: 'none' }}
+              style={{ textDecoration: 'none', color: 'var(--nutra-hueso)' }}
             >
               <IconArrowLeft size={20} />
             </ActionIcon>
@@ -182,7 +174,7 @@ export default function TeamSidebar({
                 color="gray"
                 size={36}
                 radius="xl"
-                style={{ textDecoration: 'none' }}
+                style={{ textDecoration: 'none', color: 'var(--nutra-hueso)' }}
               >
                 <Icon3D name="configuracion" size={20} />
               </ActionIcon>
@@ -197,16 +189,16 @@ export default function TeamSidebar({
               src={avatarSrc || undefined}
               size={112}
               radius="xl"
-              color="nutralabColor"
+              color="bosque"
               style={{
                 width: 112,
                 height: 112,
                 minWidth: 112,
                 minHeight: 112,
-                border: '4px solid white',
-                boxShadow: '0 4px 18px rgba(0,0,0,0.08)',
+                border: '4px solid rgba(255, 255, 255, 0.15)',
+                boxShadow: '0 4px 18px rgba(0,0,0,0.2)',
                 backgroundColor: '#ffffff',
-                color: 'var(--mantine-color-nutralabColor-9)',
+                color: 'var(--nutra-bosque)',
                 fontWeight: 700,
                 fontSize: '32px',
               }}
@@ -250,11 +242,11 @@ export default function TeamSidebar({
             )}
           </Box>
 
-          <Title order={3} fw={700} c="dark.6" fz={18} ta="center" lh={1.2} mt="xs" lineClamp={2}>
+          <Title order={3} fw={700} c="var(--nutra-hueso)" fz={18} ta="center" lh={1.2} mt="xs" lineClamp={2}>
             {team?.nombre || 'Equipo'}
           </Title>
 
-          <Text size="xs" fw={500} c="dimmed" ta="center">
+          <Text size="xs" fw={500} c="var(--nutra-salvia-light)" ta="center">
             {team?.temporada
               ? (team.temporada.toLowerCase().includes('temporada')
                 ? team.temporada
@@ -263,17 +255,17 @@ export default function TeamSidebar({
           </Text>
 
           {team?.descripcion && (
-            <Text size="xs" c="dimmed" ta="center" lineClamp={2} mt={2} px="xs">
+            <Text size="xs" c="var(--nutra-salvia-light)" ta="center" lineClamp={2} mt={2} px="xs" style={{ opacity: 0.85 }}>
               {team.descripcion}
             </Text>
           )}
         </Stack>
 
-        <Divider my="md" color="gray.2" />
+        <Divider my="md" color="rgba(255, 255, 255, 0.1)" />
 
         {/* Tabs de navegación estilo Apple Settings */}
         <Box>
-          <Text size="11px" fw={700} c="dimmed" tt="uppercase" lts={0.8} px={6} mb={8}>
+          <Text size="11px" fw={700} c="var(--nutra-salvia-light)" tt="uppercase" lts={0.8} px={6} mb={8}>
             Secciones
           </Text>
 
@@ -296,14 +288,14 @@ export default function TeamSidebar({
                     width: '100%',
                     padding: '9px 12px',
                     borderRadius: '12px',
-                    backgroundColor: isActive ? 'var(--mantine-color-gray-1)' : 'transparent',
-                    boxShadow: isActive ? 'inset 0 0 0 1px rgba(0, 0, 0, 0.05)' : 'none',
+                    backgroundColor: isActive ? 'var(--nutra-sidebar-active-bg)' : 'transparent',
+                    boxShadow: isActive ? 'inset 0 0 0 1px rgba(193, 240, 128, 0.28)' : 'none',
                     transition: 'all 140ms ease',
                     textDecoration: 'none',
                     cursor: 'pointer',
                   }}
                   onMouseEnter={(e) => {
-                    if (!isActive) e.currentTarget.style.backgroundColor = 'var(--mantine-color-gray-0)';
+                    if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.07)';
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
@@ -318,8 +310,9 @@ export default function TeamSidebar({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        background: tab.gradient,
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.12)',
+                        background: isActive ? 'var(--nutra-lima, #C1F080)' : 'rgba(255, 255, 255, 0.08)',
+                        boxShadow: isActive ? '0 2px 8px var(--nutra-lima-glow)' : 'none',
+                        border: isActive ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
                         flexShrink: 0,
                       }}
                     >
@@ -327,8 +320,8 @@ export default function TeamSidebar({
                     </Box>
                     <Text
                       size="sm"
-                      fw={isActive ? 650 : 500}
-                      c={isActive ? 'dark.9' : 'dark.6'}
+                      fw={isActive ? 700 : 500}
+                      c={isActive ? 'var(--nutra-lima)' : '#d7e2da'}
                     >
                       {tab.label}
                     </Text>
@@ -338,7 +331,7 @@ export default function TeamSidebar({
                     size={14}
                     stroke={2}
                     style={{
-                      color: isActive ? 'var(--mantine-color-dark-4)' : 'var(--mantine-color-gray-4)',
+                      color: isActive ? 'var(--nutra-lima)' : 'rgba(255, 255, 255, 0.35)',
                       transform: isActive ? 'translateX(2px)' : 'none',
                       transition: 'transform 140ms ease',
                     }}

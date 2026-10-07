@@ -78,8 +78,8 @@ export default function PlayerCredentialsButton({ jugador, compact = false, menu
         <Button
           size="xs"
           radius="xl"
-          variant={hasCredentials ? 'light' : 'filled'}
-          color={hasCredentials ? 'gray' : 'yellow'}
+          variant={hasCredentials ? 'default' : 'filled'}
+          color={hasCredentials ? 'gray' : 'lima'}
           leftSection={<Icon3D name={hasCredentials ? "shield" : "key"} size={18} />}
           onClick={openModal}
         >

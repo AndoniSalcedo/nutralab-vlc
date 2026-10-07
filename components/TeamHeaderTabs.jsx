@@ -161,7 +161,7 @@ export default function TeamHeaderTabs({
                     src={teamId ? `/api/media/team-avatar?id=${teamId}&t=${team?.updated_at || ''}` : undefined}
                     size={40}
                     radius="xl"
-                    color="nutralabColor"
+                    color="bosque"
                     imageProps={{
                       style: { objectFit: 'contain', backgroundColor: '#ffffff', padding: '2px' },
                     }}
@@ -204,7 +204,7 @@ export default function TeamHeaderTabs({
             <Paper
               radius={24}
               p={hasDesktopHeaderContent ? 'md' : 0}
-              bg="white"
+              bg={hasDesktopHeaderContent ? 'white' : 'transparent'}
               mb={hasDesktopHeaderContent ? 'md' : 0}
               style={{
                 boxShadow: hasDesktopHeaderContent ? '0 0 2px 0 rgba(0,0,0,0.1)' : 'none',
@@ -214,7 +214,7 @@ export default function TeamHeaderTabs({
               <Group justify="space-between" align="center" wrap="nowrap" mb={slotContext?.hasDesktopFilters ? 'xs' : 0}>
                 <Group gap={8} align="center">
                   <Icon3D name={currentTabConfig?.icon3d || 'plantilla'} size={22} />
-                  <Title order={3} fz={18} fw={700} c="dark.6">
+                  <Title order={3} fz={18} fw={700} c="var(--nutra-bosque, #1F2A24)">
                     {currentTabConfig?.label || 'Plantilla'}
                   </Title>
                 </Group>
@@ -249,11 +249,11 @@ export default function TeamHeaderTabs({
           left: 0,
           right: 0,
           zIndex: 100,
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          backgroundColor: 'rgba(255, 255, 255, 0.96)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
-          borderTop: '1px solid rgba(222, 226, 230, 0.85)',
-          boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.06)',
+          borderTop: '1px solid rgba(108, 112, 90, 0.18)',
+          boxShadow: '0 -4px 20px rgba(31, 42, 36, 0.05)',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 8px) + 2px)',
         }}
       >
@@ -277,7 +277,7 @@ export default function TeamHeaderTabs({
                   flex: 1,
                   height: '100%',
                   textDecoration: 'none',
-                  color: isActive ? '#1c1f1a' : 'var(--mantine-color-gray-6)',
+                  color: isActive ? 'var(--nutra-bosque, #1F2A24)' : 'var(--nutra-salvia, #6C705A)',
                   position: 'relative',
                   paddingTop: 4,
                   transition: 'color 140ms ease, transform 100ms ease',
@@ -291,7 +291,7 @@ export default function TeamHeaderTabs({
                       width: 20,
                       height: 3,
                       borderRadius: 3,
-                      backgroundColor: '#24291f',
+                      backgroundColor: 'var(--nutra-lima, #C1F080)',
                     }}
                   />
                 )}
@@ -309,8 +309,8 @@ export default function TeamHeaderTabs({
                   fw={isActive ? 750 : 500}
                   lh={1.2}
                   mt={3}
-                  c={isActive ? '#1c1f1a' : 'dimmed'}
                   style={{
+                    color: isActive ? 'var(--nutra-bosque, #1F2A24)' : 'var(--nutra-salvia, #6C705A)',
                     letterSpacing: '-0.2px',
                   }}
                 >

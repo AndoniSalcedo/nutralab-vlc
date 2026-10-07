@@ -138,7 +138,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
         </Stack>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+      <Box py={{ base: 'sm', sm: 'md' }}>
         <Stack gap="md">
           {activeProtocol ? (
             <Stack gap="md">
@@ -160,6 +160,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
                     )}
                     <Button
                       variant="light"
+                      color="bosque"
                       size="xs"
                       leftSection={<IconPencil size={14} />}
                       onClick={() => setEditorOpen(true)}

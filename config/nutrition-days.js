@@ -5,10 +5,6 @@ function getNutritionDayType(key) {
   return FOOTBALL_DAY_TYPES.find((dayType) => dayType.key === key) || null;
 }
 
-export function getDayTypeColor(key) {
-  return getNutritionDayType(key)?.color || 'green';
-}
-
 export function getDayTypeLabel(key) {
   return getNutritionDayType(key)?.label || key;
 }

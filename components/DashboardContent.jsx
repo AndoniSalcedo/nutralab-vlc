@@ -63,8 +63,8 @@ function PlayerSemaforoIndicator({ semaforo }) {
 
   const statusConfigMap = {
     verde: {
-      color: '#2e7d32',
-      dotColor: '#2e7d32',
+      color: '#4a6813',
+      dotColor: '#719e1f',
       title: 'Óptimo',
     },
     amarillo: {
@@ -73,8 +73,8 @@ function PlayerSemaforoIndicator({ semaforo }) {
       title: 'Precaución',
     },
     rojo: {
-      color: '#c92a2a',
-      dotColor: '#e03131',
+      color: '#B8674A',
+      dotColor: '#B8674A',
       title: diff < 0 ? 'Pérdida' : 'Exceso',
     },
   };
@@ -885,7 +885,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
               <Button
                 size="xs"
                 radius="xl"
-                color="dark"
+                color="lima"
                 leftSection={<Icon3D name="plus" size={18} />}
                 onClick={() => setActiveModal('new-player')}
               >
@@ -920,7 +920,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
             <TextInput
               placeholder="Buscar jugador por nombre..."
               leftSection={<Icon3D name="search" size={18} />}
-              variant="filled"
+              variant="default"
               radius="xl"
               size="sm"
               value={filters.name}
@@ -936,7 +936,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
               data={positionOptions || []}
               value={filters.position}
               onChange={(value) => setFilters((current) => ({ ...current, position: value || '' }))}
-              variant="filled"
+              variant="default"
               radius="xl"
               size="sm"
               allowDeselect={false}
@@ -945,7 +945,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
             <TextInput
               placeholder="Buscar por email..."
               leftSection={<Icon3D name="envelope" size={18} />}
-              variant="filled"
+              variant="default"
               radius="xl"
               size="sm"
               value={filters.email}
@@ -966,20 +966,20 @@ export default function DashboardContent({ players = [], team, readOnly = false 
             <WidgetCard
               icon="players"
               title="Plantilla"
-              color="teal"
-              aside={<WidgetAside color="teal">{filteredPlayers.length} jugadores</WidgetAside>}
+              color="salvia"
+              aside={<WidgetAside color="salvia">{filteredPlayers.length} jugadores</WidgetAside>}
               style={{ height: 'auto', width: '100%', minWidth: 0 }}
             >
               <Box mx={-16} mb={-16}>
               <ScrollArea style={{ width: '100%', minWidth: 0 }}>
                 <Table verticalSpacing="sm" highlightOnHover w="100%" miw={{ base: '100%', sm: 760 }}>
-                  <Table.Thead bg="rgba(248, 249, 250, 0.95)">
+                  <Table.Thead style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)' }}>
                     <Table.Tr>
-                      <Table.Th style={{ paddingLeft: 16, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Jugador</Table.Th>
-                      <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Métricas</Table.Th>
-                      <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Semáforo Peso</Table.Th>
-                      <Table.Th visibleFrom="sm" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Plan Nutricional</Table.Th>
-                      <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Posición</Table.Th>
+                      <Table.Th style={{ paddingLeft: 16, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Jugador</Table.Th>
+                      <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Métricas</Table.Th>
+                      <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Semáforo Peso</Table.Th>
+                      <Table.Th visibleFrom="sm" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Plan Nutricional</Table.Th>
+                      <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Posición</Table.Th>
                       {!readOnly && <Table.Th w={50} />}
                     </Table.Tr>
                   </Table.Thead>
@@ -999,14 +999,14 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                               size={42}
                               radius="xl"
                               color="initials"
-                              style={{ border: '1.5px solid rgba(222, 226, 230, 0.7)', flexShrink: 0 }}
+                              style={{ border: '1.5px solid rgba(108, 112, 90, 0.2)', flexShrink: 0 }}
                             >
                               {initials(`${player.nombre} ${player.apellidos || ''}`)}
                             </Avatar>
                             <Box style={{ minWidth: 0, flex: 1 }}>
 
                               <Group gap={6} wrap="nowrap">
-                                <Text fz="sm" fw={600} c="dark.5" truncate>
+                                <Text fz="sm" fw={600} c="var(--nutra-bosque, #1F2A24)" truncate>
                                   {player.nombre} {player.apellidos}
                                 </Text>
                                 {!player.auth_user_id && (
@@ -1017,14 +1017,14 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                                   </Tooltip>
                                 )}
                               </Group>
-                              <Text c="dimmed" fz="xs" style={{ lineHeight: 1.2 }} truncate>
+                              <Text c="var(--nutra-salvia, #6C705A)" fz="xs" style={{ lineHeight: 1.2 }} truncate>
                                 {player.auth_email || 'Sin credenciales de acceso'}
                               </Text>
 
                               {/* Indicadores en móvil sin necesidad de columnas adicionales */}
                               <Group gap={6} align="center" hiddenFrom="xs" mt={3}>
                                 {player.peso_kg ? (
-                                  <Text fz="xs" fw={500} c="dimmed">
+                                  <Text fz="xs" fw={500} c="var(--nutra-salvia, #6C705A)">
                                     {player.peso_kg} kg
                                   </Text>
                                 ) : null}
@@ -1034,10 +1034,10 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                                     fw={600}
                                     c={
                                       player.semaforo.status === 'verde'
-                                        ? '#2e7d32'
+                                        ? '#4a6813'
                                         : player.semaforo.status === 'amarillo'
                                           ? '#b45309'
-                                          : '#c92a2a'
+                                          : '#B8674A'
                                     }
                                   >
                                     ● {player.semaforo.diff > 0 ? `+${player.semaforo.diff.toFixed(1)}` : player.semaforo.diff.toFixed(1)} kg
@@ -1052,16 +1052,16 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                         <Table.Td visibleFrom="xs">
                           {player.peso_kg || player.porcentaje_grasa ? (
                             <Box>
-                              <Text fz="sm" fw={600} c="dark.5">
+                              <Text fz="sm" fw={600} c="var(--nutra-bosque, #1F2A24)">
                                 {player.peso_kg ? `${player.peso_kg} kg` : '—'}
                                 {player.porcentaje_grasa ? (
-                                  <Text component="span" c="dimmed" fw={400} fz="xs"> · {player.porcentaje_grasa}% GC</Text>
+                                  <Text component="span" c="var(--nutra-salvia, #6C705A)" fw={400} fz="xs"> · {player.porcentaje_grasa}% GC</Text>
                                 ) : ''}
                               </Text>
-                              <Text fz="xs" c="dimmed">Composición corporal</Text>
+                              <Text fz="xs" c="var(--nutra-salvia, #6C705A)">Composición corporal</Text>
                             </Box>
                           ) : (
-                            <Text fz="sm" c="dimmed">—</Text>
+                            <Text fz="sm" c="var(--nutra-salvia, #6C705A)">—</Text>
                           )}
                         </Table.Td>
 
@@ -1076,16 +1076,16 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                             <Group gap={8} wrap="nowrap" align="center">
                               <Icon3D name="fire" size={24} />
                               <Box>
-                                <Text fz="sm" fw={600} c="dark.5" lh={1.1}>
+                                <Text fz="sm" fw={600} c="var(--nutra-bosque, #1F2A24)" lh={1.1}>
                                   {player.plan.kcal} kcal
                                 </Text>
-                                <Text fz="xs" c="dimmed">
+                                <Text fz="xs" c="var(--nutra-salvia, #6C705A)">
                                   {player.plan.calculated ? 'Estimado' : 'Objetivo'}
                                 </Text>
                               </Box>
                             </Group>
                           ) : (
-                            <Text fz="sm" c="dimmed">—</Text>
+                            <Text fz="sm" c="var(--nutra-salvia, #6C705A)">—</Text>
                           )}
                         </Table.Td>
 
@@ -1127,7 +1127,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                                     onSaved={(credentials) => updateCredentials(player.id, credentials)}
                                   />
                                   <Menu.Divider />
-                                  <Menu.Item color="red" leftSection={<Icon3D name="trash" size={18} />} onClick={() => handleDeletePlayer(player)}>
+                                  <Menu.Item color="arcilla" leftSection={<Icon3D name="trash" size={18} />} onClick={() => handleDeletePlayer(player)}>
                                     Eliminar
                                   </Menu.Item>
                                 </Menu.Dropdown>
@@ -1141,12 +1141,13 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                 </Table>
               </ScrollArea>
 
-              <Group justify="center" p="md" bg="gray.0" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+              <Group justify="center" p="md" style={{ borderTop: '1px solid rgba(108, 112, 90, 0.12)' }}>
                 <Pagination
                   total={totalPages}
                   value={page}
                   onChange={setPage}
                   radius="xl"
+                  color="bosque"
                 />
               </Group>
               </Box>

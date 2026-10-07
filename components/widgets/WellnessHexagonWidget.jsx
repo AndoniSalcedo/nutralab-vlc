@@ -68,8 +68,8 @@ function HexagonChart({ today, average }) {
           <stop offset="100%" stopColor="var(--mantine-color-gray-1)" />
         </linearGradient>
         <linearGradient id="wellness-today" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="var(--mantine-color-teal-4)" stopOpacity="0.75" />
-          <stop offset="100%" stopColor="var(--mantine-color-lime-4)" stopOpacity="0.55" />
+          <stop offset="0%" stopColor="var(--nutra-salvia, #6C705A)" stopOpacity="0.75" />
+          <stop offset="100%" stopColor="var(--nutra-lima, #C1F080)" stopOpacity="0.75" />
         </linearGradient>
       </defs>
 
@@ -203,14 +203,14 @@ export default function WellnessHexagonWidget({ jugadorId, canEdit = true }) {
   return (
     <WidgetCard
       id="widget-bienestar"
-      color="pink"
+      color="salvia"
       icon="heart"
       title="Bienestar"
       aside={
         overall !== null ? (
           <Group gap={6} align="center" wrap="nowrap">
             {delta !== null && (
-              <Text fz="xs" fw={700} c={delta >= 0 ? 'teal.7' : 'red.7'} style={{ whiteSpace: 'nowrap' }}>
+              <Text fz="xs" fw={700} style={{ color: delta >= 0 ? 'var(--nutra-lima-dark, #4a6813)' : 'var(--nutra-arcilla, #B8674A)', whiteSpace: 'nowrap' }}>
                 {delta >= 0 ? '▲' : '▼'} {Math.abs(delta)} vs media
               </Text>
             )}

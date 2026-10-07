@@ -413,7 +413,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
         onChange={setActiveTab}
         variant="outline"
         radius="md"
-        color="orange"
+        color="bosque"
       >
         <Tabs.List grow mb="md">
           <Tabs.Tab value="record" leftSection={<IconEdit size={16} />}>
@@ -528,7 +528,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
               <Button
                 size="xs"
                 radius="xl"
-                color="orange"
+                color="lima"
                 leftSection={<IconCheck size={16} />}
                 onClick={handleSave}
                 loading={saving}
@@ -708,7 +708,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
                             checked={isSelected}
                             onChange={() => togglePlayer(player.id)}
                             onClick={(e) => e.stopPropagation()}
-                            color="orange"
+                            color="bosque"
                             size="sm"
                           />
                           <Avatar
@@ -823,8 +823,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
                 <Button
                   size="xs"
                   radius="xl"
-                  color="teal"
-                  variant="light"
+                  variant="default"
                   leftSection={<IconFileSpreadsheet size={16} />}
                   onClick={handleExportExcel}
                   disabled={selectedPlayerIds.size === 0}
@@ -835,7 +834,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
                 <Button
                   size="xs"
                   radius="xl"
-                  color="orange"
+                  color="lima"
                   leftSection={<IconFileTypePdf size={16} />}
                   onClick={handleExportPdf}
                   loading={exportingPdf}

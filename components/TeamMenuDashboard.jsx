@@ -336,7 +336,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
         {isEditing ? (
           <Group gap="xs" wrap="nowrap">
             <Button
-              color="green"
+              color="lima"
               radius="xl"
               size="xs"
               onClick={handleSaveMenu}
@@ -346,8 +346,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
               Guardar
             </Button>
             <Button
-              variant="light"
-              color="gray"
+              variant="default"
               radius="xl"
               size="xs"
               onClick={handleCancelEdit}
@@ -377,7 +376,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
                   <Menu.Dropdown>
                     <Menu.Label>Gestión de menú semanal</Menu.Label>
                     <Menu.Item
-                      leftSection={<IconPlus size={16} color="var(--mantine-color-nutralabColor-8)" />}
+                      leftSection={<IconPlus size={16} />}
                       onClick={() => setCreateModalOpen(true)}
                     >
                       Nuevo menú
@@ -385,13 +384,13 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
                     {selectedMenu && (
                       <>
                         <Menu.Item
-                          leftSection={<IconEdit size={16} color="var(--mantine-color-teal-6)" />}
+                          leftSection={<IconEdit size={16} />}
                           onClick={handleStartEdit}
                         >
                           Editar menú
                         </Menu.Item>
                         <Menu.Item
-                          color="red"
+                          color="arcilla"
                           leftSection={<IconTrash size={16} />}
                           onClick={() => handleDeleteMenu(selectedMenu.id)}
                         >
@@ -408,7 +407,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
                 <Button
                   size="xs"
                   radius="xl"
-                  color="nutralabColor.8"
+                  color="lima"
                   onClick={() => setCreateModalOpen(true)}
                   leftSection={<IconPlus size={14} />}
                 >
@@ -419,8 +418,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
                     <Button
                       size="xs"
                       radius="xl"
-                      variant="light"
-                      color="teal"
+                      variant="default"
                       onClick={handleStartEdit}
                       leftSection={<IconEdit size={14} />}
                     >
@@ -430,7 +428,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
                       size="xs"
                       radius="xl"
                       variant="light"
-                      color="red"
+                      color="arcilla"
                       onClick={() => handleDeleteMenu(selectedMenu.id)}
                       loading={deleting}
                       leftSection={<IconTrash size={14} />}

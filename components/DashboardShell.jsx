@@ -53,14 +53,14 @@ export default function DashboardShell({ children, user }) {
     <Box
       style={{
         minHeight: "100vh",
-        backgroundColor: "var(--mantine-color-gray-0)",
+        backgroundColor: "var(--nutra-app-bg, #F8F7F4)",
       }}
     >
       <Box
         component="header"
         style={{
-          borderBottom: "1px solid var(--mantine-color-gray-2)",
-          backgroundColor: "var(--mantine-color-white)",
+          borderBottom: "1px solid var(--nutra-card-border, rgba(108, 112, 90, 0.12))",
+          backgroundColor: "#FFFFFF",
           paddingTop: "var(--mantine-spacing-xs)",
           paddingBottom: "var(--mantine-spacing-xs)",
         }}
@@ -174,7 +174,7 @@ export default function DashboardShell({ children, user }) {
                 </Menu.Item>
 
                 <Menu.Item
-                  color="red"
+                  color="arcilla"
                   leftSection={<IconLogout size={16} stroke={1.5} />}
                   onClick={handleLogout}
                 >
@@ -186,8 +186,8 @@ export default function DashboardShell({ children, user }) {
               <Button
                 component="a"
                 href="/login"
-                variant="light"
-                color="nutralabColor"
+                variant="filled"
+                color="lima"
                 size="xs"
                 radius="xl"
               >

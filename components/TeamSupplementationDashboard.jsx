@@ -78,19 +78,19 @@ export default function TeamSupplementationDashboard({
                 <Menu.Dropdown>
                   <Menu.Label>Gestión de suplementación</Menu.Label>
                   <Menu.Item
-                    leftSection={<IconUsers size={16} color="var(--mantine-color-grape-6)" />}
+                    leftSection={<IconUsers size={16} color="var(--nutra-salvia)" />}
                     onClick={() => setManagerModal('assign')}
                   >
                     Asignar fases
                   </Menu.Item>
                   <Menu.Item
-                    leftSection={<IconList size={16} color="var(--mantine-color-grape-6)" />}
+                    leftSection={<IconList size={16} color="var(--nutra-salvia)" />}
                     onClick={() => setManagerModal('catalogs')}
                   >
                     Catálogos
                   </Menu.Item>
                   <Menu.Item
-                    leftSection={<IconPill size={16} color="var(--mantine-color-grape-6)" />}
+                    leftSection={<IconPill size={16} color="var(--nutra-salvia)" />}
                     onClick={() => setManagerModal('supplements')}
                   >
                     Suplementos
@@ -103,8 +103,7 @@ export default function TeamSupplementationDashboard({
               <Button
                 size="xs"
                 radius="xl"
-                variant="light"
-                color="grape"
+                color="lima"
                 onClick={() => setManagerModal('assign')}
                 leftSection={<IconUsers size={14} />}
               >
@@ -113,8 +112,7 @@ export default function TeamSupplementationDashboard({
               <Button
                 size="xs"
                 radius="xl"
-                variant="light"
-                color="grape"
+                variant="default"
                 onClick={() => setManagerModal('catalogs')}
                 leftSection={<IconList size={14} />}
               >
@@ -123,8 +121,7 @@ export default function TeamSupplementationDashboard({
               <Button
                 size="xs"
                 radius="xl"
-                variant="light"
-                color="grape"
+                variant="default"
                 onClick={() => setManagerModal('supplements')}
                 leftSection={<IconPill size={14} />}
               >
@@ -140,18 +137,18 @@ export default function TeamSupplementationDashboard({
           <WidgetCard
             icon="suplementacion"
             title="Suplementación por jugador"
-            color="violet"
-            aside={<WidgetAside color="violet">{players.length} jugadores</WidgetAside>}
+            color="salvia"
+            aside={<WidgetAside color="salvia">{players.length} jugadores</WidgetAside>}
             style={{ height: 'auto', width: '100%', minWidth: 0 }}
           >
             <Box mx={-16} mb={-16}>
             <ScrollArea style={{ width: '100%', minWidth: 0 }}>
               <Table verticalSpacing="sm" highlightOnHover w="100%" miw={{ base: '100%', sm: 600 }}>
-            <Table.Thead bg="rgba(248, 249, 250, 0.95)">
+            <Table.Thead style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)' }}>
               <Table.Tr>
-                <Table.Th style={{ paddingLeft: 16, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Jugador</Table.Th>
-                <Table.Th visibleFrom="sm" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Catálogo Activo (Fase)</Table.Th>
-                <Table.Th visibleFrom="sm" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--mantine-color-gray-6)' }}>Extras</Table.Th>
+                <Table.Th style={{ paddingLeft: 16, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Jugador</Table.Th>
+                <Table.Th visibleFrom="sm" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Catálogo Activo (Fase)</Table.Th>
+                <Table.Th visibleFrom="sm" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Extras</Table.Th>
                 <Table.Th w={{ base: 50, sm: 110 }} style={{ textAlign: 'right', paddingRight: 16 }} />
               </Table.Tr>
             </Table.Thead>
@@ -188,15 +185,15 @@ export default function TeamSupplementationDashboard({
                             {catalog ? (
                               <Group gap={4} align="center">
                                 <IconBottle size={16} />
-                                <Text size="11px" fw={600} c="grape.8">{catalog.nombre}</Text>
+                                <Text size="11px" fw={600} c="var(--nutra-bosque, #1F2A24)">{catalog.nombre}</Text>
                               </Group>
                             ) : (
-                              <Text size="11px" c="dimmed">Sin fase</Text>
+                              <Text size="11px" c="var(--nutra-salvia, #6C705A)">Sin fase</Text>
                             )}
                             {extrasCount > 0 && (
                               <Group gap={4} align="center">
-                                <Text size="8px" c="grape.6">●</Text>
-                                <Text size="11px" fw={600} c="dark.3">
+                                <Text size="8px" c="var(--nutra-salvia, #6C705A)">●</Text>
+                                <Text size="11px" fw={600} c="var(--nutra-bosque, #1F2A24)">
                                   {extrasCount} {extrasCount === 1 ? 'extra' : 'extras'}
                                 </Text>
                               </Group>
@@ -210,23 +207,23 @@ export default function TeamSupplementationDashboard({
                       {catalog ? (
                         <Group gap={6}>
                           <IconBottle size={16} />
-                          <Text size="sm" fw={500}>{catalog.nombre}</Text>
+                          <Text size="sm" fw={500} c="var(--nutra-bosque, #1F2A24)">{catalog.nombre}</Text>
                         </Group>
                       ) : (
-                        <Text size="sm" c="dimmed">—</Text>
+                        <Text size="sm" c="var(--nutra-salvia, #6C705A)">—</Text>
                       )}
                     </Table.Td>
 
                     <Table.Td visibleFrom="sm">
                       {extrasCount > 0 ? (
                         <Group gap={6} align="center" wrap="nowrap">
-                          <Text size="8px" c="grape.6">●</Text>
-                          <Text size="sm" fw={600} c="dark.4">
-                            {extrasCount} <Text component="span" c="dimmed" fw={400} size="xs">{extrasCount === 1 ? 'suplemento' : 'suplementos'}</Text>
+                          <Text size="8px" c="var(--nutra-salvia, #6C705A)">●</Text>
+                          <Text size="sm" fw={600} c="var(--nutra-bosque, #1F2A24)">
+                            {extrasCount} <Text component="span" c="var(--nutra-salvia, #6C705A)" fw={400} size="xs">{extrasCount === 1 ? 'suplemento' : 'suplementos'}</Text>
                           </Text>
                         </Group>
                       ) : (
-                        <Text size="sm" c="dimmed">—</Text>
+                        <Text size="sm" c="var(--nutra-salvia, #6C705A)">—</Text>
                       )}
                     </Table.Td>
 

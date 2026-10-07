@@ -30,7 +30,7 @@ export default function SupplementHistoryModal({
         </Text>
 
         {historyModal.historyEvents.length > 0 ? (
-          <Timeline active={0} bulletSize={24} lineWidth={2} color="grape">
+          <Timeline active={0} bulletSize={24} lineWidth={2} color="bosque">
             {historyModal.historyEvents.map((event) => {
               const catalog = catalogsById.get(String(event.lista_id));
               return (

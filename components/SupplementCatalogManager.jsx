@@ -357,7 +357,7 @@ export default function SupplementCatalogManager({
         )}
 
         <Tabs.Panel value="assign" pt="md">
-          <BentoCard title="Asignar a jugadores" icon={IconUsers} color="grape">
+          <BentoCard title="Asignar a jugadores" icon={IconUsers} color="salvia">
             <SegmentedControl
               value={assignmentType}
               onChange={(val) => setAssignmentType(val)}
@@ -365,7 +365,7 @@ export default function SupplementCatalogManager({
                 { label: 'Asignar Catálogo', value: 'catalog' },
                 { label: 'Asignar Suplemento Extra', value: 'extra' },
               ]}
-              color="grape"
+              color="bosque"
               mb="md"
               fullWidth
             />
@@ -432,14 +432,14 @@ export default function SupplementCatalogManager({
                 <Button
                   variant="subtle"
                   size="compact-xs"
-                  color="grape"
+                  color="bosque"
                   onClick={() => setSelectedPlayerIds(displayPlayers.map((p) => p.id))}
                 >
                   Seleccionar todos
                 </Button>
                 <Button
                   variant="subtle"
-                  color="red"
+                  color="arcilla"
                   size="compact-xs"
                   onClick={() => setSelectedPlayerIds([])}
                 >
@@ -466,7 +466,7 @@ export default function SupplementCatalogManager({
                         );
                       }}
                       size="sm"
-                      color="grape"
+                      color="bosque"
                     />
                   );
                 })}
@@ -474,7 +474,7 @@ export default function SupplementCatalogManager({
             </ScrollArea>
 
             <Group justify="flex-end" mt="xs">
-              <Button radius="xl" size="xs" leftSection={<IconUsers size={15} />} onClick={assignToSelectedPlayers} loading={saving}>
+              <Button radius="xl" size="xs" color="lima" leftSection={<IconUsers size={15} />} onClick={assignToSelectedPlayers} loading={saving}>
                 Asignar a jugadores
               </Button>
             </Group>
@@ -485,14 +485,14 @@ export default function SupplementCatalogManager({
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md" align="start">
             {/* Left Column: Selector & Creation */}
             <Stack gap="md">
-              <BentoCard title="Seleccionar catálogo" icon={IconCardFile} color="teal">
+              <BentoCard title="Seleccionar catálogo" icon={IconCardFile} color="salvia">
                 <Select
                   placeholder="Selecciona un catálogo para gestionar"
                   data={listOptions}
                   value={selectedListId}
                   onChange={(value) => setSelectedListId(value || '')}
                   searchable
-                  variant="filled"
+                  variant="default"
                   radius="md"
                 />
 
@@ -506,7 +506,7 @@ export default function SupplementCatalogManager({
                       size="xs"
                       radius="xl"
                       variant="light"
-                      color="red"
+                      color="arcilla"
                       leftSection={<IconTrash size={14} />}
                       onClick={() => deleteList(selectedList.id, selectedList.nombre)}
                       mt="xs"
@@ -517,7 +517,7 @@ export default function SupplementCatalogManager({
                 )}
               </BentoCard>
 
-              <BentoCard title="Crear catálogo" icon={IconCirclePlus} color="blue">
+              <BentoCard title="Crear catálogo" icon={IconCirclePlus} color="salvia">
                 <TextInput
                   label="Nombre del catálogo"
                   placeholder="Ej. Pretemporada alta carga"
@@ -539,7 +539,7 @@ export default function SupplementCatalogManager({
                   }}
                 />
                 <Group justify="flex-end">
-                  <Button radius="xl" size="xs" onClick={createList} loading={saving} disabled={!listForm.nombre.trim()}>
+                  <Button radius="xl" size="xs" color="lima" onClick={createList} loading={saving} disabled={!listForm.nombre.trim()}>
                     Crear catálogo
                   </Button>
                 </Group>
@@ -565,6 +565,7 @@ export default function SupplementCatalogManager({
                     <Button
                       radius="xl"
                       size="sm"
+                      color="lima"
                       onClick={addSupplementToList}
                       loading={saving}
                       disabled={!selectedSupplementId}
@@ -590,7 +591,7 @@ export default function SupplementCatalogManager({
                                   </Group>
                                   <Text size="xs" c="dimmed" truncate>{suplemento?.dose_text || suplemento?.pauta || 'Según pauta'}</Text>
                                 </Stack>
-                                <ActionIcon color="red" variant="subtle" radius="xl" onClick={() => removeItem(item.id)} aria-label="Quitar suplemento">
+                                <ActionIcon color="arcilla" variant="subtle" radius="xl" onClick={() => removeItem(item.id)} aria-label="Quitar suplemento">
                                   <IconTrash size={16} />
                                 </ActionIcon>
                               </Group>
@@ -623,7 +624,7 @@ export default function SupplementCatalogManager({
         <Tabs.Panel value="supplements" pt="md">
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md" align="start">
             {/* Left Column: Supplements List */}
-            <BentoCard title="Catálogo de suplementos" icon={IconJar} color="blue">
+            <BentoCard title="Catálogo de suplementos" icon={IconJar} color="salvia">
               <TextInput
                 placeholder="Buscar por nombre o categoría..."
                 value={searchQuery}
@@ -666,7 +667,7 @@ export default function SupplementCatalogManager({
                             </Group>
                             <Group gap={4} style={{ flexShrink: 0 }}>
                               <ActionIcon
-                                color="blue"
+                                color="bosque"
                                 variant="subtle"
                                 radius="xl"
                                 onClick={() => handleSelectEditSupplement(supp)}
@@ -675,7 +676,7 @@ export default function SupplementCatalogManager({
                                 <IconPencil size={16} />
                               </ActionIcon>
                               <ActionIcon
-                                color="red"
+                                color="arcilla"
                                 variant="subtle"
                                 radius="xl"
                                 onClick={() => deleteSupplement(supp.id, supp.nombre)}
@@ -699,7 +700,7 @@ export default function SupplementCatalogManager({
             <BentoCard
               title={editingSupplementId ? `Editar: ${supplementForm.nombre || 'Suplemento'}` : "Crear suplemento"}
               icon={editingSupplementId ? IconPencil : IconCirclePlus}
-              color="teal"
+              color="salvia"
             >
               <Stack gap="sm">
                 <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
@@ -828,6 +829,7 @@ export default function SupplementCatalogManager({
                 <Button
                   radius="xl"
                   size="xs"
+                  color="lima"
                   leftSection={editingSupplementId ? <IconPencil size={15} /> : <IconCirclePlus size={15} />}
                   onClick={editingSupplementId ? updateSupplement : createSupplement}
                   loading={saving}

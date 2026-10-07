@@ -35,15 +35,15 @@ import classes from '../SubtabSectionHeader.module.css';
 
 // Icono y color de categoría de cada métrica (mismo lenguaje que los widgets del Perfil)
 const METRIC_STYLE = {
-  peso_kg: { icon: 'scale', color: 'blue' },
-  porcentaje_grasa: { icon: 'fire', color: 'red' },
-  porcentaje_musculo: { icon: 'gym', color: 'green' },
-  suma_6_pliegues: { icon: 'target', color: 'orange' },
-  suma_8_pliegues: { icon: 'target', color: 'violet' },
-  perimetro_muslo_derecho: { icon: 'running', color: 'cyan' },
-  perimetro_muslo_izquierdo: { icon: 'running', color: 'teal' },
-  perimetro_pantorrilla_derecha: { icon: 'running_shoe', color: 'lime' },
-  perimetro_pantorrilla_izquierda: { icon: 'running_shoe', color: 'orange' },
+  peso_kg: { icon: 'scale', color: 'salvia' },
+  porcentaje_grasa: { icon: 'fire', color: 'salvia' },
+  porcentaje_musculo: { icon: 'gym', color: 'salvia' },
+  suma_6_pliegues: { icon: 'target', color: 'salvia' },
+  suma_8_pliegues: { icon: 'target', color: 'salvia' },
+  perimetro_muslo_derecho: { icon: 'running', color: 'salvia' },
+  perimetro_muslo_izquierdo: { icon: 'running', color: 'salvia' },
+  perimetro_pantorrilla_derecha: { icon: 'running_shoe', color: 'salvia' },
+  perimetro_pantorrilla_izquierda: { icon: 'running_shoe', color: 'salvia' },
 };
 import MeasurementModal from '@/components/modals/MeasurementModal';
 import { DateInput } from '@mantine/dates';
@@ -376,13 +376,13 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
 
             {!readOnly && !isMobile && (
               <Group gap="xs">
-                <Button size="xs" variant="light" color="red" radius="xl" leftSection={<IconTrash size={14} />} onClick={handleDelete} loading={deleting} disabled={!selected}>
+                <Button size="xs" variant="light" color="arcilla" radius="xl" leftSection={<IconTrash size={14} />} onClick={handleDelete} loading={deleting} disabled={!selected}>
                   Borrar
                 </Button>
-                <Button size="xs" variant="light" color="dark" radius="xl" leftSection={<IconEdit size={14} />} disabled={!selected} onClick={startEdit}>
+                <Button size="xs" variant="light" color="bosque" radius="xl" leftSection={<IconEdit size={14} />} disabled={!selected} onClick={startEdit}>
                   Editar
                 </Button>
-                <Button size="xs" radius="xl" leftSection={<IconPlus size={14} />} onClick={startNew}>
+                <Button size="xs" radius="xl" color="lima" leftSection={<IconPlus size={14} />} onClick={startNew}>
                   Añadir
                 </Button>
               </Group>
@@ -399,13 +399,13 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
             <Stack gap="sm">
               {!readOnly && isMobile && (
                 <Group gap="xs" justify="center" style={{ flexDirection: 'column' }}>
-                  <Button size="xs" variant="light" color="red" radius="xl" leftSection={<IconTrash size={14} />} onClick={handleDelete} loading={deleting} disabled={!selected} fullWidth>
+                  <Button size="xs" variant="light" color="arcilla" radius="xl" leftSection={<IconTrash size={14} />} onClick={handleDelete} loading={deleting} disabled={!selected} fullWidth>
                     Borrar
                   </Button>
-                  <Button size="xs" variant="light" color="dark" radius="xl" leftSection={<IconEdit size={14} />} disabled={!selected} onClick={startEdit} fullWidth>
+                  <Button size="xs" variant="light" color="bosque" radius="xl" leftSection={<IconEdit size={14} />} disabled={!selected} onClick={startEdit} fullWidth>
                     Editar
                   </Button>
-                  <Button size="xs" radius="xl" leftSection={<IconPlus size={14} />} onClick={startNew} fullWidth>
+                  <Button size="xs" radius="xl" color="lima" leftSection={<IconPlus size={14} />} onClick={startNew} fullWidth>
                     Añadir
                   </Button>
                 </Group>
@@ -418,7 +418,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                   data={[{ value: 'Todas', label: 'Todas las temporadas' }, ...seasons.map(s => ({ value: s, label: formatSeasonOption(s) }))]}
                   value={selectedSeason}
                   onChange={handleSeasonChange}
-                  variant="filled"
+                  variant="default"
                   radius="md"
                   allowDeselect={false}
                   disabled={seasons.length === 0}
@@ -477,7 +477,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         saving={saving}
       />
 
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+      <Box py={{ base: 'sm', sm: 'md' }}>
         {sortedAsc.length === 0 ? (
           <Box mt="xl">
             <NothingFound

@@ -57,10 +57,10 @@ function parameterStatus(p) {
   const min = hasMin ? Number(p.rango_min) : null;
   const max = hasMax ? Number(p.rango_max) : null;
 
-  if (!p.fuera_rango) return { color: 'green', label: 'Normal', hex: '#10b981' };
-  if (Number.isFinite(max) && value > max) return { color: 'red', label: 'Alto', hex: '#ef4444' };
-  if (Number.isFinite(min) && value < min) return { color: 'orange', label: 'Bajo', hex: '#f59e0b' };
-  return { color: 'yellow', label: 'Revisar', hex: '#eab308' };
+  if (!p.fuera_rango) return { color: 'salvia', label: 'Normal', hex: '#6C705A' };
+  if (Number.isFinite(max) && value > max) return { color: 'arcilla', label: 'Alto', hex: '#B8674A' };
+  if (Number.isFinite(min) && value < min) return { color: 'arcilla', label: 'Bajo', hex: '#B8674A' };
+  return { color: 'arcilla', label: 'Revisar', hex: '#B8674A' };
 }
 
 function rangeLabel(p) {
@@ -333,17 +333,17 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
       <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
         {/* Resumen de analíticas en 1 sola fila compacta */}
         <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
-          <StatTile icon="players" title="Subidas" color="teal" value={`${stats.playersWithRecords}/${stats.totalPlayers}`} caption={`${stats.totalPlayers ? Math.round((stats.playersWithRecords / stats.totalPlayers) * 100) : 0}% plantilla`} />
-          <StatTile icon="warning" title="Alertas" color={stats.activeAlertsCount > 0 ? 'red' : 'teal'} value={stats.activeAlertsCount} caption="con alertas" />
-          <StatTile icon="stats" title="Bajos" color={stats.totalLowParams > 0 ? 'orange' : 'teal'} value={stats.totalLowParams} caption={`bajo mín.${stats.totalHighParams > 0 ? ` · ${stats.totalHighParams} altos` : ''}`} />
-          <StatTile icon="history" title="Total" color="violet" value={stats.totalRecords} caption="registros" />
+          <StatTile icon="players" title="Subidas" color="salvia" value={`${stats.playersWithRecords}/${stats.totalPlayers}`} caption={`${stats.totalPlayers ? Math.round((stats.playersWithRecords / stats.totalPlayers) * 100) : 0}% plantilla`} />
+          <StatTile icon="warning" title="Alertas" color={stats.activeAlertsCount > 0 ? 'arcilla' : 'salvia'} value={stats.activeAlertsCount} caption="con alertas" />
+          <StatTile icon="stats" title="Bajos" color={stats.totalLowParams > 0 ? 'arcilla' : 'salvia'} value={stats.totalLowParams} caption={`bajo mín.${stats.totalHighParams > 0 ? ` · ${stats.totalHighParams} altos` : ''}`} />
+          <StatTile icon="history" title="Total" color="salvia" value={stats.totalRecords} caption="registros" />
         </SimpleGrid>
 
       {/* Sección 2: Análisis de Parámetro Clínico (Comparativa / Historial) */}
       <WidgetCard
         icon="stethoscope"
         title="Inspector de biomarcadores"
-        color="pink"
+        color="salvia"
         style={{ height: 'auto', width: '100%', minWidth: 0 }}
       >
         <Stack gap="md">
@@ -367,7 +367,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                 onChange={(val) => val && setSelectedParam(val)}
                 allowDeselect={false}
                 searchable
-                variant="filled"
+                variant="default"
                 radius="md"
                 size="sm"
                 style={{ flex: '1 1 200px', minWidth: 0 }}
@@ -440,46 +440,46 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
               <Grid.Col span={{ base: 12, md: 4 }}>
                 {paramStats && (
                   <Stack gap="md" justify="center" h="100%">
-                    <Paper p="sm" radius="md" bg="gray.0" withBorder={false}>
-                      <Text size="xs" c="dimmed" tt="uppercase" fw={700} mb={4}>Resumen del parámetro</Text>
+                    <Paper p="sm" radius="md" style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', border: '1px solid rgba(108, 112, 90, 0.12)' }}>
+                      <Text size="xs" c="var(--nutra-salvia, #6C705A)" tt="uppercase" fw={700} mb={4}>Resumen del parámetro</Text>
                       <Group justify="space-between" wrap="nowrap" mb={4}>
                         <Text size="xs" fw={500}>Media del equipo</Text>
-                        <Text size="sm" fw={700} c="dark.5">{paramStats.avg} {paramReferenceRange.unidad}</Text>
+                        <Text size="sm" fw={700} c="var(--nutra-bosque, #1F2A24)">{paramStats.avg} {paramReferenceRange.unidad}</Text>
                       </Group>
                       {Number.isFinite(paramReferenceRange.min) && Number.isFinite(paramReferenceRange.max) && (
                         <Group justify="space-between" wrap="nowrap" mb={4}>
                           <Text size="xs" fw={500}>Rango de referencia</Text>
-                          <Text size="xs" fw={600} c="gray.6">{paramReferenceRange.min} - {paramReferenceRange.max}</Text>
+                          <Text size="xs" fw={600} c="var(--nutra-salvia, #6C705A)">{paramReferenceRange.min} - {paramReferenceRange.max}</Text>
                         </Group>
                       )}
                       <Group justify="space-between" wrap="nowrap">
                         <Text size="xs" fw={500}>Jugadores analizados</Text>
-                        <Text size="xs" fw={600} c="gray.6">{paramStats.totalCount}</Text>
+                        <Text size="xs" fw={600} c="var(--nutra-salvia, #6C705A)">{paramStats.totalCount}</Text>
                       </Group>
                     </Paper>
-                    <Paper p="sm" radius="md" bg="gray.0" withBorder={false}>
-                      <Text size="xs" c="dimmed" tt="uppercase" fw={700} mb={8}>Distribución</Text>
+                    <Paper p="sm" radius="md" style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', border: '1px solid rgba(108, 112, 90, 0.12)' }}>
+                      <Text size="xs" c="var(--nutra-salvia, #6C705A)" tt="uppercase" fw={700} mb={8}>Distribución</Text>
                       <Stack gap={6}>
                         <Group justify="space-between" wrap="nowrap">
                           <Group gap="xs" wrap="nowrap">
-                            <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--mantine-color-orange-6)', flexShrink: 0 }} />
+                            <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--nutra-arcilla, #B8674A)', flexShrink: 0 }} />
                             <Text size="xs" fw={500}>Por debajo del rango</Text>
                           </Group>
-                          <Text size="xs" fw={700} c="orange.6">{paramStats.lowCount} jugadores</Text>
+                          <Text size="xs" fw={700} c="var(--nutra-arcilla, #B8674A)">{paramStats.lowCount} jugadores</Text>
                         </Group>
                         <Group justify="space-between" wrap="nowrap">
                           <Group gap="xs" wrap="nowrap">
-                            <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--mantine-color-green-6)', flexShrink: 0 }} />
+                            <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--nutra-salvia, #6C705A)', flexShrink: 0 }} />
                             <Text size="xs" fw={500}>En rango normal</Text>
                           </Group>
-                          <Text size="xs" fw={700} c="green.6">{paramStats.normalCount} jugadores</Text>
+                          <Text size="xs" fw={700} c="var(--nutra-bosque, #1F2A24)">{paramStats.normalCount} jugadores</Text>
                         </Group>
                         <Group justify="space-between" wrap="nowrap">
                           <Group gap="xs" wrap="nowrap">
-                            <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--mantine-color-red-6)', flexShrink: 0 }} />
+                            <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--nutra-arcilla, #B8674A)', flexShrink: 0 }} />
                             <Text size="xs" fw={500}>Por encima del rango</Text>
                           </Group>
-                          <Text size="xs" fw={700} c="red.6">{paramStats.highCount} jugadores</Text>
+                          <Text size="xs" fw={700} c="var(--nutra-arcilla, #B8674A)">{paramStats.highCount} jugadores</Text>
                         </Group>
                       </Stack>
                     </Paper>
@@ -567,7 +567,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
       <WidgetCard
         icon="diario"
         title="Listado clínico general"
-        color="indigo"
+        color="salvia"
         style={{ height: 'auto', width: '100%', minWidth: 0, maxWidth: '100%' }}
       >
         <Stack gap="md" style={{ width: '100%', minWidth: 0 }}>
@@ -576,7 +576,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
               <TextInput
                 placeholder="Buscar por jugador..."
                 leftSection={<IconSearch size={16} style={{ opacity: 0.7 }} />}
-                variant="filled"
+                variant="default"
                 radius="xl"
                 size="sm"
                 value={filterName}
@@ -589,7 +589,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                 data={positionOptions}
                 value={filterPosition}
                 onChange={(val) => setFilterPosition(val || '')}
-                variant="filled"
+                variant="default"
                 radius="xl"
                 size="sm"
                 allowDeselect={false}
@@ -601,7 +601,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                 data={sortOptions}
                 value={sortBy}
                 onChange={(val) => val && setSortBy(val)}
-                variant="filled"
+                variant="default"
                 radius="xl"
                 size="sm"
                 allowDeselect={false}
@@ -636,12 +636,12 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
           {filteredPlayers.length > 0 ? (
             <ScrollArea style={{ width: '100%', minWidth: 0 }}>
               <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 800 }}>
-                <Table.Thead bg="gray.0">
+                <Table.Thead style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)' }}>
                   <Table.Tr>
-                    <Table.Th style={{ paddingLeft: 16 }}>Jugador</Table.Th>
-                    <Table.Th>Última Analítica</Table.Th>
-                    <Table.Th>Historial</Table.Th>
-                    <Table.Th>Parámetros Fuera de Rango</Table.Th>
+                    <Table.Th style={{ paddingLeft: 16, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Jugador</Table.Th>
+                    <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Última Analítica</Table.Th>
+                    <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Historial</Table.Th>
+                    <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Parámetros Fuera de Rango</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
@@ -684,7 +684,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                           )}
                         </Table.Td>
                         <Table.Td>
-                          <Text size="sm" fw={500} c="grape">
+                          <Text size="sm" fw={500} c="var(--nutra-salvia, #6C705A)">
                             {player.records.length} {player.records.length === 1 ? 'analítica' : 'analíticas'}
                           </Text>
                         </Table.Td>

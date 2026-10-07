@@ -12,7 +12,7 @@ export default function ConfirmModal({
   confirmLabel = 'Confirmar',
   cancelLabel = 'Cancelar',
   loading = false,
-  color = 'red'
+  color = 'arcilla'
 }) {
   return (
     <ResponsiveModal

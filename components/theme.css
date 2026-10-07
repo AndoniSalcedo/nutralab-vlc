@@ -1,0 +1,124 @@
+/* ==========================================================================
+   Nutralab Brand Color System
+   Palette:
+   - Bosque:  #1F2A24 (Texto primario, menú lateral y superficies de marca)
+   - Salvia:  #6C705A (Textos secundarios, datos, divisores sutiles)
+   - Hueso:   #F4F1EA (Fondo general del lienzo de la app)
+   - Lima:    #C1F080 (Acento quirúrgico <5%, estados activos, CTAs prioritarios)
+   - Arcilla: #B8674A (Alertas, desvíos fisiológicos y valores fuera de rango)
+   ========================================================================== */
+
+:root {
+  --nutra-bosque: #1F2A24;
+  --nutra-bosque-dark: #141c18;
+  --nutra-salvia: #6C705A;
+  --nutra-salvia-light: #A4AA8E;
+  --nutra-salvia-muted: rgba(108, 112, 90, 0.15);
+  --nutra-hueso: #F8F7F4;
+  --nutra-hueso-card: #FFFFFF;
+  --nutra-lima: #C1F080;
+  --nutra-lima-dark: #4a6813;
+  --nutra-lima-glow: rgba(193, 240, 128, 0.22);
+  --nutra-arcilla: #B8674A;
+  --nutra-arcilla-soft: rgba(184, 103, 74, 0.12);
+  --nutra-arcilla-border: rgba(184, 103, 74, 0.28);
+
+  /* Layout tokens: Lienzo general en Hueso calibrado (#F8F7F4) */
+  --nutra-app-bg: #F8F7F4;
+  --mantine-color-body: #F8F7F4;
+
+  /* Card tokens: Blanco puro para teselas sobre lienzo hueso, como antes */
+  --nutra-card-bg: #FFFFFF;
+  --nutra-card-border: transparent;
+  --nutra-card-shadow: 0 1px 2px rgba(21, 21, 19, 0.05);
+
+  /* Sidebar brand surface tokens */
+  --nutra-surface-sidebar: #1F2A24;
+  --nutra-sidebar-text: #F8F7F4;
+  --nutra-sidebar-muted: #A4AA8E;
+  --nutra-sidebar-border: rgba(255, 255, 255, 0.08);
+  --nutra-sidebar-active-bg: rgba(193, 240, 128, 0.14);
+  --nutra-sidebar-active-text: #C1F080;
+}
+
+body {
+  background-color: var(--nutra-app-bg);
+  color: var(--nutra-bosque);
+}
+
+/* Sidebar styling for brand presence */
+.nutra-sidebar {
+  background-color: var(--nutra-surface-sidebar) !important;
+  color: var(--nutra-sidebar-text) !important;
+  border: 1px solid var(--nutra-sidebar-border) !important;
+  box-shadow: 0 4px 20px rgba(31, 42, 36, 0.12), 0 1px 3px rgba(31, 42, 36, 0.06) !important;
+}
+
+.nutra-sidebar .nutra-sidebar-title {
+  color: var(--nutra-sidebar-text) !important;
+}
+
+.nutra-sidebar .nutra-sidebar-subtext {
+  color: var(--nutra-sidebar-muted) !important;
+}
+
+.nutra-sidebar .nutra-sidebar-divider {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.nutra-sidebar .nutra-sidebar-section-label {
+  color: var(--nutra-sidebar-muted) !important;
+}
+
+.nutra-sidebar .nutra-sidebar-tab {
+  color: #d7e2da !important;
+  transition: all 140ms ease !important;
+}
+
+.nutra-sidebar .nutra-sidebar-tab:hover {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.nutra-sidebar .nutra-sidebar-tab[data-active="true"] {
+  background-color: var(--nutra-sidebar-active-bg) !important;
+  box-shadow: inset 0 0 0 1px rgba(193, 240, 128, 0.28) !important;
+}
+
+.nutra-sidebar .nutra-sidebar-tab[data-active="true"] .nutra-sidebar-tab-label {
+  color: var(--nutra-sidebar-active-text) !important;
+  font-weight: 700 !important;
+}
+
+.nutra-sidebar .nutra-sidebar-tab[data-active="true"] .nutra-sidebar-tab-chevron {
+  color: var(--nutra-lima) !important;
+}
+
+/* Card hover & borders */
+.bento-card-hover {
+  transition: transform 180ms ease, box-shadow 180ms ease !important;
+}
+
+.bento-card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(31, 42, 36, 0.07), 0 1px 3px rgba(31, 42, 36, 0.04) !important;
+}
+
+/* Lima primary button utility */
+.btn-lima-cta {
+  background-color: var(--nutra-lima) !important;
+  color: var(--nutra-bosque) !important;
+  font-weight: 700 !important;
+  transition: all 150ms ease !important;
+}
+
+.btn-lima-cta:hover {
+  background-color: #a9de50 !important;
+  box-shadow: 0 2px 8px var(--nutra-lima-glow) !important;
+}
+
+/* Arcilla alert badge / dot utility */
+.indicator-arcilla {
+  background-color: var(--nutra-arcilla-soft) !important;
+  color: var(--nutra-arcilla) !important;
+  border: 1px solid var(--nutra-arcilla-border) !important;
+}

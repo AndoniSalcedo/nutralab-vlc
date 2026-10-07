@@ -60,7 +60,7 @@ export default function DayTypeModal({
               <Button variant="default" onClick={onClose} radius="xl">
                 Cancelar
               </Button>
-              <Button onClick={handleSaveDayType} radius="xl" color="blue" leftSection={<Icon3D name="check" size={20} />}>
+              <Button onClick={handleSaveDayType} radius="xl" color="lima" leftSection={<Icon3D name="check" size={20} />}>
                 Aceptar
               </Button>
             </Group>

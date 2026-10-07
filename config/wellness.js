@@ -23,7 +23,7 @@ export const WELLNESS_AVERAGE_DAYS = 28;
 // Color Mantine según la puntuación (1-5)
 export function wellnessScoreColor(value) {
   if (!Number.isFinite(value)) return 'gray.5';
-  if (value < 2.5) return 'red.7';
+  if (value < 2.5) return 'arcilla.6';
   if (value < 3.5) return 'yellow.8';
-  return 'teal.7';
+  return 'lima.8';
 }

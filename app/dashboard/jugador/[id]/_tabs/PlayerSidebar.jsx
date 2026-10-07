@@ -45,19 +45,16 @@ const TABS = [
     value: 'resumen',
     label: 'Resumen',
     icon: IconClipboardList,
-    gradient: 'linear-gradient(135deg, #0A84FF 0%, #0066CC 100%)',
   },
   {
     value: 'metricas',
     label: 'Métricas',
     icon: IconChartBar,
-    gradient: 'linear-gradient(135deg, #AF52DE 0%, #8E44AD 100%)',
   },
   {
     value: 'nutricion',
     label: 'Nutrición',
     icon: IconSalad,
-    gradient: 'linear-gradient(135deg, #34C759 0%, #28A745 100%)',
   },
 ];
 
@@ -145,11 +142,10 @@ export default function PlayerSidebar({
   return (
     <>
       <Paper
+        className="nutra-sidebar"
         radius={24}
         p="md"
-        bg="white"
         style={{
-          boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
           width: '100%',
         }}
       >
@@ -164,7 +160,7 @@ export default function PlayerSidebar({
                 color="gray"
                 size={36}
                 radius="xl"
-                style={{ textDecoration: 'none' }}
+                style={{ textDecoration: 'none', color: 'var(--nutra-hueso)' }}
               >
                 <IconArrowLeft size={20} />
               </ActionIcon>
@@ -183,6 +179,7 @@ export default function PlayerSidebar({
                     color="gray"
                     size={36}
                     radius="xl"
+                    style={{ color: 'var(--nutra-hueso)' }}
                     onClick={() => setEditModalOpen(true)}
                   >
                     <Icon3D name="configuracion" size={20} />
@@ -197,7 +194,7 @@ export default function PlayerSidebar({
                 <Tooltip label="Cerrar sesión" position="bottom" withArrow>
                   <ActionIcon
                     variant="subtle"
-                    color="red"
+                    color="arcilla"
                     size={36}
                     radius="xl"
                     onClick={handleLogout}
@@ -215,20 +212,20 @@ export default function PlayerSidebar({
           <Box style={{ position: 'relative', display: 'inline-block' }}>
             <Avatar
               src={avatarSrc || undefined}
-              size={112}
+              size={100}
               radius="xl"
-              color="nutralabColor"
+              color="bosque"
               style={{
-                width: 112,
-                height: 112,
-                minWidth: 112,
-                minHeight: 112,
-                border: '4px solid white',
-                boxShadow: '0 4px 18px rgba(0,0,0,0.08)',
-                backgroundColor: 'var(--mantine-color-nutralabColor-0)',
-                color: 'var(--mantine-color-nutralabColor-9)',
+                width: 100,
+                height: 100,
+                minWidth: 100,
+                minHeight: 100,
+                border: '3px solid rgba(255, 255, 255, 0.15)',
+                boxShadow: '0 4px 18px rgba(0,0,0,0.2)',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                color: 'var(--nutra-hueso)',
                 fontWeight: 700,
-                fontSize: '32px',
+                fontSize: '28px',
               }}
             >
               {initials(`${jugador?.nombre || ''} ${jugador?.apellidos || ''}`)}
@@ -263,11 +260,11 @@ export default function PlayerSidebar({
             )}
           </Box>
 
-          <Title order={3} fw={700} c="dark.6" fz={18} ta="center" lh={1.2} mt="xs" lineClamp={2}>
+          <Title order={3} fw={700} c="var(--nutra-hueso)" fz={18} ta="center" lh={1.2} mt="xs" lineClamp={2}>
             {jugador?.nombre} {jugador?.apellidos}
           </Title>
 
-          <Text size="xs" fw={500} c="dimmed" ta="center">
+          <Text size="xs" fw={500} c="var(--nutra-salvia-light)" ta="center">
             {jugador?.posicion || 'Sin posición'}
           </Text>
 
@@ -282,7 +279,7 @@ export default function PlayerSidebar({
                 gap: 7,
                 padding: '5px 12px',
                 borderRadius: 20,
-                backgroundColor: 'var(--mantine-color-gray-1)',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
                 textDecoration: 'none',
                 transition: 'all 150ms ease',
                 cursor: jugador?.equipo_id ? 'pointer' : 'default',
@@ -299,7 +296,7 @@ export default function PlayerSidebar({
                   {initials(teamName)}
                 </Avatar>
               )}
-              <Text size="xs" fw={600} c="dark.4" truncate="end" maw={180}>
+              <Text size="xs" fw={600} c="var(--nutra-hueso)" truncate="end" maw={180}>
                 {teamName}
               </Text>
             </Box>
@@ -308,18 +305,18 @@ export default function PlayerSidebar({
           {!hasCredentials && isAdmin && (
             <Group gap={6} align="center" mt={4}>
               <Icon3D name="warning" size={14} />
-              <Text size="xs" c="orange.7" fw={600}>
+              <Text size="xs" c="var(--nutra-arcilla)" fw={600}>
                 Sin credenciales
               </Text>
             </Group>
           )}
         </Stack>
 
-        <Divider my="md" color="gray.2" />
+        <Divider my="md" color="rgba(255, 255, 255, 0.1)" />
 
         {/* Tabs de navegación estilo Apple Settings */}
         <Box>
-          <Text size="11px" fw={700} c="dimmed" tt="uppercase" lts={0.8} px={6} mb={8}>
+          <Text size="11px" fw={700} c="var(--nutra-salvia-light)" tt="uppercase" lts={0.8} px={6} mb={8}>
             Secciones
           </Text>
 
@@ -342,14 +339,14 @@ export default function PlayerSidebar({
                     width: '100%',
                     padding: '9px 12px',
                     borderRadius: '12px',
-                    backgroundColor: isActive ? 'var(--mantine-color-gray-1)' : 'transparent',
-                    boxShadow: isActive ? 'inset 0 0 0 1px rgba(0, 0, 0, 0.05)' : 'none',
+                    backgroundColor: isActive ? 'var(--nutra-sidebar-active-bg)' : 'transparent',
+                    boxShadow: isActive ? 'inset 0 0 0 1px rgba(193, 240, 128, 0.28)' : 'none',
                     transition: 'all 140ms ease',
                     textDecoration: 'none',
                     cursor: 'pointer',
                   }}
                   onMouseEnter={(e) => {
-                    if (!isActive) e.currentTarget.style.backgroundColor = 'var(--mantine-color-gray-0)';
+                    if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.07)';
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
@@ -364,17 +361,18 @@ export default function PlayerSidebar({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        background: tab.gradient,
-                        boxShadow: '0 2px 5px rgba(0,0,0,0.12)',
+                        background: isActive ? 'var(--nutra-lima, #C1F080)' : 'rgba(255, 255, 255, 0.08)',
+                        boxShadow: isActive ? '0 2px 8px var(--nutra-lima-glow)' : 'none',
+                        border: isActive ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
                         flexShrink: 0,
                       }}
                     >
-                      <tab.icon size={16} color="#ffffff" stroke={2.2} />
+                      <tab.icon size={16} color={isActive ? '#1F2A24' : '#d7e2da'} stroke={2.2} />
                     </Box>
                     <Text
                       size="sm"
-                      fw={isActive ? 650 : 500}
-                      c={isActive ? 'dark.9' : 'dark.6'}
+                      fw={isActive ? 700 : 500}
+                      c={isActive ? 'var(--nutra-lima)' : '#d7e2da'}
                     >
                       {tab.label}
                     </Text>
@@ -384,7 +382,7 @@ export default function PlayerSidebar({
                     size={14}
                     stroke={2}
                     style={{
-                      color: isActive ? 'var(--mantine-color-dark-4)' : 'var(--mantine-color-gray-4)',
+                      color: isActive ? 'var(--nutra-lima)' : 'rgba(255, 255, 255, 0.35)',
                       transform: isActive ? 'translateX(2px)' : 'none',
                       transition: 'transform 140ms ease',
                     }}

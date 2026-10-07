@@ -7,7 +7,7 @@ import Icon3D from '@/components/Icon3D';
 import { IconCheck } from '@tabler/icons-react';
 import WidgetCard, { WidgetAside } from './WidgetCard';
 import { sanitizePlanData } from '@/lib/engine';
-import { getDayTypeColor, getDayTypeLabel } from '@/config/nutrition-days';
+import { getDayTypeLabel } from '@/config/nutrition-days';
 import { formatInteger as formatInt } from '@/lib/utils';
 
 const DAY_KEYS = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
@@ -85,12 +85,12 @@ export default function PlanHoyWidget({ jugador, plan: latestPlan = null, select
   return (
     <WidgetCard
       id="widget-plan-hoy"
-      color="teal"
+      color="salvia"
       icon="calendar"
       title={title}
       aside={
         hasPlan ? (
-          <WidgetAside color={getDayTypeColor(day.tipoDia)} dot>
+          <WidgetAside color="salvia" dot>
             {getDayTypeLabel(day.tipoDia)}
           </WidgetAside>
         ) : null
@@ -170,19 +170,19 @@ export default function PlanHoyWidget({ jugador, plan: latestPlan = null, select
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        backgroundColor: isDone && !isActive ? 'var(--mantine-color-nutralabColor-6)' : 'white',
-                        border: `2px solid ${isActive || isDone ? 'var(--mantine-color-nutralabColor-6)' : 'var(--mantine-color-gray-3)'}`,
-                        boxShadow: isActive ? '0 0 0 3px var(--mantine-color-nutralabColor-1)' : 'none',
+                        backgroundColor: isDone && !isActive ? 'var(--nutra-lima, #C1F080)' : 'white',
+                        border: `2px solid ${isActive ? 'var(--nutra-bosque, #1F2A24)' : isDone ? 'var(--nutra-lima-dark, #4a6813)' : 'rgba(108, 112, 90, 0.2)'}`,
+                        boxShadow: isActive ? '0 0 0 3px var(--nutra-lima-glow)' : 'none',
                         transition: 'box-shadow 0.15s ease, border-color 0.15s ease',
                       }}
                     >
                       {isDone && !isActive ? (
-                        <IconCheck size={16} stroke={3} color="white" />
+                        <IconCheck size={16} stroke={3} color="var(--nutra-bosque, #1F2A24)" />
                       ) : (
                         <Icon3D name={getMealSlot(meal.nombre).icon} size={18} />
                       )}
                     </Box>
-                    <Text fz={10} fw={isActive ? 700 : 500} c={isActive ? 'dark.5' : 'dimmed'} ta="center" lh={1.1} truncate maw="100%">
+                    <Text fz={10} fw={isActive ? 700 : 500} c={isActive ? 'var(--nutra-bosque, #1F2A24)' : 'dimmed'} ta="center" lh={1.1} truncate maw="100%">
                       {meal.nombre}
                     </Text>
                   </UnstyledButton>

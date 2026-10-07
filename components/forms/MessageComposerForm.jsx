@@ -178,7 +178,7 @@ export default function MessageComposerForm({
         <Button
           type="submit"
           variant="filled"
-          color="dark"
+          color="lima"
           size="sm"
           radius="xl"
           style={{ flex: 1 }}

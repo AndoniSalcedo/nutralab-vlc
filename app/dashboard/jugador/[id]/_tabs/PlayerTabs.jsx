@@ -120,7 +120,7 @@ export default function PlayerTabs({
         <Box
           style={{
             display: 'flex',
-            gap: 20,
+            gap: 16,
             alignItems: 'flex-start',
             width: '100%',
             minWidth: 0,
@@ -130,9 +130,9 @@ export default function PlayerTabs({
           <Box
             visibleFrom="sm"
             style={{
-              width: 280,
-              minWidth: 280,
-              maxWidth: 280,
+              width: 240,
+              minWidth: 240,
+              maxWidth: 240,
               position: 'sticky',
               top: 16,
               alignSelf: 'flex-start',
@@ -171,11 +171,11 @@ export default function PlayerTabs({
             left: 0,
             right: 0,
             zIndex: 100,
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backgroundColor: 'rgba(255, 255, 255, 0.96)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
-            borderTop: '1px solid rgba(222, 226, 230, 0.85)',
-            boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.06)',
+            borderTop: '1px solid rgba(108, 112, 90, 0.18)',
+            boxShadow: '0 -4px 20px rgba(31, 42, 36, 0.05)',
             paddingBottom: 'calc(env(safe-area-inset-bottom, 8px) + 2px)',
           }}
         >
@@ -199,7 +199,7 @@ export default function PlayerTabs({
                     border: 'none',
                     cursor: 'pointer',
                     textDecoration: 'none',
-                    color: isActive ? '#1c1f1a' : 'var(--mantine-color-gray-6)',
+                    color: isActive ? 'var(--nutra-bosque, #1F2A24)' : 'var(--nutra-salvia, #6C705A)',
                     position: 'relative',
                     paddingTop: 4,
                     transition: 'color 140ms ease, transform 100ms ease',
@@ -213,7 +213,7 @@ export default function PlayerTabs({
                         width: 20,
                         height: 3,
                         borderRadius: 3,
-                        backgroundColor: '#24291f',
+                        backgroundColor: 'var(--nutra-lima, #C1F080)',
                       }}
                     />
                   )}
@@ -231,8 +231,8 @@ export default function PlayerTabs({
                     fw={isActive ? 750 : 500}
                     lh={1.2}
                     mt={3}
-                    c={isActive ? '#1c1f1a' : 'dimmed'}
                     style={{
+                      color: isActive ? 'var(--nutra-bosque, #1F2A24)' : 'var(--nutra-salvia, #6C705A)',
                       letterSpacing: '-0.2px',
                     }}
                   >

@@ -128,7 +128,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
           <Button
             size="sm"
             radius="xl"
-            color="dark"
+            color="lima"
             leftSection={<IconPlus size={16} />}
             onClick={() => openModal(null)}
           >
@@ -151,10 +151,10 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
       ) : (
         <>
           <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
-            <StatTile icon="soccer" title="Partidos" color="teal" value={matches.length} caption="registrados" />
-            <StatTile icon="droplet" title="Líquidos" color="blue" value={Math.round(averages.aguaMl)} unit="ml" caption="por jugador" />
-            <StatTile icon="fire" title="Carbs" color="orange" value={Math.round(averages.carbsG)} unit="g" caption="por jugador" />
-            <StatTile icon="running" title="Sodio" color="red" value={Math.round(averages.sodioMg)} unit="mg" caption="por jugador" />
+            <StatTile icon="soccer" title="Partidos" color="salvia" value={matches.length} caption="registrados" />
+            <StatTile icon="droplet" title="Líquidos" color="salvia" value={Math.round(averages.aguaMl)} unit="ml" caption="por jugador" />
+            <StatTile icon="fire" title="Carbs" color="salvia" value={Math.round(averages.carbsG)} unit="g" caption="por jugador" />
+            <StatTile icon="running" title="Sodio" color="salvia" value={Math.round(averages.sodioMg)} unit="mg" caption="por jugador" />
           </SimpleGrid>
 
           <Stack gap="sm">
@@ -187,7 +187,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
 
                     <Group gap={4} wrap="nowrap" style={{ flexShrink: 0 }}>
                       <Tooltip label="Exportar Excel" withArrow>
-                        <ActionIcon variant="subtle" color="teal" radius="xl" onClick={() => handleExport(session)} aria-label="Exportar Excel">
+                        <ActionIcon variant="subtle" color="gray" radius="xl" onClick={() => handleExport(session)} aria-label="Exportar Excel">
                           <IconFileSpreadsheet size={17} />
                         </ActionIcon>
                       </Tooltip>
@@ -199,7 +199,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
                             </ActionIcon>
                           </Tooltip>
                           <Tooltip label="Eliminar" withArrow>
-                            <ActionIcon variant="subtle" color="red" radius="xl" onClick={() => setDeleting({ id: session.id, rival: info.rival })} aria-label="Eliminar partido">
+                            <ActionIcon variant="subtle" color="arcilla" radius="xl" onClick={() => setDeleting({ id: session.id, rival: info.rival })} aria-label="Eliminar partido">
                               <IconTrash size={17} />
                             </ActionIcon>
                           </Tooltip>

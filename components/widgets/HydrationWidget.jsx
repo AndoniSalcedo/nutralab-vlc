@@ -97,18 +97,18 @@ export default function HydrationWidget({
   const value = latestHydration?.valor;
   const numValue = Number(value);
 
-  let statusColor = 'teal.6';
+  let statusColor = 'blue.6';
   let statusLabel = 'Óptimo';
 
   if (Number.isFinite(numValue) && numValue > 0) {
     if (numValue > 900) {
-      statusColor = 'red.6';
+      statusColor = 'arcilla.6';
       statusLabel = 'Alerta';
     } else if (numValue >= 700) {
-      statusColor = 'yellow.7';
+      statusColor = 'salvia.7';
       statusLabel = 'Límite';
     } else {
-      statusColor = 'teal.6';
+      statusColor = 'blue.6';
       statusLabel = 'Óptimo';
     }
   } else if (latestHydration?.estado) {
@@ -124,9 +124,9 @@ export default function HydrationWidget({
       title="Agua"
       color="blue"
       fillPercent={percent}
-      fillColor={isGoalReached ? 'teal.1' : 'blue.1'}
-      fillWaveColor={isGoalReached ? 'teal.2' : 'blue.2'}
-      aside={<WidgetAside color={isGoalReached ? 'teal' : 'blue'}>{percent}%</WidgetAside>}
+      fillColor="blue.0"
+      fillWaveColor="blue.1"
+      aside={<WidgetAside color={isGoalReached ? 'blue' : 'salvia'}>{percent}%</WidgetAside>}
       style={{ minHeight: 216 }}
     >
       <Stack gap="sm" justify="space-between" h="100%">
@@ -134,7 +134,7 @@ export default function HydrationWidget({
           <WidgetValue
             value={drunk.toFixed(2).replace('.', ',')}
             unit={`/ ${targetL.toFixed(1).replace('.', ',')} L`}
-            color={isGoalReached ? 'teal.8' : 'dark.6'}
+            color={isGoalReached ? 'var(--nutra-lima-dark, #4a6813)' : 'var(--nutra-bosque, #1F2A24)'}
             size={32}
           />
           <Text
@@ -156,8 +156,7 @@ export default function HydrationWidget({
         <Group gap={6} wrap="nowrap">
           <ActionIcon
             size={44}
-            variant="white"
-            color="gray"
+            variant="default"
             radius="xl"
             disabled={drunk <= 0}
             onClick={() => handleUpdateWater(-0.25)}
@@ -169,7 +168,7 @@ export default function HydrationWidget({
             flex={1}
             h={44}
             radius="xl"
-            color={isGoalReached ? 'teal' : 'blue'}
+            color="blue"
             px={6}
             onClick={() => handleUpdateWater(0.25)}
             aria-label="Sumar 250 ml"

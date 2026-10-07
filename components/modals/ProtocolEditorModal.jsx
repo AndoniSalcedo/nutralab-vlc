@@ -192,13 +192,13 @@ export default function ProtocolEditorModal({
             radius="md"
           />
 
-          <Paper p="sm" radius="md" withBorder bg="gray.0">
+          <Paper p="sm" radius="md" withBorder style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', borderColor: 'rgba(108, 112, 90, 0.12)' }}>
             <Switch
               label="Incluir en la planificación nutricional"
               description="Muestra este protocolo en la ficha y resumen de la planificación nutricional de los días correspondientes"
               checked={incluirEnPlan}
               onChange={(e) => setIncluirEnPlan(e.currentTarget.checked)}
-              color="blue"
+              color="bosque"
             />
           </Paper>
 
@@ -309,7 +309,7 @@ export default function ProtocolEditorModal({
                                 {addingSuppIndex !== index && (
                                   <Button
                                     variant="subtle"
-                                    color="grape"
+                                    color="bosque"
                                     size="compact-xs"
                                     leftSection={<Icon3D name="plus" size={13} />}
                                     onClick={() => {
@@ -342,7 +342,7 @@ export default function ProtocolEditorModal({
                                           <Box style={{ minWidth: 0 }}>
                                             <Group gap={6} wrap="nowrap">
                                               <Text size="xs" fw={700} c="dark.5" truncate>{supp.nombre}</Text>
-                                              <Text size="xs" fw={600} c="grape.7" style={{ whiteSpace: 'nowrap' }}>· {supp.dosis}</Text>
+                                              <Text size="xs" fw={600} c="var(--nutra-salvia, #6C705A)" style={{ whiteSpace: 'nowrap' }}>· {supp.dosis}</Text>
                                             </Group>
                                             {supp.notas && (
                                               <Text size={11} c="dimmed" truncate>{supp.notas}</Text>
@@ -351,7 +351,7 @@ export default function ProtocolEditorModal({
                                         </Group>
                                         <ActionIcon
                                           variant="subtle"
-                                          color="red"
+                                          color="arcilla"
                                           size="sm"
                                           radius="md"
                                           onClick={() => handleRemoveSupplement(index, sIdx)}
@@ -426,7 +426,7 @@ export default function ProtocolEditorModal({
                                       </Button>
                                       <Button
                                         size="xs"
-                                        color="grape"
+                                        color="lima"
                                         disabled={!newSuppForm.nombre}
                                         onClick={() => handleAddSupplement(index)}
                                         radius="xl"
@@ -522,7 +522,7 @@ export default function ProtocolEditorModal({
                 <Text fw={600} size="sm" c="dark.3">Checklist Operativo</Text>
                 <Text size="xs" c="dimmed">Puntos de control y comprobaciones</Text>
               </div>
-              <Button size="xs" variant="light" color="blue" leftSection={<Icon3D name="plus" size={16} />} onClick={() => addChecklistItem(-1)} radius="xl">
+              <Button size="xs" variant="default" leftSection={<Icon3D name="plus" size={16} />} onClick={() => addChecklistItem(-1)} radius="xl">
                 Añadir Item al Final
               </Button>
             </Group>
@@ -532,7 +532,7 @@ export default function ProtocolEditorModal({
                 <Text c="dimmed" size="sm" ta="center" py="md">No hay items en el checklist.</Text>
               )}
               {checklist.map((item, index) => (
-                <Paper key={item.id} withBorder p="sm" radius="md" bg="gray.0">
+                <Paper key={item.id} withBorder p="sm" radius="md" style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', borderColor: 'rgba(108, 112, 90, 0.12)' }}>
                   <Group align="flex-start" wrap="nowrap" gap="sm">
                     <Stack style={{ flexGrow: 1 }} gap="xs">
                       <TextInput
@@ -634,7 +634,7 @@ export default function ProtocolEditorModal({
         )}
         <Group gap="xs">
           <Button variant="default" onClick={onClose} radius="xl">Cancelar</Button>
-          <Button color="blue" onClick={handleSave} radius="xl" disabled={!name} leftSection={<Icon3D name="check" size={20} />}>
+          <Button color="lima" onClick={handleSave} radius="xl" disabled={!name} leftSection={<Icon3D name="check" size={20} />}>
             {saveLabel}
           </Button>
         </Group>

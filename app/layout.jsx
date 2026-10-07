@@ -4,6 +4,7 @@ import '@mantine/dropzone/styles.css';
 import '@mantine/notifications/styles.css';
 import '@mantine/dates/styles.css';
 import '@/components/icons3d.css';
+import '@/components/theme.css';
 import { ColorSchemeScript } from '@mantine/core';
 import Providers from '@/components/Providers';
 import '@/components/bones/registry';
@@ -30,7 +31,7 @@ export const metadata = {
 };
 
 export const viewport = {
-  themeColor: '#6c705a',
+  themeColor: '#1F2A24',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,

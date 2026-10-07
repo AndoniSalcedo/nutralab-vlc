@@ -70,7 +70,7 @@ export default function SuplementacionWidget({
   return (
     <WidgetCard
       id="widget-suplementacion"
-      color="violet"
+      color="salvia"
       icon="suplementacion"
       title="Suplementos diarios"
       footer={isAllDone ? '¡Todo tomado!' : `${completedCount}/${totalCount} tomas`}
@@ -89,7 +89,7 @@ export default function SuplementacionWidget({
               py={6}
               style={{
                 borderRadius: '8px',
-                backgroundColor: isChecked ? 'var(--mantine-color-gray-0)' : 'transparent',
+                backgroundColor: isChecked ? 'rgba(108, 112, 90, 0.08)' : 'transparent',
                 transition: 'background-color 0.15s ease',
                 display: 'block',
                 width: '100%',
@@ -102,13 +102,14 @@ export default function SuplementacionWidget({
                       width: 20,
                       height: 20,
                       borderRadius: '6px',
-                      border: `1.5px solid ${isChecked ? 'var(--mantine-color-teal-6)' : 'var(--mantine-color-gray-4)'
-                        }`,
-                      backgroundColor: isChecked ? 'var(--mantine-color-teal-6)' : 'white',
+                      border: `1.5px solid ${
+                        isChecked ? 'var(--nutra-lima-dark, #4a6813)' : 'rgba(108, 112, 90, 0.25)'
+                      }`,
+                      backgroundColor: isChecked ? 'var(--nutra-lima, #C1F080)' : 'white',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: 'white',
+                      color: 'var(--nutra-bosque, #1F2A24)',
                       flexShrink: 0,
                       transition: 'all 0.15s ease',
                     }}

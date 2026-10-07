@@ -54,7 +54,7 @@ function CredentialsWarning({ show }) {
   return (
     <Group gap={6} align="center">
       <Icon3D name="warning" size={16} />
-      <Text size="xs" c="orange.7" fw={600}>
+      <Text size="xs" c="arcilla" fw={600}>
         Sin credenciales
       </Text>
     </Group>
@@ -71,7 +71,7 @@ function PlayerLogoutButton({ menuItem = false }) {
   if (menuItem) {
     return (
       <Menu.Item
-        color="red"
+        color="arcilla"
         leftSection={<IconLogout size={14} />}
         onClick={handleLogout}
       >
@@ -85,7 +85,7 @@ function PlayerLogoutButton({ menuItem = false }) {
       size="xs"
       radius="xl"
       variant="subtle"
-      color="red"
+      color="arcilla"
       leftSection={<IconLogout size={14} />}
       onClick={handleLogout}
     >
@@ -321,18 +321,18 @@ function PlayerIdentity({ jugador, isAdmin, isPlayer, hasCredentials, avatarSize
       />
 
       <Stack gap={4} align={centered ? 'center' : undefined} style={{ minWidth: 0 }}>
-        <Title order={2} c="dark.5" lh={1.1} fz={titleSize} fw={700} lineClamp={2}>
+        <Title order={2} c="var(--nutra-bosque, #1F2A24)" lh={1.1} fz={titleSize} fw={700} lineClamp={2}>
           {jugador.nombre} {jugador.apellidos}
         </Title>
 
         <Group gap="xs" align="center" justify={centered ? 'center' : undefined}>
-          <Text c="dimmed" size="sm" truncate="end">
+          <Text c="var(--nutra-salvia, #6C705A)" size="sm" truncate="end">
             {jugador.posicion || 'Sin posición'}
           </Text>
           {jugador.club && (
             <>
-              <Text c="dimmed" size="xs">•</Text>
-              <Text c="dimmed" size="sm" truncate="end">{jugador.club}</Text>
+              <Text c="var(--nutra-salvia, #6C705A)" size="xs">•</Text>
+              <Text c="var(--nutra-salvia, #6C705A)" size="sm" truncate="end">{jugador.club}</Text>
             </>
           )}
         </Group>
@@ -366,17 +366,17 @@ export function JugadorHeaderCompactMobile({
           size={44}
         />
         <Stack gap={2} style={{ minWidth: 0, flex: 1 }}>
-          <Title order={3} fw={700} c="dark.5" truncate="end">
+          <Title order={3} fw={700} c="var(--nutra-bosque, #1F2A24)" truncate="end">
             {jugador?.nombre} {jugador?.apellidos}
           </Title>
           <Group gap={6} align="center" wrap="nowrap">
-            <Text c="dimmed" size="sm" truncate="end" fw={500}>
+            <Text c="var(--nutra-salvia, #6C705A)" size="sm" truncate="end" fw={500}>
               {jugador?.posicion || 'Sin posición'}
             </Text>
             {jugador?.club && (
               <>
-                <Text c="dimmed" size="xs" style={{ opacity: 0.4 }}>•</Text>
-                <Text c="dimmed" size="xs" truncate="end">
+                <Text c="var(--nutra-salvia, #6C705A)" size="xs" style={{ opacity: 0.4 }}>•</Text>
+                <Text c="var(--nutra-salvia, #6C705A)" size="xs" truncate="end">
                   {jugador.club}
                 </Text>
               </>

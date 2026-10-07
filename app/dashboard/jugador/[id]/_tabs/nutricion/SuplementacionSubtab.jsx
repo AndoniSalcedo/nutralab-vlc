@@ -528,6 +528,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
               <Button
                 radius="xl"
                 size="xs"
+                color="lima"
                 leftSection={<IconCirclePlus size={15} />}
                 onClick={() => setModalOpened(true)}
               >
@@ -548,6 +549,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
                 <Button
                   radius="xl"
                   size="xs"
+                  color="lima"
                   leftSection={<IconCirclePlus size={15} />}
                   onClick={() => setModalOpened(true)}
                   fullWidth
@@ -593,7 +595,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
         </Stack>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }} pos="relative">
+      <Box py={{ base: 'sm', sm: 'md' }} pos="relative">
         <LoadingOverlay visible={loading} />
         <Stack gap="md">
           {!peso && (

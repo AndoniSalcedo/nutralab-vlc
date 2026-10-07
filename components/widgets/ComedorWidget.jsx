@@ -47,10 +47,10 @@ export default function ComedorWidget({
   return (
     <WidgetCard
       id="widget-comedor"
-      color="lime"
+      color="salvia"
       icon="fork_and_knife"
       title="Comedor Ciudad Deportiva"
-      aside={todayDiningMenu ? <WidgetAside color="nutralabColor">13:00 – 15:30</WidgetAside> : null}
+      aside={todayDiningMenu ? <WidgetAside color="salvia">13:00 – 15:30</WidgetAside> : null}
       footer="Supervisado por nutrición"
       footerAction={hasMenus ? 'Menú completo' : null}
       onClick={() => router.push(`/dashboard/jugador/${jugadorId}/nutricion/menu`)}

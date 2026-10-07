@@ -15,17 +15,17 @@ export default function StaffMessagesWidget({
   return (
     <WidgetCard
       id="widget-mensajes"
-      color="indigo"
+      color="salvia"
       icon="chat"
       title="Mensajes"
       onClick={() => router.push(`/dashboard/jugador/${jugadorId}/resumen/mensajes`)}
     >
-      <Text fz={24} fw={800} c="dark.6" lh={1.1} style={{ fontVariantNumeric: 'tabular-nums' }}>
+      <Text fz={24} fw={800} c="var(--nutra-bosque, #1F2A24)" lh={1.1} style={{ fontVariantNumeric: 'tabular-nums' }}>
         {count}
-        <Text span fz="xs" fw={600} c="dimmed"> {count === 1 ? 'mensaje' : 'mensajes'}</Text>
+        <Text span fz="xs" fw={600} style={{ color: 'var(--nutra-salvia, #6C705A)' }}> {count === 1 ? 'mensaje' : 'mensajes'}</Text>
       </Text>
       <Box mt={6} w="fit-content">
-        {hasMessages ? <WidgetAside color="pink" dot>Por leer</WidgetAside> : <WidgetAside color="teal">Al día</WidgetAside>}
+        {hasMessages ? <WidgetAside color="arcilla" dot>Por leer</WidgetAside> : <WidgetAside color="lima">Al día</WidgetAside>}
       </Box>
     </WidgetCard>
   );

@@ -515,8 +515,7 @@ export default function IntrapartidoModal({
           <Button
             size="compact-xs"
             radius="xl"
-            variant="light"
-            color="dark"
+            variant="default"
             leftSection={<Icon3D name="document" size={13} />}
             onClick={() => setCurrentStep('resumen')}
           >
@@ -581,7 +580,7 @@ export default function IntrapartidoModal({
                 value={session.id}
                 onChange={handleLoadMatch}
                 disabled={savedMatches.length === 0 || loadingMatch}
-                variant="filled"
+                variant="default"
                 radius="xl"
                 size="xs"
                 clearable
@@ -591,8 +590,7 @@ export default function IntrapartidoModal({
               <Button
                 size="xs"
                 radius="xl"
-                variant="light"
-                color="dark"
+                variant="default"
                 leftSection={<IconPlus size={13} />}
                 onClick={handleNewMatch}
                 disabled={loadingMatch}
@@ -763,7 +761,7 @@ export default function IntrapartidoModal({
             <Group wrap="nowrap" w="100%" style={{ flexShrink: 0 }}>
               <Button
                 variant="filled"
-                color="dark"
+                color="lima"
                 size="sm"
                 radius="xl"
                 fullWidth
@@ -797,7 +795,7 @@ export default function IntrapartidoModal({
                   ]}
                   radius="xl"
                   size="xs"
-                  color="dark"
+                  color="bosque"
                   style={{ flex: 1 }}
                 />
 
@@ -805,8 +803,7 @@ export default function IntrapartidoModal({
                 <Menu shadow="md" width={220} position="bottom-end" radius="md" zIndex={2500} withinPortal>
                   <Menu.Target>
                     <Button
-                      variant="light"
-                      color="grape"
+                      variant="default"
                       size="xs"
                       radius="xl"
                       leftSection={<IconBolt size={13} />}
@@ -1046,8 +1043,7 @@ export default function IntrapartidoModal({
                               fullWidth
                               size="xs"
                               radius="md"
-                              variant="light"
-                              color="blue"
+                              variant="default"
                               px={2}
                               styles={{ label: { fontSize: 11, fontWeight: 700 } }}
                               onClick={() => handleModifyProduct(player.id, 'agua-250', 1)}
@@ -1061,8 +1057,7 @@ export default function IntrapartidoModal({
                               fullWidth
                               size="xs"
                               radius="md"
-                              variant="light"
-                              color="orange"
+                              variant="default"
                               px={2}
                               styles={{ label: { fontSize: 11, fontWeight: 700 } }}
                               onClick={() => handleModifyProduct(player.id, 'isotonico-250', 1)}
@@ -1076,8 +1071,7 @@ export default function IntrapartidoModal({
                               fullWidth
                               size="xs"
                               radius="md"
-                              variant="light"
-                              color="grape"
+                              variant="default"
                               px={2}
                               styles={{ label: { fontSize: 11, fontWeight: 700 } }}
                               onClick={() => handleModifyProduct(player.id, 'gel-30', 1)}
@@ -1166,7 +1160,7 @@ export default function IntrapartidoModal({
               {currentPhaseIndex < INTRAPARTIDO_TIMINGS.length - 1 ? (
                 <Button
                   variant="filled"
-                  color="dark"
+                  color="lima"
                   size="sm"
                   radius="xl"
                   style={{ flex: 1 }}
@@ -1178,7 +1172,7 @@ export default function IntrapartidoModal({
               ) : (
                 <Button
                   variant="filled"
-                  color="teal"
+                  color="lima"
                   size="sm"
                   radius="xl"
                   style={{ flex: 1 }}
@@ -1203,8 +1197,7 @@ export default function IntrapartidoModal({
               </Text>
 
               <Button
-                variant="light"
-                color="teal"
+                variant="default"
                 size="xs"
                 radius="xl"
                 leftSection={<IconFileSpreadsheet size={15} />}
@@ -1365,7 +1358,7 @@ export default function IntrapartidoModal({
 
               <Button
                 variant="filled"
-                color="dark"
+                color="lima"
                 size="sm"
                 radius="xl"
                 style={{ flex: 1 }}

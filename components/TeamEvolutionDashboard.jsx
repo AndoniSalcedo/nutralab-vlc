@@ -68,15 +68,15 @@ import WidgetCard, { StatTile, WidgetAside } from '@/components/widgets/WidgetCa
 
 // Icono y color de categoría de cada métrica (mismo criterio que la pestaña Mediciones del jugador)
 const METRIC_STYLE = {
-  peso_kg: { icon: 'scale', color: 'blue' },
-  porcentaje_grasa: { icon: 'fire', color: 'red' },
-  porcentaje_musculo: { icon: 'gym', color: 'green' },
-  suma_6_pliegues: { icon: 'ruler', color: 'orange' },
-  suma_8_pliegues: { icon: 'sliders', color: 'violet' },
-  perimetro_muslo_derecho: { icon: 'running', color: 'cyan' },
-  perimetro_muslo_izquierdo: { icon: 'running', color: 'teal' },
-  perimetro_pantorrilla_derecha: { icon: 'running_shoe', color: 'lime' },
-  perimetro_pantorrilla_izquierda: { icon: 'running_shoe', color: 'orange' },
+  peso_kg: { icon: 'scale', color: 'salvia' },
+  porcentaje_grasa: { icon: 'fire', color: 'salvia' },
+  porcentaje_musculo: { icon: 'gym', color: 'salvia' },
+  suma_6_pliegues: { icon: 'ruler', color: 'salvia' },
+  suma_8_pliegues: { icon: 'sliders', color: 'salvia' },
+  perimetro_muslo_derecho: { icon: 'running', color: 'salvia' },
+  perimetro_muslo_izquierdo: { icon: 'running', color: 'salvia' },
+  perimetro_pantorrilla_derecha: { icon: 'running_shoe', color: 'salvia' },
+  perimetro_pantorrilla_izquierda: { icon: 'running_shoe', color: 'salvia' },
 };
 
 const METRICS = TREND_MEASUREMENT_METRICS;
@@ -148,7 +148,7 @@ function deltaFor(currentRecord, previousRecord, metric) {
 function deltaColor(delta, metric) {
   if (!Number.isFinite(delta) || delta === 0 || metric.goodDown === null) return 'gray';
   const improved = metric.goodDown ? delta < 0 : delta > 0;
-  return improved ? 'green' : 'red';
+  return improved ? 'salvia' : 'arcilla';
 }
 
 function latestByPlayer(players, evolutions) {
@@ -1123,8 +1123,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               visibleFrom="sm"
               radius="xl"
               size="xs"
-              variant="light"
-              color="grape"
+              color="lima"
               leftSection={<IconFileTypePdf size={14} />}
               onClick={handleDownloadPdf}
               loading={isDownloadingPdf}
@@ -1244,10 +1243,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
           <>
             {/* Resumen de evolución en 1 sola fila compacta (diseño analíticas) */}
             <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
-              <StatTile icon="players" title="Plantilla" color="teal" value={scopedPlayers.length} caption="jugadores activos" />
-              <StatTile icon="check" title="Medidos" color="blue" value={`${latestRows.length}/${scopedPlayers.length}`} caption={`${measuredPct}% con al menos una medición`} />
-              <StatTile icon="history" title="Registros" color="orange" value={totalRecords} caption="mediciones en el rango" />
-              <StatTile icon="calendar" title="Última fecha" color="violet" value={formatDate(lastDate)} caption="último registro disponible" />
+              <StatTile icon="players" title="Plantilla" color="salvia" value={scopedPlayers.length} caption="jugadores activos" />
+              <StatTile icon="check" title="Medidos" color="salvia" value={`${latestRows.length}/${scopedPlayers.length}`} caption={`${measuredPct}% con al menos una medición`} />
+              <StatTile icon="history" title="Registros" color="salvia" value={totalRecords} caption="mediciones en el rango" />
+              <StatTile icon="calendar" title="Última fecha" color="salvia" value={formatDate(lastDate)} caption="último registro disponible" />
             </SimpleGrid>
 
             {chartData.length > 0 ? (
@@ -1381,7 +1380,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               >
                 <ScrollArea style={{ width: '100%', minWidth: 0 }}>
                   <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 760 + METRICS.length * 128 }}>
-                    <Table.Thead bg="gray.0">
+                    <Table.Thead style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)' }}>
                       <Table.Tr>
                         <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
                         <Table.Th>Última medición</Table.Th>
@@ -1444,10 +1443,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
           <>
             {/* Resumen del día en 1 sola fila compacta (diseño analíticas) */}
             <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
-              <StatTile icon="calendar" title="Fecha" color="teal" value={formatDate(currentDay)} caption={`${availableDates.length} jornadas registradas`} />
-              <StatTile icon="check" title="Medidos" color="blue" value={`${measuredDayRows.length}/${scopedPlayers.length}`} caption={`${dayMeasuredPct}% de cobertura`} />
-              <StatTile icon="download" title="Importadas" color="orange" value={dayImported} caption={dayCorrected ? `${dayCorrected} fechas corregidas` : 'sin correcciones'} />
-              <StatTile icon="catalog" title="Excel" color="violet" value={rawColumnTotal} caption="datos crudos disponibles" />
+              <StatTile icon="calendar" title="Fecha" color="salvia" value={formatDate(currentDay)} caption={`${availableDates.length} jornadas registradas`} />
+              <StatTile icon="check" title="Medidos" color="salvia" value={`${measuredDayRows.length}/${scopedPlayers.length}`} caption={`${dayMeasuredPct}% de cobertura`} />
+              <StatTile icon="download" title="Importadas" color="salvia" value={dayImported} caption={dayCorrected ? `${dayCorrected} fechas corregidas` : 'sin correcciones'} />
+              <StatTile icon="catalog" title="Excel" color="salvia" value={rawColumnTotal} caption="datos crudos disponibles" />
             </SimpleGrid>
 
             {measuredDayRows.length > 0 ? (
@@ -1842,7 +1841,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                   </Box>
 
                   <Button
-                    color="grape"
+                    color="lima"
                     radius="xl"
                     size="sm"
                     leftSection={<IconPlus size={16} />}

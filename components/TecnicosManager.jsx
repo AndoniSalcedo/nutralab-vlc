@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   ActionIcon,
   Avatar,
-  Badge,
   Box,
   Button,
   Checkbox,
@@ -232,14 +231,14 @@ export default function TecnicosManager({ teams = [] }) {
       >
         <Group justify="space-between" align="center" wrap="wrap" gap="md">
           <Group gap="sm">
-            <ThemeIcon color="nutralabColor" variant="light" radius="md" size={42}>
+            <ThemeIcon color="salvia" variant="light" radius="md" size={42}>
               <IconUserCheck size={21} />
             </ThemeIcon>
             <Box>
-              <Title order={3} fw={700} c="dark.5" lh={1.1}>
+              <Title order={3} fw={700} c="var(--nutra-bosque, #1F2A24)" lh={1.1}>
                 Cuerpo Técnico
               </Title>
-              <Text size="xs" c="dimmed" mt={2}>
+              <Text size="xs" c="var(--nutra-salvia, #6C705A)" mt={2}>
                 Vincula técnicos registrados ingresando su correo y asígnales tus equipos.
               </Text>
             </Box>
@@ -247,6 +246,7 @@ export default function TecnicosManager({ teams = [] }) {
           <Button
             radius="xl"
             size="xs"
+            color="lima"
             leftSection={<IconPlus size={14} />}
             onClick={() => setModalOpened(true)}
           >
@@ -291,7 +291,7 @@ export default function TecnicosManager({ teams = [] }) {
                             src={tecnico.avatar_size ? `/api/media/tecnico-avatar?id=${tecnico.id}&t=${tecnico.updated_at || Date.now()}` : undefined}
                             size={38}
                             radius="xl"
-                            color="blue"
+                            color="bosque"
                             style={{
                               border: '2px solid white',
                               boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
@@ -306,7 +306,7 @@ export default function TecnicosManager({ teams = [] }) {
                                 <ActionIcon
                                   {...props}
                                   variant="filled"
-                                  color="dark"
+                                  color="bosque"
                                   radius="xl"
                                   size={18}
                                   style={{
@@ -342,19 +342,19 @@ export default function TecnicosManager({ teams = [] }) {
                     </Table.Td>
                     <Table.Td>
                       {tecnico.team_ids && tecnico.team_ids.length > 0 ? (
-                        <Group gap={6}>
+                        <Group gap={6} wrap="wrap">
                           {tecnico.team_ids.slice(0, 3).map((teamId) => {
                             const foundTeam = teams.find(t => String(t.id) === String(teamId));
                             return (
-                              <Badge key={teamId} variant="light" color="blue" size="sm">
-                                {foundTeam ? `${foundTeam.nombre} (${foundTeam.temporada})` : `Equipo #${teamId}`}
-                              </Badge>
+                              <Text key={teamId} size="xs" fw={500} c="var(--nutra-salvia, #6C705A)">
+                                ● {foundTeam ? `${foundTeam.nombre} (${foundTeam.temporada})` : `Equipo #${teamId}`}
+                              </Text>
                             );
                           })}
                           {tecnico.team_ids.length > 3 && (
-                            <Badge variant="filled" color="gray" size="sm">
+                            <Text size="xs" c="dimmed">
                               +{tecnico.team_ids.length - 3} más
-                            </Badge>
+                            </Text>
                           )}
                         </Group>
                       ) : (
@@ -368,7 +368,7 @@ export default function TecnicosManager({ teams = [] }) {
                         <Tooltip label="Asignar equipos" position="top" withArrow>
                           <ActionIcon
                             variant="subtle"
-                            color="blue"
+                            color="gray"
                             radius="xl"
                             onClick={() => openAssignModal(tecnico)}
                           >
@@ -378,7 +378,7 @@ export default function TecnicosManager({ teams = [] }) {
                         <Tooltip label="Eliminar técnico" position="top" withArrow>
                           <ActionIcon
                             variant="subtle"
-                            color="red"
+                            color="arcilla"
                             radius="xl"
                             onClick={() => handleDelete(tecnico)}
                           >
@@ -442,7 +442,7 @@ export default function TecnicosManager({ teams = [] }) {
               >
                 Cancelar
               </Button>
-              <Button type="submit" radius="xl" loading={saving}>
+              <Button type="submit" color="lima" radius="xl" loading={saving}>
                 Vincular
               </Button>
             </Group>
@@ -541,6 +541,7 @@ export default function TecnicosManager({ teams = [] }) {
             </Button>
             <Button
               radius="xl"
+              color="lima"
               onClick={async () => {
                 setSaving(true);
                 try {

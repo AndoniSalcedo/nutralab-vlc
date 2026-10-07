@@ -182,14 +182,14 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
             <SubtabHeader tab="metricas" subtab="pesos" />
           </Group>
           {!readOnly && (
-            <Button size="xs" radius="xl" leftSection={<IconPlus size={14} />} onClick={startNew}>
+            <Button size="xs" radius="xl" color="lima" leftSection={<IconPlus size={14} />} onClick={startNew}>
               Añadir Peso
             </Button>
           )}
         </Group>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+      <Box py={{ base: 'sm', sm: 'md' }}>
         {sortedAsc.length === 0 ? (
         <NothingFound
           icon={IconScale}
@@ -349,7 +349,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
                                   <Button size="compact-xs" variant="subtle" color="gray" onClick={(e) => { e.stopPropagation(); startEdit(row); }}>
                                     <IconEdit size={14} />
                                   </Button>
-                                  <Button size="compact-xs" variant="subtle" color="red" onClick={(e) => { e.stopPropagation(); handleDelete(row); }}>
+                                  <Button size="compact-xs" variant="subtle" color="arcilla" onClick={(e) => { e.stopPropagation(); handleDelete(row); }}>
                                     <IconTrash size={14} />
                                   </Button>
                                 </Group>
@@ -388,7 +388,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
           />
           <Group justify="flex-end" mt="md">
             <Button variant="default" onClick={() => setModalOpened(false)}>Cancelar</Button>
-            <Button color="orange" onClick={handleSave} loading={saving}>Guardar</Button>
+            <Button color="lima" onClick={handleSave} loading={saving}>Guardar</Button>
           </Group>
         </Stack>
       </Modal>

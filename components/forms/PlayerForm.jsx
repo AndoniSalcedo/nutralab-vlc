@@ -272,7 +272,7 @@ export default function PlayerForm({ initial, team }) {
                 {avatarPreview && (
                   <Button
                     variant="subtle"
-                    color="red"
+                    color="arcilla"
                     size="xs"
                     radius="xl"
                     leftSection={<IconTrash size={13} />}
@@ -454,7 +454,7 @@ export default function PlayerForm({ initial, team }) {
             <Group justify="flex-end" mt="md">
               {initial?.id && (
                 <Button 
-                  color="red" 
+                  color="arcilla" 
                   variant="light" 
                   size="xs"
                   radius="xl"
@@ -466,7 +466,7 @@ export default function PlayerForm({ initial, team }) {
               )}
               <Button 
                 type="submit" 
-                color="blue"
+                color="lima"
                 size="xs"
                 radius="xl"
                 loading={loading}

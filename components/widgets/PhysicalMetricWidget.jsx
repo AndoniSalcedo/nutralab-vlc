@@ -4,11 +4,11 @@ import { useRouter } from 'next/navigation';
 import { Box, Stack, Text, Tooltip, Divider, Group } from '@mantine/core';
 import WidgetCard, { WidgetAside } from './WidgetCard';
 
-const STATUS_COLORS = { verde: 'teal', amarillo: 'yellow', rojo: 'red' };
+const STATUS_COLORS = { verde: 'salvia', amarillo: 'salvia', rojo: 'arcilla' };
 
 const statusConfigMap = {
   verde: {
-    color: '#2e7d32',
+    color: '#4a6813',
     title: 'Óptimo',
   },
   amarillo: {
@@ -16,7 +16,7 @@ const statusConfigMap = {
     title: 'Precaución',
   },
   rojo: {
-    color: '#c92a2a',
+    color: '#B8674A',
     title: 'Alerta',
   },
 };
@@ -90,22 +90,22 @@ export default function PhysicalMetricWidget({
       <Box h="100%">
         <WidgetCard
           id="widget-fisico"
-          color="green"
+          color="salvia"
           icon="gym"
           title="Físico"
           onClick={() => router.push(`/dashboard/jugador/${jugadorId}/metricas/pesos`)}
         >
-          <Text fz={24} fw={800} c="dark.6" lh={1.1} style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+          <Text fz={24} fw={800} c="var(--nutra-bosque, #1F2A24)" lh={1.1} style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
             {pesoActual ? formatMetricNumber(pesoActual, 1) : '—'}
-            <Text span fz="xs" fw={600} c="dimmed"> kg</Text>
+            <Text span fz="xs" fw={600} c="var(--nutra-salvia, #6C705A)"> kg</Text>
           </Text>
           <Box mt={6} w="fit-content">
             {hasSemaforo ? (
-              <WidgetAside color={STATUS_COLORS[status] || 'teal'} dot>
+              <WidgetAside color={STATUS_COLORS[status] || 'salvia'} dot>
                 {formattedDiff ? `${formattedDiff} · ${cfg.title}` : cfg.title}
               </WidgetAside>
             ) : (
-              <WidgetAside color="teal">
+              <WidgetAside color="salvia">
                 {porcentajeGrasa ? `${formatMetricNumber(porcentajeGrasa, 1)}% grasa` : 'Al día'}
               </WidgetAside>
             )}

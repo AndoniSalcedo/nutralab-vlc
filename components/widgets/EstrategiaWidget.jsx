@@ -63,16 +63,16 @@ export default function EstrategiaWidget({
   return (
     <WidgetCard
       id="widget-estrategia"
-      color="grape"
+      color="salvia"
       icon="target"
       title={activeProtocol ? `Estrategia: ${activeProtocol.name}` : 'Estrategia del día'}
-      aside={<WidgetAside color="nutralabColor" dot>{activeDayLabel}</WidgetAside>}
+      aside={<WidgetAside color="salvia" dot>{activeDayLabel}</WidgetAside>}
       footer="Pautas y timing de competición"
       footerAction="Ver protocolos"
       onClick={() => router.push(`/dashboard/jugador/${jugador?.id}/nutricion/protocolos`)}
     >
       {hasTimeline ? (
-        <Timeline bulletSize={26} lineWidth={2} color="nutralabColor" pl={4}>
+        <Timeline bulletSize={26} lineWidth={2} color="bosque" pl={4}>
           {activeProtocol.timeline.map((item, idx) => {
             const IconComp = AVAILABLE_ICONS[item.icon] || IconFlag;
             return (
@@ -81,10 +81,10 @@ export default function EstrategiaWidget({
                 bullet={<IconComp size={13} />}
                 title={
                   <Group gap={8} align="center" wrap="nowrap">
-                    <Text fz="xs" fw={600} c="nutralabColor.8" style={{ minWidth: 36, flexShrink: 0 }}>
+                    <Text fz="xs" fw={600} style={{ color: 'var(--nutra-salvia, #6C705A)', minWidth: 36, flexShrink: 0 }}>
                       {item.timeLabel}
                     </Text>
-                    <Text fz="xs" fw={600} c="dark.5" truncate>
+                    <Text fz="xs" fw={600} c="var(--nutra-bosque, #1F2A24)" truncate>
                       {item.title}
                     </Text>
                   </Group>
@@ -112,8 +112,8 @@ export default function EstrategiaWidget({
                         }}
                       >
                         <IconPill size={11} style={{ opacity: 0.7 }} />
-                        <Text fz={11} fw={700} c="dark.5">{supp.nombre}</Text>
-                        <Text fz={11} fw={600} c="grape.7">· {supp.dosis}</Text>
+                        <Text fz={11} fw={700} c="var(--nutra-bosque, #1F2A24)">{supp.nombre}</Text>
+                        <Text fz={11} fw={600} c="var(--nutra-salvia, #6C705A)">· {supp.dosis}</Text>
                       </Box>
                     ))}
                   </Group>

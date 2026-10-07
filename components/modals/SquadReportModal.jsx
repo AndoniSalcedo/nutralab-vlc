@@ -524,12 +524,12 @@ export default function SquadReportModal({
           )}
 
           {/* Panel 5: Textos e Indicaciones */}
-          <Paper p="md" radius="md" withBorder bg="gray.0">
+          <Paper p="md" radius="md" withBorder style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', borderColor: 'rgba(108, 112, 90, 0.12)' }}>
             <Group gap="xs" mb="xs">
-              <ThemeIcon color="nutralabColor" size="sm" radius="xl" variant="light">
+              <ThemeIcon color="salvia" size="sm" radius="xl" variant="light">
                 <IconBook size={14} />
               </ThemeIcon>
-              <Text fw={700} size="sm" c="dark.5">Contenido e Indicaciones del PDF</Text>
+              <Text fw={700} size="sm" c="var(--nutra-bosque, #1F2A24)">Contenido e Indicaciones del PDF</Text>
             </Group>
 
             <Stack gap="sm">
@@ -579,7 +579,7 @@ export default function SquadReportModal({
         </Button>
         <Button
           variant="filled"
-          color="dark"
+          color="lima"
           size="sm"
           radius="xl"
           style={{ flex: 1 }}

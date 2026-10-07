@@ -54,10 +54,10 @@ function parameterStatus(p) {
   const min = hasMin ? Number(p.rango_min) : null;
   const max = hasMax ? Number(p.rango_max) : null;
 
-  if (!p.fuera_rango) return { color: 'green', label: 'Normal' };
-  if (Number.isFinite(max) && value > max) return { color: 'red', label: 'Alto' };
-  if (Number.isFinite(min) && value < min) return { color: 'orange', label: 'Bajo' };
-  return { color: 'yellow', label: 'Revisar' };
+  if (!p.fuera_rango) return { color: 'salvia', label: 'Normal' };
+  if (Number.isFinite(max) && value > max) return { color: 'arcilla', label: 'Alto' };
+  if (Number.isFinite(min) && value < min) return { color: 'arcilla', label: 'Bajo' };
+  return { color: 'arcilla', label: 'Revisar' };
 }
 
 function rangeLabel(p) {
@@ -270,7 +270,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
                     <Button
                       size="xs"
                       variant={selected.visible_para_jugador ? 'light' : 'default'}
-                      color={selected.visible_para_jugador ? 'green' : 'gray'}
+                      color={selected.visible_para_jugador ? 'salvia' : 'gray'}
                       radius="xl"
                       leftSection={selected.visible_para_jugador ? <IconEye size={14} /> : <IconEyeOff size={14} />}
                       onClick={handleToggleVisibility}
@@ -283,7 +283,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
                 <Button
                   size="xs"
                   variant="light"
-                  color="red"
+                  color="arcilla"
                   radius="xl"
                   leftSection={<IconTrash size={14} />}
                   onClick={handleDelete}
@@ -292,7 +292,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
                 >
                   Borrar
                 </Button>
-                <Button size="xs" radius="xl" leftSection={<IconPlus size={14} />} onClick={startUpload}>
+                <Button size="xs" radius="xl" color="lima" leftSection={<IconPlus size={14} />} onClick={startUpload}>
                   Añadir
                 </Button>
               </Group>
@@ -326,7 +326,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
                   <Button
                     size="xs"
                     variant="light"
-                    color="red"
+                    color="arcilla"
                     radius="xl"
                     leftSection={<IconTrash size={14} />}
                     onClick={handleDelete}
@@ -336,7 +336,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
                   >
                     Borrar
                   </Button>
-                  <Button size="xs" radius="xl" leftSection={<IconPlus size={14} />} onClick={startUpload} fullWidth>
+                  <Button size="xs" radius="xl" color="lima" leftSection={<IconPlus size={14} />} onClick={startUpload} fullWidth>
                     Añadir
                   </Button>
                 </Group>
@@ -374,7 +374,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
         uploading={uploading}
       />
 
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+      <Box py={{ base: 'sm', sm: 'md' }}>
         {sorted.length === 0 ? (
           <Box mt="xl">
             <NothingFound
@@ -389,7 +389,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
         ) : selected ? (
           <Stack gap={0}>
             {fueraRango.length > 0 && (
-              <BentoCard title="Parámetros a revisar" icon={IconAlertTriangle} color="red" mb={{ base: 'md', sm: 'lg' }}>
+              <BentoCard title="Parámetros a revisar" icon={IconAlertTriangle} color="arcilla" mb={{ base: 'md', sm: 'lg' }}>
                 <ScrollArea>
                   <Table verticalSpacing="xs" highlightOnHover>
                     <Table.Tbody>
@@ -418,7 +418,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
               </BentoCard>
             )}
 
-            <BentoCard title="Parámetros extraídos" icon={IconFileText} color="blue">
+            <BentoCard title="Parámetros extraídos" icon={IconFileText} color="salvia">
               <ScrollArea>
                 <Table striped highlightOnHover verticalSpacing="xs" style={{ minWidth: 640 }}>
                   <Table.Thead bg="gray.0">

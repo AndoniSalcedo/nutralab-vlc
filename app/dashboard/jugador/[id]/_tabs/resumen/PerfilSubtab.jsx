@@ -238,8 +238,8 @@ export default function PerfilSubtab({
             <Group gap="sm" align="center" wrap="nowrap">
               <HeaderIcon size={28} />
               <Box style={{ minWidth: 0 }}>
-                <Title order={3} fw={700} c="dark.5" fz={{ base: 16, sm: 18 }} lineClamp={1}>{headerConfig.title}</Title>
-                <Text size="sm" c="dimmed" lineClamp={1}>
+                <Title order={3} fw={700} c="var(--nutra-bosque, #1F2A24)" fz={{ base: 16, sm: 18 }} lineClamp={1}>{headerConfig.title}</Title>
+                <Text size="sm" c="var(--nutra-salvia, #6C705A)" lineClamp={1}>
                   {readOnly ? (headerConfig.subtitleReadOnly || headerConfig.subtitle) : headerConfig.subtitle}
                 </Text>
               </Box>
@@ -256,16 +256,16 @@ export default function PerfilSubtab({
                     gap: 6,
                     padding: '5px 12px',
                     borderRadius: 20,
-                    backgroundColor: 'var(--mantine-color-gray-1)',
+                    backgroundColor: 'rgba(108, 112, 90, 0.08)',
                     fontSize: '12px',
                     fontWeight: 500,
                     cursor: 'pointer',
                     transition: 'background-color 0.15s ease',
                   }}
                 >
-                  <span style={{ fontSize: '7px', color: `var(--mantine-color-${activeDay.color || 'blue'}-6)` }}>●</span>
-                  <Text size="xs" fw={500} c="dark.4">{activeDay.label || 'Día'}</Text>
-                  <IconChevronDown size={12} stroke={2} style={{ color: 'var(--mantine-color-gray-5)' }} />
+                  <span style={{ fontSize: '7px', color: 'var(--nutra-salvia, #6C705A)' }}>●</span>
+                  <Text size="xs" fw={500} c="var(--nutra-bosque, #1F2A24)">{activeDay.label || 'Día'}</Text>
+                  <IconChevronDown size={12} stroke={2} style={{ color: 'var(--nutra-salvia, #6C705A)' }} />
                 </UnstyledButton>
               </Menu.Target>
               <Menu.Dropdown>
@@ -274,9 +274,9 @@ export default function PerfilSubtab({
                   <Menu.Item
                     key={dt.value}
                     leftSection={
-                      <span style={{ fontSize: '8px', color: `var(--mantine-color-${dt.color || 'blue'}-6)` }}>●</span>
+                      <span style={{ fontSize: '8px', color: 'var(--nutra-salvia, #6C705A)' }}>●</span>
                     }
-                    rightSection={dt.value === activeDayType ? <IconCheck size={14} color="var(--mantine-color-blue-6)" /> : null}
+                    rightSection={dt.value === activeDayType ? <IconCheck size={14} color="var(--nutra-bosque, #1F2A24)" /> : null}
                     onClick={() => setActiveDayType(dt.value)}
                     style={{ fontWeight: dt.value === activeDayType ? 600 : 400 }}
                   >
@@ -301,8 +301,8 @@ export default function PerfilSubtab({
         </Box>
       </Paper>
 
-      {/* Main Content wrapper: Con padding lateral adecuado en móvil (12px) y escritorio (16px) */}
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 12, sm: 'md' }}>
+      {/* Main Content wrapper: Sin margen horizontal extra para alinearse con el layout y cabeceras */}
+      <Box py={{ base: 'sm', sm: 'md' }}>
         <Stack gap="md">
           {/* Bento: teselas de 1 o 2 columnas; lo urgente arriba, las constantes en pares y el detalle debajo */}
           <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>

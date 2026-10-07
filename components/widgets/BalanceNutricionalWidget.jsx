@@ -122,19 +122,19 @@ function Tube({ macro, consumed, target }) {
           <Box
             w={18}
             h={18}
-            style={{ borderRadius: '50%', display: 'grid', placeItems: 'center', backgroundColor: 'var(--mantine-color-teal-6)' }}
+            style={{ borderRadius: '50%', display: 'grid', placeItems: 'center', backgroundColor: 'var(--nutra-lima, #C1F080)' }}
           >
-            <IconCheck size={11} stroke={3.4} color="white" />
+            <IconCheck size={11} stroke={3.4} color="var(--nutra-bosque, #1F2A24)" />
           </Box>
         )}
         {status.tone === 'over' && (
           <Text
             fz={10}
             fw={800}
-            c="orange.8"
+            c="var(--nutra-arcilla, #B8674A)"
             px={6}
             lh="18px"
-            style={{ ...tabular, borderRadius: 9, backgroundColor: 'var(--mantine-color-orange-0)', whiteSpace: 'nowrap' }}
+            style={{ ...tabular, borderRadius: 9, backgroundColor: 'var(--nutra-arcilla-soft, rgba(184, 103, 74, 0.12))', whiteSpace: 'nowrap' }}
           >
             +{fmt(status.diff)}
           </Text>
@@ -147,7 +147,7 @@ function Tube({ macro, consumed, target }) {
         style={{
           width: 'calc(var(--tube-w) + 8px)',
           borderRadius: 3,
-          backgroundColor: status.tone === 'over' ? 'var(--mantine-color-orange-4)' : 'var(--mantine-color-gray-2)',
+          backgroundColor: status.tone === 'over' ? 'var(--nutra-arcilla, #B8674A)' : 'var(--mantine-color-gray-2)',
         }}
       />
 
@@ -343,12 +343,12 @@ export default function BalanceNutricionalWidget({
   else if (kcalStatus.tone === 'over') hero = { label: 'Por encima', value: `+${fmt(kcalStatus.diff)}`, color: 'orange.8' };
 
   const hint = getHint({ isEmpty, kcalTone: kcalStatus.tone, consumed, target });
-  const pctColor = kcalStatus.tone === 'over' ? 'orange.7' : kcalStatus.tone === 'ok' ? 'teal.7' : 'dark.4';
+  const pctColor = kcalStatus.tone === 'over' ? 'var(--nutra-arcilla, #B8674A)' : kcalStatus.tone === 'ok' ? 'var(--nutra-lima-dark, #4a6813)' : 'var(--nutra-bosque, #1F2A24)';
 
   return (
     <WidgetCard
       id="widget-balance-nutricional"
-      color="red"
+      color="salvia"
       icon="fire"
       title="Balance nutricional"
       aside={<DateNav date={date} onDateChange={onDateChange} />}

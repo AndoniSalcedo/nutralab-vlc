@@ -23,20 +23,20 @@ const SUBTAB_CONFIGS = {
     headers: {
       perfil: {
         icon: IconUser,
-        iconColor: 'blue',
+        iconColor: 'salvia',
         title: 'Perfil del jugador',
         subtitle: 'Objetivos, preferencias y ajustes individuales.',
         subtitleReadOnly: 'Objetivos y pautas semanales.',
       },
       diario: {
         icon: IconNotes,
-        iconColor: 'blue',
+        iconColor: 'salvia',
         title: 'Diario de Comidas',
         subtitle: 'Registro diario de ingestas.',
       },
       mensajes: {
         icon: IconMail,
-        iconColor: 'blue',
+        iconColor: 'salvia',
         title: 'Mensajes',
         subtitle: 'Comunicaciones hacia el jugador.',
       },
@@ -53,25 +53,25 @@ const SUBTAB_CONFIGS = {
     headers: {
       pesos: {
         icon: IconScale,
-        iconColor: 'orange',
+        iconColor: 'salvia',
         title: 'Evolución de Peso',
         subtitle: 'Historial de peso corporal.',
       },
       mediciones: {
         icon: IconRuler2,
-        iconColor: 'cyan',
+        iconColor: 'salvia',
         title: 'Mediciones',
         subtitle: 'Historial de medidas y evolución.',
       },
       analiticas: {
         icon: IconReportMedical,
-        iconColor: 'blue',
+        iconColor: 'salvia',
         title: 'Analíticas',
         subtitle: 'Documentos clínicos destacados.',
       },
       hidratacion: {
         icon: IconDroplet,
-        iconColor: 'blue',
+        iconColor: 'salvia',
         title: 'Hidratación y sudoración',
         subtitle: 'Osmolaridad salival y sodio en sudor.',
       },
@@ -88,25 +88,25 @@ const SUBTAB_CONFIGS = {
     headers: {
       plan: {
         icon: IconBrain,
-        iconColor: 'blue',
+        iconColor: 'salvia',
         title: 'Planes nutricionales',
         subtitle: 'Fichas con métricas, macros y pautas.',
       },
       suplementacion: {
         icon: IconBottle,
-        iconColor: 'grape',
+        iconColor: 'salvia',
         title: 'Suplementación',
         subtitle: 'Asignación de catálogos.',
       },
       menu: {
         icon: IconBentoBox,
-        iconColor: 'teal',
+        iconColor: 'salvia',
         title: 'Menú comedor',
         subtitle: 'Comedor del equipo.',
       },
       protocolos: {
         icon: IconFlag2,
-        iconColor: 'dark',
+        iconColor: 'salvia',
         title: 'Protocolos',
         subtitle: 'Guía nutricional para distintos protocolos.',
       },

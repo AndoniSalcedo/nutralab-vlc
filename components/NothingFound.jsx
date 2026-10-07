@@ -94,7 +94,12 @@ export default function NothingFound({
         shadow="xs"
         p={compact ? 'lg' : 40}
         bg="white"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: compact ? 150 : 250 }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: compact ? 150 : 250,
+        }}
       >
         {content}
       </Paper>

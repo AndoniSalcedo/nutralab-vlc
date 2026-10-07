@@ -270,7 +270,7 @@ export default function TransferPlayersModal({
                         checked={isSelected}
                         onChange={() => {}}
                         tabIndex={-1}
-                        color={action === 'move' ? 'blue' : 'teal'}
+                        color="bosque"
                         style={{ pointerEvents: 'none' }}
                       />
                     </Group>
@@ -306,7 +306,7 @@ export default function TransferPlayersModal({
           </Button>
           <Button
             variant="filled"
-            color="dark"
+            color="lima"
             size="sm"
             radius="xl"
             style={{ flex: 1 }}

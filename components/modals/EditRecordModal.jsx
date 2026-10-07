@@ -95,10 +95,10 @@ export default function EditRecordModal({
         />
 
         <Group justify="flex-end" mt="sm">
-          <Button variant="light" color="gray" radius="xl" size="xs" onClick={onClose}>
+          <Button variant="default" radius="xl" size="xs" onClick={onClose}>
             Cancelar
           </Button>
-          <Button color="blue" radius="xl" size="xs" leftSection={<Icon3D name="check" size={18} />} onClick={saveEditedRecord} loading={savingEdit}>
+          <Button color="lima" radius="xl" size="xs" leftSection={<Icon3D name="check" size={18} />} onClick={saveEditedRecord} loading={savingEdit}>
             Guardar Cambios
           </Button>
         </Group>

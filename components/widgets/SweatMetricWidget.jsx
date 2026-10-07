@@ -138,16 +138,16 @@ export default function SweatMetricWidget({
   return (
     <WidgetCard
       id="widget-sudor"
-      color="orange"
+      color="salvia"
       icon="running"
       title="Sudoración"
       aside={
         hasValue ? (
           <Text lh={1} style={{ fontVariantNumeric: 'tabular-nums' }}>
-            <Text span fz={22} fw={800} c="dark.6">
+            <Text span fz={22} fw={800} c="var(--nutra-bosque, #1F2A24)">
               {formatMetricNumber(numVal, 0)}
             </Text>{' '}
-            <Text span fz="xs" fw={600} c="dimmed">
+            <Text span fz="xs" fw={600} style={{ color: 'var(--nutra-salvia, #6C705A)' }}>
               {unit}
             </Text>
           </Text>

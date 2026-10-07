@@ -11,7 +11,7 @@ export default async function DashboardLayout({ children }) {
       <Box
         style={{
           minHeight: '100vh',
-          backgroundColor: 'var(--mantine-color-gray-0)',
+          backgroundColor: 'var(--nutra-app-bg, #F8F7F4)',
         }}
         pt={{ sm: 'md', base: 0 }}
       >

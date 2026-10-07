@@ -706,7 +706,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                         size="xs"
                         radius="xl"
                         variant="light"
-                        color="red"
+                        color="arcilla"
                         leftSection={<IconTrash size={16} />}
                         onClick={() => handleDeletePlan(currentPlan.id)}
                         loading={deleting}
@@ -725,7 +725,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                         Editar
                       </Button>
                     )}
-                    <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={openCreateModal}>
+                    <Button size="xs" radius="xl" color="lima" leftSection={<IconPlus size={16} />} onClick={openCreateModal}>
                       Crear
                     </Button>
                   </>
@@ -775,7 +775,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                           size="xs"
                           radius="xl"
                           variant="light"
-                          color="red"
+                          color="arcilla"
                           leftSection={<IconTrash size={16} />}
                           onClick={() => handleDeletePlan(currentPlan.id)}
                           loading={deleting}
@@ -796,7 +796,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                           Editar
                         </Button>
                       )}
-                      <Button size="xs" radius="xl" leftSection={<IconPlus size={16} />} onClick={openCreateModal} fullWidth>
+                      <Button size="xs" radius="xl" color="lima" leftSection={<IconPlus size={16} />} onClick={openCreateModal} fullWidth>
                         Crear
                       </Button>
                     </>
@@ -820,7 +820,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         </Stack>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+      <Box py={{ base: 'sm', sm: 'md' }}>
         {loadingList ? (
           <Paper p={{ base: 'md', sm: 'xl' }} radius={24} shadow="xs" style={{ textAlign: 'center' }}>
             <Loader size="lg" />

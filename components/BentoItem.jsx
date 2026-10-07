@@ -27,7 +27,7 @@ export function BentoCard({ title, icon: Icon, icon3d, color = 'gray', children,
             {Icon ? <Icon size={16} stroke={1.5} /> : <Icon3D name={icon3d} size={16} />}
           </ThemeIcon>
         ) : null}
-        <Text fz={13} fw={700} c="dark.5" lh={1.25}>
+        <Text fz={13} fw={700} c="var(--nutra-bosque, #1F2A24)" lh={1.25}>
           {title}
         </Text>
       </Group>
