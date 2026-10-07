@@ -5,7 +5,27 @@
  * Cada alimento incluye sus etiquetas dietéticas y clínicas ('tags') para filtrado determinista.
  * Límites gastronómicos mínimos y máximos (minGrams, maxGrams) para cada alimento.
  * Valores por 100g de alimento en crudo o ración indicada.
+ * Frutas y verduras: 'temporada' con los meses (MES) en que están de temporada en España. Al elegir fruta o verdura
+ * libre dentro de un grupo, el motor rota solo entre las de temporada del mes del plan; lo que una pauta, el
+ * protocolo o un plato del menú nombran de forma concreta se sirve siempre. Toda fruta y verdura que rota debe tenerla.
  */
+
+const MES = Object.freeze({
+  ENERO: 1,
+  FEBRERO: 2,
+  MARZO: 3,
+  ABRIL: 4,
+  MAYO: 5,
+  JUNIO: 6,
+  JULIO: 7,
+  AGOSTO: 8,
+  SEPTIEMBRE: 9,
+  OCTUBRE: 10,
+  NOVIEMBRE: 11,
+  DICIEMBRE: 12,
+});
+
+const TODO_EL_AÑO = Object.freeze(Object.values(MES));
 
 export const FOODS_CRUDO = [
   {
@@ -502,6 +522,7 @@ export const FOODS_CRUDO = [
     "minGrams": 100,
     "maxGrams": 450,
     "defaultGrams": 250,
+    "temporada": [MES.OCTUBRE, MES.NOVIEMBRE],
     "treePath": [
       "hidratos",
       "tuberculos"
@@ -518,6 +539,7 @@ export const FOODS_CRUDO = [
     "minGrams": 100,
     "maxGrams": 400,
     "defaultGrams": 250,
+    "temporada": [MES.OCTUBRE, MES.NOVIEMBRE],
     "treePath": [
       "hidratos",
       "tuberculos"
@@ -1098,6 +1120,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 200,
+    "temporada": [MES.MARZO, MES.ABRIL, MES.MAYO, MES.JUNIO, MES.JULIO],
     "treePath": [
       "frutas"
     ]
@@ -1115,6 +1138,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
     "treePath": [
       "frutas"
     ]
@@ -1147,6 +1171,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 200,
+    "temporada": [MES.JUNIO, MES.JULIO],
     "treePath": [
       "frutas"
     ]
@@ -1161,6 +1186,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.MARZO, MES.ABRIL, MES.MAYO],
     "treePath": [
       "frutas"
     ]
@@ -1175,6 +1201,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "frutas"
     ]
@@ -1189,6 +1216,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "frutas"
     ]
@@ -1206,6 +1234,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.AGOSTO, MES.SEPTIEMBRE, MES.OCTUBRE, MES.NOVIEMBRE],
     "treePath": [
       "frutas"
     ]
@@ -1223,6 +1252,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.SEPTIEMBRE, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "frutas"
     ]
@@ -1258,6 +1288,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.MAYO, MES.JUNIO, MES.JULIO, MES.AGOSTO],
     "treePath": [
       "frutas"
     ]
@@ -1272,6 +1303,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
     "treePath": [
       "frutas"
     ]
@@ -1286,6 +1318,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.ABRIL, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "frutas"
     ]
@@ -1303,6 +1336,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.MAYO, MES.JUNIO, MES.JULIO, MES.AGOSTO],
     "treePath": [
       "frutas"
     ]
@@ -1320,6 +1354,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
     "treePath": [
       "frutas"
     ]
@@ -1337,6 +1372,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.SEPTIEMBRE, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "frutas"
     ]
@@ -1369,6 +1405,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": TODO_EL_AÑO,
     "treePath": [
       "frutas"
     ]
@@ -1383,6 +1420,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": TODO_EL_AÑO,
     "treePath": [
       "frutas"
     ]
@@ -1400,6 +1438,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
     "treePath": [
       "frutas"
     ]
@@ -1446,6 +1485,147 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 220,
+    "temporada": [MES.AGOSTO, MES.SEPTIEMBRE, MES.OCTUBRE],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Pomelo",
+    "originalName": "Pomelo crudo",
+    "kcal": 42,
+    "cho": 10.7,
+    "pro": 0.8,
+    "fat": 0.1,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 220,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.DICIEMBRE],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Níspero",
+    "originalName": "Níspero crudo",
+    "kcal": 47,
+    "cho": 12.1,
+    "pro": 0.4,
+    "fat": 0.2,
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 220,
+    "temporada": [MES.ABRIL, MES.MAYO],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Cerezas",
+    "originalName": "Cereza cruda",
+    "kcal": 63,
+    "cho": 16,
+    "pro": 1.1,
+    "fat": 0.2,
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 220,
+    "temporada": [MES.MAYO, MES.JUNIO, MES.JULIO],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Albaricoque",
+    "originalName": "Albaricoque crudo",
+    "kcal": 48,
+    "cho": 11.1,
+    "pro": 1.4,
+    "fat": 0.4,
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 220,
+    "temporada": [MES.MAYO, MES.JUNIO],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Higos",
+    "originalName": "Higo fresco crudo",
+    "kcal": 74,
+    "cho": 19.2,
+    "pro": 0.8,
+    "fat": 0.3,
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 220,
+    "temporada": [MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Moras",
+    "originalName": "Mora cruda",
+    "kcal": 43,
+    "cho": 9.6,
+    "pro": 1.4,
+    "fat": 0.5,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 80,
+    "maxGrams": 200,
+    "temporada": [MES.JULIO, MES.AGOSTO],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Granada",
+    "originalName": "Granada cruda",
+    "kcal": 83,
+    "cho": 18.7,
+    "pro": 1.7,
+    "fat": 1.2,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 220,
+    "temporada": [MES.SEPTIEMBRE, MES.OCTUBRE, MES.NOVIEMBRE],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Caqui",
+    "originalName": "Caqui crudo",
+    "kcal": 70,
+    "cho": 18.6,
+    "pro": 0.6,
+    "fat": 0.2,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 220,
+    "temporada": [MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "frutas"
     ]
@@ -3636,6 +3816,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.ABRIL, MES.SEPTIEMBRE, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "verduras",
       "hojas_verdes"
@@ -3670,6 +3851,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.ABRIL, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3685,6 +3867,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3702,6 +3885,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3717,6 +3901,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.MAYO, MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3734,6 +3919,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3751,6 +3937,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": TODO_EL_AÑO,
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3768,6 +3955,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3785,6 +3973,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": TODO_EL_AÑO,
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3802,6 +3991,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.MARZO, MES.ABRIL, MES.MAYO],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3819,6 +4009,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.MARZO, MES.ABRIL, MES.MAYO],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3836,6 +4027,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3851,6 +4043,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 50,
     "maxGrams": 200,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.ABRIL, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "verduras",
       "hojas_verdes"
@@ -3883,6 +4076,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.MAYO, MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3898,6 +4092,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 50,
     "maxGrams": 200,
+    "temporada": [MES.ABRIL, MES.MAYO, MES.JUNIO],
     "treePath": [
       "verduras",
       "hojas_verdes"
@@ -3913,6 +4108,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.MAYO, MES.JUNIO, MES.JULIO, MES.AGOSTO],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3928,6 +4124,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3943,6 +4140,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE, MES.OCTUBRE],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3958,6 +4156,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.ABRIL, MES.MAYO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
     "treePath": [
       "verduras",
       "hojas_verdes"
@@ -3973,6 +4172,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -3990,6 +4190,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": TODO_EL_AÑO,
     "treePath": [
       "verduras",
       "hortalizas"
@@ -4005,6 +4206,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -4409,6 +4611,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 450,
+    "temporada": [MES.OCTUBRE, MES.NOVIEMBRE],
     "treePath": [
       "hidratos",
       "tuberculos"
@@ -4547,6 +4750,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 40,
     "maxGrams": 150,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -4562,6 +4766,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 50,
     "maxGrams": 150,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
     "treePath": [
       "verduras",
       "hortalizas"
@@ -4577,6 +4782,145 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 80,
     "maxGrams": 200,
+    "temporada": [MES.MAYO, MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Col",
+    "originalName": "Col repollo cruda",
+    "kcal": 25,
+    "cho": 5.8,
+    "pro": 1.3,
+    "fat": 0.1,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Apio",
+    "originalName": "Apio crudo",
+    "kcal": 16,
+    "cho": 3,
+    "pro": 0.7,
+    "fat": 0.2,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Nabo",
+    "originalName": "Nabo crudo",
+    "kcal": 28,
+    "cho": 6.4,
+    "pro": 0.9,
+    "fat": 0.1,
+    "tags": [],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Calabaza",
+    "originalName": "Calabaza cruda",
+    "kcal": 26,
+    "cho": 6.5,
+    "pro": 1,
+    "fat": 0.1,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.SEPTIEMBRE, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Escarola",
+    "originalName": "Escarola cruda",
+    "kcal": 17,
+    "cho": 3.4,
+    "pro": 1.3,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 50,
+    "maxGrams": 200,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hojas_verdes"
+    ]
+  },
+  {
+    "name": "Habas",
+    "originalName": "Habas tiernas crudas",
+    "kcal": 72,
+    "cho": 11.7,
+    "pro": 5.6,
+    "fat": 0.6,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.MARZO, MES.ABRIL, MES.MAYO],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Cebolleta",
+    "originalName": "Cebolleta cruda",
+    "kcal": 32,
+    "cho": 7.3,
+    "pro": 1.8,
+    "fat": 0.2,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.ABRIL, MES.MAYO],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Rábano",
+    "originalName": "Rábano crudo",
+    "kcal": 16,
+    "cho": 3.4,
+    "pro": 0.7,
+    "fat": 0.1,
+    "tags": [],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.ABRIL],
     "treePath": [
       "verduras",
       "hortalizas"
