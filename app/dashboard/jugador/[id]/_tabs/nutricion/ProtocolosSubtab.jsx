@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Box, Group, Paper, SimpleGrid, Stack, Text, Timeline, Select, Title, Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconPencil, IconCalendar, IconFlag, IconClipboardList, IconRotate } from '@/components/icons3d';
+import Icon3D from '@/components/Icon3D';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import { EditableSection } from '../editable';
@@ -176,7 +177,33 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
                     <Timeline active={activeProtocol.timeline.length - 1} bulletSize={28} lineWidth={2} color="dark">
                       {activeProtocol.timeline.map((item, idx) => (
                         <Timeline.Item key={item.id || idx} bullet={renderTimelineIcon(item.icon)} title={`${item.timeLabel} · ${item.title}`}>
-                          <Text size="sm" c="dimmed">{item.description}</Text>
+                          {item.description && <Text size="sm" c="dimmed">{item.description}</Text>}
+                          {item.suplementos?.length > 0 && (
+                            <Stack gap={4} mt={6}>
+                              {item.suplementos.map((supp, sIdx) => (
+                                <Paper
+                                  key={sIdx}
+                                  px="xs"
+                                  py={4}
+                                  radius="sm"
+                                  withBorder
+                                  bg="gray.1"
+                                  style={{ borderColor: 'var(--mantine-color-gray-3)' }}
+                                >
+                                  <Group justify="space-between" align="center" wrap="nowrap">
+                                    <Group gap={6} wrap="nowrap" style={{ minWidth: 0 }}>
+                                      <Icon3D name="pill" size={14} style={{ flexShrink: 0 }} />
+                                      <Text size="xs" fw={700} c="dark.5" truncate>{supp.nombre}</Text>
+                                      <Text size="xs" fw={600} c="grape.7" style={{ whiteSpace: 'nowrap' }}>· {supp.dosis}</Text>
+                                    </Group>
+                                    {supp.notas && (
+                                      <Text size={11} c="dimmed" truncate style={{ maxWidth: '40%' }}>{supp.notas}</Text>
+                                    )}
+                                  </Group>
+                                </Paper>
+                              ))}
+                            </Stack>
+                          )}
                         </Timeline.Item>
                       ))}
                     </Timeline>
@@ -225,6 +252,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
           opened={editorOpen}
           onClose={() => setEditorOpen(false)}
           protocol={activeProtocol}
+          peso={Number(jugador.peso_kg || 0)}
           saveLabel="Guardar Protocolo"
           helpText="Los cambios se guardarán directamente en la ficha del jugador."
           onSave={handleSaveCustomProtocol}

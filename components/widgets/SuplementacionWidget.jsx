@@ -72,9 +72,9 @@ export default function SuplementacionWidget({
       id="widget-suplementacion"
       color="violet"
       icon="suplementacion"
-      title="Suplementos"
+      title="Suplementos diarios"
       footer={isAllDone ? '¡Todo tomado!' : `${completedCount}/${totalCount} tomas`}
-      footerAction="Protocolo"
+      footerAction="Suplementación"
       onFooterAction={() => router.push(`/dashboard/jugador/${jugadorId}/nutricion/suplementacion`)}
     >
       {/* Lista de tomas interactivas */}

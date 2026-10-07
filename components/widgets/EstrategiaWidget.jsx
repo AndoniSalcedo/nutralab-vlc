@@ -95,6 +95,29 @@ export default function EstrategiaWidget({
                     {item.description}
                   </Text>
                 )}
+                {item.suplementos?.length > 0 && (
+                  <Group gap={6} mt={6} wrap="wrap">
+                    {item.suplementos.map((supp, sIdx) => (
+                      <Box
+                        key={sIdx}
+                        px={7}
+                        py={3}
+                        style={{
+                          borderRadius: 6,
+                          backgroundColor: 'var(--mantine-color-gray-1)',
+                          border: '1px solid var(--mantine-color-gray-3)',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 5,
+                        }}
+                      >
+                        <IconPill size={11} style={{ opacity: 0.7 }} />
+                        <Text fz={11} fw={700} c="dark.5">{supp.nombre}</Text>
+                        <Text fz={11} fw={600} c="grape.7">· {supp.dosis}</Text>
+                      </Box>
+                    ))}
+                  </Group>
+                )}
               </Timeline.Item>
             );
           })}

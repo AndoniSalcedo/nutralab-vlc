@@ -885,7 +885,15 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                                           </Group>
                                         )}
                                       </Group>
-                                      <Text size="xs" c="dimmed">{p.timeline?.length || 0} pasos · {p.checklist?.length || 0} checks</Text>
+                                      {(() => {
+                                        const suppCount = (p.timeline || []).reduce((acc, step) => acc + (step.suplementos?.length || 0), 0);
+                                        return (
+                                          <Text size="xs" c="dimmed">
+                                            {p.timeline?.length || 0} pasos · {p.checklist?.length || 0} checks
+                                            {suppCount > 0 ? ` · ${suppCount} ${suppCount === 1 ? 'suplemento pautado' : 'suplementos pautados'}` : ''}
+                                          </Text>
+                                        );
+                                      })()}
                                     </Table.Td>
                                     {!readOnly && (
                                       <Table.Td w={{ base: 120, sm: 150 }}>

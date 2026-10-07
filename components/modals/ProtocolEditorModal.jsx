@@ -7,25 +7,54 @@ import {
 } from '@/components/icons3d';
 import Icon3D from '@/components/Icon3D';
 import { PROTOCOL_AVAILABLE_ICONS as AVAILABLE_ICONS } from '@/components/ProtocolIcon';
+import { getAvailableSupplements } from '@/actions/supplementActions';
+import { formatSupplementDose } from '@/lib/nutrition/supplementation';
 
-export default function ProtocolEditorModal({ opened, onClose, protocol, onSave, saveLabel = 'Aceptar', helpText }) {
+export default function ProtocolEditorModal({
+  opened,
+  onClose,
+  protocol,
+  onSave,
+  saveLabel = 'Aceptar',
+  helpText,
+  supplements: propSupplements = [],
+  peso = null,
+}) {
   const [name, setName] = useState('');
   const [timeline, setTimeline] = useState([]);
   const [checklist, setChecklist] = useState([]);
   const [incluirEnPlan, setIncluirEnPlan] = useState(false);
+  const [catalogSupplements, setCatalogSupplements] = useState(propSupplements || []);
+  const [addingSuppIndex, setAddingSuppIndex] = useState(null);
+  const [newSuppForm, setNewSuppForm] = useState({ suplemento_id: '', nombre: '', dosis: '', notas: '' });
+
+  useEffect(() => {
+    if (opened && catalogSupplements.length === 0) {
+      getAvailableSupplements().then(data => {
+        if (Array.isArray(data)) setCatalogSupplements(data);
+      }).catch(err => {
+        console.error('Error cargando suplementos:', err);
+      });
+    }
+  }, [opened, catalogSupplements.length]);
 
   useEffect(() => {
     if (opened && protocol) {
       setName(protocol.name || '');
-      setTimeline(protocol.timeline || []);
+      setTimeline((protocol.timeline || []).map(item => ({
+        ...item,
+        suplementos: Array.isArray(item.suplementos) ? item.suplementos : []
+      })));
       setChecklist(protocol.checklist || []);
       const isMatch = protocol.dayTypeKey === 'partido' || protocol.dayTypeKey === 'match_day' || (typeof protocol.dayTypeKey === 'string' && protocol.dayTypeKey.includes('partido'));
       setIncluirEnPlan(protocol.incluirEnPlan !== undefined ? Boolean(protocol.incluirEnPlan) : isMatch);
+      setAddingSuppIndex(null);
     } else if (opened && !protocol) {
       setName('');
       setTimeline([]);
       setChecklist([]);
       setIncluirEnPlan(false);
+      setAddingSuppIndex(null);
     }
   }, [opened, protocol]);
 
@@ -41,13 +70,49 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
     onClose();
   };
 
+  const handleAddSupplement = (timelineIndex) => {
+    if (!newSuppForm.nombre) return;
+    setTimeline(prev => {
+      const copy = [...prev];
+      const currentSupps = copy[timelineIndex].suplementos || [];
+      copy[timelineIndex] = {
+        ...copy[timelineIndex],
+        suplementos: [
+          ...currentSupps,
+          {
+            suplemento_id: newSuppForm.suplemento_id,
+            nombre: newSuppForm.nombre,
+            dosis: newSuppForm.dosis || 'Según pauta',
+            notas: newSuppForm.notas || '',
+          }
+        ]
+      };
+      return copy;
+    });
+    setAddingSuppIndex(null);
+    setNewSuppForm({ suplemento_id: '', nombre: '', dosis: '', notas: '' });
+  };
+
+  const handleRemoveSupplement = (timelineIndex, suppIndex) => {
+    setTimeline(prev => {
+      const copy = [...prev];
+      const currentSupps = copy[timelineIndex].suplementos || [];
+      copy[timelineIndex] = {
+        ...copy[timelineIndex],
+        suplementos: currentSupps.filter((_, i) => i !== suppIndex)
+      };
+      return copy;
+    });
+  };
+
   const addTimelineItem = (index = -1) => {
     const newItem = { 
       id: `tl_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`, 
       timeLabel: '', 
       title: '', 
       description: '', 
-      icon: 'IconFlag' 
+      icon: 'IconFlag',
+      suplementos: [],
     };
     if (index === -1) {
       setTimeline(prev => [...prev, newItem]);
@@ -230,6 +295,150 @@ export default function ProtocolEditorModal({ opened, onClose, protocol, onSave,
                               minRows={2}
                               variant="filled"
                             />
+
+                            {/* Suplementos asociados a esta etapa */}
+                            <Box mt={4} pt={6} style={{ borderTop: '1px dashed var(--mantine-color-gray-3)' }}>
+                              <Group justify="space-between" align="center" mb={4}>
+                                <Group gap={6}>
+                                  <Icon3D name="pill" size={15} />
+                                  <Text size="xs" fw={700} c="dark.4">Suplementos de la etapa</Text>
+                                  {item.suplementos?.length > 0 && (
+                                    <Text size="xs" c="dimmed">({item.suplementos.length})</Text>
+                                  )}
+                                </Group>
+                                {addingSuppIndex !== index && (
+                                  <Button
+                                    variant="subtle"
+                                    color="grape"
+                                    size="compact-xs"
+                                    leftSection={<Icon3D name="plus" size={13} />}
+                                    onClick={() => {
+                                      setAddingSuppIndex(index);
+                                      setNewSuppForm({ suplemento_id: '', nombre: '', dosis: '', notas: '' });
+                                    }}
+                                    radius="xl"
+                                  >
+                                    Añadir suplemento
+                                  </Button>
+                                )}
+                              </Group>
+
+                              {/* Lista de suplementos de la etapa */}
+                              {item.suplementos?.length > 0 && (
+                                <Stack gap={4} mb={addingSuppIndex === index ? 'xs' : 2}>
+                                  {item.suplementos.map((supp, sIdx) => (
+                                    <Paper
+                                      key={sIdx}
+                                      px="sm"
+                                      py={6}
+                                      radius="md"
+                                      withBorder
+                                      bg="white"
+                                      style={{ borderColor: 'var(--mantine-color-gray-3)' }}
+                                    >
+                                      <Group justify="space-between" align="center" wrap="nowrap">
+                                        <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+                                          <Icon3D name="pill" size={16} style={{ flexShrink: 0 }} />
+                                          <Box style={{ minWidth: 0 }}>
+                                            <Group gap={6} wrap="nowrap">
+                                              <Text size="xs" fw={700} c="dark.5" truncate>{supp.nombre}</Text>
+                                              <Text size="xs" fw={600} c="grape.7" style={{ whiteSpace: 'nowrap' }}>· {supp.dosis}</Text>
+                                            </Group>
+                                            {supp.notas && (
+                                              <Text size={11} c="dimmed" truncate>{supp.notas}</Text>
+                                            )}
+                                          </Box>
+                                        </Group>
+                                        <ActionIcon
+                                          variant="subtle"
+                                          color="red"
+                                          size="sm"
+                                          radius="md"
+                                          onClick={() => handleRemoveSupplement(index, sIdx)}
+                                          title="Eliminar de esta etapa"
+                                        >
+                                          <Icon3D name="trash" size={14} />
+                                        </ActionIcon>
+                                      </Group>
+                                    </Paper>
+                                  ))}
+                                </Stack>
+                              )}
+
+                              {/* Formulario para añadir suplemento */}
+                              {addingSuppIndex === index && (
+                                <Paper p="xs" radius="md" withBorder bg="gray.1" mb="xs" style={{ borderColor: 'var(--mantine-color-gray-4)' }}>
+                                  <Stack gap="xs">
+                                    <Select
+                                      label="Seleccionar suplemento del catálogo"
+                                      placeholder="Buscar suplemento..."
+                                      searchable
+                                      data={catalogSupplements.map(s => ({ value: String(s.id), label: `${s.nombre} (${s.categoria || 'General'})` }))}
+                                      value={newSuppForm.suplemento_id ? String(newSuppForm.suplemento_id) : null}
+                                      onChange={(val) => {
+                                        const found = catalogSupplements.find(s => String(s.id) === String(val));
+                                        if (found) {
+                                          const doseVal = formatSupplementDose(found, peso).value;
+                                          setNewSuppForm({
+                                            suplemento_id: found.id,
+                                            nombre: found.nombre,
+                                            dosis: doseVal,
+                                            notas: '',
+                                          });
+                                        } else {
+                                          setNewSuppForm({ suplemento_id: '', nombre: '', dosis: '', notas: '' });
+                                        }
+                                      }}
+                                      size="xs"
+                                      radius="md"
+                                      variant="filled"
+                                      allowDeselect={false}
+                                    />
+                                    <Group grow align="flex-start">
+                                      <TextInput
+                                        label="Dosis en esta etapa"
+                                        placeholder="Ej: 200 mg"
+                                        value={newSuppForm.dosis}
+                                        onChange={(e) => setNewSuppForm(f => ({ ...f, dosis: e.currentTarget.value }))}
+                                        size="xs"
+                                        variant="filled"
+                                        radius="md"
+                                      />
+                                      <TextInput
+                                        label="Nota / Indicación (opcional)"
+                                        placeholder="Ej: Con 200ml de agua fresca"
+                                        value={newSuppForm.notas}
+                                        onChange={(e) => setNewSuppForm(f => ({ ...f, notas: e.currentTarget.value }))}
+                                        size="xs"
+                                        variant="filled"
+                                        radius="md"
+                                      />
+                                    </Group>
+                                    <Group justify="flex-end" gap="xs">
+                                      <Button
+                                        size="xs"
+                                        variant="subtle"
+                                        color="gray"
+                                        onClick={() => setAddingSuppIndex(null)}
+                                        radius="xl"
+                                      >
+                                        Cancelar
+                                      </Button>
+                                      <Button
+                                        size="xs"
+                                        color="grape"
+                                        disabled={!newSuppForm.nombre}
+                                        onClick={() => handleAddSupplement(index)}
+                                        radius="xl"
+                                        leftSection={<Icon3D name="check" size={14} />}
+                                      >
+                                        Añadir a la fase
+                                      </Button>
+                                    </Group>
+                                  </Stack>
+                                </Paper>
+                              )}
+                            </Box>
                           </Stack>
 
                           <Stack gap={4} mt={20}>

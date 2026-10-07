@@ -197,6 +197,17 @@ export default function PlanFicha({ data, activeSupplements = [], jugador, theme
                       {step.timeLabel && <Tag t={t}>{step.timeLabel}</Tag>}
                     </Group>
                     {step.description && <Text style={{ color: t.itemText, fontSize: 12.5, lineHeight: 1.4 }}>{step.description}</Text>}
+                    {step.suplementos?.length > 0 && (
+                      <Box mt={6} pt={4} style={{ borderTop: `1px dashed ${t.border || '#e5e7eb'}` }}>
+                        {step.suplementos.map((supp, sIdx2) => (
+                          <Group key={sIdx2} gap={6} wrap="nowrap" mt={2}>
+                            <Text style={{ color: t.accentText, fontSize: 11.5, fontWeight: 700 }}>💊 {supp.nombre}:</Text>
+                            <Text style={{ color: t.itemText, fontSize: 11.5 }}>{supp.dosis}</Text>
+                            {supp.notas && <Text style={{ color: t.muted, fontSize: 11 }}>({supp.notas})</Text>}
+                          </Group>
+                        ))}
+                      </Box>
+                    )}
                   </ItemBox>
                 ))}
 

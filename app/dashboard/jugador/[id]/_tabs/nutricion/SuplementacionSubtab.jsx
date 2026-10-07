@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ActionIcon,
   Alert,
@@ -29,6 +30,7 @@ import {
   IconCirclePlus,
   IconTrash,
   IconChevronDown,
+  IconFlag,
 } from '@/components/icons3d';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
@@ -130,7 +132,7 @@ function SupplementCard({ item, peso, onDelete, readOnly }) {
 
 function AssignedProtocol({ items, peso, onDelete, canManage }) {
   return (
-    <BentoCard title="Protocolo asignado" icon={IconBottle} color="nutralabColor">
+    <BentoCard title="Suplementación diaria / basal" icon={IconBottle} color="nutralabColor">
       {items.length ? (
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm" suppressHydrationWarning>
           {items.map((item) => (
@@ -148,10 +150,113 @@ function AssignedProtocol({ items, peso, onDelete, canManage }) {
           <Group gap="sm" align="flex-start" wrap="nowrap">
             <Icon3D name="sparkles" size={24} style={{ flexShrink: 0 }} />
             <Stack gap={2}>
-              <Text fw={600} c="dark.5">Sin suplementos asignados</Text>
+              <Text fw={600} c="dark.5">Sin suplementos diarios asignados</Text>
               <Text size="sm" c="dimmed">
-                Asigna un catálogo o añade suplementos extra para generar el protocolo.
+                Asigna un catálogo o añade suplementos extra para generar la pauta basal diaria.
               </Text>
+            </Stack>
+          </Group>
+        </Paper>
+      )}
+    </BentoCard>
+  );
+}
+
+function ProtocolSupplementsSection({ protocolSupplements, onNavigateToProtocols }) {
+  return (
+    <BentoCard
+      title="Suplementación por protocolos (según tipo de día)"
+      icon={IconFlag}
+      color="grape"
+    >
+      {protocolSupplements.length > 0 ? (
+        <Stack gap="md">
+          <Text size="xs" c="dimmed">
+            Suplementos pautados para fases y momentos específicos (partido, fuerza, descanso). No se incluyen en la rutina diaria basal para evitar sobrecargas en días estándar.
+          </Text>
+          <SimpleGrid cols={{ base: 1, md: protocolSupplements.length > 1 ? 2 : 1 }} spacing="sm">
+            {protocolSupplements.map((proto) => (
+              <Paper key={proto.id} p="sm" radius="md" withBorder bg="gray.0">
+                <Stack gap="xs">
+                  <Group justify="space-between" align="flex-start" wrap="nowrap">
+                    <div>
+                      <Group gap={6} align="center">
+                        <Text size="sm" fw={700} c="dark.5">{proto.name}</Text>
+                        <Text size="xs" c="dimmed">· {proto.dayTypeLabel}</Text>
+                      </Group>
+                      <Group gap={6} mt={2}>
+                        <Text size={11} c={proto.isCustom ? 'grape.7' : 'dimmed'} fw={600}>
+                          ● {proto.isCustom ? 'Personalizado para este jugador' : 'Plantilla del equipo'}
+                        </Text>
+                      </Group>
+                    </div>
+                    {onNavigateToProtocols && (
+                      <Button
+                        variant="subtle"
+                        size="compact-xs"
+                        color="grape"
+                        radius="xl"
+                        onClick={onNavigateToProtocols}
+                      >
+                        Ver en protocolos
+                      </Button>
+                    )}
+                  </Group>
+
+                  <Stack gap={6} mt={4}>
+                    {proto.stepsWithSupps.map((step) => (
+                      <Paper key={step.id} p="xs" radius="sm" withBorder bg="white">
+                        <Text size="xs" fw={700} c="dark.4" mb={4}>
+                          {step.timeLabel ? `${step.timeLabel} · ` : ''}{step.title}
+                        </Text>
+                        <Stack gap={4}>
+                          {step.suplementos.map((supp, sIdx) => (
+                            <Group key={sIdx} justify="space-between" align="center" wrap="nowrap" gap="xs">
+                              <Group gap={6} wrap="nowrap" style={{ minWidth: 0 }}>
+                                <Icon3D name="pill" size={15} style={{ flexShrink: 0 }} />
+                                <Text size="xs" fw={700} c="dark.5" truncate>{supp.nombre}</Text>
+                                <Text size="xs" fw={600} c="grape.7" style={{ whiteSpace: 'nowrap' }}>
+                                  · {supp.dosis}
+                                </Text>
+                              </Group>
+                              {supp.notas && (
+                                <Text size={11} c="dimmed" truncate style={{ maxWidth: '40%' }}>
+                                  {supp.notas}
+                                </Text>
+                              )}
+                            </Group>
+                          ))}
+                        </Stack>
+                      </Paper>
+                    ))}
+                  </Stack>
+                </Stack>
+              </Paper>
+            ))}
+          </SimpleGrid>
+        </Stack>
+      ) : (
+        <Paper p="md" radius="md" withBorder bg="gray.0">
+          <Group gap="sm" align="flex-start" wrap="nowrap">
+            <Icon3D name="chequered_flag" size={24} style={{ flexShrink: 0 }} />
+            <Stack gap={2} style={{ flex: 1 }}>
+              <Text fw={600} c="dark.5">Sin suplementos en protocolos</Text>
+              <Text size="sm" c="dimmed">
+                No hay suplementos configurados en las etapas de los protocolos de este jugador. Puedes añadirlos por fase (ej. cafeína a -45 min o geles en el descanso) en la pestaña de Protocolos.
+              </Text>
+              {onNavigateToProtocols && (
+                <Box mt={4}>
+                  <Button
+                    variant="light"
+                    size="xs"
+                    color="grape"
+                    radius="xl"
+                    onClick={onNavigateToProtocols}
+                  >
+                    Ir a Protocolos
+                  </Button>
+                </Box>
+              )}
             </Stack>
           </Group>
         </Paper>
@@ -189,9 +294,50 @@ function buildProtocol(jugador, lista, items, peso) {
 }
 
 export default function SuplementacionSubtab({ jugador, readOnly = false }) {
+  const router = useRouter();
   const isMobile = useMediaQuery('(max-width: 48em)', true);
   const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const peso = Number(jugador.peso_kg || 0);
+
+  const protocolSupplements = useMemo(() => {
+    const teamProtocols = jugador.equipos?.configuracion_nutricional?.protocols || [];
+    const customProtocols = jugador.protocolos_custom || {};
+    const dayTypes = jugador.equipos?.configuracion_nutricional?.dayTypes || [];
+    const dayTypeMap = new Map(dayTypes.map((d) => [d.key, d.label]));
+
+    const resolved = teamProtocols.map((base) => {
+      const custom = customProtocols[base.id];
+      const proto = custom || base;
+      return {
+        ...proto,
+        isCustom: Boolean(custom),
+        dayTypeLabel: dayTypeMap.get(proto.dayTypeKey) || proto.dayTypeKey || 'Tipo de día',
+      };
+    });
+
+    Object.entries(customProtocols).forEach(([id, custom]) => {
+      if (!resolved.find((p) => p.id === id) && custom) {
+        resolved.push({
+          ...custom,
+          isCustom: true,
+          dayTypeLabel: dayTypeMap.get(custom.dayTypeKey) || custom.dayTypeKey || 'Tipo de día',
+        });
+      }
+    });
+
+    return resolved
+      .map((p) => {
+        const stepsWithSupps = (p.timeline || []).filter(
+          (step) => Array.isArray(step.suplementos) && step.suplementos.length > 0
+        );
+        return {
+          ...p,
+          stepsWithSupps,
+          totalSupps: stepsWithSupps.reduce((acc, step) => acc + step.suplementos.length, 0),
+        };
+      })
+      .filter((p) => p.stepsWithSupps.length > 0);
+  }, [jugador.equipos?.configuracion_nutricional, jugador.protocolos_custom]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [modalOpened, setModalOpened] = useState(false);
@@ -471,6 +617,11 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
               readOnly={readOnly}
             />
           </SimpleGrid>
+
+          <ProtocolSupplementsSection
+            protocolSupplements={protocolSupplements}
+            onNavigateToProtocols={() => router.push(`/dashboard/jugador/${jugador.id}/nutricion/protocolos`)}
+          />
         </Stack>
       </Box>
     </Stack>

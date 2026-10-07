@@ -426,6 +426,11 @@ export function PlanCardPage({ plan, teamConfig }) {
                       {step.timeLabel ? <Text style={[st.badge, { color: t.accentText, backgroundColor: t.chipBg }]}>{step.timeLabel}</Text> : null}
                     </View>
                     {step.description ? <Text style={[st.itemMeta, { color: t.itemText }]}>{step.description}</Text> : null}
+                    {step.suplementos?.map((supp, sIdx2) => (
+                      <Text key={sIdx2} style={[st.itemMeta, { color: t.accentText, marginTop: 2 }]}>
+                        • {supp.nombre}: {supp.dosis} {supp.notas ? `(${supp.notas})` : ''}
+                      </Text>
+                    ))}
                   </View>
                 ))}
                 {prot.checklist?.length > 0 && (

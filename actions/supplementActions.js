@@ -76,6 +76,13 @@ export async function getPlayerSupplementation(requestedJugadorId) {
   };
 }
 
+export async function getAvailableSupplements() {
+  const user = await getUser();
+  if (!user) throw new Error('No autenticado');
+  const db = getDb();
+  return getAllSuplementos(db);
+}
+
 export async function postPlayerSupplementation(jugadorIdParam, payload) {
   const user = await getUser();
   if (!canManage(user) || user?.role === 'tecnico') {
