@@ -16,11 +16,11 @@
 
   @media (max-width: 48em) {
     position: sticky;
-    /* 10px Paper padding × 2 + 4px control padding × 2 + 16px icon/label + 8px label padding × 2. */
-    top: 60px;
+    /* 10px Paper padding × 2 + 4px control padding × 2 + 16px icon/label + 8px label padding × 2 - 1px overlap */
+    top: 59px;
     z-index: 98;
-    border-bottom-left-radius: 16px !important;
-    border-bottom-right-radius: 16px !important;
+    border-bottom-left-radius: 24px !important;
+    border-bottom-right-radius: 24px !important;
     clip-path: inset(0 -20px -20px -20px) !important;
   }
 }

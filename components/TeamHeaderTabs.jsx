@@ -103,9 +103,9 @@ export default function TeamHeaderTabs({
         <Box
           visibleFrom="sm"
           style={{
-            width: 280,
-            minWidth: 280,
-            maxWidth: 280,
+            width: 240,
+            minWidth: 240,
+            maxWidth: 240,
             position: 'sticky',
             top: 16,
             alignSelf: 'flex-start',
