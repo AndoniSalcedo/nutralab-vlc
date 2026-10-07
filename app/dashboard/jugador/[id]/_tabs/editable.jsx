@@ -7,6 +7,7 @@ import {
   Group,
   Paper,
   Select,
+  SimpleGrid,
   Stack,
   Text,
   Textarea,
@@ -341,7 +342,7 @@ export function ComidasEditable({
           {activeMeals.length === 0 ? (
             <Text size="xs" c="dimmed">No hay tomas configuradas.</Text>
           ) : (
-            <Stack gap="xs">
+            <SimpleGrid cols={{ base: 1, sm: 2, lg: Math.min(activeMeals.length, 4) || 1 }} spacing="xs">
               {activeMeals.map((meal) => {
                 const mealData = recsDefecto[meal] || {};
                 const isMainMealIntake = mealData.isMainMeal ?? isMainMeal(meal, mealData);
@@ -349,8 +350,8 @@ export function ComidasEditable({
                 const isComplete = mealData.type === 'complete';
 
                 return (
-                  <Paper key={meal} p="xs" withBorder radius="sm">
-                    <Group justify="space-between" align="center" mb={4}>
+                  <Paper key={meal} p="xs" withBorder radius="sm" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <Group justify="space-between" align="center" mb={4} wrap="wrap" gap={4}>
                       <Group gap="xs" align="center">
                         <Text size="xs" fw={700} c="dark.8">
                           {meal}
@@ -368,6 +369,7 @@ export function ComidasEditable({
                           radius="xl"
                           leftSection={<IconEdit size={12} />}
                           onClick={() => setSelectedMealForModal(meal)}
+                          style={{ flexShrink: 0 }}
                         >
                           Configurar pauta
                         </Button>
@@ -375,11 +377,11 @@ export function ComidasEditable({
                     </Group>
 
                     {isComplete || !hasTree ? (
-                      <Text size="11px" c="dimmed">
+                      <Text size="11px" c="dimmed" style={{ flex: 1 }}>
                         Rotación variada y completa del comedor oficial del club según preferencias.
                       </Text>
                     ) : hasTree ? (
-                      <Stack gap={2} mt={2}>
+                      <Stack gap={2} mt={2} style={{ flex: 1 }}>
                         <Text size="11px">
                           <Text span fw={600} c="teal.8">● Pauta: </Text>
                           <Text span c="dark.7" fw={500}>{formatAstToText(mealData)}</Text>
@@ -391,12 +393,12 @@ export function ComidasEditable({
                         )}
                       </Stack>
                     ) : (
-                      <Text size="11px" c="dark.7">{formatAstToText(mealData)}</Text>
+                      <Text size="11px" c="dark.7" style={{ flex: 1 }}>{formatAstToText(mealData)}</Text>
                     )}
                   </Paper>
                 );
               })}
-            </Stack>
+            </SimpleGrid>
           )}
         </Box>
       </Stack>
@@ -544,7 +546,7 @@ export function PrepartidoEditable({
 
   return (
     <BentoCard title={label} icon3d="flag" color="red" style={{ height: 'auto' }}>
-      <Stack gap="sm">
+      <SimpleGrid cols={{ base: 1, md: 3 }} spacing="sm">
         {scheduleOptions.map((opt) => {
           const cfg = config?.[opt.value];
           const hasCustomMeals = Array.isArray(cfg?.ingestas) && cfg.ingestas.length > 0;
@@ -572,8 +574,8 @@ export function PrepartidoEditable({
 
           if (!isConfigured) {
             return (
-              <Paper key={opt.value} p="sm" withBorder radius="md">
-                <Group justify="space-between" align="center" mb={4}>
+              <Paper key={opt.value} p="sm" withBorder radius="lg" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Group justify="space-between" align="center" mb={4} wrap="wrap" gap="xs">
                   <Group gap="xs" align="center">
                     <Text size="sm" fw={700} c="dark.7">
                       Partido por la {opt.label}
@@ -597,13 +599,14 @@ export function PrepartidoEditable({
                           activeMeal: null,
                         })
                       }
+                      style={{ flexShrink: 0 }}
                     >
                       Configurar rutina
                     </Button>
                   )}
                 </Group>
 
-                <Text size="xs" c="dimmed">
+                <Text size="xs" c="dimmed" style={{ flex: 1 }}>
                   Sin protocolo específico configurado. En días de partido por la{' '}
                   {opt.label.toLowerCase()} se aplicará el menú del comedor de la ciudad deportiva o sus
                   ingestas habituales.
@@ -613,8 +616,8 @@ export function PrepartidoEditable({
           }
 
           return (
-            <Paper key={opt.value} p="sm" withBorder radius="md">
-              <Group justify="space-between" align="center" mb={6}>
+            <Paper key={opt.value} p="sm" withBorder radius="lg" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <Group justify="space-between" align="center" mb={6} wrap="wrap" gap="xs">
                 <Group gap="xs" align="center">
                   <Text size="sm" fw={700} c="dark.7">
                     Partido por la {opt.label}
@@ -639,13 +642,14 @@ export function PrepartidoEditable({
                         activeMeal: null,
                       })
                     }
+                    style={{ flexShrink: 0 }}
                   >
                     Editar rutina
                   </Button>
                 )}
               </Group>
 
-              <Stack gap={6}>
+              <Stack gap={6} style={{ flex: 1 }}>
                 <Text size="xs" c="dark.6">
                   <Text span fw={600} c="dimmed">
                     Ingestas pautadas:{' '}
@@ -654,7 +658,7 @@ export function PrepartidoEditable({
                 </Text>
 
                 {/* Detalle estructurado de cada comida */}
-                <Stack gap="xs" mt={4}>
+                <Stack gap="xs" mt={4} style={{ flex: 1 }}>
                   {currentMeals.map((m) => {
                     const timing = getMealTimingBadge(opt.value, m);
                     const mealData = currentRecs[m] || { type: 'complete' };
@@ -664,7 +668,7 @@ export function PrepartidoEditable({
 
                     return (
                       <Paper key={m} p="xs" withBorder radius="sm" bg="gray.0">
-                        <Group gap="xs" align="center" mb={2}>
+                        <Group gap="xs" align="center" mb={2} wrap="wrap">
                           <Text size="xs" fw={700} c="dark.8">
                             {m} {timing ? `(${timing})` : ''}
                           </Text>
@@ -700,7 +704,7 @@ export function PrepartidoEditable({
             </Paper>
           );
         })}
-      </Stack>
+      </SimpleGrid>
 
       {/* Modal unificado para configurar la rutina completa con todas sus pautas */}
       {activeModalSchedule && (

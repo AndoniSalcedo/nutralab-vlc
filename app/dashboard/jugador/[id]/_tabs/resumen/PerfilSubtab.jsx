@@ -391,38 +391,41 @@ export default function PerfilSubtab({
                 Información que condiciona el plan nutricional.
               </Text>
 
-              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+              <Stack gap="md">
                 <ComidasEditable label="Comidas diarias" numComidas={jugador.num_comidas} postentreno={jugador.postentreno} preentreno={jugador.preentreno} jugadorId={jugador.id} recomendacionesDefecto={jugador.recomendaciones_defecto} jugador={jugador} readOnly={readOnly} />
                 <PrepartidoEditable label="Rutinas pre-partido" configPrepartido={jugador.config_prepartido} numComidas={jugador.num_comidas} postentreno={jugador.postentreno} jugadorId={jugador.id} jugador={jugador} readOnly={readOnly} />
-                <CampoEditable icon3d="goal_net" label="Objetivo nutricional" campo="objetivo" valor={jugador.objetivo || ''} jugadorId={jugador.id} tipo="select" opciones={PLAYER_OBJECTIVES} readOnly={readOnly} />
-                <CampoEditable
-                  icon3d="scale"
-                  label="% Grasa Objetivo (Semáforo)"
-                  campo="porcentaje_grasa_objetivo"
-                  valor={jugador.porcentaje_grasa_objetivo !== null && jugador.porcentaje_grasa_objetivo !== undefined ? Number(jugador.porcentaje_grasa_objetivo) : 10}
-                  jugadorId={jugador.id}
-                  tipo="number"
-                  min={3}
-                  max={35}
-                  step={0.1}
-                  decimalScale={2}
-                  suffix=" %"
-                  readOnly={readOnly}
-                />
-                <CampoEditable icon3d="strawberry" label="Gustos y preferencias" campo="gustos_preferencias" valor={jugador.gustos_preferencias || ''} jugadorId={jugador.id} readOnly={readOnly} />
-                <CampoEditable icon3d="warning" label="Aversiones" campo="aversiones" valor={jugador.aversiones || ''} jugadorId={jugador.id} readOnly={readOnly} />
-                <CampoEditable
-                  icon3d="shield"
-                  label="Restricciones Clínicas / Intolerancias"
-                  campo="intolerancias"
-                  valor={jugador.intolerancias || ''}
-                  jugadorId={jugador.id}
-                  tipo="multiselect"
-                  opciones={CLINICAL_TAGS.map((t) => ({ value: t.value, label: t.label }))}
-                  readOnly={readOnly}
-                />
-                <CampoEditable icon3d="stethoscope" label="Contexto clínico / Notas médicas" campo="contexto_clinico" valor={jugador.contexto_clinico || ''} jugadorId={jugador.id} readOnly={readOnly} />
-              </SimpleGrid>
+
+                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                  <CampoEditable icon3d="goal_net" label="Objetivo nutricional" campo="objetivo" valor={jugador.objetivo || ''} jugadorId={jugador.id} tipo="select" opciones={PLAYER_OBJECTIVES} readOnly={readOnly} />
+                  <CampoEditable
+                    icon3d="scale"
+                    label="% Grasa Objetivo (Semáforo)"
+                    campo="porcentaje_grasa_objetivo"
+                    valor={jugador.porcentaje_grasa_objetivo !== null && jugador.porcentaje_grasa_objetivo !== undefined ? Number(jugador.porcentaje_grasa_objetivo) : 10}
+                    jugadorId={jugador.id}
+                    tipo="number"
+                    min={3}
+                    max={35}
+                    step={0.1}
+                    decimalScale={2}
+                    suffix=" %"
+                    readOnly={readOnly}
+                  />
+                  <CampoEditable icon3d="strawberry" label="Gustos y preferencias" campo="gustos_preferencias" valor={jugador.gustos_preferencias || ''} jugadorId={jugador.id} readOnly={readOnly} />
+                  <CampoEditable icon3d="warning" label="Aversiones" campo="aversiones" valor={jugador.aversiones || ''} jugadorId={jugador.id} readOnly={readOnly} />
+                  <CampoEditable
+                    icon3d="shield"
+                    label="Restricciones Clínicas / Intolerancias"
+                    campo="intolerancias"
+                    valor={jugador.intolerancias || ''}
+                    jugadorId={jugador.id}
+                    tipo="multiselect"
+                    opciones={CLINICAL_TAGS.map((t) => ({ value: t.value, label: t.label }))}
+                    readOnly={readOnly}
+                  />
+                  <CampoEditable icon3d="stethoscope" label="Contexto clínico / Notas médicas" campo="contexto_clinico" valor={jugador.contexto_clinico || ''} jugadorId={jugador.id} readOnly={readOnly} />
+                </SimpleGrid>
+              </Stack>
             </Box>
           )}
 

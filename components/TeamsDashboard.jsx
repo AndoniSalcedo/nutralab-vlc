@@ -347,6 +347,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
               <Paper
                 key={team.id}
                 p="md"
+                radius={24}
                 shadow="xs"
                 bg="white"
                 className="bento-card-hover"
