@@ -90,7 +90,7 @@ export default function MensajesSubtab({ jugador, messages = [], readOnly = fals
         onSent={close}
       />
 
-      <Box py={{ base: 'sm', sm: 'md' }}>
+      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         {messages.length > 0 ? (
           <Stack gap="sm">
             {messages.map((message) => (

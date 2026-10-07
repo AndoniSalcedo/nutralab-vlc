@@ -301,8 +301,8 @@ export default function PerfilSubtab({
         </Box>
       </Paper>
 
-      {/* Main Content wrapper: Sin margen horizontal extra para alinearse con el layout y cabeceras */}
-      <Box py={{ base: 'sm', sm: 'md' }}>
+      {/* Main Content wrapper: padding horizontal solo en móvil para no pegarse a los bordes */}
+      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         <Stack gap="md">
           {/* Bento: teselas de 1 o 2 columnas; lo urgente arriba, las constantes en pares y el detalle debajo */}
           <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>

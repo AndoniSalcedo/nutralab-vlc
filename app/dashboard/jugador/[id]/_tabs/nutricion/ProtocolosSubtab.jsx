@@ -138,7 +138,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
         </Stack>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }}>
+      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         <Stack gap="md">
           {activeProtocol ? (
             <Stack gap="md">

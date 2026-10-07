@@ -19,9 +19,9 @@
     /* 10px Paper padding × 2 + 4px control padding × 2 + 16px icon/label + 8px label padding × 2. */
     top: 60px;
     z-index: 98;
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    clip-path: none !important;
+    border-bottom-left-radius: 16px !important;
+    border-bottom-right-radius: 16px !important;
+    clip-path: inset(0 -20px -20px -20px) !important;
   }
 }
 
@@ -42,6 +42,6 @@
   @media (max-width: 48em) {
     border-top-left-radius: 0 !important;
     border-top-right-radius: 0 !important;
-    clip-path: none !important;
+    clip-path: inset(-20px -20px 0 -20px) !important;
   }
 }

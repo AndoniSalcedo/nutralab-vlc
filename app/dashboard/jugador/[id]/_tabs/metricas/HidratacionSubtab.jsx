@@ -691,7 +691,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       </Paper>
 
       {/* Horizontal Charts Section */}
-      <Box>
+      <Box px={{ base: 'sm', sm: 0 }}>
         <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
           {renderMetricChart('hydration', sortedHydrationChronological)}
           {renderMetricChart('sweat', sortedSweatChronological)}
@@ -699,7 +699,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       </Box>
 
       {/* Main Hydration Content & Timing Cards */}
-      <Box pb="sm">
+      <Box px={{ base: 'sm', sm: 0 }} pb="sm">
         <Stack gap="md">
           <BentoCard title="Timing recomendado" icon={IconActivityHeartbeat} color="cyan">
             <SimpleGrid cols={{ base: 1, sm: 2, lg: 5 }} spacing={{ base: 'md', sm: 'sm' }}>

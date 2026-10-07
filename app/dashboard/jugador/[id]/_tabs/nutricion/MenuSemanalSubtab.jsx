@@ -116,7 +116,7 @@ export default function MenuSemanalSubtab({ menus = [] }) {
         </Stack>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }}>
+      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         <MenuSemanal selectedMenu={selectedMenu} viewMode={viewMode} />
       </Box>
     </Stack>
