@@ -131,7 +131,6 @@ const MENU_FOOD_NAMES = [
   'Leche desnatada',
   'Leche desnatada sin lactosa',
   'Leche entera',
-  'Leche entera alto proteína',
   'Leche entera sin lactosa',
   'Bebida de coco',
   'Yogur proteico natural',
