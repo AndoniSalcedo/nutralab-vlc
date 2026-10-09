@@ -29,6 +29,7 @@ import {
 } from '@/components/icons3d';
 import { parseMealTree } from '@/actions/mealActions';
 import { formatAstToText, validateMealAst } from '@/lib/engine/meal-ast';
+import PautaGroupsPreview from '@/components/PautaGroupsPreview';
 import {
   AVAILABLE_MEALS,
   isMainMeal as checkIsMainMeal,
@@ -87,6 +88,7 @@ function SingleMealPautaEditor({
   mealData = {},
   onChange,
   jugadorId = null,
+  jugador = null,
 }) {
   const isMainMeal = mealData.isMainMeal !== undefined ? Boolean(mealData.isMainMeal) : checkIsMainMeal(mealName, mealData);
   const isComplete = mealData.type === 'complete';
@@ -280,6 +282,7 @@ function SingleMealPautaEditor({
               <Text size="xs" fw={700} c="dark.8">
                 {formatAstToText({ tree: mealData.tree })}
               </Text>
+              <PautaGroupsPreview tree={mealData.tree} jugador={jugador} mealName={mealName} isMainMeal={isMainMeal} isPreMatch />
             </Paper>
           )}
         </Stack>
@@ -753,6 +756,7 @@ export default function PrepartidoRoutineModal({
                         mealData={mealData}
                         onChange={(patch) => handleMealRecChange(meal, patch)}
                         jugadorId={jugadorId}
+                        jugador={jugador}
                       />
                     </Accordion.Panel>
                   </Accordion.Item>

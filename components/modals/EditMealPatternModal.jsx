@@ -18,6 +18,7 @@ import { IconSparkles, IconAlertCircle, IconCheck, IconX } from '@/components/ic
 import { parseMealTree } from '@/actions/mealActions';
 import { validateMealAst } from '@/lib/engine/meal-ast';
 import { isMainMeal as checkIsMainMeal } from '@/config/nutrition-days';
+import PautaGroupsPreview from '@/components/PautaGroupsPreview';
 
 export default function EditMealPatternModal({
   opened,
@@ -27,6 +28,7 @@ export default function EditMealPatternModal({
   value = null,
   onSave,
   jugadorId = null,
+  jugador = null,
 }) {
   const [isMainMeal, setIsMainMeal] = useState(() => checkIsMainMeal(mealName, value));
   const [isComplete, setIsComplete] = useState(false);
@@ -278,6 +280,7 @@ export default function EditMealPatternModal({
               <Text size="xs" fw={700} c="dark.8">
                 {astLabel}
               </Text>
+              <PautaGroupsPreview tree={tree} jugador={jugador} mealName={mealName} isMainMeal={isMainMeal} />
             </Stack>
           ) : (
             <Text size="xs" c="dimmed">
