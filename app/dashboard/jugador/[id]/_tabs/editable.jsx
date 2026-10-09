@@ -199,7 +199,6 @@ export function ComidasEditable({
   postentreno,
   preentreno,
   jugadorId,
-  jugador = null,
   recomendacionesDefecto = {},
   readOnly = false,
   icon3d = 'bowl',
@@ -414,7 +413,6 @@ export function ComidasEditable({
           timing="Pauta habitual"
           value={recsDefecto[selectedMealForModal] || null}
           jugadorId={jugadorId}
-          jugador={jugador}
           onSave={async (updatedMeal) => {
             const newRecs = {
               ...Object.fromEntries(Object.entries(recsDefecto).map(([name, meal]) => [name, convertLegacyToAst(meal)])),
