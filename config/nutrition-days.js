@@ -85,6 +85,18 @@ export function getUserMeals(jugador) {
   return sortMeals(meals);
 }
 
+const MEAL_KINDS = ['merienda', 'desayuno', 'almuerzo', 'comida', 'cena', 'snack'];
+
+/**
+ * Tipo de una toma a partir de su nombre: 'post' (post-entreno o post-partido), 'desayuno', 'almuerzo', 'comida',
+ * 'merienda', 'cena' o 'snack'. Admite nombres compuestos ("Cena ligera"); un nombre desconocido devuelve null.
+ */
+export function getMealKind(mealName) {
+  const norm = String(mealName || '').toLowerCase();
+  if (norm.includes('post')) return 'post';
+  return MEAL_KINDS.find((kind) => norm.includes(kind)) || null;
+}
+
 export function isMainMeal(mealName, mealConfig = null) {
   if (typeof mealConfig === 'boolean') {
     return mealConfig;
@@ -100,8 +112,8 @@ export function isMainMeal(mealName, mealConfig = null) {
       return Boolean(mealConfig.isMain);
     }
   }
-  const norm = String(mealName || '').toLowerCase().trim();
-  return norm.includes('comida') || norm.includes('cena');
+  const kind = getMealKind(mealName);
+  return kind === 'comida' || kind === 'cena';
 }
 
 export const DEFAULT_OBJECTIVE_KEY = 'mejora_rendimiento';
