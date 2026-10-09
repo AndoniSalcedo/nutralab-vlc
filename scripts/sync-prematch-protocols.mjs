@@ -21,6 +21,13 @@ for (const file of ['.env.local', '.env']) {
 }
 
 const DRY_RUN = !process.argv.includes('--write');
+// Postgres guarda el JSON con sus claves reordenadas: se compara sin tener en cuenta el orden.
+const canonical = (value) => (Array.isArray(value)
+  ? value.map(canonical)
+  : value && typeof value === 'object'
+    ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])]))
+    : value);
+const sameJson = (a, b) => JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
 // .bak: ignorado por git (contiene datos de jugadores).
 const BACKUP_PATH = 'scratch/prematch-protocols-backup.bak';
 
@@ -44,7 +51,7 @@ for (const player of players) {
       else manualMeals++;
     }
   }
-  if (JSON.stringify(next) === JSON.stringify(player.config_prepartido || {})) continue;
+  if (sameJson(next, player.config_prepartido || {})) continue;
 
   const validation = validateAstValue(preMatchConfigSchema, next, { label: 'Protocolo pre-partido' });
   const name = `${player.nombre} ${player.apellidos || ''}`.trim();
