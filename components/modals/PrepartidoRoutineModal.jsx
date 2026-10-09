@@ -35,6 +35,12 @@ import {
   getMealTimingBadge,
   sortPreMatchMealsChronological,
 } from '@/config/nutrition-days';
+import {
+  PROTOCOL_ORIGIN,
+  buildDefaultProtocolMeal,
+  getProtocolMeals,
+  isDefaultProtocolMeal,
+} from '@/lib/nutrition/prematch-protocol';
 
 const SCHEDULE_DETAILS = {
   manana: {
@@ -309,6 +315,7 @@ export default function PrepartidoRoutineModal({
   onDeactivate,
   initialActiveMeal = null,
   jugadorId = null,
+  jugador = null,
 }) {
   const scheduleDetail = SCHEDULE_DETAILS[scheduleKey] || {
     label: scheduleLabel || scheduleKey,
@@ -329,6 +336,19 @@ export default function PrepartidoRoutineModal({
 
 
   const recommendedMeals = scheduleDetail.recommendedMeals;
+  // Tomas del jugador que cubre el protocolo: si no se pautan a mano, siguen su pauta habitual.
+  const defaultMeals = jugador ? getProtocolMeals(jugador, scheduleKey) : [];
+  const isDefaultMealSlot = (meal) => defaultMeals.includes(meal);
+  const newMealPattern = (meal) => (isDefaultMealSlot(meal)
+    ? buildDefaultProtocolMeal(meal, jugador?.recomendaciones_defecto || {})
+    : {
+      isMainMeal: checkIsMainMeal(meal, {}),
+      type: 'complete',
+      label: 'Rotación variada',
+      unrecognized: [],
+      raw: '',
+      origen: PROTOCOL_ORIGIN.MANUAL,
+    });
 
   // Inicialización de estado cuando abre el modal
   useEffect(() => {
@@ -352,15 +372,7 @@ export default function PrepartidoRoutineModal({
 
       // Asegurar que cada comida seleccionada tenga un objeto base
       sorted.forEach((m) => {
-        if (!currentRecs[m]) {
-          currentRecs[m] = {
-            isMainMeal: checkIsMainMeal(m, {}),
-            type: 'complete',
-            label: 'Rotación variada',
-            unrecognized: [],
-            raw: '',
-          };
-        }
+        if (!currentRecs[m]) currentRecs[m] = newMealPattern(m);
       });
       setRecs(currentRecs);
 
@@ -373,6 +385,7 @@ export default function PrepartidoRoutineModal({
         setOpenedAccordionItems([]);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, scheduleKey, initialConfig, initialActiveMeal, recommendedMeals]);
 
   // Añadir una toma al protocolo
@@ -383,16 +396,7 @@ export default function PrepartidoRoutineModal({
 
     // Inicializar recomendación si no existe
     if (!recs[mealName]) {
-      setRecs((prev) => ({
-        ...prev,
-        [mealName]: {
-          isMainMeal: checkIsMainMeal(mealName, {}),
-          type: 'complete',
-          label: 'Rotación variada',
-          unrecognized: [],
-          raw: '',
-        },
-      }));
+      setRecs((prev) => ({ ...prev, [mealName]: newMealPattern(mealName) }));
     }
 
     // Auto-expandir la nueva toma para configurar su pauta inmediatamente
@@ -419,15 +423,7 @@ export default function PrepartidoRoutineModal({
       setRecs((prev) => {
         const copy = { ...prev };
         added.forEach((m) => {
-          if (!copy[m]) {
-            copy[m] = {
-              isMainMeal: checkIsMainMeal(m, {}),
-              type: 'complete',
-              label: 'Rotación variada',
-              unrecognized: [],
-              raw: '',
-            };
-          }
+          if (!copy[m]) copy[m] = newMealPattern(m);
         });
         return copy;
       });
@@ -435,14 +431,23 @@ export default function PrepartidoRoutineModal({
     }
   }
 
-  // Actualizar la recomendación de una comida individual
+  // Actualizar la recomendación de una comida individual: lo que se edita a mano pasa a ser manual.
   function handleMealRecChange(mealName, patch) {
     setRecs((prev) => ({
       ...prev,
       [mealName]: {
         ...(prev[mealName] || {}),
         ...patch,
+        origen: PROTOCOL_ORIGIN.MANUAL,
       },
+    }));
+  }
+
+  // Devolver una toma a su pauta habitual
+  function handleResetMealToDefault(mealName) {
+    setRecs((prev) => ({
+      ...prev,
+      [mealName]: buildDefaultProtocolMeal(mealName, jugador?.recomendaciones_defecto || {}),
     }));
   }
 
@@ -454,15 +459,7 @@ export default function PrepartidoRoutineModal({
     setRecs((prev) => {
       const copy = { ...prev };
       sorted.forEach((m) => {
-        if (!copy[m]) {
-          copy[m] = {
-            isMainMeal: checkIsMainMeal(m, {}),
-            type: 'complete',
-            label: 'Rotación variada',
-            unrecognized: [],
-            raw: '',
-          };
-        }
+        if (!copy[m]) copy[m] = newMealPattern(m);
       });
       return copy;
     });
@@ -508,7 +505,7 @@ export default function PrepartidoRoutineModal({
     }
   }
 
-  // Desactivar rutina
+  // Restablecer el protocolo de este horario: todas las tomas vuelven a seguir las comidas habituales
   async function handleDeactivateClick() {
     if (!onDeactivate) return;
     setSaving(true);
@@ -518,19 +515,16 @@ export default function PrepartidoRoutineModal({
     } catch (e) {
       notifications.show({
         color: 'red',
-        title: 'Error al desactivar rutina',
-        message: e.message || 'No se pudo desactivar la rutina.',
+        title: 'Error al restablecer el protocolo',
+        message: e.message || 'No se pudo restablecer el protocolo.',
       });
     } finally {
       setSaving(false);
     }
   }
 
-  const isConfiguredAlready = Boolean(
-    initialConfig &&
-    ((Array.isArray(initialConfig.ingestas) && initialConfig.ingestas.length > 0) ||
-      (initialConfig.recomendaciones && Object.keys(initialConfig.recomendaciones).length > 0))
-  );
+  const hasManualMeals = Object.values(initialConfig?.recomendaciones || {})
+    .some((pattern) => !isDefaultProtocolMeal(pattern));
 
   // Tomas disponibles para añadir que aún no están seleccionadas
   const unselectedMeals = AVAILABLE_MEALS.filter((m) => !selectedMeals.includes(m.value));
@@ -683,6 +677,7 @@ export default function PrepartidoRoutineModal({
                 const timingBadge = getMealTimingBadge(scheduleKey, meal);
                 const isMain = mealData.isMainMeal !== undefined ? Boolean(mealData.isMainMeal) : checkIsMainMeal(meal, mealData);
                 const summary = getMealSummaryText(mealData);
+                const isDefaultMeal = isDefaultProtocolMeal(mealData);
 
                 return (
                   <Accordion.Item key={meal} value={meal}>
@@ -699,6 +694,9 @@ export default function PrepartidoRoutineModal({
                             <Text size="11px" fw={600} c={isMain ? 'blue.7' : 'dimmed'}>
                               ● {isMain ? 'Comida principal' : 'Toma ligera'}
                             </Text>
+                            <Text size="11px" fw={700} c={isDefaultMeal ? 'gray.6' : 'teal.7'}>
+                              {isDefaultMeal ? 'Por defecto' : 'Manual'}
+                            </Text>
                           </Group>
 
                           <Text size="xs" c="dimmed" lineClamp={1} mt={2}>
@@ -706,6 +704,7 @@ export default function PrepartidoRoutineModal({
                           </Text>
                         </Box>
 
+                        {!isDefaultMealSlot(meal) && (
                         <Tooltip label={`Quitar ${meal} del protocolo`} withArrow>
                           <ActionIcon
                             component="div"
@@ -730,10 +729,25 @@ export default function PrepartidoRoutineModal({
                             <IconTrash size={14} />
                           </ActionIcon>
                         </Tooltip>
+                        )}
                       </Group>
                     </Accordion.Control>
 
                     <Accordion.Panel>
+                      {isDefaultMealSlot(meal) && (
+                        <Group justify="space-between" align="center" wrap="wrap" gap="xs" mb={4}>
+                          <Text size="11px" c="dimmed" style={{ flex: 1 }}>
+                            {isDefaultMeal
+                              ? `Por defecto: igual que su pauta habitual de ${meal}, con las reglas del protocolo. Si la cambias, pasa a ser manual.`
+                              : `Pauta manual: no cambia aunque cambie su pauta habitual de ${meal}.`}
+                          </Text>
+                          {!isDefaultMeal && (
+                            <Button size="compact-xs" variant="subtle" color="gray" radius="xl" onClick={() => handleResetMealToDefault(meal)}>
+                              Volver a por defecto
+                            </Button>
+                          )}
+                        </Group>
+                      )}
                       <SingleMealPautaEditor
                         mealName={meal}
                         mealData={mealData}
@@ -765,7 +779,7 @@ export default function PrepartidoRoutineModal({
         >
           <Group justify="space-between" align="center" wrap="wrap">
             <Box>
-              {isConfiguredAlready && onDeactivate && (
+              {hasManualMeals && onDeactivate && (
                 <Button
                   variant="subtle"
                   color="red"
@@ -775,7 +789,7 @@ export default function PrepartidoRoutineModal({
                   onClick={handleDeactivateClick}
                   disabled={saving}
                 >
-                  Desactivar protocolo
+                  Restablecer todo por defecto
                 </Button>
               )}
             </Box>

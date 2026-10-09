@@ -204,7 +204,6 @@ function defaultReportForm(teamConfig) {
       domingo: 'descanso',
     },
     preMatchConfig: {
-      enabled: false,
       diaPartido: 'sabado',
       horario: 'tarde',
     },

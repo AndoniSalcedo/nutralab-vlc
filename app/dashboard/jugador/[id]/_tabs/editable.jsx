@@ -32,6 +32,7 @@ import {
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
 import PrepartidoRoutineModal from '@/components/modals/PrepartidoRoutineModal';
 import { convertLegacyToAst, formatAstToText } from '@/lib/engine/meal-ast';
+import { isDefaultProtocolMeal } from '@/lib/nutrition/prematch-protocol';
 import WidgetCard from '@/components/widgets/WidgetCard';
 
 // Color de categoría de cada campo del perfil (mismo criterio que las teselas del Perfil)
@@ -567,6 +568,8 @@ export function PrepartidoEditable({
           const currentRecs = Object.fromEntries(
             Object.entries(cfg?.recomendaciones || {}).map(([name, meal]) => [name, convertLegacyToAst(meal)])
           );
+          const manualCount = currentMeals
+            .filter((m) => !isDefaultProtocolMeal(cfg?.recomendaciones?.[m])).length;
           const mealsList =
             cfg?.ingestas && cfg.ingestas.length > 0
               ? sortPreMatchMealsChronological(opt.value, cfg.ingestas).join(', ')
@@ -607,9 +610,8 @@ export function PrepartidoEditable({
                 </Group>
 
                 <Text size="xs" c="dimmed" style={{ flex: 1 }}>
-                  Sin protocolo específico configurado. En días de partido por la{' '}
-                  {opt.label.toLowerCase()} se aplicará el menú del comedor de la ciudad deportiva o sus
-                  ingestas habituales.
+                  Por defecto: en días de partido por la {opt.label.toLowerCase()} come lo mismo que en sus
+                  comidas habituales, con las reglas del protocolo.
                 </Text>
               </Paper>
             );
@@ -623,8 +625,9 @@ export function PrepartidoEditable({
                     Partido por la {opt.label}
                   </Text>
                   <Text size="xs" c="teal.7" fw={600}>
-                    ● Configurado ({currentMeals.length}{' '}
-                    {currentMeals.length === 1 ? 'ingesta' : 'ingestas'})
+                    ● {manualCount > 0
+                      ? `${manualCount} ${manualCount === 1 ? 'toma manual' : 'tomas manuales'}, resto por defecto`
+                      : 'Por defecto (sus comidas habituales)'}
                   </Text>
                 </Group>
 
@@ -674,6 +677,9 @@ export function PrepartidoEditable({
                           </Text>
                           <Text size="11px" fw={600} c={isMainMealIntake ? 'blue.7' : 'dimmed'}>
                             ● {isMainMealIntake ? 'Comida principal' : 'Toma ligera'}
+                          </Text>
+                          <Text size="11px" fw={700} c={isDefaultProtocolMeal(cfg?.recomendaciones?.[m]) ? 'gray.6' : 'teal.7'}>
+                            {isDefaultProtocolMeal(cfg?.recomendaciones?.[m]) ? 'Por defecto' : 'Manual'}
                           </Text>
                         </Group>
 
@@ -737,13 +743,13 @@ export function PrepartidoEditable({
             const toSave = { ...config };
             delete toSave[schedKey];
             const res = await updatePlayerField(jugadorId, 'config_prepartido', toSave);
-            if (!res?.ok) throw new Error(res?.error || 'No se pudo desactivar la rutina pre-partido.');
+            if (!res?.ok) throw new Error(res?.error || 'No se pudo restablecer el protocolo pre-partido.');
             setConfig(toSave);
             router.refresh();
             notifications.show({
               color: 'teal',
-              title: 'Rutina desactivada',
-              message: `El protocolo pre-partido para partidos por la ${activeModalSchedule.label.toLowerCase()} se ha desactivado.`,
+              title: 'Protocolo restablecido',
+              message: `El protocolo para partidos por la ${activeModalSchedule.label.toLowerCase()} vuelve a seguir sus comidas habituales.`,
             });
           }}
         />

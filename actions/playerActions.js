@@ -34,9 +34,12 @@ import {
 } from '@/repositories/evolutionRepository';
 import { trackUsageEvent } from '@/lib/billing/client';
 import { personalizePautas, describeAjustes } from '@/lib/nutrition/pauta-personalization';
+import { syncPreMatchProtocol } from '@/lib/nutrition/prematch-protocol';
 
 // Campos del jugador que cambian lo que puede comer: al modificarlos se revisan sus pautas guardadas.
 const RESTRICTION_FIELDS = ['intolerancias', 'aversiones'];
+// Campos de los que salen las tomas por defecto del protocolo de partido: al modificarlos se rehacen.
+const PREMATCH_SYNC_FIELDS = ['num_comidas', 'recomendaciones_defecto', 'config_prepartido', ...RESTRICTION_FIELDS];
 
 function isValidPassword(password) {
   return typeof password === 'string' && password.length >= 8;
@@ -93,8 +96,8 @@ export async function updatePlayerField(id, field, value) {
   // las pautas ya guardadas. Si algo se ajusta, se devuelve para que el usuario lo vea.
   let ajustes = [];
   const update = { [field]: parsedValue };
+  const current = await getPlayerById(db, id);
   try {
-    const current = await getPlayerById(db, id);
     const merged = { ...current, [field]: parsedValue };
     if (field === 'recomendaciones_defecto' || field === 'config_prepartido') {
       const result = personalizePautas(merged, { [field]: parsedValue });
@@ -113,6 +116,11 @@ export async function updatePlayerField(id, field, value) {
     }
   } catch (err) {
     console.warn('[updatePlayerField] No se pudieron personalizar las pautas:', err.message);
+  }
+
+  // Las tomas por defecto del protocolo de partido siguen las comidas y pautas habituales del jugador.
+  if (PREMATCH_SYNC_FIELDS.includes(field)) {
+    update.config_prepartido = syncPreMatchProtocol({ ...current, ...update });
   }
 
   await updatePlayer(db, id, update);
@@ -339,8 +347,8 @@ export async function savePlayer(form) {
 
   // Las pautas guardadas deben valer al jugador con las restricciones que acaba de guardar el formulario.
   let ajustes = [];
+  const current = id ? await getPlayerById(db, id) : null;
   try {
-    const current = id ? await getPlayerById(db, id) : null;
     const merged = { ...(current || {}), ...payload };
     const result = personalizePautas(merged, {
       recomendaciones_defecto: current?.recomendaciones_defecto,
@@ -354,6 +362,9 @@ export async function savePlayer(form) {
   } catch (err) {
     console.warn('[savePlayer] No se pudieron personalizar las pautas:', err.message);
   }
+
+  // Todo jugador tiene protocolo de partido; sus tomas por defecto siguen las comidas que se acaban de guardar.
+  payload.config_prepartido = syncPreMatchProtocol({ ...(current || {}), ...payload });
 
   if (form.has('avatar')) {
     const avatarFile = form.get('avatar');
@@ -487,6 +498,7 @@ async function createPlayer(db, teamId, group) {
     num_comidas: DEFAULT_PLAYER_MEALS_STRING,
     preentreno: false,
     postentreno: false,
+    config_prepartido: syncPreMatchProtocol({ num_comidas: DEFAULT_PLAYER_MEALS_STRING }),
   });
 }
 

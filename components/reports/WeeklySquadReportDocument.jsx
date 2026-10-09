@@ -283,7 +283,8 @@ function CoverPage({ meta, playersCount }) {
   );
 }
 
-import { getTeamDayTypeColor, getTeamDayTypeLabel, getObjectiveLabel } from '@/config/nutrition-days';
+import { getTeamDayTypeColor, getTeamDayTypeLabel, getObjectiveLabel, getMatchSchedule } from '@/config/nutrition-days';
+import { isDefaultProtocolMeal } from '@/lib/nutrition/prematch-protocol';
 
 const detailStyles = StyleSheet.create({
   page: {
@@ -472,18 +473,18 @@ function PlayerDetailBreakdownPage({ player, plan, meta, teamConfig }) {
   const daysOfWeek = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
   const notes = plan?.notas?.length ? plan.notas : [];
 
-  const preMatchConfig = p.config_prepartido || plan?.meta?.preMatchConfig || {};
+  // Protocolo de los partidos de esta semana: solo las tomas pautadas a mano (el resto son sus comidas habituales).
+  const matchSchedules = new Set(daysOfWeek
+    .filter((day) => plan?.dias?.[day]?.tipoDia === 'partido')
+    .map((day) => getMatchSchedule(plan?.meta?.preMatchConfig, day)));
   const preMatchSummary = [];
-  ['manana', 'tarde', 'noche'].forEach((sch) => {
+  matchSchedules.forEach((sch) => {
     const label = sch === 'manana' ? 'mañana' : sch;
-    const cfg = preMatchConfig[sch];
-    if (cfg?.ingestas?.length) {
-      preMatchSummary.push(`Partido ${label}: ${cfg.ingestas.join(', ')}`);
-    }
-    const cena24h = cfg?.recomendaciones?.Cena || cfg?.dia_anterior;
-    if (cena24h) {
-      preMatchSummary.push(`24h previas (${label}): ${cena24h}`);
-    }
+    const recs = p.config_prepartido?.[sch]?.recomendaciones || {};
+    const manual = Object.entries(recs)
+      .filter(([, pattern]) => !isDefaultProtocolMeal(pattern))
+      .map(([meal, pattern]) => `${meal}: ${pattern.raw || pattern.label || 'rotación variada'}`);
+    preMatchSummary.push(`Partido ${label}: ${manual.length ? manual.join('; ') : 'comidas habituales'}`);
   });
 
   return (

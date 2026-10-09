@@ -156,6 +156,13 @@ export function getTeamDayTypeLabel(key, teamConfig) {
 
 
 
+const DEFAULT_MATCH_SCHEDULE = 'tarde';
+
+/** Horario del partido de un día: el elegido al generar el plan o, si no se eligió, tarde. */
+export function getMatchSchedule(preMatchConfig, dayKey) {
+  return preMatchConfig?.partidos?.[dayKey]?.horario || preMatchConfig?.horario || DEFAULT_MATCH_SCHEDULE;
+}
+
 export function isPreMatchPreviousDayMeal(scheduleKey, mealName) {
   const norm = String(mealName || '').toLowerCase().trim();
   if (scheduleKey === 'manana' || scheduleKey === 'tarde') {
@@ -216,8 +223,8 @@ export function getUserMealsForDay(jugador, tipoDia, teamConfig, preMatchConfig 
   const baseMeals = getUserMeals(jugador);
   if (!jugador) return baseMeals;
 
-  if (tipoDia === 'partido' && preMatchConfig?.enabled) {
-    const horario = preMatchConfig?.partidos?.[dayKey]?.horario || preMatchConfig?.horario || 'tarde';
+  if (tipoDia === 'partido') {
+    const horario = getMatchSchedule(preMatchConfig, dayKey);
     const matchConfig = jugador?.config_prepartido?.[horario];
 
     // Ingestas pre-partido específicas del día de partido

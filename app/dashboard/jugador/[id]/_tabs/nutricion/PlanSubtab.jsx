@@ -203,7 +203,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [modalSelectedMenuWeek, setModalSelectedMenuWeek] = useState('none');
   const [modalCalendar, setModalCalendar] = useState(getDefaultCalendar());
   const [modalPreMatchConfig, setModalPreMatchConfig] = useState({
-    enabled: false,
     diaPartido: 'sabado',
     horario: 'tarde',
   });
@@ -311,7 +310,6 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setModalCalendar(defaultCal);
     const matchDay = Object.keys(defaultCal).find((k) => defaultCal[k] === 'partido') || 'sabado';
     setModalPreMatchConfig({
-      enabled: false,
       diaPartido: matchDay,
       horario: 'tarde',
     });

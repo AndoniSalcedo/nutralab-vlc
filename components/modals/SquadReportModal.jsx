@@ -10,7 +10,6 @@ import {
   SegmentedControl,
   SimpleGrid,
   Stack,
-  Switch,
   Text,
   Textarea,
   TextInput,
@@ -393,24 +392,9 @@ export default function SquadReportModal({
                 </ThemeIcon>
                 <Text fw={700} size="sm" c="dark.5">Comidas 24h Pre-Partido</Text>
               </Group>
-              <Switch
-                checked={reportForm.preMatchConfig?.enabled || false}
-                onChange={(e) => {
-                  const isChecked = Boolean(e?.currentTarget?.checked);
-                  updateReportField('preMatchConfig', {
-                    ...(reportForm.preMatchConfig || {}),
-                    enabled: isChecked,
-                    horario: reportForm.preMatchConfig?.horario || 'tarde',
-                    texto: reportForm.preMatchConfig?.texto || '',
-                  });
-                }}
-                label="Aplicar rutinas 24h pre-partido personalizadas a la plantilla"
-                size="xs"
-              />
             </Group>
 
-            {reportForm.preMatchConfig?.enabled && (
-              <Stack gap="sm" mt="xs">
+            <Stack gap="sm" mt="xs">
                 {DAYS_OF_WEEK.filter((d) => reportForm.calendario?.[d.key] === 'partido').length > 0 ? (
                   DAYS_OF_WEEK.filter((d) => reportForm.calendario?.[d.key] === 'partido').map((d) => {
                     const dayKey = d.key;
@@ -452,7 +436,7 @@ export default function SquadReportModal({
                         </Group>
 
                         <Text size="xs" c="dimmed" mt="xs">
-                          Para cada jugador de la plantilla se inyectarán de forma independiente las ingestas, recomendaciones y pauta de 24h previas que tenga personalizadas en su perfil para partidos por la <strong>{dayConfig.horario === 'manana' ? 'Mañana' : dayConfig.horario === 'noche' ? 'Noche' : 'Tarde'}</strong>.
+                          A cada jugador se le aplica su protocolo de partido por la <strong>{dayConfig.horario === 'manana' ? 'Mañana' : dayConfig.horario === 'noche' ? 'Noche' : 'Tarde'}</strong>: lo que tenga pautado a mano y, en el resto de tomas, sus comidas habituales con las reglas del protocolo.
                         </Text>
                       </Box>
                     );
@@ -462,8 +446,7 @@ export default function SquadReportModal({
                     Sin días de partido asignados en el calendario superior. Selecciona &quot;Partido&quot; en al menos un día del calendario para configurar el horario de juego.
                   </Text>
                 )}
-              </Stack>
-            )}
+            </Stack>
           </Paper>
 
           {/* Panel 4: Seleccionar Jugadores */}

@@ -25,6 +25,8 @@ const patternBase = {
   label: z.string().optional(),
   isMainMeal: z.boolean().optional(),
   unrecognized: z.array(z.string()).optional(),
+  // Solo en el protocolo de partido: 'defecto' sigue la pauta habitual de la toma; 'manual' la escribió el nutricionista.
+  origen: z.enum(['defecto', 'manual']).optional(),
 };
 
 /** Pauta de una toma: árbol concreto ("meal") o rotación variada ("complete"). */

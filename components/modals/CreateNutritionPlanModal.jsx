@@ -8,7 +8,6 @@ import {
   Button,
   Group,
   Text,
-  Switch,
   SegmentedControl,
   Badge,
 } from '@mantine/core';
@@ -119,22 +118,9 @@ export default function CreateNutritionPlanModal({
                 <Icon3D name="trophy" size={22} />
                 <Text size="sm" fw={700} c="dark.5">Comidas 24h Pre-Partido</Text>
               </Group>
-              <Switch
-                checked={modalPreMatchConfig?.enabled || false}
-                onChange={(e) => {
-                  const isChecked = Boolean(e?.currentTarget?.checked);
-                  setModalPreMatchConfig((prev) => ({
-                    ...prev,
-                    enabled: isChecked,
-                  }));
-                }}
-                label="Especificar comidas 24h antes"
-                size="xs"
-              />
             </Group>
 
-            {modalPreMatchConfig?.enabled && (
-              <Stack gap="sm" mt="xs">
+            <Stack gap="sm" mt="xs">
                 {matchDaysInCalendar.length > 0 ? (
                   matchDaysInCalendar.map((dayKey) => {
                     const dayConfig = modalPreMatchConfig?.partidos?.[dayKey] || {
@@ -172,7 +158,7 @@ export default function CreateNutritionPlanModal({
                         </Group>
 
                         <Text size="xs" c="dimmed" mt="xs">
-                          Al generar el plan, se aplicarán automáticamente las ingestas, recomendaciones y pauta de 24h previas que este jugador tenga configuradas en su perfil para partidos por la <strong>{dayConfig.horario === 'manana' ? 'Mañana' : dayConfig.horario === 'noche' ? 'Noche' : 'Tarde'}</strong>.
+                          Se aplica el protocolo de partido del jugador por la <strong>{dayConfig.horario === 'manana' ? 'Mañana' : dayConfig.horario === 'noche' ? 'Noche' : 'Tarde'}</strong>: lo que tenga pautado a mano y, en el resto de tomas, sus comidas habituales con las reglas del protocolo.
                         </Text>
                       </Paper>
                     );
@@ -182,8 +168,7 @@ export default function CreateNutritionPlanModal({
                     Sin días de partido asignados en el calendario superior. Selecciona &quot;Partido&quot; en al menos un día del calendario para configurar su horario pre-partido.
                   </Text>
                 )}
-              </Stack>
-            )}
+            </Stack>
           </Paper>
         )}
 
