@@ -4137,7 +4137,9 @@ export const FOODS_CRUDO = [
     "cho": 9.6,
     "pro": 1.6,
     "fat": 0.2,
-    "tags": [],
+    "tags": [
+      "alto_fodmap"
+    ],
     "minGrams": 80,
     "maxGrams": 250,
     "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE, MES.OCTUBRE],
@@ -4779,7 +4781,9 @@ export const FOODS_CRUDO = [
     "cho": 3.5,
     "pro": 1.5,
     "fat": 0.5,
-    "tags": [],
+    "tags": [
+      "alto_fodmap"
+    ],
     "minGrams": 80,
     "maxGrams": 200,
     "temporada": [MES.MAYO, MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
