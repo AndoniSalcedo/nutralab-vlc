@@ -43,6 +43,7 @@ import {
 import NothingFound from '@/components/NothingFound';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import WidgetCard, { StatTile } from '@/components/widgets/WidgetCard';
+import TeamAnalyticsComparison from '@/components/TeamAnalyticsComparison';
 
 function formatDate(dateStr) {
   if (!dateStr) return 'Sin fecha';
@@ -562,6 +563,8 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
           )}
         </Stack>
       </WidgetCard>
+
+      <TeamAnalyticsComparison players={playersWithAnaliticas} selectedParam={selectedParam} />
 
       {/* Sección 3: Listado general de la plantilla */}
       <WidgetCard

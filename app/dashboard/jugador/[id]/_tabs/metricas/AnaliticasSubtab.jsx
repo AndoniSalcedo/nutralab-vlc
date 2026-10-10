@@ -37,6 +37,7 @@ import { BentoCard } from '@/components/BentoItem';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import UploadAnaliticaModal from '@/components/modals/UploadAnaliticaModal';
+import AnaliticasEvolucion from './AnaliticasEvolucion';
 
 function fechaLabel(fecha) {
   if (!fecha) return 'Sin fecha';
@@ -417,6 +418,8 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
                 </ScrollArea>
               </BentoCard>
             )}
+
+            <AnaliticasEvolucion analiticas={analiticas} selectedId={selected.id} />
 
             <BentoCard title="Parámetros extraídos" icon={IconFileText} color="salvia">
               <ScrollArea>
