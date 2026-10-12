@@ -10,10 +10,11 @@ import NothingFound from '@/components/NothingFound';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export default async function TeamIntrapartidoPage({ params }) {
+export default async function TeamIntrapartidoPage({ params, searchParams }) {
   const db = getDb();
   const user = await getUser();
   const { teamId } = await params;
+  const { reanudar } = await searchParams;
   const team = await getAccessibleTeam(db, user, teamId);
 
   if (!team) {
@@ -49,6 +50,7 @@ export default async function TeamIntrapartidoPage({ params }) {
       sessions={sessions}
       team={team}
       readOnly={user?.role === 'tecnico'}
+      resumeId={typeof reanudar === 'string' ? reanudar : null}
     />
   );
 }

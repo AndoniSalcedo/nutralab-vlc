@@ -1,6 +1,7 @@
 import DashboardShell from '@/components/DashboardShell';
 import { getUser } from '@/lib/auth/session';
 import { Box, Container } from '@mantine/core';
+import PlayerIntrapartidoSummaryModal from '@/components/modals/PlayerIntrapartidoSummaryModal';
 import { redirect } from 'next/navigation';
 
 export default async function DashboardLayout({ children }) {
@@ -18,6 +19,7 @@ export default async function DashboardLayout({ children }) {
         <Container size="xl" p={0}>
           {children}
         </Container>
+        <PlayerIntrapartidoSummaryModal playerId={user.id} />
       </Box>
     );
   }

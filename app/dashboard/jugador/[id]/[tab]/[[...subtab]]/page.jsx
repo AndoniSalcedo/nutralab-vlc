@@ -9,6 +9,7 @@ import { getPesajesByPlayerId } from '@/repositories/pesajeRepository';
 import { getMenusByTeam } from '@/repositories/menuRepository';
 import { getAiPlansByPlayerId } from '@/repositories/aiPlanRepository';
 import { getHydrationRecordsByPlayerId } from '@/repositories/hydrationRepository';
+import { getIntrapartidoHistoryByPlayerId } from '@/repositories/intrapartidoRepository';
 import { getMessages } from '@/repositories/messagesRepository';
 import NothingFound from '@/components/NothingFound';
 import PlayerTabContainer from './PlayerTabContainer';
@@ -78,6 +79,7 @@ export default async function JugadorTabPage({ params }) {
   let pesajes = [];
   let analiticas = [];
   let registrosHidratacion = [];
+  let historialIntrapartido = [];
   let messages = [];
   let menus = [];
   let latestPlan = null;
@@ -104,12 +106,15 @@ export default async function JugadorTabPage({ params }) {
         messages = await getMessages(db, jugador.equipo_id, id);
       }
     } else if (activeTab === 'metricas') {
-      const [resAnaliticas, resEvoluciones, resHidratacion, resPesajes] = await Promise.all([
+      const [resAnaliticas, resEvoluciones, resHidratacion, resPesajes, resIntrapartido] = await Promise.all([
         getAnalyticsByPlayerId(db, id),
         getEvolutionsByPlayerId(db, id),
         getHydrationRecordsByPlayerId(db, id),
         getPesajesByPlayerId(db, id),
+        // Solo controles finalizados; es opcional: si falla, la pestaña muestra su estado vacío
+        activeSubtab === 'intrapartido' ? getIntrapartidoHistoryByPlayerId(db, id).catch(() => []) : [],
       ]);
+      historialIntrapartido = resIntrapartido;
       analiticas = isPlayer ? resAnaliticas.filter(a => a.visible_para_jugador === true) : resAnaliticas;
       evoluciones = resEvoluciones;
       pesajes = resPesajes;
@@ -146,6 +151,7 @@ export default async function JugadorTabPage({ params }) {
         pesajes={pesajes}
         analiticas={analiticas}
         registrosHidratacion={registrosHidratacion}
+        historialIntrapartido={historialIntrapartido}
         messages={messages}
         menus={menus}
         latestPlan={latestPlan}

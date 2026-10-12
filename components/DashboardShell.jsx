@@ -24,6 +24,7 @@ import Logo from "./Logo";
 import { initials } from "@/lib/utils";
 import { env } from "@/config/env";
 import { logout } from "@/actions/authActions";
+import IntrapartidoResumePrompt from "./modals/IntrapartidoResumePrompt";
 
 export default function DashboardShell({ children, user }) {
   const [opened, setOpened] = useState(false);
@@ -201,6 +202,7 @@ export default function DashboardShell({ children, user }) {
 
       <Container size="xl" px={{ base: 0, sm: "md" }} pt={{ base: 0, sm: "md" }} pb="xl">
         {children}
+        {!isTecnico && <IntrapartidoResumePrompt />}
       </Container>
     </Box>
   );

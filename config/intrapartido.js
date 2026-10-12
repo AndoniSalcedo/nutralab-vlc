@@ -355,6 +355,9 @@ export function createEmptySession() {
     activeRosterIds: [],
     starterIds: [],
     intakes: {},
+    estado: 'borrador',
+    paso: 'alineacion',
+    faseActual: 0,
   };
 }
 
@@ -384,6 +387,9 @@ export function buildSessionFromRows(match, convocados = [], tomas = []) {
     activeRosterIds: convocados.map((c) => String(c.jugador_id)),
     starterIds: convocados.filter((c) => c.titular).map((c) => String(c.jugador_id)),
     intakes,
+    estado: match.estado || 'finalizado',
+    paso: match.paso || 'alineacion',
+    faseActual: Math.min(Math.max(Number(match.fase_actual) || 0, 0), INTRAPARTIDO_TIMINGS.length - 1),
   };
 }
 

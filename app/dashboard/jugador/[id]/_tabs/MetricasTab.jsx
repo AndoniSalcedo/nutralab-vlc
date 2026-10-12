@@ -10,8 +10,9 @@ import PesosSubtab from './metricas/PesosSubtab';
 import AnaliticasSubtab from './metricas/AnaliticasSubtab';
 import MedicionesSubtab from './metricas/MedicionesSubtab';
 import HidratacionSubtab from './metricas/HidratacionSubtab';
+import IntrapartidoSubtab from './metricas/IntrapartidoSubtab';
 
-export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes, registrosHidratacion = [], activeSubtab = 'mediciones', onSubtabChange, readOnly = false }) {
+export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes, registrosHidratacion = [], historialIntrapartido = [], activeSubtab = 'mediciones', onSubtabChange, readOnly = false }) {
   const analiticasVisibles = readOnly ? (analiticas || []).filter(a => a.visible_para_jugador) : (analiticas || []);
 
   const tabsData = getSubtabControlData('metricas', tabLabel);
@@ -42,6 +43,9 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes,
         )}
         {activeSubtab === 'hidratacion' && (
           <HidratacionSubtab jugador={jugador} registrosHidratacion={registrosHidratacion} readOnly={readOnly} />
+        )}
+        {activeSubtab === 'intrapartido' && (
+          <IntrapartidoSubtab jugador={jugador} historialIntrapartido={historialIntrapartido} />
         )}
       </Box>
     </Stack>

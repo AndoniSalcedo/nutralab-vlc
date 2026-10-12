@@ -3,20 +3,25 @@
 import { getDb } from '@/lib/db/prisma';
 import { revalidatePath } from 'next/cache';
 import { getUser } from '@/lib/auth/session';
+import { getOwnerId } from '@/lib/auth/owner';
 import { getOwnedTeam, getAccessibleTeam } from '@/lib/auth/team-access';
-import { isMockTeam } from '@/config/boneyardMockData';
+import { isMockTeam, isMockPlayer } from '@/config/boneyardMockData';
 import { assertPlainObject } from '@/lib/security/json';
-import { INTRAPARTIDO_TIMINGS, PRODUCTS_MAP, buildSessionFromRows } from '@/config/intrapartido';
+import { INTRAPARTIDO_TIMINGS, PRODUCTS_MAP, buildSessionFromRows, calculatePlayerTotals } from '@/config/intrapartido';
 import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
 import {
   getIntrapartidoMatchesByTeamId,
   getIntrapartidoMatchById,
+  getIntrapartidoDraftsByOwner,
+  getUnseenIntrapartidoForPlayer,
+  markIntrapartidoSeen,
   saveIntrapartidoMatch as saveIntrapartidoMatchInRepo,
   deleteIntrapartidoMatch as deleteIntrapartidoMatchInRepo,
 } from '@/repositories/intrapartidoRepository';
 
 const TIMING_IDS = new Set(INTRAPARTIDO_TIMINGS.map((t) => t.id));
 const MAX_STARTERS = 11;
+const STEPS = new Set(['alineacion', 'fases', 'resumen']);
 const MAX_QTY_PER_INTAKE = 50;
 
 function parseId(value, label) {
@@ -55,6 +60,64 @@ export async function getIntrapartidoMatch(teamId, matchId) {
   return { ok: true, session: buildSessionFromRows(match, convocados, tomas) };
 }
 
+// Controles a medias del nutricionista (de cualquiera de sus equipos) para ofrecer reanudarlos.
+export async function listIntrapartidoDrafts() {
+  const user = await getUser();
+  const ownerId = getOwnerId(user);
+  if (!ownerId) return { ok: true, drafts: [] };
+
+  const rows = await getIntrapartidoDraftsByOwner(getDb(), ownerId);
+  return {
+    ok: true,
+    drafts: rows.map((r) => ({
+      id: String(r.id),
+      teamId: String(r.equipo_id),
+      teamName: r.equipo_nombre,
+      rival: r.rival,
+      fecha: r.fecha,
+      paso: r.paso,
+      faseActual: r.fase_actual,
+      updatedAt: r.updated_at,
+    })),
+  };
+}
+
+// Resumen del último control finalizado del jugador que aún no ha visto (aviso de una sola vez).
+export async function getPendingIntrapartidoSummary() {
+  const user = await getUser();
+  if (!user || user.role !== 'jugador' || isMockPlayer(user.id)) return { ok: true, summary: null };
+
+  const pending = await getUnseenIntrapartidoForPlayer(getDb(), parseId(user.id, 'Jugador'));
+  if (!pending) return { ok: true, summary: null };
+
+  const { match, convocado, tomas } = pending;
+  const session = buildSessionFromRows(match, [convocado], tomas);
+  const intakes = session.intakes[String(user.id)] || {};
+  const { aguaMl, carbsG, sodioMg, kcal, totalItems } = calculatePlayerTotals(intakes);
+  return {
+    ok: true,
+    summary: {
+      id: session.id,
+      rival: match.rival,
+      competicion: match.competicion,
+      lugar: match.lugar,
+      fecha: match.fecha,
+      titular: convocado.titular,
+      totals: { aguaMl, carbsG, sodioMg, kcal, totalItems },
+      momentos: INTRAPARTIDO_TIMINGS.filter((t) => Object.keys(intakes[t.id] || {}).length > 0).map((t) => t.short),
+    },
+  };
+}
+
+export async function markIntrapartidoSummarySeen(matchId) {
+  const user = await getUser();
+  if (!user || user.role !== 'jugador' || isMockPlayer(user.id)) return { ok: true };
+
+  await markIntrapartidoSeen(getDb(), parseId(user.id, 'Jugador'), parseId(matchId, 'Partido'));
+  return { ok: true };
+}
+
+// `session.estado` = 'borrador' guarda el avance tras cada etapa; 'finalizado' cierra el control.
 export async function saveIntrapartidoMatch(teamId, session) {
   const { db, user } = await requireTeamAccess(teamId, { write: true });
   assertPlainObject(session, { label: 'Sesión' });
@@ -105,6 +168,12 @@ export async function saveIntrapartidoMatch(teamId, session) {
     });
   });
 
+  const estado = session.estado === 'borrador' ? 'borrador' : 'finalizado';
+  const paso = STEPS.has(session.paso) ? session.paso : 'alineacion';
+  const faseActual = Number.isInteger(session.faseActual)
+    ? Math.min(Math.max(session.faseActual, 0), INTRAPARTIDO_TIMINGS.length - 1)
+    : 0;
+
   const matchId = session.id ? parseId(session.id, 'Partido') : null;
   const id = await saveIntrapartidoMatchInRepo(db, {
     matchId,
@@ -116,6 +185,9 @@ export async function saveIntrapartidoMatch(teamId, session) {
     createdBy: String(user.id || ''),
     convocados: rosterIds.map((jugador_id) => ({ jugador_id, titular: starterIds.has(jugador_id) })),
     tomas,
+    estado,
+    paso: estado === 'finalizado' ? 'resumen' : paso,
+    faseActual,
   });
 
   revalidatePath(`/dashboard/equipo/${teamId}/intrapartido`);

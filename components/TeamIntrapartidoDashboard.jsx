@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   ActionIcon,
   Avatar,
@@ -33,7 +33,7 @@ import ConfirmModal from '@/components/modals/ConfirmModal';
 import IntrapartidoModal from '@/components/modals/IntrapartidoModal';
 import { TeamHeaderRightSection } from '@/components/TeamHeaderContext';
 import { deleteIntrapartidoMatch } from '@/actions/intrapartidoActions';
-import { calculatePlayerTotals } from '@/config/intrapartido';
+import { INTRAPARTIDO_TIMINGS, calculatePlayerTotals } from '@/config/intrapartido';
 import { exportIntrapartidoExcel } from '@/lib/io/intrapartido-export';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import { StatTile } from '@/components/widgets/WidgetCard';
@@ -67,17 +67,23 @@ function Stat({ label, value }) {
   );
 }
 
-export default function TeamIntrapartidoDashboard({ players = [], sessions = [], team, readOnly = false }) {
+export default function TeamIntrapartidoDashboard({ players = [], sessions = [], team, readOnly = false, resumeId = null }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [expandedId, setExpandedId] = useState(null);
-  const [modal, setModal] = useState({ opened: false, matchId: null });
+  const [modal, setModal] = useState({ opened: !readOnly && !!resumeId, matchId: !readOnly ? resumeId : null });
   const [deleting, setDeleting] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const playersMap = useMemo(() => new Map(players.map((p) => [String(p.id), p])), [players]);
 
+  // Al llegar desde el aviso de reanudar, se limpia el parámetro para no reabrir el control al recargar
+  useEffect(() => {
+    if (resumeId) router.replace(pathname, { scroll: false });
+  }, [resumeId, pathname, router]);
+
   // Totales por jugador y por partido, calculados una sola vez
-  const matches = useMemo(() => sessions.map((session) => {
+  const allMatches = useMemo(() => sessions.map((session) => {
     const perPlayer = session.activeRosterIds.map((pId) => ({
       pId,
       isStarter: session.starterIds.includes(pId),
@@ -85,6 +91,10 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
     }));
     return { session, perPlayer, totals: sumTotals(perPlayer.map((p) => p.totals)) };
   }), [sessions]);
+
+  // Los borradores se listan aparte y no cuentan en las estadísticas
+  const drafts = useMemo(() => allMatches.filter((m) => m.session.estado === 'borrador'), [allMatches]);
+  const matches = useMemo(() => allMatches.filter((m) => m.session.estado !== 'borrador'), [allMatches]);
 
   // Medias por jugador y partido (solo partidos con alguna toma registrada)
   const averages = useMemo(() => {
@@ -137,7 +147,45 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
         </TeamHeaderRightSection>
       )}
 
-      {matches.length === 0 ? (
+      {!readOnly && drafts.length > 0 && (
+        <Stack gap="xs">
+          <Text fz="xs" fw={700} c="dimmed" tt="uppercase">En curso</Text>
+          {drafts.map(({ session }) => {
+            const info = session.matchInfo;
+            const stage = session.paso === 'fases'
+              ? INTRAPARTIDO_TIMINGS[session.faseActual]?.short
+              : session.paso === 'resumen' ? 'Balance' : 'Alineación';
+            return (
+              <Paper key={session.id} radius={24} shadow="xs" bg="white" p={{ base: 10, sm: 'md' }}>
+                <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
+                  <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
+                    <Icon3D name="soccer" size={28} />
+                    <Box style={{ minWidth: 0 }}>
+                      <Group gap={6} wrap="nowrap">
+                        <Text fw={700} fz="sm" c="dark.6" truncate>{info.rival || 'Sin rival'}</Text>
+                        <Badge size="xs" variant="light" color="yellow">Borrador · {stage}</Badge>
+                      </Group>
+                      <Text fz="xs" c="dimmed" truncate>{formatDate(info.fecha)}</Text>
+                    </Box>
+                  </Group>
+                  <Group gap={4} wrap="nowrap" style={{ flexShrink: 0 }}>
+                    <Button size="compact-sm" radius="xl" color="lima" onClick={() => openModal(session.id)}>
+                      Reanudar
+                    </Button>
+                    <Tooltip label="Descartar borrador" withArrow>
+                      <ActionIcon variant="subtle" color="arcilla" radius="xl" onClick={() => setDeleting({ id: session.id, rival: info.rival })} aria-label="Descartar borrador">
+                        <IconTrash size={17} />
+                      </ActionIcon>
+                    </Tooltip>
+                  </Group>
+                </Group>
+              </Paper>
+            );
+          })}
+        </Stack>
+      )}
+
+      {matches.length === 0 && (readOnly || drafts.length === 0) ? (
         <NothingFound
           title="Sin partidos registrados"
           description={
@@ -148,7 +196,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
           icon3d="stadium"
           withPaper
         />
-      ) : (
+      ) : matches.length > 0 && (
         <>
           <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
             <StatTile icon="soccer" title="Partidos" color="salvia" value={matches.length} caption="registrados" />

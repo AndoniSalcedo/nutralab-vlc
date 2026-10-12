@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   ActionIcon,
   Avatar,
@@ -121,6 +121,11 @@ export default function IntrapartidoModal({
   // Índice de la fase activa del partido (0 a 6)
   const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
 
+  // Guardado de borrador: las escrituras se encadenan para que nunca se solapen y siempre
+  // usen el id del partido ya creado por la anterior.
+  const saveQueueRef = useRef(Promise.resolve());
+  const matchIdRef = useRef(null);
+
   // Sub-filtro dentro de fases: 'titulares' | 'suplentes'
   const [groupFilter, setGroupFilter] = useState('titulares');
 
@@ -168,7 +173,52 @@ export default function IntrapartidoModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, matchId]);
 
+  // Guarda el avance como borrador tras cada etapa. Solo aplica a controles en curso
+  // (los finalizados se editan y se guardan con el botón Guardar).
+  const persistDraft = (snapshot, step, phaseIndex) => {
+    if (readOnly || !team?.id || snapshot.estado !== 'borrador' || snapshot.activeRosterIds.length === 0) {
+      return saveQueueRef.current;
+    }
+    const task = saveQueueRef.current.then(async () => {
+      try {
+        const res = await saveIntrapartidoMatch(team.id, {
+          ...snapshot,
+          id: matchIdRef.current,
+          paso: step,
+          faseActual: phaseIndex,
+        });
+        matchIdRef.current = res.id;
+        setSession((prev) => (prev.id === res.id ? prev : { ...prev, id: res.id }));
+        onSaved?.();
+      } catch (err) {
+        notifications.show({ color: 'orange', title: 'Borrador sin guardar', message: err.message || 'No se pudo guardar el avance; se reintentará en la siguiente etapa.' });
+      }
+    });
+    saveQueueRef.current = task;
+    return task;
+  };
+
+  // Cambio de etapa (paso o fase): se actualiza la vista y se guarda el borrador
+  const goTo = (step, phaseIndex = currentPhaseIndex) => {
+    setCurrentStep(step);
+    setCurrentPhaseIndex(phaseIndex);
+    persistDraft(session, step, phaseIndex);
+  };
+
+  // Cerrar con un control a medias: se guarda lo último registrado en la fase actual
+  // El título está memoizado: su botón «Balance» usa siempre la versión más reciente de goTo
+  const goToRef = useRef(goTo);
+  useEffect(() => {
+    goToRef.current = goTo;
+  });
+
+  const handleClose = () => {
+    if (session.estado === 'borrador') persistDraft(session, currentStep, currentPhaseIndex);
+    onClose();
+  };
+
   const handleNewMatch = () => {
+    matchIdRef.current = null;
     setSession(createEmptySession());
     setCurrentStep('alineacion');
     setCurrentPhaseIndex(0);
@@ -183,8 +233,12 @@ export default function IntrapartidoModal({
     setLoadingMatch(true);
     try {
       const res = await getIntrapartidoMatch(team.id, id);
+      matchIdRef.current = res.session.id;
       setSession(res.session);
-      setCurrentPhaseIndex(0);
+      // Un borrador se reanuda donde se dejó; un partido finalizado se abre desde el inicio
+      const isDraft = res.session.estado === 'borrador';
+      setCurrentStep(isDraft ? res.session.paso : 'alineacion');
+      setCurrentPhaseIndex(isDraft ? res.session.faseActual : 0);
       setGroupFilter('titulares');
     } catch (err) {
       notifications.show({ color: 'red', title: 'Error', message: err.message || 'No se pudo cargar el partido.' });
@@ -454,7 +508,8 @@ export default function IntrapartidoModal({
   const handleSaveSession = async () => {
     setSaving(true);
     try {
-      await saveIntrapartidoMatch(team.id, session);
+      await saveQueueRef.current;
+      await saveIntrapartidoMatch(team.id, { ...session, id: matchIdRef.current, estado: 'finalizado' });
       notifications.show({
         color: 'teal',
         title: 'Registro guardado',
@@ -517,7 +572,7 @@ export default function IntrapartidoModal({
             radius="xl"
             variant="default"
             leftSection={<Icon3D name="document" size={13} />}
-            onClick={() => setCurrentStep('resumen')}
+            onClick={() => goToRef.current('resumen')}
           >
             Balance
           </Button>
@@ -554,7 +609,7 @@ export default function IntrapartidoModal({
   return (
     <ResponsiveModal
       opened={opened}
-      onClose={onClose}
+      onClose={handleClose}
       title={modalTitle}
       size="1100px"
       padding={{ base: 'xs', sm: 'md' }}
@@ -575,7 +630,7 @@ export default function IntrapartidoModal({
                 leftSection={<Icon3D name="document" size={16} />}
                 data={savedMatches.map((m) => ({
                   value: String(m.id),
-                  label: `${m.fecha.split('-').reverse().join('/')} · ${m.rival || 'Sin rival'}`,
+                  label: `${m.fecha.split('-').reverse().join('/')} · ${m.rival || 'Sin rival'}${m.estado === 'borrador' ? ' (borrador)' : ''}`,
                 }))}
                 value={session.id}
                 onChange={handleLoadMatch}
@@ -766,7 +821,7 @@ export default function IntrapartidoModal({
                 radius="xl"
                 fullWidth
                 rightSection={<IconArrowRight size={14} />}
-                onClick={() => setCurrentStep('fases')}
+                onClick={() => goTo('fases')}
                 disabled={session.starterIds.length === 0}
               >
                 Continuar ({session.starterIds.length} titulares)
@@ -1147,11 +1202,8 @@ export default function IntrapartidoModal({
                 style={{ flex: 1 }}
                 leftSection={<IconArrowLeft size={14} />}
                 onClick={() => {
-                  if (currentPhaseIndex > 0) {
-                    setCurrentPhaseIndex((prev) => prev - 1);
-                  } else {
-                    setCurrentStep('alineacion');
-                  }
+                  if (currentPhaseIndex > 0) goTo('fases', currentPhaseIndex - 1);
+                  else goTo('alineacion');
                 }}
               >
                 {currentPhaseIndex > 0 ? 'Anterior' : 'Alineación'}
@@ -1165,7 +1217,7 @@ export default function IntrapartidoModal({
                   radius="xl"
                   style={{ flex: 1 }}
                   rightSection={<IconArrowRight size={14} />}
-                  onClick={() => setCurrentPhaseIndex((prev) => prev + 1)}
+                  onClick={() => goTo('fases', currentPhaseIndex + 1)}
                 >
                   {INTRAPARTIDO_TIMINGS[currentPhaseIndex + 1].short}
                 </Button>
@@ -1177,7 +1229,7 @@ export default function IntrapartidoModal({
                   radius="xl"
                   style={{ flex: 1 }}
                   leftSection={<IconCheck size={14} />}
-                  onClick={() => setCurrentStep('resumen')}
+                  onClick={() => goTo('resumen')}
                 >
                   Finalizar
                 </Button>
@@ -1351,7 +1403,7 @@ export default function IntrapartidoModal({
                 radius="xl"
                 style={{ flex: 1 }}
                 leftSection={<IconArrowLeft size={14} />}
-                onClick={() => setCurrentStep('fases')}
+                onClick={() => goTo('fases')}
               >
                 Volver
               </Button>

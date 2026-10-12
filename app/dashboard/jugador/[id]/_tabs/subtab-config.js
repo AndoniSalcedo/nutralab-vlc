@@ -1,7 +1,7 @@
 import { IconUser, IconNotes, IconMail } from '@/components/icons3d';
 import { IconReportMedical, IconDroplet } from '@/components/icons3d';
 import { IconBrain, IconBottle } from '@/components/icons3d';
-import { IconScale, IconRuler2, IconBentoBox, IconFlag2 } from '@/components/icons3d';
+import { IconScale, IconRuler2, IconBentoBox, IconFlag2, IconBallFootball } from '@/components/icons3d';
 
 /**
  * Single source of truth for all player dashboard subtab configs.
@@ -49,6 +49,7 @@ const SUBTAB_CONFIGS = {
       { value: 'pesos', icon: IconScale, label: 'Pesos', mobileLabel: 'Pesos' },
       { value: 'analiticas', icon: IconReportMedical, label: 'Analíticas', mobileLabel: 'Anali.' },
       { value: 'hidratacion', icon: IconDroplet, label: 'Hidratación', mobileLabel: 'Hidra.' },
+      { value: 'intrapartido', icon: IconBallFootball, label: 'Intrapartido', mobileLabel: 'Partido' },
     ],
     headers: {
       pesos: {
@@ -74,6 +75,12 @@ const SUBTAB_CONFIGS = {
         iconColor: 'salvia',
         title: 'Hidratación y sudoración',
         subtitle: 'Osmolaridad salival y sodio en sudor.',
+      },
+      intrapartido: {
+        icon: IconBallFootball,
+        iconColor: 'salvia',
+        title: 'Control intrapartido',
+        subtitle: 'Hidratación y nutrición durante los partidos.',
       },
     },
   },
