@@ -195,6 +195,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
   const [nombre, setNombre] = useState('');
   const [contenido, setContenido] = useState('');
   const [datos, setDatos] = useState(null);
+  const [notasText, setNotasText] = useState('');
   const [hasGeneratedAi, setHasGeneratedAi] = useState(false);
   const [actionType, setActionType] = useState(null);
   const [selectedMenuWeek, setSelectedMenuWeek] = useState('none');
@@ -328,7 +329,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         resolvedMenu = availableMenus.find(m => m.semana === modalSelectedMenuWeek) || null;
       }
 
-      setDatos(buildBasePlanData({
+      const baseData = buildBasePlanData({
         jugador,
         nombre: modalNombre,
         menu: resolvedMenu,
@@ -336,7 +337,9 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         preMatchConfig: modalPreMatchConfig,
         teamConfig,
         suplementacion: activeSupplements,
-      }));
+      });
+      setDatos(baseData);
+      setNotasText((baseData?.notas || []).join('\n'));
 
       setHasGeneratedAi(false);
       setCreationModalOpened(false);
@@ -382,6 +385,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       setSelectedMenuWeek(modalSelectedMenuWeek);
 
       setDatos(data.datos || null);
+      setNotasText((data.datos?.notas || []).join('\n'));
       notifyPlanWarnings(data.datos);
       setContenido('');
       setHasGeneratedAi(true);
@@ -418,7 +422,9 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setNombre(currentPlan.nombre || '');
     setSelectedMenuWeek(currentPlan.datos?.meta?.semanaMenu || 'none');
     setContenido(currentPlan.contenido || '');
-    setDatos(currentDatos ? clonePlan(currentDatos) : null);
+    const cloned = currentDatos ? clonePlan(currentDatos) : null;
+    setDatos(cloned);
+    setNotasText((cloned?.notas || []).join('\n'));
     setHasGeneratedAi(true);
   }
 
@@ -463,7 +469,12 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         semanaMenu: selectedMenuWeek,
         preMatchConfig: datos?.meta?.preMatchConfig || null,
       });
-      setDatos(data.datos || null);
+      const newNotasText = data.datos?.notas?.length ? data.datos.notas.join('\n') : notasText;
+      setNotasText(newNotasText);
+      setDatos(data.datos ? {
+        ...data.datos,
+        notas: newNotasText.split('\n'),
+      } : null);
       notifyPlanWarnings(data.datos);
       setContenido('');
       setHasGeneratedAi(true);
@@ -493,7 +504,14 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
 
   async function saveCreate() {
     const notificationId = 'ai-plan-save';
-    const finalDatos = planWithMeta(datos, { nombre });
+    const cleanNotas = notasText
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+    const finalDatos = planWithMeta(
+      datos ? { ...datos, notas: cleanNotas } : null,
+      { nombre }
+    );
     setActionType('save');
     notifications.show({
       id: notificationId,
@@ -549,7 +567,14 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       return;
     }
     const notificationId = 'ai-plan-save';
-    const finalDatos = planWithMeta(datos, { nombre });
+    const cleanNotas = notasText
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+    const finalDatos = planWithMeta(
+      datos ? { ...datos, notas: cleanNotas } : null,
+      { nombre }
+    );
     setActionType('save');
     notifications.show({
       id: notificationId,
@@ -1063,14 +1088,16 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                   <Textarea
                     label="Notas de pie de ficha"
                     description="Una nota por línea."
-                    value={(datos.notas || []).join('\n')}
+                    placeholder="Escribe las indicaciones o notas del plan..."
+                    value={notasText}
                     autosize
                     minRows={3}
                     onChange={(e) => {
-                      const lines = e.target.value.split('\n').map((line) => line.trim()).filter(Boolean);
+                      const val = e.target.value;
+                      setNotasText(val);
                       setDatos((prev) => ({
                         ...prev,
-                        notas: lines,
+                        notas: val.split('\n'),
                       }));
                     }}
                   />
