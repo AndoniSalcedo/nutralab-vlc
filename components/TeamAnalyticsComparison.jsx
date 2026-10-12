@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Badge, Group, ScrollArea, SegmentedControl, Stack, Table, Text } from '@mantine/core';
+import { Badge, Box, Group, Paper, ScrollArea, SegmentedControl, Stack, Table, Text } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
 import WidgetCard from '@/components/widgets/WidgetCard';
 import NothingFound from '@/components/NothingFound';
@@ -19,6 +20,7 @@ const round2 = (n) => Math.round(n * 100) / 100;
 // Compara, para cada jugador con 2+ analíticas, su última analítica con la anterior.
 export default function TeamAnalyticsComparison({ players = [], selectedParam }) {
   const router = useRouter();
+  const isMobile = useMediaQuery('(max-width: 48em)', false);
   const [view, setView] = useState('parametros');
 
   const comparisons = useMemo(
@@ -49,7 +51,8 @@ export default function TeamAnalyticsComparison({ players = [], selectedParam })
       .map((e) => {
         const antes = avg(e.antes);
         const ahora = avg(e.ahora);
-        return { ...e, mediaAntes: round2(antes), mediaAhora: round2(ahora), delta: ahora - antes, n: e.antes.length };
+        const tone = e.mejora > e.empeora ? 'salvia' : e.empeora > e.mejora ? 'arcilla' : 'gray';
+        return { ...e, mediaAntes: round2(antes), mediaAhora: round2(ahora), delta: ahora - antes, n: e.antes.length, tone };
       })
       .sort((a, b) => b.empeora - a.empeora || b.n - a.n);
   }, [comparisons]);
@@ -88,10 +91,32 @@ export default function TeamAnalyticsComparison({ players = [], selectedParam })
 
         {comparisons.length === 0 ? (
           <NothingFound
+            compact={isMobile}
             title="Aún no hay nada que comparar"
             icon3d="chart"
             description="Hacen falta al menos dos analíticas de un mismo jugador para ver su evolución."
           />
+        ) : view === 'parametros' && isMobile ? (
+          <Stack gap="xs">
+            {byParam.map((e) => (
+              <Paper key={e.nombre} radius="lg" p="sm" withBorder>
+                <Group justify="space-between" wrap="nowrap" align="flex-start">
+                  <Box style={{ minWidth: 0 }}>
+                    <Text size="sm" fw={700} truncate>{e.nombre}</Text>
+                    <Text size="xs" c="dimmed">{e.mediaAntes} → {e.mediaAhora} {e.unidad}</Text>
+                  </Box>
+                  <Text size="sm" fw={700} c={`${e.tone}.7`} style={{ flexShrink: 0 }}>
+                    {e.delta > 0 ? '↑' : e.delta < 0 ? '↓' : '→'} {formatDelta(e.delta)}
+                  </Text>
+                </Group>
+                <Group gap={6} mt={6}>
+                  <Badge variant="light" color="salvia" size="sm">{e.mejora} mejoran</Badge>
+                  <Badge variant="light" color="arcilla" size="sm">{e.empeora} empeoran</Badge>
+                  {e.estable > 0 && <Badge variant="light" color="gray" size="sm">{e.estable} estables</Badge>}
+                </Group>
+              </Paper>
+            ))}
+          </Stack>
         ) : view === 'parametros' ? (
           <ScrollArea>
             <Table verticalSpacing="xs" highlightOnHover style={{ minWidth: 640 }}>
@@ -111,7 +136,7 @@ export default function TeamAnalyticsComparison({ players = [], selectedParam })
                     <Table.Td><Text size="sm" c="dimmed">{e.mediaAntes} {e.unidad}</Text></Table.Td>
                     <Table.Td><Text size="sm" fw={700}>{e.mediaAhora} {e.unidad}</Text></Table.Td>
                     <Table.Td>
-                      <Text size="sm" fw={600}>{e.delta > 0 ? '↑' : e.delta < 0 ? '↓' : '→'} {formatDelta(e.delta)}</Text>
+                      <Text size="sm" fw={700} c={`${e.tone}.7`}>{e.delta > 0 ? '↑' : e.delta < 0 ? '↓' : '→'} {formatDelta(e.delta)}</Text>
                     </Table.Td>
                     <Table.Td>
                       <Group gap={4} wrap="nowrap">
@@ -131,6 +156,37 @@ export default function TeamAnalyticsComparison({ players = [], selectedParam })
             icon3d="chart"
             description={`Ningún jugador tiene "${selectedParam}" en dos analíticas distintas.`}
           />
+        ) : isMobile ? (
+          <Stack gap="xs">
+            {byPlayer.map(({ player, latest, previous, row }) => {
+              const meta = TREND_META[row.trend];
+              return (
+                <Paper
+                  key={player.id}
+                  radius="lg"
+                  p="sm"
+                  withBorder
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => router.push(`/dashboard/jugador/${player.id}/metricas/analiticas`)}
+                >
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text size="sm" fw={700} truncate>{player.nombre} {player.apellidos}</Text>
+                    <Badge variant="light" color={meta.color} size="sm">{meta.label}</Badge>
+                  </Group>
+                  <Group justify="space-between" wrap="nowrap" mt={4}>
+                    <Text size="xs" c="dimmed">
+                      {row.anterior} → <Text span fw={700} c={row.parametro.fuera_rango ? 'arcilla' : 'salvia'}>{row.valor}</Text> {row.unidad}
+                    </Text>
+                    <Text size="sm" fw={700} c={`${meta.color}.7`}>
+                      {row.delta > 0 ? '↑' : row.delta < 0 ? '↓' : '→'} {formatDelta(row.delta)}
+                      {row.pct !== null && <Text span size="xs" c="dimmed"> ({formatDelta(row.pct)}%)</Text>}
+                    </Text>
+                  </Group>
+                  <Text size="xs" c="dimmed" mt={2}>{formatDate(previous.fecha_extraccion)} → {formatDate(latest.fecha_extraccion)}</Text>
+                </Paper>
+              );
+            })}
+          </Stack>
         ) : (
           <ScrollArea>
             <Table verticalSpacing="xs" highlightOnHover style={{ minWidth: 640 }}>
@@ -162,7 +218,7 @@ export default function TeamAnalyticsComparison({ players = [], selectedParam })
                         <Text size="xs" c="dimmed">{formatDate(latest.fecha_extraccion)}</Text>
                       </Table.Td>
                       <Table.Td>
-                        <Text size="sm" fw={600}>
+                        <Text size="sm" fw={700} c={`${meta.color}.7`}>
                           {row.delta > 0 ? '↑' : row.delta < 0 ? '↓' : '→'} {formatDelta(row.delta)}
                           {row.pct !== null && <Text span size="xs" c="dimmed"> ({formatDelta(row.pct)}%)</Text>}
                         </Text>

@@ -1,12 +1,14 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useMediaQuery } from '@mantine/hooks';
 import { playerFullName as playerName } from '@/lib/utils';
 import {
   ActionIcon,
   Anchor,
   Box,
   Button,
+  Collapse,
   Group,
   Menu,
   MultiSelect,
@@ -48,6 +50,7 @@ import {
   IconUsers,
   IconX,
   IconDotsVertical,
+  IconChevronDown,
   IconFileTypePdf,
 } from '@/components/icons3d';
 import { exportEvolutionFiltersReport } from '@/services/report';
@@ -65,6 +68,7 @@ import {
   getSeason,
 } from '@/lib/metrics/measurements';
 import WidgetCard, { StatTile, WidgetAside } from '@/components/widgets/WidgetCard';
+import PlayerListCards from '@/components/widgets/PlayerListCards';
 
 // Icono y color de categoría de cada métrica (mismo criterio que la pestaña Mediciones del jugador)
 const METRIC_STYLE = {
@@ -369,6 +373,8 @@ function evaluateValueAgainstRules(val, rulesForMetric) {
 
 export default function TeamEvolutionDashboard({ players = [], evolutions = [], team = null }) {
   const router = useRouter();
+  const isMobile = useMediaQuery('(max-width: 48em)', false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [viewMode, setViewMode] = useState('trends');
   const [position, setPosition] = useState('');
   const [selectedSeason, setSelectedSeason] = useState(() => {
@@ -556,6 +562,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
   const chartData = useMemo(() => aggregateByDate(rows), [rows]);
   const latestRows = rows.filter((row) => row.latest);
+  // Métricas sin ninguna medición en el rango: no se dibujan (solo se avisa de cuáles son)
+  const emptyMetricLabels = METRICS
+    .filter((item) => !chartData.some((d) => d[item.key] !== null && d[item.key] !== undefined))
+    .map((item) => item.label);
   const measuredPct = scopedPlayers.length ? Math.round((latestRows.length / scopedPlayers.length) * 100) : 0;
   const totalRecords = rows.reduce((sum, row) => sum + row.records.length, 0);
   const lastDate = chartData.at(-1)?.fecha;
@@ -613,7 +623,6 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   const dayMeasuredPct = scopedPlayers.length ? Math.round((measuredDayRows.length / scopedPlayers.length) * 100) : 0;
   const dayImported = measuredDayRows.filter((row) => row.measurement?.fuente_hoja).length;
   const dayCorrected = measuredDayRows.filter((row) => row.measurement?.fecha_corregida).length;
-  const rawColumnTotal = measuredDayRows.reduce((sum, row) => sum + rawMetricEntries(row.measurement).length, 0);
 
   const dayAverages = METRICS.map((metric) => {
     const values = measuredDayRows
@@ -1161,6 +1170,25 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               ]}
             />
 
+            {isMobile && (
+              <Button
+                variant="light"
+                color="gray"
+                radius="xl"
+                size="xs"
+                fullWidth
+                leftSection={<IconFilter size={14} />}
+                rightSection={<IconChevronDown size={14} style={{ transform: filtersOpen ? 'rotate(180deg)' : 'none', transition: 'transform 150ms ease' }} />}
+                onClick={() => setFiltersOpen((open) => !open)}
+                aria-expanded={filtersOpen}
+              >
+                Filtros{[position, viewMode === 'trends' ? dateFrom : '', viewMode === 'trends' ? dateTo : ''].filter(Boolean).length > 0
+                  ? ` · ${[position, viewMode === 'trends' ? dateFrom : '', viewMode === 'trends' ? dateTo : ''].filter(Boolean).length} activos`
+                  : ''}
+                {selectedSeason ? ` · ${selectedSeason}` : ''}
+              </Button>
+            )}
+            <Collapse in={!isMobile || filtersOpen}>
             <Group gap={8} wrap="wrap" align="center" w="100%" style={{ minWidth: 0 }}>
                 <Select
                   placeholder="Posición"
@@ -1194,7 +1222,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                   <>
                     <DateInput
                       placeholder="Fecha de inicio"
-                      leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+                      leftSection={<IconCalendarStats size={16} style={{ opacity: 0.7 }} />}
                       value={dateValue(dateFrom)}
                       onChange={(value) => setDateFrom(dateInputToIso(value))}
                       variant="filled"
@@ -1206,7 +1234,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     />
                     <DateInput
                       placeholder="Fecha de fin"
-                      leftSection={<IconFilter size={16} style={{ opacity: 0.7 }} />}
+                      leftSection={<IconCalendarStats size={16} style={{ opacity: 0.7 }} />}
                       value={dateValue(dateTo)}
                       onChange={(value) => setDateTo(dateInputToIso(value))}
                       variant="filled"
@@ -1233,6 +1261,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                   />
                 )}
             </Group>
+            </Collapse>
           </Stack>
         </Box>
       </TeamHeaderFilters>
@@ -1260,6 +1289,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     : null;
                   const metricData = chartData.filter(d => d[item.key] !== null);
                   const reverseMetricData = [...metricData].reverse();
+                  if (metricData.length === 0) return null;
 
                   return (
                     <WidgetCard
@@ -1272,11 +1302,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                           Media {avg === null ? '-' : `${avg} ${item.unit}`}
                         </WidgetAside>
                       }
-                      footer="Tendencia media del equipo"
                       style={{ height: 'auto' }}
                     >
                       <Stack gap="md">
-                        <Box h={200}>
+                        <Box h={isMobile ? 150 : 200}>
                           <ResponsiveContainer width="100%" height="100%">
                             <ComposedChart data={metricData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                               <defs>
@@ -1288,14 +1317,15 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                               <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
                               <XAxis
                                 dataKey="fecha"
-                                tick={{ fontSize: 9 }}
-                                tickFormatter={(value) => String(value).slice(5)}
+                                tick={{ fontSize: 11 }}
+                                tickFormatter={formatShortDate}
+                                minTickGap={16}
                                 stroke="var(--mantine-color-gray-5)"
                                 axisLine={false}
                                 tickLine={false}
                               />
                               <YAxis
-                                tick={{ fontSize: 9 }}
+                                tick={{ fontSize: 11 }}
                                 domain={['auto', 'auto']}
                                 stroke="var(--mantine-color-gray-5)"
                                 axisLine={false}
@@ -1326,28 +1356,33 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                           </ResponsiveContainer>
                         </Box>
 
-                        <ScrollArea h={120} offsetScrollbars>
+                        <details>
+                          <summary style={{ cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--nutra-salvia, #6C705A)' }}>
+                            Ver {reverseMetricData.length} {reverseMetricData.length === 1 ? 'fecha' : 'fechas'}
+                          </summary>
+                        <ScrollArea.Autosize mah={180} offsetScrollbars mt={6}>
                           <Table verticalSpacing={4} striped highlightOnHover style={{ minWidth: 150 }}>
                             <Table.Thead bg="gray.0">
                               <Table.Tr>
-                                <Table.Th style={{ fontSize: 10, padding: '4px 8px' }}>Fecha</Table.Th>
-                                <Table.Th style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right' }}>Media</Table.Th>
+                                <Table.Th style={{ fontSize: 12, padding: '4px 8px' }}>Fecha</Table.Th>
+                                <Table.Th style={{ fontSize: 12, padding: '4px 8px', textAlign: 'right' }}>Media</Table.Th>
                               </Table.Tr>
                             </Table.Thead>
                             <Table.Tbody>
                               {reverseMetricData.map((row) => (
                                 <Table.Tr key={row.fecha}>
-                                  <Table.Td style={{ fontSize: 10, padding: '4px 8px' }}>
+                                  <Table.Td style={{ fontSize: 12, padding: '4px 8px' }}>
                                     {formatDate(row.fecha)}
                                   </Table.Td>
-                                  <Table.Td style={{ fontSize: 10, padding: '4px 8px', textAlign: 'right', fontWeight: 650 }}>
+                                  <Table.Td style={{ fontSize: 12, padding: '4px 8px', textAlign: 'right', fontWeight: 650 }}>
                                     {row[item.key]} {item.unit}
                                   </Table.Td>
                                 </Table.Tr>
                               ))}
                             </Table.Tbody>
                           </Table>
-                        </ScrollArea>
+                        </ScrollArea.Autosize>
+                        </details>
                       </Stack>
                     </WidgetCard>
                   );
@@ -1363,7 +1398,41 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               />
             )}
 
-            {rows.length > 0 && (
+            {chartData.length > 0 && emptyMetricLabels.length > 0 && (
+              <Text fz="xs" c="dimmed" ta="center">
+                Sin mediciones en este rango: {emptyMetricLabels.join(', ')}.
+              </Text>
+            )}
+
+            {rows.length > 0 && isMobile && (
+              <Stack gap="xs">
+                <Text fz="xs" fw={700} c="dimmed" tt="uppercase">Última medición por jugador</Text>
+                <PlayerListCards
+                  items={rows.map((row) => ({
+                    id: row.id,
+                    player: row,
+                    name: playerName(row),
+                    subtitle: `${row.posicion || 'Sin posición'} · ${formatDate(row.latest?.fecha)}`,
+                    onClick: () => router.push(`/dashboard/jugador/${row.id}/metricas/mediciones`),
+                    chips: METRICS.map((item) => {
+                      const latestMetric = metricRecord(row.records, item, 0);
+                      const val = latestMetric?.[item.key] ?? null;
+                      if (val === null) return null;
+                      const delta = deltaFor(latestMetric, metricRecord(row.records, item, 1), item);
+                      return {
+                        key: item.key,
+                        label: item.label,
+                        value: metricDisplay(val, item.unit),
+                        delta: delta !== null && delta !== 0 ? `${delta > 0 ? '+' : ''}${delta}` : null,
+                        deltaTone: deltaColor(delta, item),
+                      };
+                    }).filter(Boolean),
+                  }))}
+                />
+              </Stack>
+            )}
+
+            {rows.length > 0 && !isMobile && (
               <Paper
                 radius={24}
                 p={0}
@@ -1443,10 +1512,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
           <>
             {/* Resumen del día en 1 sola fila compacta (diseño analíticas) */}
             <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
-              <StatTile icon="calendar" title="Fecha" color="salvia" value={formatDate(currentDay)} caption={`${availableDates.length} jornadas registradas`} />
+              <StatTile icon="calendar" title="Fecha" color="salvia" value={formatDate(currentDay)} caption={`${availableDates.length} ${availableDates.length === 1 ? 'jornada registrada' : 'jornadas registradas'}`} />
               <StatTile icon="check" title="Medidos" color="salvia" value={`${measuredDayRows.length}/${scopedPlayers.length}`} caption={`${dayMeasuredPct}% de cobertura`} />
+              <StatTile icon="warning" title="Sin medir" color={missingDayRows.length > 0 ? 'arcilla' : 'salvia'} value={missingDayRows.length} caption="jugadores sin registro ese día" />
               <StatTile icon="download" title="Importadas" color="salvia" value={dayImported} caption={dayCorrected ? `${dayCorrected} fechas corregidas` : 'sin correcciones'} />
-              <StatTile icon="catalog" title="Excel" color="salvia" value={rawColumnTotal} caption="datos crudos disponibles" />
             </SimpleGrid>
 
             {measuredDayRows.length > 0 ? (
@@ -1472,7 +1541,37 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               />
             )}
 
-            {measuredDayRows.length > 0 && (
+            {measuredDayRows.length > 0 && isMobile && (
+              <Stack gap="xs">
+                <Group justify="space-between" align="center">
+                  <Text fz="xs" fw={700} c="dimmed" tt="uppercase">Mediciones del día</Text>
+                  <Text fz="xs" fw={600} c="teal.7">{dayMeasuredPct}% cobertura</Text>
+                </Group>
+                <PlayerListCards
+                  items={measuredDayRows.map((row) => ({
+                    id: `${row.id}-${currentDay}`,
+                    player: row,
+                    name: playerName(row),
+                    subtitle: `${row.posicion || 'Sin posición'} · ${row.measurement?.fuente_hoja || 'Manual'}`,
+                    onClick: () => setDetailRow(row),
+                    chips: METRICS.map((item) => {
+                      const value = metricValue(row.measurement, item);
+                      if (!hasMetricValue(value)) return null;
+                      const delta = deltaFor(row.measurement, row.previous, item);
+                      return {
+                        key: item.key,
+                        label: item.label,
+                        value: metricDisplay(value, item.unit),
+                        delta: delta !== null && delta !== 0 ? `${delta > 0 ? '+' : ''}${delta}` : null,
+                        deltaTone: deltaColor(delta, item),
+                      };
+                    }).filter(Boolean),
+                  }))}
+                />
+              </Stack>
+            )}
+
+            {measuredDayRows.length > 0 && !isMobile && (
               <Paper
                 radius={24}
                 p={0}

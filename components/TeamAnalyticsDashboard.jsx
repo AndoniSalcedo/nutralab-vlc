@@ -1,14 +1,18 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useMediaQuery } from '@mantine/hooks';
 import {
   Avatar,
+  Badge,
   Box,
+  Button,
   Grid,
   Group,
   Paper,
   ScrollArea,
   SegmentedControl,
+  MultiSelect,
   Select,
   SimpleGrid,
   Stack,
@@ -39,16 +43,31 @@ import {
   IconTrendingUp,
   IconSortDescending,
   IconChartLine,
+  IconChevronDown,
 } from '@/components/icons3d';
 import NothingFound from '@/components/NothingFound';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import WidgetCard, { StatTile } from '@/components/widgets/WidgetCard';
 import TeamAnalyticsComparison from '@/components/TeamAnalyticsComparison';
+import PlayerListCards from '@/components/widgets/PlayerListCards';
 
 function formatDate(dateStr) {
   if (!dateStr) return 'Sin fecha';
   return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
     .format(new Date(`${dateStr}T00:00:00`));
+}
+
+// Bajo y alto necesitan colores distintos: son problemas clínicos opuestos
+const LOW_HEX = '#4A7BA6';
+const HIGH_HEX = '#B8674A';
+const NORMAL_HEX = '#6C705A';
+
+const hasNum = (v) => v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v));
+
+// "Ana Pérez" -> "Ana P." (el nombre solo confunde a dos jugadores con el mismo nombre de pila)
+function shortName(player) {
+  const surname = String(player.apellidos || '').trim().split(/\s+/)[0];
+  return surname ? `${player.nombre} ${surname[0]}.` : player.nombre;
 }
 
 function parameterStatus(p) {
@@ -58,10 +77,10 @@ function parameterStatus(p) {
   const min = hasMin ? Number(p.rango_min) : null;
   const max = hasMax ? Number(p.rango_max) : null;
 
-  if (!p.fuera_rango) return { color: 'salvia', label: 'Normal', hex: '#6C705A' };
-  if (Number.isFinite(max) && value > max) return { color: 'arcilla', label: 'Alto', hex: '#B8674A' };
-  if (Number.isFinite(min) && value < min) return { color: 'arcilla', label: 'Bajo', hex: '#B8674A' };
-  return { color: 'arcilla', label: 'Revisar', hex: '#B8674A' };
+  if (!p.fuera_rango) return { color: 'salvia', label: 'Normal', hex: NORMAL_HEX };
+  if (Number.isFinite(max) && value > max) return { color: 'arcilla', label: 'Alto', hex: HIGH_HEX };
+  if (Number.isFinite(min) && value < min) return { color: 'blue', label: 'Bajo', hex: LOW_HEX };
+  return { color: 'arcilla', label: 'Revisar', hex: HIGH_HEX };
 }
 
 function rangeLabel(p) {
@@ -75,6 +94,8 @@ function rangeLabel(p) {
 
 export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }) {
   const router = useRouter();
+  const isMobile = useMediaQuery('(max-width: 48em)', false);
+  const [historySelection, setHistorySelection] = useState(null); // null = selección automática
   const [filterName, setFilterName] = useState('');
   const [filterPosition, setFilterPosition] = useState('');
   const [filterSeverity, setFilterSeverity] = useState('todos');
@@ -99,7 +120,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
   // Lista de posiciones únicas para filtro
   const positionOptions = useMemo(() => {
     const values = Array.from(new Set(players.map((player) => player.posicion).filter(Boolean))).sort();
-    return [{ value: '', label: 'Todas las posiciones' }, ...values.map((value) => ({ value, label: value }))];
+    return [{ value: '', label: 'Todas' }, ...values.map((value) => ({ value, label: value }))];
   }, [players]);
 
   // Obtener todos los nombres de parámetros únicos disponibles en las analíticas
@@ -115,20 +136,14 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
     return Array.from(names).sort();
   }, [analiticas]);
 
-  // Seleccionar automáticamente el parámetro por defecto (Hierro/Ferritina si existe, sino el primero)
-  useMemo(() => {
-    if (selectedParam) return;
+  // Parámetro por defecto: hierro/ferritina si existe; si no, el primero
+  useEffect(() => {
+    if (selectedParam || allParamNames.length === 0) return;
     const ironKeys = ['ferritina', 'fer', 'hierro', 'iron', 'fe'];
-    for (const key of ironKeys) {
-      const match = allParamNames.find((name) => name.toLowerCase() === key || name.toLowerCase().includes(key));
-      if (match) {
-        setSelectedParam(match);
-        return;
-      }
-    }
-    if (allParamNames.length > 0) {
-      setSelectedParam(allParamNames[0]);
-    }
+    const match = ironKeys
+      .map((key) => allParamNames.find((name) => name.toLowerCase() === key || name.toLowerCase().includes(key)))
+      .find(Boolean);
+    setSelectedParam(match || allParamNames[0]);
   }, [allParamNames, selectedParam]);
 
   // --- Estadísticas del equipo ---
@@ -221,9 +236,10 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
         if (param) {
           const status = parameterStatus(param);
           data.push({
-            name: p.nombre,
+            name: shortName(p),
+            nombre: p.nombre,
             apellidos: p.apellidos || '',
-            valor: param.valor,
+            valor: Number(param.valor),
             unidad: param.unidad,
             rango_min: param.rango_min,
             rango_max: param.rango_max,
@@ -236,71 +252,75 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
     return data.sort((a, b) => b.valor - a.valor);
   }, [playersWithAnaliticas, selectedParam]);
 
-  // --- Datos para el gráfico de historial del parámetro seleccionado ---
+  // Jugadores con datos del parámetro seleccionado (candidatos para el historial)
+  const historyAvailable = useMemo(() => {
+    const names = [];
+    playersWithAnaliticas.forEach((p) => {
+      const has = p.records.some((record) => Array.isArray(record.parametros) && record.parametros.some((param) => param.nombre === selectedParam));
+      if (has) names.push({ id: String(p.id), name: `${p.nombre} ${p.apellidos || ''}`.trim(), short: shortName(p) });
+    });
+    return names;
+  }, [playersWithAnaliticas, selectedParam]);
+
+  // Selección por defecto: quienes tienen el último valor fuera de rango (máx. 6); si no hay, los 6 primeros.
+  // Con 25 líneas a la vez el historial es ilegible, así que se muestran pocos y se eligen a mano.
+  const defaultHistorySelection = useMemo(() => {
+    const flagged = chartData.filter((d) => d.statusLabel !== 'Normal').map((d) => `${d.nombre} ${d.apellidos}`.trim());
+    const pool = flagged.length > 0 ? flagged : historyAvailable.map((h) => h.name);
+    return pool.filter((name) => historyAvailable.some((h) => h.name === name)).slice(0, 6);
+  }, [chartData, historyAvailable]);
+
+  const historyPlayerNames = useMemo(() => {
+    if (chartMode !== 'historial') return [];
+    const base = historySelection ?? defaultHistorySelection;
+    return historyAvailable.map((h) => h.name).filter((name) => base.includes(name));
+  }, [chartMode, historySelection, defaultHistorySelection, historyAvailable]);
+
+  // Datos para el gráfico de historial: solo los jugadores seleccionados
   const historyChartData = useMemo(() => {
     if (!selectedParam || chartMode !== 'historial') return [];
 
-    // Recopilar todas las fechas únicas y valores por jugador
     const dateMap = new Map();
     playersWithAnaliticas.forEach((p) => {
+      const key = `${p.nombre} ${p.apellidos || ''}`.trim();
+      if (!historyPlayerNames.includes(key)) return;
       p.records.forEach((record) => {
-        if (Array.isArray(record.parametros)) {
-          const param = record.parametros.find((param) => param.nombre === selectedParam);
-          if (param) {
-            const fecha = record.fecha_extraccion || '';
-            if (!dateMap.has(fecha)) dateMap.set(fecha, {});
-            const entry = dateMap.get(fecha);
-            entry[`${p.nombre} ${p.apellidos || ''}`.trim()] = param.valor;
-          }
-        }
+        const param = Array.isArray(record.parametros) ? record.parametros.find((item) => item.nombre === selectedParam) : null;
+        if (!param) return;
+        const fecha = record.fecha_extraccion || '';
+        if (!dateMap.has(fecha)) dateMap.set(fecha, {});
+        dateMap.get(fecha)[key] = Number(param.valor);
       });
     });
 
-    // Convertir a array ordenado por fecha
     return Array.from(dateMap.entries())
       .map(([fecha, values]) => ({ fecha, label: formatDate(fecha), ...values }))
       .sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
-  }, [playersWithAnaliticas, selectedParam, chartMode]);
+  }, [playersWithAnaliticas, selectedParam, chartMode, historyPlayerNames]);
 
-  // Jugadores que tienen datos del parámetro seleccionado (para líneas del historial)
-  const historyPlayerNames = useMemo(() => {
-    if (chartMode !== 'historial') return [];
-    const names = new Set();
-    playersWithAnaliticas.forEach((p) => {
-      p.records.forEach((record) => {
-        if (Array.isArray(record.parametros)) {
-          const param = record.parametros.find((param) => param.nombre === selectedParam);
-          if (param) names.add(`${p.nombre} ${p.apellidos || ''}`.trim());
-        }
-      });
-    });
-    return Array.from(names);
-  }, [playersWithAnaliticas, selectedParam, chartMode]);
-
-  // Paleta de colores para líneas de historial
+  // Color estable por jugador (según su posición en la lista completa, no en la selección)
   const historyColors = useMemo(() => {
-    const palette = [
-      '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
-      '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1',
-      '#14b8a6', '#e11d48', '#a855f7', '#0ea5e9', '#d946ef',
-    ];
+    const palette = ['#4A7BA6', '#B8674A', '#6C705A', '#C58B2A', '#8A5FA8', '#2F8F83'];
     const map = {};
-    historyPlayerNames.forEach((name, i) => {
-      map[name] = palette[i % palette.length];
+    historyAvailable.forEach((h, i) => {
+      map[h.name] = palette[i % palette.length];
     });
     return map;
-  }, [historyPlayerNames]);
+  }, [historyAvailable]);
 
-  // Rango de referencia para el gráfico
+  // Rango de referencia: solo se dibuja si es el mismo para todos los jugadores
   const paramReferenceRange = useMemo(() => {
-    if (chartData.length === 0) return { min: null, max: null, unidad: '' };
+    if (chartData.length === 0) return { min: null, max: null, unidad: '', uniform: true };
     const first = chartData[0];
+    const uniform = chartData.every((d) => String(d.rango_min ?? '') === String(first.rango_min ?? '') && String(d.rango_max ?? '') === String(first.rango_max ?? ''));
     return {
-      min: first.rango_min,
-      max: first.rango_max,
+      min: hasNum(first.rango_min) ? Number(first.rango_min) : null,
+      max: hasNum(first.rango_max) ? Number(first.rango_max) : null,
       unidad: first.unidad || '',
+      uniform,
     };
   }, [chartData]);
+  const showReferenceBand = paramReferenceRange.uniform && paramReferenceRange.min !== null && paramReferenceRange.max !== null;
 
   // Estadísticas del parámetro seleccionado
   const paramStats = useMemo(() => {
@@ -334,10 +354,10 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
       <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
         {/* Resumen de analíticas en 1 sola fila compacta */}
         <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
-          <StatTile icon="players" title="Subidas" color="salvia" value={`${stats.playersWithRecords}/${stats.totalPlayers}`} caption={`${stats.totalPlayers ? Math.round((stats.playersWithRecords / stats.totalPlayers) * 100) : 0}% plantilla`} />
-          <StatTile icon="warning" title="Alertas" color={stats.activeAlertsCount > 0 ? 'arcilla' : 'salvia'} value={stats.activeAlertsCount} caption="con alertas" />
-          <StatTile icon="stats" title="Bajos" color={stats.totalLowParams > 0 ? 'arcilla' : 'salvia'} value={stats.totalLowParams} caption={`bajo mín.${stats.totalHighParams > 0 ? ` · ${stats.totalHighParams} altos` : ''}`} />
-          <StatTile icon="history" title="Total" color="salvia" value={stats.totalRecords} caption="registros" />
+          <StatTile icon="players" title="Subidas" color="salvia" value={`${stats.playersWithRecords}/${stats.totalPlayers}`} caption={`${stats.totalPlayers ? Math.round((stats.playersWithRecords / stats.totalPlayers) * 100) : 0}% de la plantilla`} />
+          <StatTile icon="warning" title="Con alertas" color={stats.activeAlertsCount > 0 ? 'arcilla' : 'salvia'} value={stats.activeAlertsCount} caption={stats.activeAlertsCount === 1 ? 'jugador en su última analítica' : 'jugadores en su última analítica'} />
+          <StatTile icon="stats" title="Bajos" color={stats.totalLowParams > 0 ? 'arcilla' : 'salvia'} value={stats.totalLowParams} caption="parámetros bajo el mínimo" />
+          <StatTile icon="stats" title="Altos" color={stats.totalHighParams > 0 ? 'arcilla' : 'salvia'} value={stats.totalHighParams} caption="parámetros sobre el máximo" />
         </SimpleGrid>
 
       {/* Sección 2: Análisis de Parámetro Clínico (Comparativa / Historial) */}
@@ -348,7 +368,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
         style={{ height: 'auto', width: '100%', minWidth: 0 }}
       >
         <Stack gap="md">
-          <Group justify="space-between" align="center" wrap="wrap" gap="sm">
+          <Stack gap="xs">
             <Text size="xs" c="dimmed">Compara o visualiza la evolución del biomarcador seleccionado</Text>
             <Group gap="sm" wrap="wrap">
               <SegmentedControl
@@ -356,6 +376,8 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                 onChange={setChartMode}
                 size="sm"
                 radius="xl"
+                fullWidth={isMobile}
+                w={{ base: '100%', sm: 'auto' }}
                 data={[
                   { value: 'comparativa', label: 'Comparativa' },
                   { value: 'historial', label: 'Historial' },
@@ -365,7 +387,11 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                 placeholder="Selecciona biomarcador"
                 data={allParamNames.map((name) => ({ value: name, label: name }))}
                 value={selectedParam}
-                onChange={(val) => val && setSelectedParam(val)}
+                onChange={(val) => {
+                  if (!val) return;
+                  setSelectedParam(val);
+                  setHistorySelection(null);
+                }}
                 allowDeselect={false}
                 searchable
                 variant="default"
@@ -376,58 +402,47 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                 leftSection={<IconFilter size={16} />}
               />
             </Group>
-          </Group>
+          </Stack>
 
           {chartMode === 'comparativa' && chartData.length > 0 ? (
             <Grid gutter="lg">
-              {/* Gráfico comparativo */}
+              {/* Gráfico comparativo: barras horizontales en móvil para poder leer todos los nombres */}
               <Grid.Col span={{ base: 12, md: 8 }}>
-                <Box h={280} style={{ position: 'relative' }}>
+                <Box h={isMobile ? Math.max(180, chartData.length * 30 + 20) : 280} style={{ position: 'relative' }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--mantine-color-gray-2)" />
-                      <XAxis
-                        dataKey="name"
-                        tick={{ fontSize: 9, fontWeight: 500 }}
-                        angle={-30}
-                        textAnchor="end"
-                        interval={0}
-                        stroke="var(--mantine-color-gray-5)"
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <YAxis
-                        tick={{ fontSize: 9 }}
-                        stroke="var(--mantine-color-gray-5)"
-                        tickLine={false}
-                        axisLine={false}
-                      />
+                    <BarChart
+                      data={chartData}
+                      layout={isMobile ? 'vertical' : 'horizontal'}
+                      margin={isMobile ? { top: 4, right: 16, left: 0, bottom: 4 } : { top: 10, right: 10, left: -15, bottom: 24 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" vertical={isMobile} horizontal={!isMobile} stroke="var(--mantine-color-gray-2)" />
+                      {/* Recharts no recorre fragmentos: cada eje va como hijo directo */}
+                      {isMobile && <XAxis type="number" tick={{ fontSize: 11 }} stroke="var(--mantine-color-gray-5)" tickLine={false} axisLine={false} domain={[0, 'auto']} />}
+                      {isMobile && <YAxis type="category" dataKey="name" width={84} tick={{ fontSize: 11, fontWeight: 500 }} interval={0} stroke="var(--mantine-color-gray-5)" tickLine={false} axisLine={false} />}
+                      {!isMobile && <XAxis dataKey="name" tick={{ fontSize: 11, fontWeight: 500 }} angle={-30} textAnchor="end" interval={0} stroke="var(--mantine-color-gray-5)" tickLine={false} axisLine={false} />}
+                      {!isMobile && <YAxis tick={{ fontSize: 11 }} stroke="var(--mantine-color-gray-5)" tickLine={false} axisLine={false} domain={[0, 'auto']} />}
                       <ChartTooltip
-                        formatter={(value, name, props) => {
-                          return [
-                            <Text key="tooltip-value" span fw={700} c={props.payload.color}>
-                              {value} {props.payload.unidad} ({props.payload.statusLabel})
-                            </Text>,
-                            selectedParam,
-                          ];
-                        }}
+                        cursor={{ fill: 'rgba(108, 112, 90, 0.06)' }}
+                        formatter={(value, name, props) => [
+                          <Text key="tooltip-value" span fw={700} c={props.payload.color}>
+                            {value} {props.payload.unidad} ({props.payload.statusLabel})
+                          </Text>,
+                          selectedParam,
+                        ]}
                         labelFormatter={(label, items) => {
                           const item = items[0]?.payload;
-                          return item ? `${item.name} ${item.apellidos}` : label;
+                          return item ? `${item.nombre} ${item.apellidos}` : label;
                         }}
-                        contentStyle={{ borderRadius: '12px', border: '1px solid var(--mantine-color-gray-2)', padding: '6px 10px', fontSize: 11 }}
+                        contentStyle={{ borderRadius: '12px', border: '1px solid var(--mantine-color-gray-2)', padding: '6px 10px', fontSize: 12 }}
                       />
-                      {/* Zona de referencia si hay mínimo y máximo */}
-                      {Number.isFinite(paramReferenceRange.min) && Number.isFinite(paramReferenceRange.max) && (
-                        <ReferenceArea
-                          y1={paramReferenceRange.min}
-                          y2={paramReferenceRange.max}
-                          fill="rgba(16, 185, 129, 0.07)"
-                          stroke="rgba(16, 185, 129, 0.15)"
-                          strokeDasharray="3 3"
-                        />
+                      {showReferenceBand && (
+                        isMobile ? (
+                          <ReferenceArea ifOverflow="hidden" x1={paramReferenceRange.min} x2={paramReferenceRange.max} fill="rgba(108, 112, 90, 0.10)" stroke="rgba(108, 112, 90, 0.35)" strokeDasharray="3 3" />
+                        ) : (
+                          <ReferenceArea ifOverflow="hidden" y1={paramReferenceRange.min} y2={paramReferenceRange.max} fill="rgba(108, 112, 90, 0.10)" stroke="rgba(108, 112, 90, 0.35)" strokeDasharray="3 3" />
+                        )
                       )}
-                      <Bar dataKey="valor" radius={[4, 4, 0, 0]} maxBarSize={28}>
+                      <Bar dataKey="valor" radius={isMobile ? [0, 4, 4, 0] : [4, 4, 0, 0]} maxBarSize={22}>
                         {chartData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
@@ -440,117 +455,123 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
               {/* Estadísticas del parámetro */}
               <Grid.Col span={{ base: 12, md: 4 }}>
                 {paramStats && (
-                  <Stack gap="md" justify="center" h="100%">
+                  <Stack gap="sm" justify="center" h="100%">
                     <Paper p="sm" radius="lg" style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', border: '1px solid rgba(108, 112, 90, 0.12)' }}>
                       <Text size="xs" c="var(--nutra-salvia, #6C705A)" tt="uppercase" fw={700} mb={4}>Resumen del parámetro</Text>
                       <Group justify="space-between" wrap="nowrap" mb={4}>
                         <Text size="xs" fw={500}>Media del equipo</Text>
                         <Text size="sm" fw={700} c="var(--nutra-bosque, #1F2A24)">{paramStats.avg} {paramReferenceRange.unidad}</Text>
                       </Group>
-                      {Number.isFinite(paramReferenceRange.min) && Number.isFinite(paramReferenceRange.max) && (
-                        <Group justify="space-between" wrap="nowrap" mb={4}>
-                          <Text size="xs" fw={500}>Rango de referencia</Text>
-                          <Text size="xs" fw={600} c="var(--nutra-salvia, #6C705A)">{paramReferenceRange.min} - {paramReferenceRange.max}</Text>
-                        </Group>
-                      )}
+                      <Group justify="space-between" wrap="nowrap" mb={4}>
+                        <Text size="xs" fw={500}>Rango de referencia</Text>
+                        <Text size="xs" fw={600} c="var(--nutra-salvia, #6C705A)">
+                          {!paramReferenceRange.uniform
+                            ? 'Varía por jugador'
+                            : showReferenceBand
+                              ? `${paramReferenceRange.min} - ${paramReferenceRange.max}`
+                              : 'Sin rango'}
+                        </Text>
+                      </Group>
                       <Group justify="space-between" wrap="nowrap">
                         <Text size="xs" fw={500}>Jugadores analizados</Text>
                         <Text size="xs" fw={600} c="var(--nutra-salvia, #6C705A)">{paramStats.totalCount}</Text>
                       </Group>
                     </Paper>
+                    {/* Distribución: leyenda de los colores de las barras */}
                     <Paper p="sm" radius="lg" style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', border: '1px solid rgba(108, 112, 90, 0.12)' }}>
                       <Text size="xs" c="var(--nutra-salvia, #6C705A)" tt="uppercase" fw={700} mb={8}>Distribución</Text>
                       <Stack gap={6}>
-                        <Group justify="space-between" wrap="nowrap">
-                          <Group gap="xs" wrap="nowrap">
-                            <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--nutra-arcilla, #B8674A)', flexShrink: 0 }} />
-                            <Text size="xs" fw={500}>Por debajo del rango</Text>
+                        {[
+                          { label: 'Por debajo del rango', hex: LOW_HEX, count: paramStats.lowCount },
+                          { label: 'En rango normal', hex: NORMAL_HEX, count: paramStats.normalCount },
+                          { label: 'Por encima del rango', hex: HIGH_HEX, count: paramStats.highCount },
+                        ].map((row) => (
+                          <Group key={row.label} justify="space-between" wrap="nowrap">
+                            <Group gap="xs" wrap="nowrap">
+                              <Box w={10} h={10} style={{ borderRadius: 3, backgroundColor: row.hex, flexShrink: 0 }} />
+                              <Text size="xs" fw={500}>{row.label}</Text>
+                            </Group>
+                            <Text size="xs" fw={700} c={row.count > 0 ? row.hex : 'dimmed'}>
+                              {row.count} {row.count === 1 ? 'jugador' : 'jugadores'}
+                            </Text>
                           </Group>
-                          <Text size="xs" fw={700} c="var(--nutra-arcilla, #B8674A)">{paramStats.lowCount} jugadores</Text>
-                        </Group>
-                        <Group justify="space-between" wrap="nowrap">
-                          <Group gap="xs" wrap="nowrap">
-                            <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--nutra-salvia, #6C705A)', flexShrink: 0 }} />
-                            <Text size="xs" fw={500}>En rango normal</Text>
-                          </Group>
-                          <Text size="xs" fw={700} c="var(--nutra-bosque, #1F2A24)">{paramStats.normalCount} jugadores</Text>
-                        </Group>
-                        <Group justify="space-between" wrap="nowrap">
-                          <Group gap="xs" wrap="nowrap">
-                            <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: 'var(--nutra-arcilla, #B8674A)', flexShrink: 0 }} />
-                            <Text size="xs" fw={500}>Por encima del rango</Text>
-                          </Group>
-                          <Text size="xs" fw={700} c="var(--nutra-arcilla, #B8674A)">{paramStats.highCount} jugadores</Text>
-                        </Group>
+                        ))}
                       </Stack>
                     </Paper>
                   </Stack>
                 )}
               </Grid.Col>
             </Grid>
-          ) : chartMode === 'historial' && historyChartData.length > 0 ? (
+          ) : chartMode === 'historial' && historyAvailable.length > 0 ? (
             <Stack gap="sm">
-              <Box h={320} style={{ position: 'relative' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={historyChartData} margin={{ top: 10, right: 20, left: -15, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--mantine-color-gray-2)" />
-                    <XAxis
-                      dataKey="label"
-                      tick={{ fontSize: 9, fontWeight: 500 }}
-                      angle={-25}
-                      textAnchor="end"
-                      stroke="var(--mantine-color-gray-5)"
-                      tickLine={false}
-                      axisLine={false}
-                    />
-                    <YAxis
-                      tick={{ fontSize: 9 }}
-                      stroke="var(--mantine-color-gray-5)"
-                      tickLine={false}
-                      axisLine={false}
-                    />
-                    <ChartTooltip
-                      contentStyle={{ borderRadius: '12px', border: '1px solid var(--mantine-color-gray-2)', padding: '8px 12px', fontSize: 11 }}
-                    />
-                    {/* Zona de referencia */}
-                    {Number.isFinite(paramReferenceRange.min) && Number.isFinite(paramReferenceRange.max) && (
-                      <ReferenceArea
-                        y1={paramReferenceRange.min}
-                        y2={paramReferenceRange.max}
-                        fill="rgba(16, 185, 129, 0.07)"
-                        stroke="rgba(16, 185, 129, 0.15)"
-                        strokeDasharray="3 3"
-                      />
-                    )}
-                    {historyPlayerNames.map((playerName) => (
-                      <Line
-                        key={playerName}
-                        type="monotone"
-                        dataKey={playerName}
-                        stroke={historyColors[playerName]}
-                        strokeWidth={2}
-                        dot={{ r: 3, fill: historyColors[playerName] }}
-                        activeDot={{ r: 5 }}
-                        connectNulls
-                      />
-                    ))}
-                  </LineChart>
-                </ResponsiveContainer>
-              </Box>
-              {/* Leyenda de jugadores */}
-              {historyPlayerNames.length > 0 && (
-                <Group gap={8} wrap="wrap" justify="center">
-                  {historyPlayerNames.map((name) => (
-                    <Group key={name} gap={4} wrap="nowrap">
-                      <Box w={10} h={10} style={{ borderRadius: '50%', backgroundColor: historyColors[name], flexShrink: 0 }} />
-                      <Text size="xs" fw={500} c="gray.7">{name}</Text>
-                    </Group>
-                  ))}
+              {/* Selector de jugadores: pocas líneas a la vez para que el historial se lea */}
+              <Group gap="xs" wrap="wrap" align="flex-end">
+                <MultiSelect
+                  placeholder={historyPlayerNames.length === 0 ? 'Elige jugadores' : undefined}
+                  data={historyAvailable.map((h) => ({ value: h.name, label: h.name }))}
+                  value={historyPlayerNames}
+                  onChange={setHistorySelection}
+                  searchable
+                  clearable
+                  radius="xl"
+                  size="xs"
+                  hidePickedOptions={false}
+                  style={{ flex: '1 1 220px', minWidth: 0 }}
+                  comboboxProps={{ zIndex: 2500 }}
+                />
+                <Group gap={6} wrap="nowrap">
+                  <Button size="compact-xs" radius="xl" variant="light" color="gray" onClick={() => setHistorySelection(null)}>
+                    Solo alertas
+                  </Button>
+                  <Button size="compact-xs" radius="xl" variant="light" color="gray" onClick={() => setHistorySelection(historyAvailable.map((h) => h.name))}>
+                    Todos
+                  </Button>
                 </Group>
+              </Group>
+
+              {historyChartData.length > 0 ? (
+                <>
+                  <Box h={isMobile ? 260 : 320} style={{ position: 'relative' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={historyChartData} margin={{ top: 10, right: 16, left: -15, bottom: 8 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--mantine-color-gray-2)" />
+                        <XAxis dataKey="label" tick={{ fontSize: 11, fontWeight: 500 }} minTickGap={24} stroke="var(--mantine-color-gray-5)" tickLine={false} axisLine={false} />
+                        <YAxis tick={{ fontSize: 11 }} stroke="var(--mantine-color-gray-5)" tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                        <ChartTooltip contentStyle={{ borderRadius: '12px', border: '1px solid var(--mantine-color-gray-2)', padding: '8px 12px', fontSize: 12 }} />
+                        {showReferenceBand && (
+                          <ReferenceArea ifOverflow="hidden" y1={paramReferenceRange.min} y2={paramReferenceRange.max} fill="rgba(108, 112, 90, 0.10)" stroke="rgba(108, 112, 90, 0.35)" strokeDasharray="3 3" />
+                        )}
+                        {historyPlayerNames.map((playerName) => (
+                          <Line
+                            key={playerName}
+                            type="monotone"
+                            dataKey={playerName}
+                            stroke={historyColors[playerName]}
+                            strokeWidth={2}
+                            dot={{ r: 3, fill: historyColors[playerName] }}
+                            activeDot={{ r: 5 }}
+                            connectNulls
+                          />
+                        ))}
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </Box>
+                  <Group gap={10} wrap="wrap" justify="center">
+                    {historyPlayerNames.map((name) => (
+                      <Group key={name} gap={5} wrap="nowrap">
+                        <Box w={10} h={10} style={{ borderRadius: '50%', backgroundColor: historyColors[name], flexShrink: 0 }} />
+                        <Text size="xs" fw={500} c="gray.7">{name}</Text>
+                      </Group>
+                    ))}
+                  </Group>
+                </>
+              ) : (
+                <Text size="sm" c="dimmed" ta="center" py="lg">Elige al menos un jugador para ver su historial.</Text>
               )}
             </Stack>
           ) : (
             <NothingFound
+              compact={isMobile}
               icon={chartMode === 'historial' ? IconChartLine : IconTrendingUp}
               title={chartMode === 'historial' ? 'Sin historial disponible' : 'Sin datos del parámetro'}
               icon3d="chart"
@@ -588,7 +609,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                 w={{ base: '100%', sm: 'auto' }}
               />
               <Select
-                placeholder="Filtrar por posición"
+                placeholder="Posición"
                 data={positionOptions}
                 value={filterPosition}
                 onChange={(val) => setFilterPosition(val || '')}
@@ -615,7 +636,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
             </Group>
           </Group>
 
-          {/* Filtro por gravedad */}
+          {/* Filtro por gravedad (scroll horizontal propio en móvil) */}
           <Box style={{ width: '100%', minWidth: 0, overflowX: 'auto' }}>
             <SegmentedControl
               value={filterSeverity}
@@ -636,7 +657,47 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
             />
           </Box>
 
-          {filteredPlayers.length > 0 ? (
+          {filteredPlayers.length > 0 && isMobile ? (
+            <PlayerListCards
+              items={filteredPlayers.map((player) => {
+                const params = player.latest?.parametros || [];
+                const outOfRange = params.filter((p) => p.fuera_rango);
+                const shown = outOfRange.slice(0, 4);
+                const hidden = outOfRange.length - shown.length;
+                const subtitle = [
+                  player.posicion,
+                  player.latest ? formatDate(player.latest.fecha_extraccion) : 'Sin analíticas',
+                  player.records.length > 1 ? `${player.records.length} analíticas` : null,
+                ].filter(Boolean).join(' · ');
+                return {
+                  id: player.id,
+                  player,
+                  name: `${player.nombre} ${player.apellidos || ''}`.trim(),
+                  subtitle,
+                  onClick: () => router.push(`/dashboard/jugador/${player.id}/metricas/analiticas`),
+                  highlight: player.latest ? (
+                    <Badge size="sm" variant="light" color={outOfRange.length > 0 ? 'arcilla' : 'salvia'}>
+                      {outOfRange.length > 0 ? `${outOfRange.length} ${outOfRange.length === 1 ? 'alerta' : 'alertas'}` : 'En rango'}
+                    </Badge>
+                  ) : (
+                    <Badge size="sm" variant="light" color="gray">Sin datos</Badge>
+                  ),
+                  chips: [
+                    ...shown.map((param, i) => {
+                      const status = parameterStatus(param);
+                      return {
+                        key: `${param.nombre}-${i}`,
+                        label: `${param.nombre} · ${status.label.toLowerCase()}`,
+                        value: `${param.valor} ${param.unidad || ''}`.trim(),
+                        tone: status.color,
+                      };
+                    }),
+                    ...(hidden > 0 ? [{ key: 'more', label: 'Otros', value: `+${hidden} más` }] : []),
+                  ],
+                };
+              })}
+            />
+          ) : filteredPlayers.length > 0 ? (
             <ScrollArea style={{ width: '100%', minWidth: 0 }}>
               <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 800 }}>
                 <Table.Thead style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)' }}>
@@ -645,6 +706,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                     <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Última Analítica</Table.Th>
                     <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Historial</Table.Th>
                     <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Parámetros Fuera de Rango</Table.Th>
+                    <Table.Th w={32} />
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
@@ -695,7 +757,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                           {hasLatest ? (
                             outOfRange.length > 0 ? (
                               <Group gap={8} wrap="wrap">
-                                {outOfRange.map((param, i) => {
+                                {outOfRange.slice(0, 5).map((param, i) => {
                                   const status = parameterStatus(param);
                                   return (
                                     <Tooltip key={`${player.id}-alert-${param.nombre}-${i}`} label={`Rango de referencia: ${rangeLabel(param)}`} withArrow>
@@ -711,6 +773,16 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                                     </Tooltip>
                                   );
                                 })}
+                                {outOfRange.length > 5 && (
+                                  <Tooltip
+                                    label={outOfRange.slice(5).map((param) => `${param.nombre}: ${param.valor} ${param.unidad || ''}`).join(' · ')}
+                                    withArrow
+                                    multiline
+                                    maw={280}
+                                  >
+                                    <Badge size="sm" variant="light" color="gray" style={{ cursor: 'help' }}>+{outOfRange.length - 5} más</Badge>
+                                  </Tooltip>
+                                )}
                               </Group>
                             ) : (
                               <Group gap={5} align="center" wrap="nowrap">
@@ -721,6 +793,9 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
                           ) : (
                             <Text size="xs" c="dimmed">—</Text>
                           )}
+                        </Table.Td>
+                        <Table.Td>
+                          <IconChevronDown size={16} style={{ transform: 'rotate(-90deg)', opacity: 0.4 }} />
                         </Table.Td>
                       </Table.Tr>
                     );
