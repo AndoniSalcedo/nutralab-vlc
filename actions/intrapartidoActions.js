@@ -104,7 +104,11 @@ export async function getPendingIntrapartidoSummary() {
       fecha: match.fecha,
       titular: convocado.titular,
       totals: { aguaMl, carbsG, sodioMg, kcal, totalItems },
-      momentos: INTRAPARTIDO_TIMINGS.filter((t) => Object.keys(intakes[t.id] || {}).length > 0).map((t) => t.short),
+      // Los 7 momentos del partido con lo que tomó en cada uno: el modal los usa para ir sumando las cifras
+      momentos: INTRAPARTIDO_TIMINGS.map((t) => {
+        const m = calculatePlayerTotals({ [t.id]: intakes[t.id] || {} });
+        return { id: t.id, short: t.short, aguaMl: m.aguaMl, carbsG: m.carbsG, sodioMg: m.sodioMg, kcal: m.kcal, items: m.totalItems };
+      }),
     },
   };
 }
