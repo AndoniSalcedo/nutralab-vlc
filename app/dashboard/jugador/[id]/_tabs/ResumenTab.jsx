@@ -1,6 +1,7 @@
 'use client';
 
-import { Box, Paper, Stack } from '@mantine/core';
+import { motion } from 'motion/react';
+import { Paper, Stack } from '@mantine/core';
 import { tabLabel } from './tab-label';
 import { getSubtabControlData } from './subtab-config';
 import PlayerSubtabControl from './PlayerSubtabControl';
@@ -36,7 +37,13 @@ export default function ResumenTab({
         />
       </Paper>
 
-      <Box mt={0}>
+      {/* Cambio de subpestaña con un fundido corto (antes cambiaba de golpe) */}
+      <motion.div
+        key={activeSubtab}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+      >
         {activeSubtab === 'perfil' && (
           <PerfilSubtab
             jugador={jugador}
@@ -52,7 +59,7 @@ export default function ResumenTab({
         )}
         {activeSubtab === 'diario' && <DiarioComidasSubtab jugador={jugador} readOnly={!isPlayer} />}
         {activeSubtab === 'mensajes' && <MensajesSubtab jugador={jugador} messages={messages} readOnly={readOnly} />}
-      </Box>
+      </motion.div>
     </Stack>
   );
 }

@@ -375,6 +375,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   const router = useRouter();
   const isMobile = useMediaQuery('(max-width: 48em)', false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [mobileMetric, setMobileMetric] = useState(null);
   const [viewMode, setViewMode] = useState('trends');
   const [position, setPosition] = useState('');
   const [selectedSeason, setSelectedSeason] = useState(() => {
@@ -566,6 +567,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   const emptyMetricLabels = METRICS
     .filter((item) => !chartData.some((d) => d[item.key] !== null && d[item.key] !== undefined))
     .map((item) => item.label);
+  const firstMetricWithData = METRICS.find((item) => !emptyMetricLabels.includes(item.label))?.key;
+  const mobileMetricKey = mobileMetric && !emptyMetricLabels.includes(METRICS.find((m) => m.key === mobileMetric)?.label)
+    ? mobileMetric
+    : firstMetricWithData;
   const measuredPct = scopedPlayers.length ? Math.round((latestRows.length / scopedPlayers.length) * 100) : 0;
   const totalRecords = rows.reduce((sum, row) => sum + row.records.length, 0);
   const lastDate = chartData.at(-1)?.fecha;
@@ -1188,7 +1193,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                 {selectedSeason ? ` · ${selectedSeason}` : ''}
               </Button>
             )}
-            <Collapse in={!isMobile || filtersOpen}>
+            <Collapse expanded={!isMobile || filtersOpen}>
             <Group gap={8} wrap="wrap" align="center" w="100%" style={{ minWidth: 0 }}>
                 <Select
                   placeholder="Posición"
@@ -1278,9 +1283,33 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               <StatTile icon="calendar" title="Última fecha" color="salvia" value={formatDate(lastDate)} caption="último registro disponible" />
             </SimpleGrid>
 
+            {/* En móvil se ve una métrica cada vez (9 gráficas seguidas hacían la página interminable) */}
+            {chartData.length > 0 && isMobile && (
+              <ScrollArea type="never" style={{ width: '100%' }}>
+                <Group gap={6} wrap="nowrap" pb={2}>
+                  {METRICS.filter((item) => !emptyMetricLabels.includes(item.label)).map((item) => {
+                    const active = item.key === mobileMetricKey;
+                    return (
+                      <Button
+                        key={item.key}
+                        size="compact-sm"
+                        radius="xl"
+                        variant={active ? 'filled' : 'default'}
+                        color={active ? 'bosque' : 'gray'}
+                        onClick={() => setMobileMetric(item.key)}
+                        style={{ flexShrink: 0 }}
+                      >
+                        {item.label}
+                      </Button>
+                    );
+                  })}
+                </Group>
+              </ScrollArea>
+            )}
+
             {chartData.length > 0 ? (
               <SimpleGrid cols={{ base: 1, md: 1, lg: 2 }} spacing="lg">
-                {METRICS.map((item) => {
+                {(isMobile ? METRICS.filter((item) => item.key === mobileMetricKey) : METRICS).map((item) => {
                   const latestValuesForMetric = latestRows
                     .map((row) => Number(metricRecord(row.records, item, 0)?.[item.key]))
                     .filter(Number.isFinite);
@@ -1408,6 +1437,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               <Stack gap="xs">
                 <Text fz="xs" fw={700} c="dimmed" tt="uppercase">Última medición por jugador</Text>
                 <PlayerListCards
+                  maxChips={4}
                   items={rows.map((row) => ({
                     id: row.id,
                     player: row,
@@ -1548,6 +1578,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                   <Text fz="xs" fw={600} c="teal.7">{dayMeasuredPct}% cobertura</Text>
                 </Group>
                 <PlayerListCards
+                  maxChips={4}
                   items={measuredDayRows.map((row) => ({
                     id: `${row.id}-${currentDay}`,
                     player: row,

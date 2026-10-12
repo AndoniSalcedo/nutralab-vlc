@@ -19,9 +19,11 @@ import {
   Table,
   Text,
   TextInput,
+  UnstyledButton,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
+import { notifySaved } from '@/components/motion/notifySaved';
 import {
   IconPlus,
   IconMinus,
@@ -34,6 +36,7 @@ import {
   IconFileSpreadsheet,
   IconArrowsExchange,
 } from '@/components/icons3d';
+import { motion } from 'motion/react';
 import Icon3D from '@/components/Icon3D';
 import ResponsiveModal from './ResponsiveModal';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
@@ -510,8 +513,7 @@ export default function IntrapartidoModal({
     try {
       await saveQueueRef.current;
       await saveIntrapartidoMatch(team.id, { ...session, id: matchIdRef.current, estado: 'finalizado' });
-      notifications.show({
-        color: 'teal',
+      notifySaved({
         title: 'Registro guardado',
         message: 'Se han guardado las tomas de hidratación y nutrición del partido con éxito.',
       });
@@ -837,6 +839,35 @@ export default function IntrapartidoModal({
         {/* ============================================================= */}
         {currentStep === 'fases' && (
           <Stack gap="xs" style={{ flex: 1, minHeight: 0, height: '100%' }}>
+            {/* Progreso del partido: 7 fases, se puede saltar a cualquiera (guarda el borrador) */}
+            <Group gap={4} wrap="nowrap" aria-label="Fases del partido">
+              {INTRAPARTIDO_TIMINGS.map((timing, index) => {
+                const done = index < currentPhaseIndex;
+                const active = index === currentPhaseIndex;
+                return (
+                  <UnstyledButton
+                    key={timing.id}
+                    onClick={() => goTo('fases', index)}
+                    aria-label={timing.label}
+                    aria-current={active ? 'step' : undefined}
+                    style={{ flex: 1, minWidth: 0, padding: '6px 0' }}
+                  >
+                    <Box style={{ position: 'relative', height: 6, borderRadius: 6, background: '#e9ecef', overflow: 'hidden' }}>
+                      <motion.div
+                        initial={false}
+                        animate={{ scaleX: done || active ? 1 : 0 }}
+                        transition={{ type: 'spring', stiffness: 260, damping: 30 }}
+                        style={{ position: 'absolute', inset: 0, transformOrigin: 'left', background: active ? '#8fd14f' : '#C1F080' }}
+                      />
+                    </Box>
+                    <Text fz={9} fw={active ? 800 : 500} c={active ? 'dark.6' : 'dimmed'} ta="center" mt={3} truncate visibleFrom="xs">
+                      {timing.short}
+                    </Text>
+                  </UnstyledButton>
+                );
+              })}
+            </Group>
+
             {/* Barra de herramientas móvil y escritorio */}
             <Stack gap={6}>
               {/* Selector de grupo en móvil: a ancho completo para dedos */}
@@ -917,14 +948,21 @@ export default function IntrapartidoModal({
             </Stack>
 
             {/* Lista directa y táctil de jugadores adaptada a móvil y escritorio */}
-            <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 200px)', sm: 500 }} style={{ flex: 1, minHeight: 0 }} type="auto">
+            <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 240px)', sm: 500 }} style={{ flex: 1, minHeight: 0 }} type="auto">
+              {/* Al cambiar de fase la lista entra deslizándose: deja claro que es otro momento del partido */}
+              <motion.div
+                key={currentTiming.id}
+                initial={{ opacity: 0, x: 28 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              >
               <Stack gap={8}>
                 {currentPhasePlayers.length === 0 ? (
                   <Paper p="xl" radius="md" style={{ textAlign: 'center', backgroundColor: '#f8fafc' }}>
                     <Text fz="sm" c="dimmed">No hay jugadores en esta sección.</Text>
                   </Paper>
                 ) : (
-                  currentPhasePlayers.map((player) => {
+                  currentPhasePlayers.map((player, rowIndex) => {
                     const pId = String(player.id);
                     const phaseIntakes = session.intakes[pId]?.[currentTiming.id] || {};
                     const intakeEntries = Object.entries(phaseIntakes);
@@ -959,6 +997,7 @@ export default function IntrapartidoModal({
                               </Text>
                             </Box>
 
+                            <Box style={{ flex: 1 }} />
                             {/* Botón táctil para hacer sustitución/cambio */}
                             {starterSet.has(pId) ? (
                               <Menu shadow="md" width={240} position="bottom-start" radius="md" zIndex={2500} withinPortal>
@@ -1049,47 +1088,41 @@ export default function IntrapartidoModal({
                             )}
                           </Group>
 
-                          {/* Chips de tomas actuales en esta fase */}
-                          <Box style={{ flexShrink: 0, textAlign: 'right' }}>
-                            {intakeEntries.length === 0 ? (
-                              <Text fz="11px" c="dimmed" style={{ fontStyle: 'italic' }}>
-                                Sin tomas
-                              </Text>
-                            ) : (
-                              <Group gap={4} justify="flex-end" wrap="wrap">
-                                {intakeEntries.map(([prodId, qty]) => {
-                                  const prod = PRODUCTS_MAP.get(prodId);
-                                  if (!prod) return null;
-                                  return (
-                                    <Group
-                                      key={prodId}
-                                      gap={2}
-                                      style={{
-                                        backgroundColor: '#f8fafc',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: 6,
-                                        padding: '1px 5px',
-                                      }}
-                                    >
-                                      <Text size="11px" fw={600} c="dark.5">
-                                        {qty}x {prod.short}
-                                      </Text>
-                                      <ActionIcon
-                                        size={16}
-                                        variant="subtle"
-                                        color="red"
-                                        radius="xl"
-                                        onClick={() => handleModifyProduct(player.id, prodId, -1)}
-                                      >
-                                        <IconMinus size={10} />
-                                      </ActionIcon>
-                                    </Group>
-                                  );
-                                })}
-                              </Group>
-                            )}
-                          </Box>
                         </Group>
+
+                        {/* Tomas de esta fase: fila propia para no aplastar nombre ni botón de cambio.
+                            Cada chip "salta" al cambiar su cantidad (también en los repartos en lote). */}
+                        {intakeEntries.length > 0 && (
+                          <Group gap={4} mt={6} wrap="wrap">
+                            {intakeEntries.map(([prodId, qty], chipIndex) => {
+                              const prod = PRODUCTS_MAP.get(prodId);
+                              if (!prod) return null;
+                              return (
+                                <motion.div
+                                  key={`${prodId}-${qty}`}
+                                  initial={{ scale: 1.25, backgroundColor: '#ecfccb' }}
+                                  animate={{ scale: 1, backgroundColor: '#f8fafc' }}
+                                  transition={{ type: 'spring', stiffness: 520, damping: 18, delay: rowIndex * 0.03 + chipIndex * 0.02, backgroundColor: { duration: 0.8 } }}
+                                  style={{ display: 'flex', alignItems: 'center', gap: 2, border: '1px solid #e2e8f0', borderRadius: 6, padding: '1px 5px' }}
+                                >
+                                  <Text size="11px" fw={600} c="dark.5">
+                                    {qty}x {prod.short}
+                                  </Text>
+                                  <ActionIcon
+                                    size={16}
+                                    variant="subtle"
+                                    color="red"
+                                    radius="xl"
+                                    aria-label={`Quitar ${prod.short}`}
+                                    onClick={() => handleModifyProduct(player.id, prodId, -1)}
+                                  >
+                                    <IconMinus size={10} />
+                                  </ActionIcon>
+                                </motion.div>
+                              );
+                            })}
+                          </Group>
+                        )}
 
                         {/* Fila 2: Botonera táctil de 4 botones distribuidos para el pulgar */}
                         <Grid gutter={4} mt={6}>
@@ -1189,6 +1222,7 @@ export default function IntrapartidoModal({
                   })
                 )}
               </Stack>
+              </motion.div>
             </ScrollArea.Autosize>
 
             {/* Barra inferior: botones al 50% de ancho en móvil para acceso con pulgares */}

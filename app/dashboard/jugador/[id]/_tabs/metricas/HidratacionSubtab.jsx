@@ -722,6 +722,39 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
           {/* Historical Hydration Entries Table */}
           {registros.length > 0 && (
             <BentoCard title="Historial detallado de hidratación y sudoración" icon={IconCalendarStats} color="blue">
+              {isMobile ? (
+                // Móvil: lista compacta (la tabla de 8 columnas se cortaba en Estado)
+                <ScrollArea.Autosize mah={360}>
+                  <Stack gap={6}>
+                    {sortedDesc.map((row) => {
+                      const cfg = getRecordStatusConfig(row);
+                      const unit = row.unidad || (isSweatRecord(row) ? METRIC_TABS.sweat.unit : METRIC_TABS.hydration.unit);
+                      return (
+                        <Group key={row.id} justify="space-between" wrap="nowrap" gap="xs" p={8} style={{ borderRadius: 12, background: 'var(--mantine-color-gray-0)' }}>
+                          <Box style={{ minWidth: 0 }}>
+                            <Text fz="sm" fw={700} c="dark.6">
+                              {row.valor !== null ? row.valor : '-'} <Text span fz="xs" c="dimmed" fw={500}>{unit}</Text>
+                            </Text>
+                            <Text fz="xs" c="dimmed" truncate>
+                              {formatDateLabel(row.fecha)}{row.hora ? ` · ${row.hora}` : ''} · {isSweatRecord(row) ? 'Sudor' : 'Saliva'}
+                            </Text>
+                          </Box>
+                          <Group gap={4} wrap="nowrap" style={{ flexShrink: 0 }}>
+                            <Badge style={{ backgroundColor: cfg.bg, color: cfg.color, border: `1px solid ${cfg.color}33` }} size="sm">
+                              {cfg.label}
+                            </Badge>
+                            {!readOnly && (
+                              <ActionIcon color="blue" variant="subtle" radius="xl" onClick={() => startEditRecord(row)} aria-label="Editar registro">
+                                <IconEdit size={15} />
+                              </ActionIcon>
+                            )}
+                          </Group>
+                        </Group>
+                      );
+                    })}
+                  </Stack>
+                </ScrollArea.Autosize>
+              ) : (
               <ScrollArea h={300}>
                 <Table striped highlightOnHover verticalSpacing="xs">
                   <Table.Thead bg="gray.0">
@@ -797,6 +830,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
                   </Table.Tbody>
                 </Table>
               </ScrollArea>
+              )}
             </BentoCard>
           )}
         </Stack>

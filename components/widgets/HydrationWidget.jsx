@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { Box, Group, Stack, Text, ActionIcon, Button } from '@mantine/core';
 import { IconMinus } from '@tabler/icons-react';
 import WidgetCard, { WidgetAside, WidgetValue } from './WidgetCard';
 import { calculateHydration } from '@/lib/metrics/anthropometry';
+import { FloatingLabels, ParticleBurst } from '@/components/motion/Celebration';
 
 export default function HydrationWidget({
   jugadorId: propJugadorId,
@@ -18,6 +20,11 @@ export default function HydrationWidget({
   const router = useRouter();
   const jugadorId = jugador?.id || propJugadorId;
   const [drunk, setDrunk] = useState(0);
+  // Feedback al registrar agua: "+250 ml" que sube, gota que cae y celebración al llegar al objetivo
+  const [floats, setFloats] = useState([]);
+  const [dropKey, setDropKey] = useState(0);
+  const [goalBurst, setGoalBurst] = useState(0);
+  const floatId = useRef(0);
 
   // Cálculo fisiológico de agua según peso del jugador y tipo de día activo
   const peso = Number(pesoActual || jugador?.peso_kg || 75);
@@ -91,6 +98,14 @@ export default function HydrationWidget({
     const newValue = Math.max(0, parseFloat((drunk + amount).toFixed(2)));
     setDrunk(newValue);
     saveWater(newValue);
+    if (amount > 0) {
+      const id = ++floatId.current;
+      setFloats((list) => [...list, { id, text: `+${Math.round(amount * 1000)} ml` }]);
+      setTimeout(() => setFloats((list) => list.filter((f) => f.id !== id)), 1200);
+      setDropKey(id);
+      const reached = targetL > 0 && newValue >= targetL && drunk < targetL;
+      if (reached) setGoalBurst(id);
+    }
   };
 
   // Métrica clínica de osmolaridad
@@ -130,7 +145,9 @@ export default function HydrationWidget({
       style={{ minHeight: 216 }}
     >
       <Stack gap="sm" justify="space-between" h="100%">
-        <Box>
+        <Box style={{ position: 'relative' }}>
+          <FloatingLabels items={floats} style={{ top: 4, left: 110 }} />
+          <ParticleBurst burstKey={goalBurst} top={16} left={60} colors={['#7cc6f2', '#C1F080', '#38a0e6']} count={18} />
           <WidgetValue
             value={drunk.toFixed(2).replace('.', ',')}
             unit={`/ ${targetL.toFixed(1).replace('.', ',')} L`}
@@ -164,17 +181,32 @@ export default function HydrationWidget({
           >
             <IconMinus size={18} stroke={2.5} />
           </ActionIcon>
-          <Button
-            flex={1}
-            h={44}
-            radius="xl"
-            color="blue"
-            px={6}
-            onClick={() => handleUpdateWater(0.25)}
-            aria-label="Sumar 250 ml"
-          >
-            + 250 ml
-          </Button>
+          <Box style={{ flex: 1, position: 'relative' }}>
+            {/* Gota que cae desde el botón hacia el vaso */}
+            {dropKey > 0 && (
+              <motion.span
+                key={dropKey}
+                aria-hidden
+                initial={{ y: 0, opacity: 1, scale: 1 }}
+                animate={{ y: -70, opacity: 0, scale: 0.6 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                style={{ position: 'absolute', left: '50%', top: 0, width: 12, height: 15, marginLeft: -6, borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%', background: 'var(--mantine-color-blue-4)', pointerEvents: 'none', zIndex: 2 }}
+              />
+            )}
+            <motion.div whileTap={{ scale: 0.94 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}>
+              <Button
+                fullWidth
+                h={44}
+                radius="xl"
+                color="blue"
+                px={6}
+                onClick={() => handleUpdateWater(0.25)}
+                aria-label="Sumar 250 ml"
+              >
+                + 250 ml
+              </Button>
+            </motion.div>
+          </Box>
         </Group>
       </Stack>
     </WidgetCard>

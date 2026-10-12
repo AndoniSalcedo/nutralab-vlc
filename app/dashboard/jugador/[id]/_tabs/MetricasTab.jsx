@@ -1,6 +1,7 @@
 'use client';
 
-import { Box, Paper, Stack } from '@mantine/core';
+import { motion } from 'motion/react';
+import { Paper, Stack } from '@mantine/core';
 import { tabLabel } from './tab-label';
 import { getSubtabControlData } from './subtab-config';
 import PlayerSubtabControl from './PlayerSubtabControl';
@@ -31,7 +32,13 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes,
         />
       </Paper>
 
-      <Box mt={0}>
+      {/* Cambio de subpestaña con un fundido corto (antes cambiaba de golpe) */}
+      <motion.div
+        key={activeSubtab}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+      >
         {activeSubtab === 'pesos' && (
           <PesosSubtab jugador={jugador} pesajes={pesajes} evoluciones={evoluciones} readOnly={readOnly} />
         )}
@@ -47,7 +54,7 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes,
         {activeSubtab === 'intrapartido' && (
           <IntrapartidoSubtab jugador={jugador} historialIntrapartido={historialIntrapartido} />
         )}
-      </Box>
+      </motion.div>
     </Stack>
   );
 }

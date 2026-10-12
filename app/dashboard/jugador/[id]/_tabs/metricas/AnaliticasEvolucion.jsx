@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Badge, Box, Group, ScrollArea, Select, Stack, Table, Text } from '@mantine/core';
+import { Badge, Box, Group, Paper, ScrollArea, Select, Stack, Table, Text } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import {
   CartesianGrid,
   Line,
@@ -29,6 +30,7 @@ export default function AnaliticasEvolucion({ analiticas = [], selectedId }) {
   const sorted = useMemo(() => sortByDateDesc(analiticas), [analiticas]);
   const [baseOverride, setBaseOverride] = useState(null);
   const [paramOverride, setParamOverride] = useState(null);
+  const isMobile = useMediaQuery('(max-width: 48em)', false);
 
   const current = sorted.find((a) => String(a.id) === String(selectedId)) || sorted[0];
   const currentIndex = sorted.findIndex((a) => a.id === current?.id);
@@ -101,6 +103,28 @@ export default function AnaliticasEvolucion({ analiticas = [], selectedId }) {
 
           {rows.length === 0 ? (
             <Text size="sm" c="dimmed">Las dos analíticas no comparten parámetros.</Text>
+          ) : isMobile ? (
+            // Móvil: una tarjeta por parámetro (la tabla cortaba la columna de variación)
+            <Stack gap={6}>
+              {orderedRows.map((r) => {
+                const meta = TREND_META[r.trend];
+                const arrow = r.delta > 0 ? '↑' : r.delta < 0 ? '↓' : '→';
+                return (
+                  <Paper key={r.nombre} radius="lg" p="xs" withBorder style={{ cursor: 'pointer' }} onClick={() => setParamOverride(r.nombre)}>
+                    <Group justify="space-between" wrap="nowrap">
+                      <Text size="sm" fw={700} truncate>{r.nombre}</Text>
+                      <Badge variant="light" color={meta.color} size="sm">{meta.label}</Badge>
+                    </Group>
+                    <Group justify="space-between" wrap="nowrap" mt={2}>
+                      <Text size="xs" c="dimmed">
+                        {r.anterior} → <Text span fw={700} c={r.parametro.fuera_rango ? 'arcilla' : 'salvia'}>{r.valor}</Text> {r.unidad}
+                      </Text>
+                      <Text size="sm" fw={700} c={`${meta.color}.7`}>{arrow} {formatDelta(r.delta)}</Text>
+                    </Group>
+                  </Paper>
+                );
+              })}
+            </Stack>
           ) : (
             <ScrollArea>
               <Table verticalSpacing="xs" highlightOnHover style={{ minWidth: 520 }}>
@@ -125,7 +149,7 @@ export default function AnaliticasEvolucion({ analiticas = [], selectedId }) {
                           <Text size="sm" fw={700} c={r.parametro.fuera_rango ? 'arcilla' : 'salvia'}>{r.valor} {r.unidad}</Text>
                         </Table.Td>
                         <Table.Td>
-                          <Text size="sm" fw={600}>
+                          <Text size="sm" fw={700} c={`${meta.color}.7`}>
                             {arrow} {formatDelta(r.delta)}
                             {r.pct !== null && <Text span size="xs" c="dimmed"> ({formatDelta(r.pct)}%)</Text>}
                           </Text>
@@ -157,14 +181,14 @@ export default function AnaliticasEvolucion({ analiticas = [], selectedId }) {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={series.data} margin={{ top: 10, right: 16, left: -15, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--mantine-color-gray-2)" />
-                <XAxis dataKey="label" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
+                <XAxis dataKey="label" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} minTickGap={16} />
+                <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} domain={['auto', 'auto']} />
                 <ChartTooltip
                   formatter={(v) => [`${v} ${series.unidad}`, selectedParam]}
                   contentStyle={{ borderRadius: 12, border: '1px solid var(--mantine-color-gray-2)', fontSize: 11 }}
                 />
                 {Number.isFinite(series.min) && Number.isFinite(series.max) && (
-                  <ReferenceArea y1={series.min} y2={series.max} fill="rgba(16, 185, 129, 0.07)" stroke="rgba(16, 185, 129, 0.15)" strokeDasharray="3 3" />
+                  <ReferenceArea y1={series.min} y2={series.max} ifOverflow="hidden" fill="rgba(108, 112, 90, 0.10)" stroke="rgba(108, 112, 90, 0.35)" strokeDasharray="3 3" />
                 )}
                 <Line type="monotone" dataKey="valor" stroke="#6C705A" strokeWidth={2} dot={{ r: 4, fill: '#6C705A' }} activeDot={{ r: 6 }} />
               </LineChart>

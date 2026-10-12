@@ -1,6 +1,7 @@
 'use client';
 
-import { Box, Paper, Stack } from '@mantine/core';
+import { motion } from 'motion/react';
+import { Paper, Stack } from '@mantine/core';
 import { tabLabel } from './tab-label';
 import { getSubtabControlData } from './subtab-config';
 import PlayerSubtabControl from './PlayerSubtabControl';
@@ -25,12 +26,18 @@ export default function NutricionTab({ jugador, menus = [], activeSubtab = 'plan
         />
       </Paper>
 
-      <Box mt={0}>
+      {/* Cambio de subpestaña con un fundido corto (antes cambiaba de golpe) */}
+      <motion.div
+        key={activeSubtab}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+      >
         {activeSubtab === 'plan' && <PlanSubtab jugador={jugador} readOnly={readOnly} />}
         {activeSubtab === 'suplementacion' && <SuplementacionSubtab jugador={jugador} readOnly={readOnly} />}
         {activeSubtab === 'menu' && <MenuSemanalSubtab menus={menus} />}
         {activeSubtab === 'protocolos' && <ProtocolosSubtab jugador={jugador} readOnly={readOnly} />}
-      </Box>
+      </motion.div>
     </Stack>
   );
 }

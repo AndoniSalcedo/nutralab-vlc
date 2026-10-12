@@ -113,6 +113,12 @@ function formFromMedicion(medicion) {
   return form;
 }
 
+// "2026-10-05" -> "5/10" para los ejes de las gráficas
+function shortDate(value) {
+  const [, m, d] = String(value || '').split('-');
+  return m && d ? `${Number(d)}/${Number(m)}` : String(value || '');
+}
+
 function fechaLabel(fecha) {
   if (!fecha) return 'Sin fecha';
   return new Date(`${fecha}T00:00:00`).toLocaleDateString('es-ES', {
@@ -161,6 +167,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   });
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [mobileMetric, setMobileMetric] = useState(null);
   const [modalMode, setModalMode] = useState(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -491,8 +498,35 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
           </Box>
         ) : selected ? (
           <Stack gap={0}>
+            {/* Métricas con datos: las vacías no se dibujan; en móvil se elige una cada vez */}
+            {(() => {
+              const withData = METRICAS.filter((m) => sortedAsc.some((item) => hasMetricValue(metricValue(item, m))));
+              const activeKey = withData.some((m) => m.key === mobileMetric) ? mobileMetric : withData[0]?.key;
+              const shown = isMobile ? withData.filter((m) => m.key === activeKey) : withData;
+              const missing = METRICAS.filter((m) => !withData.includes(m)).map((m) => m.label);
+              return (
+            <>
+            {isMobile && withData.length > 1 && (
+              <ScrollArea type="never" mb="sm">
+                <Group gap={6} wrap="nowrap" pb={2}>
+                  {withData.map((m) => (
+                    <Button
+                      key={m.key}
+                      size="compact-sm"
+                      radius="xl"
+                      variant={m.key === activeKey ? 'filled' : 'default'}
+                      color={m.key === activeKey ? 'bosque' : 'gray'}
+                      onClick={() => setMobileMetric(m.key)}
+                      style={{ flexShrink: 0 }}
+                    >
+                      {m.label}
+                    </Button>
+                  ))}
+                </Group>
+              </ScrollArea>
+            )}
             <Grid gutter="lg" mb={{ base: 'md', sm: 'xl' }}>
-              {METRICAS.map((m) => {
+              {shown.map((m) => {
                 const metricData = sortedAsc
                   .map((item) => {
                     const rawVal = metricValue(item, m);
@@ -533,15 +567,16 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                               <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
                               <XAxis
                                 dataKey="fecha"
-                                tick={{ fontSize: 9 }}
-                                tickFormatter={(v) => String(v).slice(5)}
+                                tick={{ fontSize: 11 }}
+                                tickFormatter={shortDate}
+                                minTickGap={12}
                                 stroke="var(--mantine-color-gray-5)"
                                 axisLine={false}
                                 tickLine={false}
                               />
                               <YAxis
-                                tick={{ fontSize: 9 }}
-                                domain={[0, 'auto']}
+                                tick={{ fontSize: 11 }}
+                                domain={['auto', 'auto']}
                                 stroke="var(--mantine-color-gray-5)"
                                 axisLine={false}
                                 tickLine={false}
@@ -600,6 +635,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                           </ResponsiveContainer>
                         </Box>
 
+                        {!isMobile && (
                         <ScrollArea h={120} offsetScrollbars>
                           <Table verticalSpacing={4} striped highlightOnHover style={{ minWidth: 150 }}>
                             <Table.Thead bg="gray.0">
@@ -633,12 +669,19 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                             </Table.Tbody>
                           </Table>
                         </ScrollArea>
+                        )}
                       </Stack>
                     </WidgetCard>
                   </Grid.Col>
                 );
               })}
             </Grid>
+            {missing.length > 0 && (
+              <Text fz="xs" c="dimmed" ta="center" mt={-8} mb="md">Sin datos de: {missing.join(', ')}.</Text>
+            )}
+            </>
+              );
+            })()}
 
             <BentoCard title="Detalle completo" icon={IconRuler2} color="gray">
               <Stack gap="lg">

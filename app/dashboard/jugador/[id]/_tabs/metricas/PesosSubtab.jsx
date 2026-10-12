@@ -254,15 +254,16 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
                       <XAxis
                         dataKey="fecha"
-                        tick={{ fontSize: 9 }}
-                        tickFormatter={(v) => String(v).slice(5)}
+                        tick={{ fontSize: 11 }}
+                        tickFormatter={(v) => { const [, m, d] = String(v).split('-'); return m && d ? `${Number(d)}/${Number(m)}` : v; }}
+                        minTickGap={12}
                         stroke="var(--mantine-color-gray-5)"
                         axisLine={false}
                         tickLine={false}
                       />
                       <YAxis
                         domain={['dataMin - 5', 'auto']}
-                        tick={{ fontSize: 9 }}
+                        tick={{ fontSize: 11 }}
                         stroke="var(--mantine-color-gray-5)"
                         axisLine={false}
                         tickLine={false}

@@ -2,6 +2,7 @@
 
 import { Box, Group, Paper, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
+import AnimatedNumber from '@/components/motion/AnimatedNumber';
 
 // Tesela común del bento: fondo blanco sin borde y esquinas amplias. Títulos y enlaces
 // van siempre en tonos neutros; el color de la categoría vive solo en el icono 3D.
@@ -139,7 +140,7 @@ function WaterFill({ percent, color, waveColor = color }) {
 export function WidgetValue({ value, unit, color = 'var(--nutra-bosque, #1F2A24)', size = 30 }) {
   return (
     <Text fz={size} fw={800} c={color} lh={1} lts={-0.8} style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-      {value}
+      {typeof value === 'number' || typeof value === 'string' ? <AnimatedNumber value={value} /> : value}
       {unit && (
         <Text span fz={13} fw={600} lts={0} ml={3} style={{ color: 'var(--nutra-salvia, #6C705A)' }}>
           {unit}

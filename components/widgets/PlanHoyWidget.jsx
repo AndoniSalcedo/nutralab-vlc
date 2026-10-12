@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Group, Paper, Text, UnstyledButton } from '@mantine/core';
@@ -114,7 +115,16 @@ export default function PlanHoyWidget({ jugador, plan: latestPlan = null, select
       ) : (
         <>
           {/* Ingesta destacada */}
-          <Paper p="sm" radius="md" bg="gray.0" mt="xs" withBorder style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
+          <Paper p="sm" radius="md" bg="gray.0" mt="xs" withBorder style={{ borderColor: 'var(--mantine-color-gray-2)', overflow: 'hidden' }}>
+            {/* Al elegir otra toma, el contenido se desliza */}
+            <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={activeIdx}
+              initial={{ opacity: 0, x: 16 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.2 }}
+            >
             <Group gap="sm" align="center" wrap="nowrap">
               <Box style={{ flexShrink: 0 }}>
                 <Icon3D name={getMealSlot(activeMeal.nombre).icon} size={44} />
@@ -133,6 +143,8 @@ export default function PlanHoyWidget({ jugador, plan: latestPlan = null, select
                 </Text>
               </Box>
             </Group>
+            </motion.div>
+            </AnimatePresence>
           </Paper>
 
           {/* Recorrido del día */}
@@ -148,6 +160,23 @@ export default function PlanHoyWidget({ jugador, plan: latestPlan = null, select
                   backgroundColor: 'var(--mantine-color-gray-2)',
                 }}
               />
+              {/* Progreso del día: la línea se llena hasta la toma actual */}
+              {currentIdx > 0 && (
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+                  style={{
+                    position: 'absolute',
+                    top: 15,
+                    left: `calc(100% / ${meals.length * 2})`,
+                    width: `${(Math.min(currentIdx, meals.length - 1) / meals.length) * 100}%`,
+                    height: 2,
+                    transformOrigin: 'left',
+                    backgroundColor: 'var(--nutra-lima-dark, #4a6813)',
+                  }}
+                />
+              )}
               {meals.map((meal, idx) => {
                 const isActive = idx === activeIdx;
                 const isDone = currentIdx !== -1 && idx < currentIdx;
@@ -162,8 +191,18 @@ export default function PlanHoyWidget({ jugador, plan: latestPlan = null, select
                     aria-pressed={isActive}
                     style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, position: 'relative' }}
                   >
+                    {/* La toma que toca ahora late suavemente */}
+                    {idx === currentIdx && (
+                      <motion.span
+                        aria-hidden
+                        animate={{ scale: [1, 1.55], opacity: [0.55, 0] }}
+                        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+                        style={{ position: 'absolute', top: 0, width: 32, height: 32, borderRadius: '50%', background: 'var(--nutra-lima, #C1F080)', pointerEvents: 'none' }}
+                      />
+                    )}
                     <Box
                       style={{
+                        position: 'relative',
                         width: 32,
                         height: 32,
                         borderRadius: '50%',

@@ -136,6 +136,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
       {!readOnly && (
         <TeamHeaderRightSection>
           <Button
+            visibleFrom="sm"
             size="sm"
             radius="xl"
             color="lima"
@@ -144,6 +145,19 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
           >
             Nuevo partido
           </Button>
+          {/* En móvil, botón redondo: el texto aplastaba el nombre del equipo en la cabecera */}
+          <ActionIcon
+            hiddenFrom="sm"
+            size={38}
+            radius="xl"
+            variant="filled"
+            color="lima"
+            c="dark.7"
+            onClick={() => openModal(null)}
+            aria-label="Nuevo partido"
+          >
+            <IconPlus size={18} />
+          </ActionIcon>
         </TeamHeaderRightSection>
       )}
 
@@ -161,11 +175,11 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
                   <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
                     <Icon3D name="soccer" size={28} />
                     <Box style={{ minWidth: 0 }}>
-                      <Group gap={6} wrap="nowrap">
-                        <Text fw={700} fz="sm" c="dark.6" truncate>{info.rival || 'Sin rival'}</Text>
-                        <Badge size="xs" variant="light" color="yellow">Borrador · {stage}</Badge>
+                      <Text fw={700} fz="sm" c="dark.6" truncate>{info.rival || 'Sin rival'}</Text>
+                      <Group gap={6} wrap="nowrap" mt={2}>
+                        <Badge size="xs" variant="light" color="yellow" style={{ flexShrink: 0 }}>Borrador · {stage}</Badge>
+                        <Text fz="xs" c="dimmed" truncate>{formatDate(info.fecha)}</Text>
                       </Group>
-                      <Text fz="xs" c="dimmed" truncate>{formatDate(info.fecha)}</Text>
                     </Box>
                   </Group>
                   <Group gap={4} wrap="nowrap" style={{ flexShrink: 0 }}>
@@ -274,7 +288,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
                     <Stat label="Energía" value={`${Math.round(totals.kcal)} kcal`} />
                   </SimpleGrid>
 
-                  <Collapse in={expanded}>
+                  <Collapse expanded={expanded}>
                     <ScrollArea.Autosize mah={420} mt="md" type="auto" offsetScrollbars>
                       <Table verticalSpacing="xs" highlightOnHover striped miw={560}>
                         <Table.Thead bg="#f8fafc" style={{ position: 'sticky', top: 0, zIndex: 2 }}>

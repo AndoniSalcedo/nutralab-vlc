@@ -11,7 +11,6 @@ import {
   IconShieldCheck,
 } from "@/components/icons3d";
 import {
-  Avatar,
   Box,
   Button,
   Container,
@@ -21,6 +20,7 @@ import {
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import Logo from "./Logo";
+import SafeAvatar from "./SafeAvatar";
 import { initials } from "@/lib/utils";
 import { env } from "@/config/env";
 import { logout } from "@/actions/authActions";
@@ -90,7 +90,7 @@ export default function DashboardShell({ children, user }) {
                   }}
                 >
                   <Group gap={6}>
-                    <Avatar
+                    <SafeAvatar
                       src={userAvatarSrc}
                       alt={user?.name}
                       radius="xl"
@@ -98,7 +98,7 @@ export default function DashboardShell({ children, user }) {
                       color="nutralabColor"
                     >
                       {initials(user?.name || user?.username || user?.email || "N")}
-                    </Avatar>
+                    </SafeAvatar>
                     <IconChevronDown size={16} stroke={1.5} />
                   </Group>
                 </UnstyledButton>

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ActionIcon,
-  Avatar,
   Box,
   Divider,
   FileButton,
@@ -23,6 +22,7 @@ import {
 } from '@/components/icons3d';
 import Icon3D from '@/components/Icon3D';
 import { compressAvatar, initials } from '@/lib/utils/avatar';
+import SafeAvatar from '@/components/SafeAvatar';
 import { uploadTeamPhoto } from '@/actions/teamActions';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 
@@ -87,14 +87,15 @@ export default function TeamSidebar({
   const teamId = team?.id;
 
   const [avatarSrc, setAvatarSrc] = useState(() => {
-    if (team?.id) {
+    // Solo se pide la foto si el equipo tiene una (si no, la petición da 404)
+    if (team?.id && team?.foto_size) {
       return `/api/media/team-avatar?id=${team.id}&t=${team.updated_at || ''}`;
     }
     return '';
   });
 
   useEffect(() => {
-    if (team?.id) {
+    if (team?.id && team?.foto_size) {
       setAvatarSrc(`/api/media/team-avatar?id=${team.id}&t=${team.updated_at || ''}`);
     }
   }, [team?.id, team?.updated_at, team?.foto_size]);
@@ -185,7 +186,7 @@ export default function TeamSidebar({
         {/* Identidad del equipo: Escudo ampliado, nombre y temporada */}
         <Stack align="center" gap={4} my="sm">
           <Box style={{ position: 'relative', display: 'inline-block' }}>
-            <Avatar
+            <SafeAvatar
               src={avatarSrc || undefined}
               size={112}
               radius="xl"
@@ -211,7 +212,7 @@ export default function TeamSidebar({
               }}
             >
               {initials(team?.nombre || 'Equipo')}
-            </Avatar>
+            </SafeAvatar>
 
             {canEditPhoto && (
               <FileButton onChange={handleFileSelected} accept="image/*">

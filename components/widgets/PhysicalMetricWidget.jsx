@@ -81,6 +81,9 @@ export default function PhysicalMetricWidget({
     <Tooltip
       label={tooltipContent}
       disabled={!hasSemaforo}
+      // Solo con ratón: en táctil se quedaba abierto tapando el widget de balance
+      events={{ hover: true, focus: false, touch: false }}
+      openDelay={150}
       position="top"
       withArrow
       radius="md"

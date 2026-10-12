@@ -5,6 +5,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { slugify } from '@/lib/utils';
 import { Button, Group, Stack, TextInput, NumberInput, Accordion, Paper, ActionIcon, Table, Text, Tooltip, Textarea, Box, Avatar, FileButton, ScrollArea } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { notifySaved } from '@/components/motion/notifySaved';
 import { IconPlus, IconTrash, IconDeviceFloppy, IconPencil, IconCalendarStats, IconSettings, IconBook, IconClipboardList, IconCamera, IconFolderShare, IconDownload, IconCalculator } from '@/components/icons3d';
 import { calcKcalPerKg } from '@/config/day-types/macros';
 import { PLAYER_OBJECTIVES } from '@/config/nutrition-days';
@@ -46,7 +47,7 @@ function getInitialColors(teamData) {
 
 export default function TeamConfigClient({ team, readOnly = false }) {
   const router = useRouter();
-  const [teamPhotoVersion, setTeamPhotoVersion] = useState(() => team.updated_at || Date.now());
+  const [teamPhotoVersion, setTeamPhotoVersion] = useState(() => team.updated_at || ''); // sin Date.now(): descuadraba la hidratación
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [tempImageSrc, setTempImageSrc] = useState('');
   const [tempFileName, setTempFileName] = useState('');
@@ -294,7 +295,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           ...prev,
           info: { nombre: teamName, temporada: teamSeason }
         }));
-        notifications.show({ title: 'Guardado exitoso', message: 'Información básica del equipo actualizada.', color: 'green' });
+        notifySaved({ title: 'Guardado exitoso', message: 'Información básica del equipo actualizada.' });
         router.refresh();
       } catch (e) {
         notifications.show({ title: 'Error', message: e.message, color: 'red' });
@@ -341,10 +342,9 @@ export default function TeamConfigClient({ team, readOnly = false }) {
         macros: 'Multiplicadores de macros guardados'
       };
 
-      notifications.show({
+      notifySaved({
         title: 'Guardado exitoso',
         message: labels[sectionKey] || 'Sección guardada correctamente.',
-        color: 'green'
       });
       router.refresh();
     } catch (e) {
@@ -357,7 +357,26 @@ export default function TeamConfigClient({ team, readOnly = false }) {
   return (
     <BoneyardSkeleton name="team-config" loading={false}>
       <Stack gap="lg">
-        <Paper p="md" radius={24} shadow="xs">
+        {/* Móvil: índice de secciones fijo arriba (la página es muy larga) */}
+        <Box hiddenFrom="sm" style={{ position: 'sticky', top: 0, zIndex: 50, margin: '0 -6px', padding: '6px', background: 'var(--nutra-app-bg, #F8F7F4)' }}>
+          <ScrollArea type="never">
+            <Group gap={6} wrap="nowrap">
+              {[['general', 'General'], ['pdf', 'Textos PDF'], ['ficha', 'Ficha'], ['dias', 'Tipos de día'], ['macros', 'Multiplicadores'], ['protocolos', 'Protocolos']].map(([id, label]) => (
+                <Button
+                  key={id}
+                  size="compact-sm"
+                  radius="xl"
+                  variant="default"
+                  style={{ flexShrink: 0 }}
+                  onClick={() => document.getElementById(`config-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                >
+                  {label}
+                </Button>
+              ))}
+            </Group>
+          </ScrollArea>
+        </Box>
+        <Paper p="md" radius={24} shadow="xs" id="config-general" style={{ scrollMarginTop: 72 }}>
           <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
             <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
               <IconSettings size={20} style={{ flexShrink: 0 }} />
@@ -485,7 +504,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           </Group>
         </Paper>
 
-        <Paper p="md" radius={24} shadow="xs">
+        <Paper p="md" radius={24} shadow="xs" id="config-pdf" style={{ scrollMarginTop: 72 }}>
           <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
             <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
               <IconBook size={20} style={{ flexShrink: 0 }} />
@@ -546,6 +565,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           </Stack>
         </Paper>
 
+        <Box id="config-ficha" style={{ scrollMarginTop: 72 }}>
         <PlanThemeEditor
           colors={planColors}
           onChange={setPlanColors}
@@ -556,8 +576,9 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           clubName={teamName || team?.nombre}
           dayTypes={dayTypes}
         />
+        </Box>
 
-        <Paper p="md" radius={24} shadow="xs">
+        <Paper p="md" radius={24} shadow="xs" id="config-dias" style={{ scrollMarginTop: 72 }}>
           <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
             <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
               <IconCalendarStats size={20} style={{ flexShrink: 0 }} />
@@ -610,8 +631,8 @@ export default function TeamConfigClient({ team, readOnly = false }) {
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mantine-color-dimmed)' }}>Tipo de Día</Table.Th>
-                  <Table.Th style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mantine-color-dimmed)' }}>Color</Table.Th>
-                  <Table.Th style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mantine-color-dimmed)' }}>Batido de proteínas</Table.Th>
+                  <Table.Th visibleFrom="sm" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mantine-color-dimmed)' }}>Color</Table.Th>
+                  <Table.Th style={{ fontSize: '12px', fontWeight: 600, color: 'var(--mantine-color-dimmed)' }}>Batido</Table.Th>
                   {!readOnly && <Table.Th w={100} style={{ textAlign: 'right', fontSize: '12px', fontWeight: 600, color: 'var(--mantine-color-dimmed)' }}>Acciones</Table.Th>}
                 </Table.Tr>
               </Table.Thead>
@@ -622,10 +643,10 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                       <Group gap="xs" wrap="nowrap">
                         <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: `var(--mantine-color-${d.color}-6)`, flexShrink: 0 }} />
                         <Text fw={500} size="sm" truncate>{d.label}</Text>
-                        <Text size="xs" c="dimmed">({d.key})</Text>
+                        <Text size="xs" c="dimmed" visibleFrom="sm">({d.key})</Text>
                       </Group>
                     </Table.Td>
-                    <Table.Td>
+                    <Table.Td visibleFrom="sm">
                       <Text size="sm" tt="capitalize" c={d.color}>{d.color}</Text>
                     </Table.Td>
                     <Table.Td>
@@ -680,7 +701,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           )}
         </Paper>
 
-        <Paper p="md" radius={24} shadow="xs">
+        <Paper p="md" radius={24} shadow="xs" id="config-macros" style={{ scrollMarginTop: 72 }}>
           <Group justify="space-between" align="center" mb="md" wrap="wrap" gap="sm" style={{ width: '100%' }}>
             <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
               <IconCalculator size={20} style={{ flexShrink: 0 }} />
@@ -789,7 +810,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           )}
         </Paper>
 
-        <Paper p="md" radius={24} shadow="xs">
+        <Paper p="md" radius={24} shadow="xs" id="config-protocolos" style={{ scrollMarginTop: 72 }}>
           <Group justify="space-between" align="center" mb="lg" wrap="wrap" gap="sm" style={{ width: '100%' }}>
             <Group gap="sm" style={{ flex: '1 1 auto', minWidth: 0 }}>
               <IconClipboardList size={20} style={{ flexShrink: 0 }} />

@@ -287,7 +287,8 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       const playerPosition = player.posicion || '';
 
       return (
-        (!name || fullName.includes(name)) &&
+        // Un solo buscador: coincide por nombre o por email
+        (!name || fullName.includes(name) || playerEmail.includes(name)) &&
         (!email || playerEmail.includes(email)) &&
         (!position || playerPosition === position)
       );
@@ -917,7 +918,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
         <Box w="100%" style={{ minWidth: 0 }}>
           <Group gap={8} wrap="wrap" align="center" w="100%">
             <TextInput
-              placeholder="Buscar jugador por nombre..."
+              placeholder="Buscar por nombre o email..."
               leftSection={<Icon3D name="search" size={18} />}
               variant="default"
               radius="xl"
@@ -940,19 +941,6 @@ export default function DashboardContent({ players = [], team, readOnly = false 
               size="sm"
               allowDeselect={false}
               style={{ flex: '1 1 140px', minWidth: 0 }}
-            />
-            <TextInput
-              placeholder="Buscar por email..."
-              leftSection={<Icon3D name="envelope" size={18} />}
-              variant="default"
-              radius="xl"
-              size="sm"
-              value={filters.email}
-              onChange={(event) => {
-                const { value } = event.currentTarget;
-                setFilters((current) => ({ ...current, email: value }));
-              }}
-              style={{ flex: '1.5 1 160px', minWidth: 0 }}
             />
           </Group>
         </Box>

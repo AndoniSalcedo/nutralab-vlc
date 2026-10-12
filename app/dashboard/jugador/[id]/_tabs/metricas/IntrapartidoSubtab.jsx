@@ -112,7 +112,7 @@ export default function IntrapartidoSubtab({ jugador, historialIntrapartido = []
                     <Stat label="Energía" value={`${Math.round(totals.kcal)} kcal`} />
                   </SimpleGrid>
 
-                  <Collapse in={expanded}>
+                  <Collapse expanded={expanded}>
                     {phases.length === 0 ? (
                       <Text fz="xs" c="dimmed" mt="md">No se registraron tomas en este partido.</Text>
                     ) : (

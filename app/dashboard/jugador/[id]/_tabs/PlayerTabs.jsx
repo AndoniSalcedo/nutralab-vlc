@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'motion/react';
 import { Box, Group, Tabs, Text } from '@mantine/core';
 import { IconChartBar, IconClipboardList, IconSalad } from '@/components/icons3d';
 import { useParams, useRouter } from 'next/navigation';
@@ -206,7 +207,10 @@ export default function PlayerTabs({
                   }}
                 >
                   {isActive && (
-                    <Box
+                    // El indicador se desliza entre pestañas (layoutId compartido)
+                    <motion.div
+                      layoutId="player-nav-indicator"
+                      transition={{ type: 'spring', stiffness: 500, damping: 38 }}
                       style={{
                         position: 'absolute',
                         top: 3,

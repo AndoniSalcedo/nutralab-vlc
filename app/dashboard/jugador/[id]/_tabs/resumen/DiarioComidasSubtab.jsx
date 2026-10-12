@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { motion } from 'motion/react';
 import {
   ActionIcon,
   Box,
@@ -25,6 +26,8 @@ import ImageViewerModal from '@/components/modals/ImageViewerModal';
 import MealEditorModal from '@/components/modals/MealEditorModal';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
+import AnimatedNumber from '@/components/motion/AnimatedNumber';
+import { ParticleBurst } from '@/components/motion/Celebration';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 
@@ -193,7 +196,7 @@ function DayHeader({ dayKey, todayKey, meals }) {
       </Box>
       <Box ta="right" style={{ flexShrink: 0 }}>
         <Text fw={800} fz="lg" c="dark.5" lh={1.2}>
-          {total > 0 ? formatKcal(total) : '—'}
+          {total > 0 ? <AnimatedNumber value={formatKcal(total)} /> : '—'}
           <Text span fz="xs" fw={600} c="dimmed">
             {' '}
             kcal
@@ -461,7 +464,7 @@ function StatPill({ icon, value, label }) {
     <Group gap={4} wrap="nowrap">
       {icon}
       <Text fz="xs" fw={800} c="dark.4" lh={1}>
-        {value}
+        <AnimatedNumber value={value} />
       </Text>
       <Text fz="xs" c="dimmed" lh={1}>
         {label}
@@ -477,6 +480,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
   const [loading, setLoading] = useState(true);
   const [meals, setMeals] = useState([]);
   const [selectedKey, setSelectedKey] = useState(todayKey);
+  const [savedBurst, setSavedBurst] = useState(0);
   const [weekStart, setWeekStart] = useState(() => windowStartOf(todayKey));
 
   const [viewer, setViewer] = useState({ open: false, src: '', caption: '' });
@@ -603,15 +607,23 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
     }
   };
 
+  // Las tarjetas entran con un pequeño "pop" (la recién registrada destaca al aparecer)
   const renderCard = (m, stacked) => (
-    <DiaryMealCard
+    <motion.div
       key={m.id}
-      meal={m}
-      stacked={stacked}
-      onClick={!readOnly ? () => openEditMeal(m) : m.photoUrl ? () => openPhoto(m) : undefined}
-      onOpenPhoto={m.photoUrl ? () => openPhoto(m) : undefined}
-      onDelete={!readOnly ? () => setDeleteMeal(m) : undefined}
-    />
+      layout
+      initial={{ opacity: 0, y: 12, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+    >
+      <DiaryMealCard
+        meal={m}
+        stacked={stacked}
+        onClick={!readOnly ? () => openEditMeal(m) : m.photoUrl ? () => openPhoto(m) : undefined}
+        onOpenPhoto={m.photoUrl ? () => openPhoto(m) : undefined}
+        onDelete={!readOnly ? () => setDeleteMeal(m) : undefined}
+      />
+    </motion.div>
   );
 
   return (
@@ -680,7 +692,9 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
           {loading ? (
             <BoneyardSkeleton name="diario-comidas" loading={true} />
           ) : (
-            <Paper radius="lg" shadow="sm" p="md" bg="white" withBorder>
+            <Paper radius="lg" shadow="sm" p="md" bg="white" withBorder style={{ position: 'relative' }}>
+              {/* Celebración al registrar una comida */}
+              <ParticleBurst burstKey={savedBurst} top={28} left="85%" />
               <DayHeader dayKey={selectedKey} todayKey={todayKey} meals={dayMeals} />
               <Box hiddenFrom="md">
                 <DayTimeline meals={dayMeals} canAdd={canAdd} onAdd={openDraft} renderCard={renderCard} />
@@ -707,6 +721,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
         onSuccess={() => {
           closeEditor();
           setReload((prev) => prev + 1);
+          setSavedBurst(Date.now());
         }}
         onCancel={closeEditor}
       />

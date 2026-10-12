@@ -1,8 +1,10 @@
 'use client';
 
+import { motion } from 'motion/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box, Group, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { notifySaved } from '@/components/motion/notifySaved';
 import WidgetCard, { WidgetAside } from './WidgetCard';
 import WellnessModal from '@/components/modals/WellnessModal';
 import { WELLNESS_ITEMS, WELLNESS_KEYS, wellnessScoreColor as scoreColor } from '@/config/wellness';
@@ -105,7 +107,13 @@ function HexagonChart({ today, average }) {
 
       {/* Línea del día */}
       {today && (
-        <>
+        // El polígono del día crece desde el centro al aparecer
+        <motion.g
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 140, damping: 16, delay: 0.15 }}
+          style={{ transformOrigin: `${CENTER}px ${CENTER}px`, transformBox: 'view-box' }}
+        >
           <polygon
             points={polygonPoints(today)}
             fill="url(#wellness-today)"
@@ -118,7 +126,7 @@ function HexagonChart({ today, average }) {
             const [x, y] = pointFor(i, v);
             return <circle key={WELLNESS_ITEMS[i].key} cx={x} cy={y} r="3.5" fill="white" stroke="var(--mantine-color-teal-6)" strokeWidth="1.5" />;
           })}
-        </>
+        </motion.g>
       )}
 
       {/* Etiquetas de vértice: valor del día + nombre */}
@@ -192,7 +200,7 @@ export default function WellnessHexagonWidget({ jugadorId, canEdit = true }) {
       await saveWellnessRecord({ jugador_id: jugadorId, fecha: today, ...values });
       await load();
       setModalOpen(false);
-      notifications.show({ color: 'teal', title: 'Registro guardado', message: 'Tu bienestar de hoy se ha guardado.' });
+      notifySaved({ title: 'Registro guardado', message: 'Tu bienestar de hoy se ha guardado.' });
     } catch (err) {
       notifications.show({ color: 'red', title: 'No se pudo guardar', message: err.message });
     } finally {

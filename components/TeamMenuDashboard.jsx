@@ -520,7 +520,8 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
               isEditing={isEditing}
               editedDias={editedDias}
               onChangeDayData={handleUpdateDayData}
-              onSaveDishDecomposition={handleSaveDishDecomposition}
+              // Solo lectura (técnico): sin lápiz de editar platos
+              onSaveDishDecomposition={readOnly ? undefined : handleSaveDishDecomposition}
             />
           </Stack>
         </Box>

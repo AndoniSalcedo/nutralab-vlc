@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -11,22 +12,58 @@ import {
 } from '@mantine/core';
 import { IconCheck } from '@tabler/icons-react';
 import WidgetCard from './WidgetCard';
+import { ParticleBurst } from '@/components/motion/Celebration';
+import { getPlayerSupplementation } from '@/actions/supplementActions';
 
-const DEFAULT_SUPPLEMENTS = [
-  { id: 'cafeina', name: 'Cafeína Anhidra', dose: '200 mg', timing: '45m pre-partido / sesión intensa' },
-  { id: 'creatina', name: 'Creatina Creapure', dose: '5 g', timing: 'Post-sesión con carbohidratos' },
-  { id: 'beta_alanina', name: 'Beta-Alanina', dose: '3.2 g', timing: 'Comida principal (tampón láctico)' },
-  { id: 'whey', name: 'Whey Protein Isolate', dose: '30 g', timing: 'Ventana de recuperación muscular' },
-  { id: 'omega3_d3', name: 'Omega 3 + Vitamina D3', dose: '2 cáp + 2000 UI', timing: 'Desayuno (inmunidad y articulaciones)' },
-];
+// Lista diaria real del jugador: catálogo asignado + suplementos extra (con sus ajustes de dosis)
+function buildDailyList(data) {
+  if (!data) return [];
+  const byId = new Map((data.suplementos || []).map((s) => [Number(s.id), s]));
+  const extrasBySupp = new Map((data.extras || []).map((e) => [Number(e.suplemento_id), e]));
+  const listaId = Number(data.asignacion?.lista_id || 0);
+  const used = new Set();
+  const toItem = (supp, extra) => ({
+    id: `s-${supp.id}`,
+    name: supp.nombre,
+    dose: extra?.dose_override || supp.dose_text || supp.pauta || '',
+  });
+  const base = (data.items || [])
+    .filter((item) => Number(item.lista_id) === listaId)
+    .sort((a, b) => Number(a.orden || 0) - Number(b.orden || 0))
+    .map((item) => {
+      const supp = byId.get(Number(item.suplemento_id));
+      if (!supp) return null;
+      used.add(Number(item.suplemento_id));
+      return toItem(supp, extrasBySupp.get(Number(item.suplemento_id)));
+    })
+    .filter(Boolean);
+  const extras = (data.extras || [])
+    .filter((e) => !used.has(Number(e.suplemento_id)))
+    .map((e) => (byId.get(Number(e.suplemento_id)) ? toItem(byId.get(Number(e.suplemento_id)), e) : null))
+    .filter(Boolean);
+  return [...base, ...extras];
+}
 
 export default function SuplementacionWidget({
   jugadorId,
-  supplementList = DEFAULT_SUPPLEMENTS,
+  supplementList,
 }) {
   const router = useRouter();
-  const list = supplementList && supplementList.length > 0 ? supplementList : DEFAULT_SUPPLEMENTS;
+  // Antes mostraba una lista de ejemplo si no se pasaba ninguna: ahora carga la pauta real del jugador
+  const [loadedList, setLoadedList] = useState(null);
+  const list = useMemo(() => supplementList || loadedList || [], [supplementList, loadedList]);
   const [suppChecks, setSuppChecks] = useState({});
+  const [burst, setBurst] = useState(0);
+  const prevDone = useRef(false);
+
+  useEffect(() => {
+    if (supplementList || !jugadorId) return undefined;
+    let cancelled = false;
+    getPlayerSupplementation(jugadorId)
+      .then((data) => { if (!cancelled) setLoadedList(buildDailyList(data)); })
+      .catch(() => { if (!cancelled) setLoadedList([]); });
+    return () => { cancelled = true; };
+  }, [jugadorId, supplementList]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !jugadorId) return;
@@ -67,16 +104,26 @@ export default function SuplementacionWidget({
   const totalCount = list.length;
   const isAllDone = totalCount > 0 && completedCount === totalCount;
 
+  // Celebración al marcar el último
+  useEffect(() => {
+    if (isAllDone && !prevDone.current) setBurst(Date.now());
+    prevDone.current = isAllDone;
+  }, [isAllDone]);
+
   return (
     <WidgetCard
       id="widget-suplementacion"
       color="salvia"
       icon="suplementacion"
       title="Suplementos diarios"
-      footer={isAllDone ? '¡Todo tomado!' : `${completedCount}/${totalCount} tomas`}
+      footer={totalCount === 0 ? null : isAllDone ? '¡Todo tomado!' : `${completedCount}/${totalCount} tomas`}
       footerAction="Suplementación"
       onFooterAction={() => router.push(`/dashboard/jugador/${jugadorId}/nutricion/suplementacion`)}
     >
+      <ParticleBurst burstKey={burst} top="40%" left="50%" />
+      {totalCount === 0 && loadedList !== null && (
+        <Text fz="xs" c="dimmed" py="sm">Tu nutricionista aún no te ha asignado suplementos diarios.</Text>
+      )}
       {/* Lista de tomas interactivas */}
       <Stack gap={6}>
         {list.map((item) => {
@@ -97,7 +144,9 @@ export default function SuplementacionWidget({
             >
               <Group justify="space-between" align="center" wrap="nowrap">
                 <Group gap="xs" align="center" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
-                  <Box
+                  <motion.div
+                    animate={{ scale: isChecked ? [1, 1.3, 1] : 1 }}
+                    transition={{ duration: 0.35 }}
                     style={{
                       width: 20,
                       height: 20,
@@ -114,8 +163,12 @@ export default function SuplementacionWidget({
                       transition: 'all 0.15s ease',
                     }}
                   >
-                    {isChecked && <IconCheck size={13} stroke={3} />}
-                  </Box>
+                    {isChecked && (
+                      <motion.span initial={{ scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 600, damping: 18 }} style={{ display: 'flex' }}>
+                        <IconCheck size={13} stroke={3} />
+                      </motion.span>
+                    )}
+                  </motion.div>
                   <Box style={{ minWidth: 0, flex: 1 }}>
                     <Text
                       fz="xs"

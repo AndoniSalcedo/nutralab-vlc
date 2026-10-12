@@ -1,11 +1,11 @@
 'use client';
 
+import { motion } from 'motion/react';
 import { useMemo, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   ActionIcon,
-  Avatar,
   Box,
   Group,
   Paper,
@@ -17,6 +17,7 @@ import {
 import {
   IconArrowLeft,
 } from '@/components/icons3d';
+import SafeAvatar from '@/components/SafeAvatar';
 import Icon3D from '@/components/Icon3D';
 import { initials } from '@/lib/utils/avatar';
 import { useTeamHeaderSlot } from '@/components/TeamHeaderContext';
@@ -157,8 +158,8 @@ export default function TeamHeaderTabs({
                     </ActionIcon>
                   </Tooltip>
 
-                  <Avatar
-                    src={teamId ? `/api/media/team-avatar?id=${teamId}&t=${team?.updated_at || ''}` : undefined}
+                  <SafeAvatar
+                    src={teamId && team?.foto_size ? `/api/media/team-avatar?id=${teamId}&t=${team?.updated_at || ''}` : undefined}
                     size={40}
                     radius="xl"
                     color="bosque"
@@ -168,7 +169,7 @@ export default function TeamHeaderTabs({
                     style={{ flexShrink: 0 }}
                   >
                     {initials(team?.nombre || 'Equipo')}
-                  </Avatar>
+                  </SafeAvatar>
 
                   <Stack gap={1} style={{ minWidth: 0, flex: 1 }}>
                     <Title order={4} fw={700} c="dark.5" truncate="end" fz={15}>
@@ -284,7 +285,10 @@ export default function TeamHeaderTabs({
                 }}
               >
                 {isActive && (
-                  <Box
+                  // El indicador se desliza entre pestañas (layoutId compartido)
+                  <motion.div
+                    layoutId="team-nav-indicator"
+                    transition={{ type: 'spring', stiffness: 500, damping: 38 }}
                     style={{
                       position: 'absolute',
                       top: 3,

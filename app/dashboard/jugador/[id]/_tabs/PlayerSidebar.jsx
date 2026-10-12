@@ -1,5 +1,6 @@
 'use client';
 
+import SafeAvatar from '@/components/SafeAvatar';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
@@ -287,14 +288,14 @@ export default function PlayerSidebar({
               }}
             >
               {jugador?.equipo_id && (
-                <Avatar
-                  src={`/api/media/team-avatar?id=${jugador.equipo_id}`}
+                <SafeAvatar
+                  src={jugador?.equipos?.foto_size === 0 ? undefined : `/api/media/team-avatar?id=${jugador.equipo_id}`}
                   size={18}
                   radius="xl"
                   imageProps={{ style: { objectFit: 'contain' } }}
                 >
                   {initials(teamName)}
-                </Avatar>
+                </SafeAvatar>
               )}
               <Text size="xs" fw={600} c="var(--nutra-hueso)" truncate="end" maw={180}>
                 {teamName}
