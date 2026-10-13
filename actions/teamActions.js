@@ -47,6 +47,7 @@ const PLAYER_COPY_FIELDS = [
   'posicion',
   'fecha_nacimiento',
   'num_comidas',
+  'reparto_ingestas',
   'objetivo',
   'gustos_preferencias',
   'aversiones',

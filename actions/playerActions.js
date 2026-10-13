@@ -35,11 +35,14 @@ import {
 import { trackUsageEvent } from '@/lib/billing/client';
 import { personalizePautas, describeAjustes } from '@/lib/nutrition/pauta-personalization';
 import { syncPreMatchProtocol } from '@/lib/nutrition/prematch-protocol';
+import { syncMealDistribution } from '@/lib/nutrition/meal-distribution';
 
 // Campos del jugador que cambian lo que puede comer: al modificarlos se revisan sus pautas guardadas.
 const RESTRICTION_FIELDS = ['intolerancias', 'aversiones'];
 // Campos de los que salen las tomas por defecto del protocolo de partido: al modificarlos se rehacen.
 const PREMATCH_SYNC_FIELDS = ['num_comidas', 'recomendaciones_defecto', 'config_prepartido', ...RESTRICTION_FIELDS];
+// Campos de los que sale el reparto de kcal por ingesta: al cambiar las tomas, el reparto se rehace para ellas.
+const MEAL_DISTRIBUTION_SYNC_FIELDS = ['num_comidas', 'postentreno', 'reparto_ingestas'];
 
 function isValidPassword(password) {
   return typeof password === 'string' && password.length >= 8;
@@ -57,8 +60,21 @@ const CAMPOS_PERMITIDOS = [
   'notas_hidratacion', 'notas_suplementacion', 'notas_protocolos',
   'gustos_preferencias', 'aversiones', 'intolerancias',
   'contexto_clinico', 'objetivo', 'posicion', 'num_comidas', 'preentreno', 'postentreno', 'recomendaciones_defecto', 'config_prepartido',
-  'porcentaje_grasa_objetivo', 'protocolos_custom',
+  'porcentaje_grasa_objetivo', 'protocolos_custom', 'reparto_ingestas',
 ];
+
+// Reparto de kcal por ingesta: { toma: % } con enteros 0-100 que suman 100; null vuelve al reparto por defecto.
+function parseMealDistribution(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const entries = Object.entries(value)
+    .map(([meal, pct]) => [String(meal).trim(), Math.round(Number(pct))])
+    .filter(([meal, pct]) => meal && Number.isFinite(pct) && pct >= 0 && pct <= 100);
+  const total = entries.reduce((sum, [, pct]) => sum + pct, 0);
+  if (entries.length === 0 || total !== 100) {
+    throw new Error('El reparto de kcal por ingesta debe sumar 100 %.');
+  }
+  return Object.fromEntries(entries);
+}
 
 export async function updatePlayerField(id, field, value) {
   if (!id || !field || !CAMPOS_PERMITIDOS.includes(field)) {
@@ -82,6 +98,8 @@ export async function updatePlayerField(id, field, value) {
     parsedValue = normalizeObjective(value);
   } else if (field === 'protocolos_custom') {
     parsedValue = typeof value === 'object' && value !== null ? value : {};
+  } else if (field === 'reparto_ingestas') {
+    parsedValue = parseMealDistribution(value);
   } else if (field === 'recomendaciones_defecto' || field === 'config_prepartido') {
     // Las pautas son AST nutricionales: se validan contra el contrato único antes de guardar.
     // El error se devuelve (no se lanza) para que el mensaje llegue al cliente en producción.
@@ -121,6 +139,11 @@ export async function updatePlayerField(id, field, value) {
   // Las tomas por defecto del protocolo de partido siguen las comidas y pautas habituales del jugador.
   if (PREMATCH_SYNC_FIELDS.includes(field)) {
     update.config_prepartido = syncPreMatchProtocol({ ...current, ...update });
+  }
+
+  // Todo jugador tiene su reparto de kcal guardado y corresponde a sus tomas actuales.
+  if (MEAL_DISTRIBUTION_SYNC_FIELDS.includes(field)) {
+    update.reparto_ingestas = syncMealDistribution({ ...current, ...update });
   }
 
   await updatePlayer(db, id, update);
@@ -365,6 +388,7 @@ export async function savePlayer(form) {
 
   // Todo jugador tiene protocolo de partido; sus tomas por defecto siguen las comidas que se acaban de guardar.
   payload.config_prepartido = syncPreMatchProtocol({ ...(current || {}), ...payload });
+  payload.reparto_ingestas = syncMealDistribution({ ...(current || {}), ...payload });
 
   if (form.has('avatar')) {
     const avatarFile = form.get('avatar');
@@ -499,6 +523,7 @@ async function createPlayer(db, teamId, group) {
     preentreno: false,
     postentreno: false,
     config_prepartido: syncPreMatchProtocol({ num_comidas: DEFAULT_PLAYER_MEALS_STRING }),
+    reparto_ingestas: syncMealDistribution({ num_comidas: DEFAULT_PLAYER_MEALS_STRING, postentreno: false }),
   });
 }
 

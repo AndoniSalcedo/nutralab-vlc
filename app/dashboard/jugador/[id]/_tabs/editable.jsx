@@ -33,6 +33,7 @@ import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
 import PrepartidoRoutineModal from '@/components/modals/PrepartidoRoutineModal';
 import { convertLegacyToAst, formatAstToText } from '@/lib/engine/meal-ast';
 import { isDefaultProtocolMeal } from '@/lib/nutrition/prematch-protocol';
+import { getDefaultMealDistribution } from '@/lib/engine/day-balance';
 import WidgetCard from '@/components/widgets/WidgetCard';
 
 // Color de categoría de cada campo del perfil (mismo criterio que las teselas del Perfil)
@@ -200,6 +201,7 @@ export function ComidasEditable({
   preentreno,
   jugadorId,
   recomendacionesDefecto = {},
+  repartoIngestas = null,
   readOnly = false,
   icon3d = 'bowl',
 }) {
@@ -207,6 +209,8 @@ export function ComidasEditable({
   const [editingDistribution, setEditingDistribution] = useState(false);
   const [meals, setMeals] = useState(() => parseMeals(numComidas));
   const [hasPost, setHasPost] = useState(Boolean(postentreno));
+  // Reparto de kcal por toma ({ toma: % }); null (jugador aún sin reparto) muestra el de por defecto.
+  const [distribution, setDistribution] = useState(repartoIngestas || null);
   const [recsDefecto, setRecsDefecto] = useState(() => recomendacionesDefecto || {});
   const [saving, setSaving] = useState(false);
   const [selectedMealForModal, setSelectedMealForModal] = useState(null);
@@ -214,18 +218,28 @@ export function ComidasEditable({
   useEffect(() => {
     setMeals(parseMeals(numComidas));
     setHasPost(Boolean(postentreno));
+    setDistribution(repartoIngestas || null);
     setRecsDefecto(recomendacionesDefecto || {});
-  }, [numComidas, postentreno, preentreno, recomendacionesDefecto]);
+  }, [numComidas, postentreno, preentreno, recomendacionesDefecto, repartoIngestas]);
 
   const MEAL_OPTIONS = AVAILABLE_MEALS;
 
   async function saveDistribution() {
+    if (mealsTotal !== 100) {
+      notifications.show({
+        color: 'red',
+        title: 'Reparto incompleto',
+        message: `El reparto de kcal por ingesta suma ${mealsTotal} %; debe sumar 100 %.`,
+      });
+      return;
+    }
     setSaving(true);
     try {
       const mealsValue = meals.join(', ');
       await updatePlayerField(jugadorId, 'num_comidas', mealsValue);
       await updatePlayerField(jugadorId, 'preentreno', false);
       await updatePlayerField(jugadorId, 'postentreno', hasPost);
+      await updatePlayerField(jugadorId, 'reparto_ingestas', mealPercents);
       setEditingDistribution(false);
       router.refresh();
       notifications.show({
@@ -247,11 +261,21 @@ export function ComidasEditable({
   function handleCancelDistribution() {
     setMeals(parseMeals(numComidas));
     setHasPost(Boolean(postentreno));
+    setDistribution(repartoIngestas || null);
     setEditingDistribution(false);
   }
 
   const activeMeals = meals.filter((m) => m.toLowerCase() !== 'post-entreno');
   const displayMeals = meals.length > 0 ? meals.join(', ') : 'Ninguna seleccionada';
+  const defaultPercents = getDefaultMealDistribution(activeMeals, { hasPost });
+  // % de cada toma activa: el personalizado o, para las tomas que no lo tienen, el de por defecto.
+  const mealPercents = Object.fromEntries(activeMeals.map((meal) => [
+    meal,
+    Number.isFinite(Number(distribution?.[meal])) ? Number(distribution[meal]) : (defaultPercents[meal] ?? 0),
+  ]));
+  const mealsTotal = activeMeals.reduce((sum, meal) => sum + mealPercents[meal], 0);
+  const isDefaultDistribution = activeMeals.every((meal) => mealPercents[meal] === defaultPercents[meal]);
+  const displayPercents = activeMeals.map((meal) => `${meal} ${mealPercents[meal]} %`).join(' · ');
 
   return (
     <BentoCard title={label} icon3d={icon3d} color={ICON_COLORS[icon3d] || 'gray'} style={{ height: 'auto' }}>
@@ -281,6 +305,40 @@ export function ComidasEditable({
                     onChange={(event) => setHasPost(event.currentTarget.checked)}
                     size="xs"
                   />
+                  {activeMeals.length > 0 && (
+                    <Stack gap={6} mt={4}>
+                      <Group justify="space-between" align="center" gap="xs">
+                        <Text size="xs" fw={500}>Reparto de kcal por ingesta</Text>
+                        {!isDefaultDistribution && (
+                          <Button variant="subtle" color="gray" size="compact-xs" radius="xl" onClick={() => setDistribution(defaultPercents)}>
+                            Restablecer por defecto
+                          </Button>
+                        )}
+                      </Group>
+                      <SimpleGrid cols={{ base: 2, sm: Math.min(activeMeals.length, 5) }} spacing="xs">
+                        {activeMeals.map((meal) => (
+                          <NumberInput
+                            key={meal}
+                            label={meal}
+                            value={mealPercents[meal]}
+                            onChange={(v) => setDistribution({ ...mealPercents, [meal]: Number(v) || 0 })}
+                            min={0}
+                            max={100}
+                            step={1}
+                            allowDecimal={false}
+                            allowNegative={false}
+                            clampBehavior="strict"
+                            suffix=" %"
+                            size="xs"
+                          />
+                        ))}
+                      </SimpleGrid>
+                      <Text size="11px" c={mealsTotal === 100 ? 'dimmed' : 'red.7'} fw={mealsTotal === 100 ? 400 : 600}>
+                        Total {mealsTotal} %{mealsTotal !== 100 ? ' · debe sumar 100 %' : ''}
+                        {hasPost ? ' · se reparte lo que queda tras los macros fijos del post-entreno' : ''}
+                      </Text>
+                    </Stack>
+                  )}
                 </Stack>
               ) : (
                 <Stack gap={3}>
@@ -292,6 +350,13 @@ export function ComidasEditable({
                     <Text span fw={700} c="dimmed">Post-entreno: </Text>
                     <Text span c="dark.7">{hasPost ? 'Sí (recuperación)' : 'No'}</Text>
                   </Text>
+                  {activeMeals.length > 0 && (
+                    <Text size="xs">
+                      <Text span fw={700} c="dimmed">Reparto kcal: </Text>
+                      <Text span c="dark.7">{displayPercents}</Text>
+                      {isDefaultDistribution && <Text span c="dimmed"> (por defecto)</Text>}
+                    </Text>
+                  )}
                 </Stack>
               )}
             </Box>

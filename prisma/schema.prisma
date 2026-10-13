@@ -194,6 +194,7 @@ model jugadores {
   avatar_size                      Int?
   porcentaje_grasa_objetivo        Float?                             @default(10)
   protocolos_custom                Json?                              @default("{}")
+  reparto_ingestas                 Json?
   analiticas                       analiticas[]
   comidas                          comidas[]
   evoluciones                      evoluciones[]

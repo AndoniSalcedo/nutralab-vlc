@@ -392,7 +392,7 @@ export default function PerfilSubtab({
               </Text>
 
               <Stack gap="md">
-                <ComidasEditable label="Comidas diarias" numComidas={jugador.num_comidas} postentreno={jugador.postentreno} preentreno={jugador.preentreno} jugadorId={jugador.id} recomendacionesDefecto={jugador.recomendaciones_defecto} jugador={jugador} readOnly={readOnly} />
+                <ComidasEditable label="Comidas diarias" numComidas={jugador.num_comidas} postentreno={jugador.postentreno} preentreno={jugador.preentreno} jugadorId={jugador.id} recomendacionesDefecto={jugador.recomendaciones_defecto} repartoIngestas={jugador.reparto_ingestas} jugador={jugador} readOnly={readOnly} />
                 <PrepartidoEditable label="Rutinas pre-partido" configPrepartido={jugador.config_prepartido} numComidas={jugador.num_comidas} postentreno={jugador.postentreno} jugadorId={jugador.id} jugador={jugador} readOnly={readOnly} />
 
                 <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
