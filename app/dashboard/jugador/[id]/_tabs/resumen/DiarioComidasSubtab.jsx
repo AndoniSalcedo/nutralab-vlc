@@ -652,17 +652,20 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
           {loading ? (
             <BoneyardSkeleton name="diario-comidas" loading={true} />
           ) : (
-            <Paper radius="lg" shadow="sm" p="md" bg="white" withBorder style={{ position: 'relative' }}>
-              {/* Celebración al registrar una comida */}
-              <ParticleBurst burstKey={savedBurst} top={28} left="85%" />
-              <DayHeader dayKey={selectedKey} todayKey={todayKey} meals={dayMeals} />
-              <Box hiddenFrom="md">
-                <DayTimeline meals={dayMeals} canAdd={canAdd} onAdd={openDraft} renderCard={renderCard} />
-              </Box>
-              <Box visibleFrom="md">
-                <DayBoard meals={dayMeals} canAdd={canAdd} onAdd={openDraft} renderCard={renderCard} />
-              </Box>
-            </Paper>
+            // Envuelto para que `npm run bones:build` capture el skeleton de carga del día
+            <BoneyardSkeleton name="diario-comidas" loading={false}>
+              <Paper radius="lg" shadow="sm" p="md" bg="white" withBorder style={{ position: 'relative' }}>
+                {/* Celebración al registrar una comida */}
+                <ParticleBurst burstKey={savedBurst} top={28} left="85%" />
+                <DayHeader dayKey={selectedKey} todayKey={todayKey} meals={dayMeals} />
+                <Box hiddenFrom="md">
+                  <DayTimeline meals={dayMeals} canAdd={canAdd} onAdd={openDraft} renderCard={renderCard} />
+                </Box>
+                <Box visibleFrom="md">
+                  <DayBoard meals={dayMeals} canAdd={canAdd} onAdd={openDraft} renderCard={renderCard} />
+                </Box>
+              </Paper>
+            </BoneyardSkeleton>
           )}
         </Box>
       </Stack>
