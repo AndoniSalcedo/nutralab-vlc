@@ -9,11 +9,12 @@ const SODIUM_THRESHOLDS = [750, 1100, 1450];
 const SODIUM_SCALE_MIN = 400;
 const SODIUM_SCALE_MAX = 1800;
 
+// Escala de la paleta de la marca, de lima claro (poco sodio) a bosque oscuro (mucho sodio)
 const SODIUM_SEGMENTS = [
-  { label: 'Bajo', status: 'Sodio bajo', bg: 'orange-1', text: 'orange.9' },
-  { label: 'Moderado', status: 'Sodio moderado', bg: 'orange-3', text: 'orange.9' },
-  { label: 'Alto', status: 'Sodio alto', bg: 'orange-5', text: 'white' },
-  { label: 'Muy alto', status: 'Sodio muy alto', bg: 'orange-7', text: 'white' },
+  { label: 'Bajo', status: 'Sodio bajo', bg: 'lima-4', text: 'bosque.8' },
+  { label: 'Moderado', status: 'Sodio moderado', bg: 'lima-6', text: 'bosque.8' },
+  { label: 'Alto', status: 'Sodio alto', bg: 'bosque-6', text: 'white' },
+  { label: 'Muy alto', status: 'Sodio muy alto', bg: 'bosque-8', text: 'white' },
 ];
 
 function getSegmentIndex(val) {
@@ -80,11 +81,12 @@ function SodiumScale({ value, activeIndex }) {
                 top: -7,
                 bottom: -7,
                 left: `${getMarkerPercent(value)}%`,
-                width: 4,
+                width: 5,
                 transform: 'translateX(-50%)',
                 borderRadius: 4,
-                background: 'var(--mantine-color-dark-7)',
-                boxShadow: '0 0 0 1.5px white',
+                // Blanco con contorno oscuro: se ve tanto sobre los tramos claros como sobre los oscuros
+                background: 'white',
+                boxShadow: '0 0 0 1.5px var(--mantine-color-bosque-9), 0 1px 4px rgba(0, 0, 0, 0.25)',
                 transition: 'left 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             />
