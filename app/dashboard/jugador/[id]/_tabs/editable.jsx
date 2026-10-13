@@ -30,6 +30,7 @@ import {
   getMealTimingBadge,
 } from '@/config/nutrition-days';
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
+import { MealDistributionBar, MealDistributionEditor } from '@/components/plan/MealDistributionEditor';
 import PrepartidoRoutineModal from '@/components/modals/PrepartidoRoutineModal';
 import { convertLegacyToAst, formatAstToText } from '@/lib/engine/meal-ast';
 import { isDefaultProtocolMeal } from '@/lib/nutrition/prematch-protocol';
@@ -194,13 +195,16 @@ function parseMeals(val) {
   return sortMeals(val.split(',').map((s) => s.trim()).filter(Boolean));
 }
 
+// Valor estable por defecto: un `{}` nuevo en cada render dispararía el efecto que reinicia el estado del editor.
+const EMPTY_MEAL_PATTERNS = {};
+
 export function ComidasEditable({
   label,
   numComidas,
   postentreno,
   preentreno,
   jugadorId,
-  recomendacionesDefecto = {},
+  recomendacionesDefecto = EMPTY_MEAL_PATTERNS,
   repartoIngestas = null,
   readOnly = false,
   icon3d = 'bowl',
@@ -230,6 +234,15 @@ export function ComidasEditable({
         color: 'red',
         title: 'Reparto incompleto',
         message: `El reparto de kcal por ingesta suma ${mealsTotal} %; debe sumar 100 %.`,
+      });
+      return;
+    }
+    const emptyMeals = activeMeals.filter((meal) => !mealPercents[meal]);
+    if (emptyMeals.length > 0) {
+      notifications.show({
+        color: 'red',
+        title: 'Toma sin kcal',
+        message: `${emptyMeals.join(', ')} tiene 0 % de las kcal. Dale un porcentaje o quítala de las tomas.`,
       });
       return;
     }
@@ -275,7 +288,6 @@ export function ComidasEditable({
   ]));
   const mealsTotal = activeMeals.reduce((sum, meal) => sum + mealPercents[meal], 0);
   const isDefaultDistribution = activeMeals.every((meal) => mealPercents[meal] === defaultPercents[meal]);
-  const displayPercents = activeMeals.map((meal) => `${meal} ${mealPercents[meal]} %`).join(' · ');
 
   return (
     <BentoCard title={label} icon3d={icon3d} color={ICON_COLORS[icon3d] || 'gray'} style={{ height: 'auto' }}>
@@ -294,6 +306,8 @@ export function ComidasEditable({
                     onChange={(val) => {
                       const sorted = sortMeals(val);
                       setMeals(sorted);
+                      // Con otras tomas, el reparto vuelve al de por defecto para la nueva combinación.
+                      setDistribution(null);
                     }}
                     size="xs"
                     searchable
@@ -302,43 +316,13 @@ export function ComidasEditable({
                   <Checkbox
                     label="Incluir toma Post-entreno / Recuperación"
                     checked={hasPost}
-                    onChange={(event) => setHasPost(event.currentTarget.checked)}
+                    onChange={(event) => {
+                      setHasPost(event.currentTarget.checked);
+                      // Si no se había personalizado, sigue el reparto por defecto con o sin post-entreno.
+                      if (isDefaultDistribution) setDistribution(null);
+                    }}
                     size="xs"
                   />
-                  {activeMeals.length > 0 && (
-                    <Stack gap={6} mt={4}>
-                      <Group justify="space-between" align="center" gap="xs">
-                        <Text size="xs" fw={500}>Reparto de kcal por ingesta</Text>
-                        {!isDefaultDistribution && (
-                          <Button variant="subtle" color="gray" size="compact-xs" radius="xl" onClick={() => setDistribution(defaultPercents)}>
-                            Restablecer por defecto
-                          </Button>
-                        )}
-                      </Group>
-                      <SimpleGrid cols={{ base: 2, sm: Math.min(activeMeals.length, 5) }} spacing="xs">
-                        {activeMeals.map((meal) => (
-                          <NumberInput
-                            key={meal}
-                            label={meal}
-                            value={mealPercents[meal]}
-                            onChange={(v) => setDistribution({ ...mealPercents, [meal]: Number(v) || 0 })}
-                            min={0}
-                            max={100}
-                            step={1}
-                            allowDecimal={false}
-                            allowNegative={false}
-                            clampBehavior="strict"
-                            suffix=" %"
-                            size="xs"
-                          />
-                        ))}
-                      </SimpleGrid>
-                      <Text size="11px" c={mealsTotal === 100 ? 'dimmed' : 'red.7'} fw={mealsTotal === 100 ? 400 : 600}>
-                        Total {mealsTotal} %{mealsTotal !== 100 ? ' · debe sumar 100 %' : ''}
-                        {hasPost ? ' · se reparte lo que queda tras los macros fijos del post-entreno' : ''}
-                      </Text>
-                    </Stack>
-                  )}
                 </Stack>
               ) : (
                 <Stack gap={3}>
@@ -350,13 +334,6 @@ export function ComidasEditable({
                     <Text span fw={700} c="dimmed">Post-entreno: </Text>
                     <Text span c="dark.7">{hasPost ? 'Sí (recuperación)' : 'No'}</Text>
                   </Text>
-                  {activeMeals.length > 0 && (
-                    <Text size="xs">
-                      <Text span fw={700} c="dimmed">Reparto kcal: </Text>
-                      <Text span c="dark.7">{displayPercents}</Text>
-                      {isDefaultDistribution && <Text span c="dimmed"> (por defecto)</Text>}
-                    </Text>
-                  )}
                 </Stack>
               )}
             </Box>
@@ -397,6 +374,32 @@ export function ComidasEditable({
               </Box>
             )}
           </Group>
+
+          {activeMeals.length > 0 && (
+            editingDistribution ? (
+              <Paper mt="sm" p="sm" radius="sm" withBorder bg="white">
+                <MealDistributionEditor
+                  key={activeMeals.join('|')}
+                  meals={activeMeals}
+                  value={mealPercents}
+                  defaults={defaultPercents}
+                  onChange={setDistribution}
+                />
+                {hasPost && (
+                  <Text size="11px" c="dimmed" mt={4}>
+                    Los días con post-entreno, el reparto se aplica a lo que queda tras sus macros fijos.
+                  </Text>
+                )}
+              </Paper>
+            ) : (
+              <Stack gap={6} mt="xs">
+                <Text size="xs" fw={700} c="dimmed">
+                  Reparto de kcal{isDefaultDistribution ? ' (por defecto)' : ''}
+                </Text>
+                <MealDistributionBar meals={activeMeals} percents={mealPercents} height={22} showLegend />
+              </Stack>
+            )
+          )}
         </Paper>
 
         {/* Lista de pautas tipadas por comida */}
