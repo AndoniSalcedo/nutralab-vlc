@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'motion/react';
 import { useMemo, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -22,6 +21,7 @@ import Icon3D from '@/components/Icon3D';
 import { initials } from '@/lib/utils/avatar';
 import { useTeamHeaderSlot } from '@/components/TeamHeaderContext';
 import TeamSidebar, { TEAM_TABS } from '@/components/TeamSidebar';
+import GlassDock from '@/components/navigation/GlassDock';
 
 const MOBILE_LABELS = {
   plantilla: 'Plantilla',
@@ -241,90 +241,19 @@ export default function TeamHeaderTabs({
         </Box>
       </Box>
 
-      {/* BARRA DE NAVEGACIÓN INFERIOR FIJA PARA MÓVILES */}
-      <Box
-        hiddenFrom="sm"
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 100,
-          backgroundColor: 'rgba(255, 255, 255, 0.96)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderTop: '1px solid rgba(108, 112, 90, 0.18)',
-          boxShadow: '0 -4px 20px rgba(31, 42, 36, 0.05)',
-          paddingBottom: 'calc(env(safe-area-inset-bottom, 8px) + 2px)',
-        }}
-      >
-        <Group justify="space-around" align="center" gap={0} wrap="nowrap" h={58} px={4}>
-          {TEAM_TABS.map((tab) => {
-            const href = teamId ? tab.href(teamId) : '#';
-            const isActive = tab.value === tabValue;
-            const mobileLabel = MOBILE_LABELS[tab.value] || tab.label;
-
-            return (
-              <Box
-                key={tab.value}
-                component={Link}
-                href={href}
-                onClick={() => setOptimisticTab(tab.value)}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flex: 1,
-                  height: '100%',
-                  textDecoration: 'none',
-                  color: isActive ? 'var(--nutra-bosque, #1F2A24)' : 'var(--nutra-salvia, #6C705A)',
-                  position: 'relative',
-                  paddingTop: 4,
-                  transition: 'color 140ms ease, transform 100ms ease',
-                }}
-              >
-                {isActive && (
-                  // El indicador se desliza entre pestañas (layoutId compartido)
-                  <motion.div
-                    layoutId="team-nav-indicator"
-                    transition={{ type: 'spring', stiffness: 500, damping: 38 }}
-                    style={{
-                      position: 'absolute',
-                      top: 3,
-                      width: 20,
-                      height: 3,
-                      borderRadius: 3,
-                      backgroundColor: 'var(--nutra-lima, #C1F080)',
-                    }}
-                  />
-                )}
-                <Icon3D
-                  name={tab.icon3d}
-                  size={22}
-                  style={{
-                    opacity: isActive ? 1 : 0.75,
-                    transform: isActive ? 'scale(1.08)' : 'scale(1)',
-                    transition: 'transform 140ms ease, opacity 140ms ease',
-                  }}
-                />
-                <Text
-                  fz={10}
-                  fw={isActive ? 750 : 500}
-                  lh={1.2}
-                  mt={3}
-                  style={{
-                    color: isActive ? 'var(--nutra-bosque, #1F2A24)' : 'var(--nutra-salvia, #6C705A)',
-                    letterSpacing: '-0.2px',
-                  }}
-                >
-                  {mobileLabel}
-                </Text>
-              </Box>
-            );
-          })}
-        </Group>
-      </Box>
+      {/* Barra de navegación inferior en móvil: dock flotante de cristal */}
+      <GlassDock
+        ariaLabel="Secciones del equipo"
+        layoutId="team-nav-glass"
+        active={tabValue}
+        items={TEAM_TABS.map((tab) => ({
+          value: tab.value,
+          label: MOBILE_LABELS[tab.value] || tab.label,
+          href: teamId ? tab.href(teamId) : '#',
+          icon: <Icon3D name={tab.icon3d} size={22} />,
+          onClick: () => setOptimisticTab(tab.value),
+        }))}
+      />
     </Box>
   );
 }

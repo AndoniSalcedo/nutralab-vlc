@@ -1,6 +1,7 @@
 'use client';
 
 import { SegmentedControl } from '@mantine/core';
+import classes from './SubtabControl.module.css';
 
 const styles = () => ({
   root: {
@@ -12,7 +13,6 @@ const styles = () => ({
   },
   label: {
     padding: '8px 4px',
-    color: 'var(--mantine-color-dimmed)',
   },
 });
 
@@ -30,6 +30,7 @@ export default function PlayerSubtabControl({ value, onChange, data, readOnly = 
       bg="rgba(108, 112, 90, 0.08)"
       data={data}
       styles={styles}
+      classNames={{ root: classes.root, control: classes.control, label: classes.label }}
       readOnly={readOnly}
     />
   );

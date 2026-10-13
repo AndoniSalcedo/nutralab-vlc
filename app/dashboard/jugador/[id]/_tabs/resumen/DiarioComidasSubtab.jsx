@@ -27,6 +27,7 @@ import MealEditorModal from '@/components/modals/MealEditorModal';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import AnimatedNumber from '@/components/motion/AnimatedNumber';
+import WeekDayStrip from '@/components/WeekDayStrip';
 import { ParticleBurst } from '@/components/motion/Celebration';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
@@ -115,65 +116,24 @@ function WeekNavigator({ weekStart, selectedKey, onSelect, onShiftWeek, todayKey
         </ActionIcon>
       </Group>
 
-      <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
-        {days.map((key) => {
-          const isFuture = key > todayKey;
-          const isSelected = key === selectedKey;
-          const isToday = key === todayKey;
+      <WeekDayStrip
+        selectedKey={selectedKey}
+        onSelect={onSelect}
+        days={days.map((key) => {
           const activity = activityByDay[key];
-
-          return (
-            <UnstyledButton
-              key={key}
-              disabled={isFuture}
-              onClick={() => onSelect(key)}
-              aria-label={dayjs(key).locale('es').format('dddd D [de] MMMM')}
-              aria-pressed={isSelected}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 4,
-                padding: '6px 0',
-                borderRadius: 'var(--mantine-radius-lg)',
-                cursor: isFuture ? 'not-allowed' : 'pointer',
-                opacity: isFuture ? 0.35 : 1,
-                background: isSelected ? 'var(--mantine-color-gray-1)' : 'transparent',
-                transition: 'background 120ms ease',
-              }}
-            >
-              <Text fz={11} fw={600} c="dimmed" lh={1}>
-                {isToday ? 'Hoy' : WEEKDAYS[dayjs(key).day()]}
-              </Text>
-              <Box
-                w={34}
-                h={34}
-                style={{
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: isSelected ? 'var(--mantine-primary-color-filled)' : 'transparent',
-                  border: isToday && !isSelected ? '2px solid var(--mantine-primary-color-filled)' : '2px solid transparent',
-                }}
-              >
-                <Text fz="sm" fw={800} c={isSelected ? 'white' : 'dark.5'} lh={1}>
-                  {dayjs(key).date()}
-                </Text>
-              </Box>
-              {/* Un punto por toma registrada, del color de la toma */}
-              <Group gap={2} h={6} justify="center" wrap="nowrap">
-                {(activity?.types || []).slice(0, 6).map((t, idx) => (
-                  <Box key={idx} w={5} h={5} style={{ borderRadius: '50%', background: slotColor(t) }} />
-                ))}
-              </Group>
-              <Text visibleFrom="sm" fz={10} fw={600} c="dimmed" h={12} lh="12px">
-                {activity?.kcal > 0 ? `${formatKcal(activity.kcal)} kcal` : ''}
-              </Text>
-            </UnstyledButton>
-          );
+          return {
+            key,
+            label: WEEKDAYS[dayjs(key).day()],
+            number: dayjs(key).date(),
+            isToday: key === todayKey,
+            disabled: key > todayKey,
+            ariaLabel: dayjs(key).locale('es').format('dddd D [de] MMMM'),
+            // Un punto por toma registrada, del color de la toma
+            dots: (activity?.types || []).map((t) => slotColor(t)),
+            caption: activity?.kcal > 0 ? `${formatKcal(activity.kcal)} kcal` : '',
+          };
         })}
-      </Box>
+      />
     </Stack>
   );
 }

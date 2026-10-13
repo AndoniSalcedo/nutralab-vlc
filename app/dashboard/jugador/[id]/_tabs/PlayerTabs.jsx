@@ -1,7 +1,6 @@
 'use client';
 
-import { motion } from 'motion/react';
-import { Box, Group, Tabs, Text } from '@mantine/core';
+import { Box, Tabs } from '@mantine/core';
 import { IconChartBar, IconClipboardList, IconSalad } from '@/components/icons3d';
 import { useParams, useRouter } from 'next/navigation';
 import MetricasTab from './MetricasTab';
@@ -11,6 +10,7 @@ import PlayerSidebar from './PlayerSidebar';
 import classes from './PlayerTabs.module.css';
 import { PlayerDashboardProvider } from './PlayerDashboardContext';
 import PlayerTutorial from '@/components/tutorials/PlayerTutorial';
+import GlassDock from '@/components/navigation/GlassDock';
 
 const DEFAULT_SUBTABS = {
   resumen: 'perfil',
@@ -163,90 +163,19 @@ export default function PlayerTabs({
           </Box>
         </Box>
 
-        {/* BARRA DE NAVEGACIÓN INFERIOR FIJA PARA MÓVILES */}
-        <Box
-          hiddenFrom="sm"
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: 100,
-            backgroundColor: 'rgba(255, 255, 255, 0.96)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            borderTop: '1px solid rgba(108, 112, 90, 0.18)',
-            boxShadow: '0 -4px 20px rgba(31, 42, 36, 0.05)',
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 8px) + 2px)',
-          }}
-        >
-          <Group justify="space-around" align="center" gap={0} wrap="nowrap" h={58} px={4}>
-            {mobileTabs.map(({ value, label, icon: Icon }) => {
-              const isActive = activeTab === value;
-              return (
-                <Box
-                  key={value}
-                  id={`mobile-nav-${value}`}
-                  component="button"
-                  onClick={() => navigate(value)}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flex: 1,
-                    height: '100%',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    textDecoration: 'none',
-                    color: isActive ? 'var(--nutra-bosque, #1F2A24)' : 'var(--nutra-salvia, #6C705A)',
-                    position: 'relative',
-                    paddingTop: 4,
-                    transition: 'color 140ms ease, transform 100ms ease',
-                  }}
-                >
-                  {isActive && (
-                    // El indicador se desliza entre pestañas (layoutId compartido)
-                    <motion.div
-                      layoutId="player-nav-indicator"
-                      transition={{ type: 'spring', stiffness: 500, damping: 38 }}
-                      style={{
-                        position: 'absolute',
-                        top: 3,
-                        width: 20,
-                        height: 3,
-                        borderRadius: 3,
-                        backgroundColor: 'var(--nutra-lima, #C1F080)',
-                      }}
-                    />
-                  )}
-                  <Icon
-                    size={isActive ? 22 : 20}
-                    style={{
-                      opacity: isActive ? 1 : 0.75,
-                      transform: isActive ? 'scale(1.04)' : 'scale(1)',
-                      transition: 'transform 160ms ease, opacity 160ms ease',
-                      marginBottom: 2,
-                    }}
-                  />
-                  <Text
-                    fz={10}
-                    fw={isActive ? 750 : 500}
-                    lh={1.2}
-                    mt={3}
-                    style={{
-                      color: isActive ? 'var(--nutra-bosque, #1F2A24)' : 'var(--nutra-salvia, #6C705A)',
-                      letterSpacing: '-0.2px',
-                    }}
-                  >
-                    {label}
-                  </Text>
-                </Box>
-              );
-            })}
-          </Group>
-        </Box>
+        {/* Barra de navegación inferior en móvil: dock flotante de cristal */}
+        <GlassDock
+          ariaLabel="Secciones del jugador"
+          layoutId="player-nav-glass"
+          active={activeTab}
+          items={mobileTabs.map(({ value, label, icon: Icon }) => ({
+            value,
+            label,
+            id: `mobile-nav-${value}`,
+            icon: <Icon size={activeTab === value ? 22 : 20} />,
+            onClick: () => navigate(value),
+          }))}
+        />
       </Box>
     </PlayerDashboardProvider>
   );

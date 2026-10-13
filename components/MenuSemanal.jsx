@@ -23,6 +23,7 @@ import {
 import EditDishDecompositionModal from '@/components/modals/EditDishDecompositionModal';
 import { formatAstToText } from '@/lib/engine/meal-ast';
 import NothingFound from '@/components/NothingFound';
+import WeekDayStrip from '@/components/WeekDayStrip';
 import { BentoCard } from '@/components/BentoItem';
 
 // Standard Spanish weekday names to match database records
@@ -37,20 +38,25 @@ export function formatWeek(value) {
   }).format(new Date(`${value}T00:00:00`));
 }
 
-function getDayDate(weekStr, dayName) {
+// Inicial de cada día en la tira de días (X para miércoles, como en el diario)
+const WEEKDAY_INITIALS = { Lunes: 'L', Martes: 'M', 'Miércoles': 'X', Jueves: 'J', Viernes: 'V', 'Sábado': 'S', Domingo: 'D' };
+const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
+/** Fecha real de un día del menú a partir del lunes de su semana, o null si no se puede calcular. */
+function getDayDateObj(weekStr, dayName) {
   if (!weekStr) return null;
-  try {
-    const date = new Date(`${weekStr}T00:00:00`);
-    const offset = WEEKDAY_ORDER.indexOf(dayName);
-    if (offset === -1) return null;
-    date.setDate(date.getDate() + offset);
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-  } catch {
-    return null;
-  }
+  const offset = WEEKDAY_ORDER.indexOf(dayName);
+  if (offset === -1) return null;
+  const date = new Date(`${weekStr}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return null;
+  date.setDate(date.getDate() + offset);
+  return date;
 }
 
-function isToday(dayName) {
+/** Hoy es ese día del menú: por fecha si se conoce la semana (un menú de otra semana no tiene "hoy"). */
+function isToday(dayName, weekStr = null) {
+  const date = getDayDateObj(weekStr, dayName);
+  if (date) return date.toDateString() === new Date().toDateString();
   try {
     const todayName = new Intl.DateTimeFormat('es-ES', { weekday: 'long' }).format(new Date());
     return normalizeKey(dayName) === normalizeKey(todayName);
@@ -59,10 +65,14 @@ function isToday(dayName) {
   }
 }
 
-function getTodayIndex() {
-  const day = new Date().getDay(); // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
-  return day === 0 ? 6 : day - 1; // Map Lunes to 0, Domingo to 6
+/** Evento del día (partido, descanso…) si algún servicio lo indica, para destacarlo en la tira y la cabecera. */
+function getDayEvent(dayData) {
+  const texts = ['comida', 'cena'].flatMap((service) => ['primero', 'segundo'].map((course) => dayData?.[service]?.[course]));
+  const event = texts.find((text) => text && isServiceEvent(text) && String(text).trim() !== '-' && !/sin registrar/i.test(text));
+  return event ? capitalize(String(event).trim().toLowerCase()) : '';
 }
+
+const hasService = (service) => Boolean(service?.primero || service?.segundo);
 
 function findDishAst(dishText, serviceTree, course = null) {
   if (!dishText || !serviceTree) return null;
@@ -135,49 +145,62 @@ function AgendaDishLine({ label, value, serviceTree = null }) {
 }
 
 function AgendaDayRow({ dayData, weekStr }) {
-  const isDayToday = isToday(dayData.dia);
-  const dayCalendarDate = getDayDate(weekStr, dayData.dia);
+  const isDayToday = isToday(dayData.dia, weekStr);
+  const date = getDayDateObj(weekStr, dayData.dia);
+  const event = getDayEvent(dayData);
 
   return (
     <Paper
       p="md"
-      radius="md"
-      bg={isDayToday ? 'teal.0' : 'gray.0'}
+      radius="lg"
+      bg="white"
       withBorder
       style={{
-        borderColor: isDayToday ? 'var(--mantine-color-teal-2)' : 'var(--mantine-color-gray-2)',
+        borderColor: isDayToday ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-gray-2)',
+        boxShadow: isDayToday ? '0 4px 14px rgba(31, 42, 36, 0.08)' : 'none',
         transition: 'all 0.2s ease',
       }}
     >
       <Grid gutter="md" align="flex-start">
-        {/* Day Column */}
+        {/* Día: número en círculo como en la tira de días */}
         <Grid.Col span={{ base: 12, md: 2 }}>
-          <Stack gap={2}>
-            <Group gap="xs" align="center" wrap="nowrap">
-              {isDayToday && (
-                <Box style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'var(--mantine-color-teal-5)', flexShrink: 0 }} />
-              )}
-              <Text fw={700} size="sm" c={isDayToday ? 'teal.7' : 'dark.5'} lh={1.1}>
+          <Group gap="sm" align="center" wrap="nowrap">
+            <Box
+              w={38}
+              h={38}
+              style={{
+                flexShrink: 0,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: isDayToday ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-gray-1)',
+              }}
+            >
+              <Text fz="sm" fw={800} c={isDayToday ? 'white' : 'dark.5'} lh={1}>
+                {date ? date.getDate() : WEEKDAY_INITIALS[dayData.dia] || dayData.dia.slice(0, 1)}
+              </Text>
+            </Box>
+            <Box style={{ minWidth: 0 }}>
+              <Text fz={10} fw={700} c="dimmed" tt="uppercase" lh={1.3}>
+                {isDayToday ? 'Hoy' : date ? date.toLocaleDateString('es-ES', { month: 'short' }) : ''}
+              </Text>
+              <Text fw={800} size="sm" c="dark.5" lh={1.2}>
                 {dayData.dia}
               </Text>
-              {isDayToday && (
-                <Text size="xs" fw={600} c="teal.7" ml="auto">
-                  HOY
+              {event && (
+                <Text fz={10} fw={700} c="bosque.6" lh={1.3}>
+                  {event}
                 </Text>
               )}
-            </Group>
-            {dayCalendarDate && (
-              <Text size="xs" c="dimmed" fw={500} pl={isDayToday ? 14 : 0}>
-                {dayCalendarDate}
-              </Text>
-            )}
-          </Stack>
+            </Box>
+          </Group>
         </Grid.Col>
 
         {/* Comida Column */}
         <Grid.Col span={{ base: 12, sm: 6, md: 5 }}>
           <Stack gap={4}>
-            <Text size="xs" fw={600} c="nutralabColor.8" tt="uppercase" style={{ letterSpacing: '0.5px' }}>
+            <Text fz={10} fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.5px' }}>
               Comida
             </Text>
             <Stack gap={4}>
@@ -194,7 +217,7 @@ function AgendaDayRow({ dayData, weekStr }) {
         {/* Cena Column */}
         <Grid.Col span={{ base: 12, sm: 6, md: 5 }}>
           <Stack gap={4}>
-            <Text size="xs" fw={600} c="nutralabColor.8" tt="uppercase" style={{ letterSpacing: '0.5px' }}>
+            <Text fz={10} fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.5px' }}>
               Cena
             </Text>
             <Stack gap={4}>
@@ -275,66 +298,42 @@ function HeroDishSection({ title, label, value, color, serviceTree = null, onEdi
   );
 }
 
-function DaySelectorButton({ dayName, isSelected, isHoy, dateStr, onClick }) {
-  return (
-    <Paper
-      onClick={onClick}
-      radius="md"
-      p="xs"
-      withBorder
-      style={{
-        flex: 1,
-        cursor: 'pointer',
-        textAlign: 'center',
-        transition: 'all 0.2s ease',
-        backgroundColor: isSelected ? 'var(--mantine-color-dark-8)' : 'var(--mantine-color-gray-0)',
-        borderColor: isSelected
-          ? 'var(--mantine-color-dark-8)'
-          : isHoy
-            ? 'var(--mantine-color-teal-3)'
-            : 'var(--mantine-color-gray-2)',
-        boxShadow: isSelected ? '0 4px 10px rgba(0, 0, 0, 0.08)' : 'none',
-        transform: isSelected ? 'translateY(-1px)' : 'none',
-      }}
-    >
-      <Stack gap={2} align="center">
-        {isHoy && (
-          <Box style={{
-            width: 4,
-            height: 4,
-            borderRadius: '50%',
-            backgroundColor: isSelected ? 'var(--mantine-color-teal-3)' : 'var(--mantine-color-teal-5)'
-          }} />
-        )}
-        {!isHoy && <Box style={{ height: 4 }} />}
+/* Cabecera del día seleccionado (mismo diseño que el diario de comidas) */
+function MenuDayHeader({ dayData, weekStr }) {
+  const date = getDayDateObj(weekStr, dayData.dia);
+  const isDayToday = isToday(dayData.dia, weekStr);
+  const event = getDayEvent(dayData);
+  const longDate = date ? date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' }) : '';
 
-        <Text
-          size="xs"
-          fw={600}
-          tt="uppercase"
-          c={isSelected ? 'gray.3' : 'dimmed'}
-          style={{ letterSpacing: '0.5px' }}
-        >
-          {dayName.slice(0, 3)}
+  return (
+    <Group justify="space-between" align="flex-end" wrap="nowrap">
+      <Box style={{ minWidth: 0 }}>
+        <Text fz="xs" fw={700} c="dimmed" tt="uppercase" lh={1.4}>
+          {isDayToday ? 'Hoy' : dayData.dia}
         </Text>
-        <Text
-          size="md"
-          fw={700}
-          lh={1.1}
-          c={isSelected ? 'white' : 'dark.4'}
-        >
-          {dateStr ? dateStr.split(' ')[0] : ''}
+        <Text fw={800} fz="lg" c="dark.5" lh={1.2}>
+          {isDayToday ? `${dayData.dia}${longDate ? `, ${longDate}` : ''}` : longDate || dayData.dia}
         </Text>
-        <Text
-          size="xs"
-          fw={500}
-          c={isSelected ? 'gray.4' : 'dimmed'}
-        >
-          {dateStr ? dateStr.split(' ')[1] : ''}
+      </Box>
+      {event && (
+        <Text fz="xs" fw={700} c="bosque.7" px={10} py={4} style={{ borderRadius: 999, background: 'var(--mantine-color-lima-1)', flexShrink: 0 }}>
+          {event}
         </Text>
-      </Stack>
-    </Paper>
+      )}
+    </Group>
   );
+}
+
+/* Rango de la semana del menú: "13 – 19 de octubre" o "29 sept – 5 oct" */
+function weekRangeLabel(weekStr) {
+  const first = getDayDateObj(weekStr, 'Lunes');
+  const last = getDayDateObj(weekStr, 'Domingo');
+  if (!first || !last) return 'Semana';
+  if (first.getMonth() === last.getMonth()) {
+    return `${first.getDate()} – ${last.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}`;
+  }
+  const short = (d) => d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  return `${short(first)} – ${short(last)}`;
 }
 
 export default function MenuSemanal({
@@ -356,14 +355,8 @@ export default function MenuSemanal({
 
   useEffect(() => {
     if (orderedDays.length > 0) {
-      const todayIdx = getTodayIndex();
-      const todayName = WEEKDAY_ORDER[todayIdx];
-      const hasToday = orderedDays.some(d => d.dia === todayName);
-      if (hasToday) {
-        setActiveDay(todayName);
-      } else {
-        setActiveDay(orderedDays[0].dia);
-      }
+      const today = orderedDays.find((d) => isToday(d.dia, selectedMenu?.semana));
+      setActiveDay(today ? today.dia : orderedDays[0].dia);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMenu]);
@@ -567,22 +560,44 @@ export default function MenuSemanal({
     <Box>
       {viewMode === 'diaria' ? (
         <Stack gap="md">
-          {/* Day Buttons Selector */}
-          <Group gap="xs" justify="stretch" wrap="nowrap" style={{ width: '100%', overflowX: 'auto' }}>
-            {orderedDays.map((dia) => (
-              <DaySelectorButton
-                key={dia.dia}
-                dayName={dia.dia}
-                isSelected={activeDay === dia.dia}
-                isHoy={isToday(dia.dia)}
-                dateStr={getDayDate(selectedMenu.semana, dia.dia)}
-                onClick={() => setActiveDay(dia.dia)}
+          {/* Tira de días (mismo diseño que el diario de comidas) */}
+          <Paper radius="lg" p="sm" bg="white" withBorder>
+            <Stack gap={8}>
+              <Text fw={700} fz="sm" c="dark.4" ta="center">
+                {capitalize(weekRangeLabel(selectedMenu.semana))}
+              </Text>
+              <WeekDayStrip
+                selectedKey={activeDay}
+                onSelect={setActiveDay}
+                days={orderedDays.map((dia) => {
+                  const date = getDayDateObj(selectedMenu.semana, dia.dia);
+                  return {
+                    key: dia.dia,
+                    label: WEEKDAY_INITIALS[dia.dia] || dia.dia.slice(0, 1),
+                    number: date ? date.getDate() : WEEKDAY_INITIALS[dia.dia] || dia.dia.slice(0, 1),
+                    isToday: isToday(dia.dia, selectedMenu.semana),
+                    ariaLabel: date ? date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }) : dia.dia,
+                    // Un punto por servicio con menú: comida y cena
+                    dots: [
+                      hasService(dia.comida) && 'var(--mantine-color-bosque-5)',
+                      hasService(dia.cena) && 'var(--mantine-color-salvia-5)',
+                    ].filter(Boolean),
+                    caption: getDayEvent(dia),
+                  };
+                })}
               />
-            ))}
-          </Group>
+            </Stack>
+          </Paper>
 
-          {/* Hero Active Day Menu */}
-          {renderHeroDay(activeDayData)}
+          {/* Menú del día seleccionado */}
+          {activeDayData && (
+            <Box>
+              <Box px={4} mb={4}>
+                <MenuDayHeader dayData={activeDayData} weekStr={selectedMenu.semana} />
+              </Box>
+              {renderHeroDay(activeDayData)}
+            </Box>
+          )}
         </Stack>
       ) : (
         /* Weekly Agenda View */

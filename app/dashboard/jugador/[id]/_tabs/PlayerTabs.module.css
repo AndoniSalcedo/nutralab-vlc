@@ -1,43 +1,5 @@
 .tabs {
   @media (max-width: 48em) {
-    padding-bottom: calc(76px + env(safe-area-inset-bottom));
-  }
-}
-
-.mobileDock {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 100;
-  border-right: 0;
-  border-bottom: 0;
-  border-left: 0;
-  background: var(--mantine-color-white);
-}
-
-.mobileDockInner {
-  max-width: 48rem;
-  margin: 0 auto;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.mobileTab {
-  padding: 4px 2px;
-  color: var(--mantine-color-gray-5);
-  transition: color 150ms ease;
-
-  &[data-active] {
-    color: var(--mantine-color-dark-filled);
-  }
-
-  &[data-active] span,
-  &[data-active] svg {
-    transform: scale(1.04);
-  }
-
-  span,
-  svg {
-    transition: transform 150ms ease;
+    padding-bottom: calc(92px + env(safe-area-inset-bottom));
   }
 }

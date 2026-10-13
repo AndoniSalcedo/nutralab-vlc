@@ -31,7 +31,7 @@ import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHead
 import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
 
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 10;
 
 function PlayerPositionText({ position }) {
   if (!position) {
@@ -659,9 +659,9 @@ export default function DashboardContent({ players = [], team, readOnly = false 
         const newPreviews = prev.previews.map((p) =>
           String(p.id) === String(playerId)
             ? {
-                ...p,
-                plan: newPreview.plan,
-              }
+              ...p,
+              plan: newPreview.plan,
+            }
             : p
         );
         return { ...prev, previews: newPreviews };
@@ -958,185 +958,185 @@ export default function DashboardContent({ players = [], team, readOnly = false 
               style={{ height: 'auto', width: '100%', minWidth: 0 }}
             >
               <Box mx={-16} mb={-16}>
-              <ScrollArea style={{ width: '100%', minWidth: 0 }}>
-                <Table verticalSpacing="sm" highlightOnHover w="100%" miw={{ base: '100%', sm: 760 }}>
-                  <Table.Thead style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)' }}>
-                    <Table.Tr>
-                      <Table.Th style={{ paddingLeft: 16, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Jugador</Table.Th>
-                      <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Métricas</Table.Th>
-                      <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Semáforo Peso</Table.Th>
-                      <Table.Th visibleFrom="sm" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Plan Nutricional</Table.Th>
-                      <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Posición</Table.Th>
-                      {!readOnly && <Table.Th w={50} />}
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {paginatedPlayers.map((player) => (
-                      <Table.Tr
-                        h={74}
-                        key={player.id}
-                        onClick={() => router.push(`/dashboard/jugador/${player.id}`)}
-                        style={{ cursor: 'pointer', transition: 'background-color 120ms ease' }}
-                      >
-                        {/* COLUMNA 1: JUGADOR */}
-                        <Table.Td style={{ paddingLeft: 16 }}>
-                          <Group gap="sm" wrap="nowrap">
-                            <Avatar
-                              src={getPlayerAvatarUrl(player)}
-                              size={42}
-                              radius="xl"
-                              color="initials"
-                              style={{ border: '1.5px solid rgba(108, 112, 90, 0.2)', flexShrink: 0 }}
-                            >
-                              {initials(`${player.nombre} ${player.apellidos || ''}`)}
-                            </Avatar>
-                            <Box style={{ minWidth: 0, flex: 1 }}>
+                <ScrollArea style={{ width: '100%', minWidth: 0 }}>
+                  <Table verticalSpacing="sm" highlightOnHover w="100%" miw={{ base: '100%', sm: 760 }}>
+                    <Table.Thead style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)' }}>
+                      <Table.Tr>
+                        <Table.Th style={{ paddingLeft: 16, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Jugador</Table.Th>
+                        <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Métricas</Table.Th>
+                        <Table.Th visibleFrom="xs" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Semáforo Peso</Table.Th>
+                        <Table.Th visibleFrom="sm" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Plan Nutricional</Table.Th>
+                        <Table.Th style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--nutra-salvia, #6C705A)' }}>Posición</Table.Th>
+                        {!readOnly && <Table.Th w={50} />}
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {paginatedPlayers.map((player) => (
+                        <Table.Tr
+                          h={74}
+                          key={player.id}
+                          onClick={() => router.push(`/dashboard/jugador/${player.id}`)}
+                          style={{ cursor: 'pointer', transition: 'background-color 120ms ease' }}
+                        >
+                          {/* COLUMNA 1: JUGADOR */}
+                          <Table.Td style={{ paddingLeft: 16 }}>
+                            <Group gap="sm" wrap="nowrap">
+                              <Avatar
+                                src={getPlayerAvatarUrl(player)}
+                                size={42}
+                                radius="xl"
+                                color="initials"
+                                style={{ border: '1.5px solid rgba(108, 112, 90, 0.2)', flexShrink: 0 }}
+                              >
+                                {initials(`${player.nombre} ${player.apellidos || ''}`)}
+                              </Avatar>
+                              <Box style={{ minWidth: 0, flex: 1 }}>
 
-                              <Group gap={6} wrap="nowrap">
-                                <Text fz="sm" fw={600} c="var(--nutra-bosque, #1F2A24)" truncate>
-                                  {player.nombre} {player.apellidos}
-                                </Text>
-                                {!player.auth_user_id && (
-                                  <Tooltip label="El usuario no tiene credenciales para entrar" withArrow>
-                                    <Box component="span" style={{ display: 'inline-flex', verticalAlign: 'middle', flexShrink: 0 }}>
-                                      <Icon3D name="warning" size={16} />
-                                    </Box>
-                                  </Tooltip>
-                                )}
-                              </Group>
-                              <Text c="var(--nutra-salvia, #6C705A)" fz="xs" style={{ lineHeight: 1.2 }} truncate>
-                                {player.auth_email || 'Sin credenciales de acceso'}
-                              </Text>
-
-                              {/* Indicadores en móvil sin necesidad de columnas adicionales */}
-                              <Group gap={6} align="center" hiddenFrom="xs" mt={3}>
-                                {player.peso_kg ? (
-                                  <Text fz="xs" fw={500} c="var(--nutra-salvia, #6C705A)">
-                                    {player.peso_kg} kg
+                                <Group gap={6} wrap="nowrap">
+                                  <Text fz="sm" fw={600} c="var(--nutra-bosque, #1F2A24)" truncate>
+                                    {player.nombre} {player.apellidos}
                                   </Text>
-                                ) : null}
-                                {player.semaforo?.diff !== null && player.semaforo?.diff !== undefined && (
-                                  <Text
-                                    fz="xs"
-                                    fw={600}
-                                    c={
-                                      player.semaforo.status === 'verde'
-                                        ? '#4a6813'
-                                        : player.semaforo.status === 'amarillo'
-                                          ? '#b45309'
-                                          : '#B8674A'
-                                    }
-                                  >
-                                    ● {player.semaforo.diff > 0 ? `+${player.semaforo.diff.toFixed(1)}` : player.semaforo.diff.toFixed(1)} kg
-                                  </Text>
-                                )}
-                              </Group>
-                            </Box>
-                          </Group>
-                        </Table.Td>
-
-                        {/* COLUMNA 2: MÉTRICAS */}
-                        <Table.Td visibleFrom="xs">
-                          {player.peso_kg || player.porcentaje_grasa ? (
-                            <Box>
-                              <Text fz="sm" fw={600} c="var(--nutra-bosque, #1F2A24)">
-                                {player.peso_kg ? `${player.peso_kg} kg` : '—'}
-                                {player.porcentaje_grasa ? (
-                                  <Text component="span" c="var(--nutra-salvia, #6C705A)" fw={400} fz="xs"> · {player.porcentaje_grasa}% GC</Text>
-                                ) : ''}
-                              </Text>
-                              <Text fz="xs" c="var(--nutra-salvia, #6C705A)">Composición corporal</Text>
-                            </Box>
-                          ) : (
-                            <Text fz="sm" c="var(--nutra-salvia, #6C705A)">—</Text>
-                          )}
-                        </Table.Td>
-
-                        {/* COLUMNA 3: SEMÁFORO */}
-                        <Table.Td visibleFrom="xs">
-                          <PlayerSemaforoIndicator semaforo={player.semaforo} />
-                        </Table.Td>
-
-                        {/* COLUMNA 4: KCAL OBJETIVO */}
-                        <Table.Td visibleFrom="sm">
-                          {player.plan?.kcal ? (
-                            <Group gap={8} wrap="nowrap" align="center">
-                              <Icon3D name="fire" size={24} />
-                              <Box>
-                                <Text fz="sm" fw={600} c="var(--nutra-bosque, #1F2A24)" lh={1.1}>
-                                  {player.plan.kcal} kcal
+                                  {!player.auth_user_id && (
+                                    <Tooltip label="El usuario no tiene credenciales para entrar" withArrow>
+                                      <Box component="span" style={{ display: 'inline-flex', verticalAlign: 'middle', flexShrink: 0 }}>
+                                        <Icon3D name="warning" size={16} />
+                                      </Box>
+                                    </Tooltip>
+                                  )}
+                                </Group>
+                                <Text c="var(--nutra-salvia, #6C705A)" fz="xs" style={{ lineHeight: 1.2 }} truncate>
+                                  {player.auth_email || 'Sin credenciales de acceso'}
                                 </Text>
-                                <Text fz="xs" c="var(--nutra-salvia, #6C705A)">
-                                  {player.plan.calculated ? 'Estimado' : 'Objetivo'}
-                                </Text>
+
+                                {/* Indicadores en móvil sin necesidad de columnas adicionales */}
+                                <Group gap={6} align="center" hiddenFrom="xs" mt={3}>
+                                  {player.peso_kg ? (
+                                    <Text fz="xs" fw={500} c="var(--nutra-salvia, #6C705A)">
+                                      {player.peso_kg} kg
+                                    </Text>
+                                  ) : null}
+                                  {player.semaforo?.diff !== null && player.semaforo?.diff !== undefined && (
+                                    <Text
+                                      fz="xs"
+                                      fw={600}
+                                      c={
+                                        player.semaforo.status === 'verde'
+                                          ? '#4a6813'
+                                          : player.semaforo.status === 'amarillo'
+                                            ? '#b45309'
+                                            : '#B8674A'
+                                      }
+                                    >
+                                      ● {player.semaforo.diff > 0 ? `+${player.semaforo.diff.toFixed(1)}` : player.semaforo.diff.toFixed(1)} kg
+                                    </Text>
+                                  )}
+                                </Group>
                               </Box>
                             </Group>
-                          ) : (
-                            <Text fz="sm" c="var(--nutra-salvia, #6C705A)">—</Text>
-                          )}
-                        </Table.Td>
-
-                        {/* COLUMNA 5: POSICIÓN */}
-                        <Table.Td>
-                          <PlayerPositionText position={player.posicion} />
-                        </Table.Td>
-
-                        {/* COLUMNA 5: ACCIONES */}
-                        {!readOnly && (
-                          <Table.Td>
-                            <Group gap={4} justify="flex-end" wrap="nowrap">
-                              <Menu shadow="md" width={220} position="bottom-end" withArrow radius="md" keepMounted>
-                                <Menu.Target>
-                                  <ActionIcon
-                                    variant="subtle"
-                                    color="gray"
-                                    radius="xl"
-                                    loading={deletingId === player.id}
-                                    onClick={(event) => event.stopPropagation()}
-                                  >
-                                    <IconDots size={18} stroke={1.5} />
-                                  </ActionIcon>
-                                </Menu.Target>
-                                <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
-                                  <Menu.Item leftSection={<Icon3D name="edit" size={18} />} onClick={() => setEditingPlayer(player)}>
-                                    Editar
-                                  </Menu.Item>
-                                  <Menu.Item leftSection={<Icon3D name="memo" size={18} />} onClick={() => openReportModal(player)}>
-                                    Generar informe
-                                  </Menu.Item>
-                                  <Menu.Divider />
-                                  <Menu.Item leftSection={<Icon3D name="refresh" size={18} />} onClick={() => setTransferModal({ opened: true, initialSelectedIds: [player.id] })}>
-                                    Transferir a otro equipo
-                                  </Menu.Item>
-                                  <PlayerCredentialsButton
-                                    jugador={player}
-                                    menuItem
-                                    onSaved={(credentials) => updateCredentials(player.id, credentials)}
-                                  />
-                                  <Menu.Divider />
-                                  <Menu.Item color="arcilla" leftSection={<Icon3D name="trash" size={18} />} onClick={() => handleDeletePlayer(player)}>
-                                    Eliminar
-                                  </Menu.Item>
-                                </Menu.Dropdown>
-                              </Menu>
-                            </Group>
                           </Table.Td>
-                        )}
-                      </Table.Tr>
-                    ))}
-                  </Table.Tbody>
-                </Table>
-              </ScrollArea>
 
-              <Group justify="center" p="md" style={{ borderTop: '1px solid rgba(108, 112, 90, 0.12)' }}>
-                <Pagination
-                  total={totalPages}
-                  value={page}
-                  onChange={setPage}
-                  radius="xl"
-                  color="bosque"
-                />
-              </Group>
+                          {/* COLUMNA 2: MÉTRICAS */}
+                          <Table.Td visibleFrom="xs">
+                            {player.peso_kg || player.porcentaje_grasa ? (
+                              <Box>
+                                <Text fz="sm" fw={600} c="var(--nutra-bosque, #1F2A24)">
+                                  {player.peso_kg ? `${player.peso_kg} kg` : '—'}
+                                  {player.porcentaje_grasa ? (
+                                    <Text component="span" c="var(--nutra-salvia, #6C705A)" fw={400} fz="xs"> · {player.porcentaje_grasa}% GC</Text>
+                                  ) : ''}
+                                </Text>
+                                <Text fz="xs" c="var(--nutra-salvia, #6C705A)">Composición corporal</Text>
+                              </Box>
+                            ) : (
+                              <Text fz="sm" c="var(--nutra-salvia, #6C705A)">—</Text>
+                            )}
+                          </Table.Td>
+
+                          {/* COLUMNA 3: SEMÁFORO */}
+                          <Table.Td visibleFrom="xs">
+                            <PlayerSemaforoIndicator semaforo={player.semaforo} />
+                          </Table.Td>
+
+                          {/* COLUMNA 4: KCAL OBJETIVO */}
+                          <Table.Td visibleFrom="sm">
+                            {player.plan?.kcal ? (
+                              <Group gap={8} wrap="nowrap" align="center">
+                                <Icon3D name="fire" size={24} />
+                                <Box>
+                                  <Text fz="sm" fw={600} c="var(--nutra-bosque, #1F2A24)" lh={1.1}>
+                                    {player.plan.kcal} kcal
+                                  </Text>
+                                  <Text fz="xs" c="var(--nutra-salvia, #6C705A)">
+                                    {player.plan.calculated ? 'Estimado' : 'Objetivo'}
+                                  </Text>
+                                </Box>
+                              </Group>
+                            ) : (
+                              <Text fz="sm" c="var(--nutra-salvia, #6C705A)">—</Text>
+                            )}
+                          </Table.Td>
+
+                          {/* COLUMNA 5: POSICIÓN */}
+                          <Table.Td>
+                            <PlayerPositionText position={player.posicion} />
+                          </Table.Td>
+
+                          {/* COLUMNA 5: ACCIONES */}
+                          {!readOnly && (
+                            <Table.Td>
+                              <Group gap={4} justify="flex-end" wrap="nowrap">
+                                <Menu shadow="md" width={220} position="bottom-end" withArrow radius="md" keepMounted>
+                                  <Menu.Target>
+                                    <ActionIcon
+                                      variant="subtle"
+                                      color="gray"
+                                      radius="xl"
+                                      loading={deletingId === player.id}
+                                      onClick={(event) => event.stopPropagation()}
+                                    >
+                                      <IconDots size={18} stroke={1.5} />
+                                    </ActionIcon>
+                                  </Menu.Target>
+                                  <Menu.Dropdown onClick={(event) => event.stopPropagation()}>
+                                    <Menu.Item leftSection={<Icon3D name="edit" size={18} />} onClick={() => setEditingPlayer(player)}>
+                                      Editar
+                                    </Menu.Item>
+                                    <Menu.Item leftSection={<Icon3D name="memo" size={18} />} onClick={() => openReportModal(player)}>
+                                      Generar informe
+                                    </Menu.Item>
+                                    <Menu.Divider />
+                                    <Menu.Item leftSection={<Icon3D name="refresh" size={18} />} onClick={() => setTransferModal({ opened: true, initialSelectedIds: [player.id] })}>
+                                      Transferir a otro equipo
+                                    </Menu.Item>
+                                    <PlayerCredentialsButton
+                                      jugador={player}
+                                      menuItem
+                                      onSaved={(credentials) => updateCredentials(player.id, credentials)}
+                                    />
+                                    <Menu.Divider />
+                                    <Menu.Item color="arcilla" leftSection={<Icon3D name="trash" size={18} />} onClick={() => handleDeletePlayer(player)}>
+                                      Eliminar
+                                    </Menu.Item>
+                                  </Menu.Dropdown>
+                                </Menu>
+                              </Group>
+                            </Table.Td>
+                          )}
+                        </Table.Tr>
+                      ))}
+                    </Table.Tbody>
+                  </Table>
+                </ScrollArea>
+
+                <Group justify="center" p="md" style={{ borderTop: '1px solid rgba(108, 112, 90, 0.12)' }}>
+                  <Pagination
+                    total={totalPages}
+                    value={page}
+                    onChange={setPage}
+                    radius="xl"
+                    color="bosque"
+                  />
+                </Group>
               </Box>
             </WidgetCard>
           ) : (
