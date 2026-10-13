@@ -4454,7 +4454,8 @@ export const FOODS_CRUDO = [
     "pro": 23.3,
     "fat": 4.9,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 100,
     "maxGrams": 350,
@@ -4472,7 +4473,8 @@ export const FOODS_CRUDO = [
     "pro": 24.5,
     "fat": 3,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 100,
     "maxGrams": 350,
@@ -4490,7 +4492,8 @@ export const FOODS_CRUDO = [
     "pro": 20.5,
     "fat": 3.5,
     "tags": [
-      "pescado"
+      "pescado",
+      "pescado_azul"
     ],
     "minGrams": 100,
     "maxGrams": 350,
