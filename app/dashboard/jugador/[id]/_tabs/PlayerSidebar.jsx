@@ -155,7 +155,7 @@ export default function PlayerSidebar({
         <Group justify="space-between" align="center" mb="xs" wrap="nowrap">
           {!isPlayer ? (
             <Tooltip label={teamName ? `Volver a ${teamName}` : 'Volver al equipo'} position="right" withArrow>
-              <ActionIcon
+              <ActionIcon aria-label="Volver"
                 component={Link}
                 href={backUrl}
                 variant="subtle"
@@ -176,7 +176,7 @@ export default function PlayerSidebar({
               <>
                 <PlayerCredentialsButton jugador={jugador} />
                 <Tooltip label="Editar ficha" position="bottom" withArrow>
-                  <ActionIcon
+                  <ActionIcon aria-label="Editar ficha"
                     variant="subtle"
                     color="gray"
                     size={36}
@@ -194,7 +194,7 @@ export default function PlayerSidebar({
               <>
                 <PlayerPasswordButton />
                 <Tooltip label="Cerrar sesión" position="bottom" withArrow>
-                  <ActionIcon
+                  <ActionIcon aria-label="Cerrar sesión"
                     variant="subtle"
                     color="arcilla"
                     size={36}

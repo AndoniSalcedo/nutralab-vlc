@@ -445,7 +445,7 @@ export default function ProtocolEditorModal({
 
                           <Stack gap={4} mt={20}>
                             <Tooltip label="Subir fase" position="left" withArrow>
-                              <ActionIcon
+                              <ActionIcon aria-label="Subir fase"
                                 variant="subtle"
                                 color="gray"
                                 size="sm"
@@ -458,7 +458,7 @@ export default function ProtocolEditorModal({
                             </Tooltip>
 
                             <Tooltip label="Bajar fase" position="left" withArrow>
-                              <ActionIcon
+                              <ActionIcon aria-label="Bajar fase"
                                 variant="subtle"
                                 color="gray"
                                 size="sm"
@@ -471,7 +471,7 @@ export default function ProtocolEditorModal({
                             </Tooltip>
 
                             <Tooltip label="Insertar fase a continuación" position="left" withArrow>
-                              <ActionIcon
+                              <ActionIcon aria-label="Insertar fase a continuación"
                                 variant="light"
                                 color="blue"
                                 size="sm"
@@ -483,7 +483,7 @@ export default function ProtocolEditorModal({
                             </Tooltip>
 
                             <Tooltip label="Eliminar fase" position="left" withArrow>
-                              <ActionIcon
+                              <ActionIcon aria-label="Eliminar fase"
                                 variant="subtle"
                                 color="red"
                                 size="sm"
@@ -571,7 +571,7 @@ export default function ProtocolEditorModal({
 
                     <Stack gap={4} mt={20}>
                       <Tooltip label="Subir item" position="left" withArrow>
-                        <ActionIcon
+                        <ActionIcon aria-label="Subir item"
                           variant="subtle"
                           color="gray"
                           size="sm"
@@ -584,7 +584,7 @@ export default function ProtocolEditorModal({
                       </Tooltip>
 
                       <Tooltip label="Bajar item" position="left" withArrow>
-                        <ActionIcon
+                        <ActionIcon aria-label="Bajar item"
                           variant="subtle"
                           color="gray"
                           size="sm"
@@ -597,7 +597,7 @@ export default function ProtocolEditorModal({
                       </Tooltip>
 
                       <Tooltip label="Insertar item a continuación" position="left" withArrow>
-                        <ActionIcon
+                        <ActionIcon aria-label="Insertar item a continuación"
                           variant="light"
                           color="blue"
                           size="sm"
@@ -609,7 +609,7 @@ export default function ProtocolEditorModal({
                       </Tooltip>
 
                       <Tooltip label="Eliminar item" position="left" withArrow>
-                        <ActionIcon
+                        <ActionIcon aria-label="Eliminar item"
                           variant="subtle"
                           color="red"
                           size="sm"

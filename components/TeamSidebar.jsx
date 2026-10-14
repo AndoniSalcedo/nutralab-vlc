@@ -154,7 +154,7 @@ export default function TeamSidebar({
         {/* Cabecera superior con botón volver y acceso a configuración */}
         <Group justify="space-between" align="center" mb="xs" wrap="nowrap">
           <Tooltip label="Volver a equipos" position="right" withArrow>
-            <ActionIcon
+            <ActionIcon aria-label="Volver a equipos"
               component={Link}
               href="/dashboard"
               variant="subtle"
@@ -169,7 +169,7 @@ export default function TeamSidebar({
 
           {!readOnly && teamId && (
             <Tooltip label="Configuración de equipo" position="bottom" withArrow>
-              <ActionIcon
+              <ActionIcon aria-label="Configuración de equipo"
                 component={Link}
                 href={`/dashboard/equipo/${teamId}/configuracion`}
                 variant="subtle"

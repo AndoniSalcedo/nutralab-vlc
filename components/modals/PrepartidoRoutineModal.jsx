@@ -708,7 +708,7 @@ export default function PrepartidoRoutineModal({
 
                         {!isDefaultMealSlot(meal) && (
                         <Tooltip label={`Quitar ${meal} del protocolo`} withArrow>
-                          <ActionIcon
+                          <ActionIcon aria-label={`Quitar ${meal} del protocolo`}
                             component="div"
                             role="button"
                             tabIndex={0}

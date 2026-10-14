@@ -401,7 +401,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                     {!readOnly && (
                       <Menu shadow="md" width={240} position="bottom-end" withArrow radius="md">
                         <Menu.Target>
-                          <ActionIcon
+                          <ActionIcon aria-label="Más opciones"
                             variant="subtle"
                             color="gray"
                             radius="xl"

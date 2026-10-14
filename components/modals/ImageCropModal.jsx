@@ -165,7 +165,7 @@ export default function ImageCropModal({
 
           <Group gap="xs">
             <Tooltip label="Girar 90°" withArrow position="top">
-              <ActionIcon
+              <ActionIcon aria-label="Girar 90°"
                 variant="light"
                 color="gray"
                 size="md"
@@ -178,7 +178,7 @@ export default function ImageCropModal({
             </Tooltip>
 
             <Tooltip label="Restablecer posición" withArrow position="top">
-              <ActionIcon
+              <ActionIcon aria-label="Restablecer posición"
                 variant="light"
                 color="gray"
                 size="md"

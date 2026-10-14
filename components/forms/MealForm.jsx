@@ -359,7 +359,7 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
             />
 
             {file && (
-              <ActionIcon
+              <ActionIcon aria-label="Quitar foto"
                 variant="filled"
                 color="dark"
                 radius="xl"

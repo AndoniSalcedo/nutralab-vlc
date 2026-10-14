@@ -367,7 +367,7 @@ export default function TecnicosManager({ teams = [] }) {
                     <Table.Td style={{ textAlign: 'right' }}>
                       <Group gap={4} justify="flex-end">
                         <Tooltip label="Asignar equipos" position="top" withArrow>
-                          <ActionIcon
+                          <ActionIcon aria-label="Asignar equipos"
                             variant="subtle"
                             color="gray"
                             radius="xl"
@@ -377,7 +377,7 @@ export default function TecnicosManager({ teams = [] }) {
                           </ActionIcon>
                         </Tooltip>
                         <Tooltip label="Eliminar técnico" position="top" withArrow>
-                          <ActionIcon
+                          <ActionIcon aria-label="Eliminar técnico"
                             variant="subtle"
                             color="arcilla"
                             radius="xl"

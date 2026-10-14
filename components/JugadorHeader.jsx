@@ -34,7 +34,7 @@ function BackButton({ size = 42, iconSize = 26, equipoId }) {
   const url = equipoId ? `/dashboard/equipo/${equipoId}` : '/dashboard';
   return (
     <Tooltip label="Volver al listado" position="right" withArrow>
-      <ActionIcon
+      <ActionIcon aria-label="Volver al listado"
         component={Link}
         href={url}
         variant="subtle"
@@ -112,7 +112,7 @@ function HeaderActions({
     return (
       <Menu shadow="md" width={230} position="bottom-end" withArrow radius="md" keepMounted>
         <Menu.Target>
-          <ActionIcon variant="subtle" color="gray" radius="xl" size={38}>
+          <ActionIcon aria-label="Más opciones" variant="subtle" color="gray" radius="xl" size={38}>
             <IconDotsVertical size={20} stroke={1.8} />
           </ActionIcon>
         </Menu.Target>

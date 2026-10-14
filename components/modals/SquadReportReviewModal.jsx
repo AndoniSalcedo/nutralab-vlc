@@ -506,7 +506,7 @@ export default function SquadReportReviewModal({
                                     style={{ flex: 1, maxWidth: 300 }}
                                     styles={{ input: { fontWeight: 700, textTransform: 'uppercase', color: 'var(--mantine-color-nutralabColor-8)' } }}
                                   />
-                                  <ActionIcon
+                                  <ActionIcon aria-label="Eliminar"
                                     size="sm"
                                     color="red"
                                     variant="subtle"
@@ -569,7 +569,7 @@ export default function SquadReportReviewModal({
                           <Box key={`${dayKey}-${mealIndex}`}>
                             <Group justify="space-between" align="center" mb={2}>
                               <Text size="xs" fw={700} c="nutralabColor.8" tt="uppercase">{meal.nombre}</Text>
-                              <ActionIcon
+                              <ActionIcon aria-label="Editar"
                                 size="xs"
                                 variant="subtle"
                                 color="gray"
@@ -634,7 +634,7 @@ export default function SquadReportReviewModal({
                       onChange={(e) => updateNote(noteIndex, e.target.value)}
                       style={{ flex: 1 }}
                     />
-                    <ActionIcon
+                    <ActionIcon aria-label="Eliminar"
                       size="sm"
                       color="red"
                       variant="subtle"

@@ -657,10 +657,10 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                     {!readOnly && (
                       <Table.Td>
                         <Group gap="xs" justify="flex-end" wrap="nowrap">
-                          <ActionIcon variant="light" color="gray" radius="xl" size="md" onClick={() => { setEditingDayType(d); setModalOpen(true); }}>
+                          <ActionIcon aria-label="Editar" variant="light" color="gray" radius="xl" size="md" onClick={() => { setEditingDayType(d); setModalOpen(true); }}>
                             <IconPencil size={16} />
                           </ActionIcon>
-                          <ActionIcon variant="light" color="red" radius="xl" size="md" onClick={() => removeDayType(d.key)}>
+                          <ActionIcon aria-label="Eliminar" variant="light" color="red" radius="xl" size="md" onClick={() => removeDayType(d.key)}>
                             <IconTrash size={16} />
                           </ActionIcon>
                         </Group>
@@ -920,7 +920,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                                       <Table.Td w={{ base: 120, sm: 150 }}>
                                         <Group gap="xs" justify="flex-end" wrap="nowrap">
                                           <Tooltip label="Copiar o mover a otro equipo" withArrow>
-                                            <ActionIcon
+                                            <ActionIcon aria-label="Copiar o mover a otro equipo"
                                               variant="light"
                                               color="gray"
                                               radius="xl"
@@ -934,12 +934,12 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                                             </ActionIcon>
                                           </Tooltip>
                                           <Tooltip label="Editar protocolo" withArrow>
-                                            <ActionIcon variant="light" color="gray" radius="xl" size="md" onClick={() => { setEditingProtocol(p); setProtocolModalOpen(true); }}>
+                                            <ActionIcon aria-label="Editar protocolo" variant="light" color="gray" radius="xl" size="md" onClick={() => { setEditingProtocol(p); setProtocolModalOpen(true); }}>
                                               <IconPencil size={16} />
                                             </ActionIcon>
                                           </Tooltip>
                                           <Tooltip label="Eliminar protocolo" withArrow>
-                                            <ActionIcon variant="light" color="red" radius="xl" size="md" onClick={() => setDeleteProtocolId(p.id)}>
+                                            <ActionIcon aria-label="Eliminar protocolo" variant="light" color="red" radius="xl" size="md" onClick={() => setDeleteProtocolId(p.id)}>
                                               <IconTrash size={16} />
                                             </ActionIcon>
                                           </Tooltip>

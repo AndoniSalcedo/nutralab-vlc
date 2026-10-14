@@ -145,7 +145,7 @@ export default function TeamHeaderTabs({
               <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
                 <Group gap="xs" align="center" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
                   <Tooltip label="Volver a equipos" position="right" withArrow>
-                    <ActionIcon
+                    <ActionIcon aria-label="Volver a equipos"
                       component={Link}
                       href="/dashboard"
                       variant="subtle"

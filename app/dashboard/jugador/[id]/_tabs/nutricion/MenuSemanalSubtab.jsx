@@ -69,7 +69,7 @@ export default function MenuSemanalSubtab({ menus = [] }) {
               }}
             >
               <Tooltip label="Día a Día (Vista diaria)" withArrow>
-                <ActionIcon
+                <ActionIcon aria-label="Día a Día (Vista diaria)"
                   onClick={() => setViewMode('diaria')}
                   variant={viewMode === 'diaria' ? 'filled' : 'transparent'}
                   color={viewMode === 'diaria' ? 'dark' : 'gray'}
@@ -82,7 +82,7 @@ export default function MenuSemanalSubtab({ menus = [] }) {
               </Tooltip>
 
               <Tooltip label="Semana completa (Vista general)" withArrow>
-                <ActionIcon
+                <ActionIcon aria-label="Semana completa (Vista general)"
                   onClick={() => setViewMode('semanal')}
                   variant={viewMode === 'semanal' ? 'filled' : 'transparent'}
                   color={viewMode === 'semanal' ? 'dark' : 'gray'}

@@ -1090,7 +1090,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                               <Group gap={4} justify="flex-end" wrap="nowrap">
                                 <Menu shadow="md" width={220} position="bottom-end" withArrow radius="md" keepMounted>
                                   <Menu.Target>
-                                    <ActionIcon
+                                    <ActionIcon aria-label="Más opciones"
                                       variant="subtle"
                                       color="gray"
                                       radius="xl"

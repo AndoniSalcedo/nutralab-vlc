@@ -801,7 +801,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
                           {!readOnly && (
                             <Table.Td style={{ fontSize: 11, textAlign: 'center' }}>
                               <Group gap={4} justify="center">
-                                <ActionIcon
+                                <ActionIcon aria-label="Editar"
                                   color="blue"
                                   variant="subtle"
                                   radius="xl"
@@ -809,7 +809,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
                                 >
                                   <IconEdit size={14} />
                                 </ActionIcon>
-                                <ActionIcon
+                                <ActionIcon aria-label="Eliminar"
                                   color="red"
                                   variant="subtle"
                                   radius="xl"

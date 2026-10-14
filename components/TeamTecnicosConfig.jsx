@@ -260,7 +260,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
                 {!readOnly && (
                   <Table.Td style={{ textAlign: 'right' }}>
                     <Tooltip label="Desvincular del equipo" position="top" withArrow>
-                      <ActionIcon
+                      <ActionIcon aria-label="Desvincular del equipo"
                         variant="subtle"
                         color="red"
                         radius="xl"
