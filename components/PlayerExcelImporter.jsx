@@ -37,6 +37,7 @@ import {
 } from '@/components/icons3d';
 import { useRouter } from 'next/navigation';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 const EXCEL_TYPES = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -292,7 +293,7 @@ export default function PlayerExcelImporter({ team }) {
       notifications.show({
         color: 'red',
         title: 'Error al generar plantilla',
-        message: err.message
+        message: errorMessage(err)
       });
     }
   }
@@ -313,7 +314,7 @@ export default function PlayerExcelImporter({ team }) {
       notifications.show({
         color: 'red',
         title: 'Error procesando Excel',
-        message: error.message,
+        message: errorMessage(error),
       });
       setState('error');
     }
@@ -407,7 +408,7 @@ export default function PlayerExcelImporter({ team }) {
       notifications.show({
         color: 'red',
         title: 'Error importando Excel',
-        message: error.message,
+        message: errorMessage(error),
       });
       setState('preview');
     }

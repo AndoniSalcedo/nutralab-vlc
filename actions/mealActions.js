@@ -15,6 +15,7 @@ import { parseMealTreeWithAI } from '@/lib/ai/meal-tree-parser';
 import { enforceRateLimit } from '@/lib/security/rate-limit';
 import { readImageUpload, toByteaHex } from '@/lib/security/uploads';
 import { toDateKey } from '@/lib/dates';
+import { ActionError } from '@/lib/actionError';
 
 const MEAL_TYPES = new Set(['breakfast', 'midMorning', 'lunch', 'snack', 'dinner', 'lateSnack']);
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -40,24 +41,24 @@ function mapMealToClient(dbMeal) {
 }
 
 export async function listPlayerMeals(jugadorId, { mealType, day } = {}) {
-  if (!jugadorId) throw new Error('Falta jugador_id');
+  if (!jugadorId) throw new ActionError('Falta jugador_id');
 
   const db = getDb();
   const user = await getUser();
-  if (!user) throw new Error('No autorizado');
+  if (!user) throw new ActionError('No autorizado');
 
   const isPlayer = user.role === 'jugador';
   if (!isPlayer) {
     const accessiblePlayer = await getAccessiblePlayer(db, user, jugadorId);
-    if (!accessiblePlayer) throw new Error('No tienes acceso a este jugador');
+    if (!accessiblePlayer) throw new ActionError('No tienes acceso a este jugador');
   } else {
     if (String(user.id) !== String(jugadorId)) {
-      throw new Error('No tienes acceso a este jugador');
+      throw new ActionError('No tienes acceso a este jugador');
     }
   }
 
   if (day && (!DAY_RE.test(String(day)) || Number.isNaN(Date.parse(`${day}T00:00:00Z`)))) {
-    throw new Error('Fecha no válida');
+    throw new ActionError('Fecha no válida');
   }
 
   let resultMeals = [];
@@ -116,21 +117,21 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
   const notes = formData.get('notes');
   const photoFile = formData.get('photo');
 
-  if (!jugadorId) throw new Error('Falta jugador_id');
-  if (!mealType) throw new Error('Falta el tipo de ingesta');
-  if (!MEAL_TYPES.has(String(mealType))) throw new Error('Tipo de ingesta no válido');
+  if (!jugadorId) throw new ActionError('Falta jugador_id');
+  if (!mealType) throw new ActionError('Falta el tipo de ingesta');
+  if (!MEAL_TYPES.has(String(mealType))) throw new ActionError('Tipo de ingesta no válido');
 
   const user = await getUser();
-  if (!user || user.role === 'tecnico') throw new Error('No autorizado');
+  if (!user || user.role === 'tecnico') throw new ActionError('No autorizado');
   const db = getDb();
 
   const isPlayer = user.role === 'jugador';
   if (!isPlayer) {
     const ownedPlayer = await getOwnedPlayer(db, user, jugadorId);
-    if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+    if (!ownedPlayer) throw new ActionError('No tienes acceso a este jugador');
   } else {
     if (String(user.id) !== String(jugadorId)) {
-      throw new Error('No tienes acceso a este jugador');
+      throw new ActionError('No tienes acceso a este jugador');
     }
   }
 
@@ -139,7 +140,7 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
     // (si no, se podrían editar/reasignar comidas de otros jugadores).
     const existing = await getMealById(db, id);
     if (!existing || String(existing.jugador_id) !== String(jugadorId)) {
-      throw new Error('Comida no encontrada');
+      throw new ActionError('Comida no encontrada');
     }
   }
 
@@ -184,22 +185,22 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
 }
 
 export async function deletePlayerMeal(id) {
-  if (!id) throw new Error('Falta id');
+  if (!id) throw new ActionError('Falta id');
 
   const db = getDb();
   const user = await getUser();
-  if (!user || user.role === 'tecnico') throw new Error('No autorizado');
+  if (!user || user.role === 'tecnico') throw new ActionError('No autorizado');
 
   const meal = await getMealById(db, id);
-  if (!meal) throw new Error('Comida no encontrada');
+  if (!meal) throw new ActionError('Comida no encontrada');
 
   const isPlayer = user.role === 'jugador';
   if (!isPlayer) {
     const ownedPlayer = await getOwnedPlayer(db, user, meal.jugador_id);
-    if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+    if (!ownedPlayer) throw new ActionError('No tienes acceso a este jugador');
   } else {
     if (String(user.id) !== String(meal.jugador_id)) {
-      throw new Error('No tienes acceso a este jugador');
+      throw new ActionError('No tienes acceso a este jugador');
     }
   }
 

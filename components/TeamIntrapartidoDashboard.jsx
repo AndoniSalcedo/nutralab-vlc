@@ -38,6 +38,7 @@ import { exportIntrapartidoExcel } from '@/lib/io/intrapartido-export';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import { StatTile } from '@/components/widgets/WidgetCard';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 function formatDate(dateStr) {
   if (!dateStr) return 'Sin fecha';
@@ -113,7 +114,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
     try {
       await exportIntrapartidoExcel({ session, players, team });
     } catch (err) {
-      notifications.show({ color: 'red', title: 'Error', message: err.message || 'No se pudo generar el Excel.' });
+      notifications.show({ color: 'red', title: 'Error', message: errorMessage(err, 'No se pudo generar el Excel.') });
     }
   };
 
@@ -126,7 +127,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
       setDeleting(null);
       router.refresh();
     } catch (err) {
-      notifications.show({ color: 'red', title: 'Error', message: err.message || 'No se pudo eliminar el partido.' });
+      notifications.show({ color: 'red', title: 'Error', message: errorMessage(err, 'No se pudo eliminar el partido.') });
     } finally {
       setDeleteLoading(false);
     }

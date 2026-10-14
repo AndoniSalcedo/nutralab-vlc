@@ -9,6 +9,7 @@ import WidgetCard, { WidgetAside } from './WidgetCard';
 import WellnessModal from '@/components/modals/WellnessModal';
 import { WELLNESS_ITEMS, WELLNESS_KEYS, wellnessScoreColor as scoreColor } from '@/config/wellness';
 import { getWellnessRecords, saveWellnessRecord } from '@/actions/wellnessActions';
+import { errorMessage } from '@/lib/actionError';
 
 // Geometría del hexágono (viewBox cuadrado)
 const VIEW = 300;
@@ -202,7 +203,7 @@ export default function WellnessHexagonWidget({ jugadorId, canEdit = true }) {
       setModalOpen(false);
       notifySaved({ title: 'Registro guardado', message: 'Tu bienestar de hoy se ha guardado.' });
     } catch (err) {
-      notifications.show({ color: 'red', title: 'No se pudo guardar', message: err.message });
+      notifications.show({ color: 'red', title: 'No se pudo guardar', message: errorMessage(err) });
     } finally {
       setSaving(false);
     }

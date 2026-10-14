@@ -37,6 +37,7 @@ import ConfirmModal from '@/components/modals/ConfirmModal';
 import { calculateSemaforo } from '@/lib/metrics/player';
 import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 function fechaLabel(fecha) {
   if (!fecha) return 'Sin fecha';
@@ -118,7 +119,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
       notifications.show({
         color: 'red',
         title: 'No se pudo guardar el peso',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setSaving(false);
@@ -158,7 +159,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
       notifications.show({
         color: 'red',
         title: 'No se pudo borrar el registro',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setDeleting(false);

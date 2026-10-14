@@ -10,6 +10,7 @@ import {
   getJugadorSuplementosExtra,
 } from '@/repositories/supplementationRepository';
 import { todayKey } from '@/lib/dates';
+import { ActionError } from '@/lib/actionError';
 
 const MAX_DAILY_WATER_ML = 20000;
 
@@ -39,17 +40,17 @@ async function getAssignedSupplementIds(db, jugadorId) {
 
 // Agua y suplementos de hoy (día en Europe/Madrid). El staff con acceso al jugador puede leerlos.
 export async function getDailyRecord(jugadorId) {
-  if (!jugadorId) throw new Error('Falta jugador_id');
+  if (!jugadorId) throw new ActionError('Falta jugador_id');
 
   const db = getDb();
   const user = await getUser();
-  if (!user) throw new Error('No autorizado');
+  if (!user) throw new ActionError('No autorizado');
 
   if (user.role === 'jugador') {
-    if (String(user.id) !== String(jugadorId)) throw new Error('No tienes acceso a este jugador');
+    if (String(user.id) !== String(jugadorId)) throw new ActionError('No tienes acceso a este jugador');
   } else {
     const accessiblePlayer = await getAccessiblePlayer(db, user, jugadorId);
-    if (!accessiblePlayer) throw new Error('No tienes acceso a este jugador');
+    if (!accessiblePlayer) throw new ActionError('No tienes acceso a este jugador');
   }
 
   const today = todayKey();
@@ -59,11 +60,11 @@ export async function getDailyRecord(jugadorId) {
 // Solo el propio jugador registra lo que bebe y toma. Los campos ausentes no se tocan.
 export async function saveDailyRecord(payload) {
   const { jugador_id, agua_ml, suplementos_tomados } = payload || {};
-  if (!jugador_id) throw new Error('Falta jugador_id');
+  if (!jugador_id) throw new ActionError('Falta jugador_id');
 
   const user = await getUser();
   if (!user || user.role !== 'jugador' || String(user.id) !== String(jugador_id)) {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const db = getDb();
@@ -76,12 +77,12 @@ export async function saveDailyRecord(payload) {
 
   if (agua_ml !== undefined) {
     const ml = Number(agua_ml);
-    if (!Number.isInteger(ml) || ml < 0 || ml > MAX_DAILY_WATER_ML) throw new Error('Cantidad de agua no válida');
+    if (!Number.isInteger(ml) || ml < 0 || ml > MAX_DAILY_WATER_ML) throw new ActionError('Cantidad de agua no válida');
     recordPayload.agua_ml = ml;
   }
 
   if (suplementos_tomados !== undefined) {
-    if (!Array.isArray(suplementos_tomados)) throw new Error('Lista de suplementos no válida');
+    if (!Array.isArray(suplementos_tomados)) throw new ActionError('Lista de suplementos no válida');
     const assigned = await getAssignedSupplementIds(db, jugador_id);
     recordPayload.suplementos_tomados = [...new Set(suplementos_tomados.map(Number))].filter((id) => assigned.has(id));
   }

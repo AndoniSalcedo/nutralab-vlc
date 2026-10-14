@@ -19,6 +19,7 @@ import { IconSend } from '@/components/icons3d';
 import { useRouter } from 'next/navigation';
 import { sendMessage } from '@/actions/messageActions';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 export default function MessageComposerForm({
   players = [],
@@ -85,7 +86,7 @@ export default function MessageComposerForm({
       notifications.show({
         color: 'red',
         title: 'No se pudo enviar',
-        message: error.message,
+        message: errorMessage(error),
       });
     } finally {
       setLoading(false);

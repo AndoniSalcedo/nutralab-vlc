@@ -32,6 +32,7 @@ import { CLINICAL_TAGS, parsePlayerClinicalTags } from '@/config/clinical-tags';
 import { compressAvatar, avatarFromRecord, initials as getInitials } from '@/lib/utils/avatar';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 function dateInputToIso(value) {
   if (!value) return '';
@@ -191,7 +192,7 @@ export default function PlayerForm({ initial, team }) {
       notifications.show({
         color: 'red',
         title: 'No se pudo guardar',
-        message: err.message,
+        message: errorMessage(err),
       });
       setLoading(false);
     }

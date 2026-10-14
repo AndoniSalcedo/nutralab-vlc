@@ -37,6 +37,7 @@ import { isDefaultProtocolMeal } from '@/lib/nutrition/prematch-protocol';
 import { getDefaultMealDistribution } from '@/lib/engine/day-balance';
 import WidgetCard from '@/components/widgets/WidgetCard';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 // Color de categoría de cada campo del perfil (mismo criterio que las teselas del Perfil)
 const ICON_COLORS = {
@@ -110,7 +111,7 @@ export function CampoEditable({
       notifications.show({
         color: 'red',
         title: 'No se pudo guardar',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setSaving(false);
@@ -265,7 +266,7 @@ export function ComidasEditable({
       notifications.show({
         color: 'red',
         title: 'No se pudo guardar',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setSaving(false);
@@ -501,7 +502,7 @@ export function ComidasEditable({
               notifications.show({
                 color: 'red',
                 title: 'Error al guardar',
-                message: err.message,
+                message: errorMessage(err),
               });
             }
           }}
@@ -530,7 +531,7 @@ export function EditableSection({ title, defaultValue, onSave, readOnly = false 
       notifications.show({
         color: 'red',
         title: 'No se pudo guardar',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setSaving(false);

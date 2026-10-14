@@ -9,6 +9,7 @@ import Icon3D from '@/components/Icon3D';
 import { updatePlayerCredentials } from '@/actions/playerActions';
 import PlayerCredentialsModal from '@/components/modals/PlayerCredentialsModal';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 function generatePassword() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@$%';
@@ -62,7 +63,7 @@ export default function PlayerCredentialsButton({ jugador, compact = false, menu
       notifications.show({
         color: 'red',
         title: 'No se pudieron guardar las credenciales',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setSaving(false);

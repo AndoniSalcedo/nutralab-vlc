@@ -15,13 +15,14 @@ import {
   deleteAnalytics,
   updateAnalyticsVisibility
 } from '@/repositories/analyticsRepository';
+import { ActionError } from '@/lib/actionError';
 
 const ANALITICA_TOOL_NAME = 'guardar_analitica';
 const ANALITICA_MAX_TOKENS = env.ANALITICA_MAX_TOKENS;
 
 function extractAnalitica(message) {
   if (message.stop_reason === 'max_tokens') {
-    throw new Error('La extracción se cortó por límite de tokens. Prueba con un PDF más corto o vuelve a intentarlo.');
+    throw new ActionError('La extracción se cortó por límite de tokens. Prueba con un PDF más corto o vuelve a intentarlo.');
   }
 
   const toolUse = message.content?.find((item) => item.type === 'tool_use' && item.name === ANALITICA_TOOL_NAME);
@@ -35,7 +36,7 @@ function extractAnalitica(message) {
     }
   }
   if (!Array.isArray(parametros)) {
-    throw new Error('No se pudieron extraer parámetros válidos de la analítica.');
+    throw new ActionError('No se pudieron extraer parámetros válidos de la analítica.');
   }
 
   return parametros;
@@ -52,15 +53,15 @@ export async function uploadAnalitica(fileOrFormData, jugadorIdParam, fechaParam
     jugadorId = jugadorIdParam;
     fechaExtraccion = fechaParam;
   }
-  if (!archivo || !jugadorId) throw new Error('Faltan datos');
+  if (!archivo || !jugadorId) throw new ActionError('Faltan datos');
 
   const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
   const ownedPlayer = await getOwnedPlayer(db, user, jugadorId);
-  if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+  if (!ownedPlayer) throw new ActionError('No tienes acceso a este jugador');
 
   // Solo PDF reales y de tamaño acotado (se envían a un servicio de IA de pago).
   const upload = await readDocumentUpload(archivo);
@@ -141,19 +142,19 @@ export async function uploadAnalitica(fileOrFormData, jugadorIdParam, fechaParam
 }
 
 export async function deleteAnalitica(id) {
-  if (!id) throw new Error('Falta id');
+  if (!id) throw new ActionError('Falta id');
 
   const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const analitica = await getAnalyticsById(db, id);
-  if (!analitica) throw new Error('Analítica no encontrada');
+  if (!analitica) throw new ActionError('Analítica no encontrada');
 
   const ownedPlayer = await getOwnedPlayer(db, user, analitica.jugador_id);
-  if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+  if (!ownedPlayer) throw new ActionError('No tienes acceso a este jugador');
 
   await deleteAnalytics(db, id);
   revalidatePath(`/dashboard/jugador/${analitica.jugador_id}`);
@@ -162,20 +163,20 @@ export async function deleteAnalitica(id) {
 
 export async function toggleAnaliticaVisibility(id, visible_para_jugador) {
   if (!id || typeof visible_para_jugador !== 'boolean') {
-    throw new Error('Faltan datos');
+    throw new ActionError('Faltan datos');
   }
 
   const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const analitica = await getAnalyticsById(db, id);
-  if (!analitica) throw new Error('Analítica no encontrada');
+  if (!analitica) throw new ActionError('Analítica no encontrada');
 
   const ownedPlayer = await getOwnedPlayer(db, user, analitica.jugador_id);
-  if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+  if (!ownedPlayer) throw new ActionError('No tienes acceso a este jugador');
 
   const data = await updateAnalyticsVisibility(db, id, visible_para_jugador);
   revalidatePath(`/dashboard/jugador/${analitica.jugador_id}`);

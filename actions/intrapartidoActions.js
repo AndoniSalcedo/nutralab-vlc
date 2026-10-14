@@ -18,6 +18,7 @@ import {
   saveIntrapartidoMatch as saveIntrapartidoMatchInRepo,
   deleteIntrapartidoMatch as deleteIntrapartidoMatchInRepo,
 } from '@/repositories/intrapartidoRepository';
+import { ActionError } from '@/lib/actionError';
 
 const TIMING_IDS = new Set(INTRAPARTIDO_TIMINGS.map((t) => t.id));
 const MAX_STARTERS = 11;
@@ -26,21 +27,21 @@ const MAX_QTY_PER_INTAKE = 50;
 
 function parseId(value, label) {
   const num = Number(value);
-  if (!Number.isInteger(num) || num <= 0) throw new Error(`${label} no válido`);
+  if (!Number.isInteger(num) || num <= 0) throw new ActionError(`${label} no válido`);
   return num;
 }
 
 async function requireTeamAccess(teamId, { write }) {
-  if (!teamId) throw new Error('Falta equipo_id');
+  if (!teamId) throw new ActionError('Falta equipo_id');
   const user = await getUser();
-  if (!user) throw new Error('No autorizado');
-  if (write && (user.role === 'tecnico' || user.role === 'jugador')) throw new Error('No autorizado');
+  if (!user) throw new ActionError('No autorizado');
+  if (write && (user.role === 'tecnico' || user.role === 'jugador')) throw new ActionError('No autorizado');
 
   const db = getDb();
   const team = write
     ? await getOwnedTeam(db, user, teamId)
     : await getAccessibleTeam(db, user, teamId);
-  if (!team) throw new Error('No tienes acceso a este equipo');
+  if (!team) throw new ActionError('No tienes acceso a este equipo');
 
   return { db, user };
 }
@@ -54,7 +55,7 @@ export async function listIntrapartidoMatches(teamId) {
 export async function getIntrapartidoMatch(teamId, matchId) {
   const { db } = await requireTeamAccess(teamId, { write: false });
   const result = await getIntrapartidoMatchById(db, teamId, parseId(matchId, 'Partido'));
-  if (!result) throw new Error('Partido no encontrado');
+  if (!result) throw new ActionError('Partido no encontrado');
 
   const { match, convocados, tomas } = result;
   return { ok: true, session: buildSessionFromRows(match, convocados, tomas) };
@@ -131,7 +132,7 @@ export async function saveIntrapartidoMatch(teamId, session) {
   const matchInfo = session.matchInfo || {};
   const fecha = String(matchInfo.fecha || '');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha) || Number.isNaN(Date.parse(`${fecha}T12:00:00Z`))) {
-    throw new Error('Indica la fecha del partido');
+    throw new ActionError('Indica la fecha del partido');
   }
 
   const roster = Array.isArray(session.activeRosterIds) ? session.activeRosterIds : [];
@@ -139,17 +140,17 @@ export async function saveIntrapartidoMatch(teamId, session) {
   const starterIds = new Set(
     (Array.isArray(session.starterIds) ? session.starterIds : []).map((id) => parseId(id, 'Jugador')),
   );
-  if (rosterIds.length === 0) throw new Error('Convoca al menos un jugador');
-  if (starterIds.size > MAX_STARTERS) throw new Error(`Un partido no puede tener más de ${MAX_STARTERS} titulares`);
+  if (rosterIds.length === 0) throw new ActionError('Convoca al menos un jugador');
+  if (starterIds.size > MAX_STARTERS) throw new ActionError(`Un partido no puede tener más de ${MAX_STARTERS} titulares`);
   starterIds.forEach((id) => {
-    if (!rosterIds.includes(id)) throw new Error('Un titular no está en la convocatoria');
+    if (!rosterIds.includes(id)) throw new ActionError('Un titular no está en la convocatoria');
   });
 
   // Todos los jugadores deben pertenecer al equipo indicado.
   const teamPlayers = await getPlayersByTeamSelect(db, teamId, 'id');
   const teamPlayerIds = new Set(teamPlayers.map((p) => Number(p.id)));
   rosterIds.forEach((id) => {
-    if (!teamPlayerIds.has(id)) throw new Error('Hay jugadores que no pertenecen al equipo');
+    if (!teamPlayerIds.has(id)) throw new ActionError('Hay jugadores que no pertenecen al equipo');
   });
 
   const rosterSet = new Set(rosterIds);
@@ -159,13 +160,13 @@ export async function saveIntrapartidoMatch(teamId, session) {
     const jugadorId = parseId(rawPlayerId, 'Jugador');
     if (!rosterSet.has(jugadorId) || !timings || typeof timings !== 'object') return;
     Object.entries(timings).forEach(([momento, products]) => {
-      if (!TIMING_IDS.has(momento)) throw new Error('Momento de partido no válido');
+      if (!TIMING_IDS.has(momento)) throw new ActionError('Momento de partido no válido');
       if (!products || typeof products !== 'object') return;
       Object.entries(products).forEach(([productoId, qty]) => {
-        if (!PRODUCTS_MAP.has(productoId)) throw new Error('Producto no válido');
+        if (!PRODUCTS_MAP.has(productoId)) throw new ActionError('Producto no válido');
         const cantidad = Number(qty);
         if (!Number.isInteger(cantidad) || cantidad < 0 || cantidad > MAX_QTY_PER_INTAKE) {
-          throw new Error('Cantidad no válida');
+          throw new ActionError('Cantidad no válida');
         }
         if (cantidad > 0) tomas.push({ jugador_id: jugadorId, momento, producto_id: productoId, cantidad });
       });

@@ -14,6 +14,7 @@ import { IconCheck, IconX, IconCooking, IconSparkles, IconAlertCircle } from '@/
 import ResponsiveModal from './ResponsiveModal';
 import { interpretDishTree } from '@/actions/menuActions';
 import { formatAstToText } from '@/lib/engine/meal-ast';
+import { errorMessage } from '@/lib/actionError';
 
 /**
  * Edita el AST de un plato del comedor: descripción libre → IA → AST (allOf / oneOf / food).
@@ -49,7 +50,7 @@ export default function EditDishDecompositionModal({
       }
       setTree(data.tree);
     } catch (err) {
-      setAiError(err.message || 'Error al conectar con el servicio de IA.');
+      setAiError(errorMessage(err, 'Error al conectar con el servicio de IA.'));
     } finally {
       setIsAnalyzing(false);
     }

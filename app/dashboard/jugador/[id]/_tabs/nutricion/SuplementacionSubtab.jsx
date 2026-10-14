@@ -35,6 +35,7 @@ import {
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 
 function getSupplementIcon(suplemento) {
@@ -430,7 +431,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
       notifications.show({
         color: 'red',
         title: 'No se pudo cargar suplementación',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setLoading(false);
@@ -454,7 +455,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
       await loadData();
       return true;
     } catch (err) {
-      notifications.show({ color: 'red', title: 'No se pudo guardar', message: err.message });
+      notifications.show({ color: 'red', title: 'No se pudo guardar', message: errorMessage(err) });
       return false;
     } finally {
       setSaving(false);

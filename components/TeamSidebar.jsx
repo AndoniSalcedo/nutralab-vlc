@@ -26,6 +26,7 @@ import SafeAvatar from '@/components/SafeAvatar';
 import { uploadTeamPhoto } from '@/actions/teamActions';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 export const TEAM_TABS = [
   {
@@ -134,7 +135,7 @@ export default function TeamSidebar({
       notifications.show({
         color: 'red',
         title: 'Error al actualizar imagen',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setUploadLoading(false);

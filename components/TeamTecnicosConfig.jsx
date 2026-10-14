@@ -33,6 +33,7 @@ import {
 } from '@/actions/tecnicoActions';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 export default function TeamTecnicosConfig({ team, readOnly = false }) {
   const [tecnicos, setTecnicos] = useState([]);
@@ -56,7 +57,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
       notifications.show({
         color: 'red',
         title: 'Error al cargar técnicos',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setLoading(false);
@@ -111,7 +112,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
       notifications.show({
         color: 'red',
         title: 'Error al asignar',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setSaving(false);
@@ -144,7 +145,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
       notifications.show({
         color: 'red',
         title: 'Error al vincular técnico',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setSaving(false);
@@ -175,7 +176,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
       notifications.show({
         color: 'red',
         title: 'Error',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setUnassigning(false);

@@ -5,6 +5,7 @@ import { getUser } from '@/lib/auth/session';
 import { getDb } from '@/lib/db/prisma';
 import { getOwnedPlayer, getOwnedTeam, getOwnerId } from '@/lib/auth/team-access';
 import { insertMessages } from '@/repositories/messagesRepository';
+import { ActionError } from '@/lib/actionError';
 
 function cleanText(value) {
   return String(value || '').trim();
@@ -23,7 +24,7 @@ function normalizeRecipientIds(value) {
 export async function sendMessage(payload) {
   const user = await getUser();
   if (user?.role !== 'admin') {
-    throw new Error('Sin permisos');
+    throw new ActionError('Sin permisos');
   }
 
   const titulo = cleanText(payload?.titulo);
@@ -33,11 +34,11 @@ export async function sendMessage(payload) {
   const teamId = cleanText(payload?.team_id);
 
   if (!titulo || !contenido) {
-    throw new Error('Título y mensaje son obligatorios');
+    throw new ActionError('Título y mensaje son obligatorios');
   }
 
   if (!sendToAll && recipientIds.length === 0) {
-    throw new Error('Selecciona al menos un jugador');
+    throw new ActionError('Selecciona al menos un jugador');
   }
 
   const base = {
@@ -49,13 +50,13 @@ export async function sendMessage(payload) {
 
   const db = getDb();
   const team = await getOwnedTeam(db, user, teamId);
-  if (!team) throw new Error('No tienes acceso a este equipo');
+  if (!team) throw new ActionError('No tienes acceso a este equipo');
 
   if (!sendToAll) {
     for (const jugadorId of recipientIds) {
       const ownedPlayer = await getOwnedPlayer(db, user, jugadorId);
       if (!ownedPlayer || String(ownedPlayer.equipo_id) !== String(team.id)) {
-        throw new Error('Hay jugadores fuera de este equipo');
+        throw new ActionError('Hay jugadores fuera de este equipo');
       }
     }
   }

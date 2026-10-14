@@ -19,6 +19,7 @@ import { getPlayerById } from '@/repositories/playerRepository';
 import { enrichMenuWithDecomposedDishes, decomposeDishesToAst, toDishNode } from '@/lib/ai/menu-decomposer';
 import { validateAstValue, astNodeSchema } from '@/validations/mealAstSchema';
 import { trackUsageEvent } from '@/lib/billing/client';
+import { ActionError } from '@/lib/actionError';
 
 const MENU_TOOL_NAME = 'extraer_menu_semanal';
 const MENU_MAX_TOKENS = 8192;
@@ -87,7 +88,7 @@ function extractSemanaInicio(input) {
 
 function extractMenuData(message) {
   if (message.stop_reason === 'max_tokens') {
-    throw new Error('La extracción del menú se cortó por límite de tokens. Prueba a intentarlo de nuevo o usa un documento más conciso.');
+    throw new ActionError('La extracción del menú se cortó por límite de tokens. Prueba a intentarlo de nuevo o usa un documento más conciso.');
   }
 
   const toolUse = message.content?.find((item) => item.type === 'tool_use' && item.name === MENU_TOOL_NAME);
@@ -117,22 +118,22 @@ function extractMenuData(message) {
     }
   }
 
-  throw new Error('No se pudo extraer una estructura válida del menú desde el documento.');
+  throw new ActionError('No se pudo extraer una estructura válida del menú desde el documento.');
 }
 
 export async function getWeeklyMenus(teamId, semana = null) {
-  if (!teamId) throw new Error('Falta equipo_id');
+  if (!teamId) throw new ActionError('Falta equipo_id');
 
   const user = await getUser();
-  if (!user) throw new Error('No autenticado');
+  if (!user) throw new ActionError('No autenticado');
 
   const db = getDb();
   if (user.role === 'jugador') {
     const player = await getPlayerById(db, user.id);
-    if (String(player?.equipo_id) !== String(teamId)) throw new Error('No autorizado');
+    if (String(player?.equipo_id) !== String(teamId)) throw new ActionError('No autorizado');
   } else {
     const team = await getAccessibleTeam(db, user, teamId);
-    if (!team) throw new Error('No tienes acceso a este equipo');
+    if (!team) throw new ActionError('No tienes acceso a este equipo');
   }
 
   const data = await getMenusByTeamLimit(db, teamId, semana, 10);
@@ -142,13 +143,13 @@ export async function getWeeklyMenus(teamId, semana = null) {
 export async function createWeeklyMenu({ semana, equipo_id, dias }) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
-  if (!semana || !equipo_id) throw new Error('Faltan datos');
+  if (!semana || !equipo_id) throw new ActionError('Faltan datos');
 
   const db = getDb();
   const team = await getOwnedTeam(db, user, equipo_id);
-  if (!team) throw new Error('No tienes acceso a este equipo');
+  if (!team) throw new ActionError('No tienes acceso a este equipo');
 
   const data = await upsertMenu(db, { semana, equipo_id, dias: dias || [], updated_at: new Date().toISOString() });
   revalidatePath(`/dashboard/equipo/${equipo_id}/menu`);
@@ -171,7 +172,7 @@ export async function uploadWeeklyMenu(fileOrFormData, weekDateParam, teamIdPara
 async function processWeeklyMenuUpload(fileOrFormData, weekDateParam, teamIdParam) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   let formData = fileOrFormData;
@@ -188,7 +189,7 @@ async function processWeeklyMenuUpload(fileOrFormData, weekDateParam, teamIdPara
 
   const db = getDb();
   const team = await getOwnedTeam(db, user, equipoId);
-  if (!team) throw new Error('No tienes acceso a este equipo');
+  if (!team) throw new ActionError('No tienes acceso a este equipo');
 
   // Tipo y tamaño se verifican sobre el contenido real, no sobre `archivo.type`.
   const upload = await readDocumentUpload(archivo, { allowImages: true });
@@ -290,7 +291,7 @@ IMPORTANTE:
   const finalSemana = (semanaInicio && /^\d{4}-\d{2}-\d{2}$/.test(semanaInicio)) ? semanaInicio : semana;
   const enrichedDias = await enrichMenuWithDecomposedDishes(formattedDias);
   const validation = validateMenuDias(enrichedDias);
-  if (!validation.success) throw new Error(validation.error);
+  if (!validation.success) throw new ActionError(validation.error);
 
   const data = await upsertMenu(db, { semana: finalSemana, equipo_id: equipoId, dias: validation.data, updated_at: new Date().toISOString() });
 
@@ -327,16 +328,16 @@ IMPORTANTE:
 export async function updateWeeklyMenu(id, dias) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
-  if (!id || !dias) throw new Error('Faltan datos');
+  if (!id || !dias) throw new ActionError('Faltan datos');
 
   const db = getDb();
   const menu = await getMenuById(db, id);
-  if (!menu) throw new Error('Menú no encontrado');
+  if (!menu) throw new ActionError('Menú no encontrado');
 
   const team = await getOwnedTeam(db, user, menu.equipo_id);
-  if (!team) throw new Error('No tienes acceso a este equipo');
+  if (!team) throw new ActionError('No tienes acceso a este equipo');
 
   // Los platos nuevos o renombrados se estructuran como AST; los ya estructurados se conservan.
   // Los errores se devuelven (no se lanzan) para que el mensaje llegue al cliente en producción.
@@ -358,16 +359,16 @@ export async function updateWeeklyMenu(id, dias) {
 export async function deleteWeeklyMenu(id) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
-  if (!id) throw new Error('Falta id');
+  if (!id) throw new ActionError('Falta id');
 
   const db = getDb();
   const menu = await getMenuById(db, id);
-  if (!menu) throw new Error('Menú no encontrado');
+  if (!menu) throw new ActionError('Menú no encontrado');
 
   const team = await getOwnedTeam(db, user, menu.equipo_id);
-  if (!team) throw new Error('No tienes acceso a este equipo');
+  if (!team) throw new ActionError('No tienes acceso a este equipo');
 
   await deleteMenu(db, id);
   revalidatePath(`/dashboard/equipo/${menu.equipo_id}/menu`);

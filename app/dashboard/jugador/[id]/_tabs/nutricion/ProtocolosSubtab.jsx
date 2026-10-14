@@ -15,6 +15,7 @@ import ProtocolEditorModal from '@/components/modals/ProtocolEditorModal';
 import NothingFound from '@/components/NothingFound';
 import { PROTOCOL_ICON_MAP as AVAILABLE_ICONS } from '@/components/ProtocolIcon';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 export default function ProtocolosSubtab({ jugador, readOnly = false }) {
   const router = useRouter();
@@ -63,7 +64,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
     } catch (e) {
       notifications.show({
         title: 'Error al guardar',
-        message: e.message || 'No se pudo guardar el protocolo personalizado.',
+        message: errorMessage(e, 'No se pudo guardar el protocolo personalizado.'),
         color: 'red'
       });
     }
@@ -86,7 +87,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
     } catch (e) {
       notifications.show({
         title: 'Error al restablecer',
-        message: e.message || 'No se pudo restablecer el protocolo.',
+        message: errorMessage(e, 'No se pudo restablecer el protocolo.'),
         color: 'red'
       });
     }

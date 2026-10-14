@@ -7,6 +7,7 @@ import Icon3D from '@/components/Icon3D';
 import { updatePlayerPassword } from '@/actions/playerActions';
 import PlayerPasswordModal from '@/components/modals/PlayerPasswordModal';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 export default function PlayerPasswordButton({ compact = false, menuItem = false }) {
   const [opened, setOpened] = useState(false);
@@ -38,7 +39,7 @@ export default function PlayerPasswordButton({ compact = false, menuItem = false
       setConfirm('');
       setOpened(false);
     } catch (e) {
-      notifications.show({ color: 'red', title: 'No se pudo actualizar', message: e.message });
+      notifications.show({ color: 'red', title: 'No se pudo actualizar', message: errorMessage(e) });
     } finally {
       setSaving(false);
     }

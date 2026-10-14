@@ -9,6 +9,7 @@ import { verifyAuthPassword } from '@/lib/auth/auth-users';
 import { getPlayerByAuthUserIdSingle } from '@/repositories/playerRepository';
 import { getTecnicoByAuthUserId } from '@/repositories/tecnicoRepository';
 import { enforceRateLimit } from '@/lib/security/rate-limit';
+import { ActionError } from '@/lib/actionError';
 
 export async function login(emailOrPayload, passwordParam, expectedRoleParam) {
   let email, password, expectedRole;
@@ -25,10 +26,10 @@ export async function login(emailOrPayload, passwordParam, expectedRoleParam) {
   const cleanEmail = String(email || '').trim().toLowerCase();
 
   if (!cleanEmail || !password) {
-    throw new Error('Email y contraseña son obligatorios');
+    throw new ActionError('Email y contraseña son obligatorios');
   }
   if (typeof password !== 'string' || password.length > 256 || cleanEmail.length > 254) {
-    throw new Error('Email o contraseña incorrectos');
+    throw new ActionError('Email o contraseña incorrectos');
   }
 
   // Frena la fuerza bruta: por IP+email y, más laxo, por IP.
@@ -42,11 +43,11 @@ export async function login(emailOrPayload, passwordParam, expectedRoleParam) {
     supabaseUser = await verifyAuthPassword(cleanEmail, password);
   } catch (authError) {
     console.error('Login auth error:', authError?.message);
-    throw new Error('El inicio de sesión no está disponible temporalmente. Inténtalo más tarde.');
+    throw new ActionError('El inicio de sesión no está disponible temporalmente. Inténtalo más tarde.');
   }
 
   if (!supabaseUser) {
-    throw new Error('Email o contraseña incorrectos');
+    throw new ActionError('Email o contraseña incorrectos');
   }
 
   const db = getDb();
@@ -71,7 +72,7 @@ export async function login(emailOrPayload, passwordParam, expectedRoleParam) {
           ? 'No se ha encontrado un perfil de jugador asociado a este email. Contacta con tu nutricionista.'
           : 'No se ha encontrado un perfil asociado a este email. Contacta con tu nutricionista.';
 
-    throw new Error(errorMsg);
+    throw new ActionError(errorMsg);
   }
 
   let sessionObj;

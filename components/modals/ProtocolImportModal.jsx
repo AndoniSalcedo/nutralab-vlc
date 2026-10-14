@@ -21,6 +21,7 @@ import { IconDownload, IconShield } from '@/components/icons3d';
 import { getTeams } from '@/actions/teamActions';
 import { batchImportProtocols } from '@/actions/protocolActions';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 const EMPTY_DAY_TYPES = [];
 
@@ -59,7 +60,7 @@ export default function ProtocolImportModal({
           notifications.show({
             color: 'red',
             title: 'Error al cargar equipos',
-            message: err.message || 'No se pudieron recuperar los equipos',
+            message: errorMessage(err, 'No se pudieron recuperar los equipos'),
           });
         })
         .finally(() => {
@@ -153,7 +154,7 @@ export default function ProtocolImportModal({
       notifications.show({
         color: 'red',
         title: 'Error al importar',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setLoading(false);

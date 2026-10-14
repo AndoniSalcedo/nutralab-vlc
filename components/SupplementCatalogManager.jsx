@@ -40,6 +40,7 @@ import Icon3D, {
 } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 function getSupplementIcon(supp) {
   const cat = (supp?.categoria || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -154,7 +155,7 @@ export default function SupplementCatalogManager({
       setData(nextData);
       setSelectedListId((current) => current || (nextData.listas?.[0]?.id ? String(nextData.listas[0].id) : ''));
     } catch (err) {
-      notifications.show({ color: 'red', title: 'No se pudo cargar', message: err.message });
+      notifications.show({ color: 'red', title: 'No se pudo cargar', message: errorMessage(err) });
     } finally {
       setLoading(false);
     }
@@ -172,7 +173,7 @@ export default function SupplementCatalogManager({
       await loadData();
       return result;
     } catch (err) {
-      notifications.show({ color: 'red', title: 'No se pudo guardar', message: err.message });
+      notifications.show({ color: 'red', title: 'No se pudo guardar', message: errorMessage(err) });
       return null;
     } finally {
       setSaving(false);

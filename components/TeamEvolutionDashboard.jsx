@@ -70,6 +70,7 @@ import {
 import WidgetCard, { StatTile, WidgetAside } from '@/components/widgets/WidgetCard';
 import PlayerListCards from '@/components/widgets/PlayerListCards';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 // Icono y color de categoría de cada métrica (mismo criterio que la pestaña Mediciones del jugador)
 const METRIC_STYLE = {
@@ -1088,7 +1089,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
       console.error('Error al generar PDF de filtros:', error);
       notifications.show({
         title: 'Error al exportar PDF',
-        message: error.message || 'No se pudo generar el documento PDF.',
+        message: errorMessage(error, 'No se pudo generar el documento PDF.'),
         color: 'red',
       });
     } finally {

@@ -53,6 +53,7 @@ import {
   getIntrapartidoMatch,
   saveIntrapartidoMatch,
 } from '@/actions/intrapartidoActions';
+import { errorMessage } from '@/lib/actionError';
 
 const COMPETITION_OPTIONS = [
   { value: 'LaLiga EA Sports', label: 'LaLiga EA Sports' },
@@ -161,7 +162,7 @@ export default function IntrapartidoModal({
       })
       .catch((err) => {
         if (cancelled) return;
-        notifications.show({ color: 'red', title: 'Error', message: err.message || 'No se pudieron cargar los partidos guardados.' });
+        notifications.show({ color: 'red', title: 'Error', message: errorMessage(err, 'No se pudieron cargar los partidos guardados.') });
       });
     return () => {
       cancelled = true;
@@ -194,7 +195,7 @@ export default function IntrapartidoModal({
         setSession((prev) => (prev.id === res.id ? prev : { ...prev, id: res.id }));
         onSaved?.();
       } catch (err) {
-        notifications.show({ color: 'orange', title: 'Borrador sin guardar', message: err.message || 'No se pudo guardar el avance; se reintentará en la siguiente etapa.' });
+        notifications.show({ color: 'orange', title: 'Borrador sin guardar', message: errorMessage(err, 'No se pudo guardar el avance; se reintentará en la siguiente etapa.') });
       }
     });
     saveQueueRef.current = task;
@@ -244,7 +245,7 @@ export default function IntrapartidoModal({
       setCurrentPhaseIndex(isDraft ? res.session.faseActual : 0);
       setGroupFilter('titulares');
     } catch (err) {
-      notifications.show({ color: 'red', title: 'Error', message: err.message || 'No se pudo cargar el partido.' });
+      notifications.show({ color: 'red', title: 'Error', message: errorMessage(err, 'No se pudo cargar el partido.') });
     } finally {
       setLoadingMatch(false);
     }
@@ -504,7 +505,7 @@ export default function IntrapartidoModal({
     try {
       await exportIntrapartidoExcel({ session, players, team });
     } catch (err) {
-      notifications.show({ color: 'red', title: 'Error', message: err.message || 'No se pudo generar el Excel.' });
+      notifications.show({ color: 'red', title: 'Error', message: errorMessage(err, 'No se pudo generar el Excel.') });
     }
   };
 
@@ -520,7 +521,7 @@ export default function IntrapartidoModal({
       onSaved?.();
       onClose();
     } catch (err) {
-      notifications.show({ color: 'red', title: 'No se pudo guardar', message: err.message || 'Inténtalo de nuevo.' });
+      notifications.show({ color: 'red', title: 'No se pudo guardar', message: errorMessage(err, 'Inténtalo de nuevo.') });
     } finally {
       setSaving(false);
     }

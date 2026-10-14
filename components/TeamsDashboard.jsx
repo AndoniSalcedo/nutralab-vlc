@@ -35,6 +35,7 @@ import TeamFormModal from '@/components/modals/TeamFormModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import Icon3D from '@/components/Icon3D';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 
 function nextSeasonLabel() {
@@ -249,7 +250,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
       setModal({ type: null, team: null });
       router.refresh();
     } catch (error) {
-      notifications.show({ color: 'red', title: 'No se pudo guardar', message: error.message });
+      notifications.show({ color: 'red', title: 'No se pudo guardar', message: errorMessage(error) });
     } finally {
       setSaving(false);
     }
@@ -270,7 +271,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
       router.refresh();
       setDeleteTeamData(null);
     } catch (error) {
-      notifications.show({ color: 'red', title: 'No se pudo eliminar', message: error.message });
+      notifications.show({ color: 'red', title: 'No se pudo eliminar', message: errorMessage(error) });
     } finally {
       setSaving(false);
     }

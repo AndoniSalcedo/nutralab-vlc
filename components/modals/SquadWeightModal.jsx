@@ -39,6 +39,7 @@ import {
 } from '@/lib/io/weight-export';
 import ResponsiveModal from './ResponsiveModal';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 const MIN_WEIGHT_KG = 15;
 const MAX_WEIGHT_KG = 200;
@@ -317,7 +318,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
       notifications.show({
         color: 'red',
         title: 'Error al guardar pesos',
-        message: err.message || 'Ocurrió un error inesperado al registrar los pesos.',
+        message: errorMessage(err, 'Ocurrió un error inesperado al registrar los pesos.'),
       });
     } finally {
       setSaving(false);
@@ -346,7 +347,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
         summary: exportSummary,
       });
     } catch (err) {
-      notifications.show({ color: 'red', title: 'Error al generar el Excel', message: err.message });
+      notifications.show({ color: 'red', title: 'Error al generar el Excel', message: errorMessage(err) });
       return;
     }
 
@@ -389,7 +390,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
       notifications.show({
         color: 'red',
         title: 'Error al exportar PDF',
-        message: err.message || 'Ocurrió un error al generar el PDF.',
+        message: errorMessage(err, 'Ocurrió un error al generar el PDF.'),
       });
     } finally {
       setExportingPdf(false);

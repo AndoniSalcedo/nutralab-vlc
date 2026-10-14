@@ -37,6 +37,7 @@ import { trackUsageEvent } from '@/lib/billing/client';
 import { personalizePautas, describeAjustes } from '@/lib/nutrition/pauta-personalization';
 import { syncPreMatchProtocol } from '@/lib/nutrition/prematch-protocol';
 import { syncMealDistribution } from '@/lib/nutrition/meal-distribution';
+import { ActionError } from '@/lib/actionError';
 
 // Campos del jugador que cambian lo que puede comer: al modificarlos se revisan sus pautas guardadas.
 const RESTRICTION_FIELDS = ['intolerancias', 'aversiones'];
@@ -72,24 +73,24 @@ function parseMealDistribution(value) {
     .filter(([meal, pct]) => meal && Number.isFinite(pct) && pct >= 0 && pct <= 100);
   const total = entries.reduce((sum, [, pct]) => sum + pct, 0);
   if (entries.length === 0 || total !== 100) {
-    throw new Error('El reparto de kcal por ingesta debe sumar 100 %.');
+    throw new ActionError('El reparto de kcal por ingesta debe sumar 100 %.');
   }
   return Object.fromEntries(entries);
 }
 
 export async function updatePlayerField(id, field, value) {
   if (!id || !field || !CAMPOS_PERMITIDOS.includes(field)) {
-    throw new Error('Campo no permitido: ' + field);
+    throw new ActionError('Campo no permitido: ' + field);
   }
 
   const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const ownedPlayer = await getOwnedPlayer(db, user, id);
-  if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+  if (!ownedPlayer) throw new ActionError('No tienes acceso a este jugador');
 
   let parsedValue = value;
   if (field === 'porcentaje_grasa_objetivo') {
@@ -166,29 +167,29 @@ export async function updatePlayerCredentials(jugadorIdOrPayload, emailParam, pa
 
   const user = await getUser();
   if (user?.role !== 'admin') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const cleanEmail = String(email || '').trim().toLowerCase();
   const cleanPassword = String(password || '');
 
-  if (!jugadorId) throw new Error('Falta jugador');
+  if (!jugadorId) throw new ActionError('Falta jugador');
   if (!cleanEmail || !cleanEmail.includes('@')) {
-    throw new Error('Introduce un correo válido');
+    throw new ActionError('Introduce un correo válido');
   }
   if (!isValidPassword(cleanPassword)) {
-    throw new Error('La contraseña debe tener al menos 8 caracteres');
+    throw new ActionError('La contraseña debe tener al menos 8 caracteres');
   }
 
   const db = getDb();
   const ownedPlayer = await getOwnedPlayer(db, user, jugadorId);
   if (!ownedPlayer) {
-    throw new Error('No tienes acceso a este jugador');
+    throw new ActionError('No tienes acceso a este jugador');
   }
 
   const jugador = await getPlayerById(db, jugadorId);
   if (!jugador) {
-    throw new Error('Jugador no encontrado');
+    throw new ActionError('Jugador no encontrado');
   }
 
   const metadata = playerMetadata(jugador);
@@ -198,7 +199,7 @@ export async function updatePlayerCredentials(jugadorIdOrPayload, emailParam, pa
     // contraseña: hacerlo permitiría a un admin tomar cuentas de otros tenants.
     const existingUser = await findAuthUserByEmail(db, cleanEmail);
     if (existingUser) {
-      throw new Error('Ese correo ya está en uso por otra cuenta. Usa un correo distinto.');
+      throw new ActionError('Ese correo ya está en uso por otra cuenta. Usa un correo distinto.');
     }
   }
 
@@ -226,28 +227,28 @@ export async function updatePlayerCredentials(jugadorIdOrPayload, emailParam, pa
 export async function updatePlayerPassword(password, currentPassword) {
   const user = await getUser();
   if (user?.role !== 'jugador' || !user?.supabase_uid) {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const cleanPassword = String(password || '');
   if (cleanPassword.length < 8 || cleanPassword.length > 128) {
-    throw new Error('La contraseña debe tener al menos 8 caracteres');
+    throw new ActionError('La contraseña debe tener al menos 8 caracteres');
   }
   if (!currentPassword) {
-    throw new Error('Introduce tu contraseña actual');
+    throw new ActionError('Introduce tu contraseña actual');
   }
 
   await enforceRateLimit('change-password', String(user.id), { limit: 5, windowMs: 15 * 60 * 1000 });
 
   const authUser = await getAuthUserById(user.supabase_uid);
   if (!authUser?.email) {
-    throw new Error('No se pudo verificar tu cuenta');
+    throw new ActionError('No se pudo verificar tu cuenta');
   }
 
   // Verifica la contraseña actual contra auth.users (sin crear sesión).
   const verified = await verifyAuthPassword(authUser.email, String(currentPassword));
   if (!verified || verified.id !== authUser.id) {
-    throw new Error('La contraseña actual no es correcta');
+    throw new ActionError('La contraseña actual no es correcta');
   }
 
   await updateAuthUser(user.supabase_uid, { password: cleanPassword });
@@ -258,31 +259,31 @@ export async function updatePlayerPassword(password, currentPassword) {
 export async function transferPlayers({ playerIds, targetTeamId, action }) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const ownerId = getOwnerId(user);
-  if (!ownerId) throw new Error('No se pudo determinar el propietario');
+  if (!ownerId) throw new ActionError('No se pudo determinar el propietario');
 
   if (!Array.isArray(playerIds) || playerIds.length === 0) {
-    throw new Error('Faltan jugadores por transferir');
+    throw new ActionError('Faltan jugadores por transferir');
   }
   if (!targetTeamId) {
-    throw new Error('Falta el equipo de destino');
+    throw new ActionError('Falta el equipo de destino');
   }
   if (action !== 'move' && action !== 'copy') {
-    throw new Error('Acción inválida');
+    throw new ActionError('Acción inválida');
   }
 
   const db = getDb();
   const targetTeam = await getOwnedTeam(db, user, targetTeamId);
   if (!targetTeam) {
-    throw new Error('No tienes acceso al equipo de destino');
+    throw new ActionError('No tienes acceso al equipo de destino');
   }
 
   const players = await getOwnedPlayersByIds(db, ownerId, playerIds);
   if (players.length !== playerIds.length) {
-    throw new Error('No tienes acceso a todos los jugadores seleccionados o algunos no existen');
+    throw new ActionError('No tienes acceso a todos los jugadores seleccionados o algunos no existen');
   }
 
   if (action === 'move') {
@@ -326,18 +327,18 @@ export async function savePlayer(form) {
   const user = await getUser();
 
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   let targetTeam = null;
   if (id) {
     const ownedPlayer = await getOwnedPlayer(db, user, id);
-    if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+    if (!ownedPlayer) throw new ActionError('No tienes acceso a este jugador');
     targetTeam = await getOwnedTeam(db, user, ownedPlayer.equipo_id);
-    if (!targetTeam) throw new Error('No tienes acceso a este equipo');
+    if (!targetTeam) throw new ActionError('No tienes acceso a este equipo');
   } else {
     targetTeam = await getOwnedTeam(db, user, teamId);
-    if (!targetTeam) throw new Error('Debes crear o seleccionar un equipo antes de añadir jugadores');
+    if (!targetTeam) throw new ActionError('Debes crear o seleccionar un equipo antes de añadir jugadores');
   }
 
   const payload = {
@@ -464,16 +465,16 @@ export async function savePlayer(form) {
 }
 
 export async function deletePlayer(id) {
-  if (!id) throw new Error('Falta id del jugador');
+  if (!id) throw new ActionError('Falta id del jugador');
 
   const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const owned = await getOwnedPlayer(db, user, id);
-  if (!owned) throw new Error('No tienes acceso a este jugador');
+  if (!owned) throw new ActionError('No tienes acceso a este jugador');
 
   const jugador = await getPlayerAuthUserId(db, id);
 
@@ -662,7 +663,7 @@ async function importGroups({ db, team, plan, players, decisions, user }) {
       } else {
         player = playersById.get(String(decision.jugadorId));
         if (!player) {
-          throw new Error('El jugador seleccionado no pertenece a este equipo');
+          throw new ActionError('El jugador seleccionado no pertenece a este equipo');
         }
         player = await updatePlayerIfNeeded(db, player, group);
         playersById.set(String(player.id), player);
@@ -713,20 +714,20 @@ export async function importPlayerExcel(formDataOrPayload) {
   const teamId = cleanText(formData.get('team_id'));
 
   if (!file || typeof file.arrayBuffer !== 'function') {
-    throw new Error('Sin archivo Excel');
+    throw new ActionError('Sin archivo Excel');
   }
   if (file.size > MAX_DOCUMENT_BYTES) {
-    throw new Error('El archivo Excel es demasiado grande');
+    throw new ActionError('El archivo Excel es demasiado grande');
   }
 
   const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const team = await getOwnedTeam(db, user, teamId);
-  if (!team) throw new Error('Debes importar dentro de un equipo propio');
+  if (!team) throw new ActionError('Debes importar dentro de un equipo propio');
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const parsed = await parsePlayerExcel(buffer);
@@ -738,7 +739,7 @@ export async function importPlayerExcel(formDataOrPayload) {
   }
 
   if (mode !== 'importar') {
-    throw new Error('Modo de importación no soportado');
+    throw new ActionError('Modo de importación no soportado');
   }
 
   const decisions = parseJson(formData.get('decisiones'), {});
@@ -762,7 +763,7 @@ export async function importPlayerExcel(formDataOrPayload) {
 
 export async function uploadPlayerAvatar(jugadorIdOrFormData, maybeFile) {
   const user = await getUser();
-  if (!user) throw new Error('No autorizado');
+  if (!user) throw new ActionError('No autorizado');
 
   let id;
   let remove = false;
@@ -784,17 +785,17 @@ export async function uploadPlayerAvatar(jugadorIdOrFormData, maybeFile) {
   if (!id && user.role === 'jugador') {
     id = user.id;
   }
-  if (!id) throw new Error('Falta id del jugador');
+  if (!id) throw new ActionError('Falta id del jugador');
 
   const db = getDb();
 
   if (user.role === 'jugador') {
     if (String(user.id) !== String(id)) {
-      throw new Error('No tienes acceso a este jugador');
+      throw new ActionError('No tienes acceso a este jugador');
     }
   } else {
     const owned = await getOwnedPlayer(db, user, id);
-    if (!owned) throw new Error('No tienes acceso a este jugador');
+    if (!owned) throw new ActionError('No tienes acceso a este jugador');
   }
 
   if (remove) {
@@ -809,7 +810,7 @@ export async function uploadPlayerAvatar(jugadorIdOrFormData, maybeFile) {
   }
 
   if (!avatarFile || !(avatarFile instanceof File)) {
-    throw new Error('Falta archivo de avatar');
+    throw new ActionError('Falta archivo de avatar');
   }
 
   const image = await readImageUpload(avatarFile);

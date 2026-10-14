@@ -28,6 +28,7 @@ import { registerTecnico } from '@/actions/tecnicoActions';
 import { env } from '@/config/env';
 import MascotAvatar from '@/components/mascot/MascotAvatar';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 export default function TecnicoLoginForm() {
   const [email, setEmail] = useState('');
@@ -128,16 +129,16 @@ export default function TecnicoLoginForm() {
       }
     } catch (err) {
       const isPasswordError =
-        err?.message?.toLowerCase().includes('contraseña') ||
-        err?.message?.toLowerCase().includes('password') ||
-        err?.message?.toLowerCase().includes('credenciales');
+        errorMessage(err)?.toLowerCase().includes('contraseña') ||
+        errorMessage(err)?.toLowerCase().includes('password') ||
+        errorMessage(err)?.toLowerCase().includes('credenciales');
 
       setMascotState(isPasswordError ? 'embarrassed' : 'confused');
 
       notifications.show({
         color: 'red',
         title: isRegister ? 'Error al registrarse' : 'No se pudo iniciar sesión',
-        message: err.message,
+        message: errorMessage(err),
       });
 
       if (resetTimerRef.current) clearTimeout(resetTimerRef.current);

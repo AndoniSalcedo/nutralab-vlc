@@ -41,6 +41,7 @@ import { compressAvatar, initials } from '@/lib/utils/avatar';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 
 export default function TecnicosManager({ teams = [] }) {
@@ -88,7 +89,7 @@ export default function TecnicosManager({ teams = [] }) {
       notifications.show({
         color: 'red',
         title: 'Error',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setLoading(false);
@@ -116,7 +117,7 @@ export default function TecnicosManager({ teams = [] }) {
       notifications.show({
         color: 'red',
         title: 'Error al vincular',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setSaving(false);
@@ -156,7 +157,7 @@ export default function TecnicosManager({ teams = [] }) {
       notifications.show({
         color: 'red',
         title: 'Error al subir foto',
-        message: err.message,
+        message: errorMessage(err),
       });
     }
   }
@@ -180,7 +181,7 @@ export default function TecnicosManager({ teams = [] }) {
       notifications.show({
         color: 'red',
         title: 'Error',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setDeleting(false);
@@ -208,7 +209,7 @@ export default function TecnicosManager({ teams = [] }) {
       notifications.show({
         color: 'red',
         title: 'Error al asignar',
-        message: err.message,
+        message: errorMessage(err),
       });
     }
   }

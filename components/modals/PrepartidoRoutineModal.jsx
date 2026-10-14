@@ -42,6 +42,7 @@ import {
   isDefaultProtocolMeal,
 } from '@/lib/nutrition/prematch-protocol';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 const SCHEDULE_DETAILS = {
   manana: {
@@ -158,7 +159,7 @@ function SingleMealPautaEditor({
         message: `La pauta para ${mealName} se ha clasificado en las opciones aptas del catálogo del jugador.`,
       });
     } catch (err) {
-      setAiError(err.message || 'Error al conectar con el servicio de IA.');
+      setAiError(errorMessage(err, 'Error al conectar con el servicio de IA.'));
     } finally {
       setIsAnalyzing(false);
     }
@@ -498,7 +499,7 @@ export default function PrepartidoRoutineModal({
       notifications.show({
         color: 'red',
         title: 'Error al guardar rutina',
-        message: e.message || 'No se pudo guardar la rutina pre-partido.',
+        message: errorMessage(e, 'No se pudo guardar la rutina pre-partido.'),
       });
     } finally {
       setSaving(false);
@@ -516,7 +517,7 @@ export default function PrepartidoRoutineModal({
       notifications.show({
         color: 'red',
         title: 'Error al restablecer el protocolo',
-        message: e.message || 'No se pudo restablecer el protocolo.',
+        message: errorMessage(e, 'No se pudo restablecer el protocolo.'),
       });
     } finally {
       setSaving(false);

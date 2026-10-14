@@ -40,6 +40,7 @@ import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import PlanFicha from '@/components/plan/PlanFicha';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 
 
@@ -291,7 +292,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
           notifications.show({
             color: 'red',
             title: 'No se pudieron cargar los planes',
-            message: e.message,
+            message: errorMessage(e),
           });
         }
       } finally {
@@ -348,7 +349,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       notifications.show({
         color: 'red',
         title: 'No se pudo crear la ficha',
-        message: e.message,
+        message: errorMessage(e),
       });
     }
   }
@@ -407,7 +408,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         id: notificationId,
         color: 'red',
         title: 'No se pudo generar la ficha',
-        message: e.message,
+        message: errorMessage(e),
         loading: false,
         autoClose: 6000,
         withCloseButton: true,
@@ -493,7 +494,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         id: notificationId,
         color: 'red',
         title: 'No se pudo generar la ficha',
-        message: e.message,
+        message: errorMessage(e),
         loading: false,
         autoClose: 6000,
         withCloseButton: true,
@@ -547,7 +548,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         id: notificationId,
         color: 'red',
         title: 'No se pudo guardar el plan',
-        message: e.message,
+        message: errorMessage(e),
         loading: false,
         autoClose: 6000,
         withCloseButton: true,
@@ -610,7 +611,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         id: notificationId,
         color: 'red',
         title: 'No se pudo guardar el plan',
-        message: e.message,
+        message: errorMessage(e),
         loading: false,
         autoClose: 6000,
         withCloseButton: true,
@@ -644,7 +645,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       notifications.show({
         color: 'red',
         title: 'Error de descarga',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setActionType(null);
@@ -674,7 +675,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       notifications.show({
         color: 'red',
         title: 'Error al eliminar el plan',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setDeleting(false);

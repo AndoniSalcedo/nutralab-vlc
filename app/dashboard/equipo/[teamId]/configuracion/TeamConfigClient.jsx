@@ -22,6 +22,7 @@ import ProtocolTransferModal from '@/components/modals/ProtocolTransferModal';
 import ProtocolImportModal from '@/components/modals/ProtocolImportModal';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
+import { errorMessage } from '@/lib/actionError';
 
 const COLORS = ['blue', 'teal', 'green', 'orange', 'red', 'grape', 'cyan', 'pink', 'yellow'];
 
@@ -83,7 +84,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
       notifications.show({
         color: 'red',
         title: 'Error al subir imagen',
-        message: err.message,
+        message: errorMessage(err),
       });
     }
   }
@@ -102,7 +103,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
       notifications.show({
         color: 'red',
         title: 'Error al eliminar imagen',
-        message: err.message,
+        message: errorMessage(err),
       });
     }
   }
@@ -298,7 +299,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
         notifySaved({ title: 'Guardado exitoso', message: 'Información básica del equipo actualizada.' });
         router.refresh();
       } catch (e) {
-        notifications.show({ title: 'Error', message: e.message, color: 'red' });
+        notifications.show({ title: 'Error', message: errorMessage(e), color: 'red' });
       } finally {
         setSavingSection(null);
       }
@@ -348,7 +349,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
       });
       router.refresh();
     } catch (e) {
-      notifications.show({ title: 'Error', message: e.message, color: 'red' });
+      notifications.show({ title: 'Error', message: errorMessage(e), color: 'red' });
     } finally {
       setSavingSection(null);
     }

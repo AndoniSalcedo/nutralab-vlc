@@ -27,6 +27,7 @@ import {
   upsertJugadorSuplementosExtraBulk,
   nextListOrder
 } from '@/repositories/supplementationRepository';
+import { ActionError } from '@/lib/actionError';
 
 const slugify = (value) => sharedSlugify(value).slice(0, 80);
 
@@ -36,20 +37,20 @@ function canManage(user) {
 
 export async function getPlayerSupplementation(requestedJugadorId) {
   const user = await getUser();
-  if (!user) throw new Error('No autenticado');
+  if (!user) throw new ActionError('No autenticado');
 
   const requested = toPositiveNumber(requestedJugadorId);
   const jugadorId = user?.role === 'jugador' ? toPositiveNumber(user.id) : requested;
 
-  if (!jugadorId) throw new Error('Falta jugador_id');
+  if (!jugadorId) throw new ActionError('Falta jugador_id');
   if (user?.role === 'jugador' && String(user.id) !== String(jugadorId)) {
-    throw new Error('Sin permisos');
+    throw new ActionError('Sin permisos');
   }
 
   const db = getDb();
   if (user?.role !== 'jugador') {
     const accessiblePlayer = await getAccessiblePlayer(db, user, jugadorId);
-    if (!accessiblePlayer) throw new Error('Sin permisos');
+    if (!accessiblePlayer) throw new ActionError('Sin permisos');
   }
 
   const [
@@ -78,7 +79,7 @@ export async function getPlayerSupplementation(requestedJugadorId) {
 
 export async function getAvailableSupplements() {
   const user = await getUser();
-  if (!user) throw new Error('No autenticado');
+  if (!user) throw new ActionError('No autenticado');
   const db = getDb();
   return getAllSuplementos(db);
 }
@@ -86,17 +87,17 @@ export async function getAvailableSupplements() {
 export async function postPlayerSupplementation(jugadorIdParam, payload) {
   const user = await getUser();
   if (!canManage(user) || user?.role === 'tecnico') {
-    throw new Error('Sin permisos');
+    throw new ActionError('Sin permisos');
   }
 
   const action = cleanText(payload?.action);
   const jugadorId = toPositiveNumber(payload?.jugador_id || jugadorIdParam);
   const db = getDb();
 
-  if (!jugadorId) throw new Error('Falta jugador_id');
+  if (!jugadorId) throw new ActionError('Falta jugador_id');
 
   const accessiblePlayer = await getAccessiblePlayer(db, user, jugadorId);
-  if (!accessiblePlayer) throw new Error('Sin permisos');
+  if (!accessiblePlayer) throw new ActionError('Sin permisos');
 
   if (action === 'set_list') {
     const listaId = toPositiveNumber(payload.lista_id);
@@ -111,7 +112,7 @@ export async function postPlayerSupplementation(jugadorIdParam, payload) {
 
   if (action === 'add_extra') {
     const suplementoId = toPositiveNumber(payload.suplemento_id);
-    if (!suplementoId) throw new Error('Falta suplemento_id');
+    if (!suplementoId) throw new ActionError('Falta suplemento_id');
 
     const data = await upsertJugadorSuplementosExtra(db, {
       jugador_id: jugadorId,
@@ -127,20 +128,20 @@ export async function postPlayerSupplementation(jugadorIdParam, payload) {
 
   if (action === 'delete_extra') {
     const extraId = toPositiveNumber(payload.extra_id);
-    if (!extraId) throw new Error('Falta extra_id');
+    if (!extraId) throw new ActionError('Falta extra_id');
 
     await deleteJugadorSuplementosExtra(db, extraId, jugadorId);
     revalidatePath(`/dashboard/jugador/${jugadorId}`);
     return { ok: true };
   }
 
-  throw new Error('Acción no soportada');
+  throw new ActionError('Acción no soportada');
 }
 
 export async function getSupplementationCatalog() {
   const user = await getUser();
   if (!user || user.role === 'jugador') {
-    throw new Error('Sin permisos');
+    throw new ActionError('Sin permisos');
   }
 
   const db = getDb();
@@ -160,7 +161,7 @@ export async function getSupplementationCatalog() {
 export async function updateSupplementationCatalog(payload) {
   const user = await getUser();
   if (!user || user.role !== 'admin') {
-    throw new Error('Sin permisos');
+    throw new ActionError('Sin permisos');
   }
 
   const action = cleanText(payload?.action);
@@ -168,7 +169,7 @@ export async function updateSupplementationCatalog(payload) {
 
   if (action === 'create_supplement') {
     const nombre = cleanText(payload.nombre);
-    if (!nombre) throw new Error('El nombre del suplemento es obligatorio');
+    if (!nombre) throw new ActionError('El nombre del suplemento es obligatorio');
 
     const slug = slugify(payload.slug || nombre);
     const doseType = payload.dose_type === 'per_kg_range' ? 'per_kg_range' : 'custom';
@@ -195,10 +196,10 @@ export async function updateSupplementationCatalog(payload) {
 
   if (action === 'update_supplement') {
     const id = toPositiveNumber(payload.id);
-    if (!id) throw new Error('ID de suplemento no válido');
+    if (!id) throw new ActionError('ID de suplemento no válido');
 
     const nombre = cleanText(payload.nombre);
-    if (!nombre) throw new Error('El nombre del suplemento es obligatorio');
+    if (!nombre) throw new ActionError('El nombre del suplemento es obligatorio');
 
     const doseType = payload.dose_type === 'per_kg_range' ? 'per_kg_range' : 'custom';
     const body = {
@@ -223,7 +224,7 @@ export async function updateSupplementationCatalog(payload) {
 
   if (action === 'delete_supplement') {
     const id = toPositiveNumber(payload.id);
-    if (!id) throw new Error('ID de suplemento no válido');
+    if (!id) throw new ActionError('ID de suplemento no válido');
 
     await deleteSuplemento(db, id);
     revalidatePath('/dashboard');
@@ -232,7 +233,7 @@ export async function updateSupplementationCatalog(payload) {
 
   if (action === 'delete_list') {
     const id = toPositiveNumber(payload.id);
-    if (!id) throw new Error('ID de catálogo no válido');
+    if (!id) throw new ActionError('ID de catálogo no válido');
 
     await deleteSuplementacionLista(db, id);
     revalidatePath('/dashboard');
@@ -241,7 +242,7 @@ export async function updateSupplementationCatalog(payload) {
 
   if (action === 'create_list') {
     const nombre = cleanText(payload.nombre);
-    if (!nombre) throw new Error('El nombre del catálogo es obligatorio');
+    if (!nombre) throw new ActionError('El nombre del catálogo es obligatorio');
 
     const slug = slugify(payload.slug || nombre);
     const body = {
@@ -260,7 +261,7 @@ export async function updateSupplementationCatalog(payload) {
   if (action === 'add_item') {
     const listaId = toPositiveNumber(payload.lista_id);
     const suplementoId = toPositiveNumber(payload.suplemento_id);
-    if (!listaId || !suplementoId) throw new Error('Falta catálogo o suplemento');
+    if (!listaId || !suplementoId) throw new ActionError('Falta catálogo o suplemento');
 
     const existing = await getSuplementacionListaItemsByList(db, listaId);
     const body = {
@@ -277,7 +278,7 @@ export async function updateSupplementationCatalog(payload) {
 
   if (action === 'remove_item') {
     const itemId = toPositiveNumber(payload.item_id);
-    if (!itemId) throw new Error('Falta item_id');
+    if (!itemId) throw new ActionError('Falta item_id');
 
     await deleteSuplementacionListaItem(db, itemId);
     revalidatePath('/dashboard');
@@ -287,8 +288,8 @@ export async function updateSupplementationCatalog(payload) {
   if (action === 'assign_all') {
     const listaId = toPositiveNumber(payload.lista_id);
     const team = await getOwnedTeam(db, user, payload.team_id);
-    if (!listaId) throw new Error('Selecciona un catálogo');
-    if (!team) throw new Error('No tienes acceso a este equipo');
+    if (!listaId) throw new ActionError('Selecciona un catálogo');
+    if (!team) throw new ActionError('No tienes acceso a este equipo');
 
     const players = await getPlayersByTeam(db, team.id);
     const rows = (players || []).map((player) => ({
@@ -310,11 +311,11 @@ export async function updateSupplementationCatalog(payload) {
       ? payload.jugadorIds.map(Number).filter(Number.isFinite)
       : [];
 
-    if (!listaId) throw new Error('Selecciona un catálogo');
-    if (!jugadorIds.length) throw new Error('Debes seleccionar al menos un jugador');
+    if (!listaId) throw new ActionError('Selecciona un catálogo');
+    if (!jugadorIds.length) throw new ActionError('Debes seleccionar al menos un jugador');
 
     const team = await getOwnedTeam(db, user, payload.team_id);
-    if (!team) throw new Error('No tienes acceso a este equipo');
+    if (!team) throw new ActionError('No tienes acceso a este equipo');
 
     const teamPlayers = await getPlayersByTeamIds(db, team.id, jugadorIds);
     const rows = (teamPlayers || []).map((player) => ({
@@ -338,11 +339,11 @@ export async function updateSupplementationCatalog(payload) {
       ? payload.jugadorIds.map(Number).filter(Number.isFinite)
       : [];
 
-    if (!suplementoIds.length) throw new Error('Selecciona al menos un suplemento');
-    if (!jugadorIds.length) throw new Error('Debes seleccionar al menos un jugador');
+    if (!suplementoIds.length) throw new ActionError('Selecciona al menos un suplemento');
+    if (!jugadorIds.length) throw new ActionError('Debes seleccionar al menos un jugador');
 
     const team = await getOwnedTeam(db, user, payload.team_id);
-    if (!team) throw new Error('No tienes acceso a este equipo');
+    if (!team) throw new ActionError('No tienes acceso a este equipo');
 
     const teamPlayers = await getPlayersByTeamIds(db, team.id, jugadorIds);
     const rows = [];
@@ -363,5 +364,5 @@ export async function updateSupplementationCatalog(payload) {
     return { ok: true, assigned: rows.length };
   }
 
-  throw new Error('Acción no soportada');
+  throw new ActionError('Acción no soportada');
 }

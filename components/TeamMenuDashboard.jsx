@@ -21,6 +21,7 @@ import ConfirmModal from '@/components/modals/ConfirmModal';
 import CreateMenuModal from '@/components/modals/CreateMenuModal';
 import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly = false }) {
   const [menus, setMenus] = useState(initialMenus);
@@ -95,7 +96,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
       notifications.show({
         color: 'red',
         title: 'Error al guardar menú',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setSaving(false);
@@ -185,7 +186,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
       notifications.show({
         color: 'red',
         title: 'Error al actualizar desglose',
-        message: e.message,
+        message: errorMessage(e),
       });
     }
   }
@@ -225,7 +226,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
       notifications.show({
         color: 'red',
         title: 'Error al crear menú',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setCreatingEmpty(false);
@@ -284,7 +285,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
         id: notificationId,
         color: 'red',
         title: 'Error al subir menú',
-        message: e.message,
+        message: errorMessage(e),
         loading: false,
         autoClose: 5000,
         withCloseButton: true,
@@ -319,7 +320,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
       notifications.show({
         color: 'red',
         title: 'Error al eliminar menú',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setDeleting(false);

@@ -18,6 +18,7 @@ import { parseMealTree } from '@/actions/mealActions';
 import { validateMealAst } from '@/lib/engine/meal-ast';
 import { isMainMeal as checkIsMainMeal } from '@/config/nutrition-days';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 export default function EditMealPatternModal({
   opened,
@@ -108,7 +109,7 @@ export default function EditMealPatternModal({
         message: 'Las categorías se han clasificado correctamente.',
       });
     } catch (err) {
-      setAiError(err.message || 'Error de conexión con el servicio de IA.');
+      setAiError(errorMessage(err, 'Error de conexión con el servicio de IA.'));
     } finally {
       setIsAnalyzing(false);
     }

@@ -25,6 +25,7 @@ import {
   upsertJugadorSuplementacion,
   upsertJugadorSuplementosExtraBulk
 } from '@/repositories/supplementationRepository';
+import { ActionError } from '@/lib/actionError';
 
 function clean(value) {
   return String(value || '').trim();
@@ -158,7 +159,7 @@ async function copyPlayerAllHistory(db, sourcePlayerId, newPlayerId) {
 export async function getTeams() {
   const user = await getUser();
   const ownerId = getOwnerId(user);
-  if (!ownerId) throw new Error('No autorizado');
+  if (!ownerId) throw new ActionError('No autorizado');
 
   const db = getDb();
   const teams = await getTeamsByOwner(db, ownerId);
@@ -168,7 +169,7 @@ export async function getTeams() {
 export async function createTeam(payload) {
   const user = await getUser();
   const ownerId = getOwnerId(user);
-  if (!ownerId) throw new Error('No autorizado');
+  if (!ownerId) throw new ActionError('No autorizado');
 
   const db = getDb();
   const action = clean(payload?.action || 'create');
@@ -180,7 +181,7 @@ export async function createTeam(payload) {
     const selectedPlayerIds = cleanPlayerIds(payload.player_ids);
 
     if (!nombre) {
-      throw new Error('El nombre del equipo es obligatorio');
+      throw new ActionError('El nombre del equipo es obligatorio');
     }
 
     const newTeam = await insertTeam(db, { owner_id: ownerId, nombre, temporada, descripcion });
@@ -189,7 +190,7 @@ export async function createTeam(payload) {
       const players = await getOwnedPlayersByIds(db, ownerId, selectedPlayerIds);
       const foundIds = new Set(players.map((player) => String(player.id)));
       const missingIds = selectedPlayerIds.filter((playerId) => !foundIds.has(playerId));
-      if (missingIds.length) throw new Error('Algún jugador seleccionado no pertenece a tus equipos');
+      if (missingIds.length) throw new ActionError('Algún jugador seleccionado no pertenece a tus equipos');
 
       let copiedPlayers = 0;
       const copiedPlayerSummaries = [];
@@ -228,11 +229,11 @@ export async function createTeam(payload) {
     let sourceTeam = null;
     if (teamId) {
       sourceTeam = await getOwnedTeam(db, user, teamId);
-      if (!sourceTeam) throw new Error('No tienes acceso a este equipo');
+      if (!sourceTeam) throw new ActionError('No tienes acceso a este equipo');
     }
 
     if (!temporada) {
-      throw new Error('La temporada destino es obligatoria');
+      throw new ActionError('La temporada destino es obligatoria');
     }
 
     let players = [];
@@ -240,7 +241,7 @@ export async function createTeam(payload) {
       players = await getOwnedPlayersByIds(db, ownerId, selectedPlayerIds);
       const foundIds = new Set(players.map((player) => String(player.id)));
       const missingIds = selectedPlayerIds.filter((playerId) => !foundIds.has(playerId));
-      if (missingIds.length) throw new Error('Algún jugador seleccionado no pertenece a tus equipos');
+      if (missingIds.length) throw new ActionError('Algún jugador seleccionado no pertenece a tus equipos');
     } else if (sourceTeam) {
       players = await getPlayersByTeam(db, sourceTeam.id);
     }
@@ -277,7 +278,7 @@ export async function createTeam(payload) {
     return { equipo: newTeam, copiedPlayers, players: copiedPlayerSummaries };
   }
 
-  throw new Error('Acción no soportada');
+  throw new ActionError('Acción no soportada');
 }
 
 export async function updateTeam(teamId, payload) {
@@ -287,13 +288,13 @@ export async function updateTeam(teamId, payload) {
   const descripcion = clean(payload?.descripcion);
 
   if (!cleanTeamId || !nombre) {
-    throw new Error('Faltan datos obligatorios');
+    throw new ActionError('Faltan datos obligatorios');
   }
 
   const db = getDb();
   const user = await getUser();
   const team = await getOwnedTeam(db, user, cleanTeamId);
-  if (!team) throw new Error('No tienes acceso a este equipo');
+  if (!team) throw new ActionError('No tienes acceso a este equipo');
 
   const data = await updateTeamInRepo(db, team.id, { nombre, temporada, descripcion });
   revalidatePath(`/dashboard/equipo/${cleanTeamId}`);
@@ -305,7 +306,7 @@ export async function deleteTeam(teamId) {
   const db = getDb();
   const user = await getUser();
   const team = await getOwnedTeam(db, user, teamId);
-  if (!team) throw new Error('No tienes acceso a este equipo');
+  if (!team) throw new ActionError('No tienes acceso a este equipo');
 
   await deleteTeamInRepo(db, team.id);
   revalidatePath('/dashboard');
@@ -316,13 +317,13 @@ export async function saveTeamConfig(teamId, configuracion_nutricional) {
   const user = await getUser();
   const ownerId = getOwnerId(user);
   if (!user || user.role !== 'admin' || !ownerId) {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const db = getDb();
   const team = await getTeamByIdAndOwner(db, teamId, ownerId);
   if (!team) {
-    throw new Error('Equipo no encontrado o sin permisos');
+    throw new ActionError('Equipo no encontrado o sin permisos');
   }
 
   assertPlainObject(configuracion_nutricional, { label: 'Configuración nutricional' });
@@ -334,7 +335,7 @@ export async function saveTeamConfig(teamId, configuracion_nutricional) {
 export async function uploadTeamPhoto(teamIdOrFormData, maybeFile) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   let id;
@@ -347,14 +348,14 @@ export async function uploadTeamPhoto(teamIdOrFormData, maybeFile) {
     fotoFile = maybeFile;
   }
 
-  if (!id) throw new Error('Falta id del equipo');
+  if (!id) throw new ActionError('Falta id del equipo');
   if (!fotoFile || !(fotoFile instanceof File)) {
-    throw new Error('Falta archivo de foto');
+    throw new ActionError('Falta archivo de foto');
   }
 
   const db = getDb();
   const ownedTeam = await getOwnedTeam(db, user, id);
-  if (!ownedTeam) throw new Error('No tienes acceso a este equipo');
+  if (!ownedTeam) throw new ActionError('No tienes acceso a este equipo');
 
   const image = await readImageUpload(fotoFile);
   const payload = {
@@ -377,7 +378,7 @@ export async function uploadTeamPhoto(teamIdOrFormData, maybeFile) {
 export async function removeTeamPhoto(teamIdOrFormData) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   let id;
@@ -387,11 +388,11 @@ export async function removeTeamPhoto(teamIdOrFormData) {
     id = teamIdOrFormData;
   }
 
-  if (!id) throw new Error('Falta id del equipo');
+  if (!id) throw new ActionError('Falta id del equipo');
 
   const db = getDb();
   const ownedTeam = await getOwnedTeam(db, user, id);
-  if (!ownedTeam) throw new Error('No tienes acceso a este equipo');
+  if (!ownedTeam) throw new ActionError('No tienes acceso a este equipo');
 
   await updateTeamInRepo(db, id, {
     foto: null,

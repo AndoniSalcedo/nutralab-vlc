@@ -32,6 +32,7 @@ import {
 } from '@/components/icons3d';
 import { useRouter } from 'next/navigation';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 const CSV_TYPES = ['text/csv', 'application/vnd.ms-excel'];
 
@@ -106,7 +107,7 @@ export default function TeamOsmolarityImporter({ team }) {
       notifications.show({
         color: 'red',
         title: 'Error al generar plantilla',
-        message: err.message
+        message: errorMessage(err)
       });
     }
   }
@@ -125,7 +126,7 @@ export default function TeamOsmolarityImporter({ team }) {
       notifications.show({
         color: 'red',
         title: 'Error procesando CSV',
-        message: error.message,
+        message: errorMessage(error),
       });
       setState('error');
     }
@@ -199,7 +200,7 @@ export default function TeamOsmolarityImporter({ team }) {
       notifications.show({
         color: 'red',
         title: 'Error importando datos',
-        message: error.message,
+        message: errorMessage(error),
       });
       setState('preview');
     }

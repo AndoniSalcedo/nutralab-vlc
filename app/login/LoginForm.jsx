@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation';
 import { login } from '@/actions/authActions';
 import { env } from '@/config/env';
 import MascotAvatar from '@/components/mascot/MascotAvatar';
+import { errorMessage } from '@/lib/actionError';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -99,16 +100,16 @@ export default function LoginForm() {
       }, 1000);
     } catch (err) {
       const isPasswordError =
-        err?.message?.toLowerCase().includes('contraseña') ||
-        err?.message?.toLowerCase().includes('password') ||
-        err?.message?.toLowerCase().includes('credenciales');
+        errorMessage(err)?.toLowerCase().includes('contraseña') ||
+        errorMessage(err)?.toLowerCase().includes('password') ||
+        errorMessage(err)?.toLowerCase().includes('credenciales');
 
       setMascotState(isPasswordError ? 'embarrassed' : 'confused');
 
       notifications.show({
         color: 'red',
         title: 'No se pudo iniciar sesión',
-        message: err.message,
+        message: errorMessage(err),
       });
 
       if (resetTimerRef.current) clearTimeout(resetTimerRef.current);

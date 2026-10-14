@@ -65,6 +65,7 @@ import {
 } from '@/lib/metrics/measurements';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { toNumber as parseDecimal } from '@/lib/utils';
+import { errorMessage } from '@/lib/actionError';
 
 const METRICAS = TREND_MEASUREMENT_METRICS;
 
@@ -323,7 +324,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
       notifications.show({
         color: 'red',
         title: 'No se pudo guardar la medición',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setSaving(false);
@@ -369,7 +370,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
       notifications.show({
         color: 'red',
         title: 'No se pudo borrar la medición',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setDeleting(false);

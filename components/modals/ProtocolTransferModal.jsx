@@ -21,6 +21,7 @@ import { getTeams } from '@/actions/teamActions';
 import { transferProtocol } from '@/actions/protocolActions';
 import { FOOTBALL_DAY_TYPES } from '@/config/day-types/football';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 export default function ProtocolTransferModal({ 
   opened, 
@@ -58,7 +59,7 @@ export default function ProtocolTransferModal({
           notifications.show({
             color: 'red',
             title: 'Error al cargar equipos',
-            message: err.message || 'No se pudieron recuperar los equipos',
+            message: errorMessage(err, 'No se pudieron recuperar los equipos'),
           });
         })
         .finally(() => {
@@ -131,7 +132,7 @@ export default function ProtocolTransferModal({
       notifications.show({
         color: 'red',
         title: 'Error en la operación',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setLoading(false);

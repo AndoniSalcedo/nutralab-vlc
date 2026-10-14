@@ -18,11 +18,12 @@ import {
   updateTecnicoAvatar,
   removeTecnicoAvatar,
 } from '@/repositories/tecnicoRepository';
+import { ActionError } from '@/lib/actionError';
 
 export async function getTecnicos() {
   const user = await getUser();
   const ownerId = getOwnerId(user);
-  if (!ownerId) throw new Error('No autorizado');
+  if (!ownerId) throw new ActionError('No autorizado');
 
   const db = getDb();
   const result = await getTecnicosByOwner(db, ownerId);
@@ -32,15 +33,15 @@ export async function getTecnicos() {
 export async function createTecnico(payload) {
   const user = await getUser();
   const ownerId = getOwnerId(user);
-  if (!ownerId) throw new Error('No autorizado');
+  if (!ownerId) throw new ActionError('No autorizado');
 
   const email = String(payload?.email || '').trim().toLowerCase();
-  if (!email) throw new Error('Falta el email del técnico');
+  if (!email) throw new ActionError('Falta el email del técnico');
 
   const db = getDb();
   const tecnico = await getTecnicoByEmail(db, email);
   if (!tecnico) {
-    throw new Error('No se encontró ningún técnico registrado con este correo. Por favor, indícale al técnico que se registre primero en la pantalla de acceso.');
+    throw new ActionError('No se encontró ningún técnico registrado con este correo. Por favor, indícale al técnico que se registre primero en la pantalla de acceso.');
   }
 
   await linkTecnicoToNutricionista(db, ownerId, tecnico.id);
@@ -51,8 +52,8 @@ export async function createTecnico(payload) {
 export async function deleteTecnico(id) {
   const user = await getUser();
   const ownerId = getOwnerId(user);
-  if (!ownerId) throw new Error('No autorizado');
-  if (!id) throw new Error('Falta id');
+  if (!ownerId) throw new ActionError('No autorizado');
+  if (!id) throw new ActionError('Falta id');
 
   const db = getDb();
   await unlinkTecnicoFromNutricionista(db, ownerId, id);
@@ -63,13 +64,13 @@ export async function deleteTecnico(id) {
 export async function assignTeams(tecnicoId, teamIds) {
   const user = await getUser();
   const ownerId = getOwnerId(user);
-  if (!ownerId) throw new Error('No autorizado');
-  if (!tecnicoId) throw new Error('Falta tecnico_id');
+  if (!ownerId) throw new ActionError('No autorizado');
+  if (!tecnicoId) throw new ActionError('Falta tecnico_id');
 
   const teams = Array.isArray(teamIds) ? teamIds : [];
   const db = getDb();
   const link = await getNutricionistaTecnicoLink(db, ownerId, tecnicoId);
-  if (!link) throw new Error('No tienes acceso a este técnico');
+  if (!link) throw new ActionError('No tienes acceso a este técnico');
 
   await assignTeamsToTecnico(db, ownerId, tecnicoId, teams);
   revalidatePath('/dashboard/tecnicos');
@@ -83,13 +84,13 @@ export async function registerTecnico(payload) {
   const password = String(payload?.password || '').trim();
 
   if (!nombre || !email || !password) {
-    throw new Error('Faltan campos obligatorios');
+    throw new ActionError('Faltan campos obligatorios');
   }
   if (!email.includes('@') || email.length > 254 || nombre.length > 100 || apellidos.length > 150) {
-    throw new Error('Datos no válidos');
+    throw new ActionError('Datos no válidos');
   }
   if (password.length < 8 || password.length > 128) {
-    throw new Error('La contraseña debe tener al menos 8 caracteres');
+    throw new ActionError('La contraseña debe tener al menos 8 caracteres');
   }
 
   // Endpoint público: limitar altas por IP y por email.
@@ -103,7 +104,7 @@ export async function registerTecnico(payload) {
   // Nunca se toca una cuenta existente: antes se le reseteaba la contraseña,
   // lo que permitía a un anónimo apoderarse de cualquier usuario por su email.
   if (existingTecnico || existingUser) {
-    throw new Error('No se puede registrar este email. Si ya tienes cuenta, inicia sesión o contacta con tu nutricionista.');
+    throw new ActionError('No se puede registrar este email. Si ya tienes cuenta, inicia sesión o contacta con tu nutricionista.');
   }
 
   // Cuenta de acceso y ficha del técnico en una sola transacción: o se crean las dos o ninguna.
@@ -129,7 +130,7 @@ export async function registerTecnico(payload) {
 
 export async function uploadTecnicoAvatar(tecnicoIdOrFormData, maybeFile) {
   const user = await getUser();
-  if (!user) throw new Error('No autorizado');
+  if (!user) throw new ActionError('No autorizado');
 
   let id;
   let remove = false;
@@ -151,20 +152,20 @@ export async function uploadTecnicoAvatar(tecnicoIdOrFormData, maybeFile) {
   if (!id && user.role === 'tecnico') {
     id = user.id;
   }
-  if (!id) throw new Error('Falta id del técnico');
+  if (!id) throw new ActionError('Falta id del técnico');
 
   const db = getDb();
 
   if (user.role === 'tecnico') {
     if (String(user.id) !== String(id)) {
-      throw new Error('No tienes acceso a este técnico');
+      throw new ActionError('No tienes acceso a este técnico');
     }
   } else {
     const ownerId = getOwnerId(user);
-    if (!ownerId) throw new Error('No autorizado');
+    if (!ownerId) throw new ActionError('No autorizado');
 
     const link = await getNutricionistaTecnicoLink(db, ownerId, id);
-    if (!link) throw new Error('No tienes acceso a este técnico');
+    if (!link) throw new ActionError('No tienes acceso a este técnico');
   }
 
   if (remove) {
@@ -174,7 +175,7 @@ export async function uploadTecnicoAvatar(tecnicoIdOrFormData, maybeFile) {
   }
 
   if (!avatarFile || !(avatarFile instanceof File)) {
-    throw new Error('Falta archivo de avatar');
+    throw new ActionError('Falta archivo de avatar');
   }
 
   const image = await readImageUpload(avatarFile);

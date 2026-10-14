@@ -51,6 +51,7 @@ import { BentoCard } from '@/components/BentoItem';
 import WidgetCard from '@/components/widgets/WidgetCard';
 import Icon3D from '@/components/Icon3D';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 const METRIC_TABS = {
   hydration: {
@@ -172,7 +173,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       notifications.show({
         color: 'red',
         title: 'Error al generar plantilla',
-        message: err.message
+        message: errorMessage(err)
       });
     }
   };
@@ -279,7 +280,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       notifications.show({
         color: 'red',
         title: 'Error al actualizar',
-        message: e.message
+        message: errorMessage(e)
       });
     } finally {
       setSavingEdit(false);
@@ -428,7 +429,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       notifications.show({
         color: 'red',
         title: 'Error al guardar registros',
-        message: e.message
+        message: errorMessage(e)
       });
     } finally {
       setImporting(false);
@@ -459,7 +460,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       notifications.show({
         color: 'red',
         title: 'Error al eliminar',
-        message: e.message
+        message: errorMessage(e)
       });
     } finally {
       setDeletingId(null);

@@ -10,6 +10,7 @@ import {
   upsertEvolution,
   deleteEvolution as deleteEvolutionInRepo
 } from '@/repositories/evolutionRepository';
+import { ActionError } from '@/lib/actionError';
 
 const EVOLUTION_FIELDS = [
   'fecha',
@@ -58,15 +59,15 @@ const EVOLUTION_FIELDS = [
 
 export async function saveEvolution(body) {
   const { id, jugador_id, fecha } = body || {};
-  if (!jugador_id || !fecha) throw new Error('Faltan datos obligatorios');
+  if (!jugador_id || !fecha) throw new ActionError('Faltan datos obligatorios');
 
   const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
   const ownedPlayer = await getOwnedPlayer(db, user, jugador_id);
-  if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+  if (!ownedPlayer) throw new ActionError('No tienes acceso a este jugador');
 
   const payload = {};
   for (const key of EVOLUTION_FIELDS) {
@@ -80,7 +81,7 @@ export async function saveEvolution(body) {
     // El id llega del cliente: comprobar que el registro es del jugador autorizado.
     const existing = await getEvolutionById(db, id);
     if (!existing || String(existing.jugador_id) !== String(jugador_id)) {
-      throw new Error('Medición no encontrada');
+      throw new ActionError('Medición no encontrada');
     }
     data = await updateEvolution(db, id, payload);
   } else {
@@ -95,19 +96,19 @@ export async function saveEvolution(body) {
 }
 
 export async function deleteEvolution(id) {
-  if (!id) throw new Error('Falta id de la medición');
+  if (!id) throw new ActionError('Falta id de la medición');
 
   const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const evolucion = await getEvolutionById(db, id);
-  if (!evolucion) throw new Error('Medición no encontrada');
+  if (!evolucion) throw new ActionError('Medición no encontrada');
 
   const ownedPlayer = await getOwnedPlayer(db, user, evolucion.jugador_id);
-  if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+  if (!ownedPlayer) throw new ActionError('No tienes acceso a este jugador');
 
   await deleteEvolutionInRepo(db, id);
   revalidatePath(`/dashboard/jugador/${evolucion.jugador_id}`);

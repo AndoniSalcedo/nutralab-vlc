@@ -31,6 +31,7 @@ import TeamTecnicosConfig from '@/components/TeamTecnicosConfig';
 import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
 import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 
 const PAGE_SIZE = 10;
@@ -337,7 +338,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       notifications.show({
         color: 'red',
         title: 'No se pudo eliminar',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setDeletingId(null);
@@ -539,7 +540,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       notifications.show({
         color: 'red',
         title: 'No se pudo generar el borrador',
-        message: e.message,
+        message: errorMessage(e),
       });
     }
   }
@@ -616,7 +617,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       notifications.show({
         color: 'red',
         title: 'No se pudo completar el informe',
-        message: e.message,
+        message: errorMessage(e),
       });
     }
   }
@@ -635,7 +636,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       notifications.show({
         color: 'red',
         title: 'No se pudo completar la revisión',
-        message: e.message,
+        message: errorMessage(e),
       });
     }
   }
@@ -683,7 +684,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       notifications.show({
         color: 'red',
         title: 'Error al regenerar',
-        message: e.message || 'No se pudo regenerar la dieta.',
+        message: errorMessage(e, 'No se pudo regenerar la dieta.'),
       });
     } finally {
       setReviewLoading(false);
@@ -738,7 +739,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       notifications.show({
         color: 'red',
         title: 'Error al descargar PDF',
-        message: e.message || 'No se pudo generar el PDF individual.',
+        message: errorMessage(e, 'No se pudo generar el PDF individual.'),
       });
     } finally {
       setReviewLoading(false);
@@ -780,7 +781,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       notifications.show({
         color: 'red',
         title: 'Error al descargar plantilla',
-        message: e.message || 'No se pudo generar el PDF de todos los jugadores.',
+        message: errorMessage(e, 'No se pudo generar el PDF de todos los jugadores.'),
       });
     } finally {
       setReviewLoading(false);

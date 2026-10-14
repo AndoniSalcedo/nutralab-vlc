@@ -6,24 +6,25 @@ import { getDb } from '@/lib/db/prisma';
 import { getOwnedTeam } from '@/lib/auth/team-access';
 import { assertPlainObject } from '@/lib/security/json';
 import { updateTeamConfig } from '@/repositories/teamRepository';
+import { ActionError } from '@/lib/actionError';
 
 export async function transferProtocol(payload) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const { action, sourceTeamId, targetTeamId, protocol, targetDayTypeKey } = payload || {};
   if (!['copy', 'move'].includes(action)) {
-    throw new Error('Acción no válida');
+    throw new ActionError('Acción no válida');
   }
 
   if (!sourceTeamId || !targetTeamId || !protocol || !targetDayTypeKey) {
-    throw new Error('Parámetros incompletos para transferir el protocolo');
+    throw new ActionError('Parámetros incompletos para transferir el protocolo');
   }
   assertPlainObject(protocol, { maxBytes: 50_000, label: 'Protocolo' });
   if (typeof targetDayTypeKey !== 'string' || targetDayTypeKey.length > 100) {
-    throw new Error('Tipo de día no válido');
+    throw new ActionError('Tipo de día no válido');
   }
 
   const db = getDb();
@@ -31,7 +32,7 @@ export async function transferProtocol(payload) {
   const targetTeam = await getOwnedTeam(db, user, targetTeamId);
 
   if (!sourceTeam || !targetTeam) {
-    throw new Error('No tienes acceso a los equipos seleccionados');
+    throw new ActionError('No tienes acceso a los equipos seleccionados');
   }
 
   const targetConfig = targetTeam.configuracion_nutricional || {};
@@ -68,20 +69,20 @@ export async function transferProtocol(payload) {
 export async function batchImportProtocols({ sourceTeamId, targetTeamId, protocols }) {
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   if (!sourceTeamId || !targetTeamId || !Array.isArray(protocols) || protocols.length === 0) {
-    throw new Error('Parámetros de importación incompletos');
+    throw new ActionError('Parámetros de importación incompletos');
   }
-  if (protocols.length > 100) throw new Error('Demasiados protocolos en una sola importación');
+  if (protocols.length > 100) throw new ActionError('Demasiados protocolos en una sola importación');
 
   const db = getDb();
   const sourceTeam = await getOwnedTeam(db, user, sourceTeamId);
   const targetTeam = await getOwnedTeam(db, user, targetTeamId);
 
   if (!sourceTeam || !targetTeam) {
-    throw new Error('No tienes acceso a los equipos seleccionados');
+    throw new ActionError('No tienes acceso a los equipos seleccionados');
   }
 
   const sourceConfig = sourceTeam.configuracion_nutricional || {};

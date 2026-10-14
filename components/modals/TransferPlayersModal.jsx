@@ -26,6 +26,7 @@ import { transferPlayers } from '@/actions/playerActions';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 export default function TransferPlayersModal({
   opened,
@@ -125,7 +126,7 @@ export default function TransferPlayersModal({
       notifications.show({
         color: 'red',
         title: 'Error al transferir',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setLoading(false);

@@ -29,6 +29,7 @@ import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 function BackButton({ size = 42, iconSize = 26, equipoId }) {
   const url = equipoId ? `/dashboard/equipo/${equipoId}` : '/dashboard';
@@ -241,7 +242,7 @@ function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
       notifications.show({
         color: 'red',
         title: 'Error al actualizar foto',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setLoading(false);

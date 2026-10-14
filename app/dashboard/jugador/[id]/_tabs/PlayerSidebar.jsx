@@ -35,6 +35,7 @@ import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import PlayerPasswordButton from '@/components/PlayerPasswordButton';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 const DEFAULT_SUBTABS = {
   resumen: 'perfil',
@@ -129,7 +130,7 @@ export default function PlayerSidebar({
       notifications.show({
         color: 'red',
         title: 'Error al actualizar foto',
-        message: err.message,
+        message: errorMessage(err),
       });
     } finally {
       setUploadLoading(false);

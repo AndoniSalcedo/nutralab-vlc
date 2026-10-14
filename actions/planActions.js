@@ -16,6 +16,7 @@ import {
   updateAiPlan as updateAiPlanInRepo,
   deleteAiPlan as deleteAiPlanInRepo
 } from '@/repositories/aiPlanRepository';
+import { ActionError } from '@/lib/actionError';
 
 async function loadPlayerWithLatestMetrics(db, jugadorId) {
   const [jugador, evoluciones, pesajes] = await Promise.all([
@@ -28,17 +29,17 @@ async function loadPlayerWithLatestMetrics(db, jugadorId) {
 }
 
 export async function getAiPlans(jugadorId, semana = null) {
-  if (!jugadorId) throw new Error('Falta jugador_id');
+  if (!jugadorId) throw new ActionError('Falta jugador_id');
 
   const db = getDb();
   const user = await getUser();
-  if (!user) throw new Error('No autenticado');
+  if (!user) throw new ActionError('No autenticado');
   if (user.role === 'jugador' && String(user.id) !== String(jugadorId)) {
-    throw new Error('Sin permisos');
+    throw new ActionError('Sin permisos');
   }
   if (user.role !== 'jugador') {
     const accessiblePlayer = await getAccessiblePlayer(db, user, jugadorId);
-    if (!accessiblePlayer) throw new Error('No tienes acceso a este jugador');
+    if (!accessiblePlayer) throw new ActionError('No tienes acceso a este jugador');
   }
 
   const planes = await getAiPlansByPlayerId(db, jugadorId, semana);
@@ -58,17 +59,17 @@ async function createAiPlan(payload) {
   } = payload || {};
 
   const planNombre = String(nombre || '').trim();
-  if (!jugador?.id) throw new Error('Falta jugador');
-  if (!planNombre) throw new Error('El nombre del plan es obligatorio');
+  if (!jugador?.id) throw new ActionError('Falta jugador');
+  if (!planNombre) throw new ActionError('El nombre del plan es obligatorio');
 
   const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const ownedPlayer = await getOwnedPlayer(db, user, jugador.id);
-  if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+  if (!ownedPlayer) throw new ActionError('No tienes acceso a este jugador');
 
   const jugadorConMetricas = await loadPlayerWithLatestMetrics(db, jugador.id);
   const teamConfig = jugadorConMetricas?.equipos?.configuracion_nutricional;
@@ -109,21 +110,21 @@ async function createAiPlan(payload) {
 
 export async function updateAiPlan(payload) {
   const { id, nombre, contenido, datos } = payload || {};
-  if (!id) throw new Error('Falta id del plan');
+  if (!id) throw new ActionError('Falta id del plan');
   const planNombre = String(nombre || '').trim();
-  if (!planNombre) throw new Error('El nombre del plan es obligatorio');
+  if (!planNombre) throw new ActionError('El nombre del plan es obligatorio');
 
   const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const currentPlan = await getAiPlanById(db, id);
-  if (!currentPlan) throw new Error('Plan no encontrado');
+  if (!currentPlan) throw new ActionError('Plan no encontrado');
 
   const ownedPlayer = await getOwnedPlayer(db, user, currentPlan.jugador_id);
-  if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+  if (!ownedPlayer) throw new ActionError('No tienes acceso a este jugador');
 
   const jugadorConMetricas = await loadPlayerWithLatestMetrics(db, currentPlan.jugador_id);
   const teamConfig = jugadorConMetricas?.equipos?.configuracion_nutricional;
@@ -145,19 +146,19 @@ export async function updateAiPlan(payload) {
 }
 
 export async function deleteAiPlan(id) {
-  if (!id) throw new Error('Falta id del plan');
+  if (!id) throw new ActionError('Falta id del plan');
 
   const db = getDb();
   const user = await getUser();
   if (!user || user.role === 'jugador' || user.role === 'tecnico') {
-    throw new Error('No autorizado');
+    throw new ActionError('No autorizado');
   }
 
   const plan = await getAiPlanById(db, id);
-  if (!plan) throw new Error('Plan no encontrado');
+  if (!plan) throw new ActionError('Plan no encontrado');
 
   const ownedPlayer = await getOwnedPlayer(db, user, plan.jugador_id);
-  if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
+  if (!ownedPlayer) throw new ActionError('No tienes acceso a este jugador');
 
   await deleteAiPlanInRepo(db, id);
   revalidatePath(`/dashboard/jugador/${plan.jugador_id}`);

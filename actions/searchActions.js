@@ -6,6 +6,7 @@ import { getOwnerId } from '@/lib/auth/owner';
 import { getTeamsByOwner } from '@/repositories/teamRepository';
 import { getTeamsByTecnico } from '@/repositories/tecnicoRepository';
 import { getQuickSearchPlayers } from '@/repositories/playerRepository';
+import { ActionError } from '@/lib/actionError';
 
 /**
  * Índice del buscador rápido (⌘K): equipos y jugadores a los que el usuario tiene acceso.
@@ -14,7 +15,7 @@ import { getQuickSearchPlayers } from '@/repositories/playerRepository';
  */
 export async function getQuickSearchIndex() {
   const user = await getUser();
-  if (!user || user.role === 'jugador') throw new Error('No autorizado');
+  if (!user || user.role === 'jugador') throw new ActionError('No autorizado');
 
   const db = getDb();
   let teams = [];
@@ -22,7 +23,7 @@ export async function getQuickSearchIndex() {
     teams = await getTeamsByTecnico(db, user.id);
   } else {
     const ownerId = getOwnerId(user);
-    if (!ownerId) throw new Error('No autorizado');
+    if (!ownerId) throw new ActionError('No autorizado');
     teams = await getTeamsByOwner(db, ownerId);
   }
 

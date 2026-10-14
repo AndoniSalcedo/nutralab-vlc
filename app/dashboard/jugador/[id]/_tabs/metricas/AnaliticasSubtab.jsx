@@ -39,6 +39,7 @@ import ConfirmModal from '@/components/modals/ConfirmModal';
 import UploadAnaliticaModal from '@/components/modals/UploadAnaliticaModal';
 import AnaliticasEvolucion from './AnaliticasEvolucion';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
 
 function fechaLabel(fecha) {
   if (!fecha) return 'Sin fecha';
@@ -162,7 +163,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
       notifications.show({
         color: 'red',
         title: 'Error al cambiar visibilidad',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setToggling(false);
@@ -213,7 +214,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
         id: notificationId,
         color: 'red',
         title: 'No se pudo subir la analítica',
-        message: e.message,
+        message: errorMessage(e),
         loading: false,
         autoClose: 6000,
         withCloseButton: true,
@@ -249,7 +250,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
       notifications.show({
         color: 'red',
         title: 'No se pudo borrar la analítica',
-        message: e.message,
+        message: errorMessage(e),
       });
     } finally {
       setDeleting(false);
