@@ -119,7 +119,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
 
   // Lista de posiciones únicas para filtro
   const positionOptions = useMemo(() => {
-    const values = Array.from(new Set(players.map((player) => player.posicion).filter(Boolean))).sort();
+    const values = Array.from(new Set(players.map((player) => player.posicion).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
     return [{ value: '', label: 'Todas' }, ...values.map((value) => ({ value, label: value }))];
   }, [players]);
 
@@ -133,7 +133,7 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
         });
       }
     });
-    return Array.from(names).sort();
+    return Array.from(names).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
   }, [analiticas]);
 
   // Parámetro por defecto: hierro/ferritina si existe; si no, el primero

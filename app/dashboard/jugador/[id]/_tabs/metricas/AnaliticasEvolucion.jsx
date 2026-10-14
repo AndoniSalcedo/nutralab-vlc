@@ -42,7 +42,7 @@ export default function AnaliticasEvolucion({ analiticas = [], selectedId }) {
   const paramNames = useMemo(() => {
     const names = new Set();
     sorted.forEach((a) => (a.parametros || []).forEach((p) => p.nombre && names.add(p.nombre)));
-    return Array.from(names).sort();
+    return Array.from(names).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
   }, [sorted]);
 
   const selectedParam =

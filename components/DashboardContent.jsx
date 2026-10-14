@@ -267,7 +267,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
   const playersWithPlan = playersState.map((player) => ({ ...player, plan: getPlayerPlan(player, team?.configuracion_nutricional) }));
 
   const positionOptions = useMemo(() => {
-    const positions = Array.from(new Set(playersState.map((player) => player.posicion).filter(Boolean))).sort();
+    const positions = Array.from(new Set(playersState.map((player) => player.posicion).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
     return [
       { value: '', label: 'Todas' },
       ...positions.map((position) => ({ value: position, label: position })),

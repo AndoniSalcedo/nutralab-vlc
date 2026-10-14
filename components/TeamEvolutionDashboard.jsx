@@ -518,7 +518,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   };
 
   const positionOptions = useMemo(() => {
-    const values = Array.from(new Set(players.map((player) => player.posicion).filter(Boolean))).sort();
+    const values = Array.from(new Set(players.map((player) => player.posicion).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
     return [{ value: '', label: 'Todas' }, ...values.map((value) => ({ value, label: value }))];
   }, [players]);
 
