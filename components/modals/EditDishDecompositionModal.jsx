@@ -63,6 +63,8 @@ export default function EditDishDecompositionModal({
 
   return (
     <ResponsiveModal
+      // Formulario de captura: un clic fuera no debe descartar lo escrito
+      closeOnClickOutside={false}
       opened={opened}
       onClose={onClose}
       title={
