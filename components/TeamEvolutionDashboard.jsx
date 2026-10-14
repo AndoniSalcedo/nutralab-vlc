@@ -87,10 +87,14 @@ const METRIC_STYLE = {
 
 const METRICS = TREND_MEASUREMENT_METRICS;
 
+// Cifras en formato español (coma decimal)
+const fmtEs = (value) => (Number.isFinite(Number(value)) ? Number(value).toLocaleString('es-ES', { maximumFractionDigits: 2 }) : value);
+
 function formatSeasonOption(s) {
   if (!s) return '';
   const [startYear, endYear] = s.split('/');
-  return `Temporada ${s} (julio ${startYear} - junio ${endYear})`;
+  // Corto para que quepa en el selector (la temporada va de julio a junio)
+  return `Temporada ${startYear}/${String(endYear || '').slice(-2)}`;
 }
 
 function formatDate(value) {
@@ -1332,7 +1336,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                       color={(METRIC_STYLE[item.key] || {}).color || 'gray'}
                       aside={
                         <WidgetAside color={item.goodDown === true ? 'red' : item.goodDown === false ? 'teal' : 'gray'}>
-                          Media {avg === null ? '-' : `${avg} ${item.unit}`}
+                          Media {avg === null ? '-' : `${fmtEs(avg)} ${item.unit}`}
                         </WidgetAside>
                       }
                       style={{ height: 'auto' }}
@@ -1366,7 +1370,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                               />
                               <ChartTooltip
                                 labelFormatter={(value) => formatDate(value)}
-                                formatter={(value) => [`${value} ${item.unit}`, item.label]}
+                                formatter={(value) => [`${fmtEs(value)} ${item.unit}`, item.label]}
                                 labelStyle={{ fontWeight: 700, color: 'var(--mantine-color-dark-4)', fontSize: 10 }}
                                 contentStyle={{ borderRadius: '12px', border: '1px solid var(--mantine-color-gray-2)', padding: '6px 10px', fontSize: 10 }}
                               />
@@ -1408,7 +1412,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                                     {formatDate(row.fecha)}
                                   </Table.Td>
                                   <Table.Td style={{ fontSize: 12, padding: '4px 8px', textAlign: 'right', fontWeight: 650 }}>
-                                    {row[item.key]} {item.unit}
+                                    {fmtEs(row[item.key])} {item.unit}
                                   </Table.Td>
                                 </Table.Tr>
                               ))}
