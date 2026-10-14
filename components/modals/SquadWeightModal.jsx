@@ -40,6 +40,9 @@ import {
 import ResponsiveModal from './ResponsiveModal';
 import { notifySaved } from '@/components/motion/notifySaved';
 
+const MIN_WEIGHT_KG = 15;
+const MAX_WEIGHT_KG = 200;
+
 export default function SquadWeightModal({ opened, onClose, players = [], team }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('record');
@@ -249,7 +252,8 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
 
   async function handleSave() {
     const entries = Object.entries(weights)
-      .map(([playerId, val]) => ({ playerId, value: val.trim() }))
+      // Acepta coma decimal (teclado español): "72,5" → "72.5"
+      .map(([playerId, val]) => ({ playerId, value: String(val).trim().replace(',', '.') }))
       .filter((e) => e.value !== '');
 
     if (entries.length === 0) {
@@ -263,13 +267,14 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
 
     for (const entry of entries) {
       const val = Number(entry.value);
-      if (isNaN(val) || val <= 0) {
+      // Rango plausible: atrapa erratas como 725 en lugar de 72,5
+      if (isNaN(val) || val < MIN_WEIGHT_KG || val > MAX_WEIGHT_KG) {
         const player = players.find((p) => String(p.id) === String(entry.playerId));
         const name = player ? `${player.nombre} ${player.apellidos || ''}` : 'Jugador';
         notifications.show({
           color: 'red',
           title: 'Error de validación',
-          message: `El peso introducido para ${name} no es un número válido.`,
+          message: `El peso de ${name} no es válido (entre ${MIN_WEIGHT_KG} y ${MAX_WEIGHT_KG} kg).`,
         });
         return;
       }
@@ -491,9 +496,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
 
                         <TextInput
                           placeholder="kg"
-                          type="number"
-                          step="any"
-                          min={0}
+                          inputMode="decimal"
                           w={90}
                           radius="md"
                           value={weights[player.id] ?? ''}
