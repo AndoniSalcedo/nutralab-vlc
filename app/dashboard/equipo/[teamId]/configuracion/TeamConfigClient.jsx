@@ -74,7 +74,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
       const compressed = await compressAvatar(croppedFile);
       await uploadTeamPhoto(team.id, compressed);
       setTeamPhotoVersion(Date.now());
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Escudo actualizado',
         message: 'La imagen del equipo se ha guardado correctamente.',
@@ -93,7 +93,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
     try {
       await removeTeamPhoto(team.id);
       setTeamPhotoVersion(Date.now());
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Escudo eliminado',
         message: 'La foto del equipo se ha eliminado.',

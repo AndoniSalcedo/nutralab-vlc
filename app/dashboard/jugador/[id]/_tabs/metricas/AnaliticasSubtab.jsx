@@ -38,6 +38,7 @@ import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import UploadAnaliticaModal from '@/components/modals/UploadAnaliticaModal';
 import AnaliticasEvolucion from './AnaliticasEvolucion';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 function fechaLabel(fecha) {
   if (!fecha) return 'Sin fecha';
@@ -152,7 +153,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
       setAnaliticas((prev) =>
         prev.map((a) => (String(a.id) === String(selected.id) ? { ...a, visible_para_jugador: isVisible } : a))
       );
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Visibilidad actualizada',
         message: isVisible ? 'El jugador ahora puede ver esta analítica.' : 'La analítica se ha ocultado para el jugador.',
@@ -238,7 +239,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
       const nextSelected = [...remaining].sort((a, b) => String(b.fecha_extraccion || '').localeCompare(String(a.fecha_extraccion || '')))[0];
       setCurrentId(nextSelected?.id ? String(nextSelected.id) : null);
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Analítica borrada',
         message: 'La analítica se ha eliminado correctamente.',

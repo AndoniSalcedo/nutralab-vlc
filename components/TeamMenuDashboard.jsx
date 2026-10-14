@@ -20,6 +20,7 @@ import { uploadWeeklyMenu, deleteWeeklyMenu, updateWeeklyMenu, createWeeklyMenu 
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import CreateMenuModal from '@/components/modals/CreateMenuModal';
 import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly = false }) {
   const [menus, setMenus] = useState(initialMenus);
@@ -85,7 +86,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
       setMenus((prev) => prev.map((m) => (m.id === selectedMenu.id ? data.menu : m)));
       setSelectedMenu(data.menu);
       setIsEditing(false);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Menú guardado',
         message: 'El menú se ha guardado correctamente.',
@@ -175,7 +176,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
       if (!data?.ok) throw new Error(data?.error || 'No se pudo guardar el desglose del plato.');
       setMenus((prev) => prev.map((m) => (m.id === selectedMenu.id ? data.menu : m)));
       setSelectedMenu(data.menu);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Ingredientes guardados',
         message: `Desglose de "${updatedDish.nombre}" actualizado correctamente.`,
@@ -215,7 +216,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
       setIsEditing(true);
       setViewMode('diaria');
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Menú creado',
         message: 'Se ha creado un menú vacío para la semana seleccionada. Ahora puedes rellenarlo.',
@@ -303,7 +304,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
     setDeleting(true);
     try {
       await deleteWeeklyMenu(deleteMenuId);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Menú eliminado',
         message: 'El menú comedor se ha eliminado correctamente.',

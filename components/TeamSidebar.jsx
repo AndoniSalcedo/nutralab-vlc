@@ -25,6 +25,7 @@ import { compressAvatar, initials } from '@/lib/utils/avatar';
 import SafeAvatar from '@/components/SafeAvatar';
 import { uploadTeamPhoto } from '@/actions/teamActions';
 import ImageCropModal from '@/components/modals/ImageCropModal';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 export const TEAM_TABS = [
   {
@@ -124,7 +125,7 @@ export default function TeamSidebar({
       await uploadTeamPhoto(teamId, compressed);
       const localUrl = URL.createObjectURL(compressed);
       setAvatarSrc(localUrl);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Escudo actualizado',
         message: 'La imagen del equipo se ha guardado correctamente.',

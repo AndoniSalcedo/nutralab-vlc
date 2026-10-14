@@ -38,6 +38,7 @@ import {
   downloadWeightPdf,
 } from '@/lib/io/weight-export';
 import ResponsiveModal from './ResponsiveModal';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 export default function SquadWeightModal({ opened, onClose, players = [], team }) {
   const router = useRouter();
@@ -297,7 +298,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
         return next;
       });
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Pesos registrados',
         message: `Se han guardado las métricas de peso para ${entries.length} jugadores.`,
@@ -344,7 +345,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
       return;
     }
 
-    notifications.show({
+    notifySaved({
       color: 'green',
       title: 'Excel generado',
       message: `Se ha descargado el archivo Excel con ${selectedList.length} jugadores.`,
@@ -374,7 +375,7 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
         summary: exportSummary,
       });
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'PDF generado',
         message: `Se ha descargado el informe de pesajes con ${selectedList.length} jugadores.`,

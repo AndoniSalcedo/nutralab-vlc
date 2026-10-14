@@ -38,6 +38,7 @@ import { savePlayerMeal } from '@/actions/mealActions';
 import { compressFoodPhoto } from '@/lib/utils/compress';
 import { notifications } from '@mantine/notifications';
 import { getFoods } from '@/actions/foodActions';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 const MEAL_TYPES = [
   { value: 'breakfast', label: 'Desayuno' },
@@ -314,7 +315,7 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
 
       await savePlayerMeal(jugadorId, fd);
 
-      notifications.show({
+      notifySaved({
         title: meal?.id ? 'Comida modificada' : 'Comida registrada',
         message: meal?.id ? 'La ingesta se actualizó correctamente.' : 'La ingesta se guardó en el diario.',
         color: 'green',

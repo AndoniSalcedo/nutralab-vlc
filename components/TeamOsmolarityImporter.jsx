@@ -31,6 +31,7 @@ import {
   IconX,
 } from '@/components/icons3d';
 import { useRouter } from 'next/navigation';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 const CSV_TYPES = ['text/csv', 'application/vnd.ms-excel'];
 
@@ -189,7 +190,7 @@ export default function TeamOsmolarityImporter({ team }) {
       setResults(data);
       setState('done');
       router.refresh();
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Importación completada',
         message: `${data.resumen?.mediciones_guardadas || 0} registros guardados con éxito.`,

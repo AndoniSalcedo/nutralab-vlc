@@ -6,6 +6,7 @@ import { notifications } from '@mantine/notifications';
 import Icon3D from '@/components/Icon3D';
 import { updatePlayerPassword } from '@/actions/playerActions';
 import PlayerPasswordModal from '@/components/modals/PlayerPasswordModal';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 export default function PlayerPasswordButton({ compact = false, menuItem = false }) {
   const [opened, setOpened] = useState(false);
@@ -31,7 +32,7 @@ export default function PlayerPasswordButton({ compact = false, menuItem = false
     setSaving(true);
     try {
       await updatePlayerPassword(password, currentPassword);
-      notifications.show({ color: 'green', title: 'Contraseña actualizada', message: 'Tu contraseña se ha cambiado correctamente.' });
+      notifySaved({ color: 'green', title: 'Contraseña actualizada', message: 'Tu contraseña se ha cambiado correctamente.' });
       setCurrentPassword('');
       setPassword('');
       setConfirm('');

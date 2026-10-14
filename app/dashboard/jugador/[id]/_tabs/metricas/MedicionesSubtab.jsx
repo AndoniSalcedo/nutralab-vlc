@@ -63,6 +63,7 @@ import {
   getSeason,
   formatMetricNumber,
 } from '@/lib/metrics/measurements';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 const METRICAS = TREND_MEASUREMENT_METRICS;
 
@@ -311,7 +312,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
       setSelectedSeason(getSeason(data.evolucion.fecha) || 'Todas');
       setCurrentId(String(data.evolucion.id));
       setModalMode(null);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Medición guardada',
         message: 'La medición se ha guardado correctamente.',
@@ -356,7 +357,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         setCurrentId(nextSelected?.id ? String(nextSelected.id) : null);
       }
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Medición borrada',
         message: 'La medición se ha eliminado correctamente.',

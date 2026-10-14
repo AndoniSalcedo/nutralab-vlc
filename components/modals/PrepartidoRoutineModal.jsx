@@ -41,6 +41,7 @@ import {
   getProtocolMeals,
   isDefaultProtocolMeal,
 } from '@/lib/nutrition/prematch-protocol';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 const SCHEDULE_DETAILS = {
   manana: {
@@ -151,11 +152,10 @@ function SingleMealPautaEditor({
         });
       }
 
-      notifications.show({
+      notifySaved({
         color: 'teal',
         title: 'Interpretación completada',
         message: `La pauta para ${mealName} se ha clasificado en las opciones aptas del catálogo del jugador.`,
-        icon: <IconCheck size={16} />,
       });
     } catch (err) {
       setAiError(err.message || 'Error al conectar con el servicio de IA.');

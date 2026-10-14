@@ -30,7 +30,6 @@ import {
   IconTrash,
   IconEdit,
   IconDatabaseImport,
-  IconCheck,
   IconCalendarStats,
   IconClock,
   IconChevronDown,
@@ -51,6 +50,7 @@ import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
 import WidgetCard from '@/components/widgets/WidgetCard';
 import Icon3D from '@/components/Icon3D';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 const METRIC_TABS = {
   hydration: {
@@ -251,11 +251,10 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
         cuestionario: editForm.cuestionario
       });
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Toma Actualizada',
-        message: 'La toma se ha actualizado correctamente.',
-        icon: <IconCheck size={18} />
+        message: 'La toma se ha actualizado correctamente.'
       });
 
       if (result.record) {
@@ -406,15 +405,14 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
     try {
       const result = await importHydrationRecords(jugadorId, allImportRows);
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Carga Completada',
         message: [
           `Se importaron/actualizaron con éxito ${result.count} registro(s).`,
           result.duplicateDateRows ? `${result.duplicateDateRows} fila(s) repetidas por fecha y tipo actualizaron la toma existente.` : '',
           result.skippedRows ? `${result.skippedRows} fila(s) se omitieron por fecha inválida o ausente.` : ''
-        ].filter(Boolean).join(' '),
-        icon: <IconCheck size={18} />
+        ].filter(Boolean).join(' ')
       });
 
       // Refetch or update local state
@@ -448,11 +446,10 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
     try {
       await deleteHydrationRecord(deleteRecordId);
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Registro Eliminado',
-        message: 'El registro se ha borrado correctamente.',
-        icon: <IconCheck size={18} />
+        message: 'El registro se ha borrado correctamente.'
       });
 
       // Update state locally

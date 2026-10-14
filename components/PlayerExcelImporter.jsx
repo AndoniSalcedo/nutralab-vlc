@@ -36,6 +36,7 @@ import {
   IconX,
 } from '@/components/icons3d';
 import { useRouter } from 'next/navigation';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 const EXCEL_TYPES = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -397,7 +398,7 @@ export default function PlayerExcelImporter({ team }) {
       setResults(data);
       setState('done');
       router.refresh();
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Importación completada',
         message: `${data.resumen?.jugadores_importados || 0} jugadores procesados correctamente.`,

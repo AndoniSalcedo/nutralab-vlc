@@ -27,6 +27,7 @@ import { login } from '@/actions/authActions';
 import { registerTecnico } from '@/actions/tecnicoActions';
 import { env } from '@/config/env';
 import MascotAvatar from '@/components/mascot/MascotAvatar';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 export default function TecnicoLoginForm() {
   const [email, setEmail] = useState('');
@@ -107,7 +108,7 @@ export default function TecnicoLoginForm() {
         }
         await registerTecnico({ nombre, apellidos, email, password });
         setMascotState('success');
-        notifications.show({
+        notifySaved({
           color: 'green',
           title: 'Registro exitoso',
           message: 'Tu cuenta de técnico ha sido creada. Ahora puedes iniciar sesión.',

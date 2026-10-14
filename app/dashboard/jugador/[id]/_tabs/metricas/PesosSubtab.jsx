@@ -36,6 +36,7 @@ import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import { calculateSemaforo } from '@/lib/metrics/player';
 import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 function fechaLabel(fecha) {
   if (!fecha) return 'Sin fecha';
@@ -108,7 +109,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
       });
       setCurrentId(String(data.pesaje.id));
       setModalOpened(false);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Peso guardado',
         message: 'El registro de peso se ha guardado correctamente.',
@@ -147,7 +148,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
         setCurrentId(null);
       }
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Registro borrado',
         message: 'El peso se ha eliminado correctamente.',

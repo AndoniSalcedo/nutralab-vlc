@@ -34,6 +34,7 @@ import ConfirmModal from '@/components/modals/ConfirmModal';
 import TeamFormModal from '@/components/modals/TeamFormModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import Icon3D from '@/components/Icon3D';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 
 function nextSeasonLabel() {
@@ -194,7 +195,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
               : item
           )
         );
-        notifications.show({
+        notifySaved({
           color: 'green',
           title: 'Equipo actualizado',
           message: `${form.nombre} guardado correctamente.`,
@@ -235,7 +236,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
         };
 
         setTeamsState((current) => [newTeam, ...current]);
-        notifications.show({
+        notifySaved({
           color: 'green',
           title: shouldCopyPlayers ? 'Equipo creado con plantilla e historial' : 'Equipo creado',
           message: shouldCopyPlayers
@@ -265,7 +266,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
     try {
       await deleteTeam(deleteTeamData.id);
       setTeamsState((current) => current.filter((item) => String(item.id) !== String(deleteTeamData.id)));
-      notifications.show({ color: 'green', title: 'Equipo eliminado', message: deleteTeamData.nombre });
+      notifySaved({ color: 'green', title: 'Equipo eliminado', message: deleteTeamData.nombre });
       router.refresh();
       setDeleteTeamData(null);
     } catch (error) {

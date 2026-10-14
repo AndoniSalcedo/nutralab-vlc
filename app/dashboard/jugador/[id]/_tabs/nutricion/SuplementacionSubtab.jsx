@@ -34,6 +34,7 @@ import {
 } from '@/components/icons3d';
 import { EditableSection } from '../editable';
 import { BentoCard } from '@/components/BentoItem';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 
 function getSupplementIcon(suplemento) {
@@ -449,7 +450,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
     setSaving(true);
     try {
       await postPlayerSupplementation(jugador.id, payload);
-      notifications.show({ color: 'green', title: 'Suplementación actualizada', message: successMessage });
+      notifySaved({ color: 'green', title: 'Suplementación actualizada', message: successMessage });
       await loadData();
       return true;
     } catch (err) {

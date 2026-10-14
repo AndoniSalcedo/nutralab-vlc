@@ -20,6 +20,7 @@ import { IconFolderShare, IconArrowsExchange, IconClipboardList, IconShield } fr
 import { getTeams } from '@/actions/teamActions';
 import { transferProtocol } from '@/actions/protocolActions';
 import { FOOTBALL_DAY_TYPES } from '@/config/day-types/football';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 export default function ProtocolTransferModal({ 
   opened, 
@@ -109,7 +110,7 @@ export default function ProtocolTransferModal({
 
       const targetTeamName = selectedTargetTeam?.nombre || 'Equipo destino';
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: action === 'copy' ? 'Protocolo copiado' : 'Protocolo movido',
         message: `El protocolo "${protocol.name}" ha sido ${action === 'copy' ? 'copiado' : 'movido'} a ${targetTeamName}.`,

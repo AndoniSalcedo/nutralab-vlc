@@ -39,6 +39,7 @@ import IntercambiosModal from '@/components/modals/IntercambiosModal';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import PlanFicha from '@/components/plan/PlanFicha';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 
 
@@ -633,7 +634,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'PDF listo',
         message: 'La ficha nutricional se ha descargado correctamente.',
@@ -659,7 +660,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     setDeleting(true);
     try {
       await deleteAiPlan(deletePlanId);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Plan eliminado',
         message: 'El plan nutricional se ha eliminado correctamente.',

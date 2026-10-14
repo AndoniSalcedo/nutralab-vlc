@@ -28,6 +28,7 @@ import ImageCropModal from '@/components/modals/ImageCropModal';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 function BackButton({ size = 42, iconSize = 26, equipoId }) {
   const url = equipoId ? `/dashboard/equipo/${equipoId}` : '/dashboard';
@@ -231,7 +232,7 @@ function PlayerAvatarUploader({ jugador, isAdmin, isPlayer, size = 84 }) {
       await uploadPlayerAvatar(jugador.id, compressed);
       const localUrl = URL.createObjectURL(compressed);
       setAvatarSrc(localUrl);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Foto actualizada',
         message: 'La foto de perfil se ha guardado correctamente.',

@@ -32,6 +32,7 @@ import { ParticleBurst } from '@/components/motion/Celebration';
 import { APP_TZ, toDateKey, shiftDateKey } from '@/lib/dates';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 
 // Tomas del día en orden cronológico; `optional` se oculta si está vacía
@@ -548,7 +549,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
 
     try {
       await deletePlayerMeal(deleteMeal.id);
-      notifications.show({
+      notifySaved({
         title: 'Ingesta eliminada',
         message: 'La comida se borró correctamente.',
         color: 'green',

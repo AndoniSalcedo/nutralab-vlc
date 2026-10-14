@@ -40,6 +40,7 @@ import {
 import { compressAvatar, initials } from '@/lib/utils/avatar';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import ImageCropModal from '@/components/modals/ImageCropModal';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 
 export default function TecnicosManager({ teams = [] }) {
@@ -103,7 +104,7 @@ export default function TecnicosManager({ teams = [] }) {
     setSaving(true);
     try {
       const linkedTecnico = await createTecnico(form);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Éxito',
         message: `Técnico ${linkedTecnico.nombre} vinculado con éxito.`,
@@ -145,7 +146,7 @@ export default function TecnicosManager({ teams = [] }) {
     try {
       const compressed = await compressAvatar(croppedFile);
       await uploadTecnicoAvatar(cropTargetTecnicoId, compressed);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Foto actualizada',
         message: 'La foto del técnico se ha guardado correctamente.',
@@ -169,7 +170,7 @@ export default function TecnicosManager({ teams = [] }) {
     setDeleting(true);
     try {
       await deleteTecnico(deletingTecnico.id);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Técnico eliminado',
         message: `${deletingTecnico.nombre} ha sido eliminado.`,
@@ -190,7 +191,7 @@ export default function TecnicosManager({ teams = [] }) {
   async function handleAssignTeams(tecnicoId, teamIds) {
     try {
       await assignTeams(tecnicoId, teamIds);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Equipos asignados',
         message: 'Asignación de equipos actualizada con éxito.',

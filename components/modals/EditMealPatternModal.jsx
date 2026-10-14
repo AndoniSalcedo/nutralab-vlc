@@ -13,11 +13,11 @@ import {
   Box,
 } from '@mantine/core';
 import ResponsiveModal from './ResponsiveModal';
-import { notifications } from '@mantine/notifications';
 import { IconSparkles, IconAlertCircle, IconCheck, IconX } from '@/components/icons3d';
 import { parseMealTree } from '@/actions/mealActions';
 import { validateMealAst } from '@/lib/engine/meal-ast';
 import { isMainMeal as checkIsMainMeal } from '@/config/nutrition-days';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 export default function EditMealPatternModal({
   opened,
@@ -102,11 +102,10 @@ export default function EditMealPatternModal({
       }
       setInterpretedText(aiText.trim());
 
-      notifications.show({
+      notifySaved({
         color: 'teal',
         title: 'Interpretación completada',
         message: 'Las categorías se han clasificado correctamente.',
-        icon: <IconCheck size={16} />,
       });
     } catch (err) {
       setAiError(err.message || 'Error de conexión con el servicio de IA.');

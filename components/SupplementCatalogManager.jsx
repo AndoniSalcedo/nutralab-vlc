@@ -39,6 +39,7 @@ import Icon3D, {
   IconUsers,
 } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 function getSupplementIcon(supp) {
   const cat = (supp?.categoria || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -167,7 +168,7 @@ export default function SupplementCatalogManager({
     setSaving(true);
     try {
       const result = await updateSupplementationCatalog(payload);
-      notifications.show({ color: 'green', title: 'Suplementación actualizada', message: successMessage });
+      notifySaved({ color: 'green', title: 'Suplementación actualizada', message: successMessage });
       await loadData();
       return result;
     } catch (err) {

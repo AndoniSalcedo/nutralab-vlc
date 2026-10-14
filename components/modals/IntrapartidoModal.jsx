@@ -315,7 +315,7 @@ export default function IntrapartidoModal({
       };
     });
 
-    notifications.show({
+    notifySaved({
       color: 'teal',
       title: 'Cambio realizado',
       message: `Entra ${inPlayer?.nombre || 'Jugador'} por ${outPlayer?.nombre || 'Jugador'} (${currentTiming.short}).`,
@@ -349,7 +349,7 @@ export default function IntrapartidoModal({
         starterIds: Array.from(nextStarters),
       };
     });
-    notifications.show({
+    notifySaved({
       color: 'green',
       title: 'Pasa a titular',
       message: `${player?.nombre || 'Jugador'} pasa al once titular.`,
@@ -432,7 +432,7 @@ export default function IntrapartidoModal({
       ? `a los suplentes (${targetIds.length})`
       : `al once titular (${targetIds.length})`;
 
-    notifications.show({
+    notifySaved({
       color: 'teal',
       title: 'Toma repartida',
       message: `+1 ${prodName} repartido ${targetDesc} en ${currentTiming.short}.`,

@@ -30,6 +30,7 @@ import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import TeamTecnicosConfig from '@/components/TeamTecnicosConfig';
 import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
 import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 
 const PAGE_SIZE = 10;
@@ -322,7 +323,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
     try {
       await deletePlayer(deletePlayerData.id);
       setPlayersState((prev) => prev.filter((item) => String(item.id) !== String(deletePlayerData.id)));
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Jugador eliminado',
         message: `${deletePlayerData.nombre} ${deletePlayerData.apellidos || ''}`.trim(),
@@ -564,7 +565,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
     }));
     await downloadPdfFromResponse(res);
 
-    notifications.show({
+    notifySaved({
       color: 'green',
       title: 'Informe guardado y generado',
       message: reportModal.player
@@ -668,7 +669,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
         plan: newPreview.plan,
       }));
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Dieta regenerada',
         message: `Se ha generado una nueva propuesta para ${reviewPreview.nombre || 'el jugador'}.`,
@@ -722,7 +723,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       a.remove();
       URL.revokeObjectURL(url);
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Dieta descargada',
         message: `PDF descargado para ${reviewPreview.nombre || 'el jugador'} (sin guardar en base de datos).`,
@@ -764,7 +765,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
 
       await downloadPdfFromResponse(res);
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Informe de plantilla descargado',
         message: `PDF descargado con ${allDrafts.length} jugadores (sin guardar en base de datos).`,

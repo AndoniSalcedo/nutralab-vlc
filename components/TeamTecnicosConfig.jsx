@@ -32,6 +32,7 @@ import {
   getTecnicos,
 } from '@/actions/tecnicoActions';
 import ConfirmModal from '@/components/modals/ConfirmModal';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 export default function TeamTecnicosConfig({ team, readOnly = false }) {
   const [tecnicos, setTecnicos] = useState([]);
@@ -97,7 +98,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
 
       await assignTeams(target.id, newTeamIds);
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Técnico asignado',
         message: `${target.nombre} asignado a ${team.nombre} con éxito.`,
@@ -130,7 +131,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
       const newTeamIds = Array.from(new Set([...currentTeamIds, team.id]));
       await assignTeams(linkedTecnico.id, newTeamIds);
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Técnico vinculado y asignado',
         message: `Técnico ${linkedTecnico.nombre} asignado a ${team.nombre}.`,
@@ -163,7 +164,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
       );
       await assignTeams(unassigningTecnico.id, newTeamIds);
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Técnico desvinculado',
         message: `${unassigningTecnico.nombre} ya no tiene acceso a este equipo.`,

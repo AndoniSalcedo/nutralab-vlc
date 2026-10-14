@@ -25,6 +25,7 @@ import { getTeams } from '@/actions/teamActions';
 import { transferPlayers } from '@/actions/playerActions';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 export default function TransferPlayersModal({
   opened,
@@ -109,7 +110,7 @@ export default function TransferPlayersModal({
     try {
       await transferPlayers({ playerIds: selectedIds, targetTeamId, action });
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Operación completada',
         message:

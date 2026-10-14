@@ -37,6 +37,7 @@ import { INTRAPARTIDO_TIMINGS, calculatePlayerTotals } from '@/config/intraparti
 import { exportIntrapartidoExcel } from '@/lib/io/intrapartido-export';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import { StatTile } from '@/components/widgets/WidgetCard';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 function formatDate(dateStr) {
   if (!dateStr) return 'Sin fecha';
@@ -121,7 +122,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
     setDeleteLoading(true);
     try {
       await deleteIntrapartidoMatch(team.id, deleting.id);
-      notifications.show({ color: 'teal', title: 'Partido eliminado', message: 'Se ha eliminado el registro del partido.' });
+      notifySaved({ color: 'teal', title: 'Partido eliminado', message: 'Se ha eliminado el registro del partido.' });
       setDeleting(null);
       router.refresh();
     } catch (err) {

@@ -69,6 +69,7 @@ import {
 } from '@/lib/metrics/measurements';
 import WidgetCard, { StatTile, WidgetAside } from '@/components/widgets/WidgetCard';
 import PlayerListCards from '@/components/widgets/PlayerListCards';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 // Icono y color de categoría de cada métrica (mismo criterio que la pestaña Mediciones del jugador)
 const METRIC_STYLE = {
@@ -1076,7 +1077,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
       link.remove();
       URL.revokeObjectURL(url);
 
-      notifications.show({
+      notifySaved({
         title: 'PDF descargado',
         message: 'El informe de filtros se ha generado correctamente.',
         color: 'green',

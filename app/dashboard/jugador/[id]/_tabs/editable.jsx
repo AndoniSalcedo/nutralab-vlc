@@ -36,6 +36,7 @@ import { convertLegacyToAst, formatAstToText } from '@/lib/engine/meal-ast';
 import { isDefaultProtocolMeal } from '@/lib/nutrition/prematch-protocol';
 import { getDefaultMealDistribution } from '@/lib/engine/day-balance';
 import WidgetCard from '@/components/widgets/WidgetCard';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 // Color de categoría de cada campo del perfil (mismo criterio que las teselas del Perfil)
 const ICON_COLORS = {
@@ -100,7 +101,7 @@ export function CampoEditable({
       await updatePlayerField(jugadorId, campo, finalVal);
       setEditing(false);
       router.refresh();
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Campo guardado',
         message: `${label} se ha actualizado correctamente.`,
@@ -255,7 +256,7 @@ export function ComidasEditable({
       await updatePlayerField(jugadorId, 'reparto_ingestas', mealPercents);
       setEditingDistribution(false);
       router.refresh();
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Distribución guardada',
         message: 'La distribución de comidas y tomas se ha guardado correctamente.',
@@ -490,7 +491,7 @@ export function ComidasEditable({
               const res = await updatePlayerField(jugadorId, 'recomendaciones_defecto', newRecs);
               if (!res?.ok) throw new Error(res?.error || 'No se pudo guardar la pauta.');
               setRecsDefecto(newRecs);
-              notifications.show({
+              notifySaved({
                 color: 'teal',
                 title: 'Pauta guardada',
                 message: `La pauta de ${selectedMealForModal} se ha guardado correctamente.`,
@@ -520,7 +521,7 @@ export function EditableSection({ title, defaultValue, onSave, readOnly = false 
     try {
       await onSave(value);
       setEditing(false);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Sección guardada',
         message: `${title} se ha actualizado correctamente.`,
@@ -801,7 +802,7 @@ export function PrepartidoEditable({
             if (!res?.ok) throw new Error(res?.error || 'No se pudo guardar la rutina pre-partido.');
             setConfig(toSave);
             router.refresh();
-            notifications.show({
+            notifySaved({
               color: 'teal',
               title: 'Rutina pre-partido guardada',
               message: `La rutina para partidos por la ${activeModalSchedule.label.toLowerCase()} se ha guardado correctamente.`,
@@ -814,7 +815,7 @@ export function PrepartidoEditable({
             if (!res?.ok) throw new Error(res?.error || 'No se pudo restablecer el protocolo pre-partido.');
             setConfig(toSave);
             router.refresh();
-            notifications.show({
+            notifySaved({
               color: 'teal',
               title: 'Protocolo restablecido',
               message: `El protocolo para partidos por la ${activeModalSchedule.label.toLowerCase()} vuelve a seguir sus comidas habituales.`,

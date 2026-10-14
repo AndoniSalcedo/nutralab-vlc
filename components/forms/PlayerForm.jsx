@@ -31,6 +31,7 @@ import { AVAILABLE_MEALS, PLAYER_OBJECTIVES } from '@/config/nutrition-days';
 import { CLINICAL_TAGS, parsePlayerClinicalTags } from '@/config/clinical-tags';
 import { compressAvatar, avatarFromRecord, initials as getInitials } from '@/lib/utils/avatar';
 import ImageCropModal from '@/components/modals/ImageCropModal';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 function dateInputToIso(value) {
   if (!value) return '';
@@ -179,7 +180,7 @@ export default function PlayerForm({ initial, team }) {
         await savePlayer(formData);
       }
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: isDelete ? 'Jugador eliminado' : 'Jugador guardado',
         message: isDelete ? 'El jugador se ha eliminado correctamente.' : 'Los datos del jugador se han guardado correctamente.',

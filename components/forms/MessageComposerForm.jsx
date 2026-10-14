@@ -18,6 +18,7 @@ import { notifications } from '@mantine/notifications';
 import { IconSend } from '@/components/icons3d';
 import { useRouter } from 'next/navigation';
 import { sendMessage } from '@/actions/messageActions';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 export default function MessageComposerForm({
   players = [],
@@ -69,7 +70,7 @@ export default function MessageComposerForm({
         team_id: team?.id,
       });
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Mensaje enviado',
         message: mode === 'all' ? 'Disponible para todos los jugadores.' : 'Disponible para los jugadores seleccionados.',

@@ -14,6 +14,7 @@ import { updatePlayerField } from '@/actions/playerActions';
 import ProtocolEditorModal from '@/components/modals/ProtocolEditorModal';
 import NothingFound from '@/components/NothingFound';
 import { PROTOCOL_ICON_MAP as AVAILABLE_ICONS } from '@/components/ProtocolIcon';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 export default function ProtocolosSubtab({ jugador, readOnly = false }) {
   const router = useRouter();
@@ -53,7 +54,7 @@ export default function ProtocolosSubtab({ jugador, readOnly = false }) {
       await updatePlayerField(jugador.id, 'protocolos_custom', newCustoms);
       setCustomProtocols(newCustoms);
       jugador.protocolos_custom = newCustoms;
-      notifications.show({
+      notifySaved({
         title: 'Protocolo guardado',
         message: 'El protocolo personalizado se ha guardado correctamente para este jugador.',
         color: 'green'

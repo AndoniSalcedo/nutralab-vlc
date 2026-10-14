@@ -34,6 +34,7 @@ import ImageCropModal from '@/components/modals/ImageCropModal';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import PlayerPasswordButton from '@/components/PlayerPasswordButton';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 const DEFAULT_SUBTABS = {
   resumen: 'perfil',
@@ -119,7 +120,7 @@ export default function PlayerSidebar({
       await uploadPlayerAvatar(jugador.id, compressed);
       const localUrl = URL.createObjectURL(compressed);
       setAvatarSrc(localUrl);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Foto actualizada',
         message: 'La foto de perfil se ha guardado correctamente.',

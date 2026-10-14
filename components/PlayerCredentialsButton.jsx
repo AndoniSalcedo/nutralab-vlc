@@ -8,6 +8,7 @@ import Icon3D from '@/components/Icon3D';
 
 import { updatePlayerCredentials } from '@/actions/playerActions';
 import PlayerCredentialsModal from '@/components/modals/PlayerCredentialsModal';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 function generatePassword() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@$%';
@@ -51,7 +52,7 @@ export default function PlayerCredentialsButton({ jugador, compact = false, menu
       setEmail(savedEmail);
       setCredentials(data.credentials);
       onSaved?.(data.credentials);
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Credenciales listas',
         message: `Correo: ${savedEmail} · Contraseña: ${finalPassword}`,

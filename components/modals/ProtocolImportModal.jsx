@@ -20,6 +20,7 @@ import { notifications } from '@mantine/notifications';
 import { IconDownload, IconShield } from '@/components/icons3d';
 import { getTeams } from '@/actions/teamActions';
 import { batchImportProtocols } from '@/actions/protocolActions';
+import { notifySaved } from '@/components/motion/notifySaved';
 
 const EMPTY_DAY_TYPES = [];
 
@@ -137,7 +138,7 @@ export default function ProtocolImportModal({
         protocols: protocolsToImport,
       });
 
-      notifications.show({
+      notifySaved({
         color: 'green',
         title: 'Protocolos importados',
         message: `Se han importado exitosamente ${data.importedCount} protocolo(s) desde ${sourceTeam?.nombre}.`,
