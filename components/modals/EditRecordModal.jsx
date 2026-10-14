@@ -53,7 +53,7 @@ export default function EditRecordModal({
           />
           <TextInput
             label="Valor"
-            type="number"
+            inputMode="decimal"
             placeholder="e.g. 60"
             value={editForm.valor}
             onChange={(e) => setEditForm(prev => ({ ...prev, valor: e.target.value }))}

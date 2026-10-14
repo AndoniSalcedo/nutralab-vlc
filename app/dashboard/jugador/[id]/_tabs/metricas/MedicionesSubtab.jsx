@@ -64,6 +64,7 @@ import {
   formatMetricNumber,
 } from '@/lib/metrics/measurements';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { toNumber as parseDecimal } from '@/lib/utils';
 
 const METRICAS = TREND_MEASUREMENT_METRICS;
 
@@ -275,7 +276,8 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
       MEASUREMENT_DETAIL_SECTIONS.forEach((section) => {
         section.fields.forEach((field) => {
           const val = form[field.key];
-          payload[field.key] = val !== '' && val !== null && val !== undefined ? Number(val) : null;
+          // Acepta coma decimal («72,5»); Number() daba NaN
+          payload[field.key] = val !== '' && val !== null && val !== undefined ? parseDecimal(val, { zeroAsNull: false }) : null;
         });
       });
 

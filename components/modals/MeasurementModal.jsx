@@ -85,8 +85,7 @@ export default function MeasurementModal({
                     <TextInput
                       key={field.key}
                       label={`${field.label}${field.unit ? ` (${field.unit})` : ''}`}
-                      type="number"
-                      step="any"
+                      inputMode="decimal"
                       value={form[field.key] ?? ''}
                       onChange={(e) => updateFormField(field.key, e.target.value)}
                     />
