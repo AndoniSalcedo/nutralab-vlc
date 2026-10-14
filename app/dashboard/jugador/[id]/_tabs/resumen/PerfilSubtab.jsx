@@ -343,8 +343,9 @@ export default function PerfilSubtab({
               activeDayType={activeDayType}
               latestHydration={latestHydration}
               formatMetricNumber={formatMetricNumber}
+              readOnly={user?.role !== 'jugador'}
             />
-            <SuplementacionWidget jugadorId={jugador.id} />
+            <SuplementacionWidget jugadorId={jugador.id} readOnly={user?.role !== 'jugador'} />
 
             <Box style={{ gridColumn: 'span 2' }}>
               <WellnessHexagonWidget

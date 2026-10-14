@@ -7,7 +7,25 @@ import { Box, Group, Stack, Text, ActionIcon, Button } from '@mantine/core';
 import { IconMinus } from '@tabler/icons-react';
 import WidgetCard, { WidgetAside, WidgetValue } from './WidgetCard';
 import { calculateHydration } from '@/lib/metrics/anthropometry';
+import { notifications } from '@mantine/notifications';
 import { FloatingLabels, ParticleBurst } from '@/components/motion/Celebration';
+import { getDailyRecord, saveDailyRecord } from '@/actions/dailyRecordActions';
+
+// Claves antiguas del navegador: solo se leen una vez para subir a BD el día en curso
+function takeLegacyTodayLiters(jugadorId) {
+  const storageKey = `nutrilab_water_log_${jugadorId}`;
+  const legacyKey = `hydration_${jugadorId}_${new Date().toISOString().split('T')[0]}`;
+  let liters = 0;
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
+    const old = JSON.parse(localStorage.getItem(legacyKey) || 'null');
+    if (saved?.date === new Date().toDateString()) liters = Number(saved.amount || 0);
+    else if (old?.consumed) liters = parseFloat((old.consumed / 1000).toFixed(2));
+    localStorage.removeItem(storageKey);
+    localStorage.removeItem(legacyKey);
+  } catch { }
+  return Number.isFinite(liters) ? liters : 0;
+}
 
 export default function HydrationWidget({
   jugadorId: propJugadorId,
@@ -16,6 +34,7 @@ export default function HydrationWidget({
   activeDayType = 'entreno',
   latestHydration,
   formatMetricNumber = (val) => val ?? '-',
+  readOnly = false,
 }) {
   const router = useRouter();
   const jugadorId = jugador?.id || propJugadorId;
@@ -34,67 +53,37 @@ export default function HydrationWidget({
   const percent = targetL > 0 ? Math.min(100, Math.round((drunk / targetL) * 100)) : 0;
   const isGoalReached = percent >= 100;
 
-  const storageKey = jugadorId ? `nutrilab_water_log_${jugadorId}` : 'nutrilab_water_log';
-  const legacyKey = jugadorId ? `hydration_${jugadorId}_${new Date().toISOString().split('T')[0]}` : null;
+  const [loaded, setLoaded] = useState(false);
+  // Guardados en cola: así el último valor pulsado es siempre el que queda en BD
+  const saveQueue = useRef(Promise.resolve());
 
-  // Cargar registro de agua desde localStorage
-  useEffect(() => {
-    const todayKey = new Date().toDateString();
-
-    try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.date === todayKey) {
-          setDrunk(Number(parsed.amount || 0));
-          return;
-        } else {
-          localStorage.removeItem(storageKey);
-        }
-      }
-
-      if (legacyKey) {
-        const legacySaved = localStorage.getItem(legacyKey);
-        if (legacySaved) {
-          const parsed = JSON.parse(legacySaved);
-          if (parsed.consumed) {
-            setDrunk(parseFloat((parsed.consumed / 1000).toFixed(2)));
-          }
-        }
-      }
-    } catch (e) {
-      console.error('Error cargando agua consumida:', e);
-    }
-  }, [storageKey, legacyKey]);
-
-  // Guardar en localStorage
   const saveWater = (newDrunk) => {
-    try {
-      const todayKey = new Date().toDateString();
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify({
-          date: todayKey,
-          amount: newDrunk,
-          targetType: activeDayType,
-        })
-      );
-
-      if (legacyKey) {
-        localStorage.setItem(
-          legacyKey,
-          JSON.stringify({
-            consumed: Math.round(newDrunk * 1000),
-            targetType: activeDayType,
-          })
-        );
-      }
-    } catch (e) {
-      console.error('Error guardando agua:', e);
-    }
+    saveQueue.current = saveQueue.current
+      .then(() => saveDailyRecord({ jugador_id: jugadorId, agua_ml: Math.round(newDrunk * 1000) }))
+      .catch(() => {
+        notifications.show({ color: 'red', title: 'Agua', message: 'No se pudo guardar el agua. Inténtalo de nuevo.' });
+      });
   };
 
+  // Cargar el agua de hoy desde BD (antes vivía en localStorage: se sube una vez si hay dato de hoy)
+  useEffect(() => {
+    if (!jugadorId) return undefined;
+    let cancelled = false;
+    getDailyRecord(jugadorId)
+      .then((data) => {
+        if (cancelled) return;
+        const legacy = !readOnly && !data?.exists ? takeLegacyTodayLiters(jugadorId) : 0;
+        if (legacy > 0) saveWater(legacy);
+        setDrunk(legacy > 0 ? legacy : (data?.agua_ml || 0) / 1000);
+      })
+      .catch((e) => console.error('Error cargando agua consumida:', e))
+      .finally(() => { if (!cancelled) setLoaded(true); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jugadorId, readOnly]);
+
   const handleUpdateWater = (amount) => {
+    if (readOnly || !loaded) return;
     const newValue = Math.max(0, parseFloat((drunk + amount).toFixed(2)));
     setDrunk(newValue);
     saveWater(newValue);
@@ -175,7 +164,7 @@ export default function HydrationWidget({
             size={44}
             variant="default"
             radius="xl"
-            disabled={drunk <= 0}
+            disabled={readOnly || !loaded || drunk <= 0}
             onClick={() => handleUpdateWater(-0.25)}
             aria-label="Restar 250 ml"
           >
@@ -200,6 +189,7 @@ export default function HydrationWidget({
                 radius="xl"
                 color="blue"
                 px={6}
+                disabled={readOnly || !loaded}
                 onClick={() => handleUpdateWater(0.25)}
                 aria-label="Sumar 250 ml"
               >

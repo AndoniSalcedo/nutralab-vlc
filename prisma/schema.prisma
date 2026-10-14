@@ -208,6 +208,7 @@ model jugadores {
   pesajes                          pesajes[]
   planes_ia                        planes_ia[]
   registros_bienestar              registros_bienestar[]
+  registros_diarios                registros_diarios[]
   registros_hidratacion            registros_hidratacion[]
 
   @@index([auth_user_id], map: "teams_jugadores_auth_user_id_idx")
@@ -362,6 +363,21 @@ model registros_bienestar {
 
   @@unique([jugador_id, fecha])
   @@index([jugador_id, fecha], map: "teams_registros_bienestar_jugador_fecha_idx")
+}
+
+/// Registro diario del jugador: agua bebida y suplementos marcados como tomados
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model registros_diarios {
+  id                  BigInt    @id @default(autoincrement())
+  jugador_id          BigInt
+  fecha               DateTime  @db.Date
+  agua_ml             Int       @default(0)
+  suplementos_tomados Int[]     @default([])
+  created_at          DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime? @default(now()) @db.Timestamptz(6)
+  jugadores           jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([jugador_id, fecha])
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.

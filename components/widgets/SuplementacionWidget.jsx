@@ -13,7 +13,26 @@ import {
 import { IconCheck } from '@tabler/icons-react';
 import WidgetCard from './WidgetCard';
 import { ParticleBurst } from '@/components/motion/Celebration';
+import { notifications } from '@mantine/notifications';
 import { getPlayerSupplementation } from '@/actions/supplementActions';
+import { getDailyRecord, saveDailyRecord } from '@/actions/dailyRecordActions';
+
+// Los items del widget usan ids `s-<suplemento_id>`; en BD se guarda el suplemento_id
+const toChecks = (ids = []) => Object.fromEntries(ids.map((id) => [`s-${id}`, true]));
+const toSupplementIds = (checks) => Object.keys(checks)
+  .filter((key) => checks[key] && key.startsWith('s-'))
+  .map((key) => Number(key.slice(2)));
+
+// Clave antigua del navegador: solo se lee una vez para subir a BD el día en curso
+function takeLegacyTodayChecks(jugadorId) {
+  const key = `vlc_supp_checklist_${jugadorId}`;
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || 'null');
+    localStorage.removeItem(key);
+    if (parsed?.date === new Date().toDateString() && parsed.checks) return parsed.checks;
+  } catch { }
+  return {};
+}
 
 // Lista diaria real del jugador: catálogo asignado + suplementos extra (con sus ajustes de dosis)
 function buildDailyList(data) {
@@ -47,6 +66,7 @@ function buildDailyList(data) {
 export default function SuplementacionWidget({
   jugadorId,
   supplementList,
+  readOnly = false,
 }) {
   const router = useRouter();
   // Antes mostraba una lista de ejemplo si no se pasaba ninguna: ahora carga la pauta real del jugador
@@ -65,36 +85,42 @@ export default function SuplementacionWidget({
     return () => { cancelled = true; };
   }, [jugadorId, supplementList]);
 
+  // Guardados en cola: así el último estado marcado es siempre el que queda en BD
+  const saveQueue = useRef(Promise.resolve());
+
+  const persist = (checks) => {
+    saveQueue.current = saveQueue.current
+      .then(() => saveDailyRecord({ jugador_id: jugadorId, suplementos_tomados: toSupplementIds(checks) }))
+      .catch(() => {
+        notifications.show({ color: 'red', title: 'Suplementos', message: 'No se pudo guardar la toma. Inténtalo de nuevo.' });
+      });
+  };
+
+  // Tomas de hoy desde BD (antes vivían en localStorage: se suben una vez si hay dato de hoy)
   useEffect(() => {
-    if (typeof window === 'undefined' || !jugadorId) return;
-    try {
-      const todayKey = new Date().toDateString();
-      const saved = localStorage.getItem(`vlc_supp_checklist_${jugadorId}`);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.date === todayKey) {
-          setSuppChecks(parsed.checks || {});
+    if (!jugadorId) return undefined;
+    let cancelled = false;
+    getDailyRecord(jugadorId)
+      .then((data) => {
+        if (cancelled) return;
+        const legacy = !readOnly && !data?.exists ? takeLegacyTodayChecks(jugadorId) : {};
+        if (toSupplementIds(legacy).length) {
+          setSuppChecks(legacy);
+          persist(legacy);
         } else {
-          localStorage.removeItem(`vlc_supp_checklist_${jugadorId}`);
+          setSuppChecks(toChecks(data?.suplementos_tomados));
         }
-      }
-    } catch (e) {
-      console.error('Error cargando suplementos guardados:', e);
-    }
-  }, [jugadorId]);
+      })
+      .catch((e) => console.error('Error cargando suplementos tomados:', e));
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jugadorId, readOnly]);
 
   const handleToggle = (id) => {
+    if (readOnly) return;
     const next = { ...suppChecks, [id]: !suppChecks[id] };
     setSuppChecks(next);
-    try {
-      localStorage.setItem(
-        `vlc_supp_checklist_${jugadorId}`,
-        JSON.stringify({
-          date: new Date().toDateString(),
-          checks: next,
-        })
-      );
-    } catch { }
+    persist(next);
   };
 
   const completedCount = useMemo(() => {
@@ -132,6 +158,7 @@ export default function SuplementacionWidget({
             <UnstyledButton
               key={item.id}
               onClick={() => handleToggle(item.id)}
+              disabled={readOnly}
               px={4}
               py={6}
               style={{
