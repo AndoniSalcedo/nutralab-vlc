@@ -9,13 +9,9 @@ import {
   getJugadorSuplementacion,
   getJugadorSuplementosExtra,
 } from '@/repositories/supplementationRepository';
+import { todayKey } from '@/lib/dates';
 
-const DEFAULT_TZ = 'Europe/Madrid';
 const MAX_DAILY_WATER_ML = 20000;
-
-function todayStr() {
-  return new Date().toLocaleDateString('sv-SE', { timeZone: DEFAULT_TZ });
-}
 
 function toDto(today, record) {
   return {
@@ -56,7 +52,7 @@ export async function getDailyRecord(jugadorId) {
     if (!accessiblePlayer) throw new Error('No tienes acceso a este jugador');
   }
 
-  const today = todayStr();
+  const today = todayKey();
   return toDto(today, await repoGetDailyRecord(db, jugadorId, today));
 }
 
@@ -71,7 +67,7 @@ export async function saveDailyRecord(payload) {
   }
 
   const db = getDb();
-  const today = todayStr();
+  const today = todayKey();
   const recordPayload = {
     jugador_id: Number(jugador_id),
     fecha: today,

@@ -6,18 +6,7 @@ import { getUser } from '@/lib/auth/session';
 import { getOwnedPlayer, getAccessiblePlayer } from '@/lib/auth/team-access';
 import { WELLNESS_KEYS, WELLNESS_AVERAGE_DAYS } from '@/config/wellness';
 import { getWellnessRecordsByPlayerId, upsertWellnessRecord } from '@/repositories/wellnessRepository';
-
-const DEFAULT_TZ = 'Europe/Madrid';
-
-function todayStr() {
-  return new Date().toLocaleDateString('sv-SE', { timeZone: DEFAULT_TZ });
-}
-
-function shiftDate(dateStr, days) {
-  const d = new Date(`${dateStr}T12:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-}
+import { todayKey, shiftDateKey } from '@/lib/dates';
 
 function parseScore(value, key) {
   const num = Number(value);
@@ -41,9 +30,9 @@ export async function getWellnessRecords(jugadorId) {
     if (!accessiblePlayer) throw new Error('No tienes acceso a este jugador');
   }
 
-  const today = todayStr();
+  const today = todayKey();
   const records = await getWellnessRecordsByPlayerId(db, jugadorId, {
-    from: shiftDate(today, -WELLNESS_AVERAGE_DAYS),
+    from: shiftDateKey(today, -WELLNESS_AVERAGE_DAYS),
   });
   return { ok: true, today, records };
 }
@@ -63,13 +52,13 @@ export async function saveWellnessRecord(payload) {
     if (!ownedPlayer) throw new Error('No tienes acceso a este jugador');
   }
 
-  const recordDate = fecha ? String(fecha) : todayStr();
+  const recordDate = fecha ? String(fecha) : todayKey();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(recordDate) || Number.isNaN(Date.parse(`${recordDate}T12:00:00Z`))) {
     throw new Error('Fecha no válida');
   }
   // Los registros son del día: no se permiten fechas futuras ni muy antiguas.
-  const today = todayStr();
-  if (recordDate > today || recordDate < shiftDate(today, -WELLNESS_AVERAGE_DAYS)) {
+  const today = todayKey();
+  if (recordDate > today || recordDate < shiftDateKey(today, -WELLNESS_AVERAGE_DAYS)) {
     throw new Error('La fecha del registro está fuera del rango permitido');
   }
 

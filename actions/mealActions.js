@@ -14,14 +14,10 @@ import {
 import { parseMealTreeWithAI } from '@/lib/ai/meal-tree-parser';
 import { enforceRateLimit } from '@/lib/security/rate-limit';
 import { readImageUpload, toByteaHex } from '@/lib/security/uploads';
+import { toDateKey } from '@/lib/dates';
 
-const DEFAULT_TZ = 'Europe/Madrid';
 const MEAL_TYPES = new Set(['breakfast', 'midMorning', 'lunch', 'snack', 'dinner', 'lateSnack']);
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
-
-function getDateStr(dateStr, tz = DEFAULT_TZ) {
-  return new Date(dateStr).toLocaleDateString('sv-SE', { timeZone: tz });
-}
 
 function mapMealToClient(dbMeal) {
   if (!dbMeal) return null;
@@ -72,7 +68,7 @@ export async function listPlayerMeals(jugadorId, { mealType, day } = {}) {
     toUTC.setHours(toUTC.getHours() + 3);
     
     resultMeals = await getMealsFiltered(db, jugadorId, mealType, fromUTC.toISOString(), toUTC.toISOString());
-    resultMeals = resultMeals.filter(m => getDateStr(m.taken_at) === day);
+    resultMeals = resultMeals.filter(m => toDateKey(m.taken_at) === day);
   } else {
     resultMeals = await getMealsFiltered(db, jugadorId, mealType, null, null);
   }
