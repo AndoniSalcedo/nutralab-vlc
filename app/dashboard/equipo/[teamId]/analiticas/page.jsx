@@ -6,6 +6,8 @@ import { getPlayersByTeamSelectSimple } from '@/repositories/playerRepository';
 import { getAnalyticsByPlayerIds } from '@/repositories/analyticsRepository';
 import NothingFound from '@/components/NothingFound';
 
+export const metadata = { title: 'Analíticas' };
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 

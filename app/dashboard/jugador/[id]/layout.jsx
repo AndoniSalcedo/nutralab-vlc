@@ -4,6 +4,27 @@ import { getAccessiblePlayer } from '@/lib/auth/team-access';
 import PlayerTabs from './_tabs/PlayerTabs';
 import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
 import NothingFound from '@/components/NothingFound';
+import { playerFullName } from '@/lib/utils';
+
+// Pestaña del navegador con el nombre del jugador (solo si quien mira tiene acceso)
+export async function generateMetadata({ params }) {
+  try {
+    const db = getDb();
+    const user = await getUser();
+    const { id } = await params;
+    if (!user) return {};
+    if (user.role === 'jugador') {
+      if (String(user.id) !== String(id)) return {};
+    } else if (!(await getAccessiblePlayer(db, user, id))) {
+      return {};
+    }
+    const jugador = await getPlayerWithTeamConfig(db, id);
+    const name = playerFullName(jugador, '');
+    return name ? { title: name } : {};
+  } catch {
+    return {};
+  }
+}
 
 export default async function JugadorLayout({ children, params }) {
   const db = getDb();

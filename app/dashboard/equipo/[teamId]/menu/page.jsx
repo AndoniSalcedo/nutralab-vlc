@@ -5,6 +5,8 @@ import TeamMenuDashboard from '@/components/TeamMenuDashboard';
 import { getMenusByTeam } from '@/repositories/menuRepository';
 import NothingFound from '@/components/NothingFound';
 
+export const metadata = { title: 'Menú semanal' };
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 

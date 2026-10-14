@@ -16,7 +16,8 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata = {
-  title: 'Nutralab - Cuídate y disfruta',
+  // Cada sección pone su título («Equipos · Nutralab»): con varias pestañas abiertas se distinguen
+  title: { default: 'Nutralab - Cuídate y disfruta', template: '%s · Nutralab' },
   description: 'Panel nutricional para monitorización de jugadores',
   manifest: '/manifest.json',
   appleWebApp: {

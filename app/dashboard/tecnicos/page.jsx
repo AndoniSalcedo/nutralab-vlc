@@ -5,6 +5,8 @@ import { getTeamsByOwner } from '@/repositories/teamRepository';
 import { redirect } from 'next/navigation';
 import TecnicosManager from '@/components/TecnicosManager';
 
+export const metadata = { title: 'Técnicos' };
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 

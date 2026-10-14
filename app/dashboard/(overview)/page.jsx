@@ -8,6 +8,8 @@ import { getTeamsByOwner } from '@/repositories/teamRepository';
 import { getTeamsByTecnico } from '@/repositories/tecnicoRepository';
 import NothingFound from '@/components/NothingFound';
 
+export const metadata = { title: 'Equipos' };
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 

@@ -11,6 +11,8 @@ import {
 } from '@/repositories/supplementationRepository';
 import NothingFound from '@/components/NothingFound';
 
+export const metadata = { title: 'Suplementación' };
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 

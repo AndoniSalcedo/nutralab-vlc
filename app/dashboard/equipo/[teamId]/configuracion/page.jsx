@@ -4,6 +4,8 @@ import { getAccessibleTeam } from '@/lib/auth/team-access';
 import TeamConfigClient from './TeamConfigClient';
 import NothingFound from '@/components/NothingFound';
 
+export const metadata = { title: 'Configuración' };
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 

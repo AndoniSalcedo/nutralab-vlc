@@ -9,6 +9,18 @@ import { Box } from '@mantine/core';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+// Pestaña del navegador: «Menú semanal · Primer Equipo» (solo si quien mira tiene acceso)
+export async function generateMetadata({ params }) {
+  try {
+    const { teamId } = await params;
+    const team = await getAccessibleTeam(getDb(), await getUser(), teamId);
+    if (!team?.nombre) return {};
+    return { title: { default: team.nombre, template: `%s · ${team.nombre}` } };
+  } catch {
+    return {};
+  }
+}
+
 export default async function TeamDashboardLayout({ children, params }) {
   const db = getDb();
   const user = await getUser();

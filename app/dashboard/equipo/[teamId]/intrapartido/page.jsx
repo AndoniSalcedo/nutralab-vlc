@@ -7,6 +7,8 @@ import { getIntrapartidoHistoryByTeamId } from '@/repositories/intrapartidoRepos
 import TeamIntrapartidoDashboard from '@/components/TeamIntrapartidoDashboard';
 import NothingFound from '@/components/NothingFound';
 
+export const metadata = { title: 'Intrapartido' };
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 

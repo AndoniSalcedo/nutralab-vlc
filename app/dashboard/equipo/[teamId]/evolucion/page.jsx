@@ -6,6 +6,8 @@ import { getPlayersByTeamSelectSimple } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIds } from '@/repositories/evolutionRepository';
 import NothingFound from '@/components/NothingFound';
 
+export const metadata = { title: 'Evolución' };
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
