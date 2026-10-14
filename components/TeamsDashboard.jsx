@@ -19,6 +19,8 @@ import {
 import { notifications } from '@mantine/notifications';
 import { createTeam, deleteTeam, updateTeam, uploadTeamPhoto, removeTeamPhoto } from '@/actions/teamActions';
 import { compressAvatar, initials } from '@/lib/utils/avatar';
+import { getPlayerAvatarUrl, playerFullName } from '@/lib/utils';
+import Reveal from '@/components/motion/Reveal';
 import {
   IconCalendarStats,
   IconCopy,
@@ -37,6 +39,9 @@ import Icon3D from '@/components/Icon3D';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
 
+
+// Avatares de jugadores que se muestran en cada tarjeta de equipo
+const MAX_CARD_AVATARS = 5;
 
 function nextSeasonLabel() {
   const now = new Date();
@@ -345,9 +350,10 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
 
         {filteredTeams.length ? (
           <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-            {filteredTeams.map((team) => (
+            {filteredTeams.map((team, index) => (
+              <Reveal key={team.id} index={index}>
               <Paper
-                key={team.id}
+                h="100%"
                 p="md"
                 radius={24}
                 shadow="xs"
@@ -448,16 +454,40 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
                   </Group>
 
                   <Group justify="space-between" align="center" pt="xs" style={{ borderTop: '1px solid var(--mantine-color-gray-1)' }}>
-                    <Text size="xs" c="dimmed">
-                      {team.players_count || 0} jugador{Number(team.players_count || 0) === 1 ? '' : 'es'}
-                    </Text>
+                    <Group gap={8} wrap="nowrap">
+                      {(team.players || []).length > 0 && (
+                        <Avatar.Group spacing={6}>
+                          {team.players.slice(0, MAX_CARD_AVATARS).map((player) => (
+                            <Avatar
+                              key={player.id}
+                              src={getPlayerAvatarUrl(player)}
+                              size={26}
+                              radius="xl"
+                              color="bosque"
+                              title={playerFullName(player)}
+                              style={{ border: '2px solid #fff', fontSize: 10 }}
+                            >
+                              {initials(playerFullName(player, '?'))}
+                            </Avatar>
+                          ))}
+                          {team.players.length > MAX_CARD_AVATARS && (
+                            <Avatar size={26} radius="xl" color="gray" style={{ border: '2px solid #fff', fontSize: 10 }}>
+                              +{team.players.length - MAX_CARD_AVATARS}
+                            </Avatar>
+                          )}
+                        </Avatar.Group>
+                      )}
+                      <Text size="xs" c="dimmed">
+                        {team.players_count || 0} jugador{Number(team.players_count || 0) === 1 ? '' : 'es'}
+                      </Text>
+                    </Group>
                     <Text size="xs" fw={600} c="dark.4">
                       Abrir dashboard →
                     </Text>
                   </Group>
                 </Stack>
               </Paper>
-
+              </Reveal>
             ))}
           </SimpleGrid>
         ) : (

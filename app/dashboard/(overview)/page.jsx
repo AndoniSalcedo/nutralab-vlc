@@ -54,6 +54,8 @@ export default async function Dashboard() {
           nombre: player.nombre,
           apellidos: player.apellidos,
           posicion: player.posicion,
+          avatar_size: player.avatar_size || null,
+          updated_at: player.updated_at || null,
         });
         playersByTeam.set(teamId, currentPlayers);
       }
@@ -91,6 +93,8 @@ export default async function Dashboard() {
         nombre: player.nombre,
         apellidos: player.apellidos,
         posicion: player.posicion,
+        avatar_size: player.avatar_size || null,
+        updated_at: player.updated_at || null,
       });
       playersByTeam.set(teamId, currentPlayers);
     }

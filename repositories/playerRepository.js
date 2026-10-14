@@ -55,6 +55,8 @@ export async function getPlayersByOwner(db, ownerId) {
       nombre: true,
       apellidos: true,
       posicion: true,
+      avatar_size: true,
+      updated_at: true,
       equipos: { select: { owner_id: true } },
     },
     orderBy: { nombre: 'asc' },
@@ -133,7 +135,7 @@ export async function getPlayersByMultipleTeamIds(db, teamIds) {
 
   return db.jugadores.findMany({
     where: { equipo_id: { in: teamIds } },
-    select: selectFields('id,equipo_id,nombre,apellidos,posicion'),
+    select: selectFields('id,equipo_id,nombre,apellidos,posicion,avatar_size,updated_at'),
     orderBy: { nombre: 'asc' },
   });
 }
