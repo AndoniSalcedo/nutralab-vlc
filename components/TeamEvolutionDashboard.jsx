@@ -262,7 +262,8 @@ function downloadCsv(name, csv) {
   link.href = url;
   link.download = name;
   link.click();
-  URL.revokeObjectURL(url);
+  // Diferido: revocarlo en el mismo tick puede abortar la descarga (Safari)
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function rawMetricEntries(medicion) {
@@ -1075,7 +1076,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
       document.body.appendChild(link);
       link.click();
       link.remove();
-      URL.revokeObjectURL(url);
+      // Diferido: revocarlo en el mismo tick puede abortar la descarga (Safari)
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
 
       notifySaved({
         title: 'PDF descargado',

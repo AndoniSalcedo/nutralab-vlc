@@ -633,7 +633,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       document.body.appendChild(a);
       a.click();
       a.remove();
-      URL.revokeObjectURL(url);
+      // Diferido: revocarlo en el mismo tick puede abortar la descarga (Safari)
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
       notifySaved({
         color: 'green',
         title: 'PDF listo',

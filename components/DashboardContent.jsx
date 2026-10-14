@@ -264,7 +264,11 @@ export default function DashboardContent({ players = [], team, readOnly = false 
   const [selectedMenuWeek, setSelectedMenuWeek] = useState('');
   const [filters, setFilters] = useState({ name: '', email: '', position: '' });
   const [page, setPage] = useState(1);
-  const playersWithPlan = playersState.map((player) => ({ ...player, plan: getPlayerPlan(player, team?.configuracion_nutricional) }));
+  // Memoizado: antes se recalculaba el plan de toda la plantilla en cada render (cada tecla del buscador)
+  const playersWithPlan = useMemo(
+    () => playersState.map((player) => ({ ...player, plan: getPlayerPlan(player, teamConfig) })),
+    [playersState, teamConfig]
+  );
 
   const positionOptions = useMemo(() => {
     const positions = Array.from(new Set(playersState.map((player) => player.posicion).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
@@ -409,7 +413,8 @@ export default function DashboardContent({ players = [], team, readOnly = false 
     document.body.appendChild(a);
     a.click();
     a.remove();
-    URL.revokeObjectURL(url);
+    // Diferido: revocarlo en el mismo tick puede abortar la descarga (Safari)
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   function reportPayload(jugadorIds, extra = {}) {
@@ -721,7 +726,8 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       document.body.appendChild(a);
       a.click();
       a.remove();
-      URL.revokeObjectURL(url);
+      // Diferido: revocarlo en el mismo tick puede abortar la descarga (Safari)
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
 
       notifySaved({
         color: 'green',
