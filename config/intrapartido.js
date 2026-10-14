@@ -5,6 +5,8 @@
  * Los ids de momento y de producto son los que se persisten en base de datos.
  */
 
+import { todayKey } from '@/lib/dates';
+
 export const INTRAPARTIDO_TIMINGS = [
   { id: 'llegada', label: 'Llegada a campo', short: 'Llegada', icon: 'flag' },
   { id: 'calentamiento', label: 'Calentamiento', short: 'Calentamiento', icon: 'gym' },
@@ -350,7 +352,7 @@ export function createEmptySession() {
       rival: '',
       competicion: 'LaLiga EA Sports',
       lugar: 'Mestalla',
-      fecha: new Date().toISOString().split('T')[0],
+      fecha: todayKey(),
     },
     activeRosterIds: [],
     starterIds: [],

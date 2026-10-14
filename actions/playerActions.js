@@ -2,6 +2,7 @@
 
 import { validateAstValue, mealPatternsSchema, preMatchConfigSchema } from '@/validations/mealAstSchema';
 import { revalidatePath } from 'next/cache';
+import { todayKey } from '@/lib/dates';
 import { getUser } from '@/lib/auth/session';
 import { getDb } from '@/lib/db/prisma';
 import { getOwnedPlayer, getOwnedTeam } from '@/lib/auth/team-access';
@@ -418,7 +419,7 @@ export async function savePlayer(form) {
     if (newPlayer?.id && (initialWeight !== null || initialHeight !== null)) {
       await insertEvolution(db, {
         jugador_id: newPlayer.id,
-        fecha: new Date().toISOString().split('T')[0],
+        fecha: todayKey(),
         peso_kg: initialWeight,
         altura_cm: initialHeight,
         notas: 'Medición inicial al crear jugador',

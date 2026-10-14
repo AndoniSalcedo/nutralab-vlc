@@ -28,6 +28,7 @@ import { getSubtabHeader } from '../subtab-config';
 import { JugadorHeaderCompactMobile } from '@/components/JugadorHeader';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import { usePlayerDashboard } from '../PlayerDashboardContext';
+import { toDateKey } from '@/lib/dates';
 import headerClasses from '../SubtabSectionHeader.module.css';
 import {
   PhysicalMetricWidget,
@@ -127,7 +128,7 @@ export default function PerfilSubtab({
     if (!jugador?.id) return;
     let active = true;
 
-    const dateStr = new Date(selectedDate).toLocaleDateString('sv-SE', { timeZone: 'Europe/Madrid' });
+    const dateStr = toDateKey(selectedDate);
 
     listPlayerMeals(jugador.id, { day: dateStr })
       .then((mealsData) => {

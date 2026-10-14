@@ -10,6 +10,7 @@ import WidgetCard, { WidgetAside } from './WidgetCard';
 import { sanitizePlanData } from '@/lib/engine';
 import { getDayTypeLabel } from '@/config/nutrition-days';
 import { formatInteger as formatInt } from '@/lib/utils';
+import { toDateKey } from '@/lib/dates';
 
 const DAY_KEYS = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
 
@@ -33,8 +34,7 @@ function getMealSlot(name) {
 }
 
 function isSameDay(a, b) {
-  const fmt = (d) => new Date(d).toLocaleDateString('sv-SE', { timeZone: 'Europe/Madrid' });
-  return fmt(a) === fmt(b);
+  return toDateKey(a) === toDateKey(b);
 }
 
 export default function PlanHoyWidget({ jugador, plan: latestPlan = null, selectedDate = new Date() }) {

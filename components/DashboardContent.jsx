@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { initials, filenameFromResponse, getPlayerAvatarUrl } from '@/lib/utils';
+import { mondayKeyOf } from '@/lib/dates';
 import { Button, Group, Stack, Text, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Modal, Divider } from '@mantine/core';
 import { deletePlayer } from '@/actions/playerActions';
 import { getWeeklyMenus } from '@/actions/menuActions';
@@ -176,17 +177,12 @@ function getWeekRangeLabel(mondayInput) {
 }
 
 function defaultReportForm(teamConfig) {
-  const today = new Date();
-  const monday = new Date(today);
-  const day = today.getDay();
-  const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-  monday.setDate(diff);
-  const weekStr = monday.toISOString().split('T')[0];
+  const weekStr = mondayKeyOf();
 
   return {
     semana: weekStr,
     contexto: 'semana_partido',
-    title: getWeekRangeLabel(monday),
+    title: getWeekRangeLabel(weekStr),
     subtitle: 'Plan nutricional',
     team: 'Primer Equipo',
     author: 'Carlos Ferrando · Nutralab',

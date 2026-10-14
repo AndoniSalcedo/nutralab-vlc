@@ -29,10 +29,10 @@ import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import AnimatedNumber from '@/components/motion/AnimatedNumber';
 import WeekDayStrip from '@/components/WeekDayStrip';
 import { ParticleBurst } from '@/components/motion/Celebration';
+import { APP_TZ, toDateKey, shiftDateKey } from '@/lib/dates';
 import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 
-const TZ = 'Europe/Madrid';
 
 // Tomas del día en orden cronológico; `optional` se oculta si está vacía
 const MEAL_SLOTS = [
@@ -50,10 +50,8 @@ const WEEKDAYS = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
 const slotColor = (key, shade = 5) => `var(--mantine-color-${(SLOT_BY_KEY[key] || OTHER_SLOT).color}-${shade})`;
 const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 const formatTime = (date) =>
-  new Date(date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: TZ });
+  new Date(date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: APP_TZ });
 const formatKcal = (n) => Math.round(n).toLocaleString('es-ES');
-const toDateKey = (date = new Date()) => new Date(date).toLocaleDateString('sv-SE', { timeZone: TZ });
-const shiftDateKey = (key, days) => dayjs(key).add(days, 'day').format('YYYY-MM-DD');
 const windowStartOf = (endKey) => shiftDateKey(endKey, -6);
 const mealKcal = (meals) => meals.reduce((a, m) => a + (Number(m.calories) || 0), 0);
 

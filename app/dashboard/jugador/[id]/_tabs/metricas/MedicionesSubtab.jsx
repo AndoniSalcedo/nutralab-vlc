@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { todayKey } from '@/lib/dates';
 import {
   ComposedChart,
   Bar,
@@ -88,7 +89,7 @@ function dateInputToIso(value) {
 function emptyForm() {
   const form = {
     id: null,
-    fecha: new Date().toISOString().split('T')[0],
+    fecha: todayKey(),
     notas: '',
   };
   MEASUREMENT_DETAIL_SECTIONS.forEach((section) => {
@@ -102,7 +103,7 @@ function emptyForm() {
 function formFromMedicion(medicion) {
   const form = {
     id: medicion?.id || null,
-    fecha: medicion?.fecha || new Date().toISOString().split('T')[0],
+    fecha: medicion?.fecha || todayKey(),
     notas: medicion?.notas || '',
   };
   MEASUREMENT_DETAIL_SECTIONS.forEach((section) => {

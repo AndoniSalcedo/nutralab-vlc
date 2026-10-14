@@ -2,6 +2,7 @@ import React from 'react';
 import { NextResponse } from 'next/server';
 import { renderToStream } from '@react-pdf/renderer';
 import { getUser } from '@/lib/auth/session';
+import { todayKey } from '@/lib/dates';
 import { getDb } from '@/lib/db/prisma';
 import { getAccessibleTeam } from '@/lib/auth/team-access';
 import { withLatestMeasurement } from '@/lib/metrics/player';
@@ -206,7 +207,7 @@ export async function POST(request) {
     const downloadOnly = !!body?.downloadOnly;
 
     if (!semana) {
-      semana = new Date().toISOString().split('T')[0];
+      semana = todayKey();
     }
     const nombre = String(body?.nombre || '').trim() || `Plan ${semana}`;
 

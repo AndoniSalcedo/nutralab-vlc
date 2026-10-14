@@ -12,6 +12,7 @@ import {
   Menu,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { mondayKeyOf } from '@/lib/dates';
 import { IconTrash, IconEdit, IconCheck, IconCalendar, IconList, IconPlus, IconX, IconDotsVertical } from '@/components/icons3d';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import MenuSemanal, { formatWeek, WEEKDAY_ORDER } from '@/components/MenuSemanal';
@@ -27,12 +28,7 @@ export default function TeamMenuDashboard({ initialMenus = [], teamId, readOnly 
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteMenuId, setDeleteMenuId] = useState(null);
-  const [weekDate, setWeekDate] = useState(() => {
-    const today = new Date();
-    const monday = new Date(today);
-    monday.setDate(today.getDate() - today.getDay() + 1);
-    return monday.toISOString().split('T')[0];
-  });
+  const [weekDate, setWeekDate] = useState(() => mondayKeyOf());
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedDias, setEditedDias] = useState([]);
