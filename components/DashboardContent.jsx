@@ -48,6 +48,18 @@ function PlayerPositionText({ position }) {
   );
 }
 
+// Cifras en formato español (coma decimal), como en el resto de la app
+const fmtNum = (value, decimals = 1) => {
+  const n = Number(value);
+  if (value === null || value === undefined || value === '' || !Number.isFinite(n)) return value;
+  return n.toLocaleString('es-ES', { maximumFractionDigits: decimals });
+};
+const fmtSigned = (value, decimals = 1) => {
+  const n = Number(value) || 0;
+  const text = n.toLocaleString('es-ES', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  return n > 0 ? `+${text}` : text;
+};
+
 function PlayerSemaforoIndicator({ semaforo }) {
   if (!semaforo?.hasPesajes && !semaforo?.hasReference) {
     return (
@@ -60,8 +72,7 @@ function PlayerSemaforoIndicator({ semaforo }) {
   }
 
   const { status, label, pesoActual, pesoReferencia, diff, masaMagra, porcentajeGrasaObjetivo } = semaforo;
-  const isPositive = diff > 0;
-  const formattedDiff = diff !== null ? (isPositive ? `+${diff.toFixed(2)} kg` : `${diff.toFixed(2)} kg`) : '0.00 kg';
+  const formattedDiff = diff !== null ? `${fmtSigned(diff, 2)} kg` : '0,00 kg';
   const fatPctLabel = porcentajeGrasaObjetivo ? `${porcentajeGrasaObjetivo}%` : '10%';
 
   const statusConfigMap = {
@@ -103,16 +114,16 @@ function PlayerSemaforoIndicator({ semaforo }) {
           <Divider my={2} style={{ opacity: 0.2 }} />
           <Group justify="space-between">
             <Text size="xs" c="dimmed">Peso Actual:</Text>
-            <Text size="xs" fw={700}>{pesoActual} kg</Text>
+            <Text size="xs" fw={700}>{fmtNum(pesoActual)} kg</Text>
           </Group>
           <Group justify="space-between">
             <Text size="xs" c="dimmed">Peso Ref ({fatPctLabel} grasa):</Text>
-            <Text size="xs" fw={700}>{pesoReferencia} kg</Text>
+            <Text size="xs" fw={700}>{fmtNum(pesoReferencia)} kg</Text>
           </Group>
           {masaMagra && (
             <Group justify="space-between">
               <Text size="xs" c="dimmed">Masa Magra (Antropo):</Text>
-              <Text size="xs" fw={700}>{masaMagra} kg</Text>
+              <Text size="xs" fw={700}>{fmtNum(masaMagra)} kg</Text>
             </Group>
           )}
           <Group justify="space-between">
@@ -144,7 +155,7 @@ function PlayerSemaforoIndicator({ semaforo }) {
           </Text>
         </Group>
         <Text fz="11px" c="dimmed" mt={2}>
-          {cfg.title} · Ref: <span style={{ fontWeight: 600 }}>{pesoReferencia} kg</span>
+          {cfg.title} · Ref: <span style={{ fontWeight: 600 }}>{fmtNum(pesoReferencia)} kg</span>
         </Text>
       </Box>
     </Tooltip>
@@ -1016,7 +1027,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                                 <Group gap={6} align="center" hiddenFrom="xs" mt={3}>
                                   {player.peso_kg ? (
                                     <Text fz="xs" fw={500} c="var(--nutra-salvia, #6C705A)">
-                                      {player.peso_kg} kg
+                                      {fmtNum(player.peso_kg)} kg
                                     </Text>
                                   ) : null}
                                   {player.semaforo?.diff !== null && player.semaforo?.diff !== undefined && (
@@ -1031,7 +1042,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                                             : '#B8674A'
                                       }
                                     >
-                                      ● {player.semaforo.diff > 0 ? `+${player.semaforo.diff.toFixed(1)}` : player.semaforo.diff.toFixed(1)} kg
+                                      ● {fmtSigned(player.semaforo.diff, 1)} kg
                                     </Text>
                                   )}
                                 </Group>
@@ -1044,9 +1055,9 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                             {player.peso_kg || player.porcentaje_grasa ? (
                               <Box>
                                 <Text fz="sm" fw={600} c="var(--nutra-bosque, #1F2A24)">
-                                  {player.peso_kg ? `${player.peso_kg} kg` : '—'}
+                                  {player.peso_kg ? `${fmtNum(player.peso_kg)} kg` : '—'}
                                   {player.porcentaje_grasa ? (
-                                    <Text component="span" c="var(--nutra-salvia, #6C705A)" fw={400} fz="xs"> · {player.porcentaje_grasa}% GC</Text>
+                                    <Text component="span" c="var(--nutra-salvia, #6C705A)" fw={400} fz="xs"> · {fmtNum(player.porcentaje_grasa)}% GC</Text>
                                   ) : ''}
                                 </Text>
                                 <Text fz="xs" c="var(--nutra-salvia, #6C705A)">Composición corporal</Text>

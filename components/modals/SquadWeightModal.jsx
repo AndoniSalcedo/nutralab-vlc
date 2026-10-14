@@ -40,6 +40,7 @@ import {
 import ResponsiveModal from './ResponsiveModal';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
+import { formatDecimal } from '@/lib/utils';
 
 const MIN_WEIGHT_KG = 15;
 const MAX_WEIGHT_KG = 200;
@@ -684,8 +685,8 @@ export default function SquadWeightModal({ opened, onClose, players = [], team }
                     const formattedDiff =
                       player.diff !== null && player.diff !== undefined
                         ? player.diff > 0
-                          ? `+${player.diff.toFixed(2)} kg`
-                          : `${player.diff.toFixed(2)} kg`
+                          ? `+${formatDecimal(player.diff, 2)} kg`
+                          : `${formatDecimal(player.diff, 2)} kg`
                         : '—';
 
                     return (

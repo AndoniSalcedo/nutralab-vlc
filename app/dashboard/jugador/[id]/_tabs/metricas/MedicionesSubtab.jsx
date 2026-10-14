@@ -66,6 +66,7 @@ import {
 import { notifySaved } from '@/components/motion/notifySaved';
 import { toNumber as parseDecimal } from '@/lib/utils';
 import { errorMessage } from '@/lib/actionError';
+import { formatDecimal } from '@/lib/utils';
 
 const METRICAS = TREND_MEASUREMENT_METRICS;
 
@@ -258,7 +259,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
       ? (goodDown ? 'red' : goodUp ? 'green' : 'blue')
       : (goodDown ? 'green' : goodUp ? 'red' : 'blue');
     return {
-      val: d > 0 ? `+${d.toFixed(2)}` : d.toFixed(2),
+      val: d > 0 ? `+${formatDecimal(d, 2)}` : formatDecimal(d, 2),
       color,
     };
   }

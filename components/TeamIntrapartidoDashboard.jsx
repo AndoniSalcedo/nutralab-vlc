@@ -39,6 +39,7 @@ import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import { StatTile } from '@/components/widgets/WidgetCard';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
+import { formatDecimal } from '@/lib/utils';
 
 function formatDate(dateStr) {
   if (!dateStr) return 'Sin fecha';
@@ -58,7 +59,7 @@ function sumTotals(list) {
   );
 }
 
-const formatLiters = (ml) => `${(ml / 1000).toFixed(1)} L`;
+const formatLiters = (ml) => `${formatDecimal(ml / 1000, 1)} L`;
 
 function Stat({ label, value }) {
   return (
@@ -328,7 +329,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
                                   <Text fz="xs" fw={700} c={t.aguaMl > 0 ? '#0284c7' : 'dimmed'}>{Math.round(t.aguaMl)} ml</Text>
                                 </Table.Td>
                                 <Table.Td style={{ textAlign: 'right' }}>
-                                  <Text fz="xs" fw={700} c={t.carbsG > 0 ? '#d97706' : 'dimmed'}>{t.carbsG.toFixed(1)} g</Text>
+                                  <Text fz="xs" fw={700} c={t.carbsG > 0 ? '#d97706' : 'dimmed'}>{formatDecimal(t.carbsG, 1)} g</Text>
                                 </Table.Td>
                                 <Table.Td style={{ textAlign: 'right' }}>
                                   <Text fz="xs" fw={600} c="dark.5">{Math.round(t.sodioMg)} mg</Text>

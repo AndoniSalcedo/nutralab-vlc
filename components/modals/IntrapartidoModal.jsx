@@ -54,6 +54,7 @@ import {
   saveIntrapartidoMatch,
 } from '@/actions/intrapartidoActions';
 import { errorMessage } from '@/lib/actionError';
+import { formatDecimal } from '@/lib/utils';
 
 const COMPETITION_OPTIONS = [
   { value: 'LaLiga EA Sports', label: 'LaLiga EA Sports' },
@@ -1307,7 +1308,7 @@ export default function IntrapartidoModal({
                     <Box>
                       <Text fz="10px" fw={500} c="dimmed">Volumen</Text>
                       <Text fz="xs" fw={700} c="dark.5">
-                        {(teamNutrients.aguaMl / 1000).toFixed(1)} L
+                        {formatDecimal(teamNutrients.aguaMl / 1000, 1)} L
                       </Text>
                     </Box>
                   </Group>
@@ -1407,7 +1408,7 @@ export default function IntrapartidoModal({
 
                         <Table.Td style={{ textAlign: 'right' }}>
                           <Text fz="xs" fw={700} c={totals.carbsG > 0 ? '#d97706' : 'dimmed'}>
-                            {totals.carbsG.toFixed(1)} g
+                            {formatDecimal(totals.carbsG, 1)} g
                           </Text>
                         </Table.Td>
 
