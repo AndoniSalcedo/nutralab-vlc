@@ -1,6 +1,6 @@
 // Simulación masiva: 5000 semanas, con/sin menú (últimos 3 menús), partidos de mañana/tarde. Busca fallos y rarezas.
 import fs from 'node:fs';
-import { createClient } from '@supabase/supabase-js';
+import { getDb } from '../lib/db/prisma.js';
 import { withLatestMeasurement } from '../lib/metrics/player.js';
 import { generarDatosPlan } from '../lib/engine/generator.js';
 import { getClinicalCatalogForPlayer } from '../lib/nutrition/clinical-catalog.js';
@@ -15,22 +15,32 @@ let seed = +process.argv[4] || 12345;
 const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
 const pick = (a) => a[Math.floor(rnd() * a.length)];
 
-const env = {};
-for (const l of fs.readFileSync('.env.local', 'utf8').split('\n')) { const m = l.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/); if (m) { let v = m[2] || ''; if (/^["'].*["']$/.test(v)) v = v.slice(1, -1); env[m[1]] = v; } }
-const sb = createClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false }, db: { schema: 'teams' } });
-const { data: jug } = await sb.from('jugadores').select('*, equipos(nombre, configuracion_nutricional)');
-const { data: menusAll } = await sb.from('menu_semanal').select('*').eq('equipo_id', 7).order('created_at', { ascending: false }).limit(3);
+// Carga de datos con Prisma (solo lectura). Antes usaba supabase-js, retirado de la app.
+for (const file of ['.env.local', '.env']) {
+  if (!fs.existsSync(file)) continue;
+  for (const line of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (!match || match[1] in process.env) continue;
+    process.env[match[1]] = match[2].replace(/^(['"])(.*)\1$/, '$2');
+  }
+}
+const TEAM_ID = +(process.env.SIM_TEAM_ID || 7);
+const db = getDb();
+const jug = await db.jugadores.findMany({ include: { equipos: { select: { nombre: true, configuracion_nutricional: true } } } });
+const menusAll = await db.menu_semanal.findMany({ where: { equipo_id: TEAM_ID }, orderBy: { created_at: 'desc' }, take: 3 });
 const MENUS = { none: null, ...Object.fromEntries(menusAll.map((m) => [String(m.id), m])) };
 const MENU_KEYS = Object.keys(MENUS);
 const players = []; const skipped = [];
 for (const p of jug) {
-  const { data: ev } = await sb.from('evoluciones').select('*').eq('jugador_id', p.id);
-  const { data: pe } = await sb.from('pesajes').select('*').eq('jugador_id', p.id);
+  const [ev, pe] = await Promise.all([
+    db.evoluciones.findMany({ where: { jugador_id: p.id } }),
+    db.pesajes.findMany({ where: { jugador_id: p.id } }),
+  ]);
   const w = withLatestMeasurement(p, ev || [], pe || []);
-  if (w.num_comidas && w.peso_kg) players.push(w); else skipped.push(`${p.nombre}#${p.id} (eq ${p.equipo_id}): ${!w.num_comidas ? 'sin num_comidas' : ''} ${!w.peso_kg ? 'sin peso' : ''}`);
+  if (w.num_comidas && w.peso_kg) players.push(w); else skipped.push(`#${p.id} (eq ${p.equipo_id}): ${!w.num_comidas ? 'sin num_comidas' : ''} ${!w.peso_kg ? 'sin peso' : ''}`);
 }
-const team7 = players.filter((p) => p.equipo_id === 7);
-const others = players.filter((p) => p.equipo_id !== 7);
+const team7 = players.filter((p) => p.equipo_id === TEAM_ID);
+const others = players.filter((p) => p.equipo_id !== TEAM_ID);
 
 const DAYS = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
 const HOR = ['manana', 'tarde'];
@@ -124,7 +134,7 @@ while (S.plans < N && attempt < N * 2) {
   attempt++;
   const useT7 = rnd() < 0.7;
   const p = pick(useT7 ? team7 : others);
-  const menuKey = p.equipo_id === 7 ? pick(MENU_KEYS) : 'none';
+  const menuKey = p.equipo_id === TEAM_ID ? pick(MENU_KEYS) : 'none';
   const menu = MENUS[menuKey];
   const cal = randomCalendar();
   const matchDays = DAYS.filter((d) => cal[d] === 'partido');
@@ -302,7 +312,7 @@ while (S.plans < N && attempt < N * 2) {
 const mean = (a) => a.reduce((x, y) => x + y, 0) / (a.length || 1);
 const L = [];
 L.push(`Jugadores descartados (no generables): ${skipped.length}`);
-L.push(`# ${S.plans} planes (${S.days} días) | ${players.length} jugadores (${team7.length} equipo 7) | menús ${menusAll.map((m) => `${m.id}=${m.semana}`).join(', ')} | ${((Date.now() - t0) / 1000).toFixed(0)} s | excepciones: ${Object.values(S.errors).reduce((a, b) => a + b, 0)}`);
+L.push(`# ${S.plans} planes (${S.days} días) | ${players.length} jugadores (${team7.length} equipo ${TEAM_ID}) | menús ${menusAll.map((m) => `${m.id}=${m.semana}`).join(', ')} | ${((Date.now() - t0) / 1000).toFixed(0)} s | excepciones: ${Object.values(S.errors).reduce((a, b) => a + b, 0)}`);
 for (const [k, v] of Object.entries(S.errors)) L.push(`  ERROR ${v}× ${k}\n${S.errEx[k].map((e) => '      ' + e).join('\n')}`);
 const ks = S.dev.map((d) => Math.abs(d.k));
 L.push(`\nCUADRE: |Δkcal| medio ${mean(ks).toFixed(1)} | ≤50: ${(100 * ks.filter((x) => x <= 50).length / ks.length).toFixed(1)}% | ≤100: ${(100 * ks.filter((x) => x <= 100).length / ks.length).toFixed(2)}% | |ΔP| ${mean(S.dev.map((d) => Math.abs(d.p))).toFixed(1)} g | |ΔHC| ${mean(S.dev.map((d) => Math.abs(d.h))).toFixed(1)} g | |ΔG| ${mean(S.dev.map((d) => Math.abs(d.g))).toFixed(1)} g`);

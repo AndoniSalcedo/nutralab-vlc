@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 
 /**
@@ -8,6 +9,15 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
  */
 export function ParticleBurst({ burstKey, colors = ['#C1F080', '#7cc6f2', '#f2b45c'], count = 14, top = '50%', left = '50%' }) {
   const reduce = useReducedMotion();
+  // Vibración breve en móvil al celebrar (Android; iOS la ignora)
+  useEffect(() => {
+    if (!burstKey || reduce) return;
+    try {
+      navigator.vibrate?.([12, 40, 18]);
+    } catch {
+      // Sin soporte de vibración
+    }
+  }, [burstKey, reduce]);
   if (reduce || !burstKey) return null;
   return (
     <span key={burstKey} aria-hidden style={{ position: 'absolute', top, left, width: 0, height: 0, pointerEvents: 'none', zIndex: 3 }}>
