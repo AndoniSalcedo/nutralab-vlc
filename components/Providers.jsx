@@ -172,6 +172,7 @@ const theme = createTheme({
 import { Notifications } from '@mantine/notifications';
 import CookieBanner from '@/components/legal/CookieBanner';
 import ConnectionStatus from '@/components/ConnectionStatus';
+import PullToRefresh from '@/components/PullToRefresh';
 
 export default function Providers({ children }) {
   useEffect(() => {
@@ -209,6 +210,7 @@ export default function Providers({ children }) {
       {children}
       <CookieBanner />
       <ConnectionStatus />
+      <PullToRefresh />
     </MantineProvider>
   );
 }
