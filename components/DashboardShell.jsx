@@ -25,6 +25,7 @@ import { initials } from "@/lib/utils";
 import { env } from "@/config/env";
 import { logout } from "@/actions/authActions";
 import IntrapartidoResumePrompt from "./modals/IntrapartidoResumePrompt";
+import QuickSearch from "./navigation/QuickSearch";
 
 export default function DashboardShell({ children, user }) {
   const [opened, setOpened] = useState(false);
@@ -71,6 +72,8 @@ export default function DashboardShell({ children, user }) {
             <Logo href={user ? "/dashboard" : "/login"} width={180} />
 
             {user ? (
+              <Group gap="sm" wrap="nowrap">
+              <QuickSearch user={user} />
               <Menu
               width={240}
               position="bottom-end"
@@ -183,6 +186,7 @@ export default function DashboardShell({ children, user }) {
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
+              </Group>
             ) : (
               <Button
                 component="a"

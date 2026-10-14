@@ -103,6 +103,28 @@ export async function getPlayersByTeamIds(db, teamId, ids) {
   });
 }
 
+/** Datos mínimos para el buscador rápido del staff: jugadores de los equipos indicados con su equipo. */
+export async function getQuickSearchPlayers(db, teamIds) {
+  if (!teamIds || teamIds.length === 0) return [];
+  if (teamIds.every(isMockTeam)) {
+    return mockPlayers;
+  }
+
+  return db.jugadores.findMany({
+    where: { equipo_id: { in: teamIds } },
+    select: {
+      id: true,
+      equipo_id: true,
+      nombre: true,
+      apellidos: true,
+      posicion: true,
+      avatar_size: true,
+      updated_at: true,
+    },
+    orderBy: { nombre: 'asc' },
+  });
+}
+
 export async function getPlayersByMultipleTeamIds(db, teamIds) {
   if (!teamIds || teamIds.length === 0) return [];
   if (teamIds.every(isMockTeam)) {
