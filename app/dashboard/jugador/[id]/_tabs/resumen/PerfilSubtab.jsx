@@ -29,6 +29,7 @@ import { JugadorHeaderCompactMobile } from '@/components/JugadorHeader';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import { usePlayerDashboard } from '../PlayerDashboardContext';
 import { toDateKey } from '@/lib/dates';
+import Reveal from '@/components/motion/Reveal';
 import headerClasses from '../SubtabSectionHeader.module.css';
 import {
   PhysicalMetricWidget,
@@ -307,11 +308,11 @@ export default function PerfilSubtab({
         <Stack gap="md">
           {/* Bento: teselas de 1 o 2 columnas; lo urgente arriba, las constantes en pares y el detalle debajo */}
           <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
-            <Box style={{ gridColumn: 'span 2' }}>
+            <Reveal index={0} style={{ gridColumn: 'span 2' }}>
               <PlanHoyWidget jugador={jugador} plan={latestPlan} selectedDate={selectedDate} />
-            </Box>
+            </Reveal>
 
-            <Box style={{ gridColumn: 'span 2' }}>
+            <Reveal index={1} style={{ gridColumn: 'span 2' }}>
               <BalanceNutricionalWidget
                 jugadorId={jugador.id}
                 selectedDate={selectedDate}
@@ -323,61 +324,69 @@ export default function PerfilSubtab({
                 target={{ kcal, protein, cho, fat }}
                 mealsCount={meals.length}
               />
-            </Box>
+            </Reveal>
 
-            <PhysicalMetricWidget
-              jugadorId={jugador.id}
-              pesoActual={pesoActual}
-              porcentajeGrasa={porcentajeGrasa}
-              semaforo={semaforo}
-              formatMetricNumber={formatMetricNumber}
-            />
-            <StaffMessagesWidget
-              jugadorId={jugador.id}
-              messages={messages}
-            />
+            <Reveal index={2}>
+              <PhysicalMetricWidget
+                jugadorId={jugador.id}
+                pesoActual={pesoActual}
+                porcentajeGrasa={porcentajeGrasa}
+                semaforo={semaforo}
+                formatMetricNumber={formatMetricNumber}
+              />
+            </Reveal>
+            <Reveal index={3}>
+              <StaffMessagesWidget
+                jugadorId={jugador.id}
+                messages={messages}
+              />
+            </Reveal>
 
-            <HydrationWidget
-              jugadorId={jugador.id}
-              jugador={jugador}
-              pesoActual={pesoActual}
-              activeDayType={activeDayType}
-              latestHydration={latestHydration}
-              formatMetricNumber={formatMetricNumber}
-              readOnly={user?.role !== 'jugador'}
-            />
-            <SuplementacionWidget jugadorId={jugador.id} readOnly={user?.role !== 'jugador'} />
+            <Reveal index={4}>
+              <HydrationWidget
+                jugadorId={jugador.id}
+                jugador={jugador}
+                pesoActual={pesoActual}
+                activeDayType={activeDayType}
+                latestHydration={latestHydration}
+                formatMetricNumber={formatMetricNumber}
+                readOnly={user?.role !== 'jugador'}
+              />
+            </Reveal>
+            <Reveal index={5}>
+              <SuplementacionWidget jugadorId={jugador.id} readOnly={user?.role !== 'jugador'} />
+            </Reveal>
 
-            <Box style={{ gridColumn: 'span 2' }}>
+            <Reveal index={6} style={{ gridColumn: 'span 2' }}>
               <WellnessHexagonWidget
                 jugadorId={jugador.id}
                 canEdit={user?.role !== 'tecnico'}
               />
-            </Box>
+            </Reveal>
 
-            <Box style={{ gridColumn: 'span 2' }}>
+            <Reveal index={7} style={{ gridColumn: 'span 2' }}>
               <SweatMetricWidget
                 jugadorId={jugador.id}
                 latestSweat={latestSweat}
                 formatMetricNumber={formatMetricNumber}
               />
-            </Box>
+            </Reveal>
 
-            <Box style={{ gridColumn: 'span 2' }}>
+            <Reveal index={8} style={{ gridColumn: 'span 2' }}>
               <ComedorWidget
                 jugadorId={jugador.id}
                 menus={menus}
                 selectedDate={selectedDate}
               />
-            </Box>
+            </Reveal>
 
-            <Box style={{ gridColumn: 'span 2' }}>
+            <Reveal index={9} style={{ gridColumn: 'span 2' }}>
               <EstrategiaWidget
                 jugador={jugador}
                 activeDayType={activeDayType}
                 activeDayLabel={activeDay?.label || 'Día activo'}
               />
-            </Box>
+            </Reveal>
           </Box>
 
           {/* =========================================================================
