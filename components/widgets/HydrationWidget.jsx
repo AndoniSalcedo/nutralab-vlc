@@ -138,7 +138,7 @@ export default function HydrationWidget({
           <FloatingLabels items={floats} style={{ top: 4, left: 110 }} />
           <ParticleBurst burstKey={goalBurst} top={16} left={60} colors={['#7cc6f2', '#C1F080', '#38a0e6']} count={18} />
           <WidgetValue
-            value={drunk.toFixed(2).replace('.', ',')}
+            value={drunk.toLocaleString('es-ES', { maximumFractionDigits: 2 })}
             unit={`/ ${targetL.toFixed(1).replace('.', ',')} L`}
             color={isGoalReached ? 'var(--nutra-lima-dark, #4a6813)' : 'var(--nutra-bosque, #1F2A24)'}
             size={32}
