@@ -289,7 +289,7 @@ export default function TecnicosManager({ teams = [] }) {
                       <Group gap="sm" wrap="nowrap">
                         <Box style={{ position: 'relative', display: 'inline-block' }}>
                           <Avatar
-                            src={tecnico.avatar_size ? `/api/media/tecnico-avatar?id=${tecnico.id}&t=${tecnico.updated_at || Date.now()}` : undefined}
+                            src={tecnico.avatar_size ? `/api/media/tecnico-avatar?id=${tecnico.id}&t=${encodeURIComponent(tecnico.updated_at || tecnico.avatar_size)}` : undefined}
                             size={38}
                             radius="xl"
                             color="bosque"
