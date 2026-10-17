@@ -62,6 +62,9 @@ export async function updateTeam(db, teamId, payload) {
 }
 
 export async function getTeamPhoto(db, teamId) {
+  // El equipo de prueba no tiene foto (y su id no es numérico)
+  if (isMockTeam(teamId)) return null;
+
   return db.equipos.findUnique({
     where: { id: teamId },
     select: selectFields('id, nombre, foto, foto_mime, foto_size, updated_at'),
