@@ -119,6 +119,8 @@ export default function PerfilSubtab({
 }) {
   const { user } = usePlayerDashboard();
   const [meals, setMeals] = useState([]);
+  // Se incrementa al registrar una comida desde "Plan de hoy" para recargar el día
+  const [mealsReload, setMealsReload] = useState(0);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [editModalOpen, setEditModalOpen] = useState(false);
 
@@ -143,7 +145,7 @@ export default function PerfilSubtab({
     return () => {
       active = false;
     };
-  }, [jugador?.id, selectedDate]);
+  }, [jugador?.id, selectedDate, mealsReload]);
 
   // Mismo plan y misma lectura que "Plan de hoy": el tipo de día sale de latestPlan, no de una consulta aparte
   useEffect(() => {
@@ -309,7 +311,14 @@ export default function PerfilSubtab({
           {/* Bento: teselas de 1 o 2 columnas; lo urgente arriba, las constantes en pares y el detalle debajo */}
           <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
             <Reveal index={0} style={{ gridColumn: 'span 2' }}>
-              <PlanHoyWidget jugador={jugador} plan={latestPlan} selectedDate={selectedDate} />
+              <PlanHoyWidget
+                jugador={jugador}
+                plan={latestPlan}
+                selectedDate={selectedDate}
+                loggedMeals={meals}
+                canLog={user?.role === 'jugador'}
+                onMealLogged={() => setMealsReload((n) => n + 1)}
+              />
             </Reveal>
 
             <Reveal index={1} style={{ gridColumn: 'span 2' }}>
@@ -322,7 +331,7 @@ export default function PerfilSubtab({
                 dayTypes={DAY_TYPES}
                 consumed={consumed}
                 target={{ kcal, protein, cho, fat }}
-                mealsCount={meals.length}
+                meals={meals}
               />
             </Reveal>
 

@@ -6,8 +6,8 @@ import { getPlayerWithTeamConfig } from '@/repositories/playerRepository';
 import { getAnalyticsByPlayerId } from '@/repositories/analyticsRepository';
 import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
 import { getPesajesByPlayerId } from '@/repositories/pesajeRepository';
-import { getMenusByTeam } from '@/repositories/menuRepository';
-import { getAiPlansByPlayerId } from '@/repositories/aiPlanRepository';
+import { getMenusByTeamLimit } from '@/repositories/menuRepository';
+import { getLatestAiPlanByPlayerId } from '@/repositories/aiPlanRepository';
 import { PLAN_MODES } from '@/config/plan-modes';
 import { getHydrationRecordsByPlayerId } from '@/repositories/hydrationRepository';
 import { getIntrapartidoHistoryByPlayerId } from '@/repositories/intrapartidoRepository';
@@ -87,26 +87,28 @@ export default async function JugadorTabPage({ params }) {
   let jugador = rawJugador;
 
   try {
-    if (activeTab === 'resumen') {
-      const [resEvoluciones, resPesajes, resHidratacion, resMenus, resPlanes] = await Promise.all([
+    // Solo el perfil usa mediciones, menús y plan; Diario no usa nada de esto y Mensajes solo los mensajes.
+    // Cambiar de subpestaña vuelve a pasar por aquí, así que no se carga lo que no se va a pintar.
+    if (activeTab === 'resumen' && activeSubtab === 'perfil') {
+      const [resEvoluciones, resPesajes, resHidratacion, resMenus, resPlan, resMessages] = await Promise.all([
         getEvolutionsByPlayerId(db, id),
         getPesajesByPlayerId(db, id),
         getHydrationRecordsByPlayerId(db, id),
-        rawJugador?.equipo_id ? getMenusByTeam(db, rawJugador.equipo_id) : [],
+        rawJugador?.equipo_id ? getMenusByTeamLimit(db, rawJugador.equipo_id, null, 10) : [],
         // El plan es opcional para el resumen: si falla, el widget muestra su estado vacío.
         // Solo el semanal: el plan de hoy sale del día de la semana.
-        getAiPlansByPlayerId(db, id, { modo: PLAN_MODES.SEMANA }).catch(() => []),
+        getLatestAiPlanByPlayerId(db, id, { modo: PLAN_MODES.SEMANA }).catch(() => null),
+        rawJugador?.equipo_id ? getMessages(db, rawJugador.equipo_id, id) : [],
       ]);
       evoluciones = resEvoluciones;
       pesajes = resPesajes;
       registrosHidratacion = resHidratacion;
-      menus = (resMenus || []).slice(0, 10);
-      // Ordenados por created_at desc: el primero es el último plan publicado
-      latestPlan = (resPlanes || [])[0] || null;
+      menus = resMenus || [];
+      latestPlan = resPlan;
+      messages = resMessages;
       jugador = withLatestMeasurement(rawJugador, evoluciones, pesajes);
-      if (jugador?.equipo_id) {
-        messages = await getMessages(db, jugador.equipo_id, id);
-      }
+    } else if (activeTab === 'resumen' && activeSubtab === 'mensajes') {
+      if (rawJugador?.equipo_id) messages = await getMessages(db, rawJugador.equipo_id, id);
     } else if (activeTab === 'metricas') {
       const [resAnaliticas, resEvoluciones, resHidratacion, resPesajes, resIntrapartido] = await Promise.all([
         getAnalyticsByPlayerId(db, id),
@@ -124,11 +126,11 @@ export default async function JugadorTabPage({ params }) {
       registrosHidratacion = resHidratacion;
     } else if (activeTab === 'nutricion') {
       const [resMenus, resEvoluciones, resPesajes] = await Promise.all([
-        rawJugador?.equipo_id ? getMenusByTeam(db, rawJugador.equipo_id) : [],
+        rawJugador?.equipo_id ? getMenusByTeamLimit(db, rawJugador.equipo_id, null, 10) : [],
         getEvolutionsByPlayerId(db, id),
         getPesajesByPlayerId(db, id),
       ]);
-      menus = resMenus.slice(0, 10);
+      menus = resMenus;
       evoluciones = resEvoluciones;
       pesajes = resPesajes;
       jugador = withLatestMeasurement(rawJugador, evoluciones, pesajes);

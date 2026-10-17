@@ -3,7 +3,7 @@
 import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getAnalyticsByPlayerId } from '@/repositories/analyticsRepository';
-import { getAiPlansByPlayerId } from '@/repositories/aiPlanRepository';
+import { getLatestAiPlanByPlayerId } from '@/repositories/aiPlanRepository';
 import { PLAN_MODES } from '@/config/plan-modes';
 import { compareRecords, sortByDateDesc } from '@/lib/analytics/compare';
 
@@ -26,10 +26,10 @@ export async function getPlayerNews() {
   if (!user || user.role !== 'jugador') return { ok: true, news: [] };
 
   const db = getDb();
-  const [analytics, plans] = await Promise.all([
+  const [analytics, plan] = await Promise.all([
     getAnalyticsByPlayerId(db, user.id).catch(() => []),
     // La novedad muestra el plan día a día de la semana: solo cuenta el semanal.
-    getAiPlansByPlayerId(db, user.id, { modo: PLAN_MODES.SEMANA }).catch(() => []),
+    getLatestAiPlanByPlayerId(db, user.id, { modo: PLAN_MODES.SEMANA }).catch(() => null),
   ]);
 
   const news = [];
@@ -59,7 +59,6 @@ export async function getPlayerNews() {
     });
   }
 
-  const plan = (plans || [])[0];
   if (plan && isRecent(plan.created_at)) {
     const dias = plan.datos?.dias || {};
     news.push({

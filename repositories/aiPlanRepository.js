@@ -14,6 +14,19 @@ export async function getAiPlansByPlayerId(db, jugadorId, { modo } = {}) {
   });
 }
 
+/** Último plan publicado del jugador o null. Trae una sola fila: el JSON de cada plan pesa bastante. */
+export async function getLatestAiPlanByPlayerId(db, jugadorId, { modo } = {}) {
+  if (isMockPlayer(jugadorId)) return (await getAiPlansByPlayerId(db, jugadorId, { modo }))[0] || null;
+
+  const where = { jugador_id: jugadorId };
+  if (modo) where.modo = modo;
+
+  return db.planes_ia.findFirst({
+    where,
+    orderBy: { created_at: { sort: 'desc', nulls: 'first' } },
+  });
+}
+
 export async function getAiPlanById(db, id) {
   return db.planes_ia.findUnique({ where: { id } });
 }
