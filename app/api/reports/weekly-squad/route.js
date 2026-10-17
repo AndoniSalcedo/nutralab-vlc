@@ -13,6 +13,7 @@ import { sanitizeFilename, pdfHeaders as getPdfHeaders } from '@/lib/utils';
 import { getPlayersByTeam } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIds } from '@/repositories/evolutionRepository';
 import { getPesajesByPlayerIds } from '@/repositories/pesajeRepository';
+import { PLAN_MODES, isValidPlanMode } from '@/config/plan-modes';
 
 
 export const dynamic = 'force-dynamic';
@@ -88,7 +89,7 @@ async function loadPlayersWithMeasurements(
   jugadorIds,
   semana,
   semanaMenu,
-  { meta, nombre, persistPlans = true, draftPlans = null, user = null } = {}
+  { meta, nombre, modo, tiposDia, persistPlans = true, draftPlans = null, user = null } = {}
 ) {
   const rawPlayers = await getPlayersByTeam(db, team.id);
   let players = rawPlayers || [];
@@ -107,7 +108,8 @@ async function loadPlayersWithMeasurements(
     getPesajesByPlayerIds(db, playerIds),
   ]);
 
-  const menu = await resolvePlanMenu(db, { semanaMenu, equipoId: team.id });
+  // El informe por tipos no usa menú comedor
+  const menu = modo === PLAN_MODES.TIPOS ? null : await resolvePlanMenu(db, { semanaMenu, equipoId: team.id });
 
   async function persist(player, datos) {
     const saved = await savePlan(db, {
@@ -139,6 +141,8 @@ async function loadPlayersWithMeasurements(
           calendario: meta.calendario,
           preMatchConfig: meta.preMatchConfig,
           teamConfig: team.configuracion_nutricional,
+          modo,
+          tiposDia,
           equipoId: team.id,
           equipoNombre: team.nombre,
           semana,
@@ -198,6 +202,8 @@ export async function POST(request) {
     const meta = defaultMeta({ ...body?.meta, calendario: body?.calendario || body?.meta?.calendario });
     const jugadorIds = normalizeIds(body?.jugadorIds);
     const semanaMenu = body?.semanaMenu || body?.meta?.semanaMenu;
+    const modo = body?.modo;
+    if (!isValidPlanMode(modo)) throw httpError('Modo de plan no válido', 400);
 
     const team = await resolveTeam(db, user, body?.team_id);
     let semana = body?.meta?.semana;
@@ -218,6 +224,10 @@ export async function POST(request) {
         .map((item) => [String(item.id), sanitizePlanData(item.plan, team.configuracion_nutricional)])
     );
 
+    if ([...draftPlans.values()].some((plan) => plan.meta.modo !== modo)) {
+      throw httpError('El borrador de validación no corresponde a este tipo de plan', 400);
+    }
+
     if (commitDraft && draftPlans.size !== jugadorIds.length) {
       throw httpError('El borrador de validación no contiene todos los jugadores seleccionados', 400);
     }
@@ -228,6 +238,8 @@ export async function POST(request) {
     const players = await loadPlayersWithMeasurements(db, team, jugadorIds, semana, semanaMenu, {
       meta,
       nombre,
+      modo,
+      tiposDia: body?.tiposDia,
       persistPlans: shouldPersist,
       draftPlans: hasDraftPlans ? draftPlans : null,
       user,

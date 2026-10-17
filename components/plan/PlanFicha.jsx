@@ -7,9 +7,8 @@ import { getTeamDayTypeColor, getTeamDayTypeLabel } from '@/config/nutrition-day
 import { buildPlanTokens } from '@/config/plan-themes';
 import { formatInteger, formatNumberDecimal } from '@/lib/utils';
 import ProtocolIcon from '@/components/ProtocolIcon';
+import { PLAN_MODES, splitPlanDayColumns } from '@/config/plan-modes';
 
-const LEFT_DAYS = ['lunes', 'martes', 'miercoles', 'jueves'];
-const RIGHT_DAYS = ['viernes', 'sabado', 'domingo'];
 
 const TRANSITION = 'background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease';
 
@@ -126,6 +125,7 @@ export default function PlanFicha({ data, activeSupplements = [], jugador, theme
   if (!plan) return null;
 
   const clubName = jugador?.equipos?.nombre || 'Club';
+  const [leftDays, rightDays] = splitPlanDayColumns(plan.meta);
   const renderDay = (dayKey) => (plan.dias[dayKey] ? <Day key={dayKey} t={t} dayData={plan.dias[dayKey]} teamConfig={teamConfig} /> : null);
 
   const stats = [
@@ -162,7 +162,7 @@ export default function PlanFicha({ data, activeSupplements = [], jugador, theme
       <Box p={{ base: 'md', sm: 'xl' }}>
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
           <Stack gap={0}>
-            {LEFT_DAYS.map(renderDay)}
+            {leftDays.map(renderDay)}
 
             {supplementsToShow?.length > 0 && (
               <Card t={t} mb={0}>
@@ -182,7 +182,7 @@ export default function PlanFicha({ data, activeSupplements = [], jugador, theme
           </Stack>
 
           <Stack gap={0}>
-            {RIGHT_DAYS.map(renderDay)}
+            {rightDays.map(renderDay)}
 
             {protocolsToShow.map((prot, pIdx) => (
               <Card key={prot.id || pIdx} t={t}>
@@ -232,7 +232,7 @@ export default function PlanFicha({ data, activeSupplements = [], jugador, theme
 
             {plan.notas?.length > 0 && (
               <Card t={t} mb={0}>
-                <PanelTitle t={t}>Indicaciones de la semana</PanelTitle>
+                <PanelTitle t={t}>{plan.meta.modo === PLAN_MODES.TIPOS ? 'Indicaciones del plan' : 'Indicaciones de la semana'}</PanelTitle>
                 <Stack gap={7}>
                   {plan.notas.map((note, i) => (
                     <Group key={i} gap={10} align="flex-start" wrap="nowrap">

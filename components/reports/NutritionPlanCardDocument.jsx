@@ -4,9 +4,8 @@ import { sanitizePlanData } from '@/lib/engine';
 import { getTeamDayTypeColor, getTeamDayTypeLabel } from '@/config/nutrition-days';
 import { buildPlanTokens } from '@/config/plan-themes';
 import { formatInteger, formatNumberDecimal } from '@/lib/utils';
+import { PLAN_MODES, splitPlanDayColumns } from '@/config/plan-modes';
 
-const LEFT_DAYS = ['lunes', 'martes', 'miercoles', 'jueves'];
-const RIGHT_DAYS = ['viernes', 'sabado', 'domingo'];
 
 function makeStyles(k) {
   const u = (n) => Math.round(n * k * 100) / 100;
@@ -291,8 +290,9 @@ function estimateHeight(plan, { supplements, protocols, notes }, k) {
   );
   const notesH = notes.length ? 28 + notes.reduce((n, x) => n + 4 + 8.6 * lines(x), 0) : 0;
 
-  const left = sum(['lunes', 'martes', 'miercoles', 'jueves']) + (suppH ? 7 + suppH : 0);
-  const right = sum(['viernes', 'sabado', 'domingo']) + (protH ? 7 + protH : 0) + (notesH ? 7 + notesH : 0);
+  const [leftDays, rightDays] = splitPlanDayColumns(plan?.meta);
+  const left = sum(leftDays) + (suppH ? 7 + suppH : 0);
+  const right = sum(rightDays) + (protH ? 7 + protH : 0) + (notesH ? 7 + notesH : 0);
   return (Math.max(left, right) + 100 /* cabecera */ + 38 /* pie y márgenes */) * k;
 }
 
@@ -361,6 +361,7 @@ export function PlanCardPage({ plan, teamConfig }) {
   const supplements = Array.isArray(plan?.suplementacion) ? plan.suplementacion : [];
   const protocols = Array.isArray(plan?.protocolos) ? plan.protocolos : [];
   const st = getStyles(estimateScale(plan, { supplements, protocols, notes }));
+  const [leftDays, rightDays] = splitPlanDayColumns(plan?.meta);
 
   const stats = [
     ['Peso', formatNumberDecimal(plan?.metricas?.peso, ' kg', 1)],
@@ -392,7 +393,7 @@ export function PlanCardPage({ plan, teamConfig }) {
       <View style={st.body}>
         <View style={st.contentGrid}>
           <View style={st.column}>
-            {LEFT_DAYS.map((dayKey) => (
+            {leftDays.map((dayKey) => (
               <Day key={dayKey} dayData={plan.dias[dayKey]} teamConfig={teamConfig} t={t} st={st} />
             ))}
 
@@ -413,7 +414,7 @@ export function PlanCardPage({ plan, teamConfig }) {
           </View>
 
           <View style={st.column}>
-            {RIGHT_DAYS.map((dayKey) => (
+            {rightDays.map((dayKey) => (
               <Day key={dayKey} dayData={plan.dias[dayKey]} teamConfig={teamConfig} t={t} st={st} />
             ))}
 
@@ -451,7 +452,7 @@ export function PlanCardPage({ plan, teamConfig }) {
             ))}
 
             {notes.length > 0 && (
-              <Panel title="Indicaciones de la semana" t={t} st={st}>
+              <Panel title={plan?.meta?.modo === PLAN_MODES.TIPOS ? 'Indicaciones del plan' : 'Indicaciones de la semana'} t={t} st={st}>
                 {notes.map((note, index) => (
                   <View key={index} style={st.noteRow}>
                     <View style={[st.noteDot, { backgroundColor: t.accentText }]} />

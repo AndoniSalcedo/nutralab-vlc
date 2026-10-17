@@ -418,10 +418,11 @@ export const mockAiPlans = [
   {
     id: 'mock-plan',
     jugador_id: 'mock',
+    modo: 'semana',
     nombre: 'Semana 40 · Microciclo competitivo',
     created_at: '2026-09-28T09:00:00Z',
     datos: {
-      meta: { nombre: 'Semana 40 · Microciclo competitivo', semanaMenu: null },
+      meta: { nombre: 'Semana 40 · Microciclo competitivo', modo: 'semana', semanaMenu: null },
       jugador: { nombre: 'Carlos Jugador Uno', posicion: 'Delantero' },
       metricas: { peso: 81.5, grasa: 11.2 },
       dias: {

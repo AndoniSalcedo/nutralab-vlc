@@ -1,13 +1,12 @@
 
 import { mockAiPlans, isMockPlayer } from '@/config/boneyardMockData';
 
-export async function getAiPlansByPlayerId(db, jugadorId, semana = null) {
-  if (isMockPlayer(jugadorId)) return semana ? [] : mockAiPlans;
+/** Planes del jugador, del más reciente al más antiguo. `modo` ('semana' | 'tipos') los filtra; sin él, todos. */
+export async function getAiPlansByPlayerId(db, jugadorId, { modo } = {}) {
+  if (isMockPlayer(jugadorId)) return modo ? mockAiPlans.filter((plan) => plan.modo === modo) : mockAiPlans;
 
   const where = { jugador_id: jugadorId };
-  if (semana) {
-    where.datos = { path: ['meta', 'semanaMenu'], equals: semana };
-  }
+  if (modo) where.modo = modo;
 
   return db.planes_ia.findMany({
     where,

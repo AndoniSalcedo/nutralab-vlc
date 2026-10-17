@@ -30,6 +30,13 @@ import {
 } from '@/components/icons3d';
 
 import ResponsiveModal from './ResponsiveModal';
+import TypePlanRowsEditor, { isValidTypeRows } from '@/components/plan/TypePlanRowsEditor';
+import { PLAN_MODES } from '@/config/plan-modes';
+
+const REPORT_MODE_OPTIONS = [
+  { label: 'Semana', value: PLAN_MODES.SEMANA },
+  { label: 'Por tipos de día', value: PLAN_MODES.TIPOS },
+];
 
 const MATCH_SCHEDULE_OPTIONS = [
   { label: 'Mañana', value: 'manana' },
@@ -220,6 +227,9 @@ export default function SquadReportModal({
   playersState,
   generateReport,
 }) {
+  const isTypePlan = reportForm.modo === PLAN_MODES.TIPOS;
+  const canGenerate = !isTypePlan || isValidTypeRows(reportForm.tiposDia);
+
   const modalTitle = (
     <Group justify="space-between" align="center" w="100%" pr={{ base: 2, sm: 16 }} wrap="nowrap">
       <Group gap="xs" align="center" wrap="nowrap" style={{ minWidth: 0 }}>
@@ -253,6 +263,15 @@ export default function SquadReportModal({
           <AiGenerationOverlay opened={generatingReport} messages={SQUAD_GENERATION_MESSAGES} progress={reportProgress} />
           <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 160px)', sm: '72vh' }} type="auto">
             <Stack gap="md" pb="xs">
+              {/* Modo del informe: semana (calendario y menú) o tipos de día (opciones por tipo, sin menú) */}
+              <SegmentedControl
+                fullWidth
+                radius="xl"
+                data={REPORT_MODE_OPTIONS}
+                value={reportForm.modo}
+                onChange={(val) => updateReportField('modo', val)}
+              />
+
               {/* Panel 1: Datos de la Semana */}
               <Paper p="md" radius="md" withBorder bg="gray.0" style={{ borderColor: 'var(--mantine-color-gray-2)' }}>
 
@@ -332,6 +351,16 @@ export default function SquadReportModal({
             </Stack>
           </Paper>
 
+          {isTypePlan ? (
+            <Paper p="md" radius="md" withBorder bg="gray.0">
+              <TypePlanRowsEditor
+                rows={reportForm.tiposDia}
+                onChange={(rows) => updateReportField('tiposDia', rows)}
+                dayTypeOptions={dayTypeOptions}
+              />
+            </Paper>
+          ) : (
+          <>
           {/* Panel 2: Menú del Buffet Comedor */}
           <Paper p="md" radius="md" withBorder bg="gray.0">
             <Group gap="xs" mb="xs">
@@ -450,6 +479,8 @@ export default function SquadReportModal({
                 )}
             </Stack>
           </Paper>
+          </>
+          )}
 
           {/* Panel 4: Seleccionar Jugadores */}
           {!reportModal.player && (
@@ -570,6 +601,7 @@ export default function SquadReportModal({
           style={{ flex: 1 }}
           leftSection={<IconDownload size={15} />}
           loading={generatingReport}
+          disabled={!canGenerate}
           onClick={generateReport}
         >
           Generar PDF {selectedPlayerIds.length > 0 && !reportModal.player ? `(${selectedPlayerIds.length})` : ''}

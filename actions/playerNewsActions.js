@@ -4,6 +4,7 @@ import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getAnalyticsByPlayerId } from '@/repositories/analyticsRepository';
 import { getAiPlansByPlayerId } from '@/repositories/aiPlanRepository';
+import { PLAN_MODES } from '@/config/plan-modes';
 import { compareRecords, sortByDateDesc } from '@/lib/analytics/compare';
 
 const RECENT_DAYS = 10;
@@ -27,7 +28,8 @@ export async function getPlayerNews() {
   const db = getDb();
   const [analytics, plans] = await Promise.all([
     getAnalyticsByPlayerId(db, user.id).catch(() => []),
-    getAiPlansByPlayerId(db, user.id).catch(() => []),
+    // La novedad muestra el plan día a día de la semana: solo cuenta el semanal.
+    getAiPlansByPlayerId(db, user.id, { modo: PLAN_MODES.SEMANA }).catch(() => []),
   ]);
 
   const news = [];

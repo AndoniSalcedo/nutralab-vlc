@@ -10,6 +10,7 @@ import PlanSubtab from './nutricion/PlanSubtab';
 import SuplementacionSubtab from './nutricion/SuplementacionSubtab';
 import MenuSemanalSubtab from './nutricion/MenuSemanalSubtab';
 import ProtocolosSubtab from './nutricion/ProtocolosSubtab';
+import { PLAN_MODES } from '@/config/plan-modes';
 
 export default function NutricionTab({ jugador, menus = [], activeSubtab = 'plan', onSubtabChange, readOnly = false }) {
   return (
@@ -33,7 +34,8 @@ export default function NutricionTab({ jugador, menus = [], activeSubtab = 'plan
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
       >
-        {activeSubtab === 'plan' && <PlanSubtab jugador={jugador} readOnly={readOnly} />}
+        {activeSubtab === 'plan' && <PlanSubtab jugador={jugador} readOnly={readOnly} modo={PLAN_MODES.SEMANA} />}
+        {activeSubtab === 'tipos' && <PlanSubtab jugador={jugador} readOnly={readOnly} modo={PLAN_MODES.TIPOS} />}
         {activeSubtab === 'suplementacion' && <SuplementacionSubtab jugador={jugador} readOnly={readOnly} />}
         {activeSubtab === 'menu' && <MenuSemanalSubtab menus={menus} />}
         {activeSubtab === 'protocolos' && <ProtocolosSubtab jugador={jugador} readOnly={readOnly} />}

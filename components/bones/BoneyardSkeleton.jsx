@@ -43,6 +43,7 @@ const bonesMap = {
   'player-dashboard-metricas-hidratacion': _player_dashboard_metricas_hidratacion,
   'player-dashboard-metricas-protocolos': _player_dashboard_nutricion_protocolos,
   'player-dashboard-nutricion-plan': _player_dashboard_nutricion_plan,
+  'player-dashboard-nutricion-tipos': _player_dashboard_nutricion_plan,
   'player-dashboard-nutricion-suplementacion': _player_dashboard_nutricion_suplementacion,
   'player-dashboard-nutricion-menu': _player_dashboard_nutricion_menu,
   'player-dashboard-nutricion-protocolos': _player_dashboard_nutricion_protocolos,

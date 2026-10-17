@@ -344,9 +344,12 @@ model planes_ia {
   updated_at         DateTime? @default(now()) @db.Timestamptz(6)
   created_at         DateTime? @default(now()) @db.Timestamptz(6)
   datos              Json?
+  /// 'semana' (lunes a domingo) o 'tipos' (opciones por tipo de día). Check en la migración.
+  modo               String    @default("semana")
   jugadores          jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([jugador_id], map: "teams_planes_ia_jugador_id_idx")
+  @@index([jugador_id, modo], map: "teams_planes_ia_jugador_id_modo_idx")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.

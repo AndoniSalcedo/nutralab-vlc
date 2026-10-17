@@ -1,6 +1,6 @@
 import { IconUser, IconNotes, IconMail } from '@/components/icons3d';
 import { IconReportMedical, IconDroplet } from '@/components/icons3d';
-import { IconBrain, IconBottle } from '@/components/icons3d';
+import { IconBrain, IconBottle, IconCalendarStats } from '@/components/icons3d';
 import { IconScale, IconRuler2, IconBentoBox, IconFlag2, IconBallFootball } from '@/components/icons3d';
 
 /**
@@ -87,7 +87,8 @@ const SUBTAB_CONFIGS = {
   nutricion: {
     defaultSubtab: 'plan',
     tabs: [
-      { value: 'plan', icon: IconBrain, label: 'Plan nutricional', mobileLabel: 'Plan' },
+      { value: 'plan', icon: IconBrain, label: 'Plan semanal', mobileLabel: 'Semana' },
+      { value: 'tipos', icon: IconCalendarStats, label: 'Plan por tipos', mobileLabel: 'Tipos' },
       { value: 'suplementacion', icon: IconBottle, label: 'Suplementación', mobileLabel: 'Supl.' },
       { value: 'menu', icon: IconBentoBox, label: 'Menú semanal', mobileLabel: 'Menú' },
       { value: 'protocolos', icon: IconFlag2, label: 'Protocolos', mobileLabel: 'Prot.' },
@@ -98,6 +99,12 @@ const SUBTAB_CONFIGS = {
         iconColor: 'salvia',
         title: 'Planes nutricionales',
         subtitle: 'Fichas con métricas, macros y pautas.',
+      },
+      tipos: {
+        icon: IconCalendarStats,
+        iconColor: 'salvia',
+        title: 'Planes por tipos de día',
+        subtitle: 'Opciones de menú por tipo de día, sin semana ni comedor.',
       },
       suplementacion: {
         icon: IconBottle,

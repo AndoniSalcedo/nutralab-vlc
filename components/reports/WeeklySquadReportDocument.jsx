@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { PlanCardPage } from './NutritionPlanCardDocument';
+import { getPlanDayKeys } from '@/config/plan-modes';
 import { formatClinicalTags } from '@/config/clinical-tags';
 
 const COLORS = {
@@ -470,7 +471,7 @@ function PlayerDetailBreakdownPage({ player, plan, meta, teamConfig }) {
     pesoMuscular: p.peso_muscular_pct,
   };
 
-  const daysOfWeek = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+  const daysOfWeek = getPlanDayKeys(plan?.meta);
   const notes = plan?.notas?.length ? plan.notas : [];
 
   // Protocolo de los partidos de esta semana: solo las tomas pautadas a mano (el resto son sus comidas habituales).

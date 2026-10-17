@@ -54,7 +54,7 @@ export default function PlayerTabs({
     metricas: isPlayer
       ? ['mediciones', 'pesos', 'hidratacion']
       : ['mediciones', 'pesos', 'analiticas', 'hidratacion'],
-    nutricion: ['plan', 'suplementacion', 'menu', 'protocolos'],
+    nutricion: ['plan', 'tipos', 'suplementacion', 'menu', 'protocolos'],
   };
 
   const activeTab = VALID_TABS.includes(normalizedTab) ? normalizedTab : 'resumen';

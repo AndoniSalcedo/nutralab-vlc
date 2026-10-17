@@ -29,8 +29,8 @@ import {
 } from '@/components/icons3d';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import ResponsiveModal from './ResponsiveModal';
+import { getPlanDayKeys } from '@/config/plan-modes';
 
-const DAYS_OF_WEEK = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
 
 function formatMacro(value, suffix = '') {
   return value === null || value === undefined || value === '' ? '—' : `${value}${suffix}`;
@@ -99,7 +99,7 @@ export default function SquadReportReviewModal({
   const plan = editablePlan || preview?.plan;
 
   const activeDays = useMemo(
-    () => DAYS_OF_WEEK.filter((dayKey) => plan?.dias?.[dayKey]),
+    () => getPlanDayKeys(plan?.meta).filter((dayKey) => plan?.dias?.[dayKey]),
     [plan]
   );
 

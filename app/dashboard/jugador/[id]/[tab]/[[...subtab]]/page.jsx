@@ -8,6 +8,7 @@ import { getEvolutionsByPlayerId } from '@/repositories/evolutionRepository';
 import { getPesajesByPlayerId } from '@/repositories/pesajeRepository';
 import { getMenusByTeam } from '@/repositories/menuRepository';
 import { getAiPlansByPlayerId } from '@/repositories/aiPlanRepository';
+import { PLAN_MODES } from '@/config/plan-modes';
 import { getHydrationRecordsByPlayerId } from '@/repositories/hydrationRepository';
 import { getIntrapartidoHistoryByPlayerId } from '@/repositories/intrapartidoRepository';
 import { getMessages } from '@/repositories/messagesRepository';
@@ -92,8 +93,9 @@ export default async function JugadorTabPage({ params }) {
         getPesajesByPlayerId(db, id),
         getHydrationRecordsByPlayerId(db, id),
         rawJugador?.equipo_id ? getMenusByTeam(db, rawJugador.equipo_id) : [],
-        // El plan es opcional para el resumen: si falla, el widget muestra su estado vacío
-        getAiPlansByPlayerId(db, id).catch(() => []),
+        // El plan es opcional para el resumen: si falla, el widget muestra su estado vacío.
+        // Solo el semanal: el plan de hoy sale del día de la semana.
+        getAiPlansByPlayerId(db, id, { modo: PLAN_MODES.SEMANA }).catch(() => []),
       ]);
       evoluciones = resEvoluciones;
       pesajes = resPesajes;

@@ -22,6 +22,8 @@ import {
   ActionIcon
 } from '@mantine/core';
 import CreateNutritionPlanModal from '@/components/modals/CreateNutritionPlanModal';
+import CreateTypesPlanModal from '@/components/modals/CreateTypesPlanModal';
+import { getDefaultTypeRows } from '@/components/plan/TypePlanRowsEditor';
 import { useMediaQuery, useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { getAiPlans, generateAiPlanDraft, saveAiPlan, updateAiPlan, deleteAiPlan } from '@/actions/planActions';
@@ -34,23 +36,20 @@ import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import { buildBasePlanData, sanitizePlanData, getDefaultCalendar } from '@/lib/engine';
 import { calculateByObjective } from '@/lib/metrics/anthropometry';
-import { getUserMeals, getTeamNutritionDayTypes } from '@/config/nutrition-days';
+import { getUserMeals, getTeamNutritionDayTypes, getTeamDayTypeLabel } from '@/config/nutrition-days';
 import IntercambiosModal from '@/components/modals/IntercambiosModal';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import PlanFicha from '@/components/plan/PlanFicha';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
-
-
-
-const DAY_LABELS = { lunes: 'Lunes', martes: 'Martes', miercoles: 'Miércoles', jueves: 'Jueves', viernes: 'Viernes', sabado: 'Sábado', domingo: 'Domingo' };
+import { PLAN_MODES, getPlanDayKeys } from '@/config/plan-modes';
 
 /** Avisa de las referencias de las pautas del jugador que el motor no ha podido servir. */
 function notifyPlanWarnings(datos) {
   const avisos = datos?.meta?.avisos || [];
   if (avisos.length === 0) return;
-  const lines = avisos.slice(0, 4).map((a) => `${DAY_LABELS[a.dia] || a.dia} · ${a.ingesta}: ${a.mensaje}`);
+  const lines = avisos.slice(0, 4).map((a) => `${datos.dias?.[a.dia]?.label || a.dia} · ${a.ingesta}: ${a.mensaje}`);
   if (avisos.length > 4) lines.push(`… y ${avisos.length - 4} aviso(s) más.`);
   notifications.show({
     color: 'orange',
@@ -186,7 +185,9 @@ function AiGenerationOverlay({ opened, messages = [] }) {
   );
 }
 
-export default function PlanSubtab({ jugador, readOnly = false }) {
+/** Planes del jugador de un modo: 'semana' (lunes a domingo, con menú) o 'tipos' (opciones por tipo de día). */
+export default function PlanSubtab({ jugador, readOnly = false, modo }) {
+  const isTypePlan = modo === PLAN_MODES.TIPOS;
   const isMobile = useMediaQuery('(max-width: 48em)', true);
   const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const [planes, setPlanes] = useState([]);
@@ -209,6 +210,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     diaPartido: 'sabado',
     horario: 'tarde',
   });
+  const [modalTypeRows, setModalTypeRows] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
   const [availableMenus, setAvailableMenus] = useState([]);
 
@@ -272,8 +274,9 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       setLoadingList(true);
       try {
         const [plansData, menuData] = await Promise.all([
-          getAiPlans(jugador.id),
-          jugador.equipo_id ? getWeeklyMenus(jugador.equipo_id).catch(() => ({ menus: [] })) : { menus: [] },
+          getAiPlans(jugador.id, modo),
+          // El plan por tipos no usa menú comedor
+          jugador.equipo_id && !isTypePlan ? getWeeklyMenus(jugador.equipo_id).catch(() => ({ menus: [] })) : { menus: [] },
         ]);
         if (!active) return;
         const list = plansData.planes || [];
@@ -303,12 +306,13 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
     return () => {
       active = false;
     };
-  }, [jugador.id, jugador.equipo_id]);
+  }, [jugador.id, jugador.equipo_id, modo, isTypePlan]);
 
   function openCreateModal() {
     const now = new Date();
     setModalNombre(`Ficha ${now.toLocaleDateString('es-ES')}`);
     setModalSelectedMenuWeek(selectedMenuWeek || 'none');
+    setModalTypeRows(getDefaultTypeRows(dayTypeOptions));
     const defaultCal = getDefaultCalendar();
     setModalCalendar(defaultCal);
     const matchDay = Object.keys(defaultCal).find((k) => defaultCal[k] === 'partido') || 'sabado';
@@ -339,6 +343,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         preMatchConfig: modalPreMatchConfig,
         teamConfig,
         suplementacion: activeSupplements,
+        modo,
+        tiposDia: modalTypeRows,
       });
       setDatos(baseData);
       setNotasText((baseData?.notas || []).join('\n'));
@@ -367,7 +373,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
       withCloseButton: false,
     });
     try {
-      if (modalSelectedMenuWeek === 'none') {
+      if (!isTypePlan && modalSelectedMenuWeek === 'none') {
         notifications.show({
           color: 'yellow',
           title: 'Generando sin menú',
@@ -381,6 +387,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         calendario: modalCalendar,
         semanaMenu: modalSelectedMenuWeek,
         preMatchConfig: modalPreMatchConfig,
+        modo,
+        tiposDia: modalTypeRows,
       });
 
       setNombre(modalNombre);
@@ -456,7 +464,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         }
       }
 
-      if (selectedMenuWeek === 'none') {
+      if (!isTypePlan && selectedMenuWeek === 'none') {
         notifications.show({
           color: 'yellow',
           title: 'Generando sin menú',
@@ -470,6 +478,9 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         calendario: currentCalendar || getDefaultCalendar(),
         semanaMenu: selectedMenuWeek,
         preMatchConfig: datos?.meta?.preMatchConfig || null,
+        modo,
+        // Al regenerar un plan por tipos se piden las mismas opciones con las que se creó
+        tiposDia: datos?.meta?.tiposDia,
       });
       const newNotasText = data.datos?.notas?.length ? data.datos.notas.join('\n') : notasText;
       setNotasText(newNotasText);
@@ -529,7 +540,8 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         jugador,
         nombre,
         datos: finalDatos,
-        contenido
+        contenido,
+        modo,
       });
       setPlanes((prev) => [data.plan, ...prev]);
       setCurrentId(String(data.plan.id));
@@ -697,7 +709,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         <Stack gap="md">
           <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
             <Group gap="xs" style={{ flex: 1 }}>
-              <SubtabHeader tab="nutricion" subtab="plan" />
+              <SubtabHeader tab="nutricion" subtab={isTypePlan ? 'tipos' : 'plan'} />
             </Group>
 
             {!isMobile && (
@@ -893,13 +905,13 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
               <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
                 <TextInput
                   label="Nombre del plan"
-                  placeholder="Ej: Semana de 3 partidos"
+                  placeholder={isTypePlan ? 'Ej: Opciones de pretemporada' : 'Ej: Semana de 3 partidos'}
                   value={nombre}
                   onChange={(e) => setNombre(e.target.value)}
                   required
                 />
 
-                <Select
+                {!isTypePlan && <Select
                   label="Menú a utilizar"
                   placeholder="Selecciona una semana o Sin Menú..."
                   value={selectedMenuWeek}
@@ -913,7 +925,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                   ]}
                   size="sm"
                   allowDeselect={false}
-                />
+                />}
               </SimpleGrid>
 
               {menuChangedWithoutRegeneration && (
@@ -954,7 +966,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                     </SimpleGrid>
                   </Paper>
 
-                  {['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'].map((dayKey) => {
+                  {getPlanDayKeys(datos.meta).map((dayKey) => {
                     const item = datos.dias?.[dayKey];
                     if (!item) return null;
                     return (
@@ -962,7 +974,10 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                         <Group justify="space-between" align={isMobile ? 'stretch' : 'center'} mb="md" wrap="wrap" style={{ flexDirection: isMobile ? 'column' : 'row' }} gap="xs">
                           <Group gap="xs" wrap="wrap" style={{ width: isMobile ? '100%' : 'auto', flexDirection: isMobile ? 'column' : 'row' }} align={isMobile ? 'stretch' : 'center'}>
                             <Title order={4} style={{ textAlign: isMobile ? 'center' : 'left' }}>{item.label}</Title>
-                            <Select
+                            {/* En el plan por tipos cada opción es de su tipo: para otro tipo se crea otro plan */}
+                            {isTypePlan ? (
+                              <Badge variant="light" color="gray">{getTeamDayTypeLabel(item.tipoDia, teamConfig)}</Badge>
+                            ) : <Select
                               placeholder="Tipo de día"
                               data={dayTypeOptions}
                               value={item.tipoDia}
@@ -1006,7 +1021,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
                               size="xs"
                               radius="xl"
                               style={{ width: isMobile ? '100%' : 150 }}
-                            />
+                            />}
                           </Group>
                         </Group>
                         <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md" mb="md">
@@ -1131,9 +1146,11 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
           <Box mt="xl">
             <NothingFound
               icon={IconBrain}
-              title="Sin planes nutricionales"
+              title={isTypePlan ? 'Sin planes por tipos' : 'Sin planes nutricionales'}
               icon3d="salad"
-              description="Todavía no hay planes nutricionales creados para este jugador."
+              description={isTypePlan
+                ? 'Todavía no hay planes por tipos de día creados para este jugador.'
+                : 'Todavía no hay planes nutricionales creados para este jugador.'}
               actionLabel={!readOnly ? 'Crear primera ficha' : undefined}
               onAction={!readOnly ? openCreateModal : undefined}
             />
@@ -1177,7 +1194,20 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         loading={deleting}
       />
 
-      <CreateNutritionPlanModal
+      {isTypePlan ? (
+        <CreateTypesPlanModal
+          opened={creationModalOpened}
+          onClose={() => setCreationModalOpened(false)}
+          modalNombre={modalNombre}
+          setModalNombre={setModalNombre}
+          typeRows={modalTypeRows}
+          setTypeRows={setModalTypeRows}
+          dayTypeOptions={dayTypeOptions}
+          createEmptyPlan={createEmptyPlan}
+          generatePlanFromModal={generatePlanFromModal}
+          actionType={actionType}
+        />
+      ) : <CreateNutritionPlanModal
         opened={creationModalOpened}
         onClose={() => setCreationModalOpened(false)}
         isMobile={isMobile}
@@ -1194,7 +1224,7 @@ export default function PlanSubtab({ jugador, readOnly = false }) {
         createEmptyPlan={createEmptyPlan}
         generatePlanFromModal={generatePlanFromModal}
         actionType={actionType}
-      />
+      />}
     </Stack>
   );
 }

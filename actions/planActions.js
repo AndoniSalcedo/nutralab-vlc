@@ -17,6 +17,7 @@ import {
   deleteAiPlan as deleteAiPlanInRepo
 } from '@/repositories/aiPlanRepository';
 import { ActionError } from '@/lib/actionError';
+import { PLAN_MODES, isValidPlanMode } from '@/config/plan-modes';
 
 async function loadPlayerWithLatestMetrics(db, jugadorId) {
   const [jugador, evoluciones, pesajes] = await Promise.all([
@@ -28,8 +29,9 @@ async function loadPlayerWithLatestMetrics(db, jugadorId) {
   return withLatestMeasurement(jugador, evoluciones || [], pesajes || []);
 }
 
-export async function getAiPlans(jugadorId, semana = null) {
+export async function getAiPlans(jugadorId, modo) {
   if (!jugadorId) throw new ActionError('Falta jugador_id');
+  if (!isValidPlanMode(modo)) throw new ActionError('Modo de plan no válido');
 
   const db = getDb();
   const user = await getUser();
@@ -42,8 +44,15 @@ export async function getAiPlans(jugadorId, semana = null) {
     if (!accessiblePlayer) throw new ActionError('No tienes acceso a este jugador');
   }
 
-  const planes = await getAiPlansByPlayerId(db, jugadorId, semana);
+  const planes = await getAiPlansByPlayerId(db, jugadorId, { modo });
   return { planes: planes || [] };
+}
+
+// El modo de una ficha lo fija quien la guarda (la subpestaña o el plan existente), no los datos que llegan.
+function withPlanMode(datos, modo) {
+  if (!datos) return datos;
+  if (datos.meta.modo !== modo) throw new ActionError('La ficha no corresponde a este tipo de plan');
+  return datos;
 }
 
 async function createAiPlan(payload) {
@@ -55,12 +64,15 @@ async function createAiPlan(payload) {
     draftOnly = false,
     calendario,
     semanaMenu,
-    preMatchConfig
+    preMatchConfig,
+    modo,
+    tiposDia,
   } = payload || {};
 
   const planNombre = String(nombre || '').trim();
   if (!jugador?.id) throw new ActionError('Falta jugador');
   if (!planNombre) throw new ActionError('El nombre del plan es obligatorio');
+  if (!isValidPlanMode(modo)) throw new ActionError('Modo de plan no válido');
 
   const db = getDb();
   const user = await getUser();
@@ -82,16 +94,18 @@ async function createAiPlan(payload) {
     ? await generatePlanDraft(db, {
         jugador: jugadorConMetricas,
         nombre: planNombre,
-        menu: await resolvePlanMenu(db, { semanaMenu, equipoId }),
+        menu: modo === PLAN_MODES.TIPOS ? null : await resolvePlanMenu(db, { semanaMenu, equipoId }),
         calendario,
         preMatchConfig,
         teamConfig,
+        modo,
+        tiposDia,
         equipoId,
         equipoNombre: jugadorConMetricas?.equipos?.nombre,
         user,
         origen: 'plan_individual',
       })
-    : sanitizePlanData(datos, teamConfig);
+    : withPlanMode(sanitizePlanData(datos, teamConfig), modo);
 
   if (isDraftOnly) {
     return { datos: generatedDatos };
@@ -129,7 +143,7 @@ export async function updateAiPlan(payload) {
   const jugadorConMetricas = await loadPlayerWithLatestMetrics(db, currentPlan.jugador_id);
   const teamConfig = jugadorConMetricas?.equipos?.configuracion_nutricional;
 
-  const sanitizedDatos = sanitizePlanData(datos, teamConfig);
+  const sanitizedDatos = withPlanMode(sanitizePlanData(datos, teamConfig), currentPlan.modo);
   const finalContenido = String(contenido || '');
 
   const plan = await updateAiPlanInRepo(db, id, {
@@ -165,24 +179,27 @@ export async function deleteAiPlan(id) {
   return { ok: true };
 }
 
-export async function generateAiPlanDraft({ jugador, nombre, calendario, semanaMenu, preMatchConfig }) {
+export async function generateAiPlanDraft({ jugador, nombre, calendario, semanaMenu, preMatchConfig, modo, tiposDia }) {
   return await createAiPlan({
     jugador,
     nombre,
     calendario,
     semanaMenu,
     preMatchConfig,
+    modo,
+    tiposDia,
     draftOnly: true,
     guardar: false,
   });
 }
 
-export async function saveAiPlan({ jugador, nombre, datos, contenido }) {
+export async function saveAiPlan({ jugador, nombre, datos, contenido, modo }) {
   return await createAiPlan({
     jugador,
     nombre,
     datos,
     contenido,
+    modo,
     guardar: true,
   });
 }

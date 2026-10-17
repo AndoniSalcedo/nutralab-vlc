@@ -15,6 +15,8 @@ import NothingFound from '@/components/NothingFound';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import { calculateByObjective } from '@/lib/metrics/anthropometry';
 import { getTeamNutritionDayTypes } from '@/config/nutrition-days';
+import { PLAN_MODES } from '@/config/plan-modes';
+import { getDefaultTypeRows } from '@/components/plan/TypePlanRowsEditor';
 import { useRouter } from 'next/navigation';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import NewPlayerModal from '@/components/modals/NewPlayerModal';
@@ -194,6 +196,9 @@ function defaultReportForm(teamConfig) {
 
   return {
     semana: weekStr,
+    // 'semana': lunes a domingo con menú; 'tipos': opciones por tipo de día (tiposDia), sin menú ni calendario.
+    modo: PLAN_MODES.SEMANA,
+    tiposDia: getDefaultTypeRows(getTeamNutritionDayTypes(teamConfig).map((d) => ({ value: d.key, label: d.label }))),
     contexto: 'semana_partido',
     title: getWeekRangeLabel(weekStr),
     subtitle: 'Plan nutricional',
@@ -434,6 +439,8 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       meta: reportForm,
       jugadorIds,
       calendario: reportForm.calendario,
+      modo: reportForm.modo,
+      tiposDia: reportForm.tiposDia,
       team_id: team?.id,
       semanaMenu: selectedMenuWeek,
       ...extra,
