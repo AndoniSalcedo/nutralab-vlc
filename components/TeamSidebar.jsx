@@ -162,7 +162,7 @@ export default function TeamSidebar({
               color="gray"
               size={36}
               radius="xl"
-              style={{ textDecoration: 'none', color: 'var(--nutra-hueso)' }}
+              style={{ textDecoration: 'none', color: 'var(--nutra-hueso)', '--ai-hover': 'rgba(255, 255, 255, 0.1)' }}
             >
               <IconArrowLeft size={20} />
             </ActionIcon>
@@ -177,7 +177,7 @@ export default function TeamSidebar({
                 color="gray"
                 size={36}
                 radius="xl"
-                style={{ textDecoration: 'none', color: 'var(--nutra-hueso)' }}
+                style={{ textDecoration: 'none', color: 'var(--nutra-hueso)', '--ai-hover': 'rgba(255, 255, 255, 0.1)' }}
               >
                 <Icon3D name="configuracion" size={20} />
               </ActionIcon>

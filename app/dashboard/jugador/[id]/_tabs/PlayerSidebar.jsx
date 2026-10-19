@@ -163,7 +163,7 @@ export default function PlayerSidebar({
                 color="gray"
                 size={36}
                 radius="xl"
-                style={{ textDecoration: 'none', color: 'var(--nutra-hueso)' }}
+                style={{ textDecoration: 'none', color: 'var(--nutra-hueso)', '--ai-hover': 'rgba(255, 255, 255, 0.1)' }}
               >
                 <IconArrowLeft size={20} />
               </ActionIcon>
@@ -182,7 +182,7 @@ export default function PlayerSidebar({
                     color="gray"
                     size={36}
                     radius="xl"
-                    style={{ color: 'var(--nutra-hueso)' }}
+                    style={{ color: 'var(--nutra-hueso)', '--ai-hover': 'rgba(255, 255, 255, 0.1)' }}
                     onClick={() => setEditModalOpen(true)}
                   >
                     <Icon3D name="configuracion" size={20} />
@@ -200,6 +200,7 @@ export default function PlayerSidebar({
                     color="arcilla"
                     size={36}
                     radius="xl"
+                    style={{ '--ai-hover': 'rgba(184, 103, 74, 0.22)' }}
                     onClick={handleLogout}
                   >
                     <IconLogout size={18} />
