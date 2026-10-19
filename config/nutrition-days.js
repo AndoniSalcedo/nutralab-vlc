@@ -259,7 +259,7 @@ export function getUserMealsForDay(jugador, tipoDia, teamConfig, preMatchConfig 
       : Boolean(jugador.postentreno);
 
     if (hasPost) {
-      combinedMealsSet.add('Post-entreno');
+      combinedMealsSet.add('Post-partido');
     }
 
     return sortMeals([...combinedMealsSet], horario);
