@@ -431,8 +431,8 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                   data={[{ value: 'Todas', label: 'Todas las temporadas' }, ...seasons.map(s => ({ value: s, label: formatSeasonOption(s) }))]}
                   value={selectedSeason}
                   onChange={handleSeasonChange}
-                  variant="default"
-                  radius="md"
+                  variant="filled"
+                  radius="xl"
                   allowDeselect={false}
                   disabled={seasons.length === 0}
                 />
@@ -443,7 +443,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                     value={dateValue(dateFrom)}
                     onChange={(value) => setDateFrom(dateInputToIso(value))}
                     variant="filled"
-                    radius="md"
+                    radius="xl"
                     valueFormat="DD/MM/YYYY"
                     clearable
                   />
@@ -453,7 +453,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                     value={dateValue(dateTo)}
                     onChange={(value) => setDateTo(dateInputToIso(value))}
                     variant="filled"
-                    radius="md"
+                    radius="xl"
                     valueFormat="DD/MM/YYYY"
                     clearable
                   />
@@ -469,7 +469,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
                   }}
                   searchable
                   variant="filled"
-                  radius="md"
+                  radius="xl"
                   allowDeselect={false}
                   disabled={sortedDesc.length === 0}
                   nothingFoundMessage="No hay registros"
