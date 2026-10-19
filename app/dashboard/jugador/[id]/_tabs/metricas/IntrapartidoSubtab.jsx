@@ -9,7 +9,6 @@ import NothingFound from '@/components/NothingFound';
 import { StatTile } from '@/components/widgets/WidgetCard';
 import { IconChevronDown } from '@/components/icons3d';
 import {
-  INTRAPARTIDO_TIMINGS,
   PRODUCTS_MAP,
   buildSessionFromRows,
   calculatePlayerTotals,
@@ -72,7 +71,7 @@ export default function IntrapartidoSubtab({ jugador, historialIntrapartido = []
             {matches.map(({ session, intakes, isStarter, totals }) => {
               const info = session.matchInfo;
               const expanded = expandedId === session.id;
-              const phases = INTRAPARTIDO_TIMINGS.filter((t) => Object.keys(intakes[t.id] || {}).length > 0);
+              const phases = session.fases.filter((t) => Object.keys(intakes[t.id] || {}).length > 0);
 
               return (
                 <Paper key={session.id} radius={24} shadow="xs" bg="white" p={{ base: 10, sm: 'md' }}>

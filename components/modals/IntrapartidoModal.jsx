@@ -42,11 +42,12 @@ import ResponsiveModal from './ResponsiveModal';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import { exportIntrapartidoExcel } from '@/lib/io/intrapartido-export';
 import {
-  INTRAPARTIDO_TIMINGS,
   INTRAPARTIDO_PRODUCTS,
+  INTRAPARTIDO_PRODUCT_CATEGORIES,
   PRODUCTS_MAP,
   calculateNutrientTotals,
   createEmptySession,
+  resolveTeamPhases,
 } from '@/config/intrapartido';
 import {
   listIntrapartidoMatches,
@@ -115,7 +116,7 @@ export default function IntrapartidoModal({
   onSaved,
 }) {
   // Estado de la sesión del partido (se persiste al guardar)
-  const [session, setSession] = useState(() => createEmptySession());
+  const [session, setSession] = useState(() => createEmptySession(resolveTeamPhases(team?.configuracion_nutricional)));
   const [savedMatches, setSavedMatches] = useState([]);
   const [saving, setSaving] = useState(false);
   const [loadingMatch, setLoadingMatch] = useState(false);
@@ -123,7 +124,7 @@ export default function IntrapartidoModal({
   // Paso principal del flujo: 'alineacion' -> 'fases' -> 'resumen'
   const [currentStep, setCurrentStep] = useState('alineacion');
 
-  // Índice de la fase activa del partido (0 a 6)
+  // Índice de la fase activa del partido (en session.fases)
   const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
 
   // Guardado de borrador: las escrituras se encadenan para que nunca se solapen y siempre
@@ -151,7 +152,10 @@ export default function IntrapartidoModal({
     return new Set(session.starterIds);
   }, [session.starterIds]);
 
-  const currentTiming = INTRAPARTIDO_TIMINGS[currentPhaseIndex] || INTRAPARTIDO_TIMINGS[0];
+  // Fases del partido: un partido nuevo copia las del equipo; uno guardado trae las suyas
+  const phases = session.fases;
+  const currentTiming = phases[currentPhaseIndex] || phases[0];
+  const quickButtonSpan = 12 / (currentTiming.botones.length + 1);
 
   // Partidos guardados del equipo (se recargan cada vez que se abre el modal)
   useEffect(() => {
@@ -224,7 +228,7 @@ export default function IntrapartidoModal({
 
   const handleNewMatch = () => {
     matchIdRef.current = null;
-    setSession(createEmptySession());
+    setSession(createEmptySession(resolveTeamPhases(team?.configuracion_nutricional)));
     setCurrentStep('alineacion');
     setCurrentPhaseIndex(0);
     setGroupFilter('titulares');
@@ -566,7 +570,7 @@ export default function IntrapartidoModal({
                 {currentTiming.label}
               </Text>
               <Text fz="xs" c="dimmed" fw={500}>
-                ({currentPhaseIndex + 1}/{INTRAPARTIDO_TIMINGS.length})
+                ({currentPhaseIndex + 1}/{phases.length})
               </Text>
             </Group>
           </Group>
@@ -607,7 +611,7 @@ export default function IntrapartidoModal({
         )}
       </Group>
     );
-  }, [currentStep, currentTiming, currentPhaseIndex, session.starterIds.length, session.matchInfo, team]);
+  }, [currentStep, currentTiming, currentPhaseIndex, phases.length, session.starterIds.length, session.matchInfo, team]);
 
 
   return (
@@ -843,9 +847,9 @@ export default function IntrapartidoModal({
         {/* ============================================================= */}
         {currentStep === 'fases' && (
           <Stack gap="xs" style={{ flex: 1, minHeight: 0, height: '100%' }}>
-            {/* Progreso del partido: 7 fases, se puede saltar a cualquiera (guarda el borrador) */}
+            {/* Progreso del partido: se puede saltar a cualquier fase (guarda el borrador) */}
             <Group gap={4} wrap="nowrap" aria-label="Fases del partido">
-              {INTRAPARTIDO_TIMINGS.map((timing, index) => {
+              {phases.map((timing, index) => {
                 const done = index < currentPhaseIndex;
                 const active = index === currentPhaseIndex;
                 return (
@@ -907,18 +911,15 @@ export default function IntrapartidoModal({
                     <Menu.Label>
                       Reparto a {groupFilter === 'suplentes' ? 'suplentes' : 'titulares'} ({currentTiming.short})
                     </Menu.Label>
-                    <Menu.Item onClick={() => handleBatchDistribute('agua-250')}>
-                      +1 Agua 250ml
-                    </Menu.Item>
-                    <Menu.Item onClick={() => handleBatchDistribute('isotonico-250')}>
-                      +1 Isotónico 250ml
-                    </Menu.Item>
-                    <Menu.Item onClick={() => handleBatchDistribute('gel-30')}>
-                      +1 Gel 30g
-                    </Menu.Item>
-                    <Menu.Item onClick={() => handleBatchDistribute('platano-medio')}>
-                      +1 Medio Plátano
-                    </Menu.Item>
+                    {currentTiming.reparto.length === 0 ? (
+                      <Menu.Item disabled>Sin productos de reparto en esta fase</Menu.Item>
+                    ) : (
+                      currentTiming.reparto.map((prodId) => (
+                        <Menu.Item key={prodId} onClick={() => handleBatchDistribute(prodId)}>
+                          +1 {PRODUCTS_MAP.get(prodId).nombre}
+                        </Menu.Item>
+                      ))
+                    )}
                   </Menu.Dropdown>
                 </Menu>
               </Group>
@@ -1128,51 +1129,29 @@ export default function IntrapartidoModal({
                           </Group>
                         )}
 
-                        {/* Fila 2: Botonera táctil de 4 botones distribuidos para el pulgar */}
+                        {/* Fila 2: Botonera táctil (productos rápidos de la fase + «Más») repartida para el pulgar */}
                         <Grid gutter={4} mt={6}>
-                          <Grid.Col span={3}>
-                            <Button
-                              fullWidth
-                              size="xs"
-                              radius="md"
-                              variant="default"
-                              px={2}
-                              styles={{ label: { fontSize: 11, fontWeight: 700 } }}
-                              onClick={() => handleModifyProduct(player.id, 'agua-250', 1)}
-                            >
-                              + Agua
-                            </Button>
-                          </Grid.Col>
+                          {currentTiming.botones.map((prodId) => {
+                            const prod = PRODUCTS_MAP.get(prodId);
+                            return (
+                              <Grid.Col span={quickButtonSpan} key={prodId}>
+                                <Button
+                                  fullWidth
+                                  size="xs"
+                                  radius="md"
+                                  variant="default"
+                                  px={2}
+                                  title={prod.nombre}
+                                  styles={{ label: { fontSize: 11, fontWeight: 700 } }}
+                                  onClick={() => handleModifyProduct(player.id, prodId, 1)}
+                                >
+                                  <Text span inherit truncate style={{ minWidth: 0 }}>+ {prod.short}</Text>
+                                </Button>
+                              </Grid.Col>
+                            );
+                          })}
 
-                          <Grid.Col span={3}>
-                            <Button
-                              fullWidth
-                              size="xs"
-                              radius="md"
-                              variant="default"
-                              px={2}
-                              styles={{ label: { fontSize: 11, fontWeight: 700 } }}
-                              onClick={() => handleModifyProduct(player.id, 'isotonico-250', 1)}
-                            >
-                              + Iso
-                            </Button>
-                          </Grid.Col>
-
-                          <Grid.Col span={3}>
-                            <Button
-                              fullWidth
-                              size="xs"
-                              radius="md"
-                              variant="default"
-                              px={2}
-                              styles={{ label: { fontSize: 11, fontWeight: 700 } }}
-                              onClick={() => handleModifyProduct(player.id, 'gel-30', 1)}
-                            >
-                              + Gel
-                            </Button>
-                          </Grid.Col>
-
-                          <Grid.Col span={3}>
+                          <Grid.Col span={quickButtonSpan}>
                             <Menu shadow="md" width={220} position="bottom-end" radius="md" zIndex={2500} withinPortal>
                               <Menu.Target>
                                 <Button
@@ -1188,34 +1167,19 @@ export default function IntrapartidoModal({
                                 </Button>
                               </Menu.Target>
                               <Menu.Dropdown style={{ maxHeight: 300, overflowY: 'auto' }}>
-                                <Menu.Label>Bebidas</Menu.Label>
-                                {INTRAPARTIDO_PRODUCTS.filter((p) => p.categoria === 'bebidas').map((prod) => (
-                                  <Menu.Item
-                                    key={prod.id}
-                                    onClick={() => handleModifyProduct(player.id, prod.id, 1)}
-                                  >
-                                    + {prod.nombre}
-                                  </Menu.Item>
-                                ))}
-                                <Menu.Divider />
-                                <Menu.Label>Geles y Estimulantes</Menu.Label>
-                                {INTRAPARTIDO_PRODUCTS.filter((p) => p.categoria === 'geles').map((prod) => (
-                                  <Menu.Item
-                                    key={prod.id}
-                                    onClick={() => handleModifyProduct(player.id, prod.id, 1)}
-                                  >
-                                    + {prod.nombre}
-                                  </Menu.Item>
-                                ))}
-                                <Menu.Divider />
-                                <Menu.Label>Alimentos Sólidos</Menu.Label>
-                                {INTRAPARTIDO_PRODUCTS.filter((p) => p.categoria === 'solidos').map((prod) => (
-                                  <Menu.Item
-                                    key={prod.id}
-                                    onClick={() => handleModifyProduct(player.id, prod.id, 1)}
-                                  >
-                                    + {prod.nombre}
-                                  </Menu.Item>
+                                {INTRAPARTIDO_PRODUCT_CATEGORIES.map((cat, catIndex) => (
+                                  <React.Fragment key={cat.id}>
+                                    {catIndex > 0 && <Menu.Divider />}
+                                    <Menu.Label>{cat.label}</Menu.Label>
+                                    {INTRAPARTIDO_PRODUCTS.filter((p) => p.categoria === cat.id).map((prod) => (
+                                      <Menu.Item
+                                        key={prod.id}
+                                        onClick={() => handleModifyProduct(player.id, prod.id, 1)}
+                                      >
+                                        + {prod.nombre}
+                                      </Menu.Item>
+                                    ))}
+                                  </React.Fragment>
                                 ))}
                               </Menu.Dropdown>
                             </Menu>
@@ -1247,7 +1211,7 @@ export default function IntrapartidoModal({
                 {currentPhaseIndex > 0 ? 'Anterior' : 'Alineación'}
               </Button>
 
-              {currentPhaseIndex < INTRAPARTIDO_TIMINGS.length - 1 ? (
+              {currentPhaseIndex < phases.length - 1 ? (
                 <Button
                   variant="filled"
                   color="lima"
@@ -1257,7 +1221,7 @@ export default function IntrapartidoModal({
                   rightSection={<IconArrowRight size={14} />}
                   onClick={() => goTo('fases', currentPhaseIndex + 1)}
                 >
-                  {INTRAPARTIDO_TIMINGS[currentPhaseIndex + 1].short}
+                  {phases[currentPhaseIndex + 1].short}
                 </Button>
               ) : (
                 <Button

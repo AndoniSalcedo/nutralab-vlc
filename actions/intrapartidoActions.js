@@ -7,7 +7,7 @@ import { getOwnerId } from '@/lib/auth/owner';
 import { getOwnedTeam, getAccessibleTeam } from '@/lib/auth/team-access';
 import { isMockTeam, isMockPlayer } from '@/config/boneyardMockData';
 import { assertPlainObject } from '@/lib/security/json';
-import { INTRAPARTIDO_TIMINGS, PRODUCTS_MAP, buildSessionFromRows, calculatePlayerTotals } from '@/config/intrapartido';
+import { PRODUCTS_MAP, buildSessionFromRows, calculatePlayerTotals, sanitizePhases } from '@/config/intrapartido';
 import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
 import {
   getIntrapartidoMatchesByTeamId,
@@ -20,7 +20,6 @@ import {
 } from '@/repositories/intrapartidoRepository';
 import { ActionError } from '@/lib/actionError';
 
-const TIMING_IDS = new Set(INTRAPARTIDO_TIMINGS.map((t) => t.id));
 const MAX_STARTERS = 11;
 const STEPS = new Set(['alineacion', 'fases', 'resumen']);
 const MAX_QTY_PER_INTAKE = 50;
@@ -78,6 +77,7 @@ export async function listIntrapartidoDrafts() {
       fecha: r.fecha,
       paso: r.paso,
       faseActual: r.fase_actual,
+      faseShort: sanitizePhases(r.fases)[r.fase_actual]?.short || null,
       updatedAt: r.updated_at,
     })),
   };
@@ -105,8 +105,8 @@ export async function getPendingIntrapartidoSummary() {
       fecha: match.fecha,
       titular: convocado.titular,
       totals: { aguaMl, carbsG, sodioMg, kcal, totalItems },
-      // Los 7 momentos del partido con lo que tomó en cada uno: el modal los usa para ir sumando las cifras
-      momentos: INTRAPARTIDO_TIMINGS.map((t) => {
+      // Los momentos del partido con lo que tomó en cada uno: el modal los usa para ir sumando las cifras
+      momentos: session.fases.map((t) => {
         const m = calculatePlayerTotals({ [t.id]: intakes[t.id] || {} });
         return { id: t.id, short: t.short, aguaMl: m.aguaMl, carbsG: m.carbsG, sodioMg: m.sodioMg, kcal: m.kcal, items: m.totalItems };
       }),
@@ -153,6 +153,8 @@ export async function saveIntrapartidoMatch(teamId, session) {
     if (!teamPlayerIds.has(id)) throw new ActionError('Hay jugadores que no pertenecen al equipo');
   });
 
+  const fases = sanitizePhases(session.fases);
+  const phaseIds = new Set(fases.map((f) => f.id));
   const rosterSet = new Set(rosterIds);
   const tomas = [];
   const intakes = session.intakes && typeof session.intakes === 'object' ? session.intakes : {};
@@ -160,7 +162,7 @@ export async function saveIntrapartidoMatch(teamId, session) {
     const jugadorId = parseId(rawPlayerId, 'Jugador');
     if (!rosterSet.has(jugadorId) || !timings || typeof timings !== 'object') return;
     Object.entries(timings).forEach(([momento, products]) => {
-      if (!TIMING_IDS.has(momento)) throw new ActionError('Momento de partido no válido');
+      if (!phaseIds.has(momento)) throw new ActionError('Momento de partido no válido');
       if (!products || typeof products !== 'object') return;
       Object.entries(products).forEach(([productoId, qty]) => {
         if (!PRODUCTS_MAP.has(productoId)) throw new ActionError('Producto no válido');
@@ -176,7 +178,7 @@ export async function saveIntrapartidoMatch(teamId, session) {
   const estado = session.estado === 'borrador' ? 'borrador' : 'finalizado';
   const paso = STEPS.has(session.paso) ? session.paso : 'alineacion';
   const faseActual = Number.isInteger(session.faseActual)
-    ? Math.min(Math.max(session.faseActual, 0), INTRAPARTIDO_TIMINGS.length - 1)
+    ? Math.min(Math.max(session.faseActual, 0), fases.length - 1)
     : 0;
 
   const matchId = session.id ? parseId(session.id, 'Partido') : null;
@@ -193,6 +195,7 @@ export async function saveIntrapartidoMatch(teamId, session) {
     estado,
     paso: estado === 'finalizado' ? 'resumen' : paso,
     faseActual,
+    fases,
   });
 
   revalidatePath(`/dashboard/equipo/${teamId}/intrapartido`);

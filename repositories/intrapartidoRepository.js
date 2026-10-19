@@ -3,7 +3,7 @@ import { normalizeRows } from '@/lib/db/prisma';
 
 const MATCH_FIELDS = {
   id: true, rival: true, competicion: true, lugar: true, fecha: true,
-  estado: true, fase_actual: true, paso: true, updated_at: true,
+  estado: true, fase_actual: true, paso: true, fases: true, updated_at: true,
 };
 
 export async function getIntrapartidoMatchesByTeamId(db, teamId) {
@@ -41,7 +41,8 @@ export async function getIntrapartidoMatchById(db, teamId, matchId) {
 
 // Guardado atómico en la función SQL teams.guardar_intrapartido (crea/actualiza el partido
 // y reemplaza convocatoria y tomas en una transacción). `estado` es 'borrador' mientras el
-// control está en curso y 'finalizado' al guardar el balance.
+// control está en curso y 'finalizado' al guardar el balance. `fases` es la copia de las
+// fases del partido (null conserva la guardada).
 export async function saveIntrapartidoMatch(db, params) {
   if (isMockTeam(params.teamId)) return null;
 
@@ -59,7 +60,8 @@ export async function saveIntrapartidoMatch(db, params) {
       ${JSON.stringify(params.tomas ?? [])}::jsonb,
       ${params.estado ?? 'finalizado'}::text,
       ${Number(params.faseActual) || 0}::smallint,
-      ${params.paso ?? 'alineacion'}::text
+      ${params.paso ?? 'alineacion'}::text,
+      ${params.fases ? JSON.stringify(params.fases) : null}::jsonb
     ) as id`;
 
   return normalizeRows(rows)[0]?.id ?? null;

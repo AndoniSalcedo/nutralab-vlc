@@ -33,7 +33,7 @@ import ConfirmModal from '@/components/modals/ConfirmModal';
 import IntrapartidoModal from '@/components/modals/IntrapartidoModal';
 import { TeamHeaderRightSection } from '@/components/TeamHeaderContext';
 import { deleteIntrapartidoMatch } from '@/actions/intrapartidoActions';
-import { INTRAPARTIDO_TIMINGS, calculatePlayerTotals } from '@/config/intrapartido';
+import { calculatePlayerTotals } from '@/config/intrapartido';
 import { exportIntrapartidoExcel } from '@/lib/io/intrapartido-export';
 import { initials, getPlayerAvatarUrl } from '@/lib/utils';
 import { StatTile } from '@/components/widgets/WidgetCard';
@@ -170,7 +170,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
           {drafts.map(({ session }) => {
             const info = session.matchInfo;
             const stage = session.paso === 'fases'
-              ? INTRAPARTIDO_TIMINGS[session.faseActual]?.short
+              ? session.fases[session.faseActual]?.short
               : session.paso === 'resumen' ? 'Balance' : 'Alineación';
             return (
               <Paper key={session.id} radius={24} shadow="xs" bg="white" p={{ base: 10, sm: 'md' }}>

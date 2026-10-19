@@ -12,6 +12,8 @@ import { PLAYER_OBJECTIVES } from '@/config/nutrition-days';
 import { FOOTBALL_DAY_TYPES, FOOTBALL_OBJECTIVE_MACROS } from '@/config/day-types/football';
 import { resolvePlanColors } from '@/config/plan-themes';
 import PlanThemeEditor from '@/components/plan/PlanThemeEditor';
+import IntrapartidoPhaseProductsEditor from '@/components/intrapartido/IntrapartidoPhaseProductsEditor';
+import { resolveTeamPhases, sanitizePhases } from '@/config/intrapartido';
 import { compressAvatar, initials } from '@/lib/utils/avatar';
 import { uploadTeamPhoto, removeTeamPhoto, updateTeam, saveTeamConfig } from '@/actions/teamActions';
 import { useRouter } from 'next/navigation';
@@ -153,6 +155,8 @@ export default function TeamConfigClient({ team, readOnly = false }) {
 
   const [planColors, setPlanColors] = useState(() => getInitialColors(team));
 
+  const [intrapartido, setIntrapartido] = useState(() => resolveTeamPhases(team.configuracion_nutricional));
+
   const [savingSection, setSavingSection] = useState(null);
 
   const [savedBaselines, setSavedBaselines] = useState(() => ({
@@ -168,7 +172,8 @@ export default function TeamConfigClient({ team, readOnly = false }) {
     dayTypes: getInitialDayTypes(team.configuracion_nutricional),
     macros: team.configuracion_nutricional?.objectiveMacros || JSON.parse(JSON.stringify(FOOTBALL_OBJECTIVE_MACROS)),
     protocols: team.configuracion_nutricional?.protocols || [],
-    colors: getInitialColors(team)
+    colors: getInitialColors(team),
+    intrapartido: resolveTeamPhases(team.configuracion_nutricional)
   }));
 
   useEffect(() => {
@@ -185,7 +190,8 @@ export default function TeamConfigClient({ team, readOnly = false }) {
       dayTypes: getInitialDayTypes(team.configuracion_nutricional),
       macros: team.configuracion_nutricional?.objectiveMacros || JSON.parse(JSON.stringify(FOOTBALL_OBJECTIVE_MACROS)),
       protocols: team.configuracion_nutricional?.protocols || [],
-      colors: getInitialColors(team)
+      colors: getInitialColors(team),
+      intrapartido: resolveTeamPhases(team.configuracion_nutricional)
     });
   }, [team]);
 
@@ -212,6 +218,10 @@ export default function TeamConfigClient({ team, readOnly = false }) {
   const hasMacroChanges = useMemo(() => {
     return JSON.stringify(objectiveMacros) !== JSON.stringify(savedBaselines.macros);
   }, [objectiveMacros, savedBaselines.macros]);
+
+  const hasIntrapartidoChanges = useMemo(() => {
+    return JSON.stringify(intrapartido) !== JSON.stringify(savedBaselines.intrapartido);
+  }, [intrapartido, savedBaselines.intrapartido]);
 
   const handleSaveDayType = () => {
     let finalKey = editingDayType.key;
@@ -307,6 +317,8 @@ export default function TeamConfigClient({ team, readOnly = false }) {
     }
 
     setSavingSection(sectionKey);
+    // Las fases se guardan normalizadas (abreviatura vacía → derivada del nombre, etc.)
+    const intrapartidoFases = sanitizePhases(intrapartido);
     try {
       await saveTeamConfig(team.id, {
         dayTypes,
@@ -315,7 +327,8 @@ export default function TeamConfigClient({ team, readOnly = false }) {
         pdfMicrocycle,
         pdfRules,
         pdfBuffet,
-        planColors
+        planColors,
+        intrapartido: { fases: intrapartidoFases }
       });
 
       // Actualizar inmediatamente la línea base de la sección guardada para limpiar "Cambios sin guardar"
@@ -331,16 +344,20 @@ export default function TeamConfigClient({ team, readOnly = false }) {
           next.protocols = JSON.parse(JSON.stringify(protocols));
         } else if (sectionKey === 'macros') {
           next.macros = JSON.parse(JSON.stringify(objectiveMacros));
+        } else if (sectionKey === 'intrapartido') {
+          next.intrapartido = intrapartidoFases;
         }
         return next;
       });
+      if (sectionKey === 'intrapartido') setIntrapartido(intrapartidoFases);
 
       const labels = {
         pdf: 'Textos de PDF guardados',
         colors: 'Colores del plan guardados',
         dayTypes: 'Tipos de día guardados',
         protocols: 'Protocolos guardados',
-        macros: 'Multiplicadores de macros guardados'
+        macros: 'Multiplicadores de macros guardados',
+        intrapartido: 'Fases de intrapartido guardadas'
       };
 
       notifySaved({
@@ -362,7 +379,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
         <Box hiddenFrom="sm" style={{ position: 'sticky', top: 0, zIndex: 50, margin: '0 -6px', padding: '6px', background: 'var(--nutra-app-bg, #F8F7F4)' }}>
           <ScrollArea type="never">
             <Group gap={6} wrap="nowrap">
-              {[['general', 'General'], ['pdf', 'Textos PDF'], ['ficha', 'Ficha'], ['dias', 'Tipos de día'], ['macros', 'Multiplicadores'], ['protocolos', 'Protocolos']].map(([id, label]) => (
+              {[['general', 'General'], ['pdf', 'Textos PDF'], ['ficha', 'Ficha'], ['dias', 'Tipos de día'], ['macros', 'Multiplicadores'], ['protocolos', 'Protocolos'], ['intrapartido', 'Intrapartido']].map(([id, label]) => (
                 <Button
                   key={id}
                   size="compact-sm"
@@ -989,6 +1006,17 @@ export default function TeamConfigClient({ team, readOnly = false }) {
             </Group>
           )}
         </Paper>
+
+        <Box id="config-intrapartido" style={{ scrollMarginTop: 72 }}>
+        <IntrapartidoPhaseProductsEditor
+          value={intrapartido}
+          onChange={setIntrapartido}
+          readOnly={readOnly}
+          hasChanges={hasIntrapartidoChanges}
+          saving={savingSection === 'intrapartido'}
+          onSave={() => saveSection('intrapartido')}
+        />
+        </Box>
 
         <DayTypeModal
           opened={modalOpen}

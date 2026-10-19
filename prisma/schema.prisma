@@ -311,6 +311,7 @@ model partidos_intrapartido {
   estado             String               @default("finalizado")
   fase_actual        Int                  @default(0) @db.SmallInt
   paso               String               @default("alineacion")
+  fases              Json?
   partido_convocados partido_convocados[]
   partido_tomas      partido_tomas[]
   equipos            equipos              @relation(fields: [equipo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)

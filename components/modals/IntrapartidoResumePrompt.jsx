@@ -6,7 +6,6 @@ import { Button, Group, Stack, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import ResponsiveModal from './ResponsiveModal';
 import { listIntrapartidoDrafts } from '@/actions/intrapartidoActions';
-import { INTRAPARTIDO_TIMINGS } from '@/config/intrapartido';
 
 const DISMISSED_KEY = 'intrapartido-resume-dismissed';
 
@@ -20,7 +19,7 @@ function readDismissed() {
 
 function stageLabel(draft) {
   if (draft.paso === 'resumen') return 'en el balance final';
-  if (draft.paso === 'fases') return `en «${INTRAPARTIDO_TIMINGS[draft.faseActual]?.short || 'fases'}»`;
+  if (draft.paso === 'fases') return `en «${draft.faseShort || 'fases'}»`;
   return 'en la alineación';
 }
 

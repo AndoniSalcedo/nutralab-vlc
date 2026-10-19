@@ -38,12 +38,13 @@ const T = {
   routeDur: 2.1,
 };
 T.done = T.route + T.routeDur;
-const reachAt = (i) => T.route + (i / 6) * T.routeDur;
+// Instante en que el corredor llega al momento i de n (repartidos a lo largo de la ruta)
+const reachAt = (i, n) => T.route + (n > 1 ? i / (n - 1) : 1) * T.routeDur;
 
 const EASE_OUT = [0.16, 1, 0.3, 1];
 const STAT_KEYS = ['aguaMl', 'carbsG', 'sodioMg', 'kcal'];
 
-// Etiquetas cortas para móvil (7 columnas en 390 px)
+// Etiquetas cortas para móvil de las fases por defecto (7 columnas en 390 px)
 const SHORT_LABELS = { llegada: 'Llegada', calentamiento: 'Calent.', salida: 'Salida', pausa1: '1ªP', descanso: 'Desc.', pausa2: '2ªP', final: 'Final' };
 
 // Líneas del campo (viewBox 340×212, centro en 170,106 = posición final del balón)
@@ -125,7 +126,7 @@ function Stage({ summary, instant, tiltX, tiltY, onSkip, onClose, onDetail }) {
       const target = { ...acc };
       timers.push(setTimeout(() => {
         STAT_KEYS.forEach((k) => running.push(animate(values[k], target[k], { duration: 0.55, ease: EASE_OUT })));
-      }, (reachAt(i) + 0.02) * 1000));
+      }, (reachAt(i, momentos.length) + 0.02) * 1000));
     });
     timers.push(setTimeout(() => {
       doneRef.current = true;
@@ -260,6 +261,7 @@ function Stage({ summary, instant, tiltX, tiltY, onSkip, onClose, onDetail }) {
       {/* Ruta del partido: el corredor la recorre y en cada momento con tomas cae una gota */}
       <motion.div
         className={classes.route}
+        style={{ '--momentos': momentos.length }}
         aria-label="Momentos del partido"
         initial={from({ opacity: 0 })}
         animate={{ opacity: 1 }}
@@ -288,7 +290,7 @@ function Stage({ summary, instant, tiltX, tiltY, onSkip, onClose, onDetail }) {
 
         {momentos.map((m, i) => {
           const active = m.items > 0;
-          const reach = reachAt(i);
+          const reach = reachAt(i, momentos.length);
           return (
             <div key={m.id} className={classes.node}>
               <div className={classes.dotWrap}>

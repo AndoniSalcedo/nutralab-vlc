@@ -7,7 +7,8 @@
 
 import { todayKey } from '@/lib/dates';
 
-export const INTRAPARTIDO_TIMINGS = [
+// Fases por defecto del partido; cada equipo puede personalizarlas (ver resolveTeamPhases)
+const INTRAPARTIDO_TIMINGS = [
   { id: 'llegada', label: 'Llegada a campo', short: 'Llegada', icon: 'flag' },
   { id: 'calentamiento', label: 'Calentamiento', short: 'Calentamiento', icon: 'gym' },
   { id: 'salida', label: 'Salida al campo', short: 'Salida', icon: 'boxing_glove' },
@@ -311,6 +312,83 @@ export const INTRAPARTIDO_PRODUCTS = [
 
 export const PRODUCTS_MAP = new Map(INTRAPARTIDO_PRODUCTS.map((p) => [p.id, p]));
 
+export const INTRAPARTIDO_PRODUCT_CATEGORIES = [
+  { id: 'bebidas', label: 'Bebidas' },
+  { id: 'geles', label: 'Geles y Estimulantes' },
+  { id: 'solidos', label: 'Alimentos Sólidos' },
+];
+
+// Máximo de botones de toma rápida por jugador (el cuarto hueco es el menú «Más»)
+export const MAX_QUICK_BUTTONS = 3;
+export const MAX_PHASES = 15;
+export const PHASE_LABEL_MAX = 40;
+export const PHASE_SHORT_MAX = 16;
+// Mismo patrón que el check de partido_tomas.momento en la BD
+const PHASE_ID_RE = /^[a-z0-9_-]{1,40}$/;
+
+// Iconos que se pueden elegir para una fase
+export const PHASE_ICONS = [
+  'flag', 'gym', 'boxing_glove', 'droplet', 'alarmclock', 'stopwatch', 'timer_clock',
+  'running', 'soccer', 'water_bottle', 'bolt', 'banana', 'stadium', 'check',
+];
+
+// Productos por defecto de cada fase: botones de toma individual y menú «Repartir» en lote.
+export const DEFAULT_PHASE_PRODUCTS = {
+  botones: ['agua-250', 'isotonico-250', 'gel-30'],
+  reparto: ['agua-250', 'isotonico-250', 'gel-30', 'platano-medio'],
+};
+
+function sanitizeProductIds(ids, fallback, max = Infinity) {
+  if (!Array.isArray(ids)) return [...fallback];
+  return [...new Set(ids.map(String))].filter((id) => PRODUCTS_MAP.has(id)).slice(0, max);
+}
+
+/** Fases por defecto (las 7 del Excel original) con sus productos rápidos. */
+export function getDefaultPhases() {
+  return INTRAPARTIDO_TIMINGS.map((t) => ({
+    ...t,
+    botones: [...DEFAULT_PHASE_PRODUCTS.botones],
+    reparto: [...DEFAULT_PHASE_PRODUCTS.reparto],
+  }));
+}
+
+/** Id para una fase nueva creada por el equipo. */
+export function createPhaseId() {
+  return `f-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+}
+
+/**
+ * Normaliza una lista de fases: { id, label, short, icon, botones, reparto }.
+ * Descarta ids repetidos o no válidos y productos desconocidos; sin fases válidas
+ * devuelve las de por defecto.
+ */
+export function sanitizePhases(list) {
+  if (!Array.isArray(list)) return getDefaultPhases();
+  const seen = new Set();
+  const phases = [];
+  list.forEach((raw) => {
+    if (!raw || typeof raw !== 'object' || phases.length >= MAX_PHASES) return;
+    const id = String(raw.id || '');
+    if (!PHASE_ID_RE.test(id) || seen.has(id)) return;
+    const label = String(raw.label || '').trim().slice(0, PHASE_LABEL_MAX) || 'Fase sin nombre';
+    seen.add(id);
+    phases.push({
+      id,
+      label,
+      short: String(raw.short || '').trim().slice(0, PHASE_SHORT_MAX) || label.slice(0, PHASE_SHORT_MAX),
+      icon: PHASE_ICONS.includes(raw.icon) ? raw.icon : 'droplet',
+      botones: sanitizeProductIds(raw.botones, DEFAULT_PHASE_PRODUCTS.botones, MAX_QUICK_BUTTONS),
+      reparto: sanitizeProductIds(raw.reparto, DEFAULT_PHASE_PRODUCTS.reparto),
+    });
+  });
+  return phases.length ? phases : getDefaultPhases();
+}
+
+/** Fases configuradas por el equipo (configuracion_nutricional.intrapartido.fases). */
+export function resolveTeamPhases(teamConfig) {
+  return sanitizePhases(teamConfig?.intrapartido?.fases);
+}
+
 /**
  * Calcula los aportes acumulados dado un mapa o array de tomas
  * @param {Array<{ productId: string, cantidad: number }>} intakes
@@ -343,11 +421,13 @@ export function calculateNutrientTotals(intakes = []) {
 }
 
 /**
- * Sesión vacía de un partido nuevo (sin convocatoria ni tomas).
+ * Sesión vacía de un partido nuevo (sin convocatoria ni tomas). Las fases se copian
+ * en el partido para que cambios posteriores en la configuración no lo alteren.
  */
-export function createEmptySession() {
+export function createEmptySession(fases = getDefaultPhases()) {
   return {
     id: null,
+    fases,
     matchInfo: {
       rival: '',
       competicion: 'LaLiga EA Sports',
@@ -365,9 +445,19 @@ export function createEmptySession() {
 
 /**
  * Convierte las filas de la BD de un partido (cabecera, convocados y tomas)
- * en la sesión que usa la interfaz.
+ * en la sesión que usa la interfaz. Los partidos anteriores a las fases
+ * personalizadas (match.fases nulo) usan las fases por defecto.
  */
 export function buildSessionFromRows(match, convocados = [], tomas = []) {
+  const fases = sanitizePhases(match.fases);
+  // Tomas de un momento que no está en la lista: se muestran igualmente para no perderlas
+  const phaseIds = new Set(fases.map((f) => f.id));
+  tomas.forEach((t) => {
+    if (phaseIds.has(t.momento)) return;
+    phaseIds.add(t.momento);
+    fases.push({ id: t.momento, label: t.momento, short: t.momento.slice(0, PHASE_SHORT_MAX), icon: 'droplet', botones: [], reparto: [] });
+  });
+
   const intakes = {};
   convocados.forEach((c) => {
     intakes[String(c.jugador_id)] = {};
@@ -380,6 +470,7 @@ export function buildSessionFromRows(match, convocados = [], tomas = []) {
 
   return {
     id: String(match.id),
+    fases,
     matchInfo: {
       rival: match.rival,
       competicion: match.competicion,
@@ -391,7 +482,7 @@ export function buildSessionFromRows(match, convocados = [], tomas = []) {
     intakes,
     estado: match.estado || 'finalizado',
     paso: match.paso || 'alineacion',
-    faseActual: Math.min(Math.max(Number(match.fase_actual) || 0, 0), INTRAPARTIDO_TIMINGS.length - 1),
+    faseActual: Math.min(Math.max(Number(match.fase_actual) || 0, 0), fases.length - 1),
   };
 }
 

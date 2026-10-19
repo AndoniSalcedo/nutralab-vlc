@@ -162,7 +162,7 @@
 .route {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(var(--momentos, 7), 1fr);
   margin-top: 26px;
   padding-top: 30px;
 }
@@ -170,8 +170,8 @@
 .track {
   position: absolute;
   top: 37px;
-  left: calc(100% / 14);
-  right: calc(100% / 14);
+  left: calc(100% / (2 * var(--momentos, 7)));
+  right: calc(100% / (2 * var(--momentos, 7)));
   height: 3px;
 }
 
