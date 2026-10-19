@@ -159,45 +159,47 @@ export default function HydrationWidget({
           </Text>
         </Box>
 
-        <Group gap={6} wrap="nowrap">
-          <ActionIcon
-            size={44}
-            variant="default"
-            radius="xl"
-            disabled={readOnly || !loaded || drunk <= 0}
-            onClick={() => handleUpdateWater(-0.25)}
-            aria-label="Restar 250 ml"
-          >
-            <IconMinus size={18} stroke={2.5} />
-          </ActionIcon>
-          <Box style={{ flex: 1, position: 'relative' }}>
-            {/* Gota que cae desde el botón hacia el vaso */}
-            {dropKey > 0 && (
-              <motion.span
-                key={dropKey}
-                aria-hidden
-                initial={{ y: 0, opacity: 1, scale: 1 }}
-                animate={{ y: -70, opacity: 0, scale: 0.6 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                style={{ position: 'absolute', left: '50%', top: 0, width: 12, height: 15, marginLeft: -6, borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%', background: 'var(--mantine-color-blue-4)', pointerEvents: 'none', zIndex: 2 }}
-              />
-            )}
-            <motion.div whileTap={{ scale: 0.94 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}>
-              <Button
-                fullWidth
-                h={44}
-                radius="xl"
-                color="blue"
-                px={6}
-                disabled={readOnly || !loaded}
-                onClick={() => handleUpdateWater(0.25)}
-                aria-label="Sumar 250 ml"
-              >
-                + 250 ml
-              </Button>
-            </motion.div>
-          </Box>
-        </Group>
+        {!readOnly && (
+          <Group gap={6} wrap="nowrap">
+            <ActionIcon
+              size={44}
+              variant="default"
+              radius="xl"
+              disabled={!loaded || drunk <= 0}
+              onClick={() => handleUpdateWater(-0.25)}
+              aria-label="Restar 250 ml"
+            >
+              <IconMinus size={18} stroke={2.5} />
+            </ActionIcon>
+            <Box style={{ flex: 1, position: 'relative' }}>
+              {/* Gota que cae desde el botón hacia el vaso */}
+              {dropKey > 0 && (
+                <motion.span
+                  key={dropKey}
+                  aria-hidden
+                  initial={{ y: 0, opacity: 1, scale: 1 }}
+                  animate={{ y: -70, opacity: 0, scale: 0.6 }}
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ position: 'absolute', left: '50%', top: 0, width: 12, height: 15, marginLeft: -6, borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%', background: 'var(--mantine-color-blue-4)', pointerEvents: 'none', zIndex: 2 }}
+                />
+              )}
+              <motion.div whileTap={{ scale: 0.94 }} transition={{ type: 'spring', stiffness: 600, damping: 20 }}>
+                <Button
+                  fullWidth
+                  h={44}
+                  radius="xl"
+                  color="blue"
+                  px={6}
+                  disabled={!loaded}
+                  onClick={() => handleUpdateWater(0.25)}
+                  aria-label="Sumar 250 ml"
+                >
+                  + 250 ml
+                </Button>
+              </motion.div>
+            </Box>
+          </Group>
+        )}
       </Stack>
     </WidgetCard>
   );
