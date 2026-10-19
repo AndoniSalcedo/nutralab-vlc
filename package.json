@@ -17,10 +17,6 @@
     "lint": "eslint .",
     "bones:build": "boneyard-js build --no-scan --cookie \"boneyard_bypass=true\"",
     "bones:force": "boneyard-js build --no-scan --force --cookie \"boneyard_bypass=true\"",
-    "meals:migrate:ast": "node --loader ./scratch/loader.mjs scripts/migrate-meals-to-ast.mjs",
-    "meals:migrate:names": "node --loader ./scratch/loader.mjs scripts/migrate-ast-food-names.mjs",
-    "prematch:sync": "node --loader ./scratch/loader.mjs scripts/sync-prematch-protocols.mjs",
-    "meals:distribution:sync": "node --loader ./scratch/loader.mjs scripts/sync-meal-distribution.mjs",
     "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {

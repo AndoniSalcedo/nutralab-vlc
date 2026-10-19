@@ -131,7 +131,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [fecha, setFecha] = useState(null);
+  const [fecha, setFecha] = useState(() => new Date());
 
   const sorted = useMemo(
     () => [...analiticas].sort((a, b) => String(b.fecha_extraccion || '').localeCompare(String(a.fecha_extraccion || ''))),
@@ -172,7 +172,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
 
   function startUpload() {
     setUploadOpen(true);
-    setFecha(null);
+    setFecha(new Date());
   }
 
   function cancelUpload() {

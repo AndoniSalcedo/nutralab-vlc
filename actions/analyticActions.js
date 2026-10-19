@@ -114,7 +114,9 @@ export async function uploadAnalitica(fileOrFormData, jugadorIdParam, fechaParam
 
   const data = await insertAnalytics(db, {
     jugador_id: parseInt(jugadorId),
-    fecha_extraccion: fechaExtraccion && !Number.isNaN(Date.parse(String(fechaExtraccion))) ? fechaExtraccion : null,
+    fecha_extraccion: fechaExtraccion && !Number.isNaN(Date.parse(String(fechaExtraccion)))
+      ? fechaExtraccion
+      : new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Madrid' }),
     parametros,
     pdf_nombre: String(archivo.name || '').slice(0, 200),
   });
