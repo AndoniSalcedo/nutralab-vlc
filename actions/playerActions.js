@@ -153,6 +153,62 @@ export async function updatePlayerField(id, field, value) {
   return { ok: true, ...(ajustes.length > 0 ? { ajustes: describeAjustes(ajustes) } : {}) };
 }
 
+const SCHEDULE_LABELS = { manana: 'Partido mañana', tarde: 'Partido tarde', noche: 'Partido noche' };
+
+// Una pauta es copiable si alguien la escribió: con alimentos estructurados o con texto del nutricionista.
+function isCopyablePauta(pauta) {
+  return Boolean(pauta && typeof pauta === 'object' && pauta.type !== 'complete' && pauta.tree);
+}
+
+/**
+ * Pautas ya escritas por el nutricionista (protocolos de partido y comidas habituales) de sus jugadores, para
+ * copiarlas a otra toma sin volver a pasar por la IA. Solo jugadores del propio nutricionista.
+ */
+export async function listCopyablePautas() {
+  const user = await getUser();
+  if (!user || user.role === 'jugador' || user.role === 'tecnico') {
+    throw new ActionError('No autorizado');
+  }
+  const ownerId = getOwnerId(user);
+  if (!ownerId) throw new ActionError('No se pudo determinar el propietario');
+
+  const db = getDb();
+  const players = await db.jugadores.findMany({
+    where: { equipos: { owner_id: ownerId } },
+    select: {
+      id: true,
+      nombre: true,
+      apellidos: true,
+      recomendaciones_defecto: true,
+      config_prepartido: true,
+      equipos: { select: { nombre: true } },
+    },
+    orderBy: { nombre: 'asc' },
+  });
+
+  return players
+    .map((player) => {
+      const pautas = [];
+      for (const [toma, pauta] of Object.entries(player.recomendaciones_defecto || {})) {
+        if (isCopyablePauta(pauta)) pautas.push({ origen: 'Comidas habituales', toma, pauta });
+      }
+      for (const [horario, cfg] of Object.entries(player.config_prepartido || {})) {
+        for (const [toma, pauta] of Object.entries(cfg?.recomendaciones || {})) {
+          if (isCopyablePauta(pauta) && pauta.origen !== 'defecto') {
+            pautas.push({ origen: SCHEDULE_LABELS[horario] || horario, horario, toma, pauta });
+          }
+        }
+      }
+      return {
+        id: player.id,
+        nombre: `${player.nombre} ${player.apellidos || ''}`.trim(),
+        equipo: player.equipos?.nombre || '',
+        pautas,
+      };
+    })
+    .filter((player) => player.pautas.length > 0);
+}
+
 export async function updatePlayerCredentials(jugadorIdOrPayload, emailParam, passwordParam) {
   let jugadorId, email, password;
   if (typeof jugadorIdOrPayload === 'object' && jugadorIdOrPayload !== null) {

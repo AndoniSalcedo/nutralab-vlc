@@ -18,6 +18,7 @@ import {
   Alert,
 } from '@mantine/core';
 import ResponsiveModal from './ResponsiveModal';
+import CopyPautaModal from './CopyPautaModal';
 import { notifications } from '@mantine/notifications';
 import {
   IconCheck,
@@ -26,6 +27,7 @@ import {
   IconClipboardList,
   IconSparkles,
   IconAlertCircle,
+  IconDownload,
 } from '@/components/icons3d';
 import { parseMealTree } from '@/actions/mealActions';
 import { formatAstToText, validateMealAst } from '@/lib/engine/meal-ast';
@@ -95,6 +97,7 @@ function SingleMealPautaEditor({
   const [aiText, setAiText] = useState(mealData.raw || '');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiError, setAiError] = useState(null);
+  const [copyOpen, setCopyOpen] = useState(false);
 
   useEffect(() => {
     setAiText(mealData.raw || '');
@@ -165,6 +168,24 @@ function SingleMealPautaEditor({
     }
   }
 
+  // Copia una pauta ya interpretada: no vuelve a pasar por la IA.
+  function handleCopyPauta(source) {
+    setAiText(source.raw || '');
+    setAiError(null);
+    onChange({
+      type: 'meal',
+      tree: source.tree,
+      label: source.label || formatAstToText({ tree: source.tree }),
+      raw: source.raw || '',
+      unrecognized: [],
+    });
+    notifySaved({
+      color: 'teal',
+      title: 'Pauta copiada',
+      message: `La pauta de ${mealName} se ha copiado. Guarda la rutina para aplicarla.`,
+    });
+  }
+
   return (
     <Stack gap="sm" pt="xs">
       {/* 1. Jerarquía de la Ingesta */}
@@ -215,6 +236,18 @@ function SingleMealPautaEditor({
           />
         </Group>
       </Paper>
+
+      <Button
+        size="xs"
+        variant="light"
+        color="gray"
+        radius="xl"
+        leftSection={<IconDownload size={13} />}
+        onClick={() => setCopyOpen(true)}
+        style={{ alignSelf: 'flex-start' }}
+      >
+        Copiar pauta de otra toma o jugador
+      </Button>
 
       {/* 3. Configuración de Componentes (Asistente IA + AST estructurado) */}
       {!isComplete ? (
@@ -293,6 +326,16 @@ function SingleMealPautaEditor({
             El motor seleccionará combinaciones equilibradas de forma rotatoria (menú del buffet si está disponible para comida/cena o catálogo taxonómico general).
           </Text>
         </Paper>
+      )}
+
+      {copyOpen && (
+        <CopyPautaModal
+          opened={copyOpen}
+          onClose={() => setCopyOpen(false)}
+          jugadorId={jugadorId}
+          mealName={mealName}
+          onCopy={handleCopyPauta}
+        />
       )}
     </Stack>
   );
