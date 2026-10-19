@@ -29,6 +29,7 @@
     "@react-pdf/renderer": "^4.5.1",
     "@supabase/supabase-js": "^2.49.8",
     "@tabler/icons-react": "^3.31.0",
+    "bcryptjs": "^3.0.3",
     "boneyard-js": "^1.10.0",
     "dayjs": "^1.11.20",
     "exceljs": "^4.4.0",

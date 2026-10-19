@@ -1,5 +1,7 @@
 'use server';
 
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { env } from '@/config/env';
@@ -8,8 +10,48 @@ import { getDb } from '@/lib/db/prisma';
 import { verifyAuthPassword } from '@/lib/auth/auth-users';
 import { getPlayerByAuthUserIdSingle } from '@/repositories/playerRepository';
 import { getTecnicoByAuthUserId } from '@/repositories/tecnicoRepository';
+import { getNutritionistForLogin } from '@/lib/db/nutralab';
 import { enforceRateLimit } from '@/lib/security/rate-limit';
 import { ActionError } from '@/lib/actionError';
+
+// Hash válido de una contraseña inexistente: iguala el tiempo de respuesta cuando el email no existe.
+const DUMMY_HASH = '$2b$10$CwTycUXWue0Thq9StjUM0uJ8.tSuYQ1p0lbq0OeLYXhNnE6xk3c3e';
+const NUTRITIONIST_SESSION_TTL = 60 * 60 * 12;
+
+// Los nutricionistas viven en public."Nutritionist" (nutralab), con la contraseña en bcrypt.
+async function loginNutritionist(cleanEmail, password) {
+  let nutri;
+  try {
+    nutri = await getNutritionistForLogin(cleanEmail);
+  } catch (error) {
+    console.error('Login nutritionist error:', error?.message);
+    throw new ActionError('El inicio de sesión no está disponible temporalmente. Inténtalo más tarde.');
+  }
+
+  const valid = await bcrypt.compare(password, nutri?.password || DUMMY_HASH);
+  if (!nutri || !valid) throw new ActionError('Email o contraseña incorrectos');
+
+  // Misma sesión que crea /api/auth-jump
+  const sessionObj = {
+    external_admin_id: nutri.id,
+    id: nutri.id,
+    name: nutri.name || '',
+    email: nutri.email || cleanEmail,
+    role: 'admin',
+    avatar: nutri.avatarSize ? `/api/media/nutritionist-avatar?id=${nutri.id}` : null,
+  };
+
+  const cookieStore = await cookies();
+  cookieStore.set(COOKIE_NAME, buildSessionValue(sessionObj, NUTRITIONIST_SESSION_TTL), {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: NUTRITIONIST_SESSION_TTL,
+  });
+
+  return { ok: true, user: sessionObj };
+}
 
 export async function login(emailOrPayload, passwordParam, expectedRoleParam) {
   let email, password, expectedRole;
@@ -35,6 +77,10 @@ export async function login(emailOrPayload, passwordParam, expectedRoleParam) {
   // Frena la fuerza bruta: por IP+email y, más laxo, por IP.
   await enforceRateLimit('login', cleanEmail, { limit: 8, windowMs: 15 * 60 * 1000 });
   await enforceRateLimit('login-ip', '', { limit: 40, windowMs: 15 * 60 * 1000 });
+
+  if (expectedRole === 'nutritionist') {
+    return loginNutritionist(cleanEmail, password);
+  }
 
   // La contraseña se comprueba contra auth.users (hash bcrypt de Supabase Auth) por la
   // conexión directa a la BD, sin depender de la API de Supabase.
@@ -108,14 +154,30 @@ export async function login(emailOrPayload, passwordParam, expectedRoleParam) {
   return { ok: true, user: sessionObj };
 }
 
+/**
+ * URL para saltar a nutralab con un token de un solo propósito y 60 s de vida.
+ * Es el camino inverso de /api/auth-jump (nutralab → VLC).
+ */
+export async function createAuthJumpUrl(targetPath) {
+  const user = await getUser();
+  if (user?.role !== 'admin') throw new ActionError('No autorizado');
+  const id = user.external_admin_id || user.id;
+
+  const token = jwt.sign({ id, role: 'nutritionist', purpose: 'jump-nutralab' }, env.JWT_SECRET, {
+    algorithm: 'HS256',
+    expiresIn: '60s',
+  });
+  const params = new URLSearchParams({ token });
+  if (typeof targetPath === 'string' && targetPath.startsWith('/') && !targetPath.startsWith('//') && !targetPath.includes('\\')) {
+    params.set('url', targetPath);
+  }
+  return `${env.NEXT_PUBLIC_FRONTEND_URL.replace(/\/+$/, '')}/api/auth-jump?${params.toString()}`;
+}
+
 export async function logout() {
   const user = await getUser();
-  const frontendUrl = env.NEXT_PUBLIC_FRONTEND_URL;
 
-  let redirectUrl = '/login';
-  if (user?.role === 'admin') {
-    redirectUrl = `${frontendUrl}/login/nutritionist`;
-  }
+  const redirectUrl = user?.role === 'admin' ? '/login/nutritionist' : '/login';
 
   const cookieStore = await cookies();
   cookieStore.set(COOKIE_NAME, '', {

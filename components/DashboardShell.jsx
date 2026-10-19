@@ -22,15 +22,13 @@ import { useRouter } from "next/navigation";
 import Logo from "./Logo";
 import SafeAvatar from "./SafeAvatar";
 import { initials } from "@/lib/utils";
-import { env } from "@/config/env";
-import { logout } from "@/actions/authActions";
+import { logout, createAuthJumpUrl } from "@/actions/authActions";
 import IntrapartidoResumePrompt from "./modals/IntrapartidoResumePrompt";
 import QuickSearch from "./navigation/QuickSearch";
 
 export default function DashboardShell({ children, user }) {
   const [opened, setOpened] = useState(false);
   const router = useRouter();
-  const frontendUrl = env.NEXT_PUBLIC_FRONTEND_URL;
   const isAdmin = user?.role === "admin";
   const isTecnico = user?.role === "tecnico";
 
@@ -44,6 +42,12 @@ export default function DashboardShell({ children, user }) {
         : user?.role === "admin" && (user?.external_admin_id || user?.id)
           ? user?.avatar || undefined
           : undefined);
+
+  // Salta a nutralab con sesión iniciada (el token se firma en el servidor)
+  const jumpToNutralab = async (path) => {
+    setOpened(false);
+    window.location.assign(await createAuthJumpUrl(path));
+  };
 
   const handleLogout = async () => {
     // Vacía cualquier caché del service worker antes de cerrar sesión.
@@ -134,9 +138,7 @@ export default function DashboardShell({ children, user }) {
                   <>
                     <Menu.Item
                       leftSection={<IconUserCog size={16} stroke={1.5} />}
-                      component="a"
-                      href={`${frontendUrl}/dashboard/users`}
-                      onClick={() => setOpened(false)}
+                      onClick={() => jumpToNutralab("/dashboard/users")}
                     >
                       Gestionar usuarios
                     </Menu.Item>
@@ -144,9 +146,7 @@ export default function DashboardShell({ children, user }) {
                     {isAdmin && (
                       <Menu.Item
                         leftSection={<IconUserStar size={16} stroke={1.5} />}
-                        component="a"
-                        href={`${frontendUrl}/dashboard/nutritionists`}
-                        onClick={() => setOpened(false)}
+                        onClick={() => jumpToNutralab("/dashboard/nutritionists")}
                       >
                         Gestionar nutricionistas
                       </Menu.Item>
@@ -156,9 +156,7 @@ export default function DashboardShell({ children, user }) {
 
                     <Menu.Item
                       leftSection={<IconSettings size={16} stroke={1.5} />}
-                      component="a"
-                      href={`${frontendUrl}/dashboard/settings`}
-                      onClick={() => setOpened(false)}
+                      onClick={() => jumpToNutralab("/dashboard/settings")}
                     >
                       Configuración
                     </Menu.Item>

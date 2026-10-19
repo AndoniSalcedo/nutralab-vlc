@@ -25,7 +25,6 @@ import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 import { login } from '@/actions/authActions';
 import { registerTecnico } from '@/actions/tecnicoActions';
-import { env } from '@/config/env';
 import MascotAvatar from '@/components/mascot/MascotAvatar';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
@@ -43,7 +42,6 @@ export default function TecnicoLoginForm() {
 
   const typingTimerRef = useRef(null);
   const resetTimerRef = useRef(null);
-  const frontendUrl = env.NEXT_PUBLIC_FRONTEND_URL;
 
   // Limpieza de temporizadores
   useEffect(() => {
@@ -421,8 +419,8 @@ export default function TecnicoLoginForm() {
 
           <Text size="xs" c="#7a7d68">
             ¿Eres nutricionista?{' '}
-            <Anchor href={`${frontendUrl}/login/nutritionist`} fw={600} c="#5c6049" underline="hover">
-              Portal principal
+            <Anchor href="/login/nutritionist" fw={600} c="#5c6049" underline="hover">
+              Portal de nutricionistas
             </Anchor>
           </Text>
         </Stack>
