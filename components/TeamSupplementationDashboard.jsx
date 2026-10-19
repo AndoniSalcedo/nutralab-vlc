@@ -24,6 +24,7 @@ import SupplementManagerModal from '@/components/modals/SupplementManagerModal';
 import SupplementHistoryModal from '@/components/modals/SupplementHistoryModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
+import AnimatedRow from '@/components/motion/AnimatedRow';
 
 dayjs.locale('es');
 
@@ -153,13 +154,13 @@ export default function TeamSupplementationDashboard({
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {players.map((player) => {
+              {players.map((player, i) => {
                 const assignment = assignmentsByPlayer.get(String(player.id));
                 const catalog = assignment ? catalogsById.get(String(assignment.lista_id)) : null;
                 const extrasCount = extrasByPlayer.get(String(player.id))?.length || 0;
 
                 return (
-                  <Table.Tr key={player.id} h={{ base: 64, sm: 70 }} style={{ transition: 'background-color 120ms ease' }}>
+                  <AnimatedRow index={i} key={player.id} h={{ base: 64, sm: 70 }} style={{ transition: 'background-color 120ms ease' }}>
                     <Table.Td style={{ paddingLeft: 16 }}>
                       <Group gap="sm" wrap="nowrap">
                         <Avatar
@@ -253,7 +254,7 @@ export default function TeamSupplementationDashboard({
                         </ActionIcon>
                       </Tooltip>
                     </Table.Td>
-                  </Table.Tr>
+                  </AnimatedRow>
                 );
               })}
             </Table.Tbody>

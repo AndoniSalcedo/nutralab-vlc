@@ -42,6 +42,7 @@ import ConfirmModal from '@/components/modals/ConfirmModal';
 import ImageCropModal from '@/components/modals/ImageCropModal';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
+import AnimatedRow from '@/components/motion/AnimatedRow';
 
 
 export default function TecnicosManager({ teams = [] }) {
@@ -284,8 +285,8 @@ export default function TecnicosManager({ teams = [] }) {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {tecnicos.map((tecnico) => (
-                  <Table.Tr key={tecnico.id}>
+                {tecnicos.map((tecnico, i) => (
+                  <AnimatedRow index={i} key={tecnico.id}>
                     <Table.Td>
                       <Group gap="sm" wrap="nowrap">
                         <Box style={{ position: 'relative', display: 'inline-block' }}>
@@ -389,7 +390,7 @@ export default function TecnicosManager({ teams = [] }) {
                         </Tooltip>
                       </Group>
                     </Table.Td>
-                  </Table.Tr>
+                  </AnimatedRow>
                 ))}
               </Table.Tbody>
             </Table>

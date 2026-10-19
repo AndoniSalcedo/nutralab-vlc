@@ -34,6 +34,7 @@ import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHead
 import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
+import AnimatedRow from '@/components/motion/AnimatedRow';
 
 
 const PAGE_SIZE = 10;
@@ -993,8 +994,8 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                       </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
-                      {paginatedPlayers.map((player) => (
-                        <Table.Tr
+                      {paginatedPlayers.map((player, i) => (
+                        <AnimatedRow index={i}
                           h={74}
                           key={player.id}
                           onClick={() => router.push(`/dashboard/jugador/${player.id}`)}
@@ -1144,7 +1145,7 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                               </Group>
                             </Table.Td>
                           )}
-                        </Table.Tr>
+                        </AnimatedRow>
                       ))}
                     </Table.Tbody>
                   </Table>

@@ -34,6 +34,7 @@ import {
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
+import AnimatedRow from '@/components/motion/AnimatedRow';
 
 export default function TeamTecnicosConfig({ team, readOnly = false }) {
   const [tecnicos, setTecnicos] = useState([]);
@@ -238,8 +239,8 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {assignedTecnicos.map((tecnico) => (
-              <Table.Tr key={tecnico.id}>
+            {assignedTecnicos.map((tecnico, i) => (
+              <AnimatedRow index={i} key={tecnico.id}>
                 <Table.Td>
                   <Group gap="sm" wrap="nowrap">
                     <IconUser size={18} />
@@ -272,7 +273,7 @@ export default function TeamTecnicosConfig({ team, readOnly = false }) {
                     </Tooltip>
                   </Table.Td>
                 )}
-              </Table.Tr>
+              </AnimatedRow>
             ))}
           </Table.Tbody>
         </Table>
