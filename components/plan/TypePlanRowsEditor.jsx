@@ -11,7 +11,7 @@ import {
   ActionIcon,
   Badge,
 } from '@mantine/core';
-import { IconPlus, IconTrash } from '@/components/icons3d';
+import { IconPlus, IconTrash, IconArrowUp, IconArrowDown } from '@/components/icons3d';
 import { MAX_TYPE_PLAN_DAYS } from '@/config/plan-modes';
 
 const MATCH_SCHEDULE_OPTIONS = [
@@ -52,6 +52,14 @@ export default function TypePlanRowsEditor({ rows, onChange, dayTypeOptions }) {
 
   const updateRow = (id, changes) => onChange(rows.map((row) => (row.id === id ? { ...row, ...changes } : row)));
 
+  const moveRow = (index, delta) => {
+    const target = index + delta;
+    if (target < 0 || target >= rows.length) return;
+    const next = [...rows];
+    [next[index], next[target]] = [next[target], next[index]];
+    onChange(next);
+  };
+
   return (
     <Stack gap="xs">
       <Group justify="space-between">
@@ -61,7 +69,7 @@ export default function TypePlanRowsEditor({ rows, onChange, dayTypeOptions }) {
         </Badge>
       </Group>
 
-      {rows.map((row) => (
+      {rows.map((row, index) => (
         <Paper key={row.id} p="xs" radius="md" withBorder bg="white">
           <Group gap="xs" align="flex-end" wrap="wrap">
             <Select
@@ -98,6 +106,28 @@ export default function TypePlanRowsEditor({ rows, onChange, dayTypeOptions }) {
               size="xs"
               style={{ width: 90 }}
             />
+            <Group gap={2} wrap="nowrap">
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                size="lg"
+                onClick={() => moveRow(index, -1)}
+                disabled={index === 0}
+                aria-label="Subir tipo de día"
+              >
+                <IconArrowUp size={16} />
+              </ActionIcon>
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                size="lg"
+                onClick={() => moveRow(index, 1)}
+                disabled={index === rows.length - 1}
+                aria-label="Bajar tipo de día"
+              >
+                <IconArrowDown size={16} />
+              </ActionIcon>
+            </Group>
             <ActionIcon
               variant="subtle"
               color="arcilla"
