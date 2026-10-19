@@ -28,7 +28,7 @@ import { getSubtabHeader } from '../subtab-config';
 import { JugadorHeaderCompactMobile } from '@/components/JugadorHeader';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import { usePlayerDashboard } from '../PlayerDashboardContext';
-import { toDateKey } from '@/lib/dates';
+import { toDateKey, mondayKeyOf } from '@/lib/dates';
 import Reveal from '@/components/motion/Reveal';
 import headerClasses from '../SubtabSectionHeader.module.css';
 import {
@@ -123,6 +123,12 @@ export default function PerfilSubtab({
   const [mealsReload, setMealsReload] = useState(0);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [editModalOpen, setEditModalOpen] = useState(false);
+
+  // El comedor solo se muestra si ya hay menú generado para la semana del día seleccionado
+  const weekMenus = useMemo(() => {
+    const monday = mondayKeyOf(toDateKey(selectedDate));
+    return menus.filter((m) => String(m.semana).slice(0, 10) === monday);
+  }, [menus, selectedDate]);
 
   const defaultDiaType = 'entreno';
   const [activeDayType, setActiveDayType] = useState(defaultDiaType);
@@ -381,13 +387,15 @@ export default function PerfilSubtab({
               />
             </Reveal>
 
-            <Reveal index={8} style={{ gridColumn: 'span 2' }}>
-              <ComedorWidget
-                jugadorId={jugador.id}
-                menus={menus}
-                selectedDate={selectedDate}
-              />
-            </Reveal>
+            {weekMenus.length > 0 && (
+              <Reveal index={8} style={{ gridColumn: 'span 2' }}>
+                <ComedorWidget
+                  jugadorId={jugador.id}
+                  menus={weekMenus}
+                  selectedDate={selectedDate}
+                />
+              </Reveal>
+            )}
 
             <Reveal index={9} style={{ gridColumn: 'span 2' }}>
               <EstrategiaWidget

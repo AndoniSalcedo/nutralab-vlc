@@ -172,66 +172,57 @@ function ProtocolSupplementsSection({ protocolSupplements, onNavigateToProtocols
       color="grape"
     >
       {protocolSupplements.length > 0 ? (
-        <Stack gap="md">
+        <Stack gap="xs">
           <Text size="xs" c="dimmed">
-            Suplementos pautados para fases y momentos específicos (partido, fuerza, descanso). No se incluyen en la rutina diaria basal para evitar sobrecargas en días estándar.
+            Suplementos pautados para fases y momentos específicos (partido, fuerza, descanso). No se incluyen en la rutina diaria basal.
           </Text>
-          <SimpleGrid cols={{ base: 1, md: protocolSupplements.length > 1 ? 2 : 1 }} spacing="sm">
+          <SimpleGrid cols={{ base: 1, md: protocolSupplements.length > 1 ? 2 : 1 }} spacing="sm" verticalSpacing="sm" style={{ alignItems: 'start' }}>
             {protocolSupplements.map((proto) => (
-              <Paper key={proto.id} p="sm" radius="md" withBorder bg="gray.0">
-                <Stack gap="xs">
-                  <Group justify="space-between" align="flex-start" wrap="nowrap">
-                    <div>
-                      <Group gap={6} align="center">
-                        <Text size="sm" fw={700} c="dark.5">{proto.name}</Text>
-                        <Text size="xs" c="dimmed">· {proto.dayTypeLabel}</Text>
-                      </Group>
-                      <Group gap={6} mt={2}>
-                        <Text size={11} c={proto.isCustom ? 'grape.7' : 'dimmed'} fw={600}>
-                          ● {proto.isCustom ? 'Personalizado para este jugador' : 'Plantilla del equipo'}
-                        </Text>
-                      </Group>
-                    </div>
-                    {onNavigateToProtocols && (
-                      <Button
-                        variant="subtle"
-                        size="compact-xs"
-                        color="grape"
-                        radius="xl"
-                        onClick={onNavigateToProtocols}
-                      >
-                        Ver en protocolos
-                      </Button>
-                    )}
+              <Paper key={proto.id} radius="md" withBorder bg="gray.0" style={{ overflow: 'hidden' }}>
+                <Group justify="space-between" align="center" wrap="nowrap" gap="xs" px="sm" py={8}>
+                  <Group gap={6} wrap="wrap" style={{ minWidth: 0 }}>
+                    <Text size="sm" fw={700} c="dark.5">{proto.name}</Text>
+                    <Badge size="xs" variant="light" color="grape" radius="sm">{proto.dayTypeLabel}</Badge>
+                    <Badge size="xs" variant="dot" color={proto.isCustom ? 'grape' : 'gray'} radius="sm">
+                      {proto.isCustom ? 'Personalizado' : 'Plantilla del equipo'}
+                    </Badge>
                   </Group>
+                  {onNavigateToProtocols && (
+                    <Button variant="subtle" size="compact-xs" color="grape" radius="xl" onClick={onNavigateToProtocols} style={{ flexShrink: 0 }}>
+                      Ver en protocolos
+                    </Button>
+                  )}
+                </Group>
 
-                  <Stack gap={6} mt={4}>
-                    {proto.stepsWithSupps.map((step) => (
-                      <Paper key={step.id} p="xs" radius="sm" withBorder bg="white">
-                        <Text size="xs" fw={700} c="dark.4" mb={4}>
-                          {step.timeLabel ? `${step.timeLabel} · ` : ''}{step.title}
-                        </Text>
-                        <Stack gap={4}>
-                          {step.suplementos.map((supp, sIdx) => (
-                            <Group key={sIdx} justify="space-between" align="center" wrap="nowrap" gap="xs">
-                              <Group gap={6} wrap="nowrap" style={{ minWidth: 0 }}>
-                                <Icon3D name="pill" size={15} style={{ flexShrink: 0 }} />
-                                <Text size="xs" fw={700} c="dark.5" truncate>{supp.nombre}</Text>
-                                <Text size="xs" fw={600} c="grape.7" style={{ whiteSpace: 'nowrap' }}>
-                                  · {supp.dosis}
-                                </Text>
-                              </Group>
-                              {supp.notas && (
-                                <Text size={11} c="dimmed" truncate style={{ maxWidth: '40%' }}>
-                                  {supp.notas}
-                                </Text>
-                              )}
-                            </Group>
-                          ))}
-                        </Stack>
-                      </Paper>
-                    ))}
-                  </Stack>
+                <Stack gap={0} bg="white" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+                  {proto.stepsWithSupps.map((step, idx) => (
+                    <Group
+                      key={step.id}
+                      gap="sm"
+                      align="flex-start"
+                      wrap="nowrap"
+                      px="sm"
+                      py={8}
+                      style={{ borderTop: idx === 0 ? 0 : '1px solid var(--mantine-color-gray-2)' }}
+                    >
+                      <Box w={{ base: 84, sm: 96 }} style={{ flexShrink: 0 }}>
+                        <Text size="xs" fw={700} c="grape.7" lh={1.3}>{step.timeLabel || '—'}</Text>
+                        <Text size={11} c="dimmed" lh={1.3} lineClamp={2}>{step.title}</Text>
+                      </Box>
+                      <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
+                        {step.suplementos.map((supp, sIdx) => (
+                          <Group key={sIdx} gap={6} wrap="nowrap" align="center">
+                            <Icon3D name="pill" size={15} style={{ flexShrink: 0 }} />
+                            <Text size="xs" fw={700} c="dark.5" style={{ minWidth: 0 }}>
+                              {supp.nombre}
+                              <Text span size="xs" fw={600} c="grape.7"> · {supp.dosis}</Text>
+                              {supp.notas && <Text span size={11} c="dimmed"> — {supp.notas}</Text>}
+                            </Text>
+                          </Group>
+                        ))}
+                      </Stack>
+                    </Group>
+                  ))}
                 </Stack>
               </Paper>
             ))}
