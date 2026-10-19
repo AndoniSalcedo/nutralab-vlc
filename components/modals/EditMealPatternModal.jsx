@@ -143,7 +143,7 @@ export default function EditMealPatternModal({
       opened={opened}
       onClose={onClose}
       title={
-        <Group gap="xs">
+        <Group gap="xs" wrap="wrap" style={{ rowGap: 0 }}>
           <Text fw={700} size="md">
             Pauta Nutricional: {mealName}
           </Text>
@@ -160,8 +160,8 @@ export default function EditMealPatternModal({
       <Stack gap="md">
         {/* Jerarquía de ingesta: Comida Principal vs Toma Ligera */}
         <Paper p="sm" withBorder radius="sm" bg={isMainMeal ? 'blue.0' : 'gray.0'}>
-          <Group justify="space-between" align="center">
-            <Box style={{ flex: 1 }}>
+          <Group justify="space-between" align="center" wrap="nowrap" gap="sm">
+            <Box style={{ flex: 1, minWidth: 0 }}>
               <Group gap={6} align="center">
                 <Text size="sm" fw={600} c={isMainMeal ? 'blue.9' : 'dark.7'}>
                   {isMainMeal ? 'Comida principal' : 'Toma ligera / secundaria'}
@@ -187,8 +187,8 @@ export default function EditMealPatternModal({
 
         {/* Toggle Árbol Completo */}
         <Paper p="sm" withBorder radius="sm" bg={isComplete ? 'teal.0' : 'gray.0'}>
-          <Group justify="space-between" align="center">
-            <Box style={{ flex: 1 }}>
+          <Group justify="space-between" align="center" wrap="nowrap" gap="sm">
+            <Box style={{ flex: 1, minWidth: 0 }}>
               <Text size="sm" fw={600} c={isComplete ? 'teal.9' : 'dark.7'}>
                 Rotación variada (pauta abierta)
               </Text>
@@ -213,13 +213,24 @@ export default function EditMealPatternModal({
         {!isComplete && (
           <Paper p="sm" withBorder radius="sm" bg="blue.0">
             <Stack gap="xs">
-              <Group justify="space-between" align="center">
-                <Group gap={6}>
-                  <IconSparkles size={16} color="#1c7ed6" />
-                  <Text size="xs" fw={700} c="blue.9">
-                    Asistente de Clasificación con IA
-                  </Text>
-                </Group>
+              <Group gap={6} wrap="nowrap">
+                <IconSparkles size={16} color="#1c7ed6" />
+                <Text size="xs" fw={700} c="blue.9">
+                  Asistente de Clasificación con IA
+                </Text>
+              </Group>
+
+              <Textarea
+                placeholder="Escribe o pega lo que suele tomar el jugador... Ej: Arroz con tomate y huevos plancha + pollo con patata + arroz con leche"
+                value={aiText}
+                onChange={(e) => setAiText(e.target.value)}
+                autosize
+                minRows={2}
+                maxRows={6}
+                size="xs"
+              />
+
+              <Group justify="flex-end">
                 <Button
                   size="compact-xs"
                   variant="filled"
@@ -232,15 +243,6 @@ export default function EditMealPatternModal({
                   Interpretar con IA
                 </Button>
               </Group>
-
-              <Textarea
-                placeholder="Escribe o pega lo que suele tomar el jugador... Ej: Arroz con tomate y huevos plancha + pollo con patata + arroz con leche"
-                value={aiText}
-                onChange={(e) => setAiText(e.target.value)}
-                minRows={2}
-                maxRows={3}
-                size="xs"
-              />
 
               {aiError && (
                 <Alert
@@ -258,7 +260,7 @@ export default function EditMealPatternModal({
         )}
 
         <Paper p="sm" withBorder radius="md" bg={isComplete ? 'teal.0' : 'gray.0'} style={{ borderColor: isComplete ? 'var(--mantine-color-teal-2)' : undefined }}>
-          <Group justify="space-between" align="center" mb={4}>
+          <Group justify="space-between" align="center" gap={4} mb={4} style={{ rowGap: 0 }}>
             <Text size="11px" fw={700} c="dimmed" tt="uppercase">
               Resumen de la pauta ({mealName})
             </Text>
@@ -277,7 +279,7 @@ export default function EditMealPatternModal({
             </Stack>
           ) : tree ? (
             <Stack gap={2}>
-              <Text size="xs" fw={700} c="dark.8">
+              <Text size="xs" fw={700} c="dark.8" style={{ overflowWrap: 'anywhere' }}>
                 {astLabel}
               </Text>
             </Stack>

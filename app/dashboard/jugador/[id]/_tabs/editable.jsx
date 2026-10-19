@@ -17,7 +17,7 @@ import {
   NumberInput,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconEdit, IconPlus } from '@/components/icons3d';
+import { IconEdit, IconPlus, IconCopy } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/actions/playerActions';
 import { useRouter } from 'next/navigation';
@@ -30,6 +30,7 @@ import {
   getMealTimingBadge,
 } from '@/config/nutrition-days';
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
+import ImportPautaModal from '@/components/modals/ImportPautaModal';
 import { MealDistributionBar, MealDistributionEditor } from '@/components/plan/MealDistributionEditor';
 import PrepartidoRoutineModal from '@/components/modals/PrepartidoRoutineModal';
 import { convertLegacyToAst, formatAstToText } from '@/lib/engine/meal-ast';
@@ -220,6 +221,7 @@ export function ComidasEditable({
   const [recsDefecto, setRecsDefecto] = useState(() => recomendacionesDefecto || {});
   const [saving, setSaving] = useState(false);
   const [selectedMealForModal, setSelectedMealForModal] = useState(null);
+  const [importOpen, setImportOpen] = useState(false);
 
   useEffect(() => {
     setMeals(parseMeals(numComidas));
@@ -229,6 +231,45 @@ export function ComidasEditable({
   }, [numComidas, postentreno, preentreno, recomendacionesDefecto, repartoIngestas]);
 
   const MEAL_OPTIONS = AVAILABLE_MEALS;
+
+  // Guarda las pautas habituales con `changes` ({ toma: pauta }) aplicados encima de las actuales.
+  async function savePautas(changes, successMessage) {
+    const newRecs = {
+      ...Object.fromEntries(Object.entries(recsDefecto).map(([name, meal]) => [name, convertLegacyToAst(meal)])),
+      ...changes,
+    };
+    try {
+      const res = await updatePlayerField(jugadorId, 'recomendaciones_defecto', newRecs);
+      if (!res?.ok) throw new Error(res?.error || 'No se pudo guardar la pauta.');
+      setRecsDefecto(newRecs);
+      notifySaved({ color: 'teal', title: 'Pauta guardada', message: successMessage });
+      router.refresh();
+    } catch (err) {
+      notifications.show({
+        color: 'red',
+        title: 'Error al guardar',
+        message: errorMessage(err),
+      });
+    }
+  }
+
+  // Pautas importadas de otros jugadores: ya interpretadas, se guardan sin pasar por la IA.
+  async function handleImportPautas(imported) {
+    const tomas = Object.keys(imported);
+    if (tomas.length === 0) return;
+    const changes = Object.fromEntries(tomas.map((toma) => {
+      const source = imported[toma];
+      return [toma, {
+        type: 'meal',
+        tree: source.tree,
+        label: source.label || formatAstToText({ tree: source.tree }),
+        raw: source.raw || '',
+        isMainMeal: recsDefecto[toma]?.isMainMeal ?? isMainMeal(toma, source),
+        unrecognized: [],
+      }];
+    }));
+    await savePautas(changes, `Pautas importadas: ${tomas.join(', ')}.`);
+  }
 
   async function saveDistribution() {
     if (mealsTotal !== 100) {
@@ -406,9 +447,23 @@ export function ComidasEditable({
 
         {/* Lista de pautas tipadas por comida */}
         <Box mt={4}>
-          <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={6}>
-            Pautas por Ingesta
-          </Text>
+          <Group justify="space-between" align="center" wrap="nowrap" gap="xs" mb={6}>
+            <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+              Pautas por Ingesta
+            </Text>
+            {!readOnly && activeMeals.length > 0 && (
+              <Button
+                size="compact-xs"
+                variant="light"
+                color="gray"
+                radius="xl"
+                leftSection={<IconCopy size={12} />}
+                onClick={() => setImportOpen(true)}
+              >
+                Importar de otro jugador
+              </Button>
+            )}
+          </Group>
 
           {activeMeals.length === 0 ? (
             <Text size="xs" c="dimmed">No hay tomas configuradas.</Text>
@@ -483,29 +538,20 @@ export function ComidasEditable({
           timing="Pauta habitual"
           value={recsDefecto[selectedMealForModal] || null}
           jugadorId={jugadorId}
-          onSave={async (updatedMeal) => {
-            const newRecs = {
-              ...Object.fromEntries(Object.entries(recsDefecto).map(([name, meal]) => [name, convertLegacyToAst(meal)])),
-              [selectedMealForModal]: updatedMeal,
-            };
-            try {
-              const res = await updatePlayerField(jugadorId, 'recomendaciones_defecto', newRecs);
-              if (!res?.ok) throw new Error(res?.error || 'No se pudo guardar la pauta.');
-              setRecsDefecto(newRecs);
-              notifySaved({
-                color: 'teal',
-                title: 'Pauta guardada',
-                message: `La pauta de ${selectedMealForModal} se ha guardado correctamente.`,
-              });
-              router.refresh();
-            } catch (err) {
-              notifications.show({
-                color: 'red',
-                title: 'Error al guardar',
-                message: errorMessage(err),
-              });
-            }
-          }}
+          onSave={(updatedMeal) => savePautas(
+            { [selectedMealForModal]: updatedMeal },
+            `La pauta de ${selectedMealForModal} se ha guardado correctamente.`
+          )}
+        />
+      )}
+
+      {importOpen && (
+        <ImportPautaModal
+          opened={importOpen}
+          onClose={() => setImportOpen(false)}
+          jugadorId={jugadorId}
+          tomas={activeMeals}
+          onImport={handleImportPautas}
         />
       )}
     </BentoCard>

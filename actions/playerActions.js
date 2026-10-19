@@ -162,7 +162,7 @@ function isCopyablePauta(pauta) {
 
 /**
  * Pautas ya escritas por el nutricionista (protocolos de partido y comidas habituales) de sus jugadores, para
- * copiarlas a otra toma sin volver a pasar por la IA. Solo jugadores del propio nutricionista.
+ * importarlas en la misma toma de otro jugador sin volver a pasar por la IA. Solo jugadores del propio nutricionista.
  */
 export async function listCopyablePautas() {
   const user = await getUser();

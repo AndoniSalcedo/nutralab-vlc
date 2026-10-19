@@ -18,7 +18,7 @@ import {
   Alert,
 } from '@mantine/core';
 import ResponsiveModal from './ResponsiveModal';
-import CopyPautaModal from './CopyPautaModal';
+import ImportPautaModal from './ImportPautaModal';
 import { notifications } from '@mantine/notifications';
 import {
   IconCheck,
@@ -27,7 +27,7 @@ import {
   IconClipboardList,
   IconSparkles,
   IconAlertCircle,
-  IconDownload,
+  IconCopy,
 } from '@/components/icons3d';
 import { parseMealTree } from '@/actions/mealActions';
 import { formatAstToText, validateMealAst } from '@/lib/engine/meal-ast';
@@ -97,7 +97,6 @@ function SingleMealPautaEditor({
   const [aiText, setAiText] = useState(mealData.raw || '');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiError, setAiError] = useState(null);
-  const [copyOpen, setCopyOpen] = useState(false);
 
   useEffect(() => {
     setAiText(mealData.raw || '');
@@ -168,30 +167,12 @@ function SingleMealPautaEditor({
     }
   }
 
-  // Copia una pauta ya interpretada: no vuelve a pasar por la IA.
-  function handleCopyPauta(source) {
-    setAiText(source.raw || '');
-    setAiError(null);
-    onChange({
-      type: 'meal',
-      tree: source.tree,
-      label: source.label || formatAstToText({ tree: source.tree }),
-      raw: source.raw || '',
-      unrecognized: [],
-    });
-    notifySaved({
-      color: 'teal',
-      title: 'Pauta copiada',
-      message: `La pauta de ${mealName} se ha copiado. Guarda la rutina para aplicarla.`,
-    });
-  }
-
   return (
     <Stack gap="sm" pt="xs">
       {/* 1. Jerarquía de la Ingesta */}
       <Paper p="xs" withBorder radius="md" bg={isMainMeal ? 'blue.0' : 'gray.0'}>
-        <Group justify="space-between" align="center">
-          <Box style={{ flex: 1 }}>
+        <Group justify="space-between" align="center" wrap="nowrap" gap="sm">
+          <Box style={{ flex: 1, minWidth: 0 }}>
             <Group gap={6} align="center">
               <Text size="xs" fw={700} c={isMainMeal ? 'blue.9' : 'dark.7'}>
                 {isMainMeal ? 'Comida principal' : 'Toma ligera / secundaria'}
@@ -217,8 +198,8 @@ function SingleMealPautaEditor({
 
       {/* 2. Modo Rotación Variada vs Pauta Específica */}
       <Paper p="xs" withBorder radius="md" bg={isComplete ? 'teal.0' : 'gray.0'}>
-        <Group justify="space-between" align="center">
-          <Box style={{ flex: 1 }}>
+        <Group justify="space-between" align="center" wrap="nowrap" gap="sm">
+          <Box style={{ flex: 1, minWidth: 0 }}>
             <Text size="xs" fw={700} c={isComplete ? 'teal.9' : 'dark.7'}>
               Rotación variada (pauta abierta)
             </Text>
@@ -237,31 +218,30 @@ function SingleMealPautaEditor({
         </Group>
       </Paper>
 
-      <Button
-        size="xs"
-        variant="light"
-        color="gray"
-        radius="xl"
-        leftSection={<IconDownload size={13} />}
-        onClick={() => setCopyOpen(true)}
-        style={{ alignSelf: 'flex-start' }}
-      >
-        Copiar pauta de otra toma o jugador
-      </Button>
-
       {/* 3. Configuración de Componentes (Asistente IA + AST estructurado) */}
       {!isComplete ? (
         <Stack gap="xs">
           {/* Asistente IA de Clasificación */}
           <Paper p="xs" withBorder radius="md" bg="blue.0" style={{ borderColor: 'var(--mantine-color-blue-3)' }}>
             <Stack gap={6}>
-              <Group justify="space-between" align="center">
-                <Group gap={6}>
-                  <IconSparkles size={15} color="#1c7ed6" />
-                  <Text size="xs" fw={700} c="blue.9">
-                    Asistente de Clasificación con IA
-                  </Text>
-                </Group>
+              <Group gap={6} wrap="nowrap">
+                <IconSparkles size={15} color="#1c7ed6" />
+                <Text size="xs" fw={700} c="blue.9">
+                  Asistente de Clasificación con IA
+                </Text>
+              </Group>
+
+              <Textarea
+                placeholder="Escribe o pega lo que suele tomar el jugador... Ej: Arroz blanco con pechuga de pollo a la plancha y plátano"
+                value={aiText}
+                onChange={(e) => setAiText(e.target.value)}
+                autosize
+                minRows={2}
+                maxRows={6}
+                size="xs"
+              />
+
+              <Group justify="flex-end">
                 <Button
                   size="compact-xs"
                   variant="filled"
@@ -274,15 +254,6 @@ function SingleMealPautaEditor({
                   Interpretar con IA
                 </Button>
               </Group>
-
-              <Textarea
-                placeholder="Escribe o pega lo que suele tomar el jugador... Ej: Arroz blanco con pechuga de pollo a la plancha y plátano"
-                value={aiText}
-                onChange={(e) => setAiText(e.target.value)}
-                minRows={2}
-                maxRows={3}
-                size="xs"
-              />
 
               {!aiError && aiText.trim() && aiText.trim() !== String(mealData.raw || '').trim() && (
                 <Text size="11px" c="orange.8" fw={600}>
@@ -311,7 +282,7 @@ function SingleMealPautaEditor({
                   Pauta estructurada ({mealName})
                 </Text>
               </Group>
-              <Text size="xs" fw={700} c="dark.8">
+              <Text size="xs" fw={700} c="dark.8" style={{ overflowWrap: 'anywhere' }}>
                 {formatAstToText({ tree: mealData.tree })}
               </Text>
             </Paper>
@@ -326,16 +297,6 @@ function SingleMealPautaEditor({
             El motor seleccionará combinaciones equilibradas de forma rotatoria (menú del buffet si está disponible para comida/cena o catálogo taxonómico general).
           </Text>
         </Paper>
-      )}
-
-      {copyOpen && (
-        <CopyPautaModal
-          opened={copyOpen}
-          onClose={() => setCopyOpen(false)}
-          jugadorId={jugadorId}
-          mealName={mealName}
-          onCopy={handleCopyPauta}
-        />
       )}
     </Stack>
   );
@@ -377,6 +338,8 @@ export default function PrepartidoRoutineModal({
   const [openedAccordionItems, setOpenedAccordionItems] = useState([]);
   // 5. Estado de guardado
   const [saving, setSaving] = useState(false);
+  // 6. Importar pautas de otros jugadores
+  const [importOpen, setImportOpen] = useState(false);
 
 
   const recommendedMeals = scheduleDetail.recommendedMeals;
@@ -485,6 +448,28 @@ export default function PrepartidoRoutineModal({
         origen: PROTOCOL_ORIGIN.MANUAL,
       },
     }));
+  }
+
+  // Pautas importadas de otros jugadores ({ toma: pauta }): ya interpretadas, no pasan por la IA.
+  function handleImportPautas(imported) {
+    const tomas = Object.keys(imported);
+    if (tomas.length === 0) return;
+    for (const toma of tomas) {
+      const source = imported[toma];
+      handleMealRecChange(toma, {
+        type: 'meal',
+        tree: source.tree,
+        label: source.label || formatAstToText({ tree: source.tree }),
+        raw: source.raw || '',
+        isMainMeal: recs[toma]?.isMainMeal ?? source.isMainMeal ?? checkIsMainMeal(toma, source),
+        unrecognized: [],
+      });
+    }
+    notifySaved({
+      color: 'teal',
+      title: 'Pautas importadas',
+      message: `${tomas.join(', ')}: guarda la rutina para aplicarlas.`,
+    });
   }
 
   // Devolver una toma a su pauta habitual
@@ -675,27 +660,32 @@ export default function PrepartidoRoutineModal({
             2. PAUTAS NUTRICIONALES CONCENTRADAS POR INGESTA (Acordeón)
            ========================================================================= */}
         <Box>
-          <Group justify="space-between" align="center" mb={6}>
-            <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+          <Group justify="space-between" align="center" wrap="nowrap" gap="xs" mb={6}>
+            <Text size="xs" fw={700} c="dimmed" tt="uppercase" style={{ minWidth: 0 }}>
               Pautas de las Ingestas ({selectedMeals.length})
             </Text>
             {selectedMeals.length > 0 && (
-              <Group gap={6}>
+              <Group gap={4} wrap="nowrap">
                 <Button
                   size="compact-xs"
-                  variant="subtle"
+                  variant="light"
                   color="gray"
-                  onClick={() => setOpenedAccordionItems(selectedMeals)}
+                  radius="xl"
+                  leftSection={<IconCopy size={12} />}
+                  onClick={() => setImportOpen(true)}
                 >
-                  Expandir todas
+                  Importar
                 </Button>
                 <Button
                   size="compact-xs"
                   variant="subtle"
                   color="gray"
-                  onClick={() => setOpenedAccordionItems([])}
+                  radius="xl"
+                  onClick={() => setOpenedAccordionItems(
+                    openedAccordionItems.length === selectedMeals.length ? [] : selectedMeals
+                  )}
                 >
-                  Colapsar todas
+                  {openedAccordionItems.length === selectedMeals.length ? 'Colapsar' : 'Expandir'}
                 </Button>
               </Group>
             )}
@@ -859,6 +849,17 @@ export default function PrepartidoRoutineModal({
           </Group>
         </Box>
       </Stack>
+
+      {importOpen && (
+        <ImportPautaModal
+          opened={importOpen}
+          onClose={() => setImportOpen(false)}
+          jugadorId={jugadorId}
+          tomas={selectedMeals}
+          preferHorario={scheduleKey}
+          onImport={handleImportPautas}
+        />
+      )}
     </ResponsiveModal>
   );
 }
