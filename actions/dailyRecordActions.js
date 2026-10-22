@@ -4,11 +4,7 @@ import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { getAccessiblePlayer } from '@/lib/auth/team-access';
 import { getDailyRecord as repoGetDailyRecord, upsertDailyRecord } from '@/repositories/dailyRecordRepository';
-import {
-  getAllSuplementacionListaItems,
-  getJugadorSuplementacion,
-  getJugadorSuplementosExtra,
-} from '@/repositories/supplementationRepository';
+import { getAssignedSupplementIds } from '@/repositories/supplementationRepository';
 import { todayKey } from '@/lib/dates';
 import { ActionError } from '@/lib/actionError';
 
@@ -22,20 +18,6 @@ function toDto(today, record) {
     agua_ml: record?.agua_ml ?? 0,
     suplementos_tomados: record?.suplementos_tomados ?? [],
   };
-}
-
-// Suplementos que el jugador tiene pautados: los de su lista asignada + los extra
-async function getAssignedSupplementIds(db, jugadorId) {
-  const [asignacion, items, extras] = await Promise.all([
-    getJugadorSuplementacion(db, jugadorId),
-    getAllSuplementacionListaItems(db),
-    getJugadorSuplementosExtra(db, jugadorId),
-  ]);
-  const listaId = Number(asignacion?.lista_id || 0);
-  return new Set([
-    ...items.filter((item) => Number(item.lista_id) === listaId).map((item) => Number(item.suplemento_id)),
-    ...extras.map((extra) => Number(extra.suplemento_id)),
-  ]);
 }
 
 // Agua y suplementos de hoy (día en Europe/Madrid). El staff con acceso al jugador puede leerlos.

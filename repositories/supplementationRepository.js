@@ -145,3 +145,17 @@ export async function getResolvedPlayerSupplementation(db, jugadorId, pesoKg = n
   });
 }
 
+
+// Suplementos que el jugador tiene pautados: los de su lista asignada + los extra
+export async function getAssignedSupplementIds(db, jugadorId) {
+  const [asignacion, items, extras] = await Promise.all([
+    getJugadorSuplementacion(db, jugadorId),
+    getAllSuplementacionListaItems(db),
+    getJugadorSuplementosExtra(db, jugadorId),
+  ]);
+  const listaId = Number(asignacion?.lista_id || 0);
+  return new Set([
+    ...items.filter((item) => Number(item.lista_id) === listaId).map((item) => Number(item.suplemento_id)),
+    ...extras.map((extra) => Number(extra.suplemento_id)),
+  ]);
+}

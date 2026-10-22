@@ -34,6 +34,7 @@ import ImageCropModal from '@/components/modals/ImageCropModal';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from '@/components/PlayerCredentialsButton';
 import PlayerPasswordButton from '@/components/PlayerPasswordButton';
+import PlayerNotificationsButton from '@/components/PlayerNotificationsButton';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
 
@@ -193,6 +194,7 @@ export default function PlayerSidebar({
 
             {isPlayer && (
               <>
+                <PlayerNotificationsButton iconOnly />
                 <PlayerPasswordButton />
                 <Tooltip label="Cerrar sesión" position="bottom" withArrow>
                   <ActionIcon aria-label="Cerrar sesión"

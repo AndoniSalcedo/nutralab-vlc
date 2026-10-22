@@ -26,6 +26,7 @@ import { listPlayerMeals } from '@/actions/mealActions';
 import { sanitizePlanData } from '@/lib/engine';
 import { getSubtabHeader } from '../subtab-config';
 import { JugadorHeaderCompactMobile } from '@/components/JugadorHeader';
+import PushPromptCard from '@/components/notifications/PushPromptCard';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import { usePlayerDashboard } from '../PlayerDashboardContext';
 import { toDateKey, mondayKeyOf } from '@/lib/dates';
@@ -42,6 +43,8 @@ import {
   BalanceNutricionalWidget,
   WellnessHexagonWidget,
   PlanHoyWidget,
+  MatchDayWidget,
+  TeamChallengeWidget,
 } from '@/components/widgets';
 
 dayjs.locale('es');
@@ -314,8 +317,11 @@ export default function PerfilSubtab({
       {/* Main Content wrapper: padding horizontal solo en móvil para no pegarse a los bordes */}
       <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
         <Stack gap="md">
+          {user?.role === 'jugador' && <PushPromptCard />}
           {/* Bento: teselas de 1 o 2 columnas; lo urgente arriba, las constantes en pares y el detalle debajo */}
           <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
+            {/* Solo aparece si hay partido hoy o mañana */}
+            <MatchDayWidget jugadorId={jugador.id} style={{ gridColumn: 'span 2' }} />
             <Reveal index={0} style={{ gridColumn: 'span 2' }}>
               <PlanHoyWidget
                 jugador={jugador}
@@ -377,6 +383,10 @@ export default function PerfilSubtab({
                 jugadorId={jugador.id}
                 canEdit={user?.role !== 'tecnico'}
               />
+            </Reveal>
+
+            <Reveal index={7} style={{ gridColumn: 'span 2' }}>
+              <TeamChallengeWidget jugadorId={jugador.id} />
             </Reveal>
 
             <Reveal index={7} style={{ gridColumn: 'span 2' }}>

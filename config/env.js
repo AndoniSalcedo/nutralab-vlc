@@ -31,4 +31,10 @@ export const env = {
   ANALITICA_MAX_TOKENS: Number(process.env.ANALITICA_MAX_TOKENS) || 16000,
   BILLING_SERVICE_URL: process.env.BILLING_SERVICE_URL || 'http://localhost:3005',
   BILLING_API_KEY: process.env.BILLING_API_KEY || process.env.BILLING_TOKEN || '',
+  // Notificaciones push (Web Push / VAPID). Sin claves, los avisos se desactivan sin romper nada.
+  VAPID_PUBLIC_KEY: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '',
+  VAPID_PRIVATE_KEY: process.env.VAPID_PRIVATE_KEY || '',
+  VAPID_SUBJECT: process.env.VAPID_SUBJECT || 'mailto:soporte@nutralab.es',
+  // Secreto con el que el cron llama a /api/cron/notifications (Vercel Cron lo envía como Bearer)
+  CRON_SECRET: process.env.CRON_SECRET || '',
 };

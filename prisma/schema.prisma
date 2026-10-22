@@ -62,6 +62,7 @@ model equipos {
   mensajes                  mensajes[]
   menu_semanal              menu_semanal[]
   partidos_intrapartido     partidos_intrapartido[]
+  partidos_programados      partidos_programados[]
   tecnico_equipos           tecnico_equipos[]
 
   @@index([owner_id, temporada], map: "teams_equipos_owner_temporada_idx")
@@ -216,6 +217,10 @@ model jugadores {
   registros_bienestar              registros_bienestar[]
   registros_diarios                registros_diarios[]
   registros_hidratacion            registros_hidratacion[]
+  push_suscripciones               push_suscripciones[]
+  notificaciones_preferencias      notificaciones_preferencias?
+  notificaciones_enviadas          notificaciones_enviadas[]
+  retos_participantes              retos_participantes?
 
   @@index([auth_user_id], map: "teams_jugadores_auth_user_id_idx")
   @@index([equipo_id], map: "teams_jugadores_equipo_id_idx")
@@ -517,4 +522,67 @@ model auth_users {
   last_sign_in_at    DateTime? @db.Timestamptz(6)
   created_at         DateTime  @default(now()) @db.Timestamptz(6)
   updated_at         DateTime  @default(now()) @db.Timestamptz(6)
+}
+
+/// Navegadores/dispositivos del jugador suscritos a avisos push (Web Push)
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model push_suscripciones {
+  id         BigInt    @id @default(autoincrement())
+  jugador_id BigInt
+  endpoint   String    @unique
+  p256dh     String
+  auth       String
+  user_agent String?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+  jugadores  jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([jugador_id], map: "teams_push_suscripciones_jugador_idx")
+}
+
+/// Qué avisos quiere recibir el jugador: { agua, suplementos, bienestar, comidas, plan, mensajes, partido }
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model notificaciones_preferencias {
+  jugador_id BigInt    @id
+  prefs      Json      @default("{}")
+  updated_at DateTime? @default(now()) @db.Timestamptz(6)
+  jugadores  jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// Avisos ya enviados (tipo + clave): evita repetir un recordatorio
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model notificaciones_enviadas {
+  id         BigInt    @id @default(autoincrement())
+  jugador_id BigInt
+  tipo       String
+  clave      String
+  created_at DateTime  @default(now()) @db.Timestamptz(6)
+  jugadores  jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([jugador_id, tipo, clave])
+  @@index([created_at], map: "teams_notificaciones_enviadas_created_idx")
+}
+
+/// Próximos partidos del equipo con su hora de inicio (Europe/Madrid): línea de tiempo del día de partido
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model partidos_programados {
+  id         BigInt    @id @default(autoincrement())
+  equipo_id  BigInt
+  fecha      DateTime  @db.Date
+  hora       String
+  rival      String    @default("")
+  lugar      String    @default("")
+  created_by String?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  equipos    equipos   @relation(fields: [equipo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([equipo_id, fecha], map: "teams_partidos_programados_equipo_fecha_idx")
+}
+
+/// Jugadores que participan (voluntariamente) en los retos de adherencia de su equipo
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model retos_participantes {
+  jugador_id BigInt    @id
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  jugadores  jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }

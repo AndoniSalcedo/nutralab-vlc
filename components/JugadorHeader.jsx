@@ -28,6 +28,7 @@ import ImageCropModal from '@/components/modals/ImageCropModal';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import PlayerCredentialsButton from './PlayerCredentialsButton';
 import PlayerPasswordButton from './PlayerPasswordButton';
+import PlayerNotificationsButton from './PlayerNotificationsButton';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
 
@@ -141,6 +142,7 @@ function HeaderActions({
 
           {isPlayer && (
             <>
+              <PlayerNotificationsButton menuItem />
               <PlayerPasswordButton menuItem />
               <Menu.Divider />
               <PlayerLogoutButton menuItem />
@@ -163,6 +165,7 @@ function HeaderActions({
     <Group gap="xs" wrap="wrap">
       {isPlayer && (
         <>
+          <PlayerNotificationsButton />
           <PlayerPasswordButton />
           <PlayerLogoutButton />
         </>

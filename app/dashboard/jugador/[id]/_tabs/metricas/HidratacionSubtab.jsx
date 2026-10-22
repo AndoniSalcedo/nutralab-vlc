@@ -35,6 +35,7 @@ import {
   IconChevronDown,
 } from '@/components/icons3d';
 import ConfirmModal from '@/components/modals/ConfirmModal';
+import HydrationStrategyCard from '@/components/widgets/HydrationStrategyCard';
 import {
   ComposedChart,
   Area,
@@ -139,7 +140,7 @@ function getCsvVal(row, keys) {
   return foundKey ? row[foundKey] : '';
 }
 
-export default function HidratacionSubtab({ jugador, registrosHidratacion = [], readOnly = false }) {
+export default function HidratacionSubtab({ jugador, registrosHidratacion = [], historialIntrapartido = [], readOnly = false }) {
   const isMobile = useMediaQuery('(max-width: 48em)', true);
   const [expanded, { toggle: toggleExpanded }] = useDisclosure(false);
   const jugadorId = jugador.id;
@@ -699,6 +700,10 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       {/* Main Hydration Content & Timing Cards */}
       <Box px={{ base: 'sm', sm: 0 }} pb="sm">
         <Stack gap="md">
+          {/* Con peso: pauta personal (sodio en sudor, osmolaridad, partidos); sin peso, la genérica */}
+          {peso > 0 ? (
+            <HydrationStrategyCard jugador={jugador} registrosHidratacion={registros} historialIntrapartido={historialIntrapartido} />
+          ) : (
           <BentoCard title="Timing recomendado" icon={IconActivityHeartbeat} color="cyan">
             <SimpleGrid cols={{ base: 1, sm: 2, lg: 5 }} spacing={{ base: 'md', sm: 'sm' }}>
               {[
@@ -715,6 +720,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
               ))}
             </SimpleGrid>
           </BentoCard>
+          )}
           <EditableSection title="Notas y ajustes de hidratación" defaultValue={jugador.notas_hidratacion || hidDef} onSave={(v) => saveField('notas_hidratacion', v)} readOnly={readOnly} />
 
           {/* Historical Hydration Entries Table */}

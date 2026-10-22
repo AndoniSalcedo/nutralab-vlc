@@ -49,7 +49,7 @@ export default function MetricasTab({ jugador, analiticas, evoluciones, pesajes,
           <AnaliticasSubtab jugador={jugador} analiticas={analiticasVisibles} readOnly={readOnly} />
         )}
         {activeSubtab === 'hidratacion' && (
-          <HidratacionSubtab jugador={jugador} registrosHidratacion={registrosHidratacion} readOnly={readOnly} />
+          <HidratacionSubtab jugador={jugador} registrosHidratacion={registrosHidratacion} historialIntrapartido={historialIntrapartido} readOnly={readOnly} />
         )}
         {activeSubtab === 'intrapartido' && (
           <IntrapartidoSubtab jugador={jugador} historialIntrapartido={historialIntrapartido} />

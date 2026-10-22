@@ -5,6 +5,8 @@ import { getUser } from '@/lib/auth/session';
 import { getDb } from '@/lib/db/prisma';
 import { getOwnedPlayer, getOwnedTeam, getOwnerId } from '@/lib/auth/team-access';
 import { insertMessages } from '@/repositories/messagesRepository';
+import { getPlayersByTeamSelectSimple } from '@/repositories/playerRepository';
+import { notifyPlayersLater } from '@/lib/push';
 import { ActionError } from '@/lib/actionError';
 
 function cleanText(value) {
@@ -67,5 +69,17 @@ export async function sendMessage(payload) {
 
   const data = await insertMessages(db, rows);
   revalidatePath(`/dashboard/equipo/${teamId}`);
+
+  // Aviso push a los destinatarios (una vez por mensaje y jugador)
+  const recipients = sendToAll
+    ? (await getPlayersByTeamSelectSimple(db, team.id).catch(() => [])).map((p) => p.id)
+    : recipientIds;
+  const messageKey = String(data?.[0]?.id ?? Date.now());
+  notifyPlayersLater(recipients, 'mensajes', messageKey, {
+    title: `Mensaje de ${base.created_by_name} ✉️`,
+    body: titulo,
+    url: '/dashboard',
+  });
+
   return { messages: data || [] };
 }

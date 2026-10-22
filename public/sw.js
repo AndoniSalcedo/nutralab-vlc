@@ -72,3 +72,42 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// ── Notificaciones push ──
+// El servidor envía { title, body, url, tag, icon, badge } (lib/push.js)
+self.addEventListener('push', (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { body: event.data ? event.data.text() : '' };
+  }
+  const title = data.title || 'Nutralab';
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: data.body || '',
+      icon: data.icon || '/favico_nutralab-192x192.png',
+      badge: data.badge || '/favico_nutralab-32x32.png',
+      tag: data.tag,
+      renotify: Boolean(data.tag),
+      data: { url: data.url || '/dashboard' },
+    })
+  );
+});
+
+// Al pulsar el aviso se reutiliza una pestaña abierta de la app si la hay
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = new URL(event.notification.data?.url || '/dashboard', self.location.origin);
+  if (target.origin !== self.location.origin) return;
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
+      const existing = windows.find((client) => new URL(client.url).origin === self.location.origin);
+      if (existing) {
+        return existing.focus().then((client) => (client && 'navigate' in client ? client.navigate(target.href) : client));
+      }
+      return self.clients.openWindow(target.href);
+    })
+  );
+});

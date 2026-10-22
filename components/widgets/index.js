@@ -8,3 +8,5 @@ export { default as EstrategiaWidget } from './EstrategiaWidget';
 export { default as BalanceNutricionalWidget } from './BalanceNutricionalWidget';
 export { default as WellnessHexagonWidget } from './WellnessHexagonWidget';
 export { default as PlanHoyWidget } from './PlanHoyWidget';
+export { default as MatchDayWidget } from './MatchDayWidget';
+export { default as TeamChallengeWidget } from './TeamChallengeWidget';

@@ -115,8 +115,10 @@ export default async function JugadorTabPage({ params }) {
         getEvolutionsByPlayerId(db, id),
         getHydrationRecordsByPlayerId(db, id),
         getPesajesByPlayerId(db, id),
-        // Solo controles finalizados; es opcional: si falla, la pestaña muestra su estado vacío
-        activeSubtab === 'intrapartido' ? getIntrapartidoHistoryByPlayerId(db, id).catch(() => []) : [],
+        // Solo controles finalizados (Intrapartido y estrategia de Hidratación); es opcional: si falla, se muestra vacío
+        activeSubtab === 'intrapartido' || activeSubtab === 'hidratacion'
+          ? getIntrapartidoHistoryByPlayerId(db, id).catch(() => [])
+          : [],
       ]);
       historialIntrapartido = resIntrapartido;
       analiticas = isPlayer ? resAnaliticas.filter(a => a.visible_para_jugador === true) : resAnaliticas;
