@@ -142,8 +142,8 @@ export default function SuplementacionWidget({
       color="salvia"
       icon="suplementacion"
       title="Suplementos diarios"
-      footer={totalCount === 0 ? null : isAllDone ? '¡Todo tomado!' : `${completedCount}/${totalCount} tomas`}
-      footerAction="Suplementación"
+      footer={totalCount === 0 ? null : isAllDone ? '¡Hecho!' : `${completedCount}/${totalCount} hoy`}
+      footerAction="Ver todos"
       onFooterAction={() => router.push(`/dashboard/jugador/${jugadorId}/nutricion/suplementacion`)}
     >
       <ParticleBurst burstKey={burst} top="40%" left="50%" />

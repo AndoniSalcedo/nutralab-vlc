@@ -6,6 +6,9 @@ import WidgetCard, { WidgetAside } from './WidgetCard';
 
 const STATUS_COLORS = { verde: 'salvia', amarillo: 'salvia', rojo: 'arcilla' };
 
+// Coma decimal en español: "88,0 kg", no "88.0 kg"
+const fmtNum = (value, digits) => Number(value).toLocaleString('es-ES', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+
 const statusConfigMap = {
   verde: {
     color: '#4a6813',
@@ -26,7 +29,6 @@ export default function PhysicalMetricWidget({
   pesoActual,
   porcentajeGrasa,
   semaforo,
-  formatMetricNumber = (val) => val ?? '-',
 }) {
   const router = useRouter();
 
@@ -37,7 +39,7 @@ export default function PhysicalMetricWidget({
   const diff = semaforo?.diff;
   const hasDiff = diff !== null && diff !== undefined && Number.isFinite(diff);
   const formattedDiff = hasDiff
-    ? (diff > 0 ? `+${diff.toFixed(2)} kg` : `${diff.toFixed(2)} kg`)
+    ? `${diff > 0 ? '+' : ''}${fmtNum(diff, 2)} kg`
     : null;
 
   const tooltipContent = hasSemaforo ? (
@@ -53,16 +55,16 @@ export default function PhysicalMetricWidget({
       <Divider my={2} style={{ opacity: 0.2 }} />
       <Group justify="space-between">
         <Text size="xs" c="dimmed">Peso Actual:</Text>
-        <Text size="xs" fw={700}>{semaforo.pesoActual} kg</Text>
+        <Text size="xs" fw={700}>{fmtNum(semaforo.pesoActual, 1)} kg</Text>
       </Group>
       <Group justify="space-between">
         <Text size="xs" c="dimmed">Peso Ref ({semaforo.porcentajeGrasaObjetivo || 10}% gr):</Text>
-        <Text size="xs" fw={700}>{semaforo.pesoReferencia} kg</Text>
+        <Text size="xs" fw={700}>{fmtNum(semaforo.pesoReferencia, 1)} kg</Text>
       </Group>
       {semaforo.masaMagra && (
         <Group justify="space-between">
           <Text size="xs" c="dimmed">Masa Magra:</Text>
-          <Text size="xs" fw={700}>{semaforo.masaMagra} kg</Text>
+          <Text size="xs" fw={700}>{fmtNum(semaforo.masaMagra, 1)} kg</Text>
         </Group>
       )}
       <Group justify="space-between">
@@ -99,7 +101,7 @@ export default function PhysicalMetricWidget({
           onClick={() => router.push(`/dashboard/jugador/${jugadorId}/metricas/pesos`)}
         >
           <Text fz={24} fw={800} c="var(--nutra-bosque, #1F2A24)" lh={1.1} style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-            {pesoActual ? formatMetricNumber(pesoActual, 1) : '—'}
+            {pesoActual ? fmtNum(pesoActual, 1) : '—'}
             <Text span fz="xs" fw={600} c="var(--nutra-salvia, #6C705A)"> kg</Text>
           </Text>
           <Box mt={6} w="fit-content">
@@ -109,7 +111,7 @@ export default function PhysicalMetricWidget({
               </WidgetAside>
             ) : (
               <WidgetAside color="salvia">
-                {porcentajeGrasa ? `${formatMetricNumber(porcentajeGrasa, 1)}% grasa` : 'Al día'}
+                {porcentajeGrasa ? `${fmtNum(porcentajeGrasa, 1)} % grasa` : 'Al día'}
               </WidgetAside>
             )}
           </Box>

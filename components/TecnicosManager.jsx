@@ -16,7 +16,6 @@ import {
   Table,
   Text,
   TextInput,
-  ThemeIcon,
   Title,
   Tooltip,
 } from '@mantine/core';
@@ -26,7 +25,6 @@ import {
   IconPlus,
   IconSearch,
   IconTrash,
-  IconUserCheck,
   IconUserPlus,
   IconUsersGroup,
 } from '@/components/icons3d';
@@ -37,6 +35,7 @@ import {
   getTecnicos,
   uploadTecnicoAvatar,
 } from '@/actions/tecnicoActions';
+import Icon3D from '@/components/Icon3D';
 import { compressAvatar, initials } from '@/lib/utils/avatar';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import ImageCropModal from '@/components/modals/ImageCropModal';
@@ -222,7 +221,7 @@ export default function TecnicosManager({ teams = [] }) {
   }
 
   return (
-    <Stack gap="lg">
+    <Stack gap="lg" px={{ base: 'xs', sm: 0 }}>
       <Paper
         p={{ base: 'sm', sm: 'md' }}
         radius={24}
@@ -232,13 +231,12 @@ export default function TecnicosManager({ teams = [] }) {
           boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
         }}
       >
+        {/* Misma cabecera que la lista de equipos */}
         <Group justify="space-between" align="center" wrap="wrap" gap="md">
-          <Group gap="sm">
-            <ThemeIcon color="salvia" variant="light" radius="md" size={42}>
-              <IconUserCheck size={21} />
-            </ThemeIcon>
-            <Box>
-              <Title order={3} fw={700} c="var(--nutra-bosque, #1F2A24)" lh={1.1}>
+          <Group gap="sm" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+            <Icon3D name="handshake" size={44} style={{ flexShrink: 0 }} />
+            <Box style={{ minWidth: 0, flex: 1 }}>
+              <Title order={2} size="h3" fw={700} c="var(--nutra-bosque, #1F2A24)" lh={1.2}>
                 Cuerpo Técnico
               </Title>
               <Text size="xs" c="var(--nutra-salvia, #6C705A)" mt={2}>
@@ -252,6 +250,7 @@ export default function TecnicosManager({ teams = [] }) {
             color="lima"
             leftSection={<IconPlus size={14} />}
             onClick={() => setModalOpened(true)}
+            w={{ base: '100%', sm: 'auto' }}
           >
             Vincular técnico
           </Button>

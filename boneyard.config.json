@@ -18,7 +18,10 @@
     "/dashboard/jugador/mock/nutricion/plan",
     "/dashboard/jugador/mock/nutricion/suplementacion",
     "/dashboard/jugador/mock/nutricion/menu",
-    "/dashboard/jugador/mock/nutricion/protocolos"
+    "/dashboard/jugador/mock/nutricion/protocolos",
+    "/dashboard/equipo/mock/intrapartido",
+    "/dashboard/jugador/mock/metricas/intrapartido",
+    "/dashboard/jugador/mock/nutricion/tipos"
   ],
   "wait": 1500
 }

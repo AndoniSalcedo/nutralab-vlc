@@ -1,14 +1,7 @@
 'use client';
 
-import { Skeleton, Stack } from '@mantine/core';
+import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 
 export default function TeamIntrapartidoLoading() {
-  return (
-    <Stack gap="lg">
-      <Skeleton height={84} radius="lg" />
-      <Skeleton height={120} radius="lg" />
-      <Skeleton height={120} radius="lg" />
-      <Skeleton height={120} radius="lg" />
-    </Stack>
-  );
+  return <BoneyardSkeleton name="team-intrapartido" loading={true} />;
 }

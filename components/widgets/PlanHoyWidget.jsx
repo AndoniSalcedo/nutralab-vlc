@@ -299,7 +299,7 @@ export default function PlanHoyWidget({
     <WidgetCard
       id="widget-plan-hoy"
       color="salvia"
-      icon="calendar"
+      icon="tear_off_calendar"
       title={title}
       aside={
         hasPlan ? (

@@ -60,7 +60,7 @@ export default function HydrationStrategyCard({ jugador, registrosHidratacion = 
           <Step icon="alarmclock" label="2-4 h antes" value={`${fmt(plan.pre.minMl)}-${fmt(plan.pre.maxMl)} ml`} detail="5-7 ml/kg, a sorbos" />
           <Step icon="running" label="Calentamiento" value={`${plan.warmupMl[0]}-${plan.warmupMl[1]} ml`} detail="Justo antes de salir" />
           <Step icon="soccer" label="Durante" value={`~${fmt(plan.during.totalMl)} ml`} detail={`≈${fmt(plan.during.perHourMl)} ml/h · descanso ~${fmt(plan.during.halftimeMl)} ml`} />
-          <Step icon="refresh" label="Después" value="1,25-1,5 L" detail="por cada kg perdido, con sal" />
+          <Step icon="battery" label="Después" value="1,25-1,5 L" detail="por cada kg perdido, con sal" />
         </SimpleGrid>
 
         <Group gap="xs" wrap="wrap">

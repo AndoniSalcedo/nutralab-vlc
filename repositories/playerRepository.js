@@ -148,7 +148,7 @@ export async function getPlayerWithTeamConfig(db, id) {
 
   return db.jugadores.findUniqueOrThrow({
     where: { id },
-    include: { equipos: { select: { nombre: true, configuracion_nutricional: true } } },
+    include: { equipos: { select: { nombre: true, configuracion_nutricional: true, foto_size: true } } },
   });
 }
 

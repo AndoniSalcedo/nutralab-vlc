@@ -29,7 +29,7 @@ export default function TeamFormModal({
       onClose={onClose}
       title={
         <Group gap="xs">
-          <Icon3D name="soccer" size={26} />
+          <Icon3D name="t_shirt" size={26} />
           <Text fw={700}>
             {modal.type === 'copy'
               ? 'Copiar equipo a temporada'

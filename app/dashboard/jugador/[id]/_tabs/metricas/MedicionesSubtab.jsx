@@ -683,7 +683,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
               })}
             </Grid>
             {missing.length > 0 && (
-              <Text fz="xs" c="dimmed" ta="center" mt={-8} mb="md">Sin datos de: {missing.join(', ')}.</Text>
+              <Text fz="xs" c="dimmed" ta="center" mt={-8} mb="md">Sin datos de: {missing.join(', ').replace(/\.?$/, '.')}</Text>
             )}
             </>
               );

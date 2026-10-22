@@ -73,7 +73,7 @@ export default function MatchDayWidget({ jugadorId, style }) {
   return (
     <WidgetCard
       id="widget-match-day"
-      icon="soccer"
+      icon="stadium"
       title={match.rival ? `Día de partido · vs ${match.rival}` : 'Día de partido'}
       color="lima"
       aside={now ? <WidgetAside color="lima" dot>{countdown(kickoff, now)}</WidgetAside> : null}

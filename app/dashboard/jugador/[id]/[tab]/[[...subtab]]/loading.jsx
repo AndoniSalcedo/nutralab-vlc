@@ -1,9 +1,10 @@
 'use client';
 
+import { useLayoutEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Paper, Stack, Box, Group, Title, Text } from '@mantine/core';
+import { Paper, Stack } from '@mantine/core';
 import { tabLabel } from '@/app/dashboard/jugador/[id]/_tabs/tab-label';
-import { getSubtabControlData, resolveSubtab, getSubtabHeader } from '@/app/dashboard/jugador/[id]/_tabs/subtab-config';
+import { getSubtabControlData, resolveSubtab } from '@/app/dashboard/jugador/[id]/_tabs/subtab-config';
 import headerClasses from '@/app/dashboard/jugador/[id]/_tabs/SubtabSectionHeader.module.css';
 import PlayerSubtabControl from '@/app/dashboard/jugador/[id]/_tabs/PlayerSubtabControl';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
@@ -15,50 +16,33 @@ export default function PlayerSubtabLoading() {
 
   const activeSubtab = resolveSubtab(tab, subtab);
   const controlData = getSubtabControlData(tab, tabLabel);
-  const header = getSubtabHeader(tab, activeSubtab);
-  const HeaderIcon = header?.icon;
   const skeletonName = activeSubtab
     ? `player-dashboard-${tab}-${activeSubtab}`
     : `player-dashboard-${tab}`;
 
+  // El selector de subpestañas se pinta de verdad; de los huesos capturados (que lo incluyen)
+  // se descarta justo su altura, medida aquí, para que el resto encaje en cualquier ancho.
+  const controlRef = useRef(null);
+  const [controlHeight, setControlHeight] = useState(null);
+  useLayoutEffect(() => {
+    const el = controlRef.current;
+    if (!el) return undefined;
+    const update = () => setControlHeight(el.offsetHeight);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <Stack gap={0}>
-      {/* Real subtab header — static, no skeleton */}
-      <Paper
-        p="xs"
-        bg="white"
-        className={headerClasses.subtabsHeader}
-      >
-        <PlayerSubtabControl
-          value={activeSubtab}
-          data={controlData}
-          readOnly
-        />
+      <Paper ref={controlRef} p="xs" bg="white" className={headerClasses.subtabsHeader}>
+        <PlayerSubtabControl value={activeSubtab} data={controlData} readOnly />
       </Paper>
 
-      {/* Static section header — matches the real subtab's banner */}
-      {header && (
-        <Paper
-          p={{ base: 'sm', sm: 'md' }}
-          bg="white"
-          className={headerClasses.mobileSticky}
-        >
-            <Group justify="space-between" align="center" wrap="wrap" gap="sm">
-              <Group gap="sm" align="center" wrap="nowrap">
-                <HeaderIcon size={28} />
-              <Box style={{ minWidth: 0 }}>
-                <Title order={3} fw={700} c="dark.5" fz={{ base: 16, sm: 18 }} lineClamp={1}>{header.title}</Title>
-                <Text size="sm" c="dimmed" lineClamp={1}>{header.subtitle}</Text>
-              </Box>
-            </Group>
-          </Group>
-        </Paper>
+      {controlHeight != null && (
+        <BoneyardSkeleton name={skeletonName} loading={true} minY={controlHeight} />
       )}
-
-      {/* Skeleton for the dynamic content area only */}
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
-        <BoneyardSkeleton name={skeletonName} loading={true} minY={300} />
-      </Box>
     </Stack>
   );
 }

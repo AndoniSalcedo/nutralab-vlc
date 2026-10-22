@@ -1,4 +1,4 @@
-import { isMockTeam } from '@/config/boneyardMockData';
+import { isMockTeam, isMockPlayer, mockIntrapartidoHistory } from '@/config/boneyardMockData';
 import { normalizeRows } from '@/lib/db/prisma';
 
 const MATCH_FIELDS = {
@@ -78,6 +78,7 @@ export async function deleteIntrapartidoMatch(db, teamId, matchId) {
  * @returns {Promise<Array<{ match: object, convocados: object[], tomas: object[] }>>}
  */
 export async function getIntrapartidoHistoryByTeamId(db, teamId) {
+  if (isMockTeam(teamId)) return mockIntrapartidoHistory;
   const matches = await getIntrapartidoMatchesByTeamId(db, teamId);
   if (matches.length === 0) return [];
 
@@ -133,6 +134,13 @@ export async function getIntrapartidoDraftsByOwner(db, ownerId) {
  * @returns {Promise<Array<{ match: object, convocado: object, tomas: object[] }>>}
  */
 export async function getIntrapartidoHistoryByPlayerId(db, playerId) {
+  if (isMockPlayer(playerId)) {
+    return mockIntrapartidoHistory.map(({ match, convocados, tomas }) => ({
+      match,
+      convocado: convocados.find((c) => c.jugador_id === 'mock'),
+      tomas: tomas.filter((t) => t.jugador_id === 'mock'),
+    }));
+  }
   const convocados = await db.partido_convocados.findMany({
     where: { jugador_id: playerId, partidos_intrapartido: { estado: 'finalizado' } },
     select: { partido_id: true, jugador_id: true, titular: true, partidos_intrapartido: { select: MATCH_FIELDS } },

@@ -204,6 +204,12 @@ export const ICONS_3D_AVAILABLE = [
   'water_bottle',
   'watermelon',
   'xray',
+  'abacus',
+  'shopping_cart',
+  'party_popper',
+  't_shirt',
+  'tear_off_calendar',
+  'bell_with_slash',
 ];
 
 export const ALIASES = {
@@ -473,6 +479,12 @@ export const TABLER_ICON_MAP = {
   handshake: TablerIcons.IconHeartHandshake,
   busts: TablerIcons.IconUsersGroup,
   speech: TablerIcons.IconMessage,
+  abacus: TablerIcons.IconCalculator,
+  shopping_cart: TablerIcons.IconShoppingCart,
+  party_popper: TablerIcons.IconConfetti,
+  t_shirt: TablerIcons.IconShirt,
+  tear_off_calendar: TablerIcons.IconCalendarEvent,
+  bell_with_slash: TablerIcons.IconBellOff,
 };
 
 const PRESET_SIZES = {
@@ -872,7 +884,7 @@ export const IconSend = makeIcon('rocket', TablerIcons.IconSend);
 export const IconBrain = makeIcon('brain', TablerIcons.IconBrain);
 export const IconSparkles = makeIcon('sparkles', TablerIcons.IconSparkles);
 export const IconPalette = makeIcon('paint_palette', TablerIcons.IconPalette);
-export const IconCalculator = makeIcon('numbers', TablerIcons.IconCalculator);
+export const IconCalculator = makeIcon('abacus', TablerIcons.IconCalculator);
 export const IconFlag = makeIcon('flag', TablerIcons.IconFlag);
 export const IconExternalLink = makeIcon('link', TablerIcons.IconExternalLink);
 export const IconEye = makeIcon('eye', TablerIcons.IconEye);

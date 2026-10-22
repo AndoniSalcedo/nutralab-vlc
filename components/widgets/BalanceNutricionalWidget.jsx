@@ -629,7 +629,7 @@ export default function BalanceNutricionalWidget({
     <WidgetCard
       id="widget-balance-nutricional"
       color="salvia"
-      icon="fire"
+      icon="bento_box"
       title="Balance nutricional"
       aside={<DateNav date={date} onDateChange={onDateChange} />}
       footer={`${entries.length} ${entries.length === 1 ? 'comida registrada' : 'comidas registradas'}`}

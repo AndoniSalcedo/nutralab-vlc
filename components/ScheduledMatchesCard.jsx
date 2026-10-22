@@ -58,21 +58,21 @@ export default function ScheduledMatchesCard({ team, readOnly = false }) {
 
   return (
     <WidgetCard
-      icon="calendar"
+      icon="tear_off_calendar"
       title="Próximos partidos"
       color="lima"
       aside={<WidgetAside color="salvia">{matches.length}</WidgetAside>}
-      footer="Con hora exacta, cada jugador ve su plan del día de partido por horas y recibe avisos."
       style={{ height: 'auto' }}
     >
       <Stack gap="sm">
-        {matches.length === 0 && (
-          <Text fz="sm" c="dimmed">Sin partidos programados. Si no hay ninguno, se usa la hora orientativa del plan semanal.</Text>
-        )}
+        <Text fz="xs" c="dimmed" lh={1.4}>
+          Con la hora exacta, cada jugador ve su plan del día de partido por horas y recibe avisos.
+          {matches.length === 0 && ' Sin partidos programados se usa la hora orientativa del plan semanal.'}
+        </Text>
         {matches.map((m) => (
           <Group key={m.id} justify="space-between" wrap="nowrap" px="sm" py={8} bg="gray.0" style={{ borderRadius: 14 }}>
             <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
-              <Icon3D name="soccer" size={24} />
+              <Icon3D name="stadium" size={24} />
               <Box style={{ minWidth: 0 }}>
                 <Text fz="sm" fw={700} c="dark.6" truncate>{m.rival ? `vs ${m.rival}` : 'Partido'}</Text>
                 <Text fz="xs" c="dimmed" tt="capitalize" truncate>

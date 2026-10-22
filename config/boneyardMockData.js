@@ -62,6 +62,8 @@ export const mockTeams = [
   },
   {
     ...mockTeam,
+    id: 'mock-2',
+    nombre: 'Equipo Juvenil A',
     players_count: 3,
     players: [
       { id: 'mock', nombre: 'Carlos', apellidos: 'Jugador Uno', posicion: 'Delantero' },
@@ -71,6 +73,8 @@ export const mockTeams = [
   },
   {
     ...mockTeam,
+    id: 'mock-3',
+    nombre: 'Equipo Femenino',
     players_count: 3,
     players: [
       { id: 'mock', nombre: 'Carlos', apellidos: 'Jugador Uno', posicion: 'Delantero' },
@@ -333,9 +337,9 @@ export const mockHydration = [
     fecha: '2026-07-14',
     hora: '09:30',
     tipo: 'hydration',
-    valor: 1.022,
-    unidad: 'g/ml',
-    estado: 'Deshidratado leve',
+    valor: 112,
+    unidad: 'mOsm',
+    estado: 'mild',
     notas: 'Tomar más sales.'
   },
   {
@@ -344,9 +348,9 @@ export const mockHydration = [
     fecha: '2026-07-15',
     hora: '09:00',
     tipo: 'hydration',
-    valor: 1.012,
-    unidad: 'g/ml',
-    estado: 'Normal',
+    valor: 64,
+    unidad: 'mOsm',
+    estado: 'hydrated',
     notas: 'Perfecto estado de hidratación.'
   }
 ];
@@ -356,8 +360,9 @@ export const mockMessages = [
     id: 500,
     equipo_id: 'mock',
     jugador_id: 'mock',
-    sender_id: 'tecnico',
-    mensaje: 'Hola Carlos, recuerda tomar la creatina hoy después del entreno.',
+    titulo: 'Creatina post-entreno',
+    contenido: 'Hola Carlos, recuerda tomar la creatina hoy después del entreno.',
+    created_by_name: 'Cuerpo técnico',
     created_at: '2026-07-15T12:00:00Z'
   }
 ];
@@ -437,3 +442,29 @@ export const mockAiPlans = [
     },
   },
 ];
+
+// Historial intrapartido de ejemplo (dos partidos finalizados del equipo mock)
+const mockMatch = (id, rival, fecha) => ({
+  id, rival, competicion: 'Liga', lugar: 'Ciudad Deportiva', fecha,
+  estado: 'finalizado', fase_actual: 0, paso: 'resumen', fases: null, updated_at: `${fecha}T21:00:00.000Z`,
+});
+const mockTomas = (partidoId, jugadorId, extra = 0) => [
+  { partido_id: partidoId, jugador_id: jugadorId, momento: 'calentamiento', producto_id: 'agua-250', cantidad: 1 },
+  { partido_id: partidoId, jugador_id: jugadorId, momento: 'salida', producto_id: 'isotonico-250', cantidad: 1 },
+  { partido_id: partidoId, jugador_id: jugadorId, momento: 'pausa1', producto_id: 'agua-100', cantidad: 2 + extra },
+  { partido_id: partidoId, jugador_id: jugadorId, momento: 'descanso', producto_id: 'gel-30', cantidad: 1 },
+  { partido_id: partidoId, jugador_id: jugadorId, momento: 'descanso', producto_id: 'isotonico-500', cantidad: 1 },
+  { partido_id: partidoId, jugador_id: jugadorId, momento: 'pausa2', producto_id: 'agua-100', cantidad: 2 },
+];
+export const mockIntrapartidoHistory = [
+  ['mock-match-2', 'CD Ejemplo', '2026-10-12'],
+  ['mock-match-1', 'Atlético Muestra', '2026-10-05'],
+].map(([id, rival, fecha], index) => ({
+  match: mockMatch(id, rival, fecha),
+  convocados: [
+    { partido_id: id, jugador_id: 'mock', titular: true },
+    { partido_id: id, jugador_id: 'mock-2', titular: index === 0 },
+    { partido_id: id, jugador_id: 'mock-3', titular: true },
+  ],
+  tomas: ['mock', 'mock-2', 'mock-3'].flatMap((jugadorId, i) => mockTomas(id, jugadorId, i)),
+}));

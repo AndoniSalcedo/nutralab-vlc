@@ -28,6 +28,7 @@ import {
   nextListOrder
 } from '@/repositories/supplementationRepository';
 import { ActionError } from '@/lib/actionError';
+import { isMockPlayer } from '@/config/boneyardMockData';
 
 const slugify = (value) => sharedSlugify(value).slice(0, 80);
 
@@ -38,6 +39,24 @@ function canManage(user) {
 export async function getPlayerSupplementation(requestedJugadorId) {
   const user = await getUser();
   if (!user) throw new ActionError('No autenticado');
+
+  // Jugador mock (boneyard, solo fuera de producción): catálogo real con la primera lista asignada
+  if (isMockPlayer(requestedJugadorId)) {
+    const db = getDb();
+    const [suplementos, listas, items] = await Promise.all([
+      getAllSuplementos(db),
+      getAllSuplementacionListas(db),
+      getAllSuplementacionListaItems(db),
+    ]);
+    return {
+      suplementos,
+      listas,
+      items,
+      asignacion: listas[0] ? { jugador_id: requestedJugadorId, lista_id: listas[0].id } : null,
+      extras: [],
+      canManage: false,
+    };
+  }
 
   const requested = toPositiveNumber(requestedJugadorId);
   const jugadorId = user?.role === 'jugador' ? toPositiveNumber(user.id) : requested;

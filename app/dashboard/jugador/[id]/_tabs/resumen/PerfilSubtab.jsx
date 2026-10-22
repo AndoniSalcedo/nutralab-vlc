@@ -63,7 +63,7 @@ function formatMetricNumber(val, decimals = 1, fallback = '-') {
   if (val === null || val === undefined || val === '') return fallback;
   const num = Number(val);
   if (!Number.isFinite(num)) return String(val);
-  return num.toFixed(decimals);
+  return num.toLocaleString('es-ES', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 }
 
 function calculateConsumedStats(meals, foods) {
@@ -353,7 +353,6 @@ export default function PerfilSubtab({
                 pesoActual={pesoActual}
                 porcentajeGrasa={porcentajeGrasa}
                 semaforo={semaforo}
-                formatMetricNumber={formatMetricNumber}
               />
             </Reveal>
             <Reveal index={3}>

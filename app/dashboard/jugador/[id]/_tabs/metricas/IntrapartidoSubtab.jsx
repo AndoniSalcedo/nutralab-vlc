@@ -61,7 +61,7 @@ export default function IntrapartidoSubtab({ jugador, historialIntrapartido = []
       ) : (
         <>
           <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
-            <StatTile icon="soccer" title="Partidos" color="salvia" value={matches.length} caption="con control" />
+            <StatTile icon="stadium" title="Partidos" color="salvia" value={matches.length} caption="con control" />
             <StatTile icon="droplet" title="Líquidos" color="salvia" value={Math.round(averages.aguaMl)} unit="ml" caption="por partido" />
             <StatTile icon="fire" title="Carbs" color="salvia" value={Math.round(averages.carbsG)} unit="g" caption="por partido" />
             <StatTile icon="running" title="Sodio" color="salvia" value={Math.round(averages.sodioMg)} unit="mg" caption="por partido" />

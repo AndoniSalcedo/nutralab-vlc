@@ -51,6 +51,8 @@ function getInitialColors(teamData) {
 export default function TeamConfigClient({ team, readOnly = false }) {
   const router = useRouter();
   const [teamPhotoVersion, setTeamPhotoVersion] = useState(() => team.updated_at || ''); // sin Date.now(): descuadraba la hidratación
+  // Sin foto no se pide la imagen: el 404 llegaba antes de hidratar y quedaba el icono de imagen rota
+  const [hasPhoto, setHasPhoto] = useState(() => Boolean(team.foto_size));
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [tempImageSrc, setTempImageSrc] = useState('');
   const [tempFileName, setTempFileName] = useState('');
@@ -77,6 +79,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
       const compressed = await compressAvatar(croppedFile);
       await uploadTeamPhoto(team.id, compressed);
       setTeamPhotoVersion(Date.now());
+      setHasPhoto(true);
       notifySaved({
         color: 'green',
         title: 'Escudo actualizado',
@@ -96,6 +99,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
     try {
       await removeTeamPhoto(team.id);
       setTeamPhotoVersion(Date.now());
+      setHasPhoto(false);
       notifySaved({
         color: 'green',
         title: 'Escudo eliminado',
@@ -429,7 +433,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
             <Stack align="center" gap="xs">
               <Box style={{ position: 'relative', display: 'inline-block' }}>
                 <Avatar
-                  src={team?.id ? `/api/media/team-avatar?id=${team.id}&t=${teamPhotoVersion}` : undefined}
+                  src={team?.id && hasPhoto ? `/api/media/team-avatar?id=${team.id}&t=${teamPhotoVersion}` : undefined}
                   size={96}
                   radius="xl"
                   color="nutralabColor"
@@ -479,7 +483,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                   </FileButton>
                 )}
               </Box>
-              {!readOnly && (
+              {!readOnly && hasPhoto && (
                 <Button
                   variant="subtle"
                   color="red"
@@ -503,7 +507,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                 style={{ flex: '2 1 200px', minWidth: 0 }}
                 w={{ base: '100%', sm: 'auto' }}
                 fw={readOnly ? 600 : 400}
-                size="md"
+                size="sm"
                 radius="xl"
               />
               <TextInput
@@ -515,7 +519,7 @@ export default function TeamConfigClient({ team, readOnly = false }) {
                 placeholder="Ej: 2026/27"
                 style={{ flex: '1 1 140px', minWidth: 0 }}
                 w={{ base: '100%', sm: 'auto' }}
-                size="md"
+                size="sm"
                 radius="xl"
               />
             </Group>

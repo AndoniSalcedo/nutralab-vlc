@@ -294,7 +294,7 @@ export default function PlayerSidebar({
             >
               {jugador?.equipo_id && (
                 <SafeAvatar
-                  src={jugador?.equipos?.foto_size === 0 ? undefined : `/api/media/team-avatar?id=${jugador.equipo_id}`}
+                  src={jugador?.equipos?.foto_size ? `/api/media/team-avatar?id=${jugador.equipo_id}` : undefined}
                   size={18}
                   radius="xl"
                   imageProps={{ style: { objectFit: 'contain' } }}

@@ -16,7 +16,6 @@ import {
   Tooltip,
 } from '@mantine/core';
 import {
-  IconBentoBox,
   IconCooking,
   IconEdit,
 } from '@/components/icons3d';
@@ -380,7 +379,7 @@ export default function MenuSemanal({
         <Grid gutter="md" align="stretch" mt="xs">
           {/* Comida Bento Card */}
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <BentoCard title="Almuerzo / Comida" icon={IconCooking} color="orange">
+            <BentoCard title="Almuerzo / Comida" icon3d="pot" color="orange">
               <Stack gap="sm" mt="xs">
                 <Textarea
                   label="Primer Plato"
@@ -421,7 +420,7 @@ export default function MenuSemanal({
 
           {/* Cena Bento Card */}
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <BentoCard title="Cena del Equipo" icon={IconBentoBox} color="blue">
+            <BentoCard title="Cena del Equipo" icon3d="plate" color="blue">
               <Stack gap="sm" mt="xs">
                 <Textarea
                   label="Primer Plato"
@@ -467,7 +466,7 @@ export default function MenuSemanal({
       <Grid gutter="md" align="stretch" mt="xs">
         {/* Comida Bento Card */}
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <BentoCard title="Almuerzo / Comida" icon={IconCooking} color="orange">
+          <BentoCard title="Almuerzo / Comida" icon3d="pot" color="orange">
             <Stack gap="md" mt="xs">
               <HeroDishSection
                 title="Primer Plato"
@@ -505,7 +504,7 @@ export default function MenuSemanal({
 
         {/* Cena Bento Card */}
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <BentoCard title="Cena del Equipo" icon={IconBentoBox} color="blue">
+          <BentoCard title="Cena del Equipo" icon3d="plate" color="blue">
             <Stack gap="md" mt="xs">
               <HeroDishSection
                 title="Primer Plato"

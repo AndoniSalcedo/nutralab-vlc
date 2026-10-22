@@ -32,6 +32,7 @@ import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import IntrapartidoModal from '@/components/modals/IntrapartidoModal';
 import ScheduledMatchesCard from '@/components/ScheduledMatchesCard';
+import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import { TeamHeaderRightSection } from '@/components/TeamHeaderContext';
 import { deleteIntrapartidoMatch } from '@/actions/intrapartidoActions';
 import { calculatePlayerTotals } from '@/config/intrapartido';
@@ -136,6 +137,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
   };
 
   return (
+    <BoneyardSkeleton name="team-intrapartido" loading={false}>
     <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
       {!readOnly && (
         <TeamHeaderRightSection>
@@ -219,7 +221,7 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
       ) : matches.length > 0 && (
         <>
           <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
-            <StatTile icon="soccer" title="Partidos" color="salvia" value={matches.length} caption="registrados" />
+            <StatTile icon="stadium" title="Partidos" color="salvia" value={matches.length} caption="registrados" />
             <StatTile icon="droplet" title="Líquidos" color="salvia" value={Math.round(averages.aguaMl)} unit="ml" caption="por jugador" />
             <StatTile icon="fire" title="Carbs" color="salvia" value={Math.round(averages.carbsG)} unit="g" caption="por jugador" />
             <StatTile icon="running" title="Sodio" color="salvia" value={Math.round(averages.sodioMg)} unit="mg" caption="por jugador" />
@@ -374,5 +376,6 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
         confirmLabel="Eliminar partido"
       />
     </Stack>
+    </BoneyardSkeleton>
   );
 }

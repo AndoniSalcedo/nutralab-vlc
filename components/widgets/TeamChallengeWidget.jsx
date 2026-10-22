@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { Box, Button, Group, Skeleton, Stack, Text, Tooltip } from '@mantine/core';
+import { Box, Button, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import Icon3D from '@/components/Icon3D';
 import { getTeamChallenge, setChallengeParticipation } from '@/actions/challengeActions';
@@ -94,12 +94,13 @@ export default function TeamChallengeWidget({ jugadorId, style }) {
     }
   };
 
-  if (!loading && !data) return null;
+  // Sin hueco mientras carga: para el staff sin participantes la tarjeta no llega a aparecer
+  if (loading || !data) return null;
   // El staff solo ve el ranking si hay alguien apuntado
-  if (!loading && !data.isPlayer && data.participants === 0) return null;
+  if (!data.isPlayer && data.participants === 0) return null;
 
-  const myIndex = data?.ranking.findIndex((r) => String(r.id) === String(jugadorId)) ?? -1;
-  const rows = showAll ? data?.ranking || [] : (data?.ranking || []).slice(0, VISIBLE_ROWS);
+  const myIndex = data.ranking.findIndex((r) => String(r.id) === String(jugadorId));
+  const rows = showAll ? data.ranking : data.ranking.slice(0, VISIBLE_ROWS);
 
   return (
     <WidgetCard
@@ -107,15 +108,13 @@ export default function TeamChallengeWidget({ jugadorId, style }) {
       icon="trophy"
       title="Reto de equipo"
       color="lima"
-      aside={data ? <WidgetAside color="salvia">{data.participants} {data.participants === 1 ? 'jugador' : 'jugadores'}</WidgetAside> : null}
-      footer={data?.joined ? 'Solo se comparten puntos, nunca tu peso ni tus medidas.' : 'Voluntario · solo se comparten puntos de constancia'}
-      footerAction={data?.isPlayer && data?.joined ? 'Salir del reto' : null}
-      onFooterAction={data?.isPlayer && data?.joined ? () => toggle(false) : undefined}
+      aside={<WidgetAside color="salvia">{data.participants} {data.participants === 1 ? 'jugador' : 'jugadores'}</WidgetAside>}
+      footer={data.joined ? 'Solo se comparten puntos, nunca tu peso ni tus medidas.' : 'Voluntario · solo se comparten puntos de constancia'}
+      footerAction={data.isPlayer && data.joined ? 'Salir del reto' : null}
+      onFooterAction={data.isPlayer && data.joined ? () => toggle(false) : undefined}
       style={{ height: 'auto', ...style }}
     >
-      {loading ? (
-        <Stack gap="xs">{[0, 1, 2].map((i) => <Skeleton key={i} h={48} radius={14} />)}</Stack>
-      ) : data.isPlayer && !data.joined ? (
+      {data.isPlayer && !data.joined ? (
         <Stack gap="sm">
           <Text fz="sm" c="dark.5" lh={1.45}>
             Compite esta semana con tus compañeros en constancia: cada día sumas un punto por el agua, los suplementos, el diario y el bienestar.

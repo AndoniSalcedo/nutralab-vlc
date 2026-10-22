@@ -1437,7 +1437,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
 
             {chartData.length > 0 && emptyMetricLabels.length > 0 && (
               <Text fz="xs" c="dimmed" ta="center">
-                Sin mediciones en este rango: {emptyMetricLabels.join(', ')}.
+                Sin mediciones en este rango: {emptyMetricLabels.join(', ').replace(/\.?$/, '.')}
               </Text>
             )}
 
@@ -1461,7 +1461,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                         key: item.key,
                         label: item.label,
                         value: metricDisplay(val, item.unit),
-                        delta: delta !== null && delta !== 0 ? `${delta > 0 ? '+' : ''}${delta}` : null,
+                        delta: delta !== null && delta !== 0 ? `${delta > 0 ? '+' : ''}${fmtEs(delta)}` : null,
                         deltaTone: deltaColor(delta, item),
                       };
                     }).filter(Boolean),
@@ -1601,7 +1601,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                         key: item.key,
                         label: item.label,
                         value: metricDisplay(value, item.unit),
-                        delta: delta !== null && delta !== 0 ? `${delta > 0 ? '+' : ''}${delta}` : null,
+                        delta: delta !== null && delta !== 0 ? `${delta > 0 ? '+' : ''}${fmtEs(delta)}` : null,
                         deltaTone: deltaColor(delta, item),
                       };
                     }).filter(Boolean),

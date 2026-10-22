@@ -356,8 +356,8 @@ export default function TeamAnalyticsDashboard({ players = [], analiticas = [] }
         <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
           <StatTile icon="players" title="Subidas" color="salvia" value={`${stats.playersWithRecords}/${stats.totalPlayers}`} caption={`${stats.totalPlayers ? Math.round((stats.playersWithRecords / stats.totalPlayers) * 100) : 0}% de la plantilla`} />
           <StatTile icon="warning" title="Con alertas" color={stats.activeAlertsCount > 0 ? 'arcilla' : 'salvia'} value={stats.activeAlertsCount} caption={stats.activeAlertsCount === 1 ? 'jugador en su última analítica' : 'jugadores en su última analítica'} />
-          <StatTile icon="stats" title="Bajos" color={stats.totalLowParams > 0 ? 'arcilla' : 'salvia'} value={stats.totalLowParams} caption="parámetros bajo el mínimo" />
-          <StatTile icon="stats" title="Altos" color={stats.totalHighParams > 0 ? 'arcilla' : 'salvia'} value={stats.totalHighParams} caption="parámetros sobre el máximo" />
+          <StatTile icon="chart_down" title="Bajos" color={stats.totalLowParams > 0 ? 'arcilla' : 'salvia'} value={stats.totalLowParams} caption="parámetros bajo el mínimo" />
+          <StatTile icon="chart_up" title="Altos" color={stats.totalHighParams > 0 ? 'arcilla' : 'salvia'} value={stats.totalHighParams} caption="parámetros sobre el máximo" />
         </SimpleGrid>
 
       {/* Sección 2: Análisis de Parámetro Clínico (Comparativa / Historial) */}

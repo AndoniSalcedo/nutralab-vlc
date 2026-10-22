@@ -97,27 +97,26 @@ export default function HydrationWidget({
     }
   };
 
-  // Métrica clínica de osmolaridad
+  // Osmolaridad salival (mOsm) como la clasifica el dispositivo: ≤65 hidratado, 66-100 leve,
+  // 101-150 moderada, >150 severa. Manda el estado del registro; si falta, el valor.
   const value = latestHydration?.valor;
   const numValue = Number(value);
+  const estado = String(latestHydration?.estado || '').toLowerCase();
+  let level = null;
+  if (/sever|severa/.test(estado)) level = 3;
+  else if (/moderate|moderada/.test(estado)) level = 2;
+  else if (/mild|leve/.test(estado)) level = 1;
+  else if (/hydrated|hidratado/.test(estado)) level = 0;
+  else if (Number.isFinite(numValue) && numValue > 0) level = numValue <= 65 ? 0 : numValue <= 100 ? 1 : numValue <= 150 ? 2 : 3;
 
-  let statusColor = 'blue.6';
-  let statusLabel = 'Óptimo';
-
-  if (Number.isFinite(numValue) && numValue > 0) {
-    if (numValue > 900) {
-      statusColor = 'arcilla.6';
-      statusLabel = 'Alerta';
-    } else if (numValue >= 700) {
-      statusColor = 'salvia.7';
-      statusLabel = 'Límite';
-    } else {
-      statusColor = 'blue.6';
-      statusLabel = 'Óptimo';
-    }
-  } else if (latestHydration?.estado) {
-    statusLabel = latestHydration.estado;
-  }
+  const OSM_STATUS = [
+    { color: 'blue.6', label: 'Óptimo' },
+    { color: 'salvia.7', label: 'Leve' },
+    { color: 'arcilla.6', label: 'Moderada' },
+    { color: 'arcilla.6', label: 'Severa' },
+  ];
+  const statusColor = level == null ? 'blue.6' : OSM_STATUS[level].color;
+  const statusLabel = level == null ? 'Sin datos' : OSM_STATUS[level].label;
 
   const goToAnalytics = () => router.push(`/dashboard/jugador/${jugadorId}/metricas/hidratacion`);
 

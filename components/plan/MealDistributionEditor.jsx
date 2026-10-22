@@ -54,6 +54,8 @@ export function MealDistributionBar({ meals, percents, height = 28, showLegend =
       >
         {meals.map((meal) => {
           const pct = percents[meal] || 0;
+          // Con leyenda el nombre ya está debajo: en móvil "Mer 12%" no cabía en un tramo del 12 %
+          const label = pct < 8 ? '' : !showLegend && pct >= 18 ? `${meal.slice(0, 3)} ${pct}%` : `${pct}%`;
           return (
             <Tooltip key={meal} label={`${meal}: ${pct} %`} withArrow>
               <Box
@@ -72,7 +74,7 @@ export function MealDistributionBar({ meals, percents, height = 28, showLegend =
                   borderRight: '2px solid var(--mantine-color-white)',
                 }}
               >
-                {pct >= 12 ? `${meal.slice(0, 3)} ${pct}%` : pct >= 6 ? `${pct}%` : ''}
+                {label}
               </Box>
             </Tooltip>
           );

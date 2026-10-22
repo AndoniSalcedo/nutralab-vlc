@@ -39,6 +39,9 @@ import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
 
+// Coma decimal en español ("81,5 kg"); signed añade el "+" a las subidas
+const fmtKg = (value, signed = false) => `${signed && Number(value) > 0 ? '+' : ''}${Number(value).toLocaleString('es-ES', { maximumFractionDigits: 2 })}`;
+
 function fechaLabel(fecha) {
   if (!fecha) return 'Sin fecha';
   return new Date(`${fecha}T00:00:00`).toLocaleDateString('es-ES', {
@@ -218,12 +221,12 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
                     label={
                       <Box p={2}>
                         <Text size="xs" fw={700}>Semáforo: {semaforo.label}</Text>
-                        <Text size="xs">Peso Actual: {semaforo.pesoActual} kg</Text>
-                        <Text size="xs">Peso Ref ({semaforo.porcentajeGrasaObjetivo || 10}% grasa): {semaforo.pesoReferencia} kg</Text>
+                        <Text size="xs">Peso Actual: {fmtKg(semaforo.pesoActual)} kg</Text>
+                        <Text size="xs">Peso Ref ({semaforo.porcentajeGrasaObjetivo || 10}% grasa): {fmtKg(semaforo.pesoReferencia)} kg</Text>
                         {semaforo.masaMagra && (
-                          <Text size="xs">Masa Magra (Antropo): {semaforo.masaMagra} kg</Text>
+                          <Text size="xs">Masa Magra (Antropo): {fmtKg(semaforo.masaMagra)} kg</Text>
                         )}
-                        <Text size="xs">Variación: {semaforo.diff > 0 ? `+${semaforo.diff}` : semaforo.diff} kg</Text>
+                        <Text size="xs">Variación: {fmtKg(semaforo.diff, true)} kg</Text>
                         <Text size="xs" c="dimmed" mt={4} style={{ fontStyle: 'italic' }}>
                           Margen verde (±0,50 kg) · Amarillo (±1,00 kg)
                         </Text>
@@ -232,7 +235,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
                   >
                     <Box style={{ cursor: 'pointer' }}>
                       <WidgetAside color={semaforo.color === 'green' ? 'teal' : semaforo.color === 'yellow' ? 'yellow' : 'red'} dot>
-                        {semaforo.label} ({semaforo.diff > 0 ? `+${semaforo.diff}` : semaforo.diff} kg)
+                        {semaforo.label} ({fmtKg(semaforo.diff, true)} kg)
                       </WidgetAside>
                     </Box>
                   </MantineTooltip>
@@ -240,7 +243,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
               }
             >
               <Text fz={30} fw={800} c="dark.6" lh={1} lts={-0.8} mb="sm" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                {selected ? `${selected.peso_kg} kg` : '-'}
+                {selected ? `${fmtKg(selected.peso_kg)} kg` : '-'}
               </Text>
 
               <Stack gap="md">
@@ -272,7 +275,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
                       />
                       <Tooltip
                         labelFormatter={(value) => fechaLabel(value)}
-                        formatter={(value) => [`${value} kg`, 'Peso']}
+                        formatter={(value) => [`${fmtKg(value)} kg`, 'Peso']}
                         labelStyle={{ fontWeight: 700, color: 'var(--mantine-color-dark-4)', fontSize: 10 }}
                         contentStyle={{ borderRadius: '8px', border: '1px solid var(--mantine-color-gray-2)', padding: '4px 8px', fontSize: 10 }}
                       />
@@ -344,7 +347,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
                               {row.fecha ? fechaLabel(row.fecha) : '-'}
                             </Table.Td>
                             <Table.Td ta="right" fw={isSelected ? 800 : 650}>
-                              {row.peso_kg} kg
+                              {fmtKg(row.peso_kg)} kg
                             </Table.Td>
                             {!readOnly && (
                               <Table.Td ta="right">

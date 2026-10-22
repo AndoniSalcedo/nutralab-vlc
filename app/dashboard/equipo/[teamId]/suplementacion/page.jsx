@@ -10,6 +10,7 @@ import {
   getAllSuplementacionListas
 } from '@/repositories/supplementationRepository';
 import NothingFound from '@/components/NothingFound';
+import { isMockPlayer } from '@/config/boneyardMockData';
 
 export const metadata = { title: 'Suplementación' };
 
@@ -45,8 +46,12 @@ export default async function TeamSupplementationPage({ params, searchParams }) 
     players = await getPlayersByTeamSelect(db, team.id, 'id,nombre,apellidos,posicion,auth_email,avatar_size,updated_at');
 
     const playerIds = players.map((player) => player.id);
-    
-    if (playerIds.length) {
+
+    // Plantilla mock (boneyard, solo fuera de producción): catálogo real con la primera lista asignada
+    if (playerIds.length && playerIds.every(isMockPlayer)) {
+      catalogs = await getAllSuplementacionListas(db);
+      assignments = catalogs[0] ? playerIds.map((jugador_id) => ({ jugador_id, lista_id: catalogs[0].id })) : [];
+    } else if (playerIds.length) {
       const [resAssignments, resExtras, resHistory, resCatalogs] = await Promise.all([
         getJugadorSuplementacionByPlayers(db, playerIds),
         getJugadorSuplementosExtraByPlayers(db, playerIds),
