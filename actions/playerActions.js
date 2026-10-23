@@ -10,7 +10,13 @@ import { getOwnerId } from '@/lib/auth/owner';
 import { findAuthUserByEmail, getAuthUserById, verifyAuthPassword, createAuthUser, updateAuthUser, deleteAuthUser } from '@/lib/auth/auth-users';
 import { enforceRateLimit } from '@/lib/security/rate-limit';
 import { readImageUpload, toByteaHex, MAX_DOCUMENT_BYTES } from '@/lib/security/uploads';
-import { DEFAULT_PLAYER_MEALS_STRING, normalizeObjective } from '@/config/nutrition-days';
+import {
+  DEFAULT_PLAYER_MEALS_STRING,
+  normalizeObjective,
+  getUserMeals,
+  isMainMeal,
+  sortPreMatchMealsChronological,
+} from '@/config/nutrition-days';
 import { toPositiveNumber as toNumber, cleanText } from '@/lib/utils';
 import {
   TYPED_MEASUREMENT_FIELDS,
@@ -35,7 +41,8 @@ import {
 } from '@/repositories/evolutionRepository';
 import { trackUsageEvent } from '@/lib/billing/client';
 import { personalizePautas, describeAjustes } from '@/lib/nutrition/pauta-personalization';
-import { syncPreMatchProtocol } from '@/lib/nutrition/prematch-protocol';
+import { convertLegacyToAst } from '@/lib/engine/meal-ast';
+import { PROTOCOL_ORIGIN, isDefaultProtocolMeal, syncPreMatchProtocol } from '@/lib/nutrition/prematch-protocol';
 import { syncMealDistribution } from '@/lib/nutrition/meal-distribution';
 import { ActionError } from '@/lib/actionError';
 
@@ -207,6 +214,166 @@ export async function listCopyablePautas() {
       };
     })
     .filter((player) => player.pautas.length > 0);
+}
+
+// Huecos de pautas de un jugador: sus comidas habituales o el protocolo de un horario de partido.
+const PAUTA_SLOTS = ['habitual', ...Object.keys(SCHEDULE_LABELS)];
+const SLOT_LABELS = { habitual: 'Comidas habituales', ...SCHEDULE_LABELS };
+
+const findTomaKey = (patterns, toma) => Object.keys(patterns || {})
+  .find((key) => key.toLowerCase().trim() === String(toma).toLowerCase().trim());
+
+/** Pautas que se pueden copiar de un hueco: las habituales escritas y las tomas manuales del protocolo. */
+function getSlotPautas(jugador, slot) {
+  if (slot === 'habitual') {
+    return Object.fromEntries(Object.entries(jugador.recomendaciones_defecto || {})
+      .filter(([, pauta]) => isCopyablePauta(pauta)));
+  }
+  return Object.fromEntries(Object.entries(jugador.config_prepartido?.[slot]?.recomendaciones || {})
+    .filter(([, pauta]) => pauta?.type && !isDefaultProtocolMeal(pauta)));
+}
+
+// Copia de una pauta en otro hueco: conserva si el destino es comida principal y marca su origen.
+function copyPautaTo(source, target, slot, toma) {
+  const copy = JSON.parse(JSON.stringify(source));
+  delete copy.origen;
+  copy.isMainMeal = target?.isMainMeal ?? copy.isMainMeal ?? isMainMeal(toma, copy);
+  return slot === 'habitual' ? copy : { ...copy, origen: PROTOCOL_ORIGIN.MANUAL };
+}
+
+/** Jugadores del nutricionista a los que se pueden copiar pautas, con su equipo. */
+export async function listPautaCopyTargets() {
+  const user = await getUser();
+  if (!user || user.role === 'jugador' || user.role === 'tecnico') {
+    throw new ActionError('No autorizado');
+  }
+  const ownerId = getOwnerId(user);
+  if (!ownerId) throw new ActionError('No se pudo determinar el propietario');
+
+  const players = await getDb().jugadores.findMany({
+    where: { equipos: { owner_id: ownerId } },
+    select: { id: true, nombre: true, apellidos: true, equipos: { select: { nombre: true } } },
+    orderBy: { nombre: 'asc' },
+  });
+  return players.map((player) => ({
+    id: player.id,
+    nombre: `${player.nombre} ${player.apellidos || ''}`.trim(),
+    equipo: player.equipos?.nombre || '',
+  }));
+}
+
+/**
+ * Copia pautas ya escritas de un hueco del jugador (comidas habituales o protocolo de un horario) a otros huecos del
+ * mismo jugador o de otros jugadores, sin volver a pasar por la IA. En el protocolo de destino las tomas copiadas
+ * pasan a ser manuales (y se añaden a sus ingestas); en las comidas habituales solo se copian las tomas que el
+ * jugador de destino tiene. Las pautas se ajustan a las intolerancias y aversiones de cada destino.
+ *
+ * @param {{ sourceJugadorId: string, sourceSlot: string, tomas: string[], destinos: Array<{ jugadorId: string, slots: string[] }> }} payload
+ */
+export async function copyPautas({ sourceJugadorId, sourceSlot, tomas, destinos } = {}) {
+  const user = await getUser();
+  if (!user || user.role === 'jugador' || user.role === 'tecnico') {
+    throw new ActionError('No autorizado');
+  }
+  const ownerId = getOwnerId(user);
+  if (!ownerId) throw new ActionError('No se pudo determinar el propietario');
+  if (!sourceJugadorId || !PAUTA_SLOTS.includes(sourceSlot)) throw new ActionError('Origen de las pautas no válido');
+  if (!Array.isArray(tomas) || tomas.length === 0) throw new ActionError('Elige al menos una toma para copiar');
+
+  // { jugadorId: Set(huecos) }, sin el propio hueco de origen
+  const slotsByPlayer = new Map();
+  for (const { jugadorId, slots } of Array.isArray(destinos) ? destinos : []) {
+    const id = String(jugadorId || '');
+    if (!id) continue;
+    for (const slot of Array.isArray(slots) ? slots : []) {
+      if (!PAUTA_SLOTS.includes(slot) || (id === String(sourceJugadorId) && slot === sourceSlot)) continue;
+      if (!slotsByPlayer.has(id)) slotsByPlayer.set(id, new Set());
+      slotsByPlayer.get(id).add(slot);
+    }
+  }
+  const targets = [...slotsByPlayer].map(([jugadorId, slots]) => ({ jugadorId, slots: [...slots] }));
+  if (targets.length === 0) throw new ActionError('Elige al menos un destino');
+
+  const db = getDb();
+  const playerIds = Array.from(new Set([String(sourceJugadorId), ...targets.map((t) => t.jugadorId)]));
+  const players = await getOwnedPlayersByIds(db, ownerId, playerIds);
+  if (players.length !== playerIds.length) {
+    throw new ActionError('No tienes acceso a todos los jugadores seleccionados o algunos no existen');
+  }
+  const byId = new Map(players.map((player) => [String(player.id), player]));
+
+  const sourcePautas = getSlotPautas(byId.get(String(sourceJugadorId)), sourceSlot);
+  const pautas = tomas
+    .map((toma) => [toma, sourcePautas[findTomaKey(sourcePautas, toma)]])
+    .filter(([, pauta]) => pauta);
+  if (pautas.length === 0) throw new ActionError('Las tomas elegidas no tienen pauta escrita para copiar');
+
+  let copiadas = 0;
+  const omitidas = [];
+  const ajustes = [];
+  const updates = [];
+  for (const { jugadorId, slots } of targets) {
+    const player = byId.get(jugadorId);
+    const nombre = `${player.nombre} ${player.apellidos || ''}`.trim();
+    // Las habituales se normalizan al formato actual, igual que al guardarlas desde la ficha.
+    let recomendaciones_defecto = Object.fromEntries(Object.entries(player.recomendaciones_defecto || {})
+      .map(([toma, pauta]) => [toma, convertLegacyToAst(pauta)]));
+    let config_prepartido = { ...(player.config_prepartido || {}) };
+    const habitualMeals = getUserMeals(player);
+
+    for (const slot of slots) {
+      if (slot === 'habitual') {
+        for (const [toma, pauta] of pautas) {
+          const meal = habitualMeals.find((m) => m.toLowerCase() === toma.toLowerCase());
+          if (!meal) {
+            omitidas.push(`${nombre} · ${SLOT_LABELS[slot]} · ${toma} (no tiene esa toma)`);
+            continue;
+          }
+          const key = findTomaKey(recomendaciones_defecto, meal) || meal;
+          recomendaciones_defecto[key] = copyPautaTo(pauta, recomendaciones_defecto[key], slot, meal);
+          copiadas += 1;
+        }
+        continue;
+      }
+      const cfg = config_prepartido[slot] || {};
+      const recomendaciones = { ...(cfg.recomendaciones || {}) };
+      for (const [toma, pauta] of pautas) {
+        const key = findTomaKey(recomendaciones, toma) || toma;
+        recomendaciones[key] = copyPautaTo(pauta, recomendaciones[key], slot, toma);
+        copiadas += 1;
+      }
+      const ingestas = sortPreMatchMealsChronological(
+        slot,
+        Array.from(new Set([...(cfg.ingestas || []), ...Object.keys(recomendaciones)]))
+      );
+      config_prepartido[slot] = { ...cfg, ingestas, recomendaciones };
+    }
+
+    const result = personalizePautas(player, { recomendaciones_defecto, config_prepartido });
+    ajustes.push(...result.ajustes.map((ajuste) => ({ ...ajuste, donde: `${nombre} · ${ajuste.donde}` })));
+    recomendaciones_defecto = result.recomendaciones_defecto;
+    config_prepartido = syncPreMatchProtocol({ ...player, recomendaciones_defecto, config_prepartido: result.config_prepartido });
+
+    const habitualCheck = validateAstValue(mealPatternsSchema, recomendaciones_defecto, { label: 'Pautas por defecto' });
+    const protocolCheck = validateAstValue(preMatchConfigSchema, config_prepartido, { label: 'Protocolo pre-partido' });
+    if (!habitualCheck.success || !protocolCheck.success) {
+      return { ok: false, error: `${nombre}: ${habitualCheck.error || protocolCheck.error}` };
+    }
+    updates.push([player.id, { recomendaciones_defecto: habitualCheck.data, config_prepartido: protocolCheck.data }]);
+  }
+
+  // Se guarda solo si todos los destinos son válidos, para no dejar la copia a medias.
+  for (const [id, update] of updates) {
+    await updatePlayer(db, id, update);
+    revalidatePath(`/dashboard/jugador/${id}`);
+  }
+
+  return {
+    ok: true,
+    copiadas,
+    omitidas,
+    ...(ajustes.length > 0 ? { ajustes: describeAjustes(ajustes) } : {}),
+  };
 }
 
 export async function updatePlayerCredentials(jugadorIdOrPayload, emailParam, passwordParam) {

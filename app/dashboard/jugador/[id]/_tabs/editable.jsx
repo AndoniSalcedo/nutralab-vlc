@@ -17,7 +17,7 @@ import {
   NumberInput,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconEdit, IconPlus, IconCopy } from '@/components/icons3d';
+import { IconEdit, IconPlus, IconCopy, IconSend } from '@/components/icons3d';
 import { BentoCard } from '@/components/BentoItem';
 import { updatePlayerField } from '@/actions/playerActions';
 import { useRouter } from 'next/navigation';
@@ -31,6 +31,7 @@ import {
 } from '@/config/nutrition-days';
 import EditMealPatternModal from '@/components/modals/EditMealPatternModal';
 import ImportPautaModal from '@/components/modals/ImportPautaModal';
+import CopyPautaModal, { getCopyablePautas } from '@/components/modals/CopyPautaModal';
 import { MealDistributionBar, MealDistributionEditor } from '@/components/plan/MealDistributionEditor';
 import PrepartidoRoutineModal from '@/components/modals/PrepartidoRoutineModal';
 import { convertLegacyToAst, formatAstToText } from '@/lib/engine/meal-ast';
@@ -222,6 +223,7 @@ export function ComidasEditable({
   const [saving, setSaving] = useState(false);
   const [selectedMealForModal, setSelectedMealForModal] = useState(null);
   const [importOpen, setImportOpen] = useState(false);
+  const [copyOpen, setCopyOpen] = useState(false);
 
   useEffect(() => {
     setMeals(parseMeals(numComidas));
@@ -331,6 +333,10 @@ export function ComidasEditable({
   ]));
   const mealsTotal = activeMeals.reduce((sum, meal) => sum + mealPercents[meal], 0);
   const isDefaultDistribution = activeMeals.every((meal) => mealPercents[meal] === defaultPercents[meal]);
+  const copyablePautas = getCopyablePautas(
+    Object.fromEntries(activeMeals.filter((meal) => recsDefecto[meal]).map((meal) => [meal, recsDefecto[meal]])),
+    'habitual'
+  );
 
   return (
     <BentoCard title={label} icon3d={icon3d} color={ICON_COLORS[icon3d] || 'gray'} style={{ height: 'auto' }}>
@@ -452,16 +458,30 @@ export function ComidasEditable({
               Pautas por Ingesta
             </Text>
             {!readOnly && activeMeals.length > 0 && (
-              <Button
-                size="compact-xs"
-                variant="light"
-                color="gray"
-                radius="xl"
-                leftSection={<IconCopy size={12} />}
-                onClick={() => setImportOpen(true)}
-              >
-                Importar de otro jugador
-              </Button>
+              <Group gap={4} wrap="nowrap">
+                {Object.keys(copyablePautas).length > 0 && (
+                  <Button
+                    size="compact-xs"
+                    variant="light"
+                    color="gray"
+                    radius="xl"
+                    leftSection={<IconSend size={12} />}
+                    onClick={() => setCopyOpen(true)}
+                  >
+                    Copiar a…
+                  </Button>
+                )}
+                <Button
+                  size="compact-xs"
+                  variant="light"
+                  color="gray"
+                  radius="xl"
+                  leftSection={<IconCopy size={12} />}
+                  onClick={() => setImportOpen(true)}
+                >
+                  Importar de otro jugador
+                </Button>
+              </Group>
             )}
           </Group>
 
@@ -552,6 +572,17 @@ export function ComidasEditable({
           jugadorId={jugadorId}
           tomas={activeMeals}
           onImport={handleImportPautas}
+        />
+      )}
+
+      {copyOpen && (
+        <CopyPautaModal
+          opened={copyOpen}
+          onClose={() => setCopyOpen(false)}
+          jugadorId={jugadorId}
+          sourceSlot="habitual"
+          pautas={copyablePautas}
+          onCopied={() => router.refresh()}
         />
       )}
     </BentoCard>
@@ -645,6 +676,8 @@ export function PrepartidoEditable({
 }) {
   const router = useRouter();
   const [activeModalSchedule, setActiveModalSchedule] = useState(null);
+  // Horario cuyo protocolo se está copiando a otros huecos
+  const [copySchedule, setCopySchedule] = useState(null);
   const [config, setConfig] = useState(() => configPrepartido || {});
 
   const defaultMeals = parseMeals(numComidas);
@@ -748,23 +781,36 @@ export function PrepartidoEditable({
                 </Group>
 
                 {!readOnly && (
-                  <Button
-                    variant="light"
-                    color="dark"
-                    size="xs"
-                    radius="xl"
-                    leftSection={<IconEdit size={13} />}
-                    onClick={() =>
-                      setActiveModalSchedule({
-                        key: opt.value,
-                        label: opt.label,
-                        activeMeal: null,
-                      })
-                    }
-                    style={{ flexShrink: 0 }}
-                  >
-                    Editar rutina
-                  </Button>
+                  <Group gap={6} wrap="nowrap">
+                    {manualCount > 0 && (
+                      <Button
+                        variant="light"
+                        color="gray"
+                        size="xs"
+                        radius="xl"
+                        leftSection={<IconSend size={13} />}
+                        onClick={() => setCopySchedule(opt.value)}
+                      >
+                        Copiar a…
+                      </Button>
+                    )}
+                    <Button
+                      variant="light"
+                      color="dark"
+                      size="xs"
+                      radius="xl"
+                      leftSection={<IconEdit size={13} />}
+                      onClick={() =>
+                        setActiveModalSchedule({
+                          key: opt.value,
+                          label: opt.label,
+                          activeMeal: null,
+                        })
+                      }
+                    >
+                      Editar rutina
+                    </Button>
+                  </Group>
                 )}
               </Group>
 
@@ -868,6 +914,17 @@ export function PrepartidoEditable({
               message: `El protocolo para partidos por la ${activeModalSchedule.label.toLowerCase()} vuelve a seguir sus comidas habituales.`,
             });
           }}
+        />
+      )}
+
+      {copySchedule && (
+        <CopyPautaModal
+          opened={Boolean(copySchedule)}
+          onClose={() => setCopySchedule(null)}
+          jugadorId={jugadorId}
+          sourceSlot={copySchedule}
+          pautas={getCopyablePautas(config?.[copySchedule]?.recomendaciones, copySchedule)}
+          onCopied={() => router.refresh()}
         />
       )}
     </BentoCard>
