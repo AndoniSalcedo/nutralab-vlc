@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { Badge, Box, Group, Paper, ScrollArea, SegmentedControl, Stack, Table, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
-import WidgetCard from '@/components/widgets/WidgetCard';
+import WidgetCard, { WidgetAside, DATA_TABLE_STYLES } from '@/components/widgets/WidgetCard';
 import NothingFound from '@/components/NothingFound';
 import { compareRecords, formatDelta, sortByDateDesc, TREND_META } from '@/lib/analytics/compare';
 
@@ -71,11 +71,17 @@ export default function TeamAnalyticsComparison({ players = [], selectedParam })
   );
 
   return (
-    <WidgetCard icon="history" title="Comparación de analíticas" color="salvia" style={{ height: 'auto', width: '100%', minWidth: 0 }}>
+    <WidgetCard
+      icon="history"
+      title="Comparación de analíticas"
+      color="salvia"
+      aside={<WidgetAside color="salvia">{comparisons.length} {comparisons.length === 1 ? 'jugador' : 'jugadores'}</WidgetAside>}
+      style={{ height: 'auto', width: '100%', minWidth: 0 }}
+    >
       <Stack gap="md">
         <Group justify="space-between" align="center" wrap="wrap" gap="sm">
-          <Text size="xs" c="dimmed">
-            Última analítica de cada jugador frente a la anterior ({comparisons.length} {comparisons.length === 1 ? 'jugador' : 'jugadores'} con 2 o más)
+          <Text size="xs" c="dimmed" style={{ flex: '1 1 220px' }}>
+            Última analítica de cada jugador frente a la anterior (solo quienes tienen 2 o más)
           </Text>
           <SegmentedControl
             value={view}
@@ -99,7 +105,7 @@ export default function TeamAnalyticsComparison({ players = [], selectedParam })
         ) : view === 'parametros' && isMobile ? (
           <Stack gap="xs">
             {byParam.map((e) => (
-              <Paper key={e.nombre} radius="lg" p="sm" withBorder>
+              <Paper key={e.nombre} radius="lg" p="sm" style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', border: '1px solid rgba(108, 112, 90, 0.12)' }}>
                 <Group justify="space-between" wrap="nowrap" align="flex-start">
                   <Box style={{ minWidth: 0 }}>
                     <Text size="sm" fw={700} truncate>{e.nombre}</Text>
@@ -119,20 +125,20 @@ export default function TeamAnalyticsComparison({ players = [], selectedParam })
           </Stack>
         ) : view === 'parametros' ? (
           <ScrollArea>
-            <Table verticalSpacing="xs" highlightOnHover style={{ minWidth: 640 }}>
-              <Table.Thead bg="gray.0">
+            <Table verticalSpacing="sm" highlightOnHover styles={DATA_TABLE_STYLES} style={{ minWidth: 640 }}>
+              <Table.Thead>
                 <Table.Tr>
                   <Table.Th>Parámetro</Table.Th>
                   <Table.Th>Media anterior</Table.Th>
                   <Table.Th>Media última</Table.Th>
                   <Table.Th>Variación</Table.Th>
-                  <Table.Th>Jugadores</Table.Th>
+                  <Table.Th>Mejoran / empeoran / estables</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {byParam.map((e) => (
                   <Table.Tr key={e.nombre}>
-                    <Table.Td><Text size="sm" fw={600}>{e.nombre}</Text></Table.Td>
+                    <Table.Td><Text size="sm" fw={600} c="dark.5">{e.nombre}</Text></Table.Td>
                     <Table.Td><Text size="sm" c="dimmed">{e.mediaAntes} {e.unidad}</Text></Table.Td>
                     <Table.Td><Text size="sm" fw={700}>{e.mediaAhora} {e.unidad}</Text></Table.Td>
                     <Table.Td>
@@ -165,8 +171,7 @@ export default function TeamAnalyticsComparison({ players = [], selectedParam })
                   key={player.id}
                   radius="lg"
                   p="sm"
-                  withBorder
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: 'pointer', backgroundColor: 'rgba(108, 112, 90, 0.05)', border: '1px solid rgba(108, 112, 90, 0.12)' }}
                   onClick={() => router.push(`/dashboard/jugador/${player.id}/metricas/analiticas`)}
                 >
                   <Group justify="space-between" wrap="nowrap">
@@ -189,8 +194,8 @@ export default function TeamAnalyticsComparison({ players = [], selectedParam })
           </Stack>
         ) : (
           <ScrollArea>
-            <Table verticalSpacing="xs" highlightOnHover style={{ minWidth: 640 }}>
-              <Table.Thead bg="gray.0">
+            <Table verticalSpacing="sm" highlightOnHover styles={DATA_TABLE_STYLES} style={{ minWidth: 640 }}>
+              <Table.Thead>
                 <Table.Tr>
                   <Table.Th>Jugador</Table.Th>
                   <Table.Th>Anterior</Table.Th>
@@ -208,7 +213,10 @@ export default function TeamAnalyticsComparison({ players = [], selectedParam })
                       style={{ cursor: 'pointer' }}
                       onClick={() => router.push(`/dashboard/jugador/${player.id}/metricas/analiticas`)}
                     >
-                      <Table.Td><Text size="sm" fw={600}>{player.nombre} {player.apellidos}</Text></Table.Td>
+                      <Table.Td>
+                        <Text size="sm" fw={600} c="dark.5">{player.nombre} {player.apellidos}</Text>
+                        <Text size="xs" c="dimmed">{player.posicion || 'Sin posición'}</Text>
+                      </Table.Td>
                       <Table.Td>
                         <Text size="sm" c="dimmed">{row.anterior} {row.unidad}</Text>
                         <Text size="xs" c="dimmed">{formatDate(previous.fecha_extraccion)}</Text>

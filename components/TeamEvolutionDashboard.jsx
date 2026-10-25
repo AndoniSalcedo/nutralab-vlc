@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   Collapse,
+  Divider,
   Group,
   Menu,
   MultiSelect,
@@ -21,7 +22,6 @@ import {
   Table,
   Text,
   TextInput,
-  Title,
   Tooltip,
 } from '@mantine/core';
 import MeasurementDetailModal from '@/components/modals/MeasurementDetailModal';
@@ -31,7 +31,8 @@ import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
 import {
   ComposedChart,
-  Bar,
+  Area,
+  LineChart,
   Line,
   XAxis,
   YAxis,
@@ -67,7 +68,9 @@ import {
   metricValue,
   getSeason,
 } from '@/lib/metrics/measurements';
-import WidgetCard, { StatTile, WidgetAside } from '@/components/widgets/WidgetCard';
+import WidgetCard, { StatTile, WidgetAside, DATA_TABLE_STYLES } from '@/components/widgets/WidgetCard';
+import PlayerPicker from '@/components/PlayerPicker';
+import { MAX_SERIES, useStableSeriesColors } from '@/lib/charts/seriesColors';
 import PlayerListCards from '@/components/widgets/PlayerListCards';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
@@ -385,6 +388,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   const [mobileMetric, setMobileMetric] = useState(null);
   const [viewMode, setViewMode] = useState('trends');
   const [position, setPosition] = useState('');
+  // null = todos los jugadores; array = solo los elegidos (en orden de selección)
+  const [selectedPlayerIds, setSelectedPlayerIds] = useState(null);
   const [selectedSeason, setSelectedSeason] = useState(() => {
     const seasons = Array.from(new Set((evolutions || []).map((e) => getSeason(e.fecha)).filter(Boolean))).sort().reverse();
     return seasons[0] || '';
@@ -509,6 +514,13 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
     return list;
   }, []);
 
+  const activeHeaderFilters = [
+    position,
+    selectedPlayerIds !== null,
+    viewMode === 'trends' ? dateFrom : '',
+    viewMode === 'trends' ? dateTo : '',
+  ].filter(Boolean).length;
+
   const handleViewModeChange = (newMode) => {
     setViewMode(newMode);
     if (newMode === 'day' && selectedDate === 'all') {
@@ -533,10 +545,29 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
     return [{ value: '', label: 'Todas las temporadas' }, ...seasons.map((s) => ({ value: s, label: formatSeasonOption(s) }))];
   }, [evolutions]);
 
-  const scopedPlayers = useMemo(
+  const positionPlayers = useMemo(
     () => (position ? players.filter((player) => player.posicion === position) : players),
     [players, position]
   );
+
+  const scopedPlayers = useMemo(() => {
+    if (selectedPlayerIds === null) return positionPlayers;
+    const chosen = new Set(selectedPlayerIds);
+    return positionPlayers.filter((player) => chosen.has(String(player.id)));
+  }, [positionPlayers, selectedPlayerIds]);
+
+  const isPlayerSelection = selectedPlayerIds !== null;
+
+  // Mediciones por jugador en la temporada (dato de apoyo en el selector)
+  const seasonCountByPlayer = useMemo(() => {
+    const counts = new Map();
+    evolutions.forEach((record) => {
+      if (selectedSeason && getSeason(record.fecha) !== selectedSeason) return;
+      const key = String(record.jugador_id);
+      counts.set(key, (counts.get(key) || 0) + 1);
+    });
+    return counts;
+  }, [evolutions, selectedSeason]);
 
   const scopedPlayerIds = useMemo(
     () => new Set(scopedPlayers.map((player) => String(player.id))),
@@ -569,6 +600,38 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
   );
 
   const chartData = useMemo(() => aggregateByDate(rows), [rows]);
+
+  // Con pocos jugadores elegidos se dibuja una línea por jugador en vez de la media del grupo
+  const compareKeys = useMemo(() => {
+    if (!isPlayerSelection) return [];
+    const withData = new Set(rows.map((row) => String(row.id)));
+    return selectedPlayerIds.filter((id) => withData.has(id));
+  }, [isPlayerSelection, selectedPlayerIds, rows]);
+  const isCompareMode = compareKeys.length > 0 && compareKeys.length <= MAX_SERIES;
+  const compareColors = useStableSeriesColors(isCompareMode ? compareKeys : []);
+  const compareNames = useMemo(
+    () => Object.fromEntries(rows.map((row) => [String(row.id), playerName(row)])),
+    [rows]
+  );
+  const compareDataByMetric = useMemo(() => {
+    if (!isCompareMode) return {};
+    const result = {};
+    METRICS.forEach((metric) => {
+      const byDate = new Map();
+      rows.forEach((row) => {
+        const key = String(row.id);
+        if (!compareKeys.includes(key)) return;
+        row.records.forEach((record) => {
+          const value = metricNumber(record, metric);
+          if (value === null || !record.fecha) return;
+          if (!byDate.has(record.fecha)) byDate.set(record.fecha, { fecha: record.fecha });
+          byDate.get(record.fecha)[key] = value;
+        });
+      });
+      result[metric.key] = Array.from(byDate.values()).sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+    });
+    return result;
+  }, [isCompareMode, compareKeys, rows]);
   const latestRows = rows.filter((row) => row.latest);
   // Métricas sin ninguna medición en el rango: no se dibujan (solo se avisa de cuáles son)
   const emptyMetricLabels = METRICS
@@ -1195,9 +1258,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                 onClick={() => setFiltersOpen((open) => !open)}
                 aria-expanded={filtersOpen}
               >
-                Filtros{[position, viewMode === 'trends' ? dateFrom : '', viewMode === 'trends' ? dateTo : ''].filter(Boolean).length > 0
-                  ? ` · ${[position, viewMode === 'trends' ? dateFrom : '', viewMode === 'trends' ? dateTo : ''].filter(Boolean).length} activos`
-                  : ''}
+                Filtros{activeHeaderFilters > 0 ? ` · ${activeHeaderFilters} activos` : ''}
                 {selectedSeason ? ` · ${selectedSeason}` : ''}
               </Button>
             )}
@@ -1215,6 +1276,17 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                   searchable
                   allowDeselect={false}
                   style={{ flex: '1 1 130px', minWidth: 0 }}
+                />
+
+                <PlayerPicker
+                  players={positionPlayers}
+                  value={selectedPlayerIds}
+                  onChange={setSelectedPlayerIds}
+                  getMeta={(player) => {
+                    const count = seasonCountByPlayer.get(String(player.id)) || 0;
+                    return count ? `${count} med.` : 'sin datos';
+                  }}
+                  style={{ flex: '1.2 1 170px', minWidth: 0 }}
                 />
 
                 <Select
@@ -1285,11 +1357,57 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
           <>
             {/* Resumen de evolución en 1 sola fila compacta (diseño analíticas) */}
             <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
-              <StatTile icon="players" title="Plantilla" color="salvia" value={scopedPlayers.length} caption="jugadores activos" />
+              <StatTile
+                icon="players"
+                title={isPlayerSelection ? 'Selección' : 'Plantilla'}
+                color="salvia"
+                value={scopedPlayers.length}
+                caption={isPlayerSelection ? `de ${positionPlayers.length} jugadores` : 'jugadores activos'}
+              />
               <StatTile icon="check" title="Medidos" color="salvia" value={`${latestRows.length}/${scopedPlayers.length}`} caption={`${measuredPct}% con al menos una medición`} />
               <StatTile icon="history" title="Registros" color="salvia" value={totalRecords} caption="mediciones en el rango" />
               <StatTile icon="calendar" title="Última fecha" color="salvia" value={formatDate(lastDate)} caption="último registro disponible" />
             </SimpleGrid>
+
+            {/* Leyenda común: identifica a cada jugador en todas las gráficas */}
+            {chartData.length > 0 && isCompareMode && (
+              <Group gap={6} wrap="wrap">
+                <Text fz="xs" fw={700} c="dimmed" tt="uppercase" mr={4}>Comparando</Text>
+                {compareKeys.map((id) => (
+                  <Group
+                    key={id}
+                    gap={6}
+                    wrap="nowrap"
+                    px={10}
+                    py={3}
+                    bg="white"
+                    style={{ borderRadius: 20, boxShadow: '0 1px 2px rgba(21, 21, 19, 0.05)' }}
+                  >
+                    <Box w={10} h={10} style={{ borderRadius: '50%', backgroundColor: compareColors[id], flexShrink: 0 }} />
+                    <Text fz="xs" fw={600} c="dark.5">{compareNames[id]}</Text>
+                    <ActionIcon
+                      size={16}
+                      radius="xl"
+                      variant="subtle"
+                      color="gray"
+                      aria-label={`Quitar a ${compareNames[id]}`}
+                      onClick={() => setSelectedPlayerIds((prev) => {
+                        const next = (prev || []).filter((x) => x !== id);
+                        return next.length ? next : null;
+                      })}
+                    >
+                      <IconX size={10} />
+                    </ActionIcon>
+                  </Group>
+                ))}
+              </Group>
+            )}
+
+            {chartData.length > 0 && isPlayerSelection && !isCompareMode && compareKeys.length > MAX_SERIES && (
+              <Text fz="xs" c="dimmed">
+                Con más de {MAX_SERIES} jugadores las gráficas muestran la media del grupo. Elige {MAX_SERIES} o menos para ver una línea por jugador.
+              </Text>
+            )}
 
             {/* En móvil se ve una métrica cada vez (9 gráficas seguidas hacían la página interminable) */}
             {chartData.length > 0 && isMobile && (
@@ -1325,8 +1443,20 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     ? number(latestValuesForMetric.reduce((sum, value) => sum + value, 0) / latestValuesForMetric.length)
                     : null;
                   const metricData = chartData.filter(d => d[item.key] !== null);
-                  const reverseMetricData = [...metricData].reverse();
                   if (metricData.length === 0) return null;
+                  const compareData = compareDataByMetric[item.key] || [];
+                  const tableData = [...(isCompareMode ? compareData : metricData)].reverse();
+                  const axisProps = {
+                    tick: { fontSize: 11 },
+                    stroke: 'var(--mantine-color-gray-5)',
+                    axisLine: false,
+                    tickLine: false,
+                  };
+                  const tooltipProps = {
+                    labelFormatter: (value) => formatDate(value),
+                    labelStyle: { fontWeight: 700, color: 'var(--mantine-color-dark-4)', fontSize: 11, marginBottom: 2 },
+                    contentStyle: { borderRadius: 12, border: '1px solid var(--mantine-color-gray-2)', padding: '6px 10px', fontSize: 11 },
+                  };
 
                   return (
                     <WidgetCard
@@ -1335,90 +1465,109 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                       title={item.label}
                       color={(METRIC_STYLE[item.key] || {}).color || 'gray'}
                       aside={
-                        <WidgetAside color={item.goodDown === true ? 'red' : item.goodDown === false ? 'teal' : 'gray'}>
-                          Media {avg === null ? '-' : `${fmtEs(avg)} ${item.unit}`}
+                        <WidgetAside color="salvia">
+                          {isCompareMode ? 'Media últ.' : 'Media'} {avg === null ? '-' : `${fmtEs(avg)} ${item.unit}`}
                         </WidgetAside>
                       }
                       style={{ height: 'auto' }}
                     >
                       <Stack gap="md">
-                        <Box h={isMobile ? 150 : 200}>
+                        <Box h={isMobile ? 170 : 220}>
                           <ResponsiveContainer width="100%" height="100%">
-                            <ComposedChart data={metricData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                              <defs>
-                                <linearGradient id={`gradient_${item.key}`} x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="5%" stopColor={item.color} stopOpacity={0.4} />
-                                  <stop offset="95%" stopColor={item.color} stopOpacity={0.05} />
-                                </linearGradient>
-                              </defs>
-                              <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
-                              <XAxis
-                                dataKey="fecha"
-                                tick={{ fontSize: 11 }}
-                                tickFormatter={formatShortDate}
-                                minTickGap={16}
-                                stroke="var(--mantine-color-gray-5)"
-                                axisLine={false}
-                                tickLine={false}
-                              />
-                              <YAxis
-                                tick={{ fontSize: 11 }}
-                                domain={['auto', 'auto']}
-                                stroke="var(--mantine-color-gray-5)"
-                                axisLine={false}
-                                tickLine={false}
-                              />
-                              <ChartTooltip
-                                labelFormatter={(value) => formatDate(value)}
-                                formatter={(value) => [`${fmtEs(value)} ${item.unit}`, item.label]}
-                                labelStyle={{ fontWeight: 700, color: 'var(--mantine-color-dark-4)', fontSize: 10 }}
-                                contentStyle={{ borderRadius: '12px', border: '1px solid var(--mantine-color-gray-2)', padding: '6px 10px', fontSize: 10 }}
-                              />
-                              <Bar
-                                dataKey={item.key}
-                                fill={`url(#gradient_${item.key})`}
-                                radius={[4, 4, 0, 0]}
-                                maxBarSize={32}
-                              />
-                              <Line
-                                type="monotone"
-                                dataKey={item.key}
-                                stroke={item.color}
-                                strokeWidth={2}
-                                dot={{ r: 3.5, fill: 'white', stroke: item.color, strokeWidth: 2 }}
-                                activeDot={{ r: 5, strokeWidth: 0 }}
-                                connectNulls
-                              />
-                            </ComposedChart>
+                            {isCompareMode ? (
+                              <LineChart data={compareData} margin={{ top: 10, right: 12, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
+                                <XAxis dataKey="fecha" tickFormatter={formatShortDate} minTickGap={16} {...axisProps} />
+                                <YAxis domain={['auto', 'auto']} {...axisProps} />
+                                <ChartTooltip
+                                  {...tooltipProps}
+                                  cursor={{ stroke: 'var(--mantine-color-gray-4)', strokeDasharray: '3 3' }}
+                                  formatter={(value, name) => [`${fmtEs(value)} ${item.unit}`, name]}
+                                />
+                                {compareKeys.map((id) => (
+                                  <Line
+                                    key={id}
+                                    type="monotone"
+                                    dataKey={id}
+                                    name={compareNames[id]}
+                                    stroke={compareColors[id]}
+                                    strokeWidth={2}
+                                    dot={{ r: 3.5, fill: compareColors[id], stroke: 'white', strokeWidth: 1.5 }}
+                                    activeDot={{ r: 5, stroke: 'white', strokeWidth: 2 }}
+                                    connectNulls
+                                  />
+                                ))}
+                              </LineChart>
+                            ) : (
+                              <ComposedChart data={metricData} margin={{ top: 10, right: 12, left: -20, bottom: 0 }}>
+                                <defs>
+                                  <linearGradient id={`gradient_${item.key}`} x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor={item.color} stopOpacity={0.22} />
+                                    <stop offset="95%" stopColor={item.color} stopOpacity={0.02} />
+                                  </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--mantine-color-gray-2)" vertical={false} />
+                                <XAxis dataKey="fecha" tickFormatter={formatShortDate} minTickGap={16} {...axisProps} />
+                                <YAxis domain={['auto', 'auto']} {...axisProps} />
+                                <ChartTooltip
+                                  {...tooltipProps}
+                                  cursor={{ stroke: 'var(--mantine-color-gray-4)', strokeDasharray: '3 3' }}
+                                  formatter={(value, _name, props) => [
+                                    `${fmtEs(value)} ${item.unit}`,
+                                    `Media (${props?.payload?.count ?? 0} jug.)`,
+                                  ]}
+                                />
+                                <Area
+                                  type="monotone"
+                                  dataKey={item.key}
+                                  stroke={item.color}
+                                  strokeWidth={2}
+                                  fill={`url(#gradient_${item.key})`}
+                                  dot={{ r: 3.5, fill: 'white', stroke: item.color, strokeWidth: 2 }}
+                                  activeDot={{ r: 5, strokeWidth: 0, fill: item.color }}
+                                  connectNulls
+                                />
+                              </ComposedChart>
+                            )}
                           </ResponsiveContainer>
                         </Box>
 
                         <details>
                           <summary style={{ cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--nutra-salvia, #6C705A)' }}>
-                            Ver {reverseMetricData.length} {reverseMetricData.length === 1 ? 'fecha' : 'fechas'}
+                            Ver {tableData.length} {tableData.length === 1 ? 'fecha' : 'fechas'}
                           </summary>
-                        <ScrollArea.Autosize mah={180} offsetScrollbars mt={6}>
-                          <Table verticalSpacing={4} striped highlightOnHover style={{ minWidth: 150 }}>
-                            <Table.Thead bg="gray.0">
-                              <Table.Tr>
-                                <Table.Th style={{ fontSize: 12, padding: '4px 8px' }}>Fecha</Table.Th>
-                                <Table.Th style={{ fontSize: 12, padding: '4px 8px', textAlign: 'right' }}>Media</Table.Th>
-                              </Table.Tr>
-                            </Table.Thead>
-                            <Table.Tbody>
-                              {reverseMetricData.map((row) => (
-                                <Table.Tr key={row.fecha}>
-                                  <Table.Td style={{ fontSize: 12, padding: '4px 8px' }}>
-                                    {formatDate(row.fecha)}
-                                  </Table.Td>
-                                  <Table.Td style={{ fontSize: 12, padding: '4px 8px', textAlign: 'right', fontWeight: 650 }}>
-                                    {fmtEs(row[item.key])} {item.unit}
-                                  </Table.Td>
+                          <ScrollArea.Autosize mah={200} offsetScrollbars mt={6}>
+                            <Table verticalSpacing={4} striped highlightOnHover styles={DATA_TABLE_STYLES} style={{ minWidth: 150 }}>
+                              <Table.Thead>
+                                <Table.Tr>
+                                  <Table.Th>Fecha</Table.Th>
+                                  {isCompareMode
+                                    ? compareKeys.map((id) => (
+                                      <Table.Th key={id} style={{ textAlign: 'right' }}>{compareNames[id]}</Table.Th>
+                                    ))
+                                    : <Table.Th style={{ textAlign: 'right' }}>Media</Table.Th>}
                                 </Table.Tr>
-                              ))}
-                            </Table.Tbody>
-                          </Table>
-                        </ScrollArea.Autosize>
+                              </Table.Thead>
+                              <Table.Tbody>
+                                {tableData.map((row) => (
+                                  <Table.Tr key={row.fecha}>
+                                    <Table.Td fz={12}>{formatDate(row.fecha)}</Table.Td>
+                                    {isCompareMode
+                                      ? compareKeys.map((id) => (
+                                        <Table.Td key={id} fz={12} fw={650} style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                                          {row[id] === undefined ? '—' : `${fmtEs(row[id])} ${item.unit}`}
+                                        </Table.Td>
+                                      ))
+                                      : (
+                                        <Table.Td fz={12} fw={650} style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                                          {fmtEs(row[item.key])} {item.unit}
+                                        </Table.Td>
+                                      )}
+                                  </Table.Tr>
+                                ))}
+                              </Table.Tbody>
+                            </Table>
+                          </ScrollArea.Autosize>
                         </details>
                       </Stack>
                     </WidgetCard>
@@ -1429,9 +1578,11 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               <NothingFound
                 withPaper
                 icon={IconChartLine}
-                title="Sin datos"
+                title={isPlayerSelection && scopedPlayers.length === 0 ? 'Ningún jugador seleccionado' : 'Sin datos'}
                 icon3d="chart_down"
-                description="No hay mediciones para los filtros seleccionados."
+                description={isPlayerSelection && scopedPlayers.length === 0
+                  ? 'Elige al menos un jugador en el selector para ver su evolución.'
+                  : 'No hay mediciones para los filtros seleccionados.'}
               />
             )}
 
@@ -1471,28 +1622,21 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
             )}
 
             {rows.length > 0 && !isMobile && (
-              <Paper
-                radius={24}
-                p={0}
-                bg="white"
-                style={{
-                  position: 'relative',
-                  borderRadius: 24,
-                  boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
-                  overflow: 'hidden',
-                  width: '100%',
-                  minWidth: 0,
-                  maxWidth: '100%',
-                }}
+              <WidgetCard
+                icon="diario"
+                title="Última medición por jugador"
+                color="salvia"
+                aside={<WidgetAside color="salvia">{rows.length} {rows.length === 1 ? 'jugador' : 'jugadores'}</WidgetAside>}
+                style={{ height: 'auto', width: '100%', minWidth: 0, maxWidth: '100%' }}
               >
                 <ScrollArea style={{ width: '100%', minWidth: 0 }}>
-                  <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 760 + METRICS.length * 128 }}>
-                    <Table.Thead style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)' }}>
+                  <Table verticalSpacing="sm" highlightOnHover styles={DATA_TABLE_STYLES} style={{ minWidth: 640 + METRICS.length * 120 }}>
+                    <Table.Thead>
                       <Table.Tr>
-                        <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
+                        <Table.Th>Jugador</Table.Th>
                         <Table.Th>Última medición</Table.Th>
                         {METRICS.map((item) => <Table.Th key={item.key}>{item.label}</Table.Th>)}
-                        <Table.Th>Registros</Table.Th>
+                        <Table.Th style={{ textAlign: 'right' }}>Registros</Table.Th>
                       </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
@@ -1504,11 +1648,18 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                             onClick={() => router.push(`/dashboard/jugador/${row.id}/metricas/mediciones`)}
                             style={{ cursor: 'pointer' }}
                           >
-                            <Table.Td style={{ paddingLeft: 24 }}>
-                              <Text fz="sm" fw={600} c="dark.5">{playerName(row)}</Text>
-                              <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
+                            <Table.Td>
+                              <Group gap={8} wrap="nowrap">
+                                {isCompareMode && compareColors[String(row.id)] && (
+                                  <Box w={8} h={8} style={{ borderRadius: '50%', backgroundColor: compareColors[String(row.id)], flexShrink: 0 }} />
+                                )}
+                                <Box style={{ minWidth: 0 }}>
+                                  <Text fz="sm" fw={600} c="dark.5">{playerName(row)}</Text>
+                                  <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
+                                </Box>
+                              </Group>
                             </Table.Td>
-                            <Table.Td>{formatDate(latest.fecha)}</Table.Td>
+                            <Table.Td fz="sm">{formatDate(latest.fecha)}</Table.Td>
                             {METRICS.map((item) => {
                               const latestMetric = metricRecord(row.records, item, 0);
                               const previousMetric = metricRecord(row.records, item, 1);
@@ -1517,7 +1668,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                               return (
                                 <Table.Td key={item.key}>
                                   <Group gap={6} wrap="nowrap">
-                                    <Text fz="sm" fw={600} c="dark.4">
+                                    <Text fz="sm" fw={600} c="dark.4" style={{ fontVariantNumeric: 'tabular-nums' }}>
                                       {metricDisplay(val, item.unit)}
                                     </Text>
                                     {delta !== null && delta !== 0 && (
@@ -1527,21 +1678,21 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                                         c={`${deltaColor(delta, item)}.7`}
                                         style={{ fontVariantNumeric: 'tabular-nums' }}
                                       >
-                                        {delta > 0 ? `+${delta}` : delta}
+                                        {delta > 0 ? `+${fmtEs(delta)}` : fmtEs(delta)}
                                       </Text>
                                     )}
                                   </Group>
                                 </Table.Td>
                               );
                             })}
-                            <Table.Td>{row.records.length}</Table.Td>
+                            <Table.Td fz="sm" style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{row.records.length}</Table.Td>
                           </Table.Tr>
                         );
                       })}
                     </Table.Tbody>
                   </Table>
                 </ScrollArea>
-              </Paper>
+              </WidgetCard>
             )}
           </>
         )}
@@ -1611,35 +1762,18 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
             )}
 
             {measuredDayRows.length > 0 && !isMobile && (
-              <Paper
-                radius={24}
-                p={0}
-                bg="white"
-                style={{
-                  position: 'relative',
-                  borderRadius: 24,
-                  boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
-                  overflow: 'hidden',
-                  width: '100%',
-                  minWidth: 0,
-                  maxWidth: '100%',
-                }}
+              <WidgetCard
+                icon="ruler"
+                title={`Mediciones del día · ${formatDate(currentDay)}`}
+                color="salvia"
+                aside={<WidgetAside color="salvia" dot>{dayMeasuredPct}% cobertura</WidgetAside>}
+                style={{ height: 'auto', width: '100%', minWidth: 0, maxWidth: '100%' }}
               >
-                <Group justify="space-between" p="md" pb="xs" align="center">
-                  <Box>
-                    <Title order={4} fw={700} c="dark.5">Mediciones del día</Title>
-                    <Text size="xs" c="dimmed">{formatDate(currentDay)} · {measuredDayRows.length} jugadores</Text>
-                  </Box>
-                  <Group gap={6} align="center" wrap="nowrap">
-                    <span style={{ fontSize: '8px', color: 'var(--mantine-color-teal-6)' }}>●</span>
-                    <Text fz="xs" fw={600} c="teal.7">{dayMeasuredPct}% cobertura</Text>
-                  </Group>
-                </Group>
                 <ScrollArea style={{ width: '100%', minWidth: 0 }}>
-                  <Table verticalSpacing="sm" highlightOnHover style={{ minWidth: 880 + METRICS.length * 132 }}>
-                    <Table.Thead bg="gray.0">
+                  <Table verticalSpacing="sm" highlightOnHover styles={DATA_TABLE_STYLES} style={{ minWidth: 760 + METRICS.length * 124 }}>
+                    <Table.Thead>
                       <Table.Tr>
-                        <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
+                        <Table.Th>Jugador</Table.Th>
                         <Table.Th>Origen</Table.Th>
                         {METRICS.map((item) => <Table.Th key={item.key}>{item.label}</Table.Th>)}
                         <Table.Th>Acciones</Table.Th>
@@ -1652,7 +1786,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                           onClick={() => setDetailRow(row)}
                           style={{ cursor: 'pointer' }}
                         >
-                          <Table.Td style={{ paddingLeft: 24 }}>
+                          <Table.Td>
                             <Text fz="sm" fw={600} c="dark.5">{playerName(row)}</Text>
                             <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
                           </Table.Td>
@@ -1666,7 +1800,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                             return (
                               <Table.Td key={item.key}>
                                 <Stack gap={3}>
-                                  <Text fz="sm" fw={600} c="dark.5">{metricDisplay(value, item.unit)}</Text>
+                                  <Text fz="sm" fw={600} c="dark.5" style={{ fontVariantNumeric: 'tabular-nums' }}>{metricDisplay(value, item.unit)}</Text>
                                   {delta !== null && delta !== 0 && (
                                     <Text
                                       fz="xs"
@@ -1674,7 +1808,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                                       c={`${deltaColor(delta, item)}.7`}
                                       style={{ fontVariantNumeric: 'tabular-nums' }}
                                     >
-                                      {delta > 0 ? `+${delta}` : delta}
+                                      {delta > 0 ? `+${fmtEs(delta)}` : fmtEs(delta)}
                                     </Text>
                                   )}
                                 </Stack>
@@ -1686,7 +1820,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                               <Tooltip label="Ver detalle" withArrow>
                                 <ActionIcon
                                   variant="subtle"
-                                  color="blue"
+                                  color="gray"
                                   radius="xl"
                                   aria-label="Ver detalle"
                                   onClick={(event) => {
@@ -1717,48 +1851,37 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     </Table.Tbody>
                   </Table>
                 </ScrollArea>
-              </Paper>
+              </WidgetCard>
             )}
 
             {missingDayRows.length > 0 && (
-              <Paper
-                radius={24}
-                p={0}
-                bg="white"
-                style={{
-                  position: 'relative',
-                  borderRadius: 24,
-                  boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
-                  overflow: 'hidden',
-                }}
+              <WidgetCard
+                icon="warning"
+                title="Sin medición ese día"
+                color="arcilla"
+                aside={<WidgetAside color="arcilla">{missingDayRows.length} {missingDayRows.length === 1 ? 'jugador' : 'jugadores'}</WidgetAside>}
+                style={{ height: 'auto', width: '100%', minWidth: 0 }}
               >
-                <Group justify="space-between" p="md" pb="xs" align="center">
-                  <Box>
-                    <Title order={4} fw={700} c="dark.5">Sin medición ese día</Title>
-                    <Text size="xs" c="dimmed">{missingDayRows.length} jugadores sin registro en {formatDate(currentDay)}</Text>
-                  </Box>
-                  <Text fz="xs" fw={600} c="dimmed">{missingDayRows.length} jugadores</Text>
-                </Group>
-                <ScrollArea.Autosize mah={260}>
-                  <Table verticalSpacing="sm" highlightOnHover>
-                    <Table.Thead bg="gray.0">
+                <ScrollArea.Autosize mah={280}>
+                  <Table verticalSpacing="sm" highlightOnHover styles={DATA_TABLE_STYLES}>
+                    <Table.Thead>
                       <Table.Tr>
-                        <Table.Th style={{ paddingLeft: 24 }}>Jugador</Table.Th>
+                        <Table.Th>Jugador</Table.Th>
                         <Table.Th>Última medición</Table.Th>
                         <Table.Th>Registros</Table.Th>
-                        <Table.Th>Acción</Table.Th>
+                        <Table.Th />
                       </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
                       {missingDayRows.map((row) => (
                         <Table.Tr key={`missing-${row.id}`}>
-                          <Table.Td style={{ paddingLeft: 24 }}>
+                          <Table.Td>
                             <Text fz="sm" fw={600} c="dark.5">{playerName(row)}</Text>
                             <Text fz="xs" c="dimmed">{row.posicion || 'Sin posición'}</Text>
                           </Table.Td>
-                          <Table.Td>{formatDate(row.latest?.fecha)}</Table.Td>
-                          <Table.Td>{row.records.length}</Table.Td>
-                          <Table.Td>
+                          <Table.Td fz="sm">{formatDate(row.latest?.fecha)}</Table.Td>
+                          <Table.Td fz="sm">{row.records.length}</Table.Td>
+                          <Table.Td style={{ textAlign: 'right' }}>
                             <Button
                               component={Anchor}
                               href={`/dashboard/jugador/${row.id}/metricas/mediciones`}
@@ -1776,18 +1899,18 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     </Table.Tbody>
                   </Table>
                 </ScrollArea.Autosize>
-              </Paper>
+              </WidgetCard>
             )}
           </>
         )}
 
         {viewMode === 'ranking' && (
           <Stack gap="lg">
-            <Paper shadow="xs" p="md" radius={24} bg="white">
+            <WidgetCard icon="sliders" title="Reglas de semáforo" color="salvia" style={{ height: 'auto', width: '100%', minWidth: 0 }}>
               <Stack gap="md">
                 <Box>
                   <Text size="xs" fw={700} c="dimmed" mb={8} tt="uppercase">
-                    Métricas Visibles en la Tabla
+                    Métricas visibles en la tabla
                   </Text>
                   <MultiSelect
                     placeholder="Selecciona las métricas a mostrar..."
@@ -1802,11 +1925,11 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                   />
                 </Box>
 
-                <hr style={{ border: 0, borderTop: '1px solid var(--mantine-color-gray-2)', margin: '6px 0' }} />
+                <Divider color="gray.2" />
 
                 <Group justify="space-between" align="center" wrap="wrap">
-                  <Text size="xs" fw={700} c="dark.5" tt="uppercase">
-                    Configurar Reglas y Semaforización
+                  <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+                    Nueva regla
                   </Text>
                   <Text size="xs" c="dimmed">
                     Define umbrales en <Text span c="red.7" fw={700}>Rojo</Text>, <Text span c="orange.7" fw={700}>Naranja</Text>, <Text span c="yellow.8" fw={700}>Amarillo</Text> o <Text span c="teal.7" fw={700}>Verde</Text>, y elige si cada regla filtra la tabla o solo colorea.
@@ -2016,14 +2139,14 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                       (newFilterOperator !== 'between' && newFilterOperator !== 'resto' && newFilterValue === '')
                     }
                   >
-                    Añadir Regla
+                    Añadir regla
                   </Button>
                 </Group>
 
                 <Box mt="xs">
                   <Group justify="space-between" align="center" mb={10}>
                     <Text size="xs" fw={700} c="dimmed" tt="uppercase">
-                      Reglas y Semáforos Activos ({activeFilters.length})
+                      Reglas activas ({activeFilters.length})
                     </Text>
                     <Group gap="xs">
                       {activeMetricsList.some((m) => !m.hasResto) && (
@@ -2035,7 +2158,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                           leftSection={<IconPlus size={11} />}
                           onClick={handleAddRestoGreenToAll}
                         >
-                          + Resto en verde para todas
+                          Resto en verde para todas
                         </Button>
                       )}
                       {activeFilters.length > 0 && (
@@ -2059,9 +2182,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                           key={metricGroup.metricKey}
                           p="xs"
                           radius="md"
-                          withBorder
-                          bg="gray.0"
-                          style={{ borderColor: 'var(--mantine-color-gray-2)' }}
+                          style={{ backgroundColor: 'rgba(108, 112, 90, 0.05)', border: '1px solid rgba(108, 112, 90, 0.12)' }}
                         >
                           <Group justify="space-between" align="center" wrap="wrap" gap="xs" mb={6}>
                             <Group gap={6} align="center">
@@ -2088,7 +2209,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                                   leftSection={<IconPlus size={11} />}
                                   onClick={() => handleAddRestoGreen(metricGroup.metricKey)}
                                 >
-                                  + Resto en verde ({metricGroup.label})
+                                  Resto en verde
                                 </Button>
                               )}
                               <ActionIcon
@@ -2196,35 +2317,24 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                       ))}
                     </Stack>
                   ) : (
-                    <Text size="xs" c="dimmed" fs="italic">
-                      No hay filtros activos. Configura reglas con colores para resaltar alertas (rojo), alta atención (naranja), advertencias (amarillo) o valores objetivo (verde).
+                    <Text size="xs" c="dimmed">
+                      No hay reglas activas. Configura reglas con colores para resaltar alertas (rojo), alta atención (naranja), advertencias (amarillo) o valores objetivo (verde).
                     </Text>
                   )}
                 </Box>
               </Stack>
-            </Paper>
+            </WidgetCard>
 
             {sortedTableData.length > 0 ? (
-              <Paper
-                radius={24}
-                p={0}
-                bg="white"
-                style={{
-                  position: 'relative',
-                  borderRadius: 24,
-                  boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
-                  overflow: 'hidden',
-                  width: '100%',
-                  minWidth: 0,
-                  maxWidth: '100%',
-                }}
+              <WidgetCard
+                icon="diario"
+                title="Tabla de filtros"
+                color="salvia"
+                style={{ height: 'auto', width: '100%', minWidth: 0, maxWidth: '100%' }}
               >
-                <Box p="md" pb="xs" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)' }}>
+                <Box pb="xs" mb="xs" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)' }}>
                   <Group justify="space-between" align="flex-start" wrap="wrap" gap="md" mb="xs">
                     <Box>
-                      <Title order={4} fw={700} c="dark.5">
-                        Tabla de Filtros de Plantilla
-                      </Title>
                       <Text size="xs" c="dimmed">
                         {selectedDate === 'all' ? 'Temporada completa' : formatDate(currentDay)} ·{' '}
                         {tableFilterMode === 'filter' && activeFilters.length > 0
@@ -2275,7 +2385,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     <Group gap="sm" align="center" wrap="wrap">
                       <Box>
                         <Text size="xs" fw={700} c="dimmed" mb={3}>
-                          ACCIÓN REGLA
+                          ACCIÓN DE LAS REGLAS
                         </Text>
                         <SegmentedControl
                           size="xs"
@@ -2283,8 +2393,8 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                           value={tableFilterMode}
                           onChange={setTableFilterMode}
                           data={[
-                            { value: 'color', label: '🎨 Solo colorear' },
-                            { value: 'filter', label: '🔍 Filtrar filas' },
+                            { value: 'color', label: 'Solo colorear' },
+                            { value: 'filter', label: 'Filtrar filas' },
                           ]}
                         />
                       </Box>
@@ -2312,17 +2422,17 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                   <Table
                     verticalSpacing="sm"
                     highlightOnHover
+                    styles={DATA_TABLE_STYLES}
                     style={{ minWidth: 400 + (selectedDate === 'all' ? displayedMetrics.length * maxMeasurements * 90 : displayedMetrics.length * 110) }}
                   >
-                    <Table.Thead bg="gray.0">
+                    <Table.Thead>
                       <Table.Tr>
                         <Table.Th
                           style={{
                             position: 'sticky',
                             left: 0,
-                            background: 'var(--mantine-color-gray-0)',
+                            background: '#f7f7f5',
                             zIndex: 2,
-                            paddingLeft: 24,
                             boxShadow: '2px 0 5px -2px rgba(0,0,0,0.15)',
                           }}
                         >
@@ -2418,7 +2528,6 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                               left: 0,
                               background: 'white',
                               zIndex: 1,
-                              paddingLeft: 24,
                               boxShadow: '2px 0 5px -2px rgba(0,0,0,0.15)',
                             }}
                           >
@@ -2621,7 +2730,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                     </Table.Tbody>
                   </Table>
                 </ScrollArea>
-              </Paper>
+              </WidgetCard>
             ) : (
               <NothingFound
                 withPaper
@@ -2631,7 +2740,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                 description={
                   tableFilterMode === 'filter' && activeFilters.length > 0
                     ? "Ningún jugador cumple con las reglas de filtrado activas. Puedes cambiar la acción en la tabla a 'Solo colorear' para ver toda la plantilla con sus celdas semaforizadas."
-                    : "No hay jugadores medidos con la métrica seleccionada para los filtros de posición y temporada actuales."
+                    : "No hay jugadores medidos para los filtros de posición, jugadores y temporada actuales."
                 }
               />
             )}

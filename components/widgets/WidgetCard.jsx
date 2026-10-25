@@ -216,3 +216,17 @@ export function StatTile({ icon, title, color = 'salvia', value, unit, caption, 
     </WidgetCard>
   );
 }
+
+// Estilos comunes de las tablas de datos dentro de una tesela: cabecera suave en salvia,
+// rótulos en mayúscula pequeña y sin saltos de línea.
+export const DATA_TABLE_STYLES = {
+  thead: { backgroundColor: 'rgba(108, 112, 90, 0.05)' },
+  th: {
+    fontSize: 11,
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.4px',
+    color: 'var(--nutra-salvia, #6C705A)',
+    whiteSpace: 'nowrap',
+  },
+};
