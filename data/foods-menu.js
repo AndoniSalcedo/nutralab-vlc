@@ -197,8 +197,10 @@ const MENU_FOOD_NAMES = [
   'Mermelada',
   'Panela',
   'Cacao (puro y en untable / Colacao)',
-  'Batido de proteína sin lactosa 30g',
-  'Batido de proteína vegetal 30g',
+  'Batido de proteínas',
+  'Proteína whey en polvo',
+  'Batido de proteína sin lactosa',
+  'Batido de proteína vegetal',
 ];
 
 const CRUDO_BY_NAME = new Map(FOODS_CRUDO.map((food) => [food.name, food]));

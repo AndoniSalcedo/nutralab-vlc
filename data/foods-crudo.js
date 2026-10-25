@@ -2052,8 +2052,26 @@ export const FOODS_CRUDO = [
       "proteina_vaca",
       "lactosa"
     ],
-    "minGrams": 30,
-    "maxGrams": 150,
+    "minGrams": 20,
+    "maxGrams": 40,
+    "treePath": [
+      "suplementos",
+      "proteina_polvo"
+    ]
+  },
+  {
+    "name": "Batido de proteínas",
+    "originalName": "Batido de proteínas (whey en polvo disuelto en agua)",
+    "kcal": 402.5,
+    "cho": 8,
+    "pro": 78,
+    "fat": 6.5,
+    "tags": [
+      "proteina_vaca",
+      "lactosa"
+    ],
+    "minGrams": 20,
+    "maxGrams": 40,
     "treePath": [
       "suplementos",
       "proteina_polvo"
@@ -2708,35 +2726,17 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Batido de proteína de suero 30g",
-    "originalName": "Batido de proteína de suero 30g",
-    "kcal": 88.5,
-    "cho": 1,
-    "pro": 20,
-    "fat": 0.5,
-    "tags": [
-      "lactosa",
-      "proteina_vaca"
-    ],
-    "minGrams": 25,
-    "maxGrams": 40,
-    "treePath": [
-      "suplementos",
-      "proteina_polvo"
-    ]
-  },
-  {
-    "name": "Batido de proteína sin lactosa 30g",
-    "originalName": "Batido de proteína sin lactosa 30g",
-    "kcal": 88.5,
-    "cho": 1,
-    "pro": 20,
-    "fat": 0.5,
+    "name": "Batido de proteína sin lactosa",
+    "originalName": "Batido de proteína sin lactosa (whey aislado en polvo disuelto en agua)",
+    "kcal": 369,
+    "cho": 2,
+    "pro": 88,
+    "fat": 1,
     "tags": [
       "proteina_vaca",
       "sin_lactosa_especial"
     ],
-    "minGrams": 25,
+    "minGrams": 20,
     "maxGrams": 40,
     "treePath": [
       "suplementos",
@@ -2777,21 +2777,22 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Caseína micelar nocturna 30g",
-    "originalName": "Caseína micelar nocturna 30g",
-    "kcal": 110.5,
-    "cho": 1.5,
-    "pro": 25,
-    "fat": 0.5,
+    "name": "Caseína micelar",
+    "originalName": "Caseína micelar en polvo (toma nocturna)",
+    "kcal": 349.5,
+    "cho": 4,
+    "pro": 80,
+    "fat": 1.5,
     "tags": [
       "lactosa",
       "proteina_vaca"
     ],
     "minGrams": 20,
-    "maxGrams": 250,
+    "maxGrams": 40,
     "treePath": [
       "suplementos",
-      "proteina_polvo"
+      "proteina_polvo",
+      "caseina"
     ]
   },
   {
@@ -2827,30 +2828,30 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Ciclodextrina / Maltodextrina 30g",
-    "originalName": "Ciclodextrina / Maltodextrina 30g",
-    "kcal": 116,
-    "cho": 29,
+    "name": "Ciclodextrina / Maltodextrina",
+    "originalName": "Ciclodextrina / Maltodextrina en polvo",
+    "kcal": 380,
+    "cho": 95,
     "pro": 0,
     "fat": 0,
     "tags": [],
     "minGrams": 20,
-    "maxGrams": 250,
+    "maxGrams": 90,
     "treePath": [
       "suplementos",
       "deportivos"
     ]
   },
   {
-    "name": "Colágeno hidrolizado + Vitamina C 15g",
-    "originalName": "Colágeno hidrolizado + Vitamina C 15g",
-    "kcal": 56,
+    "name": "Colágeno hidrolizado + Vitamina C",
+    "originalName": "Colágeno hidrolizado + Vitamina C en polvo",
+    "kcal": 360,
     "cho": 0,
-    "pro": 14,
+    "pro": 90,
     "fat": 0,
     "tags": [],
-    "minGrams": 20,
-    "maxGrams": 250,
+    "minGrams": 10,
+    "maxGrams": 20,
     "treePath": [
       "suplementos",
       "deportivos"
@@ -4198,17 +4199,17 @@ export const FOODS_CRUDO = [
     ]
   },
   {
-    "name": "Batido de proteína vegetal 30g",
-    "originalName": "Batido de proteína vegetal 30g",
-    "kcal": 90.5,
-    "cho": 1.5,
-    "pro": 20,
-    "fat": 0.5,
+    "name": "Batido de proteína vegetal",
+    "originalName": "Batido de proteína vegetal (guisante/arroz en polvo disuelto en agua)",
+    "kcal": 382,
+    "cho": 4,
+    "pro": 78,
+    "fat": 6,
     "tags": [
       "sin_lactosa_especial",
       "vegetal"
     ],
-    "minGrams": 25,
+    "minGrams": 20,
     "maxGrams": 40,
     "treePath": [
       "suplementos",
