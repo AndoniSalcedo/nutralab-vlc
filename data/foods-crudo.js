@@ -9,6 +9,8 @@
  * Frutas y verduras: 'temporada' con los meses (MES) en que están de temporada en España. Al elegir fruta o verdura
  * libre dentro de un grupo, el motor rota solo entre las de temporada del mes del plan; lo que una pauta, el
  * protocolo o un plato del menú nombran de forma concreta se sirve siempre. Toda fruta y verdura que rota debe tenerla.
+ * Alimentos procesados: 'procesado' con sus tipos (PROCESADO) para que la variedad no repita el mismo preparado de
+ * distinto animal o grano (carne picada, hamburguesas, noodles...). El motor comprueba al cargar que son válidos.
  */
 
 const MES = Object.freeze({
@@ -28,6 +30,23 @@ const MES = Object.freeze({
 
 const TODO_EL_AÑO = Object.freeze(Object.values(MES));
 
+/**
+ * Tipos de procesado ('procesado'): el preparado que comparten alimentos de ramas distintas. Para la variedad, dos
+ * alimentos con un tipo en común son el mismo preparado: no salen en la comida y la cena del mismo día ni en días
+ * seguidos (carne picada de pollo y hamburguesa de pavo; noodles de arroz y noodles de trigo).
+ */
+const PROCESADO = Object.freeze({
+  PICADA: 'picada', // carne picada en cualquier forma: suelta, hamburguesa, albóndigas, boloñesa
+  HAMBURGUESA: 'hamburguesa',
+  ALBONDIGAS: 'albondigas',
+  BOLONESA: 'bolonesa',
+  NOODLES: 'noodles',
+  PURE: 'pure',
+  GAJOS: 'gajos',
+});
+
+export const PROCESSING_TYPES = Object.freeze(Object.values(PROCESADO));
+
 export const FOODS_CRUDO = [
   {
     "name": "Carne picada de pavo",
@@ -39,6 +58,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carne",
@@ -55,6 +75,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carne",
@@ -73,6 +94,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carne",
@@ -155,6 +177,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.HAMBURGUESA, PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carne",
@@ -171,6 +194,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.HAMBURGUESA, PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carne",
@@ -189,6 +213,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.HAMBURGUESA, PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carne",
@@ -207,6 +232,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.HAMBURGUESA, PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carne",
@@ -523,6 +549,7 @@ export const FOODS_CRUDO = [
     "maxGrams": 400,
     "defaultGrams": 250,
     "temporada": [MES.OCTUBRE, MES.NOVIEMBRE],
+    "procesado": [PROCESADO.PURE],
     "treePath": [
       "hidratos",
       "tuberculos"
@@ -924,6 +951,7 @@ export const FOODS_CRUDO = [
     "minGrams": 100,
     "maxGrams": 400,
     "defaultGrams": 250,
+    "procesado": [PROCESADO.PURE],
     "treePath": [
       "hidratos",
       "tuberculos"
@@ -956,6 +984,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 50,
     "maxGrams": 200,
+    "procesado": [PROCESADO.NOODLES],
     "treePath": [
       "hidratos",
       "otros_granos"
@@ -2408,6 +2437,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 300,
+    "procesado": [PROCESADO.HAMBURGUESA],
     "treePath": [
       "proteina",
       "vegetal_proteina"
@@ -2663,6 +2693,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 30,
     "maxGrams": 100,
+    "procesado": [PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "vegetal_proteina"
@@ -2771,6 +2802,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carnes_otras"
@@ -4046,6 +4078,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 50,
     "maxGrams": 200,
+    "procesado": [PROCESADO.HAMBURGUESA],
     "treePath": [
       "proteina",
       "vegetal_proteina"
@@ -4301,6 +4334,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.BOLONESA, PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carne",
@@ -4333,6 +4367,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.ALBONDIGAS, PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carne",
@@ -4369,6 +4404,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.HAMBURGUESA, PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carne",
@@ -4405,6 +4441,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.BOLONESA, PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carne",
@@ -4423,6 +4460,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 350,
+    "procesado": [PROCESADO.HAMBURGUESA, PROCESADO.PICADA],
     "treePath": [
       "proteina",
       "carne",
@@ -4585,6 +4623,7 @@ export const FOODS_CRUDO = [
     "tags": [],
     "minGrams": 100,
     "maxGrams": 450,
+    "procesado": [PROCESADO.GAJOS],
     "treePath": [
       "hidratos",
       "tuberculos"
@@ -4601,6 +4640,7 @@ export const FOODS_CRUDO = [
     "minGrams": 100,
     "maxGrams": 450,
     "temporada": [MES.OCTUBRE, MES.NOVIEMBRE],
+    "procesado": [PROCESADO.GAJOS],
     "treePath": [
       "hidratos",
       "tuberculos"
@@ -5155,6 +5195,620 @@ export const FOODS_CRUDO = [
       "hidratos",
       "cereales",
       "harinas"
+    ]
+  },
+  {
+    "name": "Clementina",
+    "originalName": "Clementina",
+    "kcal": 53,
+    "cho": 12,
+    "pro": 0.8,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Kiwi amarillo",
+    "originalName": "Kiwi amarillo",
+    "kcal": 63.5,
+    "cho": 14.2,
+    "pro": 1,
+    "fat": 0.3,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 220,
+    "temporada": [MES.MAYO, MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE, MES.OCTUBRE],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Chirimoya",
+    "originalName": "Chirimoya",
+    "kcal": 83.5,
+    "cho": 17.7,
+    "pro": 1.6,
+    "fat": 0.7,
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 250,
+    "temporada": [MES.SEPTIEMBRE, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Papaya",
+    "originalName": "Papaya",
+    "kcal": 47.9,
+    "cho": 10.8,
+    "pro": 0.5,
+    "fat": 0.3,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": TODO_EL_AÑO,
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Pitahaya",
+    "originalName": "Pitahaya",
+    "kcal": 52.4,
+    "cho": 11,
+    "pro": 1.2,
+    "fat": 0.4,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 250,
+    "temporada": [MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE, MES.OCTUBRE, MES.NOVIEMBRE],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Lichis",
+    "originalName": "Lichis",
+    "kcal": 72.8,
+    "cho": 16.5,
+    "pro": 0.8,
+    "fat": 0.4,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 80,
+    "maxGrams": 200,
+    "temporada": [MES.ENERO, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Macedonia de frutas",
+    "originalName": "Macedonia de frutas",
+    "kcal": 54.2,
+    "cho": 12.5,
+    "pro": 0.6,
+    "fat": 0.2,
+    "tags": [
+      "fructosa",
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 250,
+    "temporada": TODO_EL_AÑO,
+    "treePath": [
+      "frutas"
+    ]
+  },
+  {
+    "name": "Canónigos",
+    "originalName": "Canónigos",
+    "kcal": 26,
+    "cho": 3.6,
+    "pro": 2,
+    "fat": 0.4,
+    "tags": [],
+    "minGrams": 30,
+    "maxGrams": 150,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.ABRIL, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hojas_verdes"
+    ]
+  },
+  {
+    "name": "Lechuga iceberg",
+    "originalName": "Lechuga iceberg",
+    "kcal": 16.5,
+    "cho": 3,
+    "pro": 0.9,
+    "fat": 0.1,
+    "tags": [],
+    "minGrams": 50,
+    "maxGrams": 200,
+    "temporada": TODO_EL_AÑO,
+    "treePath": [
+      "verduras",
+      "hojas_verdes"
+    ]
+  },
+  {
+    "name": "Cogollos",
+    "originalName": "Cogollos",
+    "kcal": 19.5,
+    "cho": 2.9,
+    "pro": 1.3,
+    "fat": 0.3,
+    "tags": [],
+    "minGrams": 50,
+    "maxGrams": 200,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.ABRIL, MES.MAYO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hojas_verdes"
+    ]
+  },
+  {
+    "name": "Brotes tiernos",
+    "originalName": "Brotes tiernos",
+    "kcal": 20.7,
+    "cho": 3,
+    "pro": 1.5,
+    "fat": 0.3,
+    "tags": [],
+    "minGrams": 30,
+    "maxGrams": 150,
+    "temporada": TODO_EL_AÑO,
+    "treePath": [
+      "verduras",
+      "hojas_verdes"
+    ]
+  },
+  {
+    "name": "Kale",
+    "originalName": "Kale",
+    "kcal": 37.3,
+    "cho": 4.4,
+    "pro": 2.9,
+    "fat": 0.9,
+    "tags": [],
+    "minGrams": 50,
+    "maxGrams": 200,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hojas_verdes"
+    ]
+  },
+  {
+    "name": "Endibia",
+    "originalName": "Endibia",
+    "kcal": 17.3,
+    "cho": 3.2,
+    "pro": 0.9,
+    "fat": 0.1,
+    "tags": [],
+    "minGrams": 50,
+    "maxGrams": 200,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.ABRIL, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hojas_verdes"
+    ]
+  },
+  {
+    "name": "Pak choi",
+    "originalName": "Pak choi",
+    "kcal": 16.6,
+    "cho": 2.2,
+    "pro": 1.5,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hojas_verdes"
+    ]
+  },
+  {
+    "name": "Coles de Bruselas",
+    "originalName": "Coles de Bruselas",
+    "kcal": 37.1,
+    "cho": 5.2,
+    "pro": 3.4,
+    "fat": 0.3,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Lombarda",
+    "originalName": "Lombarda",
+    "kcal": 28.6,
+    "cho": 5.3,
+    "pro": 1.4,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Romanesco",
+    "originalName": "Romanesco",
+    "kcal": 26.3,
+    "cho": 3,
+    "pro": 2.9,
+    "fat": 0.3,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Hinojo",
+    "originalName": "Hinojo",
+    "kcal": 23.4,
+    "cho": 4.2,
+    "pro": 1.2,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.ABRIL, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Chirivía",
+    "originalName": "Chirivía",
+    "kcal": 59.5,
+    "cho": 13,
+    "pro": 1.2,
+    "fat": 0.3,
+    "tags": [],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Pimiento verde",
+    "originalName": "Pimiento verde",
+    "kcal": 19.4,
+    "cho": 3.5,
+    "pro": 0.9,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE, MES.OCTUBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Tomate cherry",
+    "originalName": "Tomate cherry",
+    "kcal": 21,
+    "cho": 3.9,
+    "pro": 0.9,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.MAYO, MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE, MES.OCTUBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Setas variadas",
+    "originalName": "Setas variadas",
+    "kcal": 29.6,
+    "cho": 3.5,
+    "pro": 3,
+    "fat": 0.4,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 80,
+    "maxGrams": 250,
+    "temporada": [MES.SEPTIEMBRE, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Brotes de soja",
+    "originalName": "Brotes de soja (judía mungo)",
+    "kcal": 37.4,
+    "cho": 5.9,
+    "pro": 3,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 50,
+    "maxGrams": 200,
+    "temporada": TODO_EL_AÑO,
+    "treePath": [
+      "verduras",
+      "hortalizas"
+    ]
+  },
+  {
+    "name": "Ensalada verde",
+    "originalName": "Ensalada verde (lechuga, tomate y cebolla)",
+    "kcal": 21,
+    "cho": 3.8,
+    "pro": 1,
+    "fat": 0.2,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": TODO_EL_AÑO,
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Ensalada de hojas variadas",
+    "originalName": "Ensalada de hojas variadas (mezclum)",
+    "kcal": 21.5,
+    "cho": 3.2,
+    "pro": 1.5,
+    "fat": 0.3,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": TODO_EL_AÑO,
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Ensalada de rúcula y tomate",
+    "originalName": "Ensalada de rúcula y tomate",
+    "kcal": 24.4,
+    "cho": 3.6,
+    "pro": 1.6,
+    "fat": 0.4,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": TODO_EL_AÑO,
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Ensalada de canónigos y tomate cherry",
+    "originalName": "Ensalada de canónigos y tomate cherry",
+    "kcal": 23.5,
+    "cho": 3.8,
+    "pro": 1.4,
+    "fat": 0.3,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.ABRIL, MES.MAYO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Ensalada de tomate",
+    "originalName": "Ensalada de tomate",
+    "kcal": 21,
+    "cho": 3.9,
+    "pro": 0.9,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Ensalada de pepino y tomate",
+    "originalName": "Ensalada de pepino y tomate",
+    "kcal": 19.8,
+    "cho": 3.7,
+    "pro": 0.8,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Pipirrana",
+    "originalName": "Pipirrana (tomate, pimiento, pepino y cebolla)",
+    "kcal": 22.2,
+    "cho": 4.2,
+    "pro": 0.9,
+    "fat": 0.2,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE],
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Ensalada de col y zanahoria",
+    "originalName": "Ensalada de col y zanahoria",
+    "kcal": 28.2,
+    "cho": 5.4,
+    "pro": 1.2,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Ensalada de lombarda y manzana",
+    "originalName": "Ensalada de lombarda y manzana",
+    "kcal": 37.8,
+    "cho": 8,
+    "pro": 1,
+    "fat": 0.2,
+    "tags": [
+      "alto_fodmap",
+      "fructosa"
+    ],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Ensalada de espinacas y champiñones",
+    "originalName": "Ensalada de espinacas y champiñones",
+    "kcal": 26.8,
+    "cho": 3.3,
+    "pro": 2.5,
+    "fat": 0.4,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.ABRIL, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Ensalada de escarola y granada",
+    "originalName": "Ensalada de escarola y granada",
+    "kcal": 34,
+    "cho": 6.5,
+    "pro": 1.1,
+    "fat": 0.4,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": [MES.ENERO, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Ensalada de remolacha y zanahoria",
+    "originalName": "Ensalada de remolacha y zanahoria",
+    "kcal": 37.8,
+    "cho": 7.6,
+    "pro": 1.4,
+    "fat": 0.2,
+    "tags": [
+      "alto_fodmap"
+    ],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": [MES.JUNIO, MES.JULIO, MES.AGOSTO, MES.SEPTIEMBRE, MES.OCTUBRE],
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Ensalada de endibias",
+    "originalName": "Ensalada de endibias",
+    "kcal": 19.8,
+    "cho": 3.5,
+    "pro": 1,
+    "fat": 0.2,
+    "tags": [],
+    "minGrams": 100,
+    "maxGrams": 300,
+    "temporada": [MES.ENERO, MES.FEBRERO, MES.MARZO, MES.ABRIL, MES.OCTUBRE, MES.NOVIEMBRE, MES.DICIEMBRE],
+    "treePath": [
+      "verduras",
+      "ensaladas"
+    ]
+  },
+  {
+    "name": "Noodles de trigo",
+    "originalName": "Noodles de trigo (secos)",
+    "kcal": 341.5,
+    "cho": 70,
+    "pro": 12,
+    "fat": 1.5,
+    "tags": [
+      "gluten"
+    ],
+    "minGrams": 50,
+    "maxGrams": 200,
+    "procesado": [PROCESADO.NOODLES],
+    "treePath": [
+      "hidratos",
+      "pasta"
     ]
   }
 ];
