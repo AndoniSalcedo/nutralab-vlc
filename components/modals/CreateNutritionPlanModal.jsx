@@ -13,6 +13,7 @@ import {
 } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import ResponsiveModal from './ResponsiveModal';
+import ModalFooter from './ModalFooter';
 
 const MATCH_SCHEDULE_OPTIONS = [
   { label: 'Mañana', value: 'manana' },
@@ -174,7 +175,7 @@ export default function CreateNutritionPlanModal({
           </Paper>
         )}
 
-        <Group justify="flex-end" mt="md">
+        <ModalFooter>
           <Button variant="subtle" color="gray" onClick={onClose}>
             Cancelar
           </Button>
@@ -194,7 +195,7 @@ export default function CreateNutritionPlanModal({
           >
             Generar Plan
           </Button>
-        </Group>
+        </ModalFooter>
       </Stack>
     </ResponsiveModal>
   );

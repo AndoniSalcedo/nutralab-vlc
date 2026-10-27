@@ -19,6 +19,7 @@ import {
   IconCheck
 } from '@/components/icons3d';
 import ResponsiveModal from './ResponsiveModal';
+import ModalFooter from './ModalFooter';
 
 export default function ImportCsvModal({
   opened,
@@ -188,7 +189,7 @@ export default function ImportCsvModal({
           </Paper>
         )}
 
-        <Group justify="flex-end" mt="md">
+        <ModalFooter>
           <Button variant="light" color="gray" radius="xl" size="xs" onClick={onClose} disabled={importing}>
             Cancelar
           </Button>
@@ -203,7 +204,7 @@ export default function ImportCsvModal({
           >
             Confirmar e Importar {allImportRows.length} Registros
           </Button>
-        </Group>
+        </ModalFooter>
       </Stack>
     </ResponsiveModal>
   );
