@@ -31,6 +31,7 @@ import { AVAILABLE_MEALS, PLAYER_OBJECTIVES } from '@/config/nutrition-days';
 import { CLINICAL_TAGS, parsePlayerClinicalTags } from '@/config/clinical-tags';
 import { compressAvatar, avatarFromRecord, initials as getInitials } from '@/lib/utils/avatar';
 import ImageCropModal from '@/components/modals/ImageCropModal';
+import ModalFooter from '@/components/modals/ModalFooter';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
 
@@ -453,7 +454,7 @@ export default function PlayerForm({ initial, team }) {
             )}
 
             {/* Botones de acción */}
-            <Group justify="flex-end" mt="md">
+            <ModalFooter>
               {initial?.id && (
                 <Button 
                   color="arcilla" 
@@ -476,7 +477,7 @@ export default function PlayerForm({ initial, team }) {
               >
                 Guardar Jugador
               </Button>
-            </Group>
+            </ModalFooter>
           </Stack>
         </form>
       </Stack>

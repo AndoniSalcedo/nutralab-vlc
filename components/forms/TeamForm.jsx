@@ -23,6 +23,7 @@ import { IconSearch, IconCamera, IconTrash } from '@/components/icons3d';
 import { playerFullName } from '@/lib/utils';
 import { initials } from '@/lib/utils/avatar';
 import ImageCropModal from '@/components/modals/ImageCropModal';
+import ModalFooter from '@/components/modals/ModalFooter';
 
 export default function TeamForm({
   submitTeam,
@@ -345,11 +346,11 @@ export default function TeamForm({
             </Stack>
           </>
         )}
-        <Group justify="flex-end" mt="md">
+        <ModalFooter>
           <Button type="submit" radius="xl" size="xs" loading={saving}>
             {submitLabel}
           </Button>
-        </Group>
+        </ModalFooter>
 
         <ImageCropModal
           opened={cropModalOpen}

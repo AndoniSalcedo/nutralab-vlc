@@ -34,6 +34,7 @@ import {
   IconScale,
 } from '@/components/icons3d';
 
+import ModalFooter from '@/components/modals/ModalFooter';
 import { savePlayerMeal } from '@/actions/mealActions';
 import { compressFoodPhoto } from '@/lib/utils/compress';
 import { notifications } from '@mantine/notifications';
@@ -604,14 +605,14 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
         leftSection={<IconNotes size={16} />}
       />
 
-      <Group justify="flex-end" mt="md">
+      <ModalFooter>
         <Button variant="subtle" color="gray" onClick={onCancel} radius="xl">
           Cancelar
         </Button>
         <Button onClick={handleSubmit} loading={saving} color="dark" radius="xl" px="xl">
           Guardar
         </Button>
-      </Group>
+      </ModalFooter>
     </Stack>
   );
 }

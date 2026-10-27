@@ -11,6 +11,7 @@ import {
 } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import ResponsiveModal from './ResponsiveModal';
+import ModalFooter from './ModalFooter';
 
 export default function EditRecordModal({
   opened,
@@ -96,14 +97,14 @@ export default function EditRecordModal({
           minRows={2}
         />
 
-        <Group justify="flex-end" mt="sm">
+        <ModalFooter>
           <Button variant="default" radius="xl" size="xs" onClick={onClose}>
             Cancelar
           </Button>
           <Button color="lima" radius="xl" size="xs" leftSection={<Icon3D name="check" size={18} />} onClick={saveEditedRecord} loading={savingEdit}>
             Guardar Cambios
           </Button>
-        </Group>
+        </ModalFooter>
       </Stack>
     </ResponsiveModal>
   );

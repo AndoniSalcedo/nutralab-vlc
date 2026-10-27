@@ -3,6 +3,7 @@ import { Stack, TextInput, Paper, Button, Group, Text } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import TypePlanRowsEditor, { isValidTypeRows } from '@/components/plan/TypePlanRowsEditor';
 import ResponsiveModal from './ResponsiveModal';
+import ModalFooter from './ModalFooter';
 
 export default function CreateTypesPlanModal({
   opened,
@@ -47,7 +48,7 @@ export default function CreateTypesPlanModal({
           <TypePlanRowsEditor rows={typeRows} onChange={setTypeRows} dayTypeOptions={dayTypeOptions} />
         </Paper>
 
-        <Group justify="flex-end" mt="md">
+        <ModalFooter>
           <Button variant="subtle" color="gray" onClick={onClose}>
             Cancelar
           </Button>
@@ -62,7 +63,7 @@ export default function CreateTypesPlanModal({
           >
             Generar Plan
           </Button>
-        </Group>
+        </ModalFooter>
       </Stack>
     </ResponsiveModal>
   );
