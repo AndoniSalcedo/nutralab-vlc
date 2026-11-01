@@ -43,6 +43,7 @@ const PROCESADO = Object.freeze({
   NOODLES: 'noodles',
   PURE: 'pure',
   GAJOS: 'gajos',
+  LEGUMBRE: 'legumbre', // legumbre en cualquier forma: en grano o en pasta (pasta de lenteja, espirales de lentejas)
 });
 
 export const PROCESSING_TYPES = Object.freeze(Object.values(PROCESADO));
@@ -851,6 +852,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 50,
     "maxGrams": 200,
+    "procesado": [PROCESADO.LEGUMBRE],
     "treePath": [
       "hidratos",
       "pasta"
@@ -2636,6 +2638,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 100,
     "maxGrams": 300,
+    "procesado": [PROCESADO.LEGUMBRE],
     "treePath": [
       "hidratos",
       "legumbres"
@@ -2655,6 +2658,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 50,
     "maxGrams": 180,
+    "procesado": [PROCESADO.LEGUMBRE],
     "treePath": [
       "hidratos",
       "legumbres"
@@ -2674,6 +2678,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 50,
     "maxGrams": 180,
+    "procesado": [PROCESADO.LEGUMBRE],
     "treePath": [
       "hidratos",
       "legumbres"
@@ -4712,6 +4717,7 @@ export const FOODS_CRUDO = [
     ],
     "minGrams": 50,
     "maxGrams": 200,
+    "procesado": [PROCESADO.LEGUMBRE],
     "treePath": [
       "hidratos",
       "pasta"

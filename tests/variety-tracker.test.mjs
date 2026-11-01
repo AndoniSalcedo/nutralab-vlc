@@ -93,3 +93,32 @@ test('snapshot y restore conservan la memoria por días', () => {
   assert.deepEqual(tracker.days[0].processing, ['picada']);
   assert.equal(tracker.processingOf('Hamburguesa de pavo').includes('picada'), true);
 });
+
+test('pescado blanco y azul son la misma familia en el día, pero no entre días seguidos', () => {
+  const tracker = new WeeklyVarietyTracker(null, {
+    proteinBranches: ['pollo', 'pescado_blanco', 'pescado_azul'],
+    sameDayFamilies: { pescado_blanco: 'pescado', pescado_azul: 'pescado' },
+  });
+  tracker.startNewDay('lunes');
+  tracker.setTodayLunch({ proteinBranches: ['pescado_azul'], proteinFoods: ['Salmón'], carbBranches: [], carbFoods: [] });
+  tracker.recordProtein('Salmón', 'pescado_azul');
+  tracker.setCurrentMeal('cena');
+  assert.equal(tracker.isSameDayProtein('Rodaballo', 'pescado_blanco'), true);
+  assert.equal(tracker.isSameDayProtein('Pechuga de pollo', 'pollo'), false);
+  tracker.startNewDay('martes');
+  tracker.setCurrentMeal('comida');
+  assert.equal(tracker.isProteinRecent('Rodaballo', 'pescado_blanco'), false);
+});
+
+test('la pasta de legumbre y la legumbre en grano no salen en días seguidos', () => {
+  const tracker = new WeeklyVarietyTracker(null, {
+    carbBranches: ['pasta', 'legumbres'],
+    getFoodProcessing: (name) => (['Lentejas', 'Pasta de lenteja roja'].includes(name) ? ['legumbre'] : []),
+  });
+  tracker.startNewDay('viernes');
+  tracker.recordCarb('Pasta de lenteja roja', 'pasta');
+  tracker.startNewDay('sabado');
+  tracker.setCurrentMeal('comida');
+  assert.equal(tracker.isCarbRecent('Lentejas', 'legumbres'), true);
+  assert.equal(tracker.isCarbRecent('Patata', 'tuberculos'), false);
+});
