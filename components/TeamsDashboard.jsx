@@ -284,7 +284,7 @@ export default function TeamsDashboard({ teams = [], readOnly = false }) {
 
   return (
     <BoneyardSkeleton name="teams-list" loading={false}>
-      <Stack gap="lg" style={{ width: '100%', minWidth: 0 }} px={{ base: 'xs', sm: 0 }}>
+      <Stack gap="lg" style={{ width: '100%', minWidth: 0 }}>
         <Paper
           p={{ base: 'sm', sm: 'md' }}
           radius={24}

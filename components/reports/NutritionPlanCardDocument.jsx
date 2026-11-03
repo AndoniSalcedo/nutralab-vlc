@@ -5,6 +5,7 @@ import { getTeamDayTypeColor, getTeamDayTypeLabel } from '@/config/nutrition-day
 import { buildPlanTokens } from '@/config/plan-themes';
 import { formatInteger, formatNumberDecimal } from '@/lib/utils';
 import { PLAN_MODES, splitPlanDayColumns } from '@/config/plan-modes';
+import { APP_TZ } from '@/lib/dates';
 
 
 function makeStyles(k) {
@@ -252,7 +253,7 @@ function getStyles(k) {
 
 function formatDate(date) {
   const d = date ? new Date(date) : new Date();
-  return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(
+  return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: APP_TZ }).format(
     Number.isNaN(d.getTime()) ? new Date() : d
   );
 }

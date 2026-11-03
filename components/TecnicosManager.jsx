@@ -221,7 +221,7 @@ export default function TecnicosManager({ teams = [] }) {
   }
 
   return (
-    <Stack gap="lg" px={{ base: 'xs', sm: 0 }}>
+    <Stack gap="lg">
       <Paper
         p={{ base: 'sm', sm: 'md' }}
         radius={24}

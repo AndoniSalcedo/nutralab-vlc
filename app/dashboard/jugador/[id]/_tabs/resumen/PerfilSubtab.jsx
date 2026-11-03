@@ -310,6 +310,18 @@ export default function PerfilSubtab({
             activeDayType={activeDayType}
             onDayTypeChange={setActiveDayType}
             dayTypes={DAY_TYPES}
+            // El staff ya ve foto, nombre y «volver» en la barra superior (JugadorStaffBarMobile)
+            leading={user?.role !== 'jugador' ? (
+              <Group gap="sm" align="center" wrap="nowrap">
+                <HeaderIcon size={28} />
+                <Box style={{ minWidth: 0 }}>
+                  <Title order={3} fw={700} c="var(--nutra-bosque, #1F2A24)" fz={16} lineClamp={1}>{headerConfig.title}</Title>
+                  <Text size="sm" c="var(--nutra-salvia, #6C705A)" lineClamp={1}>
+                    {readOnly ? (headerConfig.subtitleReadOnly || headerConfig.subtitle) : headerConfig.subtitle}
+                  </Text>
+                </Box>
+              </Group>
+            ) : null}
           />
         </Box>
       </Paper>

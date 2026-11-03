@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { initials, filenameFromResponse, getPlayerAvatarUrl } from '@/lib/utils';
-import { mondayKeyOf } from '@/lib/dates';
+import { mondayKeyOf, toDateKey, todayKey } from '@/lib/dates';
 import { Button, Group, Stack, Text, Box, Table, ScrollArea, Avatar, ActionIcon, Menu, Tooltip, TextInput, Select, Pagination, Modal, Divider } from '@mantine/core';
 import { deletePlayer } from '@/actions/playerActions';
 import { getWeeklyMenus } from '@/actions/menuActions';
@@ -62,6 +62,20 @@ const fmtSigned = (value, decimals = 1) => {
   const text = n.toLocaleString('es-ES', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   return n > 0 ? `+${text}` : text;
 };
+
+// Último registro del jugador en la app (comidas, agua/suplementos o bienestar): quién ha dejado de usarla
+function playerActivity(lastAt) {
+  if (lastAt === undefined) return null;
+  if (!lastAt) return { label: 'Sin registros en la app', color: 'var(--mantine-color-gray-4)' };
+  const dayMs = 24 * 60 * 60 * 1000;
+  const days = Math.max(0, Math.round(
+    (Date.parse(`${todayKey()}T12:00:00Z`) - Date.parse(`${toDateKey(lastAt)}T12:00:00Z`)) / dayMs
+  ));
+  if (days === 0) return { label: 'Último registro: hoy', color: 'var(--mantine-color-teal-6)' };
+  if (days === 1) return { label: 'Último registro: ayer', color: 'var(--mantine-color-teal-6)' };
+  if (days <= 7) return { label: `Último registro: hace ${days} días`, color: 'var(--mantine-color-yellow-6)' };
+  return { label: `Sin registros desde hace ${days} días`, color: 'var(--mantine-color-arcilla-6)' };
+}
 
 function PlayerSemaforoIndicator({ semaforo }) {
   if (!semaforo?.hasPesajes && !semaforo?.hasReference) {
@@ -1030,6 +1044,15 @@ export default function DashboardContent({ players = [], team, readOnly = false 
                                 <Text c="var(--nutra-salvia, #6C705A)" fz="xs" style={{ lineHeight: 1.2 }} truncate>
                                   {player.auth_email || 'Sin credenciales de acceso'}
                                 </Text>
+                                {(player.auth_user_id || player.ultimo_registro) && (() => {
+                                  const activity = playerActivity(player.ultimo_registro);
+                                  return activity && (
+                                    <Group gap={5} mt={4} wrap="nowrap">
+                                      <Box w={6} h={6} style={{ borderRadius: '50%', backgroundColor: activity.color, flexShrink: 0 }} />
+                                      <Text fz={11} c="var(--nutra-salvia, #6C705A)" lh={1.2} truncate>{activity.label}</Text>
+                                    </Group>
+                                  );
+                                })()}
 
                                 {/* Indicadores en móvil sin necesidad de columnas adicionales */}
                                 <Group gap={6} align="center" hiddenFrom="xs" mt={3}>

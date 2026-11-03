@@ -1,5 +1,6 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { APP_TZ } from '@/lib/dates';
 
 const STATUS_COLORS = {
   red: {
@@ -550,6 +551,7 @@ export default function EvolutionFiltersReportDocument({
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: APP_TZ,
   }).format(now);
 
   const numMetricCols = Math.max(1, columns.length);

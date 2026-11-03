@@ -3,7 +3,7 @@ import DashboardContent from '@/components/DashboardContent';
 import { getUser } from '@/lib/auth/session';
 import { withLatestMeasurement } from '@/lib/metrics/player';
 import { getAccessibleTeam } from '@/lib/auth/team-access';
-import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
+import { getPlayersByTeamSelect, getLastActivityByPlayerIds } from '@/repositories/playerRepository';
 import { getEvolutionsByPlayerIdsSimple } from '@/repositories/evolutionRepository';
 import { getPesajesByPlayerIdsSimple } from '@/repositories/pesajeRepository';
 import NothingFound from '@/components/NothingFound';
@@ -41,20 +41,27 @@ export default async function TeamDashboard({ params }) {
     const playerIds = (resJugadores || []).map((player) => player.id);
     let evoluciones = [];
     let pesajes = [];
+    let lastActivity = {};
     if (playerIds.length) {
-      [evoluciones, pesajes] = await Promise.all([
+      [evoluciones, pesajes, lastActivity] = await Promise.all([
         getEvolutionsByPlayerIdsSimple(db, playerIds),
         getPesajesByPlayerIdsSimple(db, playerIds),
+        // Un fallo aquí no debe dejar la plantilla vacía: es solo un indicador
+        getLastActivityByPlayerIds(db, playerIds).catch((err) => {
+          console.error('Error fetching player last activity:', err);
+          return {};
+        }),
       ]);
     }
 
-    players = (resJugadores || []).map((player) => (
-      withLatestMeasurement(
+    players = (resJugadores || []).map((player) => ({
+      ...withLatestMeasurement(
         player,
         evoluciones.filter((item) => String(item.jugador_id) === String(player.id)),
         pesajes.filter((item) => String(item.jugador_id) === String(player.id))
-      )
-    ));
+      ),
+      ultimo_registro: lastActivity[player.id] || null,
+    }));
   } catch (err) {
     console.error('Error fetching team players/evolutions/pesajes:', err);
   }

@@ -202,7 +202,8 @@ export default function DashboardShell({ children, user }) {
       </Box>
 
 
-      <Container size="xl" px={{ base: 0, sm: "md" }} pt={{ base: 0, sm: "md" }} pb="xl">
+      {/* En móvil también hay margen: sin él las tarjetas quedan pegadas a la barra superior y a los bordes */}
+      <Container size="xl" px={{ base: "xs", sm: "md" }} pt={{ base: "xs", sm: "md" }} pb="xl">
         {children}
         {!isTecnico && <IntrapartidoResumePrompt />}
       </Container>

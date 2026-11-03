@@ -11,6 +11,7 @@ import classes from './PlayerTabs.module.css';
 import { PlayerDashboardProvider } from './PlayerDashboardContext';
 import PlayerTutorial from '@/components/tutorials/PlayerTutorial';
 import GlassDock from '@/components/navigation/GlassDock';
+import { JugadorStaffBarMobile } from '@/components/JugadorHeader';
 
 const DEFAULT_SUBTABS = {
   resumen: 'perfil',
@@ -159,6 +160,7 @@ export default function PlayerTabs({
               maxWidth: '100%',
             }}
           >
+            {!isPlayer && <JugadorStaffBarMobile jugador={jugador} />}
             {content}
           </Box>
         </Box>

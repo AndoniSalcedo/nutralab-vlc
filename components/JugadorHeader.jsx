@@ -347,6 +347,48 @@ function PlayerIdentity({ jugador, isAdmin, isPlayer, hasCredentials, avatarSize
   );
 }
 
+/**
+ * Cabecera compacta del jugador para el staff en móvil, encima de las subpestañas de cualquier sección:
+ * sin ella, fuera de «Perfil» no se veía de qué jugador era la ficha ni había forma de volver al equipo.
+ * Redondeada arriba y sin sombra abajo para continuar sin costura en la hoja de subpestañas.
+ */
+export function JugadorStaffBarMobile({ jugador }) {
+  const avatarSrc = jugador?.avatar_url
+    || (jugador?.avatar_size ? `/api/media/player-avatar?id=${jugador.id}&t=${jugador.updated_at || ''}` : undefined);
+  const teamName = jugador?.equipos?.nombre || jugador?.club;
+
+  return (
+    <Paper
+      hiddenFrom="sm"
+      p="xs"
+      bg="white"
+      radius={0}
+      style={{
+        position: 'relative',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        boxShadow: '0 0 2px 0 rgba(0,0,0,0.1)',
+        clipPath: 'inset(-20px -20px 0 -20px)',
+      }}
+    >
+      <Group gap="xs" align="center" wrap="nowrap">
+        <BackButton size={34} iconSize={20} equipoId={jugador?.equipo_id} />
+        <Avatar src={avatarSrc} size={34} radius="xl" color="nutralabColor" fw={700}>
+          {initials(`${jugador?.nombre || ''} ${jugador?.apellidos || ''}`)}
+        </Avatar>
+        <Box style={{ minWidth: 0, flex: 1 }}>
+          <Text fw={700} size="sm" c="var(--nutra-bosque, #1F2A24)" truncate="end" lh={1.2}>
+            {jugador?.nombre} {jugador?.apellidos}
+          </Text>
+          <Text size="xs" c="var(--nutra-salvia, #6C705A)" truncate="end" lh={1.3}>
+            {[jugador?.posicion || 'Sin posición', teamName].filter(Boolean).join(' · ')}
+          </Text>
+        </Box>
+      </Group>
+    </Paper>
+  );
+}
+
 export function JugadorHeaderCompactMobile({
   jugador,
   user,
@@ -354,12 +396,17 @@ export function JugadorHeaderCompactMobile({
   activeDayType = null,
   onDayTypeChange = null,
   dayTypes = null,
+  // Sustituye la identidad (volver, foto y nombre) cuando ya la muestra JugadorStaffBarMobile
+  leading = null,
 }) {
   const isAdmin = user?.role === 'admin';
   const isPlayer = user?.role === 'jugador';
 
   return (
     <Group justify="space-between" align="center" wrap="nowrap" gap="xs" style={{ width: '100%' }}>
+      {leading ? (
+        <Box style={{ minWidth: 0, flex: 1 }}>{leading}</Box>
+      ) : (
       <Group gap="xs" align="center" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
         {!isPlayer && (
           <BackButton size={36} iconSize={20} equipoId={jugador?.equipo_id} />
@@ -389,6 +436,7 @@ export function JugadorHeaderCompactMobile({
           </Group>
         </Stack>
       </Group>
+      )}
 
       <Box style={{ flexShrink: 0 }}>
         <HeaderActions

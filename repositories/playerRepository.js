@@ -98,6 +98,34 @@ export async function getPlayersByTeamSelectSimple(db, teamId) {
   });
 }
 
+/**
+ * Último registro de cada jugador en la app (comida, agua/suplementos o bienestar), para que el staff vea en la
+ * plantilla quién ha dejado de usarla. Devuelve { [jugadorId]: ISO } solo con los jugadores que tienen alguno.
+ * Se usa `created_at`: estas tablas no actualizan `updated_at` solas y basta con saber el día.
+ */
+export async function getLastActivityByPlayerIds(db, playerIds) {
+  if (!playerIds || playerIds.length === 0) return {};
+  if (playerIds.every(isMockPlayer)) {
+    const daysAgo = (days) => new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+    return Object.fromEntries(playerIds.map((id, index) => [id, daysAgo([0, 3, 12][index % 3])]));
+  }
+
+  const where = { jugador_id: { in: playerIds } };
+  const groups = await Promise.all([
+    db.comidas.groupBy({ by: ['jugador_id'], where, _max: { created_at: true } }),
+    db.registros_diarios.groupBy({ by: ['jugador_id'], where, _max: { created_at: true } }),
+    db.registros_bienestar.groupBy({ by: ['jugador_id'], where, _max: { created_at: true } }),
+  ]);
+  const latest = {};
+  for (const rows of groups) {
+    for (const row of rows) {
+      const at = row._max?.created_at;
+      if (at && (!latest[row.jugador_id] || at > latest[row.jugador_id])) latest[row.jugador_id] = at;
+    }
+  }
+  return latest;
+}
+
 export async function getPlayersByTeamIds(db, teamId, ids) {
   return db.jugadores.findMany({
     where: { equipo_id: teamId, id: { in: ids } },

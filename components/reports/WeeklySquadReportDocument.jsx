@@ -217,6 +217,7 @@ function formatDate(date = new Date()) {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
+    timeZone: APP_TZ,
   }).format(date);
 }
 
@@ -286,6 +287,7 @@ function CoverPage({ meta, playersCount }) {
 
 import { getTeamDayTypeColor, getTeamDayTypeLabel, getObjectiveLabel, getMatchSchedule } from '@/config/nutrition-days';
 import { isDefaultProtocolMeal } from '@/lib/nutrition/prematch-protocol';
+import { APP_TZ } from '@/lib/dates';
 
 const detailStyles = StyleSheet.create({
   page: {

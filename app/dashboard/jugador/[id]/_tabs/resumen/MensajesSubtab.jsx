@@ -9,7 +9,9 @@ import SubtabHeader from '../SubtabHeader';
 import classes from '../SubtabSectionHeader.module.css';
 import NothingFound from '@/components/NothingFound';
 import WidgetCard, { WidgetAside } from '@/components/widgets/WidgetCard';
+import { APP_TZ } from '@/lib/dates';
 
+// Con zona horaria fija: el servidor (UTC) y el navegador pintaban horas distintas y fallaba la hidratación
 function formatDate(value) {
   if (!value) return '';
   return new Intl.DateTimeFormat('es-ES', {
@@ -18,6 +20,7 @@ function formatDate(value) {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: APP_TZ,
   }).format(new Date(value));
 }
 
