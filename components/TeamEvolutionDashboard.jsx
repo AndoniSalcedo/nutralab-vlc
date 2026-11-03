@@ -28,6 +28,8 @@ import MeasurementDetailModal from '@/components/modals/MeasurementDetailModal';
 import { DateInput } from '@mantine/dates';
 import { useRouter } from 'next/navigation';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
+import Icon3D from '@/components/Icon3D';
+import ImportDataModal from '@/components/modals/ImportDataModal';
 import { TeamHeaderRightSection, TeamHeaderFilters } from '@/components/TeamHeaderContext';
 import {
   ComposedChart,
@@ -381,8 +383,10 @@ function evaluateValueAgainstRules(val, rulesForMetric) {
   return null;
 }
 
-export default function TeamEvolutionDashboard({ players = [], evolutions = [], team = null }) {
+export default function TeamEvolutionDashboard({ players = [], evolutions = [], team = null, readOnly = false }) {
   const router = useRouter();
+  // Importar mediciones desde aquí (mismo importador que la plantilla), sin volver a la portada del equipo
+  const [importOpen, setImportOpen] = useState(false);
   const isMobile = useMediaQuery('(max-width: 48em)', false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [mobileMetric, setMobileMetric] = useState(null);
@@ -1170,7 +1174,7 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
       <TeamHeaderRightSection>
         <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
           <Box hiddenFrom="sm">
-            <Menu shadow="md" width={180} position="bottom-end" withArrow radius="md" keepMounted>
+            <Menu shadow="md" width={210} position="bottom-end" withArrow radius="md" keepMounted>
               <Menu.Target>
                 <ActionIcon
                   size={38}
@@ -1183,6 +1187,14 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
                 </ActionIcon>
               </Menu.Target>
               <Menu.Dropdown>
+                {!readOnly && (
+                  <Menu.Item
+                    leftSection={<Icon3D name="outbox" size={18} />}
+                    onClick={() => setImportOpen(true)}
+                  >
+                    Importar métricas
+                  </Menu.Item>
+                )}
                 {viewMode === 'ranking' && (
                   <Menu.Item
                     leftSection={<IconFileTypePdf size={16} />}
@@ -1202,6 +1214,19 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
               </Menu.Dropdown>
             </Menu>
           </Box>
+
+          {!readOnly && (
+            <Button
+              visibleFrom="sm"
+              radius="xl"
+              size="xs"
+              variant="default"
+              leftSection={<Icon3D name="outbox" size={16} />}
+              onClick={() => setImportOpen(true)}
+            >
+              Importar métricas
+            </Button>
+          )}
 
           {viewMode === 'ranking' && (
             <Button
@@ -1231,6 +1256,10 @@ export default function TeamEvolutionDashboard({ players = [], evolutions = [], 
           </Button>
         </Group>
       </TeamHeaderRightSection>
+
+      {!readOnly && (
+        <ImportDataModal opened={importOpen} onClose={() => setImportOpen(false)} team={team} />
+      )}
 
       {/* 2. BARRA DE HERRAMIENTAS Y FILTROS INTEGRADOS EN LA CABECERA */}
       <TeamHeaderFilters>
