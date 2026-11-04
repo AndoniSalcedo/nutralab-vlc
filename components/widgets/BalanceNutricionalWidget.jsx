@@ -36,6 +36,7 @@ const MEAL_TYPES = {
   snack: { label: 'Merienda', icon: 'apple', main: false },
   dinner: { label: 'Cena', icon: 'bowl', main: true },
   lateSnack: { label: 'Re-cena', icon: 'moon', main: false },
+  extra: { label: 'Snack', icon: 'coffee', main: false },
 };
 const OTHER_MEAL = { label: 'Toma', icon: 'fork_and_knife', main: false };
 

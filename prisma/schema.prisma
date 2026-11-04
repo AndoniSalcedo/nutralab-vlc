@@ -35,14 +35,40 @@ model comidas {
   meal_type   String
   ingredients String[]  @default([])
   calories    Int?
+  /// Macros en gramos. Con platos, estos campos guardan los totales y la foto va en cada plato
+  protein     Float?
+  carbs       Float?
+  fat         Float?
   notes       String?
   photo       Bytes?
   photo_mime  String?   @default("image/webp")
   photo_size  Int?
   created_at  DateTime? @default(now()) @db.Timestamptz(6)
   jugadores   jugadores @relation(fields: [jugador_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  platos      comidas_platos[]
 
   @@index([jugador_id, taken_at], map: "teams_comidas_jugador_taken_at_idx")
+}
+
+/// Plato de una ingesta (primero, segundo, postre...) con su foto y sus valores.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model comidas_platos {
+  id          BigInt    @id @default(autoincrement())
+  comida_id   BigInt
+  position    Int       @default(0)
+  dish_name   String?
+  ingredients String[]  @default([])
+  calories    Int?
+  protein     Float?
+  carbs       Float?
+  fat         Float?
+  photo       Bytes?
+  photo_mime  String?   @default("image/webp")
+  photo_size  Int?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  comidas     comidas   @relation(fields: [comida_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([comida_id, position], map: "teams_comidas_platos_comida_idx")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.

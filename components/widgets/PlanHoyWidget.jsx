@@ -116,6 +116,9 @@ function draftFromPlan(item, date, isToday) {
     mealType: item.slot.type || '',
     dishName: `${item.nombre} del plan`,
     calories: item.macros?.kcal ?? null,
+    protein: item.macros?.p ?? null,
+    carbs: item.macros?.hc ?? null,
+    fat: item.macros?.g ?? null,
     ingredients: item.foods.map((f) => {
       if (!f.qty) return f.name;
       return /\bg$/i.test(f.qty) ? `${f.name} (${f.qty.replace(/\s/g, '')})` : `${f.name} ${f.qty}`;

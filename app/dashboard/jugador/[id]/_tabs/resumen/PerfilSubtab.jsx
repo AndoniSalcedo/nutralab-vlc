@@ -23,6 +23,8 @@ import { CLINICAL_TAGS } from '@/config/clinical-tags';
 import { CampoEditable, ComidasEditable, PrepartidoEditable } from '../editable';
 import { latestMetricValue } from '@/lib/metrics/player';
 import { listPlayerMeals } from '@/actions/mealActions';
+import { getFoods } from '@/actions/foodActions';
+import { consumedFromMeals } from '@/lib/nutrition/mealDishes';
 import { sanitizePlanData } from '@/lib/engine';
 import { getSubtabHeader } from '../subtab-config';
 import { JugadorHeaderCompactMobile } from '@/components/JugadorHeader';
@@ -50,62 +52,11 @@ import {
 dayjs.locale('es');
 
 
-const calcNutrient = (food, grams, key) => {
-  const value = Number(food?.[key]);
-  const qty = Number(grams);
-  if (!Number.isFinite(value) || !Number.isFinite(qty)) return 0;
-  return (value * qty) / 100;
-};
-
-const roundMacro = (value) => Math.round(value * 10) / 10;
-
 function formatMetricNumber(val, decimals = 1, fallback = '-') {
   if (val === null || val === undefined || val === '') return fallback;
   const num = Number(val);
   if (!Number.isFinite(num)) return String(val);
   return num.toLocaleString('es-ES', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-}
-
-function calculateConsumedStats(meals, foods) {
-  let kcal = 0;
-  let cho = 0;
-  let pro = 0;
-  let fat = 0;
-
-  meals.forEach((meal) => {
-    if (meal.calories != null && Number.isFinite(Number(meal.calories))) {
-      kcal += Number(meal.calories);
-    }
-
-    if (Array.isArray(meal.ingredients)) {
-      let tempKcal = 0;
-      meal.ingredients.forEach((ingredientStr) => {
-        const match = ingredientStr.match(/^(.+?)\s*\((\d+(?:\.\d+)?)\s*g\)$/i);
-        if (match) {
-          const foodName = match[1].trim();
-          const grams = parseFloat(match[2]);
-          const foundFood = foods.find(f => f.name.toLowerCase() === foodName.toLowerCase());
-          if (foundFood && !isNaN(grams)) {
-            tempKcal += calcNutrient(foundFood, grams, 'kcal');
-            cho += calcNutrient(foundFood, grams, 'cho');
-            pro += calcNutrient(foundFood, grams, 'pro');
-            fat += calcNutrient(foundFood, grams, 'fat');
-          }
-        }
-      });
-
-      if (meal.calories == null || !Number.isFinite(Number(meal.calories))) {
-        kcal += tempKcal;
-      }
-    }
-  });
-
-  return {
-    kcal: Math.round(kcal),
-    cho: roundMacro(cho),
-    pro: roundMacro(pro),
-    fat: roundMacro(fat),
-  };
 }
 
 const DAY_KEYS = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
@@ -163,7 +114,21 @@ export default function PerfilSubtab({
     setActiveDayType(plan?.dias?.[dayKey]?.tipoDia || defaultDiaType);
   }, [latestPlan, selectedDate, jugador?.equipos?.configuracion_nutricional]);
 
-  const consumed = useMemo(() => calculateConsumedStats(meals, []), [meals]);
+  // Sin la biblioteca de alimentos los macros de los registros antiguos salían siempre a cero
+  const [foods, setFoods] = useState([]);
+  useEffect(() => {
+    let active = true;
+    getFoods()
+      .then((items) => {
+        if (active) setFoods(items || []);
+      })
+      .catch((err) => console.error('Error cargando alimentos:', err));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const consumed = useMemo(() => consumedFromMeals(meals, foods), [meals, foods]);
 
   const pesoActual = latestMetricValue(evoluciones, 'peso_kg', jugador?.peso_kg);
   const weightKg = Number(pesoActual || 0);

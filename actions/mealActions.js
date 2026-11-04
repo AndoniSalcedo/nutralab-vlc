@@ -7,8 +7,8 @@ import { getOwnedPlayer, getAccessiblePlayer } from '@/lib/auth/team-access';
 import {
   getMealsFiltered,
   getMealById,
-  insertMeal,
-  updateMeal,
+  getMealPhotoWithMeta,
+  saveMeal,
   deleteMeal
 } from '@/repositories/mealsRepository';
 import { parseMealTreeWithAI } from '@/lib/ai/meal-tree-parser';
@@ -16,14 +16,40 @@ import { enforceRateLimit } from '@/lib/security/rate-limit';
 import { readImageUpload, toByteaHex } from '@/lib/security/uploads';
 import { toDateKey } from '@/lib/dates';
 import { ActionError } from '@/lib/actionError';
+import {
+  DISH_PHOTO_PREFIX,
+  MAX_MEAL_DISHES,
+  dishCalories,
+  summarizeDishes,
+  toNumber,
+} from '@/lib/nutrition/mealDishes';
 
-const MEAL_TYPES = new Set(['breakfast', 'midMorning', 'lunch', 'snack', 'dinner', 'lateSnack']);
+const MEAL_TYPES = new Set(['breakfast', 'midMorning', 'lunch', 'snack', 'dinner', 'lateSnack', 'extra']);
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-function mapMealToClient(dbMeal) {
-  if (!dbMeal) return null;
+// `v` cambia al sustituir la foto: la respuesta se cachea como inmutable
+const mealPhotoUrl = (id, size) => `/api/media/meal-photo?id=${id}&v=${size}`;
+const dishPhotoUrl = (id, size) => `/api/media/meal-photo?dish=${id}&v=${size}`;
+
+function mapDishToClient(dish) {
+  return {
+    id: dish.id,
+    dishName: dish.dish_name,
+    ingredients: dish.ingredients || [],
+    calories: dish.calories,
+    protein: dish.protein,
+    carbs: dish.carbs,
+    fat: dish.fat,
+    photoUrl: dish.photo_size ? dishPhotoUrl(dish.id, dish.photo_size) : null,
+  };
+}
+
+function mapMealToClient({ platos, ...dbMeal }) {
+  const dishes = (platos || []).map(mapDishToClient);
+  const legacyPhotoUrl = dbMeal.photo_size ? mealPhotoUrl(dbMeal.id, dbMeal.photo_size) : null;
   return {
     ...dbMeal,
+    dishes,
     id: dbMeal.id,
     jugadorId: dbMeal.jugador_id,
     takenAt: dbMeal.taken_at,
@@ -31,14 +57,71 @@ function mapMealToClient(dbMeal) {
     mealType: dbMeal.meal_type,
     ingredients: dbMeal.ingredients || [],
     calories: dbMeal.calories,
+    protein: dbMeal.protein ?? null,
+    carbs: dbMeal.carbs ?? null,
+    fat: dbMeal.fat ?? null,
     notes: dbMeal.notes,
     hasPhoto: !!dbMeal.photo_size,
     photoMime: dbMeal.photo_mime,
     photoSize: dbMeal.photo_size,
     createdAt: dbMeal.created_at,
-    photoUrl: dbMeal.photo_size ? `/api/media/meal-photo?id=${dbMeal.id}` : null,
+    photoUrl: dishes.find((dish) => dish.photoUrl)?.photoUrl ?? legacyPhotoUrl,
   };
 }
+
+// Gramos de un macro: sin dato → null; se acota a un rango creíble para una comida
+function parseMacro(value) {
+  const num = toNumber(value);
+  if (num == null || num < 0) return null;
+  return Math.round(Math.min(num, 1000) * 10) / 10;
+}
+
+const pickMacros = (source) => ({
+  protein: parseMacro(source?.protein),
+  carbs: parseMacro(source?.carbs),
+  fat: parseMacro(source?.fat),
+});
+
+function parseDishes(raw) {
+  let list = [];
+  try {
+    list = JSON.parse(String(raw ?? '[]'));
+  } catch {
+    throw new ActionError('Platos no válidos');
+  }
+  return (Array.isArray(list) ? list : []).slice(0, MAX_MEAL_DISHES).map((dish) => ({
+    id: dish?.id ?? null,
+    dishName: String(dish?.dishName ?? '').trim().slice(0, 200) || null,
+    ingredients: (Array.isArray(dish?.ingredients) ? dish.ingredients : []).map(String).filter(Boolean).slice(0, 60),
+    calories: dishCalories(dish ?? {}),
+    ...pickMacros(dish),
+    removePhoto: Boolean(dish?.removePhoto),
+    legacyPhoto: Boolean(dish?.legacyPhoto),
+  }));
+}
+
+const photoColumns = (image) => ({
+  photo: image ? toByteaHex(image.buffer) : null,
+  photo_mime: image?.mime ?? null,
+  photo_size: image?.size ?? null,
+});
+
+// Columnas de un plato: la foto solo se toca si hay una nueva o se ha quitado
+function dishRow(dish, position, image) {
+  const row = {
+    position,
+    dish_name: dish.dishName,
+    ingredients: dish.ingredients,
+    calories: dish.calories,
+    protein: dish.protein,
+    carbs: dish.carbs,
+    fat: dish.fat,
+  };
+  if (image) return { ...row, ...photoColumns(image) };
+  return dish.removePhoto ? { ...row, ...photoColumns(null) } : row;
+}
+
+const isUploadedFile = (value) => value instanceof File && value.size > 0;
 
 export async function listPlayerMeals(jugadorId, { mealType, day } = {}) {
   if (!jugadorId) throw new ActionError('Falta jugador_id');
@@ -81,6 +164,9 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
   let formData;
   if (jugadorIdOrFormData instanceof FormData) {
     formData = jugadorIdOrFormData;
+  } else if (payload instanceof FormData) {
+    formData = payload;
+    formData.set('jugador_id', String(jugadorIdOrFormData));
   } else {
     const jugadorId = jugadorIdOrFormData;
     formData = new FormData();
@@ -102,6 +188,9 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
     if (Number.isFinite(Number(payload?.calories))) {
       formData.append('calories', String(Math.round(Number(payload.calories))));
     }
+    for (const key of ['protein', 'carbs', 'fat']) {
+      if (payload?.[key] != null) formData.append(key, String(payload[key]));
+    }
     if (payload?.notes) formData.append('notes', payload.notes);
     if (payload?.photo) formData.append('photo', payload.photo);
     if (jugadorId) formData.set('jugador_id', String(jugadorId));
@@ -116,6 +205,7 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
   const calories = formData.get('calories');
   const notes = formData.get('notes');
   const photoFile = formData.get('photo');
+  const dishes = parseDishes(formData.get('dishes'));
 
   if (!jugadorId) throw new ActionError('Falta jugador_id');
   if (!mealType) throw new ActionError('Falta el tipo de ingesta');
@@ -135,10 +225,11 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
     }
   }
 
+  let existing = null;
   if (id) {
     // El id llega del cliente: el registro debe pertenecer al jugador autorizado
     // (si no, se podrían editar/reasignar comidas de otros jugadores).
-    const existing = await getMealById(db, id);
+    existing = await getMealById(db, id);
     if (!existing || String(existing.jugador_id) !== String(jugadorId)) {
       throw new ActionError('Comida no encontrada');
     }
@@ -156,29 +247,70 @@ export async function savePlayerMeal(jugadorIdOrFormData, payload) {
     }
   }
 
+  const summary = dishes.length ? summarizeDishes(dishes) : null;
+
   const mealPayload = {
     jugador_id: Number(jugadorId),
     taken_at: takenAt && !Number.isNaN(Date.parse(String(takenAt))) ? new Date(takenAt).toISOString() : new Date().toISOString(),
-    dish_name: dishName ? String(dishName).trim() : null,
     meal_type: mealType,
-    ingredients,
-    calories: calories && Number.isFinite(Number(calories)) ? Number(calories) : null,
     notes: notes ? String(notes).trim().slice(0, 1000) : null,
+    ...(summary
+      ? {
+        dish_name: summary.dishName,
+        ingredients: summary.ingredients,
+        calories: summary.calories,
+        protein: summary.protein,
+        carbs: summary.carbs,
+        fat: summary.fat,
+      }
+      : {
+        dish_name: dishName ? String(dishName).trim() : null,
+        ingredients,
+        calories: calories && Number.isFinite(Number(calories)) ? Number(calories) : null,
+        ...pickMacros({
+          protein: formData.get('protein'),
+          carbs: formData.get('carbs'),
+          fat: formData.get('fat'),
+        }),
+      }),
   };
 
-  if (photoFile && photoFile instanceof File && photoFile.size > 0) {
-    const image = await readImageUpload(photoFile);
-    mealPayload.photo = toByteaHex(image.buffer);
-    mealPayload.photo_mime = image.mime;
-    mealPayload.photo_size = image.size;
+  // Validar las fotos antes de escribir nada
+  const dishImages = await Promise.all(dishes.map(async (_, index) => {
+    const file = formData.get(`${DISH_PHOTO_PREFIX}${index}`);
+    return isUploadedFile(file) ? readImageUpload(file) : null;
+  }));
+
+  if (isUploadedFile(photoFile)) {
+    Object.assign(mealPayload, photoColumns(await readImageUpload(photoFile)));
   }
 
-  let resultMeal;
-  if (id) {
-    resultMeal = await updateMeal(db, id, mealPayload);
-  } else {
-    resultMeal = await insertMeal(db, mealPayload);
-  }
+  // Un registro de antes de tener platos pasa su foto al plato al guardarse
+  const legacyPhoto = id && dishes.some((dish) => dish.legacyPhoto && !dish.removePhoto)
+    ? await getMealPhotoWithMeta(db, id)
+    : null;
+  const existingIds = new Set((existing?.platos || []).map((dish) => String(dish.id)));
+  const rows = dishes.map((dish, position) => {
+    const known = dish.id != null && existingIds.has(String(dish.id));
+    const image = dishImages[position];
+    const data = dishRow(dish, position, image);
+    if (!image && dish.legacyPhoto && legacyPhoto?.photo) {
+      Object.assign(data, photoColumns({
+        buffer: legacyPhoto.photo,
+        mime: legacyPhoto.photo_mime,
+        size: legacyPhoto.photo_size,
+      }));
+    }
+    return { id: known ? dish.id : null, data };
+  });
+  const keptIds = new Set(rows.map((row) => String(row.id)));
+
+  if (summary) Object.assign(mealPayload, photoColumns(null));
+
+  const resultMeal = await saveMeal(db, id || null, mealPayload, {
+    dishes: rows,
+    removedDishIds: [...existingIds].filter((dishId) => !keptIds.has(dishId)),
+  });
 
   revalidatePath(`/dashboard/jugador/${jugadorId}`);
   return { success: true, meal: resultMeal };

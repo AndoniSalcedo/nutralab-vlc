@@ -43,6 +43,8 @@ const MEAL_SLOTS = [
   { key: 'snack', label: 'Merienda', color: 'salvia', time: '17:30' },
   { key: 'dinner', label: 'Cena', color: 'bosque', time: '21:00' },
   { key: 'lateSnack', label: 'Re-cena', color: 'salvia', time: '23:00', optional: true },
+  // `addable`: entre horas, sin hora fija; caben varios al día y siempre se puede añadir otro
+  { key: 'extra', label: 'Snack', color: 'salvia', optional: true, addable: true },
 ];
 const SLOT_BY_KEY = Object.fromEntries(MEAL_SLOTS.map((s) => [s.key, s]));
 const OTHER_SLOT = { key: 'other', label: 'Otros', color: 'salvia' };
@@ -71,7 +73,7 @@ function computeStreak(activityByDay, todayKey) {
 function draftTakenAt(dateKey, slot, todayKey) {
   const [h, m] = (slot?.time || '13:00').split(':').map(Number);
   const date = dayjs(dateKey).hour(h).minute(m).second(0).toDate();
-  if (dateKey === todayKey && (!slot || date > new Date())) return new Date();
+  if (dateKey === todayKey && (!slot?.time || date > new Date())) return new Date();
   return date;
 }
 
@@ -174,6 +176,11 @@ function DiaryMealCard({ meal, stacked = false, onClick, onOpenPhoto, onDelete }
   const slot = SLOT_BY_KEY[meal.mealType] || OTHER_SLOT;
   const ingredients = Array.isArray(meal.ingredients) ? meal.ingredients.filter(Boolean) : [];
   const calories = Number(meal.calories);
+  const dishCount = meal.dishes?.length || 0;
+  const dishPhotos = (meal.dishes || []).filter((d) => d.photoUrl).map((d) => d.photoUrl);
+  const photos = dishPhotos.length ? dishPhotos : meal.photoUrl ? [meal.photoUrl] : [];
+  // Varias fotos no caben junto al texto en móvil: van en su propia fila
+  const vertical = stacked || photos.length > 1;
 
   return (
     <Box
@@ -183,10 +190,10 @@ function DiaryMealCard({ meal, stacked = false, onClick, onOpenPhoto, onDelete }
       onKeyDown={onClick ? (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onClick()) : undefined}
       style={{
         display: 'flex',
-        flexDirection: stacked ? 'column' : 'row',
-        gap: stacked ? 8 : 12,
+        flexDirection: vertical ? 'column' : 'row',
+        gap: vertical ? 8 : 12,
         width: '100%',
-        padding: meal.photoUrl ? 10 : '10px 12px',
+        padding: photos.length ? 10 : '10px 12px',
         borderRadius: 'var(--mantine-radius-lg)',
         background: 'white',
         border: '1px solid var(--mantine-color-gray-2)',
@@ -194,24 +201,36 @@ function DiaryMealCard({ meal, stacked = false, onClick, onOpenPhoto, onDelete }
         cursor: onClick ? 'pointer' : undefined,
       }}
     >
-      {meal.photoUrl && (
-        <Image
-          src={meal.photoUrl}
-          alt={meal.dishName || slot.label}
-          w={stacked ? '100%' : 76}
-          h={stacked ? 120 : 76}
-          radius="md"
-          fit="cover"
-          style={{ flexShrink: 0, cursor: onOpenPhoto ? 'zoom-in' : undefined }}
-          onClick={
-            onOpenPhoto
-              ? (e) => {
-                  e.stopPropagation();
-                  onOpenPhoto();
-                }
-              : undefined
-          }
-        />
+      {photos.length > 0 && (
+        <Box
+          w={vertical ? '100%' : 76}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${Math.min(photos.length, 3)}, minmax(0, 1fr))`,
+            gap: 6,
+            flexShrink: 0,
+          }}
+        >
+          {photos.map((src) => (
+            <Image
+              key={src}
+              src={src}
+              alt={meal.dishName || slot.label}
+              h={!vertical ? 76 : photos.length > 1 ? 84 : 120}
+              radius="md"
+              fit="cover"
+              style={{ cursor: onOpenPhoto ? 'zoom-in' : undefined }}
+              onClick={
+                onOpenPhoto
+                  ? (e) => {
+                      e.stopPropagation();
+                      onOpenPhoto(src);
+                    }
+                  : undefined
+              }
+            />
+          ))}
+        </Box>
       )}
 
       <Box style={{ flex: 1, minWidth: 0 }}>
@@ -232,6 +251,10 @@ function DiaryMealCard({ meal, stacked = false, onClick, onOpenPhoto, onDelete }
         <Group justify="space-between" align="center" gap={8} wrap="nowrap" mt={2}>
           <Text fz="xs" c="dimmed">
             {formatTime(meal.takenAt)}
+            {dishCount > 1 && ` · ${dishCount} platos`}
+            {[meal.protein, meal.carbs, meal.fat].some((v) => Number(v) > 0) && (
+              ` · P ${Math.round(Number(meal.protein) || 0)} · HC ${Math.round(Number(meal.carbs) || 0)} · G ${Math.round(Number(meal.fat) || 0)} g`
+            )}
           </Text>
           {onDelete && (
             <Tooltip label="Eliminar" withArrow>
@@ -276,11 +299,12 @@ function DiaryMealCard({ meal, stacked = false, onClick, onOpenPhoto, onDelete }
 }
 
 // Tomas a mostrar: las principales siempre, las opcionales/otros solo si tienen registros
-function groupBySlot(meals) {
+// (las `addable` también cuando se puede registrar, para tener su botón a mano)
+function groupBySlot(meals, canAdd) {
   const bySlot = {};
   for (const m of meals) (bySlot[SLOT_BY_KEY[m.mealType] ? m.mealType : 'other'] ||= []).push(m);
   const rows = [...MEAL_SLOTS, OTHER_SLOT].filter(
-    (s) => bySlot[s.key]?.length || (s !== OTHER_SLOT && !s.optional)
+    (s) => bySlot[s.key]?.length || (s !== OTHER_SLOT && (!s.optional || (s.addable && canAdd)))
   );
   return { bySlot, rows };
 }
@@ -320,7 +344,7 @@ function AddSlotButton({ slot, onAdd, fill = false }) {
 
 /* ------------------ Tablero por tomas (escritorio) ------------------ */
 function DayBoard({ meals, canAdd, onAdd, renderCard }) {
-  const { bySlot, rows } = groupBySlot(meals);
+  const { bySlot, rows } = groupBySlot(meals, canAdd);
 
   return (
     <Box style={{ display: 'grid', gridTemplateColumns: `repeat(${rows.length}, minmax(0, 1fr))`, gap: 12 }}>
@@ -345,6 +369,7 @@ function DayBoard({ meals, canAdd, onAdd, renderCard }) {
               )}
             </Group>
             {slotMeals.map((m) => renderCard(m, true))}
+            {slotMeals.length > 0 && slot.addable && canAdd && <AddSlotButton slot={slot} onAdd={onAdd} />}
             {slotMeals.length === 0 &&
               (canAdd ? (
                 <AddSlotButton slot={slot} onAdd={onAdd} fill />
@@ -362,7 +387,7 @@ function DayBoard({ meals, canAdd, onAdd, renderCard }) {
 
 /* ------------------------ Timeline de tomas del día ------------------------ */
 function DayTimeline({ meals, canAdd, onAdd, renderCard }) {
-  const { bySlot, rows } = groupBySlot(meals);
+  const { bySlot, rows } = groupBySlot(meals, canAdd);
 
   return (
     <Stack gap={0}>
@@ -408,6 +433,7 @@ function DayTimeline({ meals, canAdd, onAdd, renderCard }) {
                     {slot.label}
                   </Text>
                   {slotMeals.map((m) => renderCard(m, false))}
+                  {slot.addable && canAdd && <AddSlotButton slot={slot} onAdd={onAdd} />}
                 </Stack>
               )}
             </Box>
@@ -525,10 +551,10 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
     setEditorMeal(null);
   };
 
-  const openPhoto = (m) =>
+  const openPhoto = (m, src = m.photoUrl) =>
     setViewer({
       open: true,
-      src: m.photoUrl,
+      src,
       caption: `${formatTime(m.takenAt)}${Number.isFinite(m.calories) ? ` · ${m.calories} kcal` : ''}`,
     });
 
@@ -579,7 +605,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
         meal={m}
         stacked={stacked}
         onClick={!readOnly ? () => openEditMeal(m) : m.photoUrl ? () => openPhoto(m) : undefined}
-        onOpenPhoto={m.photoUrl ? () => openPhoto(m) : undefined}
+        onOpenPhoto={m.photoUrl ? (src) => openPhoto(m, src) : undefined}
         onDelete={!readOnly ? () => setDeleteMeal(m) : undefined}
       />
     </motion.div>

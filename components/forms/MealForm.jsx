@@ -1,45 +1,40 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import {
-  Stack,
-  Select,
-  Box,
-  Text,
-  TextInput,
-  NumberInput,
-  Textarea,
-  Group,
-  Image,
-  Button,
-  rem,
-  ThemeIcon,
-  Paper,
   ActionIcon,
-  Badge,
-  SimpleGrid,
-  Divider,
+  Box,
+  Button,
+  Chip,
+  Collapse,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Textarea,
+  UnstyledButton,
 } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
-import { Dropzone } from '@mantine/dropzone';
-import {
-  IconX,
-  IconPlus,
-  IconTrash,
-  IconFlame,
-  IconCalendar,
-  IconToolsKitchen2,
-  IconNotes,
-  IconCamera,
-  IconCalculator,
-  IconScale,
-} from '@/components/icons3d';
+import { IconChevronDown } from '@tabler/icons-react';
+import { IconCalendar, IconFlame, IconNotes, IconPlus, IconTrash } from '@/components/icons3d';
 
 import ModalFooter from '@/components/modals/ModalFooter';
 import { savePlayerMeal } from '@/actions/mealActions';
-import { compressFoodPhoto } from '@/lib/utils/compress';
-import { notifications } from '@mantine/notifications';
 import { getFoods } from '@/actions/foodActions';
+import { compressFoodPhoto } from '@/lib/utils/compress';
+import {
+  DISH_PHOTO_PREFIX,
+  MAX_MEAL_DISHES,
+  hasDishContent,
+  parseIngredients,
+  roundMacro,
+  rowsFromIngredients,
+  suggestMealType,
+  summarizeDishes,
+} from '@/lib/nutrition/mealDishes';
+import { notifications } from '@mantine/notifications';
 import { notifySaved } from '@/components/motion/notifySaved';
+import { errorMessage } from '@/lib/actionError';
+import MealDishFields from './MealDishFields';
 
 const MEAL_TYPES = [
   { value: 'breakfast', label: 'Desayuno' },
@@ -48,9 +43,13 @@ const MEAL_TYPES = [
   { value: 'snack', label: 'Merienda' },
   { value: 'dinner', label: 'Cena' },
   { value: 'lateSnack', label: 'Re-cena' },
+  { value: 'extra', label: 'Snack' },
 ];
 
+const COLLAPSE_MS = 220;
 const MAX_MEAL_PHOTO_BYTES = 6 * 1024 * 1024;
+// Por debajo de `serverActions.bodySizeLimit` (8 MB): el resto del formulario también viaja
+const MAX_UPLOAD_BYTES = 7 * 1024 * 1024;
 const SUPPORTED_MEAL_PHOTO_MIMES = new Set([
   'image/jpeg',
   'image/png',
@@ -58,15 +57,49 @@ const SUPPORTED_MEAL_PHOTO_MIMES = new Set([
   'image/avif',
 ]);
 
-const calcNutrient = (food, grams, key) => {
-  const value = Number(food?.[key]);
-  const qty = Number(grams);
+const macroToField = (value) => (value != null && Number.isFinite(Number(value)) ? String(roundMacro(Number(value))) : '');
+const numberToField = (value) => (value != null ? String(value) : '');
 
-  if (!Number.isFinite(value) || !Number.isFinite(qty)) return 0;
-  return (value * qty) / 100;
+let idSequence = 0;
+const nextId = () => {
+  idSequence += 1;
+  return idSequence;
 };
 
-const roundMacro = (value) => Math.round(value * 10) / 10;
+const newDish = (data = {}) => ({
+  key: nextId(),
+  id: null,
+  dishName: '',
+  calories: '',
+  protein: '',
+  carbs: '',
+  fat: '',
+  ingredients: '',
+  rows: [],
+  file: null,
+  photoUrl: null,
+  removePhoto: false,
+  legacyPhoto: false,
+  ...data,
+});
+
+const savedDishFields = (source) => ({
+  dishName: source?.dishName || '',
+  calories: numberToField(source?.calories),
+  protein: macroToField(source?.protein),
+  carbs: macroToField(source?.carbs),
+  fat: macroToField(source?.fat),
+  ingredients: Array.isArray(source?.ingredients) ? source.ingredients.join('\n') : '',
+  photoUrl: source?.photoUrl || null,
+});
+
+// Los registros sin platos (anteriores o precargados del plan) se editan como un único plato
+function dishesFromMeal(meal) {
+  if (meal?.dishes?.length) {
+    return meal.dishes.map((dish) => newDish({ id: dish.id, ...savedDishFields(dish) }));
+  }
+  return [newDish({ ...savedDishFields(meal), legacyPhoto: Boolean(meal?.id && meal?.photoUrl) })];
+}
 
 const isSupportedMealPhoto = (file) => {
   if (!file) return false;
@@ -78,14 +111,21 @@ const normalizeMealPhoto = async (file) => {
 
   try {
     const compressedFile = await compressFoodPhoto(file);
-    return isSupportedMealPhoto(compressedFile) ? compressedFile : null;
+    if (isSupportedMealPhoto(compressedFile)) return compressedFile;
+
+    notifications.show({
+      title: 'Formato de imagen no compatible',
+      message: 'Prueba con una foto JPG, PNG o WebP.',
+      color: 'yellow',
+    });
+    return null;
   } catch (err) {
     console.log(err);
 
     if (isSupportedMealPhoto(file)) {
       notifications.show({
         title: 'La imagen no se pudo comprimir',
-        message: 'Se guardará sin foto para evitar un fallo al enviar la comida.',
+        message: 'Se enviará tal cual; si pesa mucho, prueba con una más pequeña.',
         color: 'yellow',
         autoClose: 5000,
       });
@@ -94,7 +134,7 @@ const normalizeMealPhoto = async (file) => {
 
     notifications.show({
       title: 'Formato de imagen no compatible',
-      message: 'Ese archivo no se puede enviar al servidor. Se guardará la comida sin foto.',
+      message: 'Ese archivo no se puede enviar al servidor. Prueba con una foto JPG, PNG o WebP.',
       color: 'yellow',
       autoClose: 5000,
     });
@@ -113,6 +153,7 @@ const toValidDate = (value) => {
 
 export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
   const [foods, setFoods] = useState([]);
+  const [foodsLoading, setFoodsLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -121,146 +162,114 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
       .then((items) => {
         if (active) setFoods(items || []);
       })
-      .catch((err) => console.error('Error cargando alimentos:', err));
+      .catch((err) => console.error('Error cargando alimentos:', err))
+      .finally(() => {
+        if (active) setFoodsLoading(false);
+      });
     return () => {
       active = false;
     };
   }, []);
 
   const [takenAt, setTakenAt] = useState(new Date());
-  const [dishName, setDishName] = useState('');
   const [mealType, setMealType] = useState('');
-  const [calories, setCalories] = useState('');
-  const [ingredients, setIngredients] = useState('');
   const [notes, setNotes] = useState('');
-
-  const [foodValue, setFoodValue] = useState(null);
-  const [foodGrams, setFoodGrams] = useState(100);
-  const [calculatedFoods, setCalculatedFoods] = useState([]);
-
-  const [file, setFile] = useState(null);
-  const dzRef = useRef(null);
-  const calcIdRef = useRef(0);
+  const [dishes, setDishes] = useState(() => [newDish()]);
+  const [openDishKey, setOpenDishKey] = useState(null);
+  const addedDishKey = useRef(null);
 
   useEffect(() => {
+    const date = meal?.takenAt ? new Date(meal.takenAt) : new Date();
+    const nextDishes = dishesFromMeal(meal);
     setSaving(false);
-    setTakenAt(meal?.takenAt ? new Date(meal.takenAt) : new Date());
-    setDishName(meal?.dishName || '');
-    setMealType(meal?.mealType || '');
-    setCalories(meal?.calories != null ? String(meal.calories) : '');
-    setIngredients(Array.isArray(meal?.ingredients) ? meal.ingredients.join(', ') : '');
+    setTakenAt(date);
+    setMealType(meal?.mealType || suggestMealType(date));
     setNotes(meal?.notes || '');
-    setFoodValue(null);
-    setFoodGrams(100);
-    setFile(null);
+    setDishes(nextDishes);
+    setOpenDishKey(nextDishes[0].key);
+  }, [meal]);
 
-    // Parse ingredients to restore calculatedFoods
-    const initialCalculated = [];
-    let nextId = 1;
-    if (Array.isArray(meal?.ingredients)) {
-      for (const ingredientStr of meal.ingredients) {
-        const match = ingredientStr.match(/^(.+?)\s*\((\d+(?:\.\d+)?)\s*g\)$/i);
-        if (match) {
-          const foodName = match[1].trim();
-          const grams = parseFloat(match[2]);
-          const foundFood = foods.find(f => f.name.toLowerCase() === foodName.toLowerCase());
-          if (foundFood && !isNaN(grams)) {
-            initialCalculated.push({
-              id: nextId++,
-              food: foundFood,
-              grams: roundMacro(grams)
-            });
-          }
-        }
-      }
-    }
-    calcIdRef.current = nextId;
-    setCalculatedFoods(initialCalculated);
-  }, [meal, foods]);
+  // Los alimentos llegan después que el formulario: en un efecto aparte para no pisar lo escrito
+  useEffect(() => {
+    if (!foods.length) return;
+    setDishes((current) => current.map((dish) => (
+      dish.rows.length
+        ? dish
+        : { ...dish, rows: rowsFromIngredients(parseIngredients(dish.ingredients), foods, nextId) }
+    )));
+  }, [foods, meal]);
 
   const foodOptions = useMemo(
-    () => foods.map((food) => ({
-      value: food.id,
-      label: food.name,
-    })),
+    () => foods.map((food) => ({ value: food.id, label: food.name })),
     [foods]
   );
 
-  const calculatedTotals = useMemo(() => calculatedFoods.reduce((acc, item) => ({
-    kcal: acc.kcal + calcNutrient(item.food, item.grams, 'kcal'),
-    cho: acc.cho + calcNutrient(item.food, item.grams, 'cho'),
-    pro: acc.pro + calcNutrient(item.food, item.grams, 'pro'),
-    fat: acc.fat + calcNutrient(item.food, item.grams, 'fat'),
-  }), { kcal: 0, cho: 0, pro: 0, fat: 0 }), [calculatedFoods]);
+  const total = useMemo(
+    () => summarizeDishes(dishes.map((dish) => ({ ...dish, ingredients: [] }))),
+    [dishes]
+  );
 
-  const syncCalculatedFields = (nextFoods) => {
-    const nextTotals = nextFoods.reduce((acc, item) => ({
-      kcal: acc.kcal + calcNutrient(item.food, item.grams, 'kcal'),
-      cho: acc.cho + calcNutrient(item.food, item.grams, 'cho'),
-      pro: acc.pro + calcNutrient(item.food, item.grams, 'pro'),
-      fat: acc.fat + calcNutrient(item.food, item.grams, 'fat'),
-    }), { kcal: 0, cho: 0, pro: 0, fat: 0 });
+  const multipleDishes = dishes.length > 1;
 
-    setCalories(nextFoods.length ? String(Math.round(nextTotals.kcal)) : '');
-    setIngredients(nextFoods.map((item) => `${item.food.name} (${item.grams} g)`).join(', '));
+  const updateDish = (key, change) => {
+    setDishes((current) => current.map((dish) => (dish.key === key ? change(dish) : dish)));
   };
 
-  const handleAddCalculatedFood = () => {
-    const food = foods.find((item) => item.id === foodValue);
-    const grams = Number(foodGrams);
+  const addDish = () => {
+    const dish = newDish();
+    addedDishKey.current = dish.key;
+    setDishes((current) => [...current, dish]);
+    setOpenDishKey(dish.key);
+  };
 
-    if (!food || !Number.isFinite(grams) || grams <= 0) {
+  // Al plegarse el plato anterior, el nuevo podría quedar fuera de la vista
+  const revealAddedDish = (key) => (node) => {
+    if (!node || addedDishKey.current !== key) return;
+    addedDishKey.current = null;
+    setTimeout(() => node.scrollIntoView({ behavior: 'smooth', block: 'start' }), COLLAPSE_MS);
+  };
+
+  const removeDish = (key) => {
+    const remaining = dishes.filter((dish) => dish.key !== key);
+    setDishes(remaining);
+    if (openDishKey === key) setOpenDishKey(remaining[remaining.length - 1]?.key ?? null);
+  };
+
+  const handlePhoto = async (key, files) => {
+    const photo = await normalizeMealPhoto(files?.[0]);
+    if (photo) updateDish(key, (dish) => ({ ...dish, file: photo, removePhoto: false }));
+  };
+
+  const removePhoto = (key) => {
+    updateDish(key, (dish) => ({
+      ...dish,
+      file: null,
+      photoUrl: null,
+      removePhoto: Boolean(dish.id),
+      legacyPhoto: false,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!mealType) {
       notifications.show({
-        title: 'Completa el ingrediente',
-        message: 'Selecciona un alimento de la biblioteca e indica los gramos.',
+        title: 'Falta el tipo de ingesta',
+        message: 'Indica si es desayuno, comida, snack...',
         color: 'yellow',
       });
       return;
     }
 
-    const nextFoods = [
-      ...calculatedFoods,
-      { id: calcIdRef.current += 1, food, grams: roundMacro(grams) },
-    ];
+    const filledDishes = dishes.filter(hasDishContent);
+    const dishesToSave = filledDishes.length ? filledDishes : dishes.slice(0, 1);
+    const photos = dishesToSave.map((dish) => (isSupportedMealPhoto(dish.file) ? dish.file : null));
 
-    setCalculatedFoods(nextFoods);
-    syncCalculatedFields(nextFoods);
-    setFoodValue(null);
-    setFoodGrams(100);
-  };
-
-  const updateCalculatedFoodGrams = (id, gramsValue) => {
-    const grams = Number(gramsValue);
-    const nextFoods = calculatedFoods.map((item) => (
-      item.id === id ? { ...item, grams: Number.isFinite(grams) ? grams : 0 } : item
-    ));
-
-    setCalculatedFoods(nextFoods);
-    syncCalculatedFields(nextFoods);
-  };
-
-  const removeCalculatedFood = (id) => {
-    const nextFoods = calculatedFoods.filter((item) => item.id !== id);
-
-    setCalculatedFoods(nextFoods);
-    syncCalculatedFields(nextFoods);
-  };
-
-  const handleFileDrop = async (files) => {
-    let droppedFile = files?.[0];
-    if (!droppedFile) return;
-
-    droppedFile = await normalizeMealPhoto(droppedFile);
-    setFile(droppedFile);
-  };
-
-  const clearFile = () => {
-    setFile(null);
-  };
-
-  const handleSubmit = async () => {
-    if (!mealType) {
-      alert('Selecciona el tipo de ingesta');
+    if (photos.reduce((sum, photo) => sum + (photo?.size || 0), 0) > MAX_UPLOAD_BYTES) {
+      notifications.show({
+        title: 'Las fotos pesan demasiado',
+        message: 'Quita alguna foto o usa imágenes más pequeñas.',
+        color: 'yellow',
+      });
       return;
     }
 
@@ -278,55 +287,42 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
         return;
       }
       if (takenAtDate) fd.append('takenAt', takenAtDate.toISOString());
-
-      const cleanDishName = dishName.trim();
-      if (cleanDishName) fd.append('dishName', cleanDishName);
       fd.append('mealType', mealType);
+      fd.append('notes', notes);
 
-      // Ingredientes
-      const txt = (ingredients ?? '').trim();
-      let asJson = null;
-      if (txt.startsWith('[')) {
-        try {
-          const arr = JSON.parse(txt);
-          if (Array.isArray(arr)) asJson = JSON.stringify(arr);
-        } catch { /**/ }
-      }
-      if (!asJson) {
-        const arr = txt.split(/[\n,]/g).map(s => s.trim()).filter(Boolean);
-        asJson = JSON.stringify(arr);
-      }
-      fd.append('ingredients', asJson);
+      fd.append('dishes', JSON.stringify(dishesToSave.map((dish) => ({
+        id: dish.id,
+        dishName: dish.dishName,
+        calories: dish.calories,
+        protein: dish.protein,
+        carbs: dish.carbs,
+        fat: dish.fat,
+        ingredients: parseIngredients(dish.ingredients),
+        removePhoto: dish.removePhoto,
+        legacyPhoto: dish.legacyPhoto,
+      }))));
+      photos.forEach((photo, index) => {
+        if (photo) fd.append(`${DISH_PHOTO_PREFIX}${index}`, photo, photo.name || 'meal.jpg');
+      });
 
-      // Calorías
-      if (calories !== '' && calories != null) {
-        const val = Number(calories);
-        if (Number.isFinite(val) && val > 0) fd.append('calories', String(Math.round(val)));
-      }
-
-      if (notes) fd.append('notes', notes);
-
-      if (file && isSupportedMealPhoto(file)) {
-        fd.append('photo', file, file.name || 'meal.jpg');
-      }
-
-      if (meal?.id) {
-        fd.append('id', meal.id);
-      }
+      if (meal?.id) fd.append('id', meal.id);
 
       await savePlayerMeal(jugadorId, fd);
 
       notifySaved({
         title: meal?.id ? 'Comida modificada' : 'Comida registrada',
-        message: meal?.id ? 'La ingesta se actualizó correctamente.' : 'La ingesta se guardó en el diario.',
+        message: total.calories ? `${total.calories} kcal en el diario.` : 'La ingesta se guardó en el diario.',
         color: 'green',
       });
-
       onSuccess?.();
 
     } catch (e) {
       console.error(e);
-      alert('No se pudo guardar la comida');
+      notifications.show({
+        title: 'No se pudo guardar la comida',
+        message: errorMessage(e, 'Ha ocurrido un error al guardar la comida.'),
+        color: 'red',
+      });
     } finally {
       setSaving(false);
     }
@@ -334,91 +330,24 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
 
   return (
     <Stack gap="lg">
-      <Box>
-        <Group justify="space-between" mb={4}>
-          <Text fw={600} size="sm">Fotografía del plato (opcional)</Text>
-        </Group>
-
-        {file || meal?.photoUrl ? (
-          <Paper
-            withBorder
-            radius="lg"
-            shadow="sm"
-            style={{ overflow: 'hidden', position: 'relative' }}
-            w="100%"
-            bg="gray.1"
-          >
-            <Image
-              src={file ? URL.createObjectURL(file) : meal?.photoUrl}
-              h={220}
-              w="100%"
-              fit="cover"
-              alt=''
-              onLoad={(e) => {
-                if (file) URL.revokeObjectURL(e.currentTarget.src);
-              }}
-            />
-
-            {file && (
-              <ActionIcon aria-label="Quitar foto"
-                variant="filled"
-                color="dark"
-                radius="xl"
-                size="lg"
-                onClick={clearFile}
-                style={{ position: 'absolute', top: 10, right: 10, opacity: 0.8 }}
-              >
-                <IconX size={20} />
-              </ActionIcon>
-            )}
-          </Paper>
-        ) : (
-          <Dropzone
-            openRef={dzRef}
-            accept={{ 'image/*': [] }}
-            multiple={false}
-            onDrop={handleFileDrop}
-            maxSize={6 * 1024 ** 2}
-            radius="lg"
-            styles={{
-              root: {
-                border: '2px dashed var(--mantine-color-violet-3)',
-                backgroundColor: 'var(--mantine-color-violet-0)',
-                padding: 0,
-                minHeight: rem(140),
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s ease',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: 'var(--mantine-color-violet-1)',
-                }
-              },
-              inner: { pointerEvents: 'all', width: '100%' }
-            }}
-          >
-            <Stack align="center" gap="xs">
-              <ThemeIcon
-                size={50}
-                radius="xl"
-                variant="transparent"
-                color="dark"
-              >
-                <IconCamera size={28} />
-              </ThemeIcon>
-              <Stack gap={0} align="center">
-                <Text size="sm" fw={700} c="dark.4">
-                  Sube una foto para tener registro
-                </Text>
-                <Text size="xs" c="dimmed">
-                  La imagen se guardará junto a esta ingesta
-                </Text>
-              </Stack>
-            </Stack>
-          </Dropzone>
+      <Stack gap={6}>
+        <Text fw={500} size="sm">
+          Ingesta{' '}
+          <Text span c="red">*</Text>
+        </Text>
+        <Chip.Group value={mealType} onChange={setMealType}>
+          <Group gap={6}>
+            {MEAL_TYPES.map((type) => (
+              <Chip key={type.value} value={type.value} size="sm" radius="xl">
+                {type.label}
+              </Chip>
+            ))}
+          </Group>
+        </Chip.Group>
+        {mealType === 'extra' && (
+          <Text size="xs" c="dimmed">Para lo que tomes entre horas: un café, una pieza de fruta...</Text>
         )}
-      </Box>
+      </Stack>
 
       <DateTimePicker
         label="Fecha y hora"
@@ -429,169 +358,102 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
         leftSection={<IconCalendar size={16} />}
       />
 
-      <Select
-        label="Ingesta"
-        placeholder="Selecciona"
-        data={MEAL_TYPES}
-        value={mealType}
-        onChange={setMealType}
-        variant="filled"
-        radius="md"
-        leftSection={<IconToolsKitchen2 size={16} />}
-        withAsterisk
-      />
-
-      <TextInput
-        label="Nombre del plato"
-        placeholder="Ej: arroz con pollo, tortilla francesa..."
-        value={dishName}
-        onChange={(e) => setDishName(e.currentTarget.value)}
-        variant="filled"
-        radius="md"
-      />
-
-      <Paper withBorder radius="lg" p="md" bg="gray.0">
+      {multipleDishes ? (
         <Stack gap="sm">
-          <Group gap="xs" justify="space-between">
-            <Group gap="xs">
-              <ThemeIcon variant="light" color="green" radius="xl">
-                <IconCalculator size={18} />
-              </ThemeIcon>
-              <Box>
-                <Text fw={700} size="sm">Calculadora de ingredientes</Text>
-                <Text size="xs" c="dimmed">Valores por 100 g desde la biblioteca</Text>
-              </Box>
-            </Group>
-            {calculatedFoods.length > 0 && (
-              <Badge color="orange" variant="light" leftSection={<IconFlame size={12} />}>
-                {Math.round(calculatedTotals.kcal)} kcal
-              </Badge>
-            )}
-          </Group>
-
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs">
-            <Select
-              placeholder="Buscar alimento"
-              data={foodOptions}
-              value={foodValue}
-              onChange={setFoodValue}
-              searchable
-              clearable
-              limit={25}
-              variant="filled"
-              radius="md"
-              nothingFoundMessage="No hay alimentos"
-            />
-            <Group gap="xs" wrap="nowrap" align="flex-start">
-              <NumberInput
-                placeholder="Gramos"
-                value={foodGrams}
-                onChange={setFoodGrams}
-                min={1}
-                step={10}
-                variant="filled"
-                radius="md"
-                leftSection={<IconScale size={16} />}
-                rightSection={<Text size="xs" c="dimmed" mr="xs">g</Text>}
-                style={{ flex: 1 }}
-              />
-              <ActionIcon
-                size={36}
-                radius="xl"
-                color="dark"
-                variant="filled"
-                onClick={handleAddCalculatedFood}
-                aria-label="Añadir ingrediente"
-              >
-                <IconPlus size={18} />
-              </ActionIcon>
-            </Group>
-          </SimpleGrid>
-
-          {calculatedFoods.length > 0 && (
-            <>
-              <Divider />
-              <Stack gap="xs">
-                {calculatedFoods.map((item) => {
-                  const itemKcal = calcNutrient(item.food, item.grams, 'kcal');
-
-                  return (
-                    <Paper key={item.id} withBorder radius="md" p="xs" bg="white">
-                      <Group justify="space-between" align="center" wrap="nowrap">
-                        <Box style={{ minWidth: 0, flex: 1 }}>
-                          <Text size="sm" fw={600} lineClamp={1}>{item.food.name}</Text>
-                          <Text size="xs" c="dimmed">
-                            {Math.round(itemKcal)} kcal · P {roundMacro(calcNutrient(item.food, item.grams, 'pro'))} g · C {roundMacro(calcNutrient(item.food, item.grams, 'cho'))} g · G {roundMacro(calcNutrient(item.food, item.grams, 'fat'))} g
-                          </Text>
-                        </Box>
-                        <Group gap={6} wrap="nowrap">
-                          <NumberInput
-                            value={item.grams}
-                            onChange={(value) => updateCalculatedFoodGrams(item.id, value)}
-                            min={1}
-                            step={10}
-                            w={92}
-                            size="xs"
-                            radius="md"
-                            rightSection={<Text size="xs" c="dimmed" mr={4}>g</Text>}
-                          />
-                          <ActionIcon
-                            variant="subtle"
-                            color="red"
-                            radius="xl"
-                            onClick={() => removeCalculatedFood(item.id)}
-                            aria-label="Quitar ingrediente"
-                          >
-                            <IconTrash size={16} />
-                          </ActionIcon>
-                        </Group>
-                      </Group>
-                    </Paper>
-                  );
-                })}
-              </Stack>
-              <SimpleGrid cols={3} spacing="xs">
-                <Badge variant="light" color="blue">Prot {roundMacro(calculatedTotals.pro)} g</Badge>
-                <Badge variant="light" color="orange">Carb {roundMacro(calculatedTotals.cho)} g</Badge>
-                <Badge variant="light" color="yellow">Grasa {roundMacro(calculatedTotals.fat)} g</Badge>
-              </SimpleGrid>
-            </>
-          )}
+          {dishes.map((dish, index) => {
+            const isOpen = openDishKey === dish.key;
+            return (
+              <Paper key={dish.key} ref={revealAddedDish(dish.key)} withBorder radius="lg" p="sm">
+                <Group gap="xs" wrap="nowrap">
+                  <UnstyledButton
+                    onClick={() => setOpenDishKey(isOpen ? null : dish.key)}
+                    aria-expanded={isOpen}
+                    style={{ flex: 1, minWidth: 0 }}
+                  >
+                    <Group gap="xs" wrap="nowrap">
+                      <IconChevronDown
+                        size={16}
+                        color="var(--mantine-color-gray-6)"
+                        style={{ flexShrink: 0, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 150ms ease' }}
+                      />
+                      <Text size="sm" fw={700} lineClamp={1} style={{ flex: 1, minWidth: 0 }}>
+                        {dish.dishName.trim() || `Plato ${index + 1}`}
+                      </Text>
+                      {Number(dish.calories) > 0 && (
+                        <Text size="xs" fw={700} c="orange.7" style={{ flexShrink: 0 }}>
+                          {dish.calories} kcal
+                        </Text>
+                      )}
+                    </Group>
+                  </UnstyledButton>
+                  <ActionIcon
+                    variant="subtle"
+                    color="red"
+                    radius="xl"
+                    onClick={() => removeDish(dish.key)}
+                    aria-label={`Quitar plato ${index + 1}`}
+                  >
+                    <IconTrash size={16} />
+                  </ActionIcon>
+                </Group>
+                <Collapse expanded={isOpen}>
+                  <Box pt="sm">
+                    <MealDishFields
+                      dish={dish}
+                      foods={foods}
+                      foodsLoading={foodsLoading}
+                      foodOptions={foodOptions}
+                      nextId={nextId}
+                      onChange={(change) => updateDish(dish.key, change)}
+                      onPhoto={(files) => handlePhoto(dish.key, files)}
+                      onRemovePhoto={() => removePhoto(dish.key)}
+                    />
+                  </Box>
+                </Collapse>
+              </Paper>
+            );
+          })}
         </Stack>
-      </Paper>
+      ) : (
+        <MealDishFields
+          dish={dishes[0]}
+          foods={foods}
+          foodsLoading={foodsLoading}
+          foodOptions={foodOptions}
+          nextId={nextId}
+          onChange={(change) => updateDish(dishes[0].key, change)}
+          onPhoto={(files) => handlePhoto(dishes[0].key, files)}
+          onRemovePhoto={() => removePhoto(dishes[0].key)}
+        />
+      )}
 
-      <NumberInput
-        label={
-          <Group gap={4}>
-            Energía estimada
-          </Group>
-        }
-        placeholder="0"
-        value={calories}
-        onChange={setCalories}
-        min={0}
-        step={10}
-        variant="filled"
-        radius="md"
-        leftSection={<IconFlame size={16} />}
-        rightSection={<Text size="xs" c="dimmed" mr="xs">kcal</Text>}
-      />
+      <Button
+        variant="light"
+        color="gray"
+        radius="xl"
+        leftSection={<IconPlus size={16} />}
+        onClick={addDish}
+        disabled={dishes.length >= MAX_MEAL_DISHES}
+      >
+        {dishes.length >= MAX_MEAL_DISHES ? `Máximo ${MAX_MEAL_DISHES} platos por ingesta` : 'Añadir otro plato (segundo, postre...)'}
+      </Button>
 
-      <Textarea
-        label={
-          <Group gap={4}>
-            Ingredientes
+      {multipleDishes && (
+        <Paper radius="lg" p="sm" bg="gray.0">
+          <Group justify="space-between" wrap="nowrap">
+            <Group gap={6} wrap="nowrap">
+              <IconFlame size={16} />
+              <Text size="sm" fw={700}>Total de la ingesta</Text>
+            </Group>
+            <Box ta="right">
+              <Text size="sm" fw={800} c="orange.7">{total.calories ?? 0} kcal</Text>
+              <Text size="xs" c="dimmed">
+                P {Math.round(total.protein ?? 0)} · HC {Math.round(total.carbs ?? 0)} · G {Math.round(total.fat ?? 0)} g
+              </Text>
+            </Box>
           </Group>
-        }
-        description="Puedes editar el resultado si no es correcto"
-        placeholder="Ej: 2 huevos, pan integral..."
-        autosize
-        minRows={2}
-        value={ingredients}
-        onChange={(e) => setIngredients(e.currentTarget.value)}
-        variant="filled"
-        radius="md"
-      />
+        </Paper>
+      )}
 
       <Textarea
         label="Notas adicionales"

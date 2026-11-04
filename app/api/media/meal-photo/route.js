@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
 import { forbidden, getAccessiblePlayer } from '@/lib/auth/team-access';
-import { getMealPhotoWithMeta } from '@/repositories/mealsRepository';
+import { getMealDishPhotoWithMeta, getMealPhotoWithMeta } from '@/repositories/mealsRepository';
 import { imageResponse } from '@/lib/security/media';
 
 export const dynamic = 'force-dynamic';
@@ -10,14 +10,16 @@ export const dynamic = 'force-dynamic';
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
+    // `id`: foto de la comida; `dish`: foto de uno de sus platos
     const id = searchParams.get('id');
-    if (!id) return NextResponse.json({ error: 'Falta id' }, { status: 400 });
+    const dishId = searchParams.get('dish');
+    if (!id && !dishId) return NextResponse.json({ error: 'Falta id' }, { status: 400 });
 
     const user = await getUser();
     if (!user) return forbidden('No autorizado');
 
     const db = getDb();
-    const meal = await getMealPhotoWithMeta(db, id);
+    const meal = dishId ? await getMealDishPhotoWithMeta(db, dishId) : await getMealPhotoWithMeta(db, id);
     if (!meal) return NextResponse.json({ error: 'Comida no encontrada' }, { status: 404 });
 
     if (user.role === 'jugador') {
