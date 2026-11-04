@@ -6,6 +6,7 @@ import {
   ActionIcon,
   Box,
   Button,
+  Center,
   Group,
   Image,
   Paper,
@@ -48,6 +49,7 @@ const MEAL_SLOTS = [
 ];
 const SLOT_BY_KEY = Object.fromEntries(MEAL_SLOTS.map((s) => [s.key, s]));
 const OTHER_SLOT = { key: 'other', label: 'Otros', color: 'salvia' };
+const MAX_CARD_PHOTOS = 3;
 const WEEKDAYS = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
 
 const slotColor = (key, shade = 5) => `var(--mantine-color-${(SLOT_BY_KEY[key] || OTHER_SLOT).color}-${shade})`;
@@ -179,8 +181,10 @@ function DiaryMealCard({ meal, stacked = false, onClick, onOpenPhoto, onDelete }
   const dishCount = meal.dishes?.length || 0;
   const dishPhotos = (meal.dishes || []).filter((d) => d.photoUrl).map((d) => d.photoUrl);
   const photos = dishPhotos.length ? dishPhotos : meal.photoUrl ? [meal.photoUrl] : [];
-  // Varias fotos no caben junto al texto en móvil: van en su propia fila
+  // Varias fotos no caben junto al texto en móvil: van en su propia fila, y nunca más de tres
   const vertical = stacked || photos.length > 1;
+  const shownPhotos = photos.slice(0, MAX_CARD_PHOTOS);
+  const hasMacros = [meal.protein, meal.carbs, meal.fat].some((v) => Number(v) > 0);
 
   return (
     <Box
@@ -203,66 +207,75 @@ function DiaryMealCard({ meal, stacked = false, onClick, onOpenPhoto, onDelete }
     >
       {photos.length > 0 && (
         <Box
-          w={vertical ? '100%' : 76}
+          w={vertical ? '100%' : { base: 64, sm: 76 }}
           style={{
             display: 'grid',
-            gridTemplateColumns: `repeat(${Math.min(photos.length, 3)}, minmax(0, 1fr))`,
+            gridTemplateColumns: `repeat(${shownPhotos.length}, minmax(0, 1fr))`,
             gap: 6,
             flexShrink: 0,
           }}
         >
-          {photos.map((src) => (
-            <Image
-              key={src}
-              src={src}
-              alt={meal.dishName || slot.label}
-              h={!vertical ? 76 : photos.length > 1 ? 84 : 120}
-              radius="md"
-              fit="cover"
-              style={{ cursor: onOpenPhoto ? 'zoom-in' : undefined }}
-              onClick={
-                onOpenPhoto
-                  ? (e) => {
-                      e.stopPropagation();
-                      onOpenPhoto(src);
-                    }
-                  : undefined
-              }
-            />
-          ))}
+          {shownPhotos.map((src, index) => {
+            const hiddenCount = index === shownPhotos.length - 1 ? photos.length - shownPhotos.length : 0;
+            return (
+              <Box key={src} pos="relative">
+                <Image
+                  src={src}
+                  alt={meal.dishName || slot.label}
+                  h={!vertical ? { base: 64, sm: 76 } : photos.length === 1 ? 120 : stacked ? 56 : 88}
+                  radius="md"
+                  fit="cover"
+                  style={{ cursor: onOpenPhoto ? 'zoom-in' : undefined }}
+                  onClick={
+                    onOpenPhoto
+                      ? (e) => {
+                          e.stopPropagation();
+                          onOpenPhoto(src);
+                        }
+                      : undefined
+                  }
+                />
+                {hiddenCount > 0 && (
+                  <Center
+                    pos="absolute"
+                    style={{ inset: 0, pointerEvents: 'none', borderRadius: 'var(--mantine-radius-md)', background: 'rgba(0, 0, 0, 0.45)' }}
+                  >
+                    <Text c="white" fw={800} fz="md">+{hiddenCount}</Text>
+                  </Center>
+                )}
+              </Box>
+            );
+          })}
         </Box>
       )}
 
-      <Box style={{ flex: 1, minWidth: 0 }}>
-        <Group justify="space-between" align="flex-start" gap={8} wrap="nowrap">
-          <Text fw={700} fz="sm" c="dark.5" lineClamp={2} lh={1.3}>
-            {meal.dishName || slot.label}
-          </Text>
-          {calories > 0 && (
-            <Text fz="sm" fw={800} c="orange.7" style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
-              {formatKcal(calories)}
-              <Text span fz={10} fw={600} c="dimmed">
-                {' '}
-                kcal
+      <Box style={{ flex: 1, minWidth: 0, width: '100%' }}>
+        <Text fw={700} fz="sm" c="dark.5" lineClamp={2} lh={1.3}>
+          {dishCount > 1 ? `${dishCount} platos` : meal.dishName || slot.label}
+        </Text>
+        <Group justify="space-between" gap={6} mt={2} wrap="nowrap">
+          <Group gap={6} wrap="nowrap" style={{ minWidth: 0 }}>
+            {calories > 0 && (
+              <Text fz="sm" fw={800} c="orange.7" style={{ whiteSpace: 'nowrap' }}>
+                {formatKcal(calories)}
+                <Text span fz={10} fw={600} c="dimmed">
+                  {' '}
+                  kcal
+                </Text>
               </Text>
-            </Text>
-          )}
-        </Group>
-        <Group justify="space-between" align="center" gap={8} wrap="nowrap" mt={2}>
-          <Text fz="xs" c="dimmed">
-            {formatTime(meal.takenAt)}
-            {dishCount > 1 && ` · ${dishCount} platos`}
-            {[meal.protein, meal.carbs, meal.fat].some((v) => Number(v) > 0) && (
-              ` · P ${Math.round(Number(meal.protein) || 0)} · HC ${Math.round(Number(meal.carbs) || 0)} · G ${Math.round(Number(meal.fat) || 0)} g`
             )}
-          </Text>
+            <Text fz="xs" c="dimmed">
+              {formatTime(meal.takenAt)}
+            </Text>
+          </Group>
           {onDelete && (
             <Tooltip label="Eliminar" withArrow>
               <ActionIcon
                 variant="subtle"
                 color="red"
                 radius="xl"
-                size="sm"
+                size="md"
+                style={{ flexShrink: 0 }}
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete();
@@ -274,10 +287,32 @@ function DiaryMealCard({ meal, stacked = false, onClick, onOpenPhoto, onDelete }
             </Tooltip>
           )}
         </Group>
-        {ingredients.length > 0 && (
-          <Text fz="xs" c="dark.3" mt={4} lineClamp={stacked ? 3 : 1}>
-            {ingredients.join(' · ')}
+        {hasMacros && (
+          <Text fz="xs" c="dimmed">
+            P {Math.round(Number(meal.protein) || 0)} · HC {Math.round(Number(meal.carbs) || 0)} · G {Math.round(Number(meal.fat) || 0)} g
           </Text>
+        )}
+        {dishCount > 1 ? (
+          <Stack gap={2} mt={6}>
+            {meal.dishes.map((dish, index) => (
+              <Group key={dish.id} justify="space-between" gap={8} wrap="nowrap">
+                <Text fz="xs" c="dark.4" lineClamp={1} style={{ minWidth: 0 }}>
+                  {dish.dishName || `Plato ${index + 1}`}
+                </Text>
+                {!stacked && dish.calories > 0 && (
+                  <Text fz="xs" c="dimmed" style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
+                    {formatKcal(dish.calories)} kcal
+                  </Text>
+                )}
+              </Group>
+            ))}
+          </Stack>
+        ) : (
+          ingredients.length > 0 && (
+            <Text fz="xs" c="dark.3" mt={4} lineClamp={stacked ? 3 : 1}>
+              {ingredients.join(' · ')}
+            </Text>
+          )
         )}
         {meal.notes && (
           <Text
@@ -309,14 +344,13 @@ function groupBySlot(meals, canAdd) {
   return { bySlot, rows };
 }
 
-function AddSlotButton({ slot, onAdd, fill = false }) {
+function AddSlotButton({ slot, onAdd, fill = false, label = 'Añadir' }) {
   return (
     <UnstyledButton
       onClick={() => onAdd(slot)}
       style={{
         width: '100%',
-        flex: fill ? 1 : undefined,
-        minHeight: fill ? 72 : undefined,
+        minHeight: fill ? 44 : undefined,
         display: 'flex',
         alignItems: 'center',
         justifyContent: fill ? 'center' : 'space-between',
@@ -335,7 +369,7 @@ function AddSlotButton({ slot, onAdd, fill = false }) {
       <Group gap={4} wrap="nowrap">
         <IconPlusPlain size={14} />
         <Text fz="xs" fw={600}>
-          Añadir
+          {label}
         </Text>
       </Group>
     </UnstyledButton>
@@ -369,7 +403,7 @@ function DayBoard({ meals, canAdd, onAdd, renderCard }) {
               )}
             </Group>
             {slotMeals.map((m) => renderCard(m, true))}
-            {slotMeals.length > 0 && slot.addable && canAdd && <AddSlotButton slot={slot} onAdd={onAdd} />}
+            {slotMeals.length > 0 && slot.addable && canAdd && <AddSlotButton slot={slot} onAdd={onAdd} fill label="Añadir otro" />}
             {slotMeals.length === 0 &&
               (canAdd ? (
                 <AddSlotButton slot={slot} onAdd={onAdd} fill />
@@ -433,7 +467,7 @@ function DayTimeline({ meals, canAdd, onAdd, renderCard }) {
                     {slot.label}
                   </Text>
                   {slotMeals.map((m) => renderCard(m, false))}
-                  {slot.addable && canAdd && <AddSlotButton slot={slot} onAdd={onAdd} />}
+                  {slot.addable && canAdd && <AddSlotButton slot={slot} onAdd={onAdd} fill label="Añadir otro" />}
                 </Stack>
               )}
             </Box>
@@ -451,7 +485,7 @@ function StatPill({ icon, value, label }) {
       <Text fz="xs" fw={800} c="dark.4" lh={1}>
         <AnimatedNumber value={value} />
       </Text>
-      <Text fz="xs" c="dimmed" lh={1}>
+      <Text fz="xs" c="dimmed" lh={1} style={{ whiteSpace: 'nowrap' }}>
         {label}
       </Text>
     </Group>
@@ -628,7 +662,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
             <Group justify="space-between" align="center" wrap="nowrap" gap="sm">
               <Box style={{ minWidth: 0, flex: 1 }}>
                 <SubtabHeader tab="resumen" subtab="diario" />
-                <Group gap={10} wrap="nowrap" mt={6} pl={{ base: 0, sm: 40 }}>
+                <Group gap={10} mt={6} pl={{ base: 0, sm: 40 }}>
                   <Tooltip label="Días seguidos registrando comidas" withArrow>
                     <Box>
                       <StatPill icon={<IconFlame size={13} />} value={stats.streak} label="de racha" />
@@ -683,10 +717,11 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
                 {/* Celebración al registrar una comida */}
                 <ParticleBurst burstKey={savedBurst} top={28} left="85%" />
                 <DayHeader dayKey={selectedKey} todayKey={todayKey} meals={dayMeals} />
-                <Box hiddenFrom="md">
+                {/* Seis columnas solo caben con mucho ancho: la barra lateral resta unos 300 px */}
+                <Box hiddenFrom="xl">
                   <DayTimeline meals={dayMeals} canAdd={canAdd} onAdd={openDraft} renderCard={renderCard} />
                 </Box>
-                <Box visibleFrom="md">
+                <Box visibleFrom="xl">
                   <DayBoard meals={dayMeals} canAdd={canAdd} onAdd={openDraft} renderCard={renderCard} />
                 </Box>
               </Paper>

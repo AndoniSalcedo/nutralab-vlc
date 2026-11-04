@@ -4,10 +4,10 @@ import {
   ActionIcon,
   Box,
   Button,
-  Chip,
   Collapse,
   Group,
   Paper,
+  SimpleGrid,
   Stack,
   Text,
   Textarea,
@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { IconChevronDown } from '@tabler/icons-react';
-import { IconCalendar, IconFlame, IconNotes, IconPlus, IconTrash } from '@/components/icons3d';
+import { IconCalendar, IconNotes, IconPlus, IconTrash } from '@/components/icons3d';
 
 import ModalFooter from '@/components/modals/ModalFooter';
 import { savePlayerMeal } from '@/actions/mealActions';
@@ -47,6 +47,7 @@ const MEAL_TYPES = [
 ];
 
 const COLLAPSE_MS = 220;
+const FOOTER_PADDING = 'calc(var(--mantine-spacing-sm) + env(safe-area-inset-bottom, 0px))';
 const MAX_MEAL_PHOTO_BYTES = 6 * 1024 * 1024;
 // Por debajo de `serverActions.bodySizeLimit` (8 MB): el resto del formulario también viaja
 const MAX_UPLOAD_BYTES = 7 * 1024 * 1024;
@@ -335,15 +336,26 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
           Ingesta{' '}
           <Text span c="red">*</Text>
         </Text>
-        <Chip.Group value={mealType} onChange={setMealType}>
-          <Group gap={6}>
-            {MEAL_TYPES.map((type) => (
-              <Chip key={type.value} value={type.value} size="sm" radius="xl">
+        <SimpleGrid cols={{ base: 4, sm: 7 }} spacing={6} verticalSpacing={6}>
+          {MEAL_TYPES.map((type) => {
+            const selected = mealType === type.value;
+            return (
+              <Button
+                key={type.value}
+                size="sm"
+                radius="xl"
+                px={2}
+                fz={{ base: 11, xs: 'xs' }}
+                variant={selected ? 'filled' : 'light'}
+                color={selected ? 'dark' : 'gray'}
+                aria-pressed={selected}
+                onClick={() => setMealType(type.value)}
+              >
                 {type.label}
-              </Chip>
-            ))}
-          </Group>
-        </Chip.Group>
+              </Button>
+            );
+          })}
+        </SimpleGrid>
         {mealType === 'extra' && (
           <Text size="xs" c="dimmed">Para lo que tomes entre horas: un café, una pieza de fruta...</Text>
         )}
@@ -427,33 +439,22 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
         />
       )}
 
-      <Button
-        variant="light"
-        color="gray"
-        radius="xl"
-        leftSection={<IconPlus size={16} />}
-        onClick={addDish}
-        disabled={dishes.length >= MAX_MEAL_DISHES}
-      >
-        {dishes.length >= MAX_MEAL_DISHES ? `Máximo ${MAX_MEAL_DISHES} platos por ingesta` : 'Añadir otro plato (segundo, postre...)'}
-      </Button>
-
-      {multipleDishes && (
-        <Paper radius="lg" p="sm" bg="gray.0">
-          <Group justify="space-between" wrap="nowrap">
-            <Group gap={6} wrap="nowrap">
-              <IconFlame size={16} />
-              <Text size="sm" fw={700}>Total de la ingesta</Text>
-            </Group>
-            <Box ta="right">
-              <Text size="sm" fw={800} c="orange.7">{total.calories ?? 0} kcal</Text>
-              <Text size="xs" c="dimmed">
-                P {Math.round(total.protein ?? 0)} · HC {Math.round(total.carbs ?? 0)} · G {Math.round(total.fat ?? 0)} g
-              </Text>
-            </Box>
-          </Group>
-        </Paper>
-      )}
+      <Stack gap={4}>
+        <Button
+          variant="light"
+          color="gray"
+          radius="xl"
+          fullWidth
+          leftSection={<IconPlus size={16} />}
+          onClick={addDish}
+          disabled={dishes.length >= MAX_MEAL_DISHES}
+        >
+          {dishes.length >= MAX_MEAL_DISHES ? `Máximo ${MAX_MEAL_DISHES} platos por ingesta` : 'Añadir otro plato'}
+        </Button>
+        {!multipleDishes && (
+          <Text size="xs" c="dimmed" ta="center">Segundo, postre, bebida... cada uno con su foto</Text>
+        )}
+      </Stack>
 
       <Textarea
         label="Notas adicionales"
@@ -467,11 +468,20 @@ export default function MealForm({ jugadorId, meal, onSuccess, onCancel }) {
         leftSection={<IconNotes size={16} />}
       />
 
-      <ModalFooter>
-        <Button variant="subtle" color="gray" onClick={onCancel} radius="xl">
+      <ModalFooter gap="xs" style={{ paddingBottom: FOOTER_PADDING }}>
+        {multipleDishes && (
+          <Group w="100%" justify="space-between" wrap="nowrap" gap="xs">
+            <Text size="sm" fw={700}>Total</Text>
+            <Text size="xs" c="dimmed" ta="right" style={{ flex: 1, minWidth: 0 }}>
+              P {Math.round(total.protein ?? 0)} · HC {Math.round(total.carbs ?? 0)} · G {Math.round(total.fat ?? 0)} g
+            </Text>
+            <Text size="sm" fw={800} c="orange.7" style={{ flexShrink: 0 }}>{total.calories ?? 0} kcal</Text>
+          </Group>
+        )}
+        <Button variant="subtle" color="gray" onClick={onCancel} radius="xl" px={{ base: 'xs', sm: 'lg' }} flex={{ base: 1, sm: 'none' }}>
           Cancelar
         </Button>
-        <Button onClick={handleSubmit} loading={saving} color="dark" radius="xl" px="xl">
+        <Button onClick={handleSubmit} loading={saving} color="dark" radius="xl" px="xl" flex={{ base: 2, sm: 'none' }}>
           Guardar
         </Button>
       </ModalFooter>

@@ -20,6 +20,8 @@ export default function MealEditorModal({
       title={<Text fw={700}>{meal?.id ? 'Editar Comida' : 'Registrar Comida'}</Text>}
       radius="lg"
       padding="lg"
+      // El pie fijo del formulario llega hasta el borde; con padding asomaría contenido debajo
+      styles={{ body: { paddingBottom: 0 } }}
     >
       <MealForm
         jugadorId={jugadorId}

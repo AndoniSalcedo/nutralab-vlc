@@ -121,7 +121,7 @@ export default function MealDishFields({
             w="100%"
             bg="gray.1"
           >
-            <Image src={photoSrc} alt={dish.dishName || 'Foto del plato'} h={200} w="100%" fit="cover" />
+            <Image src={photoSrc} alt={dish.dishName || 'Foto del plato'} h={{ base: 150, sm: 200 }} w="100%" fit="cover" />
 
             <ActionIcon
               aria-label="Quitar foto"
@@ -157,7 +157,7 @@ export default function MealDishFields({
               inner: { pointerEvents: 'all', width: '100%' },
             }}
           >
-            <Stack align="center" gap="xs">
+            <Stack align="center" gap="xs" px="sm">
               <IconCamera size={40} />
               <Stack gap={0} align="center">
                 <Text size="sm" fw={700} c="dark.4" ta="center">
@@ -184,11 +184,11 @@ export default function MealDishFields({
         radius="md"
       />
 
-      <Paper withBorder radius="lg" p="md" bg="gray.0">
+      <Paper withBorder radius="lg" p={{ base: 'sm', sm: 'md' }} bg="gray.0">
         <Stack gap="sm">
-          <Group gap="xs">
-            <IconCalculator size={28} />
-            <Box>
+          <Group gap="xs" wrap="nowrap">
+            <IconCalculator size={28} style={{ flexShrink: 0 }} />
+            <Box style={{ minWidth: 0 }}>
               <Text fw={700} size="sm">Añadir ingredientes</Text>
               <Text size="xs" c="dimmed">Se suman a lo que ya tenga el plato</Text>
             </Box>
@@ -242,35 +242,37 @@ export default function MealDishFields({
                   const macros = rowMacros(row);
                   return (
                     <Paper key={row.id} withBorder radius="md" p="xs" bg="white">
-                      <Group justify="space-between" align="center" wrap="nowrap">
-                        <Box style={{ minWidth: 0, flex: 1 }}>
-                          <Text size="sm" fw={600} lineClamp={1}>{row.food.name}</Text>
-                          <Text size="xs" c="dimmed">
-                            {Math.round(foodKcal(row.food, row.grams))} kcal · P {macros.protein} · HC {macros.carbs} · G {macros.fat} g
-                          </Text>
-                        </Box>
-                        <Group gap={6} wrap="nowrap">
-                          <NumberInput
-                            aria-label={`Gramos de ${row.food.name}`}
-                            value={row.grams}
-                            onChange={(value) => setRowGrams(row, value)}
-                            min={1}
-                            step={10}
-                            w={92}
-                            size="xs"
-                            radius="md"
-                            rightSection={<Text size="xs" c="dimmed" mr={4}>g</Text>}
-                          />
-                          <ActionIcon
-                            variant="subtle"
-                            color="red"
-                            radius="xl"
-                            onClick={() => removeRow(row)}
-                            aria-label={`Quitar ${row.food.name}`}
-                          >
-                            <IconTrash size={16} />
-                          </ActionIcon>
-                        </Group>
+                      <Group gap="xs" wrap="nowrap" align="flex-start" justify="space-between">
+                        <Text size="sm" fw={600} lineClamp={2} style={{ minWidth: 0 }}>{row.food.name}</Text>
+                        <ActionIcon
+                          variant="subtle"
+                          color="red"
+                          radius="xl"
+                          size="lg"
+                          mt={-6}
+                          mr={-6}
+                          style={{ flexShrink: 0 }}
+                          onClick={() => removeRow(row)}
+                          aria-label={`Quitar ${row.food.name}`}
+                        >
+                          <IconTrash size={16} />
+                        </ActionIcon>
+                      </Group>
+                      <Group gap="xs" wrap="nowrap" justify="space-between" mt={2}>
+                        <Text size="xs" c="dimmed" style={{ minWidth: 0 }}>
+                          {Math.round(foodKcal(row.food, row.grams))} kcal · P {macros.protein} · HC {macros.carbs} · G {macros.fat} g
+                        </Text>
+                        <NumberInput
+                          aria-label={`Gramos de ${row.food.name}`}
+                          value={row.grams}
+                          onChange={(value) => setRowGrams(row, value)}
+                          min={1}
+                          step={10}
+                          w={92}
+                          radius="md"
+                          style={{ flexShrink: 0 }}
+                          rightSection={<Text size="xs" c="dimmed" mr={4}>g</Text>}
+                        />
                       </Group>
                     </Paper>
                   );
