@@ -24,6 +24,13 @@ export default function ScheduledMatchesCard({ team, readOnly = false }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
 
+  // El valor se lee antes de actualizar: el updater de setState corre más tarde y para
+  // entonces e.currentTarget ya es null (rompía la app al escribir en el formulario).
+  const setField = (key) => (e) => {
+    const { value } = e.currentTarget;
+    setForm((f) => ({ ...f, [key]: value }));
+  };
+
   useEffect(() => {
     if (!team?.id) return undefined;
     let alive = true;
@@ -66,8 +73,10 @@ export default function ScheduledMatchesCard({ team, readOnly = false }) {
     >
       <Stack gap="sm">
         <Text fz="xs" c="dimmed" lh={1.4}>
-          Con la hora exacta, cada jugador ve su plan del día de partido por horas y recibe avisos.
-          {matches.length === 0 && ' Sin partidos programados se usa la hora orientativa del plan semanal.'}
+          Apunta aquí la fecha y hora de cada partido. El día del partido (y el anterior) cada jugador
+          verá en su panel qué comer y beber hora a hora (comida previa, hidratación, recuperación) y
+          recibirá avisos en esos momentos.
+          {matches.length === 0 && ' Si no hay ninguno, se usa la hora orientativa del plan semanal.'}
         </Text>
         {matches.map((m) => (
           <Group key={m.id} justify="space-between" wrap="nowrap" px="sm" py={8} bg="gray.0" style={{ borderRadius: 14 }}>
@@ -105,13 +114,13 @@ export default function ScheduledMatchesCard({ team, readOnly = false }) {
             <TimeInput
               label="Hora"
               value={form.hora}
-              onChange={(e) => setForm((f) => ({ ...f, hora: e.currentTarget.value }))}
+              onChange={setField('hora')}
               variant="filled"
               radius="md"
               size="xs"
             />
-            <TextInput label="Rival" value={form.rival} onChange={(e) => setForm((f) => ({ ...f, rival: e.currentTarget.value }))} maxLength={80} variant="filled" radius="md" size="xs" />
-            <TextInput label="Lugar" value={form.lugar} onChange={(e) => setForm((f) => ({ ...f, lugar: e.currentTarget.value }))} maxLength={80} variant="filled" radius="md" size="xs" />
+            <TextInput label="Rival" value={form.rival} onChange={setField('rival')} maxLength={80} variant="filled" radius="md" size="xs" />
+            <TextInput label="Lugar" value={form.lugar} onChange={setField('lugar')} maxLength={80} variant="filled" radius="md" size="xs" />
             <Button mt={{ base: 0, md: 22 }} size="xs" radius="xl" color="lima" onClick={handleAdd} loading={saving} disabled={!form.fecha || !form.hora}>
               Añadir
             </Button>
