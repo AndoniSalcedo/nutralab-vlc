@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Dropzone } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
 import { importPlayerExcel } from '@/actions/playerActions';
 import { downloadXlsx } from '@/lib/io/xlsx-download';
@@ -22,19 +21,22 @@ import {
   Text,
   ThemeIcon,
   Title,
-  useMantineTheme,
 } from '@mantine/core';
 import {
   IconAlertTriangle,
   IconCheck,
-  IconCloudUpload,
   IconDatabaseImport,
-  IconDownload,
   IconFileSpreadsheet,
-  IconRefresh,
   IconUsers,
-  IconX,
 } from '@/components/icons3d';
+import {
+  ImportActionBar,
+  ImportDropzone,
+  ImportRowCard,
+  ImporterShell,
+  SummaryBadges,
+  useIsMobile,
+} from '@/components/import/ImportParts';
 import { useRouter } from 'next/navigation';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
@@ -144,12 +146,12 @@ function BusyImportState({ mode, fileName }) {
       <Stack gap="md">
         <Group justify="space-between" align="center" wrap="nowrap">
           <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
-            <ThemeIcon color={config.color} variant="light" radius="xl" size={46}>
+            <ThemeIcon color={config.color} variant="light" radius="xl" size={40}>
               <Icon size={22} />
             </ThemeIcon>
             <Box style={{ minWidth: 0 }}>
               <Group gap="xs" wrap="nowrap">
-                <Title order={4} c="dark.7" lh={1.1}>
+                <Title order={4} fz={{ base: 'sm', sm: 'lg' }} c="dark.7" lh={1.1}>
                   {config.title}
                 </Title>
                 <Loader color={config.color} size="xs" />
@@ -196,7 +198,7 @@ function BusyImportState({ mode, fileName }) {
 
 export default function PlayerExcelImporter({ team }) {
   const openRef = useRef(null);
-  const theme = useMantineTheme();
+  const isMobile = useIsMobile();
   const router = useRouter();
   const [state, setState] = useState('idle');
   const [file, setFile] = useState(null);
@@ -418,129 +420,143 @@ export default function PlayerExcelImporter({ team }) {
   const reviewCount = players.filter((player) => player.accion === 'revision').length;
   const selectedReviewCount = Object.values(decisions).filter((decision) => decision.action !== 'skip').length;
 
-  return (
-    <Paper radius="md" p="md" withBorder shadow="sm" bg="white">
-      <Stack gap="md">
-        <Group justify="space-between" align="center" wrap="wrap">
-          <Group gap="sm">
-            <ThemeIcon color="teal" variant="light" radius="md" size={40}>
-              <IconUsers size={20} />
-            </ThemeIcon>
-            <Box>
-              <Title order={4} c="dark.8">Importar Excel de jugadores</Title>
-              <Text size="xs" c="dimmed">
-                Detecta hojas de medición y hojas individuales, crea o actualiza jugadores y guarda sus métricas.
-              </Text>
-            </Box>
-          </Group>
+  function missingDatesBlock(player) {
+    if (!player.missingMeasurements?.length) return null;
+    const filledCount = player.missingMeasurements.filter((m) => decisions[player.key]?.fallbackDates?.[m.id]).length;
+    const totalCount = player.missingMeasurements.length;
+    const allFilled = filledCount === totalCount;
 
-          {state !== 'idle' && (
-            <Button
-              size="xs"
-              radius="xl"
-              variant="light"
-              color="gray"
-              leftSection={<IconRefresh size={14} />}
-              onClick={reset}
-              disabled={state === 'loading' || state === 'importing'}
-            >
-              Nuevo archivo
-            </Button>
-          )}
+    return (
+      <Stack gap={4}>
+        <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
+          <Text size="xs" fw={600} c="dark.3">Fechas de medición faltantes</Text>
+          <Badge size="xs" color={allFilled ? 'green' : 'orange'} variant="light" tt="none">
+            {allFilled ? 'Resuelto' : `${filledCount} de ${totalCount}`}
+          </Badge>
         </Group>
+        {player.missingMeasurements.map((m) => (
+          <DateInput
+            key={m.id}
+            size="xs"
+            radius="md"
+            label={`${m.sheet} (fila ${m.row})`}
+            placeholder="Selecciona una fecha"
+            value={dateValue(decisions[player.key]?.fallbackDates?.[m.id])}
+            onChange={(dateVal) => setFallbackDate(player.key, m.id, dateInputToIso(dateVal))}
+            valueFormat="DD/MM/YYYY"
+            clearable
+            popoverProps={{ zIndex: 2500, withinPortal: true }}
+          />
+        ))}
+      </Stack>
+    );
+  }
 
-        {state === 'loading' ? (
-          <BusyImportState mode="loading" fileName={file?.name} />
-        ) : null}
+  function reasonText(player) {
+    if (!player.matchReason) return null;
+    const allFilled = player.missingMeasurements?.length > 0 && player.missingMeasurements.every(
+      (m) => decisions[player.key]?.fallbackDates?.[m.id]
+    );
+    return (
+      <Text size="xs" c={allFilled ? 'green.6' : 'dimmed'} fw={allFilled ? 600 : 400}>
+        {allFilled ? 'Fechas asignadas correctamente' : player.matchReason}
+      </Text>
+    );
+  }
 
-        {state === 'idle' || state === 'error' ? (
-          <Box pos="relative">
-            <Dropzone
-              openRef={openRef}
-              onDrop={handleDrop}
-              accept={EXCEL_TYPES}
-              maxSize={30 * 1024 ** 2}
-              radius="md"
-              activateOnClick={false}
-              style={{
-                border: '2px dashed var(--mantine-color-gray-4)',
-                backgroundColor: 'var(--mantine-color-gray-0)',
-                padding: '40px',
-                textAlign: 'center',
-                cursor: 'pointer',
-                transition: 'border-color 150ms ease, background-color 150ms ease',
-              }}
-            >
-              <div style={{ pointerEvents: 'none' }}>
-                <Group justify="center">
-                  <Dropzone.Accept>
-                    <IconDownload size={50} color={theme.colors.blue[6]} stroke={1.5} />
-                  </Dropzone.Accept>
-                  <Dropzone.Reject>
-                    <IconX size={50} color={theme.colors.red[6]} stroke={1.5} />
-                  </Dropzone.Reject>
-                  <Dropzone.Idle>
-                    <IconCloudUpload size={50} stroke={1.5} color="var(--mantine-color-dimmed)" />
-                  </Dropzone.Idle>
-                </Group>
+  function warningText(player) {
+    if (!player.warnings?.length) return null;
+    return (
+      <Text size="xs" c="dimmed" lineClamp={2}>
+        {player.warnings[0]}
+        {player.warningsCount > 1 ? ` (+${player.warningsCount - 1})` : ''}
+      </Text>
+    );
+  }
 
-                <Text ta="center" fw={700} fz="lg" mt="xl">
-                  <Dropzone.Accept>¡Suelta el archivo aquí!</Dropzone.Accept>
-                  <Dropzone.Reject>Solo Excel</Dropzone.Reject>
-                  <Dropzone.Idle>Subir Excel (.xlsx)</Dropzone.Idle>
-                </Text>
+  function renderSelect(player) {
+    return (
+      <Select
+        size="xs"
+        radius="md"
+        data={decisionOptions(player)}
+        value={decisionValue(player)}
+        onChange={(value) => setDecision(player.key, value)}
+        allowDeselect={false}
+        comboboxProps={{ zIndex: 2500, withinPortal: true }}
+      />
+    );
+  }
 
-                <Text ta="center" size="sm" c="dimmed" mt={7}>
-                  Arrastra y suelta el archivo o haz clic para seleccionarlo.
-                </Text>
-              </div>
+  const statusBadge = (action) => (
+    <Badge color={actionColor(action)} variant="light" radius="sm" tt="none">
+      {actionLabel(action)}
+    </Badge>
+  );
 
-              <Group justify="center" mt="md" gap="sm">
-                <Button
-                  size="xs"
-                  radius="xl"
-                  style={{ pointerEvents: 'all' }}
-                  onClick={() => openRef.current?.()}
-                  variant="light"
+  return (
+    <ImporterShell
+      icon={IconUsers}
+      title="Excel de jugadores"
+      description="Detecta hojas de medición y hojas individuales, crea o actualiza jugadores y guarda sus métricas."
+      showReset={state !== 'idle'}
+      resetDisabled={state === 'loading' || state === 'importing'}
+      onReset={reset}
+    >
+      {state === 'loading' ? <BusyImportState mode="loading" fileName={file?.name} /> : null}
+
+      {state === 'idle' || state === 'error' ? (
+        <ImportDropzone
+          openRef={openRef}
+          onDrop={handleDrop}
+          accept={EXCEL_TYPES}
+          maxSize={30 * 1024 ** 2}
+          idleLabel="Subir Excel (.xlsx)"
+          rejectLabel="Solo Excel"
+          onTemplate={downloadTemplate}
+        />
+      ) : null}
+
+      {state === 'preview' && preview ? (
+        <Stack gap="sm">
+          <SummaryBadges
+            items={[
+              { label: `${preview.resumen.players} jugadores`, color: 'blue' },
+              { label: `${preview.resumen.measurements} mediciones`, color: 'teal' },
+              { label: `${preview.resumen.parsedSheets} hojas`, color: 'gray' },
+              preview.resumen.dateCorrections && { label: `${preview.resumen.dateCorrections} fechas corregidas`, color: 'yellow' },
+              preview.resumen.duplicateConflicts && { label: `${preview.resumen.duplicateConflicts} duplicados resueltos`, color: 'orange' },
+            ]}
+          />
+
+          {reviewCount ? (
+            <Alert color="yellow" variant="light" radius="md" p="xs" icon={<IconAlertTriangle size={16} />}>
+              <Text size="xs">
+                {reviewCount} jugador{reviewCount === 1 ? '' : 'es'} requiere{reviewCount === 1 ? '' : 'n'} revisión. Se omitirán salvo que elijas una acción o completes los datos que faltan.
+              </Text>
+            </Alert>
+          ) : null}
+
+          {isMobile ? (
+            <Stack gap="xs">
+              {players.map((player) => (
+                <ImportRowCard
+                  key={player.key}
+                  title={player.nombreCompleto}
+                  subtitle={player.fechaNacimiento ? `Nac. ${formatDate(player.fechaNacimiento)}` : 'Sin fecha de nacimiento'}
+                  badge={statusBadge(getEffectiveAction(player))}
+                  meta={[
+                    { label: 'Mediciones', value: player.medicionesCount },
+                    { label: 'Última', value: formatDate(player.ultimaFecha) },
+                  ]}
                 >
-                  Seleccionar archivo
-                </Button>
-                <Button
-                  size="xs"
-                  radius="xl"
-                  style={{ pointerEvents: 'all' }}
-                  onClick={downloadTemplate}
-                  variant="outline"
-                  color="teal"
-                  leftSection={<IconDownload size={14} />}
-                >
-                  Descargar plantilla
-                </Button>
-              </Group>
-            </Dropzone>
-          </Box>
-        ) : null}
-
-        {state === 'preview' && preview ? (
-          <Stack gap="md">
-            <Group gap="xs" wrap="wrap">
-              <Badge color="blue" variant="light">{preview.resumen.players} jugadores</Badge>
-              <Badge color="teal" variant="light">{preview.resumen.measurements} mediciones</Badge>
-              <Badge color="gray" variant="light">{preview.resumen.parsedSheets} hojas leídas</Badge>
-              {preview.resumen.dateCorrections ? (
-                <Badge color="yellow" variant="light">{preview.resumen.dateCorrections} fechas corregidas</Badge>
-              ) : null}
-              {preview.resumen.duplicateConflicts ? (
-                <Badge color="orange" variant="light">{preview.resumen.duplicateConflicts} duplicados resueltos</Badge>
-              ) : null}
-            </Group>
-
-            {reviewCount ? (
-              <Alert color="yellow" variant="light" icon={<IconAlertTriangle size={18} />}>
-                Hay {reviewCount} jugador{reviewCount === 1 ? '' : 'es'} que requiere{reviewCount === 1 ? '' : 'n'} revisión. Estos se omitirán por defecto, así que asegúrate de seleccionar una acción o rellenar los datos que falten si quieres importarlos.
-              </Alert>
-            ) : null}
-
+                  {reasonText(player)}
+                  {player.accion === 'revision' ? renderSelect(player) : warningText(player)}
+                  {missingDatesBlock(player)}
+                </ImportRowCard>
+              ))}
+            </Stack>
+          ) : (
             <ScrollArea>
               <Table striped highlightOnHover verticalSpacing="xs" style={{ minWidth: 900 }}>
                 <Table.Thead bg="gray.0">
@@ -562,75 +578,19 @@ export default function PlayerExcelImporter({ team }) {
                         </Text>
                       </Table.Td>
                       <Table.Td>
-                        <Badge color={actionColor(getEffectiveAction(player))} variant="light">
-                          {actionLabel(getEffectiveAction(player))}
-                        </Badge>
-                        {player.matchReason ? (() => {
-                          const allFilled = player.missingMeasurements?.length > 0 && player.missingMeasurements.every(
-                            (m) => decisions[player.key]?.fallbackDates?.[m.id]
-                          );
-                          return (
-                            <Text size="xs" c={allFilled ? 'green.6' : 'dimmed'} fw={allFilled ? 600 : 400} mt={4}>
-                              {allFilled ? 'Fechas asignadas correctamente' : player.matchReason}
-                            </Text>
-                          );
-                        })() : null}
+                        <Stack gap={4} align="flex-start">
+                          {statusBadge(getEffectiveAction(player))}
+                          {reasonText(player)}
+                        </Stack>
                       </Table.Td>
                       <Table.Td ta="center" fw={700}>{player.medicionesCount}</Table.Td>
                       <Table.Td ta="center">{formatDate(player.ultimaFecha)}</Table.Td>
                       <Table.Td style={{ minWidth: 280 }}>
                         <Stack gap="xs">
-                          {player.accion === 'revision' ? (
-                            <Select
-                              size="xs"
-                              radius="md"
-                              data={decisionOptions(player)}
-                              value={decisionValue(player)}
-                              onChange={(value) => setDecision(player.key, value)}
-                              allowDeselect={false}
-                              comboboxProps={{ zIndex: 2500, withinPortal: true }}
-                            />
-                          ) : player.warnings?.length ? (
-                            <Text size="xs" c="dimmed" lineClamp={2}>
-                              {player.warnings[0]}
-                              {player.warningsCount > 1 ? ` (+${player.warningsCount - 1})` : ''}
-                            </Text>
-                          ) : (
-                            <Text size="xs" c="dimmed">Sin avisos</Text>
-                          )}
-                          
-                          {player.missingMeasurements?.length > 0 && (() => {
-                            const filledCount = player.missingMeasurements.filter(
-                              (m) => decisions[player.key]?.fallbackDates?.[m.id]
-                            ).length;
-                            const totalCount = player.missingMeasurements.length;
-                            const allFilled = filledCount === totalCount;
-                            
-                            return (
-                              <Stack gap={4} mt="xs">
-                                <Group justify="space-between" align="center">
-                                  <Text size="xs" fw={600} c="dark.3">Fechas de medición faltantes:</Text>
-                                  <Badge size="xs" color={allFilled ? 'green' : 'orange'} variant="light">
-                                    {allFilled ? 'Resuelto' : `${filledCount} de ${totalCount} asignadas`}
-                                  </Badge>
-                                </Group>
-                                {player.missingMeasurements.map((m) => (
-                                  <DateInput
-                                    key={m.id}
-                                    size="xs"
-                                    radius="md"
-                                    label={`${m.sheet} (Fila ${m.row})`}
-                                    placeholder="Selecciona una fecha"
-                                    value={dateValue(decisions[player.key]?.fallbackDates?.[m.id])}
-                                    onChange={(dateVal) => setFallbackDate(player.key, m.id, dateInputToIso(dateVal))}
-                                    valueFormat="DD/MM/YYYY"
-                                    clearable
-                                    popoverProps={{ zIndex: 2500, withinPortal: true }}
-                                  />
-                                ))}
-                              </Stack>
-                            );
-                          })()}
+                          {player.accion === 'revision'
+                            ? renderSelect(player)
+                            : warningText(player) || <Text size="xs" c="dimmed">Sin avisos</Text>}
+                          {missingDatesBlock(player)}
                         </Stack>
                       </Table.Td>
                     </Table.Tr>
@@ -638,37 +598,52 @@ export default function PlayerExcelImporter({ team }) {
                 </Table.Tbody>
               </Table>
             </ScrollArea>
+          )}
 
-            <Group justify="space-between" align="center" wrap="wrap">
-              <Text size="xs" c="dimmed">
-                {reviewCount ? `${selectedReviewCount} de ${reviewCount} revisiones seleccionadas para importar.` : 'Todo listo para importar.'}
-              </Text>
-              <Button
-                size="xs"
-                radius="xl"
-                color="teal"
-                leftSection={<IconCheck size={15} />}
-                onClick={importFile}
-              >
-                Confirmar e importar
-              </Button>
-            </Group>
-          </Stack>
-        ) : null}
+          <ImportActionBar
+            text={reviewCount ? `${selectedReviewCount} de ${reviewCount} revisiones se importarán.` : 'Todo listo para importar.'}
+          >
+            <Button size="sm" radius="xl" color="teal" leftSection={<IconCheck size={15} />} onClick={importFile}>
+              Importar
+            </Button>
+          </ImportActionBar>
+        </Stack>
+      ) : null}
 
-        {state === 'importing' ? (
-          <BusyImportState mode="importing" fileName={file?.name} />
-        ) : null}
+      {state === 'importing' ? <BusyImportState mode="importing" fileName={file?.name} /> : null}
 
-        {state === 'done' && results ? (
-          <Stack gap="md">
-            <Group gap="xs" wrap="wrap">
-              <Badge color="green" variant="light">{results.resumen.jugadores_importados} jugadores importados</Badge>
-              <Badge color="teal" variant="light">{results.resumen.mediciones_creadas} mediciones creadas</Badge>
-              <Badge color="blue" variant="light">{results.resumen.mediciones_actualizadas} mediciones actualizadas</Badge>
-              {results.resumen.errores ? <Badge color="red" variant="light">{results.resumen.errores} incidencias</Badge> : null}
-            </Group>
+      {state === 'done' && results ? (
+        <Stack gap="sm">
+          <SummaryBadges
+            items={[
+              { label: `${results.resumen.jugadores_importados} jugadores importados`, color: 'green' },
+              { label: `${results.resumen.mediciones_creadas} mediciones creadas`, color: 'teal' },
+              { label: `${results.resumen.mediciones_actualizadas} actualizadas`, color: 'blue' },
+              results.resumen.errores && { label: `${results.resumen.errores} incidencias`, color: 'red' },
+            ]}
+          />
 
+          {isMobile ? (
+            <Stack gap="xs">
+              {results.resultados.map((result) => (
+                <ImportRowCard
+                  key={result.key}
+                  title={result.nombre}
+                  badge={statusBadge(result.accion)}
+                  meta={[
+                    {
+                      label: 'Mediciones',
+                      value: Number(result.mediciones_creadas || 0) + Number(result.mediciones_actualizadas || 0),
+                    },
+                  ]}
+                >
+                  <Text size="xs" c={result.error ? 'red.6' : 'green.6'} fw={600}>
+                    {result.error || 'Correcto'}
+                  </Text>
+                </ImportRowCard>
+              ))}
+            </Stack>
+          ) : (
             <ScrollArea>
               <Table highlightOnHover verticalSpacing="xs">
                 <Table.Thead bg="gray.0">
@@ -683,11 +658,7 @@ export default function PlayerExcelImporter({ team }) {
                   {results.resultados.map((result) => (
                     <Table.Tr key={result.key}>
                       <Table.Td fw={600}>{result.nombre}</Table.Td>
-                      <Table.Td ta="center">
-                        <Badge color={actionColor(result.accion)} variant="light">
-                          {actionLabel(result.accion)}
-                        </Badge>
-                      </Table.Td>
+                      <Table.Td ta="center">{statusBadge(result.accion)}</Table.Td>
                       <Table.Td ta="center">
                         {Number(result.mediciones_creadas || 0) + Number(result.mediciones_actualizadas || 0)}
                       </Table.Td>
@@ -699,9 +670,9 @@ export default function PlayerExcelImporter({ team }) {
                 </Table.Tbody>
               </Table>
             </ScrollArea>
-          </Stack>
-        ) : null}
-      </Stack>
-    </Paper>
+          )}
+        </Stack>
+      ) : null}
+    </ImporterShell>
   );
 }

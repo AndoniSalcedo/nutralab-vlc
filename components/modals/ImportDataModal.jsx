@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import {
+  Box,
   Button,
   Divider,
   Group,
@@ -73,12 +74,12 @@ export default function ImportDataModal({ opened, onClose, team }) {
           ]}
           fullWidth
           radius="xl"
-          size="xs"
+          size="sm"
           color="dark"
         />
 
         {/* Área scrolleable ajustada para móvil (100dvh) y escritorio */}
-        <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 170px)', sm: 620 }} type="auto">
+        <ScrollArea.Autosize mah={{ base: 'calc(100dvh - 116px)', sm: 620 }} type="auto" offsetScrollbars="y">
           {activeTab === 'metrics' ? (
             <PlayerExcelImporter team={team} />
           ) : (
@@ -87,20 +88,15 @@ export default function ImportDataModal({ opened, onClose, team }) {
         </ScrollArea.Autosize>
 
 
-        {/* Barra inferior consistente */}
-        <Divider mt="auto" />
-        <Group justify="flex-end" align="center" wrap="nowrap" gap="xs">
-          <Button
-            variant="subtle"
-            color="gray"
-            size="sm"
-            radius="xl"
-            style={{ flex: { base: 1, sm: 'none' } }}
-            onClick={onClose}
-          >
-            Cerrar
-          </Button>
-        </Group>
+        {/* En móvil el modal ocupa toda la pantalla y ya tiene la ✕: el pie solo se muestra en escritorio. */}
+        <Box visibleFrom="sm">
+          <Divider mb="xs" />
+          <Group justify="flex-end" align="center" wrap="nowrap" gap="xs">
+            <Button variant="subtle" color="gray" size="sm" radius="xl" onClick={onClose}>
+              Cerrar
+            </Button>
+          </Group>
+        </Box>
       </Stack>
     </ResponsiveModal>
   );

@@ -1,35 +1,18 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Dropzone } from '@mantine/dropzone';
 import { notifications } from '@mantine/notifications';
 import { previewTeamOsmolarity, importTeamOsmolarity } from '@/actions/hydrationActions';
+import { Alert, Badge, Button, Loader, Paper, ScrollArea, Select, Stack, Table, Text } from '@mantine/core';
+import { IconAlertTriangle, IconCheck, IconUsers } from '@/components/icons3d';
 import {
-  Alert,
-  Badge,
-  Box,
-  Button,
-  Group,
-  Loader,
-  Paper,
-  ScrollArea,
-  Select,
-  Stack,
-  Table,
-  Text,
-  ThemeIcon,
-  Title,
-  useMantineTheme,
-} from '@mantine/core';
-import {
-  IconAlertTriangle,
-  IconCheck,
-  IconCloudUpload,
-  IconDownload,
-  IconRefresh,
-  IconUsers,
-  IconX,
-} from '@/components/icons3d';
+  ImportActionBar,
+  ImportDropzone,
+  ImportRowCard,
+  ImporterShell,
+  SummaryBadges,
+  useIsMobile,
+} from '@/components/import/ImportParts';
 import { useRouter } from 'next/navigation';
 import { notifySaved } from '@/components/motion/notifySaved';
 import { errorMessage } from '@/lib/actionError';
@@ -54,6 +37,11 @@ function actionLabel(action) {
   return action || '-';
 }
 
+function formatDate(value) {
+  if (!value) return '-';
+  return new Date(`${value}T00:00:00`).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 function initialDecisions(players) {
   const decs = {};
   (players || []).forEach((player) => {
@@ -71,7 +59,7 @@ function initialDecisions(players) {
 
 export default function TeamOsmolarityImporter({ team }) {
   const openRef = useRef(null);
-  const theme = useMantineTheme();
+  const isMobile = useIsMobile();
   const router = useRouter();
   const [state, setState] = useState('idle');
   const [file, setFile] = useState(null);
@@ -217,241 +205,193 @@ export default function TeamOsmolarityImporter({ team }) {
   const errorCount = players.filter((player) => player.accion === 'error').length;
   const selectedUpdateCount = Object.values(decisions).filter((d) => d.action === 'update').length;
 
+  function renderSelect(player) {
+    return (
+      <Select
+        size="xs"
+        radius="md"
+        data={decisionOptions(player)}
+        value={decisionValue(player)}
+        onChange={(val) => setDecision(player.key, val)}
+        allowDeselect={false}
+        searchable
+        nothingFoundMessage="Sin resultados"
+        comboboxProps={{ zIndex: 2500, withinPortal: true }}
+      />
+    );
+  }
+
+  const statusBadge = (action, label) => (
+    <Badge color={actionColor(action)} variant="light" radius="sm" tt="none">
+      {label ?? actionLabel(action)}
+    </Badge>
+  );
+
   return (
-    <Paper radius={24} p="md" shadow="xs" bg="white">
-      <Stack gap="md">
-        <Group justify="space-between" align="center" wrap="wrap">
-          <Group gap="sm">
-            <ThemeIcon color="teal" variant="light" radius="md" size={40}>
-              <IconUsers size={20} />
-            </ThemeIcon>
-            <Box>
-              <Title order={4} c="dark.8">Importar CSV de Osmolaridad (Equipo)</Title>
-              <Text size="xs" c="dimmed">
-                Sube un archivo CSV de hidratación/osmolaridad grupal, asocia las mediciones a los jugadores del equipo y guárdalas en el historial.
+    <ImporterShell
+      icon={IconUsers}
+      title="Osmolaridad del equipo (CSV)"
+      description="Sube el CSV del osmómetro, asocia cada medición a un jugador del equipo y guárdala en su historial."
+      showReset={state !== 'idle'}
+      resetDisabled={state === 'loading' || state === 'importing'}
+      onReset={reset}
+    >
+      {(state === 'loading' || state === 'importing') && (
+        <Paper p="xl" radius="lg" bg="gray.0" withBorder style={{ borderStyle: 'dashed', textAlign: 'center' }}>
+          <Stack align="center" gap="sm">
+            <Loader color={state === 'loading' ? 'teal' : 'blue'} size="md" />
+            <Text size="sm" fw={600}>
+              {state === 'loading' ? 'Procesando archivo CSV...' : 'Guardando datos de osmolaridad...'}
+            </Text>
+            <Text size="xs" c="dimmed">
+              {state === 'loading'
+                ? 'Analizando nombres de jugadores y fechas de medición.'
+                : 'Actualizando el historial de hidratación.'}
+            </Text>
+          </Stack>
+        </Paper>
+      )}
+
+      {(state === 'idle' || state === 'error') && (
+        <ImportDropzone
+          openRef={openRef}
+          onDrop={handleDrop}
+          accept={CSV_TYPES}
+          maxSize={10 * 1024 ** 2}
+          idleLabel="Subir CSV (.csv)"
+          rejectLabel="Solo archivos CSV"
+          onTemplate={downloadTemplate}
+        />
+      )}
+
+      {state === 'preview' && preview && (
+        <Stack gap="sm">
+          <SummaryBadges
+            items={[
+              { label: `${preview.resumen.players} jugadores`, color: 'blue' },
+              { label: `${preview.resumen.measurements} mediciones`, color: 'teal' },
+              preview.resumen.skippedRows > 0 && { label: `${preview.resumen.skippedRows} filas con errores`, color: 'red' },
+            ]}
+          />
+
+          {errorCount > 0 && (
+            <Alert color="red" variant="light" radius="md" p="xs" icon={<IconAlertTriangle size={16} />}>
+              <Text size="xs">
+                {errorCount} jugador{errorCount === 1 ? '' : 'es'} sin coincidencias en el equipo. Se omitirán salvo que les asignes un jugador de la plantilla.
               </Text>
-            </Box>
-          </Group>
-
-          {state !== 'idle' && (
-            <Button
-              size="xs"
-              radius="xl"
-              variant="light"
-              color="gray"
-              leftSection={<IconRefresh size={14} />}
-              onClick={reset}
-              disabled={state === 'loading' || state === 'importing'}
-            >
-              Nuevo archivo
-            </Button>
+            </Alert>
           )}
-        </Group>
 
-        {state === 'loading' && (
-          <Paper p="xl" radius="md" bg="gray.0" withBorder style={{ borderStyle: 'dashed', textAlign: 'center' }}>
-            <Stack align="center" gap="sm">
-              <Loader color="teal" size="md" />
-              <Text size="sm" fw={600}>Procesando archivo CSV...</Text>
-              <Text size="xs" c="dimmed">Analizando nombres de jugadores y fechas de medición.</Text>
+          {reviewCount > 0 && (
+            <Alert color="yellow" variant="light" radius="md" p="xs" icon={<IconAlertTriangle size={16} />}>
+              <Text size="xs">
+                {reviewCount} jugador{reviewCount === 1 ? '' : 'es'} con coincidencia parcial. Revisa el jugador propuesto o elige &quot;Omitir&quot;.
+              </Text>
+            </Alert>
+          )}
+
+          {isMobile ? (
+            <Stack gap="xs">
+              {players.map((player) => (
+                <ImportRowCard
+                  key={player.key}
+                  title={player.nombreCompleto}
+                  badge={statusBadge(player.accion)}
+                  meta={[
+                    { label: 'Mediciones', value: player.medicionesCount },
+                    { label: 'Última', value: formatDate(player.ultimaFecha) },
+                  ]}
+                >
+                  {renderSelect(player)}
+                </ImportRowCard>
+              ))}
             </Stack>
-          </Paper>
-        )}
-
-        {(state === 'idle' || state === 'error') && (
-          <Box pos="relative">
-            <Dropzone
-              openRef={openRef}
-              onDrop={handleDrop}
-              accept={CSV_TYPES}
-              maxSize={10 * 1024 ** 2}
-              radius="md"
-              activateOnClick={false}
-              style={{
-                border: '2px dashed var(--mantine-color-gray-4)',
-                backgroundColor: 'var(--mantine-color-gray-0)',
-                padding: '40px',
-                textAlign: 'center',
-                cursor: 'pointer',
-              }}
-            >
-              <div style={{ pointerEvents: 'none' }}>
-                <Group justify="center">
-                  <Dropzone.Accept>
-                    <IconDownload size={50} color={theme.colors.blue[6]} stroke={1.5} />
-                  </Dropzone.Accept>
-                  <Dropzone.Reject>
-                    <IconX size={50} color={theme.colors.red[6]} stroke={1.5} />
-                  </Dropzone.Reject>
-                  <Dropzone.Idle>
-                    <IconCloudUpload size={50} stroke={1.5} color="var(--mantine-color-dimmed)" />
-                  </Dropzone.Idle>
-                </Group>
-
-                <Text ta="center" fw={700} fz="lg" mt="xl">
-                  <Dropzone.Accept>¡Suelta el archivo aquí!</Dropzone.Accept>
-                  <Dropzone.Reject>Solo archivos CSV</Dropzone.Reject>
-                  <Dropzone.Idle>Subir CSV (.csv)</Dropzone.Idle>
-                </Text>
-
-                <Text ta="center" size="sm" c="dimmed" mt={7}>
-                  Arrastra y suelta el archivo o haz clic para seleccionarlo.
-                </Text>
-              </div>
-
-              <Group justify="center" mt="md" gap="sm">
-                <Button
-                  size="xs"
-                  radius="xl"
-                  style={{ pointerEvents: 'all' }}
-                  onClick={() => openRef.current?.()}
-                  variant="light"
-                >
-                  Seleccionar archivo
-                </Button>
-                <Button
-                  size="xs"
-                  radius="xl"
-                  style={{ pointerEvents: 'all' }}
-                  onClick={downloadTemplate}
-                  variant="outline"
-                  color="teal"
-                  leftSection={<IconDownload size={14} />}
-                >
-                  Descargar plantilla
-                </Button>
-              </Group>
-            </Dropzone>
-          </Box>
-        )}
-
-        {state === 'preview' && preview && (
-          <Stack gap="md">
-            <Group gap="xs" wrap="wrap">
-              <Badge color="blue" variant="light">{preview.resumen.players} jugadores en el archivo</Badge>
-              <Badge color="teal" variant="light">{preview.resumen.measurements} mediciones totales</Badge>
-              {preview.resumen.skippedRows > 0 && (
-                <Badge color="red" variant="light">{preview.resumen.skippedRows} filas omitidas por errores</Badge>
-              )}
-            </Group>
-
-            {errorCount > 0 && (
-              <Alert color="red" variant="light" icon={<IconAlertTriangle size={18} />}>
-                Hay {errorCount} jugador{errorCount === 1 ? '' : 'es'} en el archivo que no existe{errorCount === 1 ? '' : 'n'} en el equipo y no tiene{errorCount === 1 ? '' : 'n'} coincidencias parciales. Se omitirán salvo que les asignes un jugador de la plantilla.
-              </Alert>
-            )}
-
-            {reviewCount > 0 && (
-              <Alert color="yellow" variant="light" icon={<IconAlertTriangle size={18} />}>
-                Hay {reviewCount} jugador{reviewCount === 1 ? '' : 'es'} con coincidencias parciales. Revisa que el jugador propuesto sea el correcto o selecciona &quot;Omitir&quot; si no deseas guardar sus mediciones.
-              </Alert>
-            )}
-
-            <ScrollArea h={400}>
+          ) : (
+            <ScrollArea.Autosize mah={400}>
               <Table striped highlightOnHover verticalSpacing="xs">
                 <Table.Thead bg="gray.0">
                   <Table.Tr>
-                    <Table.Th>Jugador (Archivo)</Table.Th>
-                    <Table.Th>Mediciones</Table.Th>
-                    <Table.Th>Última Fecha</Table.Th>
+                    <Table.Th>Jugador (archivo)</Table.Th>
+                    <Table.Th ta="center">Mediciones</Table.Th>
+                    <Table.Th>Última fecha</Table.Th>
                     <Table.Th>Estado</Table.Th>
-                    <Table.Th style={{ width: 320 }}>Acción / Mapeo</Table.Th>
+                    <Table.Th style={{ width: 320 }}>Acción / mapeo</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
                   {players.map((player) => (
                     <Table.Tr key={player.key}>
                       <Table.Td fw={600}>{player.nombreCompleto}</Table.Td>
-                      <Table.Td>{player.medicionesCount}</Table.Td>
-                      <Table.Td>{player.ultimaFecha || '-'}</Table.Td>
-                      <Table.Td>
-                        <Badge color={actionColor(player.accion)} variant="light">
-                          {actionLabel(player.accion)}
-                        </Badge>
-                      </Table.Td>
-                      <Table.Td>
-                        <Select
-                          size="xs"
-                          radius="md"
-                          data={decisionOptions(player)}
-                          value={decisionValue(player)}
-                          onChange={(val) => setDecision(player.key, val)}
-                          allowDeselect={false}
-                          searchable
-                          nothingFoundMessage="Sin resultados"
-                          comboboxProps={{ zIndex: 2500, withinPortal: true }}
-                        />
-                      </Table.Td>
+                      <Table.Td ta="center">{player.medicionesCount}</Table.Td>
+                      <Table.Td>{formatDate(player.ultimaFecha)}</Table.Td>
+                      <Table.Td>{statusBadge(player.accion)}</Table.Td>
+                      <Table.Td>{renderSelect(player)}</Table.Td>
                     </Table.Tr>
                   ))}
                 </Table.Tbody>
               </Table>
-            </ScrollArea>
+            </ScrollArea.Autosize>
+          )}
 
-            <Group justify="space-between" align="center" wrap="wrap">
-              <Text size="xs" c="dimmed">
-                Se importarán las mediciones de {selectedUpdateCount} jugadores.
-              </Text>
-              <Button
-                size="xs"
-                radius="xl"
-                color="teal"
-                leftSection={<IconCheck size={15} />}
-                onClick={importFile}
-                disabled={selectedUpdateCount === 0}
-              >
-                Confirmar e importar
-              </Button>
-            </Group>
-          </Stack>
-        )}
+          <ImportActionBar text={`Se importarán las mediciones de ${selectedUpdateCount} jugador${selectedUpdateCount === 1 ? '' : 'es'}.`}>
+            <Button
+              size="sm"
+              radius="xl"
+              color="teal"
+              leftSection={<IconCheck size={15} />}
+              onClick={importFile}
+              disabled={selectedUpdateCount === 0}
+            >
+              Importar
+            </Button>
+          </ImportActionBar>
+        </Stack>
+      )}
 
-        {state === 'importing' && (
-          <Paper p="xl" radius="md" bg="gray.0" withBorder style={{ borderStyle: 'dashed', textAlign: 'center' }}>
-            <Stack align="center" gap="sm">
-              <Loader color="blue" size="md" />
-              <Text size="sm" fw={600}>Guardando datos de osmolaridad...</Text>
-              <Text size="xs" c="dimmed">Actualizando el historial detallado de hidratación.</Text>
+      {state === 'done' && results && (
+        <Stack gap="sm">
+          <SummaryBadges
+            items={[
+              { label: `${results.resumen.mediciones_guardadas} mediciones guardadas`, color: 'green' },
+              results.resumen.mediciones_omitidas > 0 && { label: `${results.resumen.mediciones_omitidas} omitidas`, color: 'gray' },
+            ]}
+          />
+
+          {isMobile ? (
+            <Stack gap="xs">
+              {results.resultados.map((result) => (
+                <ImportRowCard
+                  key={result.key}
+                  title={result.nombre}
+                  badge={statusBadge(result.accion, result.status)}
+                  meta={[{ label: 'Mediciones', value: result.mediciones_procesadas }]}
+                />
+              ))}
             </Stack>
-          </Paper>
-        )}
-
-        {state === 'done' && results && (
-          <Stack gap="md">
-            <Group gap="xs" wrap="wrap">
-              <Badge color="green" variant="light">{results.resumen.mediciones_guardadas} mediciones guardadas</Badge>
-              {results.resumen.mediciones_omitidas > 0 && (
-                <Badge color="gray" variant="light">{results.resumen.mediciones_omitidas} mediciones omitidas</Badge>
-              )}
-            </Group>
-
-            <ScrollArea h={400}>
+          ) : (
+            <ScrollArea.Autosize mah={400}>
               <Table highlightOnHover verticalSpacing="xs">
                 <Table.Thead bg="gray.0">
                   <Table.Tr>
                     <Table.Th>Jugador</Table.Th>
-                    <Table.Th>Mediciones Procesadas</Table.Th>
-                    <Table.Th>Estado de Carga</Table.Th>
+                    <Table.Th ta="center">Mediciones procesadas</Table.Th>
+                    <Table.Th>Estado</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
                   {results.resultados.map((result) => (
                     <Table.Tr key={result.key}>
                       <Table.Td fw={600}>{result.nombre}</Table.Td>
-                      <Table.Td>{result.mediciones_procesadas}</Table.Td>
-                      <Table.Td>
-                        <Badge color={actionColor(result.accion)} variant="light">
-                          {result.status}
-                        </Badge>
-                      </Table.Td>
+                      <Table.Td ta="center">{result.mediciones_procesadas}</Table.Td>
+                      <Table.Td>{statusBadge(result.accion, result.status)}</Table.Td>
                     </Table.Tr>
                   ))}
                 </Table.Tbody>
               </Table>
-            </ScrollArea>
-          </Stack>
-        )}
-      </Stack>
-    </Paper>
+            </ScrollArea.Autosize>
+          )}
+        </Stack>
+      )}
+    </ImporterShell>
   );
 }
