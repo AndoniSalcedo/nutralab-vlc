@@ -77,7 +77,7 @@ export default function MatchDayWidget({ jugadorId, style }) {
       title={match.rival ? `Día de partido · vs ${match.rival}` : 'Día de partido'}
       color="lima"
       aside={now ? <WidgetAside color="lima" dot>{countdown(kickoff, now)}</WidgetAside> : null}
-      footer={match.approximate ? 'Hora orientativa según el horario de tu plan semanal' : 'Hora de inicio de tu plan semanal'}
+      footer={match.approximate ? 'Hora orientativa según el horario de tu plan semanal' : 'Hora fijada por tu equipo'}
       style={{ height: 'auto', ...style }}
     >
       <Stack gap="sm">

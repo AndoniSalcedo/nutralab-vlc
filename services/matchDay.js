@@ -6,31 +6,34 @@ import { getPesajesByPlayerId } from '@/repositories/pesajeRepository';
 import { getHydrationRecordsByPlayerId } from '@/repositories/hydrationRepository';
 import { getIntrapartidoHistoryByPlayerId } from '@/repositories/intrapartidoRepository';
 import { getLatestAiPlanByPlayerId } from '@/repositories/aiPlanRepository';
+import { getTeamKickoffsBetween } from '@/repositories/scheduledMatchRepository';
 import { withLatestMeasurement } from '@/lib/metrics/player';
-import { resolveMatchKickoff } from '@/lib/nutrition/match-kickoff';
+import { resolveMatchKickoff, weekdayKey } from '@/lib/nutrition/match-kickoff';
 import { PLAN_MODES } from '@/config/plan-modes';
 import { toDateKey, shiftDateKey } from '@/lib/dates';
 import { buildHydrationStrategy } from '@/lib/nutrition/hydration-strategy';
 import { buildMatchTimeline, madridDateTime } from '@/lib/nutrition/match-timeline';
 
-const DAY_KEYS = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
 // La línea de tiempo se mantiene hasta pasada la recuperación
 const VISIBLE_AFTER_KICKOFF_MS = 3 * 60 * 60 * 1000;
 
-const weekdayKey = (dateKey) => DAY_KEYS[new Date(`${dateKey}T12:00:00Z`).getUTCDay()];
-
 /**
- * Próximo partido de hoy o mañana según el último plan semanal del jugador (la fuente de verdad):
- * un día «partido» con la hora exacta que se puso al hacer el plan o, si no, la orientativa de su horario.
+ * Próximo partido de hoy o mañana. El último plan semanal del jugador decide si juega (día «partido») y
+ * con qué horario; la hora es la que el staff fijó para esa fecha en Partidos o, si no, la orientativa.
  */
 async function resolveUpcomingMatch(db, jugador, now = new Date()) {
   const today = toDateKey(now);
+  const tomorrow = shiftDateKey(today, 1);
   const plan = await getLatestAiPlanByPlayerId(db, jugador.id, { modo: PLAN_MODES.SEMANA }).catch(() => null);
   const dias = plan?.datos?.dias || {};
-  for (const fecha of [today, shiftDateKey(today, 1)]) {
+  if (![today, tomorrow].some((fecha) => dias[weekdayKey(fecha)]?.tipoDia === 'partido')) return null;
+
+  const kickoffs = await getTeamKickoffsBetween(db, jugador.equipo_id, today, tomorrow).catch(() => []);
+  for (const fecha of [today, tomorrow]) {
     const dayKey = weekdayKey(fecha);
     if (dias[dayKey]?.tipoDia !== 'partido') continue;
-    const { horario, hora, exacta } = resolveMatchKickoff(plan.datos?.meta?.preMatchConfig, dayKey);
+    const teamKickoff = kickoffs.find((k) => k.fecha === fecha)?.hora;
+    const { horario, hora, exacta } = resolveMatchKickoff(plan.datos?.meta?.preMatchConfig, dayKey, teamKickoff);
     if (madridDateTime(fecha, hora).getTime() + VISIBLE_AFTER_KICKOFF_MS > now.getTime()) {
       return { fecha, hora, horario, rival: '', lugar: '', approximate: !exacta };
     }

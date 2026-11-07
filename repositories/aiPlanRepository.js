@@ -27,6 +27,18 @@ export async function getLatestAiPlanByPlayerId(db, jugadorId, { modo } = {}) {
   });
 }
 
+/** Último plan de cada jugador ({ jugador_id, datos }), para varios a la vez. */
+export async function getLatestAiPlansByPlayerIds(db, jugadorIds, { modo } = {}) {
+  const ids = (jugadorIds || []).filter((id) => !isMockPlayer(id));
+  if (!ids.length) return [];
+  return db.planes_ia.findMany({
+    where: { jugador_id: { in: ids }, ...(modo ? { modo } : {}) },
+    distinct: ['jugador_id'],
+    orderBy: [{ jugador_id: 'asc' }, { created_at: { sort: 'desc', nulls: 'first' } }],
+    select: { jugador_id: true, datos: true },
+  });
+}
+
 export async function getAiPlanById(db, id) {
   return db.planes_ia.findUnique({ where: { id } });
 }

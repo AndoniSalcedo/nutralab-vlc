@@ -1,4 +1,3 @@
-import { resolveMatchKickoff } from '@/lib/nutrition/match-kickoff';
 import { FOOTBALL_DAY_TYPES, FOOTBALL_OBJECTIVE_MACROS } from '@/config/day-types/football';
 
 
@@ -169,12 +168,11 @@ export function getTeamDayTypeLabel(key, teamConfig) {
 
 
 
-/**
- * Horario del partido de un día: el que marca su hora exacta si se puso al generar el plan,
- * si no el horario elegido y, en último caso, tarde.
- */
+const DEFAULT_MATCH_SCHEDULE = 'tarde';
+
+/** Horario del partido de un día: el elegido al generar el plan o, si no se eligió, tarde. */
 export function getMatchSchedule(preMatchConfig, dayKey) {
-  return resolveMatchKickoff(preMatchConfig, dayKey).horario;
+  return preMatchConfig?.partidos?.[dayKey]?.horario || preMatchConfig?.horario || DEFAULT_MATCH_SCHEDULE;
 }
 
 export function isPreMatchPreviousDayMeal(scheduleKey, mealName) {

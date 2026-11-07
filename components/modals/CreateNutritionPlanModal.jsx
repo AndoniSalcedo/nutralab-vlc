@@ -8,14 +8,18 @@ import {
   Button,
   Group,
   Text,
+  SegmentedControl,
   Badge,
 } from '@mantine/core';
 import Icon3D from '@/components/Icon3D';
 import ResponsiveModal from './ResponsiveModal';
 import ModalFooter from './ModalFooter';
-import MatchKickoffControl from '@/components/plan/MatchKickoffControl';
-import { getMatchSchedule } from '@/config/nutrition-days';
 
+const MATCH_SCHEDULE_OPTIONS = [
+  { label: 'Mañana', value: 'manana' },
+  { label: 'Tarde', value: 'tarde' },
+  { label: 'Noche', value: 'noche' },
+];
 
 export default function CreateNutritionPlanModal({
   opened,
@@ -122,7 +126,9 @@ export default function CreateNutritionPlanModal({
             <Stack gap="sm" mt="xs">
                 {matchDaysInCalendar.length > 0 ? (
                   matchDaysInCalendar.map((dayKey) => {
-                    const dayHorario = getMatchSchedule(modalPreMatchConfig, dayKey);
+                    const dayConfig = modalPreMatchConfig?.partidos?.[dayKey] || {
+                      horario: modalPreMatchConfig?.horario || 'tarde',
+                    };
 
                     return (
                       <Paper key={dayKey} p="xs" radius="md" withBorder bg="white">
@@ -131,20 +137,31 @@ export default function CreateNutritionPlanModal({
                             Partido del {dayLabels[dayKey]}
                           </Badge>
 
-                          <MatchKickoffControl
-                            value={modalPreMatchConfig?.partidos?.[dayKey]}
-                            fallbackHorario={modalPreMatchConfig?.horario || 'tarde'}
-                            onChange={(nextDay) =>
-                              setModalPreMatchConfig((prev) => ({
-                                ...prev,
-                                partidos: { ...(prev?.partidos || {}), [dayKey]: nextDay },
-                              }))
-                            }
-                          />
+                          <Stack gap={2} style={{ flexGrow: 1, maxWidth: '300px', minWidth: '240px' }}>
+                            <Text size="xs" fw={600} c="dimmed">Horario del partido</Text>
+                            <SegmentedControl
+                              size="xs"
+                              fullWidth
+                              data={MATCH_SCHEDULE_OPTIONS}
+                              value={dayConfig.horario || 'tarde'}
+                              onChange={(val) =>
+                                setModalPreMatchConfig((prev) => ({
+                                  ...prev,
+                                  partidos: {
+                                    ...(prev?.partidos || {}),
+                                    [dayKey]: {
+                                      ...(prev?.partidos?.[dayKey] || {}),
+                                      horario: val,
+                                    },
+                                  },
+                                }))
+                              }
+                            />
+                          </Stack>
                         </Group>
 
                         <Text size="xs" c="dimmed" mt="xs">
-                          Se aplica el protocolo de partido del jugador por la <strong>{dayHorario === 'manana' ? 'Mañana' : dayHorario === 'noche' ? 'Noche' : 'Tarde'}</strong>: lo que tenga pautado a mano y, en el resto de tomas, sus comidas habituales con las reglas del protocolo. Con la hora de inicio, el jugador ve ese día su plan por horas y recibe los avisos a la hora real.
+                          Se aplica el protocolo de partido del jugador por la <strong>{dayConfig.horario === 'manana' ? 'Mañana' : dayConfig.horario === 'noche' ? 'Noche' : 'Tarde'}</strong>: lo que tenga pautado a mano y, en el resto de tomas, sus comidas habituales con las reglas del protocolo.
                         </Text>
                       </Paper>
                     );
