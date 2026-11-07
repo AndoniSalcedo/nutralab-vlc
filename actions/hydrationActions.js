@@ -449,11 +449,14 @@ export async function importTeamOsmolarity(formDataOrFile, teamIdParam, decision
         measurements: parsedMeasurements.length,
         skippedRows
       },
-      jugadores: playersPlan
+      jugadores: playersPlan,
+      // Plantilla completa para poder asignar a mano un nombre que no se ha reconocido.
+      plantilla: teamPlayers.map(previewCandidate)
     };
   }
 
   if (mode === 'importar') {
+    const teamPlayerIds = new Set(teamPlayers.map((p) => Number(p.id)));
     const decisions = JSON.parse(formData.get('decisiones') || '{}');
     const recordsToUpsert = [];
     const resultsSummary = [];
@@ -467,6 +470,9 @@ export async function importTeamOsmolarity(formDataOrFile, teamIdParam, decision
       if (decision) {
         if (decision.action === 'update') {
           targetJugadorId = Number(decision.jugador_id);
+          if (!teamPlayerIds.has(targetJugadorId)) {
+            throw new ActionError(`El jugador asignado a "${playerGroup.nombreCompleto}" no pertenece a este equipo.`);
+          }
         } else if (decision.action === 'skip') {
           skippedCount += playerGroup.mediciones.length;
           resultsSummary.push({

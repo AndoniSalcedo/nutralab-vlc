@@ -59,6 +59,9 @@ function initialDecisions(players) {
   (players || []).forEach((player) => {
     if (player.accion === 'actualizar') {
       decs[player.key] = { action: 'update', jugador_id: player.jugadorId };
+    } else if (player.accion === 'revision' && player.candidatos?.length === 1) {
+      // Una sola coincidencia parcial ("Danjuma" → "Arnaut Danjuma"): se propone, el usuario puede cambiarla.
+      decs[player.key] = { action: 'update', jugador_id: player.candidatos[0].id };
     } else {
       decs[player.key] = { action: 'skip' };
     }
@@ -161,25 +164,28 @@ export default function TeamOsmolarityImporter({ team }) {
   }
 
   function decisionOptions(player) {
-    const options = [];
+    const suggested = [];
+    const seen = new Set();
+    const add = (list, id, nombre) => {
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      list.push({ value: `update:${id}`, label: `Actualizar: ${nombre}` });
+    };
+
     if (player.accion === 'actualizar' && player.jugadorId) {
-      options.push({
-        value: `update:${player.jugadorId}`,
-        label: `Actualizar: ${player.nombreCompleto}`,
-      });
+      const match = (preview?.plantilla || []).find((p) => p.id === player.jugadorId);
+      add(suggested, player.jugadorId, match?.nombreCompleto || player.nombreCompleto);
     }
+    (player.candidatos || []).forEach((candidate) => add(suggested, candidate.id, candidate.nombreCompleto));
 
-    (player.candidatos || []).forEach((candidate) => {
-      if (candidate.id !== player.jugadorId) {
-        options.push({
-          value: `update:${candidate.id}`,
-          label: `Actualizar: ${candidate.nombreCompleto}`,
-        });
-      }
-    });
+    const rest = [];
+    (preview?.plantilla || []).forEach((p) => add(rest, p.id, p.nombreCompleto));
 
-    options.push({ value: 'skip', label: 'Omitir' });
-    return options;
+    const groups = [];
+    if (suggested.length) groups.push({ group: 'Sugeridos', items: suggested });
+    if (rest.length) groups.push({ group: suggested.length ? 'Resto de la plantilla' : 'Plantilla', items: rest });
+    groups.push({ group: 'Otras', items: [{ value: 'skip', label: 'Omitir' }] });
+    return groups;
   }
 
   async function importFile() {
@@ -331,13 +337,13 @@ export default function TeamOsmolarityImporter({ team }) {
 
             {errorCount > 0 && (
               <Alert color="red" variant="light" icon={<IconAlertTriangle size={18} />}>
-                Hay {errorCount} jugador{errorCount === 1 ? '' : 'es'} en el archivo que no existe{errorCount === 1 ? '' : 'n'} en el equipo y no tiene{errorCount === 1 ? '' : 'n'} coincidencias parciales. Estas filas se omitirán de forma obligatoria.
+                Hay {errorCount} jugador{errorCount === 1 ? '' : 'es'} en el archivo que no existe{errorCount === 1 ? '' : 'n'} en el equipo y no tiene{errorCount === 1 ? '' : 'n'} coincidencias parciales. Se omitirán salvo que les asignes un jugador de la plantilla.
               </Alert>
             )}
 
             {reviewCount > 0 && (
               <Alert color="yellow" variant="light" icon={<IconAlertTriangle size={18} />}>
-                Hay {reviewCount} jugador{reviewCount === 1 ? '' : 'es'} con coincidencias parciales. Asegúrate de asociar el jugador correcto o selecciona &quot;Omitir&quot; si no deseas guardar sus mediciones.
+                Hay {reviewCount} jugador{reviewCount === 1 ? '' : 'es'} con coincidencias parciales. Revisa que el jugador propuesto sea el correcto o selecciona &quot;Omitir&quot; si no deseas guardar sus mediciones.
               </Alert>
             )}
 
@@ -364,26 +370,17 @@ export default function TeamOsmolarityImporter({ team }) {
                         </Badge>
                       </Table.Td>
                       <Table.Td>
-                        {player.accion === 'error' ? (
-                          <Select
-                            size="xs"
-                            radius="md"
-                            data={[{ value: 'skip', label: 'Omitir (No existe)' }]}
-                            value="skip"
-                            disabled
-                            comboboxProps={{ zIndex: 2500, withinPortal: true }}
-                          />
-                        ) : (
-                          <Select
-                            size="xs"
-                            radius="md"
-                            data={decisionOptions(player)}
-                            value={decisionValue(player)}
-                            onChange={(val) => setDecision(player.key, val)}
-                            allowDeselect={false}
-                            comboboxProps={{ zIndex: 2500, withinPortal: true }}
-                          />
-                        )}
+                        <Select
+                          size="xs"
+                          radius="md"
+                          data={decisionOptions(player)}
+                          value={decisionValue(player)}
+                          onChange={(val) => setDecision(player.key, val)}
+                          allowDeselect={false}
+                          searchable
+                          nothingFoundMessage="Sin resultados"
+                          comboboxProps={{ zIndex: 2500, withinPortal: true }}
+                        />
                       </Table.Td>
                     </Table.Tr>
                   ))}
