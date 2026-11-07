@@ -30,19 +30,14 @@ import {
 } from '@/components/icons3d';
 
 import ResponsiveModal from './ResponsiveModal';
+import MatchKickoffControl from '@/components/plan/MatchKickoffControl';
 import TypePlanRowsEditor, { isValidTypeRows } from '@/components/plan/TypePlanRowsEditor';
 import { PLAN_MODES } from '@/config/plan-modes';
+import { getMatchSchedule } from '@/config/nutrition-days';
 
 const REPORT_MODE_OPTIONS = [
   { label: 'Semana', value: PLAN_MODES.SEMANA },
   { label: 'Por tipos de día', value: PLAN_MODES.TIPOS },
-];
-
-const MATCH_SCHEDULE_OPTIONS = [
-  { label: 'Mañana', value: 'manana' },
-
-  { label: 'Tarde', value: 'tarde' },
-  { label: 'Noche', value: 'noche' },
 ];
 
 const SQUAD_GENERATION_MESSAGES = [
@@ -429,9 +424,7 @@ export default function SquadReportModal({
                 {DAYS_OF_WEEK.filter((d) => reportForm.calendario?.[d.key] === 'partido').length > 0 ? (
                   DAYS_OF_WEEK.filter((d) => reportForm.calendario?.[d.key] === 'partido').map((d) => {
                     const dayKey = d.key;
-                    const dayConfig = reportForm.preMatchConfig?.partidos?.[dayKey] || {
-                      horario: reportForm.preMatchConfig?.horario || 'tarde',
-                    };
+                    const dayHorario = getMatchSchedule(reportForm.preMatchConfig, dayKey);
 
                     return (
                       <Box key={dayKey} p="xs" style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
@@ -443,31 +436,20 @@ export default function SquadReportModal({
                             </Text>
                           </Group>
 
-                          <Stack gap={2} style={{ flexGrow: 1, maxWidth: '300px', minWidth: '240px' }}>
-                            <Text size="xs" fw={600} c="dimmed">Horario del partido</Text>
-                            <SegmentedControl
-                              size="xs"
-                              fullWidth
-                              data={MATCH_SCHEDULE_OPTIONS}
-                              value={dayConfig.horario || 'tarde'}
-                              onChange={(val) =>
-                                updateReportField('preMatchConfig', {
-                                  ...(reportForm.preMatchConfig || {}),
-                                  partidos: {
-                                    ...(reportForm.preMatchConfig?.partidos || {}),
-                                    [dayKey]: {
-                                      ...(reportForm.preMatchConfig?.partidos?.[dayKey] || {}),
-                                      horario: val,
-                                    },
-                                  },
-                                })
-                              }
-                            />
-                          </Stack>
+                          <MatchKickoffControl
+                            value={reportForm.preMatchConfig?.partidos?.[dayKey]}
+                            fallbackHorario={reportForm.preMatchConfig?.horario || 'tarde'}
+                            onChange={(nextDay) =>
+                              updateReportField('preMatchConfig', {
+                                ...(reportForm.preMatchConfig || {}),
+                                partidos: { ...(reportForm.preMatchConfig?.partidos || {}), [dayKey]: nextDay },
+                              })
+                            }
+                          />
                         </Group>
 
                         <Text size="xs" c="dimmed" mt="xs">
-                          A cada jugador se le aplica su protocolo de partido por la <strong>{dayConfig.horario === 'manana' ? 'Mañana' : dayConfig.horario === 'noche' ? 'Noche' : 'Tarde'}</strong>: lo que tenga pautado a mano y, en el resto de tomas, sus comidas habituales con las reglas del protocolo.
+                          A cada jugador se le aplica su protocolo de partido por la <strong>{dayHorario === 'manana' ? 'Mañana' : dayHorario === 'noche' ? 'Noche' : 'Tarde'}</strong>: lo que tenga pautado a mano y, en el resto de tomas, sus comidas habituales con las reglas del protocolo. Solo afecta a los destinatarios marcados abajo: quien no juegue, déjalo fuera o hazle su plan desde su ficha.
                         </Text>
                       </Box>
                     );

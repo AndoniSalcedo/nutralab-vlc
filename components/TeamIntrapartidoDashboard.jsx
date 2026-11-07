@@ -31,7 +31,6 @@ import Icon3D from '@/components/Icon3D';
 import NothingFound from '@/components/NothingFound';
 import ConfirmModal from '@/components/modals/ConfirmModal';
 import IntrapartidoModal from '@/components/modals/IntrapartidoModal';
-import ScheduledMatchesCard from '@/components/ScheduledMatchesCard';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import { TeamHeaderRightSection } from '@/components/TeamHeaderContext';
 import { deleteIntrapartidoMatch } from '@/actions/intrapartidoActions';
@@ -166,8 +165,6 @@ export default function TeamIntrapartidoDashboard({ players = [], sessions = [],
           </ActionIcon>
         </TeamHeaderRightSection>
       )}
-
-      <ScheduledMatchesCard team={team} readOnly={readOnly} />
 
       {!readOnly && drafts.length > 0 && (
         <Stack gap="xs">
