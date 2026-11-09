@@ -588,7 +588,7 @@ export default function SuplementacionSubtab({ jugador, readOnly = false }) {
         </Stack>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }} pos="relative">
+      <Box py={{ base: 'sm', sm: 'md' }} pos="relative">
         <LoadingOverlay visible={loading} />
         <Stack gap="md">
           {!peso && (

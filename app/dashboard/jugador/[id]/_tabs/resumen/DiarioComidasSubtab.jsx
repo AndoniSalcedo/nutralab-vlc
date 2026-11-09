@@ -707,7 +707,7 @@ export default function DiarioComidasSubtab({ jugador, readOnly = false }) {
         </Paper>
 
         {/* Contenido del día */}
-        <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+        <Box py={{ base: 'sm', sm: 'md' }}>
           {loading ? (
             <BoneyardSkeleton name="diario-comidas" loading={true} />
           ) : (

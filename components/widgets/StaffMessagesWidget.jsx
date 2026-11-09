@@ -18,6 +18,7 @@ export default function StaffMessagesWidget({
       color="salvia"
       icon="chat"
       title="Mensajes"
+      illustration="envelope"
       onClick={() => router.push(`/dashboard/jugador/${jugadorId}/resumen/mensajes`)}
     >
       <Text fz={24} fw={800} c="var(--nutra-bosque, #1F2A24)" lh={1.1} style={{ fontVariantNumeric: 'tabular-nums' }}>

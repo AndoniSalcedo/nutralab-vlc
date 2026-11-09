@@ -690,7 +690,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       </Paper>
 
       {/* Horizontal Charts Section */}
-      <Box px={{ base: 'sm', sm: 0 }}>
+      <Box>
         <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
           {renderMetricChart('hydration', sortedHydrationChronological)}
           {renderMetricChart('sweat', sortedSweatChronological)}
@@ -698,7 +698,7 @@ export default function HidratacionSubtab({ jugador, registrosHidratacion = [], 
       </Box>
 
       {/* Main Hydration Content & Timing Cards */}
-      <Box px={{ base: 'sm', sm: 0 }} pb="sm">
+      <Box pb="sm">
         <Stack gap="md">
           {/* Con peso: pauta personal (sodio en sudor, osmolaridad, partidos); sin peso, la genérica */}
           {peso > 0 ? (

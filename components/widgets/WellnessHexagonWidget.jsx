@@ -2,7 +2,7 @@
 
 import { motion } from 'motion/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Box, Group, Text } from '@mantine/core';
+import { Box, Button, Group, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { notifySaved } from '@/components/motion/notifySaved';
 import WidgetCard, { WidgetAside } from './WidgetCard';
@@ -192,6 +192,7 @@ export default function WellnessHexagonWidget({ jugadorId, canEdit = true }) {
     [records, today]
   );
   const overall = overallFrom(todayValues);
+  const hasData = Boolean(todayValues || averageVals);
   const overallAvg = overallFrom(averageVals);
   const delta = overall !== null && overallAvg !== null ? overall - overallAvg : null;
 
@@ -235,19 +236,39 @@ export default function WellnessHexagonWidget({ jugadorId, canEdit = true }) {
       footerAction={canEdit && !loading ? (todayRecord ? 'Editar' : 'Rellenar') : null}
       onFooterAction={() => setModalOpen(true)}
     >
-      <HexagonChart today={todayValues} average={averageVals} />
+      <Box pos="relative">
+        <Box style={{ opacity: hasData || loading ? 1 : 0.45, transition: 'opacity 0.3s ease' }}>
+          <HexagonChart today={todayValues} average={averageVals} />
+        </Box>
+        {/* Sin ningún registro todavía: el hexágono vacío invita a rellenar el primero */}
+        {!hasData && !loading && (
+          <Box style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', pointerEvents: 'none' }}>
+            {canEdit ? (
+              <Button radius="xl" color="lima" c="var(--nutra-bosque, #1F2A24)" size="sm" onClick={() => setModalOpen(true)} style={{ pointerEvents: 'auto', boxShadow: '0 8px 20px -8px rgba(31, 42, 36, 0.35)' }}>
+                ¿Cómo estás hoy?
+              </Button>
+            ) : (
+              <Text fz="xs" fw={700} c="dimmed" px={12} py={6} bg="white" style={{ borderRadius: 20 }}>
+                Sin registros todavía
+              </Text>
+            )}
+          </Box>
+        )}
+      </Box>
 
-      {/* Leyenda */}
-      <Group justify="center" gap="md" mt={4}>
-        <Group gap={6} wrap="nowrap">
-          <Box w={14} h={4} style={{ borderRadius: 2, background: 'var(--mantine-color-teal-5)' }} />
-          <Text fz="xs" c="dark.4" fw={600}>Hoy</Text>
+      {/* Leyenda: solo cuando hay algo que leer */}
+      {hasData && (
+        <Group justify="center" gap="md" mt={4}>
+          <Group gap={6} wrap="nowrap">
+            <Box w={14} h={4} style={{ borderRadius: 2, background: 'var(--mantine-color-teal-5)' }} />
+            <Text fz="xs" c="dark.4" fw={600}>Hoy</Text>
+          </Group>
+          <Group gap={6} wrap="nowrap">
+            <Box w={14} h={0} style={{ borderTop: '2px dashed var(--mantine-color-gray-5)' }} />
+            <Text fz="xs" c="dark.4" fw={600}>Media 28 días</Text>
+          </Group>
         </Group>
-        <Group gap={6} wrap="nowrap">
-          <Box w={14} h={0} style={{ borderTop: '2px dashed var(--mantine-color-gray-5)' }} />
-          <Text fz="xs" c="dark.4" fw={600}>Media 28 días</Text>
-        </Group>
-      </Group>
+      )}
 
       {todayRecord?.molestia && (
         <Box mt="sm" p="xs" style={{ borderRadius: 10, background: 'var(--mantine-color-red-0)', border: '1px solid var(--mantine-color-red-2)' }}>

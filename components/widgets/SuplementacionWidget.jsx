@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import {
   Box,
   Group,
-  Stack,
+  SimpleGrid,
   Text,
   UnstyledButton,
 } from '@mantine/core';
@@ -150,44 +150,41 @@ export default function SuplementacionWidget({
       {totalCount === 0 && loadedList !== null && (
         <Text fz="xs" c="dimmed" py="sm">Tu nutricionista aún no te ha asignado suplementos diarios.</Text>
       )}
-      {/* Lista de tomas interactivas */}
-      <Stack gap={6}>
+      {/* Fichas de tomas que se marcan con un toque: una columna a media anchura en móvil, dos en escritorio */}
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing={6}>
         {list.map((item) => {
           const isChecked = Boolean(suppChecks[item.id]);
           return (
-            <UnstyledButton
-              key={item.id}
-              onClick={() => handleToggle(item.id)}
-              disabled={readOnly}
-              px={4}
-              py={6}
-              style={{
-                borderRadius: '8px',
-                backgroundColor: isChecked ? 'rgba(108, 112, 90, 0.08)' : 'transparent',
-                transition: 'background-color 0.15s ease',
-                display: 'block',
-                width: '100%',
-              }}
-            >
-              <Group justify="space-between" align="center" wrap="nowrap">
-                <Group gap="xs" align="center" wrap="nowrap" style={{ minWidth: 0, flex: 1 }}>
+            <motion.div key={item.id} whileTap={readOnly ? undefined : { scale: 0.96 }} style={{ minWidth: 0 }}>
+              <UnstyledButton
+                onClick={() => handleToggle(item.id)}
+                disabled={readOnly}
+                w="100%"
+                h="100%"
+                px={10}
+                py={8}
+                style={{
+                  borderRadius: 14,
+                  backgroundColor: isChecked ? 'var(--nutra-lima-glow, rgba(193, 240, 128, 0.22))' : 'var(--mantine-color-hueso-1)',
+                  border: `1.5px solid ${isChecked ? 'var(--nutra-lima, #C1F080)' : 'transparent'}`,
+                  transition: 'background-color 0.2s ease, border-color 0.2s ease',
+                  cursor: readOnly ? 'default' : 'pointer',
+                }}
+              >
+                <Group gap={8} wrap="nowrap" align="center">
                   <motion.div
-                    animate={{ scale: isChecked ? [1, 1.3, 1] : 1 }}
+                    animate={{ scale: isChecked ? [1, 1.25, 1] : 1 }}
                     transition={{ duration: 0.35 }}
                     style={{
                       width: 20,
                       height: 20,
-                      borderRadius: '6px',
-                      border: `1.5px solid ${
-                        isChecked ? 'var(--nutra-lima-dark, #4a6813)' : 'rgba(108, 112, 90, 0.25)'
-                      }`,
-                      backgroundColor: isChecked ? 'var(--nutra-lima, #C1F080)' : 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'var(--nutra-bosque, #1F2A24)',
+                      borderRadius: '50%',
                       flexShrink: 0,
-                      transition: 'all 0.15s ease',
+                      display: 'grid',
+                      placeItems: 'center',
+                      backgroundColor: isChecked ? 'var(--nutra-lima, #C1F080)' : 'white',
+                      border: `1.5px solid ${isChecked ? 'var(--nutra-lima-dark, #4a6813)' : 'rgba(108, 112, 90, 0.25)'}`,
+                      color: 'var(--nutra-bosque, #1F2A24)',
                     }}
                   >
                     {isChecked && (
@@ -197,26 +194,21 @@ export default function SuplementacionWidget({
                     )}
                   </motion.div>
                   <Box style={{ minWidth: 0, flex: 1 }}>
-                    <Text
-                      fz="xs"
-                      fw={600}
-                      c={isChecked ? 'dimmed' : 'dark.5'}
-                      td={isChecked ? 'line-through' : undefined}
-                      truncate
-                    >
+                    <Text fz={13} fw={700} c="var(--nutra-bosque, #1F2A24)" lh={1.2} truncate>
                       {item.name}
                     </Text>
-                    <Text fz={11} c="dimmed" truncate>
-                      {item.dose}
-                    </Text>
+                    {item.dose && (
+                      <Text fz={11} c="dimmed" lh={1.25} truncate>
+                        {item.dose}
+                      </Text>
+                    )}
                   </Box>
                 </Group>
-
-              </Group>
-            </UnstyledButton>
+              </UnstyledButton>
+            </motion.div>
           );
         })}
-      </Stack>
+      </SimpleGrid>
 
     </WidgetCard>
   );

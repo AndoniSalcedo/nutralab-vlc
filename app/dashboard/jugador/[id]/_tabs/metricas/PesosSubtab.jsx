@@ -194,7 +194,7 @@ export default function PesosSubtab({ jugador, pesajes: pesajesIniciales = [], e
         </Group>
       </Paper>
 
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+      <Box py={{ base: 'sm', sm: 'md' }}>
         {sortedAsc.length === 0 ? (
         <NothingFound
           icon={IconScale}

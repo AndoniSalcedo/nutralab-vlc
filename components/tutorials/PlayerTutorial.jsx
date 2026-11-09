@@ -170,14 +170,6 @@ export default function PlayerTutorial({ jugador }) {
         data: { route: basePerfil, side: 'left' },
       },
 
-      // 7. COMEDOR
-      {
-        target: '#widget-comedor',
-        title: 'Menú del Comedor 🍽️',
-        content: 'Revisa las opciones preparadas por el club en la Ciudad Deportiva para desayunar o comer según el día.',
-        data: { route: basePerfil, side: 'right' },
-      },
-
       // 8. SUPLEMENTACIÓN ACTIVA
       {
         target: '#widget-suplementacion',

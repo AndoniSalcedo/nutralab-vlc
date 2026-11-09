@@ -3,15 +3,14 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ActionIcon, Box, Button, Group, Text, UnstyledButton } from '@mantine/core';
-import { IconCheck, IconChevronLeft, IconChevronRight, IconPlus } from '@tabler/icons-react';
+import { Box, Button, Group, Text, UnstyledButton } from '@mantine/core';
+import { IconCheck, IconChevronDown, IconPlus } from '@tabler/icons-react';
 import Icon3D from '@/components/Icon3D';
 import MealEditorModal from '@/components/modals/MealEditorModal';
 import { ParticleBurst } from '@/components/motion/Celebration';
 import WidgetCard, { WidgetAside } from './WidgetCard';
 import { sanitizePlanData } from '@/lib/engine';
 import { calculateMealBudgets } from '@/lib/engine/day-balance';
-import { getDayTypeLabel } from '@/config/nutrition-days';
 import { formatInteger as formatInt } from '@/lib/utils';
 import { toDateKey } from '@/lib/dates';
 
@@ -54,7 +53,6 @@ const STATUS = {
 
 const MAX_FOODS = 5;
 const tabular = { fontVariantNumeric: 'tabular-nums' };
-const disabledArrow = { backgroundColor: 'transparent', opacity: 0.3 };
 
 const normalize = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
 const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -144,30 +142,6 @@ function StatusChip({ status }) {
   );
 }
 
-function MacroLine({ macros }) {
-  return (
-    <Group gap={10} mt={5} wrap="wrap" style={{ rowGap: 2 }}>
-      <Text fz={12} fw={800} c={BOSQUE} style={{ ...tabular, whiteSpace: 'nowrap' }}>
-        {formatInt(macros.kcal)}
-        <Text span fz={10} fw={600} c={SALVIA} ml={2}>
-          kcal
-        </Text>
-      </Text>
-      {MACROS.map((m) => (
-        <Group key={m.key} gap={4} wrap="nowrap">
-          <Box style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: m.color }} />
-          <Text fz={11} fw={600} c={SALVIA} style={{ ...tabular, whiteSpace: 'nowrap' }}>
-            {m.label}{' '}
-            <Text span inherit fw={800} c={BOSQUE}>
-              {formatInt(macros[m.key])}
-            </Text>
-          </Text>
-        </Group>
-      ))}
-    </Group>
-  );
-}
-
 function FoodList({ foods, onMore }) {
   if (foods.length === 0) {
     return (
@@ -206,11 +180,103 @@ function FoodList({ foods, onMore }) {
   );
 }
 
-const slide = {
-  enter: (dir) => ({ x: dir * 28, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (dir) => ({ x: dir * -28, opacity: 0 }),
-};
+// Baldosa de cada toma sobre la línea del día: el icono de la toma y su estado (lima con check si está
+// registrada, borde bosque que late si toca ahora, apagada con punto arcilla si pasó sin registrar)
+function MealThumb({ slot, status, open }) {
+  const logged = status === 'logged';
+  const now = status === 'now';
+  const bg = logged ? 'var(--nutra-lima-glow, rgba(193, 240, 128, 0.22))' : now || open ? 'white' : 'var(--mantine-color-hueso-1)';
+  const ring = logged ? LIMA : now ? BOSQUE : open ? 'rgba(108, 112, 90, 0.35)' : 'transparent';
+  return (
+    <Box pos="relative" w={48} h={48} style={{ flexShrink: 0 }}>
+      {now && (
+        <motion.span
+          aria-hidden
+          animate={{ scale: [1, 1.35], opacity: [0.55, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+          style={{ position: 'absolute', inset: 0, borderRadius: 16, background: LIMA, pointerEvents: 'none' }}
+        />
+      )}
+      <Box
+        style={{
+          position: 'relative',
+          width: 48,
+          height: 48,
+          borderRadius: 16,
+          display: 'grid',
+          placeItems: 'center',
+          backgroundColor: bg,
+          boxShadow: `0 0 0 2px ${ring}${now || open ? ', 0 6px 14px -8px rgba(31, 42, 36, 0.45)' : ''}`,
+          transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
+        }}
+      >
+        <Box style={{ display: 'grid', filter: status === 'missed' ? 'grayscale(0.9)' : 'none', opacity: status === 'missed' ? 0.6 : 1 }}>
+          <Icon3D name={slot.icon} size={28} force3d />
+        </Box>
+      </Box>
+      {logged && (
+        <Box
+          aria-hidden
+          style={{ position: 'absolute', right: -5, bottom: -5, width: 20, height: 20, borderRadius: '50%', display: 'grid', placeItems: 'center', backgroundColor: LIMA, border: '2px solid white' }}
+        >
+          <IconCheck size={11} stroke={3.4} color={BOSQUE} />
+        </Box>
+      )}
+      {status === 'missed' && (
+        <Box
+          aria-hidden
+          style={{ position: 'absolute', top: -4, right: -4, width: 12, height: 12, borderRadius: '50%', backgroundColor: ARCILLA, border: '2px solid white' }}
+        />
+      )}
+    </Box>
+  );
+}
+
+// Cabecera del detalle: kcal de la toma, sus macros y el reparto de energía entre ellos
+const KCAL_PER_G = { p: 4, hc: 4, g: 9 };
+
+function MealSummary({ macros }) {
+  if (!macros) return null;
+  const parts = MACROS.map((m) => ({ ...m, kcal: (Number(macros[m.key]) || 0) * KCAL_PER_G[m.key] }));
+  const total = parts.reduce((sum, m) => sum + m.kcal, 0);
+  return (
+    <Box p={12} style={{ borderRadius: 14, backgroundColor: 'white' }}>
+      <Group justify="space-between" align="flex-end" wrap="nowrap" gap="xs">
+        <Text fz={26} fw={800} c={BOSQUE} lh={1} lts={-0.6} style={{ ...tabular, whiteSpace: 'nowrap' }}>
+          {formatInt(macros.kcal)}
+          <Text span fz={12} fw={700} c={SALVIA} ml={4} lts={0}>kcal</Text>
+        </Text>
+        <Group gap={10} wrap="nowrap">
+          {MACROS.map((m) => (
+            <Box key={m.key} ta="right">
+              <Text fz={14} fw={800} c={BOSQUE} lh={1} style={tabular}>
+                {formatInt(macros[m.key])}
+                <Text span fz={10} fw={600} c={SALVIA} ml={1}>g</Text>
+              </Text>
+              <Group gap={4} justify="flex-end" wrap="nowrap" mt={4}>
+                <Box style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: m.color }} />
+                <Text fz={10} fw={600} c={SALVIA}>{m.label}</Text>
+              </Group>
+            </Box>
+          ))}
+        </Group>
+      </Group>
+      {total > 0 && (
+        <Box mt={10} style={{ display: 'flex', gap: 3, height: 6 }}>
+          {parts.map((m, i) => (
+            <motion.div
+              key={m.key}
+              initial={{ flexGrow: 0 }}
+              animate={{ flexGrow: m.kcal / total }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 + i * 0.06 }}
+              style={{ flexBasis: 0, borderRadius: 3, backgroundColor: m.color }}
+            />
+          ))}
+        </Box>
+      )}
+    </Box>
+  );
+}
 
 export default function PlanHoyWidget({
   jugador,
@@ -221,8 +287,8 @@ export default function PlanHoyWidget({
   onMealLogged,
 }) {
   const router = useRouter();
+  // Toma abierta en la agenda: null = la que toca; -1 = ninguna
   const [pickedIdx, setPickedIdx] = useState(null);
-  const [dir, setDir] = useState(1);
   const [draft, setDraft] = useState(null);
   const [burst, setBurst] = useState(0);
   // La hora actual se lee tras montar: el servidor y el navegador no comparten reloj ni zona horaria
@@ -287,16 +353,11 @@ export default function PlanHoyWidget({
   const hasPlan = Boolean(day && items.length > 0);
   const title = isToday ? 'Plan de hoy' : `Plan del ${date.toLocaleDateString('es-ES', { weekday: 'long' })}`;
 
+  // Por defecto se abre la que toca ahora (o la primera si no es hoy)
   const defaultIdx = currentIdx === -1 ? 0 : Math.min(currentIdx, items.length - 1);
-  const activeIdx = Math.min(pickedIdx ?? defaultIdx, Math.max(0, items.length - 1));
-  const active = items[activeIdx];
-  const activeStatus = active ? statusOf(active, activeIdx) : null;
-
-  const pick = (idx) => {
-    if (idx < 0 || idx >= items.length || idx === activeIdx) return;
-    setDir(idx > activeIdx ? 1 : -1);
-    setPickedIdx(idx);
-  };
+  const openIdx = pickedIdx ?? defaultIdx;
+  const toggle = (idx) => setPickedIdx(idx === openIdx ? -1 : idx);
+  const loggedCount = items.filter((i) => i.log).length;
 
   return (
     <WidgetCard
@@ -304,18 +365,9 @@ export default function PlanHoyWidget({
       color="salvia"
       icon="tear_off_calendar"
       title={title}
-      aside={
-        hasPlan ? (
-          <WidgetAside color="salvia" dot>
-            {getDayTypeLabel(day.tipoDia)}
-          </WidgetAside>
-        ) : null
-      }
-      footer={
-        hasPlan
-          ? `${formatInt(day.kcal)} kcal · P ${formatInt(day.proteina)} · HC ${formatInt(day.hidratos)} · G ${formatInt(day.grasa)}`
-          : 'Supervisado por nutrición'
-      }
+      // El tipo de día, las kcal y los macros del día ya están en la cabecera del perfil
+      aside={hasPlan ? <WidgetAside color={loggedCount === items.length ? 'lima' : 'salvia'} dot>{loggedCount}/{items.length} registradas</WidgetAside> : null}
+      footer={hasPlan ? null : 'Supervisado por nutrición'}
       footerAction={hasPlan ? 'Plan completo' : null}
       onFooterAction={hasPlan ? goToPlan : undefined}
     >
@@ -334,190 +386,114 @@ export default function PlanHoyWidget({
           <Text fz="xs" c={SALVIA} mt={2}>Aún no se ha publicado ningún plan para este jugador</Text>
         </Box>
       ) : (
-        <>
-          {/* Ingesta destacada: se cambia deslizando o con las flechas */}
-          <Box style={{ position: 'relative', borderRadius: 18, backgroundColor: 'var(--mantine-color-hueso-1)', overflow: 'hidden' }}>
-            <ParticleBurst burstKey={burst} top={40} left={40} />
-            <AnimatePresence mode="wait" initial={false} custom={dir}>
-              <motion.div
-                key={activeIdx}
-                custom={dir}
-                variants={slide}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                drag={items.length > 1 ? 'x' : false}
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.2}
-                dragSnapToOrigin
-                onDragEnd={(e, info) => {
-                  if (info.offset.x < -48) pick(activeIdx + 1);
-                  else if (info.offset.x > 48) pick(activeIdx - 1);
-                }}
-                style={{ padding: 14, touchAction: 'pan-y' }}
-              >
-                <Group gap={12} align="flex-start" wrap="nowrap">
-                  <Box
-                    style={{
-                      width: 52,
-                      height: 52,
-                      flexShrink: 0,
-                      borderRadius: 16,
-                      display: 'grid',
-                      placeItems: 'center',
-                      backgroundColor: 'white',
-                      boxShadow: '0 1px 2px rgba(21, 21, 19, 0.06)',
-                    }}
-                  >
-                    <Icon3D name={active.slot.icon} size={34} />
-                  </Box>
-                  <Box style={{ minWidth: 0, flex: 1 }}>
-                    <Group gap={8} align="center" wrap="nowrap">
-                      <Text fz={17} fw={800} c={BOSQUE} lh={1.2} truncate>
-                        {active.nombre}
-                      </Text>
-                      <StatusChip status={activeStatus} />
-                    </Group>
-                    {active.macros && <MacroLine macros={active.macros} />}
-                  </Box>
-                </Group>
-
-                <FoodList foods={active.foods} onMore={goToPlan} />
-
-                <Group justify="space-between" align="center" wrap="nowrap" mt={10} gap="xs">
-                  {active.log ? (
-                    <Group gap={6} wrap="nowrap" style={{ minWidth: 0 }}>
-                      <Box style={{ width: 18, height: 18, borderRadius: '50%', flexShrink: 0, display: 'grid', placeItems: 'center', backgroundColor: LIMA }}>
-                        <IconCheck size={11} stroke={3.4} color={BOSQUE} />
-                      </Box>
-                      <Text fz={12} fw={600} c={BOSQUE} truncate style={tabular}>
-                        {formatTime(active.log.takenAt)}
-                        {Number(active.log.calories) > 0 ? ` · ${formatInt(active.log.calories)} kcal en el diario` : ''}
-                      </Text>
-                    </Group>
-                  ) : canLog ? (
-                    <Button
-                      size="compact-sm"
-                      color="lima"
-                      leftSection={<IconPlus size={14} stroke={2.6} />}
-                      onClick={() => setDraft(draftFromPlan(active, date, isToday))}
-                    >
-                      Registrar
-                    </Button>
-                  ) : (
-                    <span />
-                  )}
-
-                  {items.length > 1 && (
-                    <Group gap={2} wrap="nowrap" style={{ flexShrink: 0 }}>
-                      <ActionIcon variant="subtle" color="salvia" size={28} disabled={activeIdx === 0} onClick={() => pick(activeIdx - 1)} aria-label="Ingesta anterior" style={activeIdx === 0 ? disabledArrow : undefined}>
-                        <IconChevronLeft size={16} stroke={2.4} />
-                      </ActionIcon>
-                      <Text fz={11} fw={700} c={SALVIA} style={tabular}>
-                        {activeIdx + 1}/{items.length}
-                      </Text>
-                      <ActionIcon variant="subtle" color="salvia" size={28} disabled={activeIdx === items.length - 1} onClick={() => pick(activeIdx + 1)} aria-label="Ingesta siguiente" style={activeIdx === items.length - 1 ? disabledArrow : undefined}>
-                        <IconChevronRight size={16} stroke={2.4} />
-                      </ActionIcon>
-                    </Group>
-                  )}
-                </Group>
-              </motion.div>
-            </AnimatePresence>
-          </Box>
-
-          {/* Recorrido del día: la línea avanza con la hora y cada toma marca si está en el diario */}
-          <Box mt="sm" pt={4} style={{ overflowX: 'auto', scrollbarWidth: 'none' }}>
-            <Box style={{ position: 'relative', display: 'flex', minWidth: items.length * 58 }}>
-              <Box
-                style={{
-                  position: 'absolute',
-                  top: 16,
-                  left: `calc(100% / ${items.length * 2})`,
-                  right: `calc(100% / ${items.length * 2})`,
-                  height: 2,
-                  backgroundColor: HAIRLINE,
-                }}
-              />
-              {currentIdx > 0 && (
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-                  style={{
-                    position: 'absolute',
-                    top: 16,
-                    left: `calc(100% / ${items.length * 2})`,
-                    width: `${(Math.min(currentIdx, items.length - 1) / items.length) * 100}%`,
-                    height: 2,
-                    transformOrigin: 'left',
-                    backgroundColor: 'var(--mantine-color-salvia-3)',
-                  }}
-                />
-              )}
-              {items.map((item, idx) => {
-                const isActive = idx === activeIdx;
-                const status = statusOf(item, idx);
-                const isLogged = status === 'logged';
-                return (
-                  <UnstyledButton
-                    key={`${item.nombre}-${idx}`}
-                    onClick={() => pick(idx)}
-                    aria-label={`Ver ${item.nombre}${STATUS[status] ? `, ${STATUS[status].label.toLowerCase()}` : ''}`}
-                    aria-pressed={isActive}
-                    style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, position: 'relative' }}
-                  >
-                    {/* La toma que toca ahora late suavemente */}
-                    {status === 'now' && (
-                      <motion.span
-                        aria-hidden
-                        animate={{ scale: [1, 1.55], opacity: [0.55, 0] }}
-                        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
-                        style={{ position: 'absolute', top: 0, width: 34, height: 34, borderRadius: '50%', background: LIMA, pointerEvents: 'none' }}
-                      />
-                    )}
+        // Agenda del día: todas las tomas a la vista, unidas por una línea; la que toca se abre con su detalle
+        <Box>
+          {items.map((item, idx) => {
+            const status = statusOf(item, idx);
+            const open = idx === openIdx;
+            const isLast = idx === items.length - 1;
+            const passed = status === 'logged' || (currentIdx !== -1 && idx < currentIdx);
+            return (
+              <Box key={`${item.nombre}-${idx}`} style={{ display: 'flex', gap: 12 }}>
+                {/* Raíl: nodo de la toma y tramo de línea hasta la siguiente */}
+                <Box w={48} style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <MealThumb slot={item.slot} status={status} open={open} />
+                  {!isLast && (
                     <Box
+                      my={4}
                       style={{
-                        position: 'relative',
-                        width: 34,
-                        height: 34,
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: isLogged ? LIMA : 'white',
-                        border: `2px solid ${isActive ? BOSQUE : isLogged ? LIMA_DARK : 'rgba(108, 112, 90, 0.2)'}`,
-                        boxShadow: isActive ? '0 0 0 3px var(--nutra-lima-glow)' : 'none',
-                        transition: 'box-shadow 0.15s ease, border-color 0.15s ease',
+                        flex: 1,
+                        minHeight: 12,
+                        width: 2,
+                        borderRadius: 1,
+                        backgroundColor: passed ? 'var(--mantine-color-lima-5)' : 'var(--mantine-color-hueso-3)',
                       }}
-                    >
-                      {isLogged ? (
-                        <IconCheck size={16} stroke={3} color={BOSQUE} />
-                      ) : (
-                        <Box style={{ opacity: status === 'missed' ? 0.55 : 1, display: 'grid' }}>
-                          <Icon3D name={item.slot.icon} size={18} />
-                        </Box>
-                      )}
-                      {status === 'missed' && (
-                        <Box
-                          aria-hidden
-                          style={{ position: 'absolute', top: -2, right: -2, width: 10, height: 10, borderRadius: '50%', backgroundColor: ARCILLA, border: '2px solid white' }}
-                        />
-                      )}
-                    </Box>
-                    <Text fz={10} fw={isActive ? 700 : 500} c={isActive ? BOSQUE : SALVIA} ta="center" lh={1.1} truncate maw="100%">
-                      {item.nombre}
-                    </Text>
-                    <Text fz={9} fw={600} c={isLogged ? LIMA_DARK : 'transparent'} lh={1} style={tabular} aria-hidden={!isLogged}>
-                      {isLogged ? formatTime(item.log.takenAt) : '·'}
-                    </Text>
+                    />
+                  )}
+                </Box>
+
+                <Box style={{ flex: 1, minWidth: 0, paddingBottom: isLast ? 0 : 10 }}>
+                  <UnstyledButton
+                    onClick={() => toggle(idx)}
+                    w="100%"
+                    mih={48}
+                    aria-expanded={open}
+                    style={{ display: 'flex', alignItems: 'center' }}
+                  >
+                    <Group justify="space-between" wrap="nowrap" gap="xs" w="100%">
+                      <Box style={{ minWidth: 0 }}>
+                        <Text fz={15} fw={700} c={status === 'missed' ? SALVIA : BOSQUE} lh={1.2} truncate>
+                          {item.nombre}
+                        </Text>
+                        <Text fz={12} fw={500} c={SALVIA} mt={2} style={tabular} truncate>
+                          {[item.slot.time, item.macros?.kcal ? `${formatInt(item.macros.kcal)} kcal` : null].filter(Boolean).join(' · ') || 'Según el plan'}
+                        </Text>
+                      </Box>
+                      <Group gap={6} wrap="nowrap" style={{ flexShrink: 0 }}>
+                        {status === 'logged' ? (
+                          <Text fz={12} fw={700} c={LIMA_DARK} style={tabular}>
+                            ✓ {formatTime(item.log.takenAt)}
+                          </Text>
+                        ) : (
+                          <StatusChip status={status === 'later' ? null : status} />
+                        )}
+                        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }} style={{ display: 'flex', color: SALVIA }}>
+                          <IconChevronDown size={16} stroke={2.2} />
+                        </motion.span>
+                      </Group>
+                    </Group>
                   </UnstyledButton>
-                );
-              })}
-            </Box>
-          </Box>
-        </>
+
+                  <AnimatePresence initial={false}>
+                    {open && (
+                      <motion.div
+                        key="detail"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                        style={{ overflow: 'hidden' }}
+                      >
+                        <Box mt={8} p={8} pb={12} pos="relative" style={{ borderRadius: 20, backgroundColor: 'var(--mantine-color-hueso-1)' }}>
+                          <ParticleBurst burstKey={burst} top={20} left={40} />
+                          <MealSummary macros={item.macros} />
+                          <Box px={4}>
+                            <FoodList foods={item.foods} onMore={goToPlan} />
+                          </Box>
+
+                          {item.log ? (
+                            <Group gap={6} wrap="nowrap" mt={10} px={4}>
+                              <Box style={{ width: 18, height: 18, borderRadius: '50%', flexShrink: 0, display: 'grid', placeItems: 'center', backgroundColor: LIMA }}>
+                                <IconCheck size={11} stroke={3.4} color={BOSQUE} />
+                              </Box>
+                              <Text fz={12} fw={600} c={BOSQUE} truncate style={tabular}>
+                                Registrada a las {formatTime(item.log.takenAt)}
+                                {Number(item.log.calories) > 0 ? ` · ${formatInt(item.log.calories)} kcal en el diario` : ''}
+                              </Text>
+                            </Group>
+                          ) : canLog ? (
+                            <motion.div whileTap={{ scale: 0.97 }} style={{ marginTop: 12, paddingInline: 4 }}>
+                              <Button
+                                fullWidth
+                                radius="xl"
+                                color="lima"
+                                c={BOSQUE}
+                                leftSection={<IconPlus size={16} stroke={2.6} />}
+                                onClick={() => setDraft(draftFromPlan(item, date, isToday))}
+                              >
+                                Registrar {item.nombre.toLowerCase()}
+                              </Button>
+                            </motion.div>
+                          ) : null}
+                        </Box>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </Box>
+              </Box>
+            );
+          })}
+        </Box>
       )}
 
       <MealEditorModal

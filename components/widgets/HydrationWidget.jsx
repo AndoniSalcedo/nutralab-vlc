@@ -130,7 +130,8 @@ export default function HydrationWidget({
       fillColor="blue.0"
       fillWaveColor="blue.1"
       aside={<WidgetAside color={isGoalReached ? 'blue' : 'salvia'}>{percent}%</WidgetAside>}
-      style={{ minHeight: 216 }}
+      // Sin botones (staff) no hace falta reservar alto
+      style={readOnly ? undefined : { minHeight: 216 }}
     >
       <Stack gap="sm" justify="space-between" h="100%">
         <Box style={{ position: 'relative' }}>
@@ -142,21 +143,17 @@ export default function HydrationWidget({
             color={isGoalReached ? 'var(--nutra-lima-dark, #4a6813)' : 'var(--nutra-bosque, #1F2A24)'}
             size={32}
           />
-          <Text
-            fz="xs"
-            c="dimmed"
-            mt={6}
-            lh={1.35}
-            style={{ cursor: 'pointer' }}
-            onClick={goToAnalytics}
-          >
+        </Box>
+
+        {/* Abajo, anclados al pie: la osmolaridad y los botones; arriba queda la cifra con el agua subiendo detrás */}
+        <Stack gap="sm" style={{ position: 'relative' }}>
+          <Text fz="xs" c="dimmed" lh={1.35} style={{ cursor: 'pointer' }} onClick={goToAnalytics}>
             Osmolaridad{' '}
             <Text span inherit fw={700} c={statusColor}>
               {value ? `${formatMetricNumber(value, 0)} mOsm` : '—'}
             </Text>{' '}
             · {statusLabel}
           </Text>
-        </Box>
 
         {!readOnly && (
           <Group gap={6} wrap="nowrap">
@@ -199,6 +196,7 @@ export default function HydrationWidget({
             </Box>
           </Group>
         )}
+        </Stack>
       </Stack>
     </WidgetCard>
   );

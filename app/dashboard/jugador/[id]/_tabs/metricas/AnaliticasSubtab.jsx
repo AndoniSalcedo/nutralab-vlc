@@ -377,7 +377,7 @@ export default function AnaliticasSubtab({ jugador, analiticas: analiticasInicia
         uploading={uploading}
       />
 
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+      <Box py={{ base: 'sm', sm: 'md' }}>
         {sorted.length === 0 ? (
           <Box mt="xl">
             <NothingFound

@@ -4,21 +4,17 @@ import { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Group,
-  Menu,
   Paper,
   SimpleGrid,
   Stack,
   Text,
   Title,
-  UnstyledButton,
 } from '@mantine/core';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 
-import { IconChevronDown, IconCheck } from '@/components/icons3d';
-
 import { calculateByObjective } from '@/lib/metrics/anthropometry';
-import { getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/config/nutrition-days';
+import { getDayTypeLabel, getTeamNutritionDayTypes, PLAYER_OBJECTIVES } from '@/config/nutrition-days';
 import { CLINICAL_TAGS } from '@/config/clinical-tags';
 import { CampoEditable, ComidasEditable, PrepartidoEditable } from '../editable';
 import { latestMetricValue } from '@/lib/metrics/player';
@@ -31,7 +27,7 @@ import { JugadorHeaderCompactMobile } from '@/components/JugadorHeader';
 import PushPromptCard from '@/components/notifications/PushPromptCard';
 import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import { usePlayerDashboard } from '../PlayerDashboardContext';
-import { toDateKey, mondayKeyOf } from '@/lib/dates';
+import { toDateKey } from '@/lib/dates';
 import Reveal from '@/components/motion/Reveal';
 import headerClasses from '../SubtabSectionHeader.module.css';
 import {
@@ -40,14 +36,14 @@ import {
   HydrationWidget,
   StaffMessagesWidget,
   SuplementacionWidget,
-  ComedorWidget,
   EstrategiaWidget,
-  BalanceNutricionalWidget,
   WellnessHexagonWidget,
   PlanHoyWidget,
   MatchDayWidget,
   TeamChallengeWidget,
 } from '@/components/widgets';
+import PerfilHero from '@/components/widgets/PerfilHero';
+import { hasStrategyFor } from '@/components/widgets/EstrategiaWidget';
 
 dayjs.locale('es');
 
@@ -67,7 +63,6 @@ export default function PerfilSubtab({
   evoluciones = [],
   messages = [],
   registrosHidratacion = [],
-  menus = [],
   latestPlan = null,
   readOnly = false,
 }) {
@@ -77,12 +72,6 @@ export default function PerfilSubtab({
   const [mealsReload, setMealsReload] = useState(0);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [editModalOpen, setEditModalOpen] = useState(false);
-
-  // El comedor solo se muestra si ya hay menú generado para la semana del día seleccionado
-  const weekMenus = useMemo(() => {
-    const monday = mondayKeyOf(toDateKey(selectedDate));
-    return menus.filter((m) => String(m.semana).slice(0, 10) === monday);
-  }, [menus, selectedDate]);
 
   const defaultDiaType = 'entreno';
   const [activeDayType, setActiveDayType] = useState(defaultDiaType);
@@ -167,15 +156,24 @@ export default function PerfilSubtab({
     return out;
   }, [weightKg, playerObjective, DAY_TYPES, teamConfig]);
 
-  const currentPlan = plans[activeDayType];
+  // Objetivo del día: el del plan publicado para esa fecha (el mismo que enseña «Plan de hoy») si el tipo de día
+  // coincide; si no hay plan o se mira otro tipo de día, el calculado por peso y objetivo
+  const planDay = useMemo(() => {
+    const plan = sanitizePlanData(latestPlan?.datos, teamConfig);
+    return plan?.dias?.[DAY_KEYS[new Date(selectedDate).getDay()]] || null;
+  }, [latestPlan, teamConfig, selectedDate]);
+  const usePlanTarget = planDay?.tipoDia === activeDayType && Number(planDay?.kcal) > 0;
+  const currentPlan = usePlanTarget
+    ? { kcal: planDay.kcal, protein: planDay.proteina, cho: planDay.hidratos, fat: planDay.grasa }
+    : plans[activeDayType];
 
   const kcal = currentPlan?.kcal || '-';
   const protein = currentPlan?.protein || null;
   const cho = currentPlan?.cho || null;
   const fat = currentPlan?.fat || null;
 
-  const activeIdx = DAY_TYPES.findIndex(d => d.value === activeDayType);
-  const activeDay = DAY_TYPES[activeIdx !== -1 ? activeIdx : 0] || {};
+  // Si el plan usa un tipo de día que no está en la configuración del equipo se muestra su nombre, no el primero de la lista
+  const activeDay = DAY_TYPES.find((d) => d.value === activeDayType) || { value: activeDayType, label: getDayTypeLabel(activeDayType) };
 
   const headerConfig = getSubtabHeader('resumen', 'perfil');
   const HeaderIcon = headerConfig.icon;
@@ -198,6 +196,9 @@ export default function PerfilSubtab({
   }, [registrosHidratacion]);
 
   const semaforo = jugador?.semaforo;
+  const isPlayer = user?.role === 'jugador';
+
+  const showStrategy = hasStrategyFor(jugador, activeDayType);
   return (
     <Stack gap={0}>
       {/* Header Banner: En escritorio conserva la cabecera original; en móvil se muestra la barra compacta de una línea */}
@@ -223,46 +224,6 @@ export default function PerfilSubtab({
               </Box>
             </Group>
 
-            {/* Selector sutil de Tipo de Día (Desktop) */}
-            <Menu shadow="sm" width={160} position="bottom-end" radius="md">
-              <Menu.Target>
-                <UnstyledButton
-                  aria-label="Seleccionar tipo de día"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '5px 12px',
-                    borderRadius: 20,
-                    backgroundColor: 'rgba(108, 112, 90, 0.08)',
-                    fontSize: '12px',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                    transition: 'background-color 0.15s ease',
-                  }}
-                >
-                  <span style={{ fontSize: '7px', color: 'var(--nutra-salvia, #6C705A)' }}>●</span>
-                  <Text size="xs" fw={500} c="var(--nutra-bosque, #1F2A24)">{activeDay.label || 'Día'}</Text>
-                  <IconChevronDown size={12} stroke={2} style={{ color: 'var(--nutra-salvia, #6C705A)' }} />
-                </UnstyledButton>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Label>Tipo de día</Menu.Label>
-                {DAY_TYPES.map((dt) => (
-                  <Menu.Item
-                    key={dt.value}
-                    leftSection={
-                      <span style={{ fontSize: '8px', color: 'var(--nutra-salvia, #6C705A)' }}>●</span>
-                    }
-                    rightSection={dt.value === activeDayType ? <IconCheck size={14} color="var(--nutra-bosque, #1F2A24)" /> : null}
-                    onClick={() => setActiveDayType(dt.value)}
-                    style={{ fontWeight: dt.value === activeDayType ? 600 : 400 }}
-                  >
-                    {dt.label}
-                  </Menu.Item>
-                ))}
-              </Menu.Dropdown>
-            </Menu>
           </Group>
         </Box>
 
@@ -272,32 +233,38 @@ export default function PerfilSubtab({
             jugador={jugador}
             user={user}
             onEdit={() => setEditModalOpen(true)}
-            activeDayType={activeDayType}
-            onDayTypeChange={setActiveDayType}
-            dayTypes={DAY_TYPES}
             // El staff ya ve foto, nombre y «volver» en la barra superior (JugadorStaffBarMobile)
             leading={user?.role !== 'jugador' ? (
               <Group gap="sm" align="center" wrap="nowrap">
-                <HeaderIcon size={28} />
-                <Box style={{ minWidth: 0 }}>
-                  <Title order={3} fw={700} c="var(--nutra-bosque, #1F2A24)" fz={16} lineClamp={1}>{headerConfig.title}</Title>
-                  <Text size="sm" c="var(--nutra-salvia, #6C705A)" lineClamp={1}>
-                    {readOnly ? (headerConfig.subtitleReadOnly || headerConfig.subtitle) : headerConfig.subtitle}
-                  </Text>
-                </Box>
+                <HeaderIcon size={22} />
+                <Title order={3} fw={700} c="var(--nutra-bosque, #1F2A24)" fz={16} lineClamp={1} style={{ minWidth: 0 }}>{headerConfig.title}</Title>
               </Group>
             ) : null}
           />
         </Box>
       </Paper>
 
-      {/* Main Content wrapper: padding horizontal solo en móvil para no pegarse a los bordes */}
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
-        <Stack gap="md">
-          {user?.role === 'jugador' && <PushPromptCard />}
+      <Box py={{ base: 'sm', sm: 'md' }}>
+        {/* Foto del tipo de día con el balance del día encima */}
+        <PerfilHero
+          jugadorId={jugador.id}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          dayTypes={DAY_TYPES}
+          activeDayType={activeDayType}
+          activeDayLabel={activeDay.label}
+          onDayTypeChange={setActiveDayType}
+          consumed={consumed}
+          target={{ kcal, protein, cho, fat }}
+          meals={meals}
+          canLog={isPlayer}
+        />
+
+        <Stack gap="md" mt="md">
+          {isPlayer && <PushPromptCard />}
           {/* Bento: teselas de 1 o 2 columnas; lo urgente arriba, las constantes en pares y el detalle debajo */}
           <Box style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
-            {/* Solo aparece si hay partido hoy o mañana */}
+            {/* Solo aparece el día del partido */}
             <MatchDayWidget jugadorId={jugador.id} style={{ gridColumn: 'span 2' }} />
             <Reveal index={0} style={{ gridColumn: 'span 2' }}>
               <PlanHoyWidget
@@ -307,20 +274,6 @@ export default function PerfilSubtab({
                 loggedMeals={meals}
                 canLog={user?.role === 'jugador'}
                 onMealLogged={() => setMealsReload((n) => n + 1)}
-              />
-            </Reveal>
-
-            <Reveal index={1} style={{ gridColumn: 'span 2' }}>
-              <BalanceNutricionalWidget
-                jugadorId={jugador.id}
-                selectedDate={selectedDate}
-                onDateChange={setSelectedDate}
-                activeDayType={activeDayType}
-                onDayTypeChange={setActiveDayType}
-                dayTypes={DAY_TYPES}
-                consumed={consumed}
-                target={{ kcal, protein, cho, fat }}
-                meals={meals}
               />
             </Reveal>
 
@@ -339,6 +292,7 @@ export default function PerfilSubtab({
               />
             </Reveal>
 
+            {/* Agua y suplementos siempre juntos: así la fila no salta mientras carga la pauta */}
             <Reveal index={4}>
               <HydrationWidget
                 jugadorId={jugador.id}
@@ -365,31 +319,25 @@ export default function PerfilSubtab({
               <TeamChallengeWidget jugadorId={jugador.id} />
             </Reveal>
 
-            <Reveal index={7} style={{ gridColumn: 'span 2' }}>
-              <SweatMetricWidget
-                jugadorId={jugador.id}
-                latestSweat={latestSweat}
-                formatMetricNumber={formatMetricNumber}
-              />
-            </Reveal>
-
-            {weekMenus.length > 0 && (
+            {latestSweat && (
               <Reveal index={8} style={{ gridColumn: 'span 2' }}>
-                <ComedorWidget
+                <SweatMetricWidget
                   jugadorId={jugador.id}
-                  menus={weekMenus}
-                  selectedDate={selectedDate}
+                  latestSweat={latestSweat}
+                  formatMetricNumber={formatMetricNumber}
                 />
               </Reveal>
             )}
 
-            <Reveal index={9} style={{ gridColumn: 'span 2' }}>
-              <EstrategiaWidget
-                jugador={jugador}
-                activeDayType={activeDayType}
-                activeDayLabel={activeDay?.label || 'Día activo'}
-              />
-            </Reveal>
+            {showStrategy && (
+              <Reveal index={10} style={{ gridColumn: 'span 2' }}>
+                <EstrategiaWidget
+                  jugador={jugador}
+                  activeDayType={activeDayType}
+                  activeDayLabel={activeDay.label || 'Día activo'}
+                />
+              </Reveal>
+            )}
           </Box>
 
           {/* =========================================================================

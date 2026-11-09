@@ -12,7 +12,7 @@ import { setTeamKickoff } from '@/repositories/scheduledMatchRepository';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-/** Línea de tiempo del día de partido del jugador (él mismo o staff con acceso). null si no hay partido. */
+/** Línea de tiempo del día de partido del jugador (él mismo o staff con acceso). null si no hay partido hoy. */
 export async function getMatchDay(jugadorId) {
   if (!jugadorId) throw new ActionError('Falta jugador');
   const user = await getUser();
@@ -25,7 +25,7 @@ export async function getMatchDay(jugadorId) {
     throw new ActionError('No tienes acceso a este jugador');
   }
 
-  return buildPlayerMatchDay(db, jugadorId);
+  return buildPlayerMatchDay(db, jugadorId, new Date(), { todayOnly: true });
 }
 
 /** Próximos días de partido del equipo (según los planes de sus jugadores) y su hora fijada. */

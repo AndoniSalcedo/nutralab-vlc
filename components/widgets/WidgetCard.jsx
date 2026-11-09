@@ -21,6 +21,9 @@ export default function WidgetCard({
   fillPercent,
   fillColor = 'blue.0',
   fillWaveColor,
+  // Ilustración 3D que asoma por la esquina superior derecha (solo decorativa)
+  illustration,
+  illustrationSize = 58,
   children,
   style,
   ...props
@@ -47,6 +50,15 @@ export default function WidgetCard({
       {...props}
     >
       {fillPercent !== undefined && <WaterFill percent={fillPercent} color={fillColor} waveColor={fillWaveColor} />}
+
+      {illustration && (
+        <Box
+          aria-hidden
+          style={{ position: 'absolute', right: -6, top: -6, transform: 'rotate(12deg)', pointerEvents: 'none', opacity: 0.95 }}
+        >
+          <Icon3D name={illustration} size={illustrationSize} force3d />
+        </Box>
+      )}
 
       {(title || aside) && (
         <Group justify="space-between" align="center" wrap="nowrap" gap="xs" style={{ position: 'relative' }}>

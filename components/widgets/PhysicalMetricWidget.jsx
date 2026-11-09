@@ -98,6 +98,7 @@ export default function PhysicalMetricWidget({
           color="salvia"
           icon="gym"
           title="Físico"
+          illustration="balance_scale"
           onClick={() => router.push(`/dashboard/jugador/${jugadorId}/metricas/pesos`)}
         >
           <Text fz={24} fw={800} c="var(--nutra-bosque, #1F2A24)" lh={1.1} style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>

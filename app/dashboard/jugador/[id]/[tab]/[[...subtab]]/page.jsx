@@ -87,14 +87,13 @@ export default async function JugadorTabPage({ params }) {
   let jugador = rawJugador;
 
   try {
-    // Solo el perfil usa mediciones, menús y plan; Diario no usa nada de esto y Mensajes solo los mensajes.
+    // Solo el perfil usa mediciones y plan; Diario no usa nada de esto y Mensajes solo los mensajes.
     // Cambiar de subpestaña vuelve a pasar por aquí, así que no se carga lo que no se va a pintar.
     if (activeTab === 'resumen' && activeSubtab === 'perfil') {
-      const [resEvoluciones, resPesajes, resHidratacion, resMenus, resPlan, resMessages] = await Promise.all([
+      const [resEvoluciones, resPesajes, resHidratacion, resPlan, resMessages] = await Promise.all([
         getEvolutionsByPlayerId(db, id),
         getPesajesByPlayerId(db, id),
         getHydrationRecordsByPlayerId(db, id),
-        rawJugador?.equipo_id ? getMenusByTeamLimit(db, rawJugador.equipo_id, null, 10) : [],
         // El plan es opcional para el resumen: si falla, el widget muestra su estado vacío.
         // Solo el semanal: el plan de hoy sale del día de la semana.
         getLatestAiPlanByPlayerId(db, id, { modo: PLAN_MODES.SEMANA }).catch(() => null),
@@ -103,7 +102,6 @@ export default async function JugadorTabPage({ params }) {
       evoluciones = resEvoluciones;
       pesajes = resPesajes;
       registrosHidratacion = resHidratacion;
-      menus = resMenus || [];
       latestPlan = resPlan;
       messages = resMessages;
       jugador = withLatestMeasurement(rawJugador, evoluciones, pesajes);

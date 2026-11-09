@@ -21,15 +21,15 @@ const VISIBLE_AFTER_KICKOFF_MS = 3 * 60 * 60 * 1000;
  * Próximo partido de hoy o mañana. El último plan semanal del jugador decide si juega (día «partido») y
  * con qué horario; la hora es la que el staff fijó para esa fecha en Partidos o, si no, la orientativa.
  */
-async function resolveUpcomingMatch(db, jugador, now = new Date()) {
+async function resolveUpcomingMatch(db, jugador, now = new Date(), { todayOnly = false } = {}) {
   const today = toDateKey(now);
-  const tomorrow = shiftDateKey(today, 1);
+  const tomorrow = todayOnly ? today : shiftDateKey(today, 1);
   const plan = await getLatestAiPlanByPlayerId(db, jugador.id, { modo: PLAN_MODES.SEMANA }).catch(() => null);
   const dias = plan?.datos?.dias || {};
   if (![today, tomorrow].some((fecha) => dias[weekdayKey(fecha)]?.tipoDia === 'partido')) return null;
 
   const kickoffs = await getTeamKickoffsBetween(db, jugador.equipo_id, today, tomorrow).catch(() => []);
-  for (const fecha of [today, tomorrow]) {
+  for (const fecha of [...new Set([today, tomorrow])]) {
     const dayKey = weekdayKey(fecha);
     if (dias[dayKey]?.tipoDia !== 'partido') continue;
     const teamKickoff = kickoffs.find((k) => k.fecha === fecha)?.hora;
@@ -41,12 +41,15 @@ async function resolveUpcomingMatch(db, jugador, now = new Date()) {
   return null;
 }
 
-/** Todo lo que necesita la vista del día de partido, o null si no hay partido hoy ni mañana. */
-export async function buildPlayerMatchDay(db, jugadorId, now = new Date()) {
+/**
+ * Todo lo que necesita la vista del día de partido, o null si no hay partido hoy ni mañana.
+ * Con `todayOnly` solo cuenta el partido de hoy (el perfil no lo muestra la víspera; los avisos sí lo necesitan).
+ */
+export async function buildPlayerMatchDay(db, jugadorId, now = new Date(), { todayOnly = false } = {}) {
   const raw = await getPlayerWithTeamConfig(db, jugadorId).catch(() => null);
   if (!raw) return null;
 
-  const match = await resolveUpcomingMatch(db, raw, now);
+  const match = await resolveUpcomingMatch(db, raw, now, { todayOnly });
   if (!match) return null;
 
   const [evoluciones, pesajes, registrosHidratacion, historialIntrapartido] = await Promise.all([

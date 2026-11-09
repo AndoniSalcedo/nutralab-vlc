@@ -36,11 +36,10 @@ function countdown(kickoff, now) {
   const minutes = Math.round(diff / 60000);
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  if (h >= 24) return `Mañana ${timeFmt.format(new Date(kickoff))}`;
   return h ? `Faltan ${h} h ${m} min` : `Faltan ${m} min`;
 }
 
-/** Plan del día de partido por horas. No pinta nada si no hay partido hoy ni mañana. */
+/** Plan del día de partido por horas. Solo aparece el mismo día del partido. */
 export default function MatchDayWidget({ jugadorId, style }) {
   const [data, setData] = useState(null);
   const [now, setNow] = useState(null);
@@ -60,15 +59,21 @@ export default function MatchDayWidget({ jugadorId, style }) {
     return () => clearInterval(id);
   }, []);
 
+  // Solo los pasos del propio día: los de la víspera ya pasaron cuando se muestra el widget
+  const steps = useMemo(
+    () => (data ? data.steps.filter((step) => dayKeyFmt(step.at) === dayKeyFmt(data.kickoff)) : []),
+    [data]
+  );
+
   const activeIndex = useMemo(() => {
-    if (!data || !now) return -1;
+    if (!now) return -1;
     let idx = -1;
-    data.steps.forEach((step, i) => { if (new Date(step.at) <= now) idx = i; });
+    steps.forEach((step, i) => { if (new Date(step.at) <= now) idx = i; });
     return idx;
-  }, [data, now]);
+  }, [steps, now]);
 
   if (!data) return null;
-  const { match, kickoff, steps } = data;
+  const { match, kickoff } = data;
 
   return (
     <WidgetCard
