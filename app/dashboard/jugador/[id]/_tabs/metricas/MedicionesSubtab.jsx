@@ -244,6 +244,33 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
     setForm((current) => ({ ...current, [field]: value }));
   }
 
+  // Medición inmediatamente anterior a la fecha del formulario (sin filtros de
+  // temporada/fechas y excluyendo la que se está editando)
+  const previousMedicion = useMemo(() => {
+    if (!modalMode) return null;
+    return evoluciones
+      .filter((e) => String(e.id) !== String(form.id) && (!form.fecha || String(e.fecha) < form.fecha))
+      .sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)))[0] || null;
+  }, [modalMode, evoluciones, form.id, form.fecha]);
+
+  // Copia los valores de la medición anterior solo en los campos vacíos,
+  // para no pisar lo que ya se haya escrito
+  function fillFromPrevious() {
+    if (!previousMedicion) return;
+    const previous = formFromMedicion(previousMedicion);
+    setForm((current) => {
+      const next = { ...current };
+      MEASUREMENT_DETAIL_SECTIONS.forEach((section) => {
+        section.fields.forEach((field) => {
+          if (!hasMetricValue(current[field.key]) && hasMetricValue(previous[field.key])) {
+            next[field.key] = previous[field.key];
+          }
+        });
+      });
+      return next;
+    });
+  }
+
   function diff(metric) {
     const metricData = sortedAsc
       .map((item) => ({ ...item, value: metricValue(item, metric) }))
@@ -486,11 +513,13 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
         modalMode={modalMode}
         form={form}
         updateFormField={updateFormField}
+        previous={previousMedicion}
+        onFillFromPrevious={fillFromPrevious}
         handleSave={handleSave}
         saving={saving}
       />
 
-      <Box py={{ base: 'sm', sm: 'md' }} px={{ base: 'sm', sm: 0 }}>
+      <Box py={{ base: 'sm', sm: 'md' }}>
         {sortedAsc.length === 0 ? (
           <Box mt="xl">
             <NothingFound

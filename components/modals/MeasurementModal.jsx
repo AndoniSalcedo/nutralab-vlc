@@ -12,8 +12,23 @@ import {
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import Icon3D from '@/components/Icon3D';
-import { MEASUREMENT_DETAIL_SECTIONS } from '@/lib/metrics/measurements';
+import { IconHistory } from '@/components/icons3d';
+import {
+  MEASUREMENT_DETAIL_SECTIONS,
+  formatMetricValue,
+  hasMetricValue,
+  metricValue,
+} from '@/lib/metrics/measurements';
 import ResponsiveModal from './ResponsiveModal';
+
+function fechaLabel(fecha) {
+  if (!fecha) return 'Sin fecha';
+  return new Date(`${fecha}T00:00:00`).toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
 
 function dateValue(value) {
   return value ? new Date(`${value}T00:00:00`) : null;
@@ -35,9 +50,21 @@ export default function MeasurementModal({
   modalMode,
   form,
   updateFormField,
+  previous = null,
+  onFillFromPrevious,
   handleSave,
   saving
 }) {
+  const previousValue = (field) => (previous ? metricValue(previous, field) : null);
+
+  // Campos vacíos que se rellenarían con la medición anterior
+  const fillableCount = MEASUREMENT_DETAIL_SECTIONS.reduce(
+    (total, section) => total + section.fields.filter(
+      (field) => !hasMetricValue(form[field.key]) && hasMetricValue(previousValue(field))
+    ).length,
+    0
+  );
+
   return (
     <ResponsiveModal
       // Formulario de captura: un clic fuera no debe descartar lo escrito
@@ -73,6 +100,29 @@ export default function MeasurementModal({
 
         <Divider my="xs" label="Métricas del Jugador" labelPosition="center" />
 
+        {previous ? (
+          <Group justify="space-between" gap="xs">
+            <Text size="sm" c="dimmed">
+              Medición anterior: <Text span fw={600} c="dark.5">{fechaLabel(previous.fecha)}</Text>
+            </Text>
+            <Button
+              size="xs"
+              radius="xl"
+              variant="light"
+              color="bosque"
+              leftSection={<IconHistory size={14} />}
+              onClick={onFillFromPrevious}
+              disabled={fillableCount === 0 || saving}
+            >
+              Rellenar con la anterior
+            </Button>
+          </Group>
+        ) : (
+          <Text size="sm" c="dimmed">
+            No hay mediciones anteriores a esta fecha.
+          </Text>
+        )}
+
         <ScrollArea.Autosize mah="50vh" offsetScrollbars>
           <Stack gap="xl" pr="xs">
             {MEASUREMENT_DETAIL_SECTIONS.map((section) => (
@@ -85,6 +135,7 @@ export default function MeasurementModal({
                     <TextInput
                       key={field.key}
                       label={`${field.label}${field.unit ? ` (${field.unit})` : ''}`}
+                      description={previous ? `Anterior: ${formatMetricValue(previousValue(field), field.unit)}` : undefined}
                       inputMode="decimal"
                       value={form[field.key] ?? ''}
                       onChange={(e) => updateFormField(field.key, e.target.value)}
