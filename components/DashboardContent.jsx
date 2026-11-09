@@ -27,6 +27,7 @@ import PlayerEditModal from '@/components/modals/PlayerEditModal';
 import SquadReportModal from '@/components/modals/SquadReportModal';
 import SquadReportReviewModal from '@/components/modals/SquadReportReviewModal';
 import SquadWeightModal from '@/components/modals/SquadWeightModal';
+import SquadMeasurementModal from '@/components/modals/SquadMeasurementModal';
 import IntrapartidoModal from '@/components/modals/IntrapartidoModal';
 import BoneyardSkeleton from '@/components/bones/BoneyardSkeleton';
 import TeamTecnicosConfig from '@/components/TeamTecnicosConfig';
@@ -840,6 +841,14 @@ export default function DashboardContent({ players = [], team, readOnly = false 
       >
         Registrar pesajes
       </Menu.Item>
+      {!readOnly && (
+        <Menu.Item
+          leftSection={<Icon3D name="ruler" size={20} />}
+          onClick={() => setActiveModal('measurements')}
+        >
+          Registrar mediciones
+        </Menu.Item>
+      )}
       <Menu.Item
         leftSection={<Icon3D name="droplet" size={20} />}
         onClick={() => setActiveModal('intrapartido')}
@@ -1264,6 +1273,15 @@ export default function DashboardContent({ players = [], team, readOnly = false 
           players={playersState}
           team={team}
         />
+
+        {!readOnly && (
+          <SquadMeasurementModal
+            opened={activeModal === 'measurements'}
+            onClose={closeModal}
+            players={playersState}
+            team={team}
+          />
+        )}
 
         <IntrapartidoModal
           opened={activeModal === 'intrapartido'}

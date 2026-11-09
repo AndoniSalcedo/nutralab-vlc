@@ -3,8 +3,10 @@
 import { revalidatePath } from 'next/cache';
 import { getDb } from '@/lib/db/prisma';
 import { getUser } from '@/lib/auth/session';
-import { getOwnedPlayer } from '@/lib/auth/team-access';
+import { getOwnedPlayer, getOwnedTeam } from '@/lib/auth/team-access';
+import { getPlayersByTeamSelect } from '@/repositories/playerRepository';
 import {
+  getEvolutionsByPlayerIds,
   getEvolutionById,
   updateEvolution,
   upsertEvolution,
@@ -56,6 +58,25 @@ const EVOLUTION_FIELDS = [
   'notas'
 ];
 
+
+/**
+ * Mediciones completas de toda la plantilla, para el registro jugador a jugador desde el equipo
+ * (la medición anterior de cada uno y la del día si ya existe). Mismos permisos que guardar.
+ */
+export async function getTeamEvolutions(teamId) {
+  if (!teamId) throw new ActionError('Falta el equipo');
+  const db = getDb();
+  const user = await getUser();
+  if (!user || user.role === 'jugador' || user.role === 'tecnico') {
+    throw new ActionError('No autorizado');
+  }
+  const team = await getOwnedTeam(db, user, teamId);
+  if (!team) throw new ActionError('No tienes acceso a este equipo');
+
+  const players = await getPlayersByTeamSelect(db, team.id, 'id');
+  const ids = (players || []).map((p) => p.id);
+  return ids.length ? getEvolutionsByPlayerIds(db, ids) : [];
+}
 
 export async function saveEvolution(body) {
   const { id, jugador_id, fecha } = body || {};

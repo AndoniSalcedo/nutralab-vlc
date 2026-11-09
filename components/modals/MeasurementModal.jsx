@@ -1,34 +1,17 @@
 import React from 'react';
 import {
+  Box,
   Group,
   Text,
   Stack,
-  SimpleGrid,
-  TextInput,
-  Textarea,
   Button,
   ScrollArea,
   Divider
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import Icon3D from '@/components/Icon3D';
-import { IconHistory } from '@/components/icons3d';
-import {
-  MEASUREMENT_DETAIL_SECTIONS,
-  formatMetricValue,
-  hasMetricValue,
-  metricValue,
-} from '@/lib/metrics/measurements';
+import MeasurementFields from '@/components/measurements/MeasurementFields';
 import ResponsiveModal from './ResponsiveModal';
-
-function fechaLabel(fecha) {
-  if (!fecha) return 'Sin fecha';
-  return new Date(`${fecha}T00:00:00`).toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
 
 function dateValue(value) {
   return value ? new Date(`${value}T00:00:00`) : null;
@@ -55,16 +38,6 @@ export default function MeasurementModal({
   handleSave,
   saving
 }) {
-  const previousValue = (field) => (previous ? metricValue(previous, field) : null);
-
-  // Campos vacíos que se rellenarían con la medición anterior
-  const fillableCount = MEASUREMENT_DETAIL_SECTIONS.reduce(
-    (total, section) => total + section.fields.filter(
-      (field) => !hasMetricValue(form[field.key]) && hasMetricValue(previousValue(field))
-    ).length,
-    0
-  );
-
   return (
     <ResponsiveModal
       // Formulario de captura: un clic fuera no debe descartar lo escrito
@@ -100,64 +73,16 @@ export default function MeasurementModal({
 
         <Divider my="xs" label="Métricas del Jugador" labelPosition="center" />
 
-        {previous ? (
-          <Group justify="space-between" gap="xs">
-            <Text size="sm" c="dimmed">
-              Medición anterior: <Text span fw={600} c="dark.5">{fechaLabel(previous.fecha)}</Text>
-            </Text>
-            <Button
-              size="xs"
-              radius="xl"
-              variant="light"
-              color="bosque"
-              leftSection={<IconHistory size={14} />}
-              onClick={onFillFromPrevious}
-              disabled={fillableCount === 0 || saving}
-            >
-              Rellenar con la anterior
-            </Button>
-          </Group>
-        ) : (
-          <Text size="sm" c="dimmed">
-            No hay mediciones anteriores a esta fecha.
-          </Text>
-        )}
-
         <ScrollArea.Autosize mah="50vh" offsetScrollbars>
-          <Stack gap="xl" pr="xs">
-            {MEASUREMENT_DETAIL_SECTIONS.map((section) => (
-              <Stack gap="xs" key={section.title}>
-                <Text fw={700} size="sm" c="dark.5" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', paddingBottom: 4 }}>
-                  {section.title}
-                </Text>
-                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-                  {section.fields.map((field) => (
-                    <TextInput
-                      key={field.key}
-                      label={`${field.label}${field.unit ? ` (${field.unit})` : ''}`}
-                      description={previous ? `Anterior: ${formatMetricValue(previousValue(field), field.unit)}` : undefined}
-                      inputMode="decimal"
-                      value={form[field.key] ?? ''}
-                      onChange={(e) => updateFormField(field.key, e.target.value)}
-                    />
-                  ))}
-                </SimpleGrid>
-              </Stack>
-            ))}
-
-            <Stack gap="xs">
-              <Text fw={700} size="sm" c="dark.5" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)', paddingBottom: 4 }}>
-                Otros
-              </Text>
-              <Textarea
-                label="Notas"
-                placeholder="Observaciones de la medición..."
-                value={form.notas || ''}
-                onChange={(e) => updateFormField('notas', e.target.value)}
-                minRows={2}
-              />
-            </Stack>
-          </Stack>
+          <Box pr="xs">
+            <MeasurementFields
+              form={form}
+              updateFormField={updateFormField}
+              previous={previous}
+              onFillFromPrevious={onFillFromPrevious}
+              disabled={saving}
+            />
+          </Box>
         </ScrollArea.Autosize>
 
         <Divider my="xs" />

@@ -57,6 +57,11 @@ import ConfirmModal from '@/components/modals/ConfirmModal';
 import {
   MEASUREMENT_DETAIL_SECTIONS,
   TREND_MEASUREMENT_METRICS,
+  buildMeasurementPayload,
+  emptyMeasurementForm,
+  fillEmptyFromPrevious,
+  formFromMeasurement,
+  previousMeasurement,
   formatMetricValue,
   hasMetricValue,
   metricValue,
@@ -64,7 +69,6 @@ import {
   formatMetricNumber,
 } from '@/lib/metrics/measurements';
 import { notifySaved } from '@/components/motion/notifySaved';
-import { toNumber as parseDecimal } from '@/lib/utils';
 import { errorMessage } from '@/lib/actionError';
 import { formatDecimal } from '@/lib/utils';
 
@@ -88,34 +92,6 @@ function dateInputToIso(value) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
-}
-
-function emptyForm() {
-  const form = {
-    id: null,
-    fecha: todayKey(),
-    notas: '',
-  };
-  MEASUREMENT_DETAIL_SECTIONS.forEach((section) => {
-    section.fields.forEach((field) => {
-      form[field.key] = '';
-    });
-  });
-  return form;
-}
-
-function formFromMedicion(medicion) {
-  const form = {
-    id: medicion?.id || null,
-    fecha: medicion?.fecha || todayKey(),
-    notas: medicion?.notas || '',
-  };
-  MEASUREMENT_DETAIL_SECTIONS.forEach((section) => {
-    section.fields.forEach((field) => {
-      form[field.key] = medicion ? (metricValue(medicion, field) ?? '') : '';
-    });
-  });
-  return form;
 }
 
 // "2026-10-05" -> "5/10" para los ejes de las gráficas
@@ -177,7 +153,7 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState(() => emptyMeasurementForm(todayKey()));
 
   const seasons = useMemo(() => {
     const list = Array.from(new Set(evoluciones.map(e => getSeason(e.fecha)).filter(Boolean))).sort().reverse();
@@ -227,13 +203,13 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
 
   function startNew() {
     setModalMode('new');
-    setForm(emptyForm());
+    setForm(emptyMeasurementForm(todayKey()));
   }
 
   function startEdit() {
     if (!selected) return;
     setModalMode('edit');
-    setForm(formFromMedicion(selected));
+    setForm(formFromMeasurement(selected, todayKey()));
   }
 
   function cancelForm() {
@@ -246,29 +222,14 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
 
   // Medición inmediatamente anterior a la fecha del formulario (sin filtros de
   // temporada/fechas y excluyendo la que se está editando)
-  const previousMedicion = useMemo(() => {
-    if (!modalMode) return null;
-    return evoluciones
-      .filter((e) => String(e.id) !== String(form.id) && (!form.fecha || String(e.fecha) < form.fecha))
-      .sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)))[0] || null;
-  }, [modalMode, evoluciones, form.id, form.fecha]);
+  const previousMedicion = useMemo(
+    () => (modalMode ? previousMeasurement(evoluciones, form.fecha, form.id) : null),
+    [modalMode, evoluciones, form.fecha, form.id]
+  );
 
-  // Copia los valores de la medición anterior solo en los campos vacíos,
-  // para no pisar lo que ya se haya escrito
+  // Copia la medición anterior solo en los campos vacíos, para no pisar lo ya escrito
   function fillFromPrevious() {
-    if (!previousMedicion) return;
-    const previous = formFromMedicion(previousMedicion);
-    setForm((current) => {
-      const next = { ...current };
-      MEASUREMENT_DETAIL_SECTIONS.forEach((section) => {
-        section.fields.forEach((field) => {
-          if (!hasMetricValue(current[field.key]) && hasMetricValue(previous[field.key])) {
-            next[field.key] = previous[field.key];
-          }
-        });
-      });
-      return next;
-    });
+    setForm((current) => fillEmptyFromPrevious(current, previousMedicion));
   }
 
   function diff(metric) {
@@ -295,44 +256,8 @@ export default function MedicionesSubtab({ jugador, evoluciones: evolucionesInic
     if (readOnly) return;
     setSaving(true);
     try {
-      const payload = {
-        jugador_id: jugadorId,
-        id: form.id,
-        fecha: form.fecha,
-        notas: form.notas,
-      };
-
-      MEASUREMENT_DETAIL_SECTIONS.forEach((section) => {
-        section.fields.forEach((field) => {
-          const val = form[field.key];
-          // Acepta coma decimal («72,5»); Number() daba NaN
-          payload[field.key] = val !== '' && val !== null && val !== undefined ? parseDecimal(val, { zeroAsNull: false }) : null;
-        });
-      });
-
-      // Synchronize fat, muscle and lean mass
-      if (payload.peso_graso !== null && payload.peso_kg !== null && payload.peso_kg > 0 && payload.porcentaje_grasa === null) {
-        payload.porcentaje_grasa = Number(((payload.peso_graso / payload.peso_kg) * 100).toFixed(2));
-      } else if (payload.porcentaje_grasa !== null && payload.peso_kg !== null && payload.peso_graso === null) {
-        payload.peso_graso = Number((payload.peso_kg * (payload.porcentaje_grasa / 100)).toFixed(2));
-      }
-
-      if (payload.porcentaje_grasa !== null) {
-        payload.porcentaje_grasa_faulkner = payload.porcentaje_grasa;
-      }
-
-      if (payload.porcentaje_musculo !== null && payload.peso_kg !== null && payload.peso_muscular === null) {
-        payload.peso_muscular = Number((payload.peso_kg * (payload.porcentaje_musculo / 100)).toFixed(2));
-      } else if (payload.peso_muscular !== null && payload.peso_kg !== null && payload.peso_kg > 0 && payload.porcentaje_musculo === null) {
-        payload.porcentaje_musculo = Number(((payload.peso_muscular / payload.peso_kg) * 100).toFixed(2));
-      }
-
-      // Autocalculate peso_magro (lean mass = peso - grasa)
-      if (payload.peso_kg !== null && payload.porcentaje_grasa !== null) {
-        payload.peso_magro = Number((payload.peso_kg * (1 - payload.porcentaje_grasa / 100)).toFixed(2));
-      } else if (payload.peso_kg !== null && payload.peso_graso !== null) {
-        payload.peso_magro = Number((payload.peso_kg - payload.peso_graso).toFixed(2));
-      }
+      // Números con coma o punto y campos derivados (peso graso, masa muscular, peso magro)
+      const payload = { ...buildMeasurementPayload(form), jugador_id: jugadorId };
 
       const data = await saveEvolution(payload);
 
